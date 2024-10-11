@@ -99,7 +99,6 @@ export default class OylProvider extends WalletProvider {
             }
         });
         this.observer.observe(document, { childList: true, subtree: true });
-
     }
 
     dispose() {
