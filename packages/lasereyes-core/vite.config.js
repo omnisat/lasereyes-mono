@@ -10,5 +10,10 @@ export default defineConfig({
       name: "LaserEyes",
       fileName: "index",
     },
+    rollupOptions: {
+      output: {
+        banner: "'use client';"
+      }
+    }
   },
 });

@@ -22,7 +22,7 @@ export default class UnisatProvider extends WalletProvider {
   observer?: MutationObserver;
 
   initialize() {
-    this.observer = new MutationObserver(() => {
+    this.observer = new window.MutationObserver(() => {
       if (this.library) {
         this.$store.setKey("hasProvider", {
           ...this.$store.get().hasProvider,
@@ -51,8 +51,14 @@ export default class UnisatProvider extends WalletProvider {
   }
 
   removeListeners() {
-    this.library.removeListener("accountsChanged", this.handleAccountsChanged.bind(this));
-    this.library.removeListener("networkChanged", this.handleNetworkChanged.bind(this));
+    this.library.removeListener(
+      "accountsChanged",
+      this.handleAccountsChanged.bind(this)
+    );
+    this.library.removeListener(
+      "networkChanged",
+      this.handleNetworkChanged.bind(this)
+    );
   }
 
   dispose() {
@@ -141,7 +147,10 @@ export default class UnisatProvider extends WalletProvider {
   }
   async pushPsbt(tx: string): Promise<string | undefined> {
     return await axios
-      .post(`${getMempoolSpaceUrl(this.network as Exclude<"testnet4", NetworkType>)}/api/tx`, tx)
+      .post(
+        `${getMempoolSpaceUrl(this.network as Exclude<"testnet4", NetworkType>)}/api/tx`,
+        tx
+      )
       .then((res) => res.data);
   }
 

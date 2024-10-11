@@ -13,6 +13,10 @@
     ".": {
       "import": "./dist/index.js",
       "require": "./dist/index.umd.cjs"
+    },
+    "./react": {
+      "import": "./dist/react/index.js",
+      "require": "./dist/react/index.umd.cjs"
     }
   },
   "scripts": {

@@ -1,5 +1,10 @@
 import * as bitcoin from "bitcoinjs-lib";
-import { GetAddressOptions, RpcErrorCode, getAddress, request } from "sats-connect";
+import {
+  GetAddressOptions,
+  RpcErrorCode,
+  getAddress,
+  request,
+} from "sats-connect";
 import { UNSUPPORTED_PROVIDER_METHOD_ERROR, WalletProvider } from ".";
 import {
   ProviderType,
@@ -72,7 +77,10 @@ export default class XVerseProvider extends WalletProvider {
       if (changedKey === "balance") {
         this.$valueStore.setKey("balance", newState.balance?.toString() ?? "");
       } else if ((keysToPersist as readonly string[]).includes(changedKey)) {
-        this.$valueStore.setKey(changedKey as PersistedKey, newState[changedKey]?.toString() ?? "");
+        this.$valueStore.setKey(
+          changedKey as PersistedKey,
+          newState[changedKey]?.toString() ?? ""
+        );
       }
     }
   }
@@ -92,11 +100,13 @@ export default class XVerseProvider extends WalletProvider {
           this.removeSubscriber = undefined;
         }
       } else {
-        this.removeSubscriber = this.$store.subscribe(this.watchStateChange.bind(this));
+        this.removeSubscriber = this.$store.subscribe(
+          this.watchStateChange.bind(this)
+        );
       }
     });
 
-    this.observer = new MutationObserver(() => {
+    this.observer = new window.MutationObserver(() => {
       const xverseLib = (window as any)?.XverseProviders?.BitcoinProvider;
       if (xverseLib) {
         this.$store.setKey("hasProvider", {
@@ -141,12 +151,20 @@ export default class XVerseProvider extends WalletProvider {
             this.$store.setKey("address", foundAddress.address);
             this.$store.setKey("paymentAddress", foundPaymentAddress.address);
           }
-          this.$store.setKey("publicKey", String(response.addresses[0].publicKey));
-          this.$store.setKey("paymentPublicKey", String(response.addresses[1].publicKey));
+          this.$store.setKey(
+            "publicKey",
+            String(response.addresses[0].publicKey)
+          );
+          this.$store.setKey(
+            "paymentPublicKey",
+            String(response.addresses[1].publicKey)
+          );
 
-          getBTCBalance(foundPaymentAddress.address, this.network).then((totalBalance) => {
-            this.$store.setKey("balance", totalBalance);
-          });
+          getBTCBalance(foundPaymentAddress.address, this.network).then(
+            (totalBalance) => {
+              this.$store.setKey("balance", totalBalance);
+            }
+          );
         },
         onCancel: () => {
           throw new Error(`User canceled lasereyes to ${XVERSE} wallet`);
@@ -209,7 +227,10 @@ export default class XVerseProvider extends WalletProvider {
       }
     }
   }
-  async signMessage(message: string, toSignAddress?: string | undefined): Promise<string> {
+  async signMessage(
+    message: string,
+    toSignAddress?: string | undefined
+  ): Promise<string> {
     const tempAddy = toSignAddress || this.$store.get().paymentAddress;
     const response = await request("signMessage", {
       address: tempAddy,
@@ -302,9 +323,12 @@ export default class XVerseProvider extends WalletProvider {
         if (response.txId) {
           txId = response.txId;
         } else if (response.psbtBase64) {
-          const signedPsbt = bitcoin.Psbt.fromBase64(String(response.psbtBase64), {
-            network: getBitcoinNetwork(this.network),
-          });
+          const signedPsbt = bitcoin.Psbt.fromBase64(
+            String(response.psbtBase64),
+            {
+              network: getBitcoinNetwork(this.network),
+            }
+          );
 
           signedPsbtHex = signedPsbt.toHex();
           signedPsbtBase64 = signedPsbt.toBase64();
