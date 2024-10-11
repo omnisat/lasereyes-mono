@@ -445,9 +445,6 @@ const App = ({
             setSignedPsbt={setSignedPsbt}
           />
         ))}
-
-        {/*<PollCard />*/}
-        {/*<div className={'grow'} />*/}
       </div>
     </div>
   )

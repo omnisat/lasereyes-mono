@@ -52,7 +52,7 @@ export class WizzProvider extends WalletProvider {
       }
     });
 
-    this.observer = new MutationObserver(() => {
+    this.observer = new window.MutationObserver(() => {
       if (this.library) {
         this.$store.setKey("hasProvider", {
           ...this.$store.get().hasProvider,
@@ -64,8 +64,14 @@ export class WizzProvider extends WalletProvider {
     this.observer.observe(document, { childList: true, subtree: true });
   }
   private removeLibraryListeners() {
-    this.library?.removeListener("networkChanged", this.handleNetworkChanged.bind(this));
-    this.library?.removeListener("accountsChanged", this.handleAccountsChanged.bind(this));
+    this.library?.removeListener(
+      "networkChanged",
+      this.handleNetworkChanged.bind(this)
+    );
+    this.library?.removeListener(
+      "accountsChanged",
+      this.handleAccountsChanged.bind(this)
+    );
   }
 
   private addLibraryListeners() {
@@ -123,7 +129,8 @@ export class WizzProvider extends WalletProvider {
   }
 
   async getBalance(): Promise<string | number | bigint> {
-    const balanceResponse: WizzBalanceResponse = await this.library.getBalance();
+    const balanceResponse: WizzBalanceResponse =
+      await this.library.getBalance();
     return balanceResponse.total;
   }
 

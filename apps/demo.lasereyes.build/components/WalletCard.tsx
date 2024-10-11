@@ -1,3 +1,5 @@
+'use client'
+
 import {
   MAGIC_EDEN,
   MAINNET,
@@ -19,7 +21,7 @@ import {
 
 const ORANGE = 'orange'
 
-import { useLaserEyes } from "@omnisat/lasereyes-react"
+import { useLaserEyes } from '@omnisat/lasereyes-react'
 import {
   Card,
   CardContent,
@@ -56,7 +58,7 @@ const WalletCard = ({
     | typeof LEATHER
     | typeof PHANTOM
     | typeof WIZZ
-    // | typeof ORANGE
+  // | typeof ORANGE
   setSignature: (signature: string) => void
   unsignedPsbt: string | undefined
   setUnsignedPsbt: (psbt: string) => void
@@ -89,7 +91,7 @@ const WalletCard = ({
     hasLeather,
     hasPhantom,
     hasWizz,
-    hasOrange,
+    // hasOrange,
     sendBTC,
     signMessage,
     signPsbt,
@@ -124,7 +126,7 @@ const WalletCard = ({
     leather: hasLeather,
     phantom: hasPhantom,
     wizz: hasWizz,
-    orange: hasOrange,
+    orange: false,
   }
 
   useEffect(() => {

@@ -6,9 +6,8 @@ import {
   SIGNET,
   TESTNET,
   TESTNET4,
-  LaserEyesProvider
+  LaserEyesProvider,
 } from '@omnisat/lasereyes-react'
-
 
 import App from '@/components/App'
 import { useState } from 'react'
