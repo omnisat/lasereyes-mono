@@ -1,7 +1,6 @@
 import * as bitcoin from "bitcoinjs-lib";
 import { WalletProvider } from ".";
 import {
-  getMempoolSpaceUrl,
   getNetworkForUnisat,
   getUnisatNetwork,
 } from "../../constants/networks";
@@ -10,6 +9,7 @@ import axios from "axios";
 import { getBTCBalance } from "../../lib/helpers";
 import { UNISAT } from "../../constants/wallets";
 import { listenKeys } from "nanostores";
+import {getMempoolSpaceUrl} from "../../lib/urls.ts";
 
 export default class UnisatProvider extends WalletProvider {
   public get library(): any | undefined {
@@ -91,6 +91,33 @@ export default class UnisatProvider extends WalletProvider {
     this.parent.connect(UNISAT);
   }
 
+
+  async connect(_: ProviderType): Promise<void> {
+    if (!this.library) throw new Error("Unisat isn't installed");
+    const unisatAccounts = await this.library.requestAccounts();
+    if (!unisatAccounts) throw new Error("No accounts found");
+    const unisatPubKey = await this.library.getPublicKey();
+    if (!unisatPubKey) throw new Error("No public key found");
+    this.$store.setKey("accounts", unisatAccounts);
+    this.$store.setKey("address", unisatAccounts[0]);
+    this.$store.setKey("paymentAddress", unisatAccounts[0]);
+    this.$store.setKey("publicKey", unisatPubKey);
+    this.$store.setKey("paymentPublicKey", unisatPubKey);
+    this.$store.setKey("provider", UNISAT);
+    await this.getNetwork().then((network) => {
+      if (this.config?.network !== network) {
+        this.switchNetwork(network);
+      }
+    });
+    // TODO: Confirm if this is necessary and why
+    getBTCBalance(unisatAccounts[0], this.network).then((totalBalance) => {
+      this.$store.setKey("balance", totalBalance);
+    });
+    this.$store.setKey("connected", true);
+    const balance = await this.getBalance();
+    if (balance) this.$store.setKey("balance", balance);
+  }
+
   async getNetwork() {
     const unisatNetwork = (await this.library?.getChain()) as {
       enum: string;
@@ -148,7 +175,7 @@ export default class UnisatProvider extends WalletProvider {
   async pushPsbt(tx: string): Promise<string | undefined> {
     return await axios
       .post(
-        `${getMempoolSpaceUrl(this.network as Exclude<"testnet4", NetworkType>)}/api/tx`,
+        `${getMempoolSpaceUrl(this.network)}/api/tx`,
         tx
       )
       .then((res) => res.data);
@@ -170,31 +197,6 @@ export default class UnisatProvider extends WalletProvider {
     return await this.library.requestAccounts();
   }
 
-  async connect(_: ProviderType): Promise<void> {
-    if (!this.library) throw new Error("Unisat isn't installed");
-    const unisatAccounts = await this.library.requestAccounts();
-    if (!unisatAccounts) throw new Error("No accounts found");
-    const unisatPubKey = await this.library.getPublicKey();
-    if (!unisatPubKey) throw new Error("No public key found");
-    this.$store.setKey("accounts", unisatAccounts);
-    this.$store.setKey("address", unisatAccounts[0]);
-    this.$store.setKey("paymentAddress", unisatAccounts[0]);
-    this.$store.setKey("publicKey", unisatPubKey);
-    this.$store.setKey("paymentPublicKey", unisatPubKey);
-    this.$store.setKey("provider", UNISAT);
-    await this.getNetwork().then((network) => {
-      if (this.config?.network !== network) {
-        this.switchNetwork(network);
-      }
-    });
-    // TODO: Confirm if this is necessary and why
-    getBTCBalance(unisatAccounts[0], this.network).then((totalBalance) => {
-      this.$store.setKey("balance", totalBalance);
-    });
-    this.$store.setKey("connected", true);
-    const balance = await this.getBalance();
-    if (balance) this.$store.setKey("balance", balance);
-  }
 
   async switchNetwork(network: NetworkType): Promise<void> {
     const wantedNetwork = getUnisatNetwork(network);

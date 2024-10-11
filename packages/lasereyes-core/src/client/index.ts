@@ -2,6 +2,8 @@ import { MapStore, WritableAtom, subscribeKeys } from "nanostores";
 
 import { Config, NetworkType, ProviderType } from "../types";
 import {
+  LEATHER,
+  OYL,
   UNISAT,
   WIZZ,
   XVERSE,
@@ -22,6 +24,8 @@ import { LaserEyesStoreType } from "./types";
 import { triggerDOMShakeHack } from "./utils";
 import XVerseProvider from "./providers/xverse";
 import { WizzProvider } from "./providers/wizz";
+import OylProvider from "./providers/oyl.ts";
+import LeatherProvider from "./providers/leather.ts";
 
 export class LaserEyesClient {
   readonly $store: MapStore<LaserEyesStoreType>;
@@ -42,6 +46,8 @@ export class LaserEyesClient {
     this.$store = stores.$store;
     this.$network = stores.$network;
     this.$providerMap = {
+      [LEATHER]: new LeatherProvider(stores, this, config),
+      [OYL]: new OylProvider(stores, this, config),
       [UNISAT]: new UnisatProvider(stores, this, config),
       [XVERSE]: new XVerseProvider(stores, this, config),
       [WIZZ]: new WizzProvider(stores, this, config),
@@ -55,6 +61,7 @@ export class LaserEyesClient {
       this.$network.set(config.network);
       this.getNetwork().then((foundNetwork) => {
         try {
+          console.log(foundNetwork)
           if (config.network !== foundNetwork) {
             this.switchNetwork(config.network);
           }

@@ -6,6 +6,8 @@ import {
   FRACTAL_MAINNET,
   TESTNET4,
 } from '@omnisat/lasereyes-react'
+import { NetworkType } from '@omnisat/lasereyes-core'
+
 export const MEMPOOL_SPACE_URL = 'https://mempool.space'
 export const MEMPOOL_SPACE_TESTNET_URL = 'https://mempool.space/testnet'
 export const MEMPOOL_SPACE_TESTNET4_URL = 'https://mempool.space/testnet4'
@@ -15,15 +17,7 @@ export const MEMPOOL_SPACE_FRACTAL_MAINNET_URL =
 export const MEMPOOL_SPACE_FRACTAL_TESTNET_URL =
   'https://mempool-testnet.fractalbitcoin.io'
 
-export const getMempoolSpaceUrl = (
-  network:
-    | typeof MAINNET
-    | typeof TESTNET
-    | typeof TESTNET4
-    | typeof SIGNET
-    | typeof FRACTAL_MAINNET
-    | typeof FRACTAL_TESTNET
-) =>
+export const getMempoolSpaceUrl = (network: NetworkType) =>
   network === TESTNET
     ? MEMPOOL_SPACE_TESTNET_URL
     : network === TESTNET4

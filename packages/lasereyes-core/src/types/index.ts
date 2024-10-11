@@ -87,6 +87,13 @@ export interface LeatherAddress {
   tweakedPublicKey?: string;
 }
 
+export interface SignPsbtRequestParams {
+  hex: string;
+  signAtIndex?: number | number[];
+  broadcast?: boolean;
+  network: string;
+}
+
 export interface BlockchainInfoResponse {
   notice: string;
   unspent_outputs: BlockchainInfoUTXO[];
