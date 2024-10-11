@@ -73,9 +73,9 @@ export default class OylProvider extends WalletProvider {
                 if (this.removeSubscriber) {
                     this.$valueStore.set({
                         address: "",
+                        publicKey: "",
                         paymentAddress: "",
                         paymentPublicKey: "",
-                        publicKey: "",
                         balance: "",
                     });
                     this.removeSubscriber();

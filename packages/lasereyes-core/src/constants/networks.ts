@@ -104,15 +104,3 @@ export const getNetworkForWizz = (network: string) => {
   return MAINNET;
 };
 
-export const MEMPOOL_SPACE_URL = "https://mempool.space";
-export const MEMPOOL_SPACE_TESTNET_URL = "https://mempool.space/testnet";
-export const MEMPOOL_SPACE_SIGNET_URL = "https://mempool.space/signet";
-
-export const getMempoolSpaceUrl = (
-  network: typeof MAINNET | typeof TESTNET | typeof SIGNET | typeof REGTEST
-) =>
-  network === TESTNET
-    ? MEMPOOL_SPACE_TESTNET_URL
-    : network === SIGNET
-    ? MEMPOOL_SPACE_SIGNET_URL
-    : MEMPOOL_SPACE_URL;
