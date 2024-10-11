@@ -1,28 +1,28 @@
-import { ReactNode, useMemo } from "react";
-import { LaserEyesContext } from "./context";
+import { ReactNode, useMemo } from 'react'
+import { LaserEyesContext } from './context'
 import {
   Config,
   LaserEyesClient,
   MAINNET,
   createConfig,
   createStores,
-} from "@omnisat/lasereyes-core";
-import { useStore } from "@nanostores/react";
+} from '@omnisat/lasereyes-core'
+import { useStore } from '@nanostores/react'
 
 export default function LaserEyesProvider({
   config,
   children,
 }: {
-  config?: Config;
-  children: ReactNode | ReactNode[];
+  config?: Config
+  children: ReactNode | ReactNode[]
 }) {
   const client = useMemo(() => {
     const c = new LaserEyesClient(
       createStores(),
       createConfig(config ?? { network: MAINNET })
-    );
-    return c;
-  }, [config]);
+    )
+    return c
+  }, [config])
   const {
     address,
     paymentAddress,
@@ -35,9 +35,9 @@ export default function LaserEyesProvider({
     isConnecting,
     isInitializing,
     provider,
-  } = useStore(client.$store);
-  const library = {};
-  const network = useStore(client.$network);
+  } = useStore(client.$store)
+  const library = {}
+  const network = useStore(client.$network)
 
   return (
     <LaserEyesContext.Provider
@@ -55,9 +55,10 @@ export default function LaserEyesProvider({
         isInitializing,
         provider,
         hasLeather: hasProvider.leather ?? false,
-        hasMagicEden: hasProvider["magic-eden"] ?? false,
+        hasMagicEden: hasProvider['magic-eden'] ?? false,
         hasOkx: hasProvider.okx ?? false,
         hasOyl: hasProvider.oyl ?? false,
+        hasOrange: hasProvider.orange ?? false,
         hasPhantom: hasProvider.phantom ?? false,
         hasUnisat: hasProvider.unisat ?? false,
         hasWizz: hasProvider.wizz ?? false,
@@ -65,30 +66,30 @@ export default function LaserEyesProvider({
         connect: client.connect.bind(client),
         disconnect: client.disconnect.bind(client),
         getBalance: async () =>
-          ((await client.getBalance.call(client)) ?? "").toString(),
+          ((await client.getBalance.call(client)) ?? '').toString(),
         getInscriptions: async () =>
           (await client.getInscriptions.call(client)) ?? [],
         getNetwork: client.getNetwork.bind(client),
         getPublicKey: async () =>
-          (await client.getPublicKey.call(client)) ?? "",
+          (await client.getPublicKey.call(client)) ?? '',
         pushPsbt: client.pushPsbt.bind(client),
         signMessage: async (message: string, toSignAddress?: string) =>
-          (await client.signMessage.call(client, message, toSignAddress)) ?? "",
+          (await client.signMessage.call(client, message, toSignAddress)) ?? '',
         requestAccounts: async () =>
           (await client.requestAccounts.call(client)) ?? [],
         sendBTC: async (to, amount) =>
-          (await client.sendBTC.call(client, to, amount)) ?? "",
+          (await client.sendBTC.call(client, to, amount)) ?? '',
         signPsbt: async (psbt, finalize, broadcast) =>
           (await client.signPsbt.call(client, psbt, finalize, broadcast)) ?? {
-            signedPsbtBase64: "",
-            signedPsbtHex: "",
+            signedPsbtBase64: '',
+            signedPsbtHex: '',
           },
         switchNetwork: async (network) => {
-          await client.switchNetwork.call(client, network);
+          await client.switchNetwork.call(client, network)
         },
       }}
     >
       {children}
     </LaserEyesContext.Provider>
-  );
+  )
 }

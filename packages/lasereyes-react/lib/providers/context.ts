@@ -1,6 +1,6 @@
-import { MAINNET, NetworkType, ProviderType } from "@omnisat/lasereyes-core";
-import { createContext } from "react";
-import { LaserEyesContextType } from "./types";
+import { MAINNET, NetworkType, ProviderType } from '@omnisat/lasereyes-core'
+import { createContext } from 'react'
+import { LaserEyesContextType } from './types'
 
 const initialContext = {
   hasUnisat: false,
@@ -8,49 +8,46 @@ const initialContext = {
   hasOyl: false,
   hasMagicEden: false,
   hasOkx: false,
+  hasOrange: false,
   hasLeather: false,
   hasPhantom: false,
   hasWizz: false,
   isInitializing: true,
   connected: false,
   isConnecting: false,
-  publicKey: "",
-  address: "",
-  paymentAddress: "",
-  paymentPublicKey: "",
+  publicKey: '',
+  address: '',
+  paymentAddress: '',
+  paymentPublicKey: '',
   balance: undefined,
   network: MAINNET as NetworkType,
   library: null,
   provider: null,
   accounts: [],
-  connect: async (
-    _network: ProviderType
-  ) => {},
+  connect: async (_network: ProviderType) => {},
   disconnect: () => {},
   requestAccounts: async () => [],
   getNetwork: async () => MAINNET,
-  switchNetwork: async (
-    _network: NetworkType
-  ) => {},
-  getPublicKey: async () => "",
-  getBalance: async () => "",
+  switchNetwork: async (_network: NetworkType) => {},
+  getPublicKey: async () => '',
+  getBalance: async () => '',
   getInscriptions: async () => [],
-  sendBTC: async (_to: string, _amount: number) => "",
-  signMessage: async (_message: string) => "",
+  sendBTC: async (_to: string, _amount: number) => '',
+  signMessage: async (_message: string) => '',
   signPsbt: async (_tx: string) => {
     return {
-      signedPsbtHex: "",
-      signedPsbtBase64: "",
-      txId: "",
-    };
+      signedPsbtHex: '',
+      signedPsbtBase64: '',
+      txId: '',
+    }
   },
   pushPsbt: async (_tx: string) => {
-    return "";
+    return ''
   },
-  inscribe: async (_content: any) => "",
+  inscribe: async (_content: any) => '',
   isCreatingCommit: false,
   isInscribing: false,
 }
 
-
-export const LaserEyesContext = createContext<LaserEyesContextType>(initialContext);
+export const LaserEyesContext =
+  createContext<LaserEyesContextType>(initialContext)

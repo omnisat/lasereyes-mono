@@ -435,6 +435,7 @@ const App = ({
                 | typeof OYL
                 | typeof MAGIC_EDEN
                 | typeof OKX
+                | typeof ORANGE
                 | typeof LEATHER
                 | typeof PHANTOM
                 | typeof WIZZ

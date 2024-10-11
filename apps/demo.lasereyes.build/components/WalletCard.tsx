@@ -16,11 +16,8 @@ import {
   SIGNET,
   TESTNET4,
   // WalletIcon,
-  // ORANGE,
+  ORANGE,
 } from '@omnisat/lasereyes-core'
-
-const ORANGE = 'orange'
-
 import { useLaserEyes } from '@omnisat/lasereyes-react'
 import {
   Card,
@@ -56,9 +53,9 @@ const WalletCard = ({
     | typeof MAGIC_EDEN
     | typeof OKX
     | typeof LEATHER
+    | typeof ORANGE
     | typeof PHANTOM
     | typeof WIZZ
-  // | typeof ORANGE
   setSignature: (signature: string) => void
   unsignedPsbt: string | undefined
   setUnsignedPsbt: (psbt: string) => void
@@ -91,7 +88,7 @@ const WalletCard = ({
     hasLeather,
     hasPhantom,
     hasWizz,
-    // hasOrange,
+    hasOrange,
     sendBTC,
     signMessage,
     signPsbt,
@@ -126,7 +123,7 @@ const WalletCard = ({
     leather: hasLeather,
     phantom: hasPhantom,
     wizz: hasWizz,
-    orange: false,
+    orange: hasOrange,
   }
 
   useEffect(() => {

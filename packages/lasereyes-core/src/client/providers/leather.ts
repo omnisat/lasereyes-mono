@@ -292,7 +292,9 @@ export default class LeatherProvider extends WalletProvider {
       'getAddresses'
     )) as LeatherRPCResponse
     const addresses = (result as LeatherRequestAddressResponse).addresses
-    return addresses.map((address: LeatherAddress) => address.address)
+    const accounts = addresses.map((address: LeatherAddress) => address.address)
+    this.$store.setKey('accounts', accounts)
+    return accounts
   }
 
   async switchNetwork(): Promise<void> {

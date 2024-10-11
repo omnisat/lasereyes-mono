@@ -1,22 +1,26 @@
 import * as bitcoin from 'bitcoinjs-lib'
-import {
+import { fromOutputScript } from 'bitcoinjs-lib/src/address'
+import orange, {
+  AddressPurpose,
+  BitcoinNetworkType as OrangeBitcoinNetworkType,
+  SignTransactionOptions as OrangeSignTransactionOptions,
   GetAddressOptions,
-  RpcErrorCode,
   getAddress,
-  request,
-} from 'sats-connect'
+  SendBtcTransactionOptions,
+} from '@orangecrypto/orange-connect'
+
 import { UNSUPPORTED_PROVIDER_METHOD_ERROR, WalletProvider } from '.'
 import {
   ProviderType,
   NetworkType,
-  XVERSE,
-  getXverseNetwork,
   MAINNET,
   TESTNET,
   TESTNET4,
   SIGNET,
   FRACTAL_TESTNET,
   LaserEyesStoreType,
+  getOrangeNetwork,
+  ORANGE,
 } from '../..'
 import {
   findOrdinalsAddress,
@@ -26,6 +30,8 @@ import {
 } from '../../lib/helpers'
 import { MapStore, listenKeys } from 'nanostores'
 import { persistentMap } from '@nanostores/persistent'
+import axios from 'axios'
+import { getMempoolSpaceUrl } from '../../lib/urls.ts'
 
 const keysToPersist = [
   'address',
@@ -35,12 +41,18 @@ const keysToPersist = [
   'balance',
 ] as const
 
+const {
+  signMessage: signMessageOrange,
+  sendBtcTransaction: sendBtcTxOrange,
+  signTransaction: signPsbtOrange,
+} = orange
+
 type PersistedKey = (typeof keysToPersist)[number]
 
-const XVERSE_WALLET_PERSISTENCE_KEY = 'XVERSE_CONNECTED_WALLET_STATE'
-export default class XVerseProvider extends WalletProvider {
+const ORANGE_WALLET_PERSISTENCE_KEY = 'ORANGE_CONNECTED_WALLET_STATE'
+export default class OrangeProvider extends WalletProvider {
   public get library(): any | undefined {
-    return (window as any).BitcoinProvider
+    return (window as any)?.OrangeWalletProviders.OrangeBitcoinProvider
   }
 
   public get network(): NetworkType {
@@ -49,7 +61,7 @@ export default class XVerseProvider extends WalletProvider {
 
   observer?: MutationObserver
   $valueStore: MapStore<Record<PersistedKey, string>> = persistentMap(
-    XVERSE_WALLET_PERSISTENCE_KEY,
+    ORANGE_WALLET_PERSISTENCE_KEY,
     {
       address: '',
       paymentAddress: '',
@@ -73,7 +85,7 @@ export default class XVerseProvider extends WalletProvider {
     _: LaserEyesStoreType | undefined,
     changedKey: keyof LaserEyesStoreType | undefined
   ) {
-    if (changedKey && newState.provider === XVERSE) {
+    if (changedKey && newState.provider === ORANGE) {
       if (changedKey === 'balance') {
         this.$valueStore.setKey('balance', newState.balance?.toString() ?? '')
       } else if ((keysToPersist as readonly string[]).includes(changedKey)) {
@@ -87,7 +99,7 @@ export default class XVerseProvider extends WalletProvider {
 
   initialize(): void {
     listenKeys(this.$store, ['provider'], (newVal) => {
-      if (newVal.provider !== XVERSE) {
+      if (newVal.provider !== ORANGE) {
         if (this.removeSubscriber) {
           this.$valueStore.set({
             address: '',
@@ -107,16 +119,18 @@ export default class XVerseProvider extends WalletProvider {
     })
 
     this.observer = new window.MutationObserver(() => {
-      const xverseLib = (window as any)?.XverseProviders?.BitcoinProvider
-      if (xverseLib) {
+      const orangeLib = (window as any)?.OrangeWalletProviders
+        .OrangeBitcoinProvider
+
+      if (orangeLib) {
         this.$store.setKey('hasProvider', {
           ...this.$store.get().hasProvider,
-          [XVERSE]: true,
+          [ORANGE]: true,
         })
         this.observer?.disconnect()
       }
     })
-    this.observer.observe(document, { childList: true, subtree: true })
+    this.observer?.observe(document, { childList: true, subtree: true })
   }
 
   dispose() {
@@ -125,7 +139,6 @@ export default class XVerseProvider extends WalletProvider {
 
   async connect(_: ProviderType): Promise<void> {
     const { address, paymentAddress } = this.$valueStore!.get()
-
     try {
       if (address) {
         this.restorePersistedValues()
@@ -134,31 +147,32 @@ export default class XVerseProvider extends WalletProvider {
         })
         return
       }
-      let xverseNetwork = getXverseNetwork(this.network || MAINNET)
+
+      let orangeNetwork = getOrangeNetwork(this.network || MAINNET)
       const getAddressOptions = {
         payload: {
-          purposes: ['ordinals', 'payment'],
+          purposes: ['ordinals', 'payment'] as AddressPurpose[],
           message: 'Address for receiving Ordinals and payments',
           network: {
-            type: xverseNetwork,
+            type: orangeNetwork,
           },
         },
         onFinish: (response: any) => {
           const foundAddress = findOrdinalsAddress(response.addresses)
           const foundPaymentAddress = findPaymentAddress(response.addresses)
           if (foundAddress && foundPaymentAddress) {
-            this.$store.setKey('provider', XVERSE)
+            this.$store.setKey(
+              'publicKey',
+              String(response.addresses[0].publicKey)
+            )
+            this.$store.setKey(
+              'paymentPublicKey',
+              String(response.addresses[1].publicKey)
+            )
+            this.$store.setKey('provider', ORANGE)
             this.$store.setKey('address', foundAddress.address)
             this.$store.setKey('paymentAddress', foundPaymentAddress.address)
           }
-          this.$store.setKey(
-            'publicKey',
-            String(response.addresses[0].publicKey)
-          )
-          this.$store.setKey(
-            'paymentPublicKey',
-            String(response.addresses[1].publicKey)
-          )
 
           getBTCBalance(foundPaymentAddress.address, this.network).then(
             (totalBalance) => {
@@ -167,13 +181,11 @@ export default class XVerseProvider extends WalletProvider {
           )
         },
         onCancel: () => {
-          throw new Error(`User canceled lasereyes to ${XVERSE} wallet`)
+          throw new Error(`User canceled lasereyes to ${ORANGE} wallet`)
         },
-        onError: (_: any) => {
-          throw new Error(`Can't lasereyes to ${XVERSE} wallet`)
-        },
-      }
-      await getAddress(getAddressOptions as GetAddressOptions)
+      } as GetAddressOptions
+
+      await getAddress(getAddressOptions)
       this.$store.setKey('connected', true)
     } catch (e) {
       throw e
@@ -208,45 +220,59 @@ export default class XVerseProvider extends WalletProvider {
   getInscriptions(): Promise<any[]> {
     throw UNSUPPORTED_PROVIDER_METHOD_ERROR
   }
+
   async sendBTC(to: string, amount: number): Promise<string> {
-    const response = await request('sendTransfer', {
-      recipients: [
-        {
-          address: to,
-          amount: amount,
+    let txId = ''
+    const sendBtcOptions = {
+      payload: {
+        network: {
+          type: getOrangeNetwork(this.network),
         },
-      ],
-    })
-    if (response.status === 'success') {
-      return response.result.txid
-    } else {
-      if (response.error.code === RpcErrorCode.USER_REJECTION) {
-        throw new Error('User rejected the request')
-      } else {
-        throw new Error('Error sending BTC: ' + response.error.message)
-      }
-    }
+        recipients: [
+          {
+            address: to,
+            amountSats: BigInt(amount),
+          },
+        ],
+        senderAddress: this.$store.get().paymentAddress,
+      },
+      onFinish: (response: any) => {
+        console.log(response)
+        txId = response
+      },
+      onCancel: () => {
+        throw new Error('User canceled the request')
+      },
+    } as SendBtcTransactionOptions
+
+    await sendBtcTxOrange(sendBtcOptions)
+    return txId
   }
+
   async signMessage(
     message: string,
     toSignAddress?: string | undefined
   ): Promise<string> {
+    let signature = ''
     const tempAddy = toSignAddress || this.$store.get().paymentAddress
-    const response = await request('signMessage', {
-      address: tempAddy,
-      message,
-    })
-
-    if (response.status === 'success') {
-      return response.result.signature as string
-    } else {
-      if (response.error.code === RpcErrorCode.USER_REJECTION) {
-        throw new Error('User rejected the request')
-      } else {
-        throw new Error('Error signing message: ' + response.error.message)
-      }
+    const signMessageOptions = {
+      payload: {
+        network: {
+          type: getOrangeNetwork(this.network) as OrangeBitcoinNetworkType,
+        },
+        address: tempAddy,
+        message: message,
+      },
+      onFinish: (response: string) => {
+        signature = response
+      },
+      onCancel: () => alert('Signature request canceled'),
     }
+
+    await signMessageOrange(signMessageOptions)
+    return signature
   }
+
   async signPsbt(
     _: string,
     __: string,
@@ -261,10 +287,12 @@ export default class XVerseProvider extends WalletProvider {
       }
     | undefined
   > {
-    const { address, paymentAddress } = this.$store.get()
     const toSignPsbt = bitcoin.Psbt.fromBase64(String(psbtBase64), {
       network: getBitcoinNetwork(this.network),
     })
+
+    const address = this.$store.get().address
+    const paymentAddress = this.$store.get().paymentAddress
 
     const inputs = toSignPsbt.data.inputs
     const inputsToSign = []
@@ -283,7 +311,7 @@ export default class XVerseProvider extends WalletProvider {
         paymentsAddressData.signingIndexes.push(Number(counter))
       } else {
         const { script } = input.witnessUtxo!
-        const addressFromScript = bitcoin.address.fromOutputScript(
+        const addressFromScript = fromOutputScript(
           script,
           getBitcoinNetwork(this.network)
         )
@@ -306,20 +334,17 @@ export default class XVerseProvider extends WalletProvider {
     }
 
     let txId, signedPsbtHex, signedPsbtBase64
-
-    const xverseNetwork = getXverseNetwork(this.network)
-
     const signPsbtOptions = {
       payload: {
         network: {
-          type: xverseNetwork,
+          type: getOrangeNetwork(this.network),
         },
-        message: 'Sign Transaction',
         psbtBase64: toSignPsbt.toBase64(),
         broadcast: broadcast,
         inputsToSign: inputsToSign,
       },
-      onFinish: (response: { psbtBase64: string; txId: string }) => {
+      onFinish: (response: any) => {
+        console.log(response)
         if (response.txId) {
           txId = response.txId
         } else if (response.psbtBase64) {
@@ -335,17 +360,26 @@ export default class XVerseProvider extends WalletProvider {
         }
       },
       onCancel: () => console.log('Canceled'),
-    }
+    } as OrangeSignTransactionOptions
 
-    // @ts-ignore
-    await signTransaction(signPsbtOptions)
+    await signPsbtOrange(signPsbtOptions)
     return {
       signedPsbtHex,
       signedPsbtBase64,
       txId,
     }
   }
-  pushPsbt(_tx: string): Promise<string | undefined> {
-    throw UNSUPPORTED_PROVIDER_METHOD_ERROR
+
+  async pushPsbt(_tx: string): Promise<string | undefined> {
+    let payload = _tx
+    if (!payload.startsWith('02')) {
+      const psbtObj = bitcoin.Psbt.fromHex(payload)
+      psbtObj.finalizeAllInputs()
+      payload = psbtObj.extractTransaction().toHex()
+    }
+
+    return await axios
+      .post(`${getMempoolSpaceUrl(this.network)}/api/tx`, payload)
+      .then((res) => res.data)
   }
 }
