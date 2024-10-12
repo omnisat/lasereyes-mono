@@ -31,6 +31,7 @@ For documentation and guides, visit [Lasereyes Docs](https://lasereyes.build/).
 For help, discussion about best practices, or any other conversation that would benefit from being searchable:
 
 
+
 [Discuss Laser Eyes on GitHub](https://github.com/omnisat/lasereyes/discussions)
 
 ## Contributing
