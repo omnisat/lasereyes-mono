@@ -5,6 +5,8 @@ on:
     branches:
       - dev
       - main
+permissions:
+  contents: write  # Grants write permissions to push commits
 
 jobs:
   release:
