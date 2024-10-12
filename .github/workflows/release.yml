@@ -49,25 +49,6 @@ jobs:
       - name: Fetch all branches
         run: git fetch --all
 
-      - name: Check pre-release mode
-        id: check_pre_mode
-        run: |
-          if pnpm changeset status | grep -q "pre mode"; then
-            echo "in_pre_mode=true" >> $GITHUB_ENV
-          else
-            echo "in_pre_mode=false" >> $GITHUB_ENV
-          fi
-
-      # Enter pre-release mode for RC only if not already in pre mode
-      - name: Enter pre-release mode for RC
-        if: ${{ env.in_pre_mode == 'false' && env.changed == 'true' && github.ref == 'refs/heads/dev' }}
-        run: pnpm changeset pre enter rc
-
-      # Exit pre-release mode for dev
-      - name: Exit pre-release mode for dev
-        if: ${{ github.ref == 'refs/heads/dev' && env.in_pre_mode == 'true' }}
-        run: pnpm changeset pre exit
-
       - name: Commit version bumps and changelog
         if: ${{ env.changed == 'true' }}
         run: |
