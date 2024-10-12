@@ -32,6 +32,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Fetch all branches
+        run: git fetch --all
+
       - name: Check if lasereyes package changed
         id: check_lasereyes_changes
         run: |
@@ -44,19 +47,14 @@ jobs:
       - name: Add Changeset if lasereyes package changed
         if: ${{ env.changed == 'true' }}
         run: |
-          pnpm changeset add --empty --force --message "chore: auto-bump lasereyes version"
+          pnpm changeset add --empty --force --message "chore: auto-bump lasereyes version (patch)"
 
-      - name: Fetch all branches
-        run: git fetch --all
-
-      # Run Changesets version bump before commit
-      - name: Run Changesets version bump
-        if: ${{ env.changed == 'true' }}
+      - name: Run Changesets version bump for dev
+        if: ${{ env.changed == 'true' && github.ref == 'refs/heads/dev' }}
         run: pnpm changeset version
 
-      # Commit version bumps and changelog
-      - name: Commit version bumps and changelog
-        if: ${{ env.changed == 'true' }}
+      - name: Commit version bumps and changelog for dev
+        if: ${{ env.changed == 'true' && github.ref == 'refs/heads/dev' }}
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
@@ -67,13 +65,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Run Changesets version for main
-        if: ${{ github.ref == 'refs/heads/main' && env.changed == 'true' }}
+      - name: Run Changesets version bump for main
+        if: ${{ env.changed == 'true' && github.ref == 'refs/heads/main' }}
         run: pnpm changeset version
 
-      # Commit version bumps and changelog for main
       - name: Commit version bumps and changelog for main
-        if: ${{ github.ref == 'refs/heads/main' && env.changed == 'true' }}
+        if: ${{ env.changed == 'true' && github.ref == 'refs/heads/main' }}
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
@@ -81,6 +78,8 @@ jobs:
           git commit -m "Version bump after merge to main for lasereyes"
           git pull --rebase origin main
           git push origin main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Post Setup pnpm
         run: echo "Workflow completed!"
