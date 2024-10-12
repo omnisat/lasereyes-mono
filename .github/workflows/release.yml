@@ -34,12 +34,10 @@ jobs:
           changed=$(pnpm changeset status | grep -q lasereyes && echo "true" || echo "false")
           echo "changed=$changed" >> $GITHUB_ENV
 
-      # Add Changeset if lasereyes package changed
       - name: Add Changeset if lasereyes package changed
         if: env.changed == 'true'
         run: |
           pnpm changeset add --empty --force --message "chore: auto-bump lasereyes version"
-          pnpm changeset /home/runner/work/lasereyes-mono/lasereyes-mono changeset "add" "--empty" "--force" "--message" "auto-bump lasereyes version"
 
       - name: Fetch all branches
         run: git fetch --all
