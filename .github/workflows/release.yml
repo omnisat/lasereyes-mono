@@ -6,7 +6,7 @@ on:
       - dev
       - main
 permissions:
-  contents: write  # Grants write permissions to push commits
+  contents: write
 
 jobs:
   release:
@@ -32,53 +32,43 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      # Check if lasereyes package changed
       - name: Check if lasereyes package changed
         id: check_lasereyes_changes
         run: |
           if pnpm changeset status | grep -q lasereyes; then
-            echo "::set-output name=changed::true"
+            echo "changed=true" >> $GITHUB_ENV
           else
-            echo "::set-output name=changed::false"
+            echo "changed=false" >> $GITHUB_ENV
           fi
 
-      # Add Changeset if lasereyes package changed
       - name: Add Changeset if lasereyes package changed
-        if: ${{ steps.check_lasereyes_changes.outputs.changed == 'true' }}
-        run: |
-          pnpm changeset add --empty --force --message "chore: rc-bump lasereyes version"
+        if: ${{ env.changed == 'true' }}
+        run: pnpm changeset add --empty --force --message "chore: auto-bump lasereyes version"
 
       - name: Fetch all branches
         run: git fetch --all
 
-      # Check pre-release mode
       - name: Check pre-release mode
         id: check_pre_mode
         run: |
           if pnpm changeset status | grep -q "pre mode"; then
-            echo "::set-output name=in_pre_mode::true"
+            echo "in_pre_mode=true" >> $GITHUB_ENV
           else
-            echo "::set-output name=in_pre_mode::false"
+            echo "in_pre_mode=false" >> $GITHUB_ENV
           fi
 
-      # Exit pre-release mode for dev if in pre mode
-      - name: Exit pre-release mode for dev
-        if: ${{ github.ref == 'refs/heads/dev' && steps.check_pre_mode.outputs.in_pre_mode == 'true' }}
-        run: pnpm changeset pre exit
-
-  # Enter pre-release mode for RC if not already in pre mode
+      # Enter pre-release mode for RC only if not already in pre mode
       - name: Enter pre-release mode for RC
-        if: ${{ steps.check_pre_mode.outputs.in_pre_mode == 'false' && steps.check_lasereyes_changes.outputs.changed == 'true' && github.ref == 'refs/heads/dev' }}
+        if: ${{ env.in_pre_mode == 'false' && env.changed == 'true' && github.ref == 'refs/heads/dev' }}
         run: pnpm changeset pre enter rc
 
-      # Run Changesets version bump for lasereyes
-      - name: Run Changesets version bump
-        if: ${{ steps.check_lasereyes_changes.outputs.changed == 'true' }}
-        run: pnpm changeset version
+      # Exit pre-release mode for dev
+      - name: Exit pre-release mode for dev
+        if: ${{ github.ref == 'refs/heads/dev' && env.in_pre_mode == 'true' }}
+        run: pnpm changeset pre exit
 
-      # Commit version bumps and changelog
       - name: Commit version bumps and changelog
-        if: ${{ steps.check_lasereyes_changes.outputs.changed == 'true' }}
+        if: ${{ env.changed == 'true' }}
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
@@ -89,14 +79,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Run Changesets version for main
       - name: Run Changesets version for main
-        if: ${{ github.ref == 'refs/heads/main' && steps.check_lasereyes_changes.outputs.changed == 'true' }}
+        if: ${{ github.ref == 'refs/heads/main' && env.changed == 'true' }}
         run: pnpm changeset version
 
-      # Commit version bumps and changelog for main
       - name: Commit version bumps and changelog for main
-        if: ${{ github.ref == 'refs/heads/main' && steps.check_lasereyes_changes.outputs.changed == 'true' }}
+        if: ${{ github.ref == 'refs/heads/main' && env.changed == 'true' }}
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
@@ -104,6 +92,8 @@ jobs:
           git commit -m "Version bump after merge to main for lasereyes"
           git pull --rebase origin main
           git push origin main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Post Setup pnpm
         run: echo "Workflow completed!"
