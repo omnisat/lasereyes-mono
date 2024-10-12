@@ -35,12 +35,20 @@ jobs:
       - name: Add Changeset if lasereyes package changed
         run: |
           if [ "$changed" = "true" ]; then
-            pnpm changeset add --empty --force --message "auto-bump lasereyes version"
+            pnpm changeset add --empty --force --message "chore: auto-bump lasereyes version"
           fi
 
-      # Enter pre-release mode for RC if on dev
+      # Check if already in pre-release mode
+      - name: Check pre-release mode
+        run: |
+          if pnpm changeset status | grep -q "pre mode"; then
+            echo "pre_mode=true" >> $GITHUB_ENV
+          else
+            echo "pre_mode=false" >> $GITHUB_ENV
+
+      # Enter pre-release mode for RC if on dev and not already in pre mode
       - name: Run Changesets pre-release mode for RC
-        if: github.ref == 'refs/heads/dev'
+        if: github.ref == 'refs/heads/dev' && env.pre_mode == 'false'
         run: |
           if [ "$changed" = "true" ]; then
             pnpm changeset pre enter rc
@@ -107,6 +115,7 @@ jobs:
         run: pnpm install
 
       - name: Exit pre-release mode
+        if: env.pre_mode == 'true'
         run: |
           if [ "$changed" = "true" ]; then
             pnpm changeset pre exit
