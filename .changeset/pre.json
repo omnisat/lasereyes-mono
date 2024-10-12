@@ -1,0 +1,13 @@
+{
+  "mode": "pre",
+  "tag": "rc",
+  "initialVersions": {
+    "demo.lasereyes.build": "0.1.0",
+    "@repo/eslint-config": "0.0.0",
+    "@omnisat/lasereyes": "0.0.4",
+    "@omnisat/lasereyes-core": "0.0.4",
+    "@omnisat/lasereyes-react": "0.0.2",
+    "@repo/typescript-config": "0.0.0"
+  },
+  "changesets": []
+}
