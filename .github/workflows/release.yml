@@ -13,6 +13,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          persist-credentials: true
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
@@ -27,22 +30,22 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      # Check if lasereyes package changed
       - name: Check if lasereyes package changed
-        id: lasereyes-changes
         run: |
-          changed=$(pnpm changeset status | grep -q lasereyes && echo "true" || echo "false")
-          echo "changed=$changed" >> $GITHUB_ENV
+          if pnpm changeset status | grep -q lasereyes; then
+            echo "changed=true" >> $GITHUB_ENV
+          else
+            echo "changed=false" >> $GITHUB_ENV
+          fi
 
       - name: Add Changeset if lasereyes package changed
-        if: env.changed == 'true'
+        if: ${{ env.changed == 'true' }}
         run: |
           pnpm changeset add --empty --force --message "chore: auto-bump lasereyes version"
 
       - name: Fetch all branches
         run: git fetch --all
 
-      # Check pre-release mode
       - name: Check pre-release mode
         run: |
           if pnpm changeset status | grep -q "pre mode"; then
@@ -51,39 +54,36 @@ jobs:
             echo "in_pre_mode=false" >> $GITHUB_ENV
           fi
 
-      # Run Changesets pre-release mode for RC
       - name: Run Changesets pre-release mode for RC
-        if: env.changed == 'true' && env.in_pre_mode == 'false'
+        if: ${{ env.changed == 'true' && env.in_pre_mode == 'false' }}
         run: pnpm changeset pre enter rc
 
-      # Exit pre-release mode after merge to dev
       - name: Exit pre-release mode for dev
-        if: github.ref == 'refs/heads/dev' && env.in_pre_mode == 'true'
+        if: ${{ github.ref == 'refs/heads/dev' && env.in_pre_mode == 'true' }}
         run: pnpm changeset pre exit
 
-      # Commit version bumps and changelog
       - name: Commit version bumps and changelog
-        if: env.changed == 'true'
+        if: ${{ env.changed == 'true' }}
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add .
           git commit -m "RC version bump for lasereyes"
+          git pull --rebase origin dev
           git push origin dev
 
-      # Run Changesets version for main
       - name: Run Changesets version for main
-        if: github.ref == 'refs/heads/main' && env.changed == 'true'
+        if: ${{ github.ref == 'refs/heads/main' && env.changed == 'true' }}
         run: pnpm changeset version
 
-      # Commit version bumps and changelog for main
       - name: Commit version bumps and changelog for main
-        if: github.ref == 'refs/heads/main' && env.changed == 'true'
+        if: ${{ github.ref == 'refs/heads/main' && env.changed == 'true' }}
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add .
           git commit -m "Version bump after merge to main for lasereyes"
+          git pull --rebase origin main
           git push origin main
 
       - name: Post Setup pnpm
