@@ -38,7 +38,7 @@ Contributions to Lasereyes are greatly appreciated! If you're interested in cont
 
 ## Sponsors
 
-If you find Laser Eyes useful or use it for work, please consider [sponsoring Laser Eyes](https://github.com/sponsors/omnisat). Thank you 🙏
+If you find Lasereyes useful or use it for work, please consider [sponsoring Laser Eyes](https://github.com/sponsors/omnisat). Thank you 🙏
 
 <p>
 <a href="https://www.utxo.management/" style="margin-right: 40px;">
