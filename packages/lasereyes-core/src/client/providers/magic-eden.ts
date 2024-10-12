@@ -1,15 +1,18 @@
 import * as bitcoin from 'bitcoinjs-lib'
 import {
   GetAddressOptions,
-  RpcErrorCode,
   getAddress,
-  request,
+  signMessage,
+  sendBtcTransaction,
+  BitcoinNetworkType,
+  SendBtcTransactionOptions,
+  MessageSigningProtocols,
 } from 'sats-connect'
 import { UNSUPPORTED_PROVIDER_METHOD_ERROR, WalletProvider } from '.'
 import {
   ProviderType,
   NetworkType,
-  XVERSE,
+  MAGIC_EDEN,
   getSatsConnectNetwork,
   MAINNET,
   TESTNET,
@@ -26,6 +29,9 @@ import {
 } from '../../lib/helpers'
 import { MapStore, listenKeys } from 'nanostores'
 import { persistentMap } from '@nanostores/persistent'
+import { fromOutputScript } from 'bitcoinjs-lib/src/address'
+import axios from 'axios'
+import { getMempoolSpaceUrl } from '../../lib/urls.ts'
 
 const keysToPersist = [
   'address',
@@ -37,10 +43,10 @@ const keysToPersist = [
 
 type PersistedKey = (typeof keysToPersist)[number]
 
-const XVERSE_WALLET_PERSISTENCE_KEY = 'XVERSE_CONNECTED_WALLET_STATE'
-export default class XVerseProvider extends WalletProvider {
+const MAGIC_EDEN_WALLET_PERSISTENCE_KEY = 'MAGIC_EDEN_CONNECTED_WALLET_STATE'
+export default class MagicEdenProvider extends WalletProvider {
   public get library(): any | undefined {
-    return (window as any).BitcoinProvider
+    return (window as any).magicEden.bitcoin
   }
 
   public get network(): NetworkType {
@@ -49,7 +55,7 @@ export default class XVerseProvider extends WalletProvider {
 
   observer?: MutationObserver
   $valueStore: MapStore<Record<PersistedKey, string>> = persistentMap(
-    XVERSE_WALLET_PERSISTENCE_KEY,
+    MAGIC_EDEN_WALLET_PERSISTENCE_KEY,
     {
       address: '',
       paymentAddress: '',
@@ -73,7 +79,7 @@ export default class XVerseProvider extends WalletProvider {
     _: LaserEyesStoreType | undefined,
     changedKey: keyof LaserEyesStoreType | undefined
   ) {
-    if (changedKey && newState.provider === XVERSE) {
+    if (changedKey && newState.provider === MAGIC_EDEN) {
       if (changedKey === 'balance') {
         this.$valueStore.setKey('balance', newState.balance?.toString() ?? '')
       } else if ((keysToPersist as readonly string[]).includes(changedKey)) {
@@ -87,7 +93,7 @@ export default class XVerseProvider extends WalletProvider {
 
   initialize(): void {
     listenKeys(this.$store, ['provider'], (newVal) => {
-      if (newVal.provider !== XVERSE) {
+      if (newVal.provider !== MAGIC_EDEN) {
         if (this.removeSubscriber) {
           this.$valueStore.set({
             address: '',
@@ -107,11 +113,11 @@ export default class XVerseProvider extends WalletProvider {
     })
 
     this.observer = new window.MutationObserver(() => {
-      const xverseLib = (window as any)?.XverseProviders?.BitcoinProvider
+      const xverseLib = (window as any)?.magicEden.bitcoin
       if (xverseLib) {
         this.$store.setKey('hasProvider', {
           ...this.$store.get().hasProvider,
-          [XVERSE]: true,
+          [MAGIC_EDEN]: true,
         })
         this.observer?.disconnect()
       }
@@ -134,20 +140,21 @@ export default class XVerseProvider extends WalletProvider {
         })
         return
       }
-      let xverseNetwork = getSatsConnectNetwork(this.network || MAINNET)
+      let magicEdenNetwork = getSatsConnectNetwork(this.network || MAINNET)
       const getAddressOptions = {
+        getProvider: async () => this.library,
         payload: {
           purposes: ['ordinals', 'payment'],
           message: 'Address for receiving Ordinals and payments',
           network: {
-            type: xverseNetwork,
+            type: magicEdenNetwork,
           },
         },
         onFinish: (response: any) => {
           const foundAddress = findOrdinalsAddress(response.addresses)
           const foundPaymentAddress = findPaymentAddress(response.addresses)
           if (foundAddress && foundPaymentAddress) {
-            this.$store.setKey('provider', XVERSE)
+            this.$store.setKey('provider', MAGIC_EDEN)
             this.$store.setKey('address', foundAddress.address)
             this.$store.setKey('paymentAddress', foundPaymentAddress.address)
           }
@@ -167,10 +174,10 @@ export default class XVerseProvider extends WalletProvider {
           )
         },
         onCancel: () => {
-          throw new Error(`User canceled lasereyes to ${XVERSE} wallet`)
+          throw new Error(`User canceled lasereyes to ${MAGIC_EDEN} wallet`)
         },
         onError: (_: any) => {
-          throw new Error(`Can't lasereyes to ${XVERSE} wallet`)
+          throw new Error(`Can't lasereyes to ${MAGIC_EDEN} wallet`)
         },
       }
       await getAddress(getAddressOptions as GetAddressOptions)
@@ -196,6 +203,7 @@ export default class XVerseProvider extends WalletProvider {
 
     return MAINNET
   }
+
   getPublicKey(): Promise<string | undefined> {
     throw UNSUPPORTED_PROVIDER_METHOD_ERROR
   }
@@ -208,45 +216,67 @@ export default class XVerseProvider extends WalletProvider {
   getInscriptions(): Promise<any[]> {
     throw UNSUPPORTED_PROVIDER_METHOD_ERROR
   }
+
   async sendBTC(to: string, amount: number): Promise<string> {
-    const response = await request('sendTransfer', {
-      recipients: [
-        {
-          address: to,
-          amount: amount,
+    let sendResponse: { txid: string }
+    await sendBtcTransaction({
+      getProvider: async () => this.library,
+      payload: {
+        network: {
+          type: getSatsConnectNetwork(this.network) as BitcoinNetworkType,
         },
-      ],
-    })
-    if (response.status === 'success') {
-      return response.result.txid
-    } else {
-      if (response.error.code === RpcErrorCode.USER_REJECTION) {
-        throw new Error('User rejected the request')
-      } else {
-        throw new Error('Error sending BTC: ' + response.error.message)
-      }
-    }
+        recipients: [
+          {
+            address: to,
+            amountSats: BigInt(amount),
+          },
+        ],
+        senderAddress: this.$store.get().paymentAddress,
+      },
+      onFinish: (response) => {
+        // @ts-ignore
+        sendResponse = response
+      },
+      onCancel: () => alert('Canceled'),
+    } as SendBtcTransactionOptions)
+    // @ts-ignore
+    if (!sendResponse) throw new Error('Error sending BTC')
+    // @ts-ignore
+    return sendResponse.txid
   }
+
   async signMessage(
     message: string,
     toSignAddress?: string | undefined
   ): Promise<string> {
-    const tempAddy = toSignAddress || this.$store.get().paymentAddress
-    const response = await request('signMessage', {
-      address: tempAddy,
-      message,
-    })
+    try {
+      const tempAddy = toSignAddress || this.$store.get().paymentAddress
+      let signedMessage: string = ''
 
-    if (response.status === 'success') {
-      return response.result.signature as string
-    } else {
-      if (response.error.code === RpcErrorCode.USER_REJECTION) {
-        throw new Error('User rejected the request')
-      } else {
-        throw new Error('Error signing message: ' + response.error.message)
-      }
+      await signMessage({
+        getProvider: async () => this.library,
+        payload: {
+          network: {
+            type: BitcoinNetworkType.Mainnet,
+          },
+          address: tempAddy,
+          message: message,
+          protocol: MessageSigningProtocols.BIP322,
+        },
+        onFinish: (response) => {
+          signedMessage = response
+        },
+        onCancel: () => {
+          alert('Request canceled')
+        },
+      })
+
+      return signedMessage
+    } catch (e) {
+      throw e
     }
   }
+
   async signPsbt(
     _: string,
     __: string,
@@ -279,21 +309,17 @@ export default class XVerseProvider extends WalletProvider {
 
     let counter = 0
     for await (let input of inputs) {
-      if (input.witnessUtxo === undefined) {
-        paymentsAddressData.signingIndexes.push(Number(counter))
-      } else {
-        const { script } = input.witnessUtxo!
-        const addressFromScript = bitcoin.address.fromOutputScript(
-          script,
-          getBitcoinNetwork(this.network)
-        )
-        if (addressFromScript === paymentAddress) {
-          paymentsAddressData.signingIndexes.push(Number(counter))
-        } else if (addressFromScript === address) {
-          ordinalAddressData.signingIndexes.push(Number(counter))
-        }
-      }
+      const { script } = input.witnessUtxo!
+      const addressFromScript = fromOutputScript(
+        script,
+        getBitcoinNetwork(this.network)
+      )
 
+      if (addressFromScript === paymentAddress) {
+        paymentsAddressData.signingIndexes.push(Number(counter))
+      } else if (addressFromScript === address) {
+        ordinalAddressData.signingIndexes.push(Number(counter))
+      }
       counter++
     }
 
@@ -306,13 +332,13 @@ export default class XVerseProvider extends WalletProvider {
     }
 
     let txId, signedPsbtHex, signedPsbtBase64
-
-    const xverseNetwork = getSatsConnectNetwork(this.network)
+    const magicEdenNetwork = getSatsConnectNetwork(this.network)
 
     const signPsbtOptions = {
+      getProvider: async () => this.library,
       payload: {
         network: {
-          type: xverseNetwork,
+          type: magicEdenNetwork,
         },
         message: 'Sign Transaction',
         psbtBase64: toSignPsbt.toBase64(),
@@ -320,9 +346,7 @@ export default class XVerseProvider extends WalletProvider {
         inputsToSign: inputsToSign,
       },
       onFinish: (response: { psbtBase64: string; txId: string }) => {
-        if (response.txId) {
-          txId = response.txId
-        } else if (response.psbtBase64) {
+        if (response.psbtBase64) {
           const signedPsbt = bitcoin.Psbt.fromBase64(
             String(response.psbtBase64),
             {
@@ -334,18 +358,39 @@ export default class XVerseProvider extends WalletProvider {
           signedPsbtBase64 = signedPsbt.toBase64()
         }
       },
-      onCancel: () => console.log('Canceled'),
+      onCancel: () => {
+        console.log('Canceled')
+        throw new Error('User canceled the request')
+      },
+      onError: (error: any) => {
+        console.log('error', error)
+        throw error
+      },
     }
 
     // @ts-ignore
     await signTransaction(signPsbtOptions)
-    return {
-      signedPsbtHex,
-      signedPsbtBase64,
-      txId,
+    if (broadcast) {
+      const signed = bitcoin.Psbt.fromBase64(String(signedPsbtBase64))
+      const finalized = signed.finalizeAllInputs()
+      const extracted = finalized.extractTransaction()
+      const txId = await this.pushPsbt(extracted.toHex())
+      return {
+        signedPsbtHex: extracted.toHex(),
+        signedPsbtBase64: 'test',
+        txId,
+      }
+    } else {
+      return {
+        signedPsbtHex,
+        signedPsbtBase64,
+        txId,
+      }
     }
   }
-  pushPsbt(_tx: string): Promise<string | undefined> {
-    throw UNSUPPORTED_PROVIDER_METHOD_ERROR
+  async pushPsbt(_tx: string): Promise<string | undefined> {
+    return await axios
+      .post(`${getMempoolSpaceUrl(this.network)}/api/tx`, _tx)
+      .then((res) => res.data)
   }
 }

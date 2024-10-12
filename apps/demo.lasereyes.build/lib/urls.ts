@@ -29,9 +29,3 @@ export const getMempoolSpaceUrl = (network: NetworkType) =>
           : network === FRACTAL_TESTNET
             ? MEMPOOL_SPACE_FRACTAL_TESTNET_URL
             : MEMPOOL_SPACE_URL
-
-export const ORDPOOL_SPACE_URL = 'https://ordpool.space'
-export const ORDPOOL_SPACE_TESTNET_URL = 'https://ordpool.space/testnet'
-
-export const getOrdpoolSpaceUrl = (network: typeof MAINNET | typeof TESTNET) =>
-  network === TESTNET ? ORDPOOL_SPACE_TESTNET_URL : ORDPOOL_SPACE_URL

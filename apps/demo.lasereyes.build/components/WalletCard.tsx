@@ -15,13 +15,9 @@ import {
   FRACTAL_TESTNET,
   SIGNET,
   TESTNET4,
-  // WalletIcon,
-  // ORANGE,
+  ORANGE,
 } from '@omnisat/lasereyes-core'
-
-const ORANGE = 'orange'
-
-import { useLaserEyes } from '@omnisat/lasereyes-react'
+import { useLaserEyes, WalletIcon } from '@omnisat/lasereyes-react'
 import {
   Card,
   CardContent,
@@ -56,9 +52,9 @@ const WalletCard = ({
     | typeof MAGIC_EDEN
     | typeof OKX
     | typeof LEATHER
+    | typeof ORANGE
     | typeof PHANTOM
     | typeof WIZZ
-  // | typeof ORANGE
   setSignature: (signature: string) => void
   unsignedPsbt: string | undefined
   setUnsignedPsbt: (psbt: string) => void
@@ -91,7 +87,7 @@ const WalletCard = ({
     hasLeather,
     hasPhantom,
     hasWizz,
-    // hasOrange,
+    hasOrange,
     sendBTC,
     signMessage,
     signPsbt,
@@ -126,7 +122,7 @@ const WalletCard = ({
     leather: hasLeather,
     phantom: hasPhantom,
     wizz: hasWizz,
-    orange: false,
+    orange: hasOrange,
   }
 
   useEffect(() => {
@@ -376,7 +372,7 @@ const WalletCard = ({
             'uppercase text-white text-center flex flex-row items-center justify-center gap-2'
           }
         >
-          {/*<WalletIcon walletName={walletName} size={42} />*/}
+          <WalletIcon walletName={walletName} size={42} />
           {walletName.replace('-', ' ')}
         </CardTitle>
       </CardHeader>
