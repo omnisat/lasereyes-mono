@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { Verifier } from 'bip322-js'
 import * as jwt from 'jsonwebtoken'
 
-const SECRET_KEY = process.env.JWT_SECRET_KEY
+const SECRET_KEY = String(process.env.JWT_SECRET_KEY)
 
 export const POST = async (req: NextRequest) => {
   try {
