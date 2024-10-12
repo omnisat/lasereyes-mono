@@ -42,10 +42,11 @@ jobs:
             echo "::set-output name=changed::false"
           fi
 
+      # Add Changeset if lasereyes package changed
       - name: Add Changeset if lasereyes package changed
         if: ${{ steps.check_lasereyes_changes.outputs.changed == 'true' }}
         run: |
-          pnpm changeset add --empty --force --message "chore: auto-bump lasereyes version"
+          pnpm changeset add --empty --force --message "chore: rc-bump lasereyes version"
 
       - name: Fetch all branches
         run: git fetch --all
@@ -60,17 +61,12 @@ jobs:
             echo "::set-output name=in_pre_mode::false"
           fi
 
-#      # Run Changesets pre-release mode for RC
-#      - name: Run Changesets pre-release mode for RC
-#        if: ${{ steps.check_lasereyes_changes.outputs.changed == 'true' && steps.check_pre_mode.outputs.in_pre_mode == 'false' && github.ref == 'refs/heads/dev' }}
-#        run: pnpm changeset pre enter rc
-#
-#      # Exit pre-release mode after merge to dev
-#      - name: Exit pre-release mode for dev
-#        if: ${{ github.ref == 'refs/heads/dev' && steps.check_pre_mode.outputs.in_pre_mode == 'true' }}
-#        run: pnpm changeset pre exit
+      # Exit pre-release mode for dev if in pre mode
+      - name: Exit pre-release mode for dev
+        if: ${{ github.ref == 'refs/heads/dev' && steps.check_pre_mode.outputs.in_pre_mode == 'true' }}
+        run: pnpm changeset pre exit
 
-      # Commit version bumps and changelog after changeset addition
+      # Apply RC Version bump
       - name: Run Changesets version bump
         if: ${{ steps.check_lasereyes_changes.outputs.changed == 'true' }}
         run: pnpm changeset version
