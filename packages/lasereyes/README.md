@@ -24,7 +24,7 @@ A common wallet interface for building JS/TS applications on Bitcoin.
 
 ## Documentation
 
-For documentation and guides, visit [Laser Eyes Docs](https://lasereyes.build/).
+For documentation and guides, visit [Lasereyes Docs](https://lasereyes.build/).
 
 ## Community
 
