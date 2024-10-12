@@ -54,6 +54,10 @@ jobs:
           else
             echo "Not in pre-release mode"
           fi
+      - name: Check if any files were changed
+        run: |
+          git status
+          git diff
 
       # Enter pre-release mode and version bump for lasereyes package
       - name: Run Changesets pre-release mode for RC
