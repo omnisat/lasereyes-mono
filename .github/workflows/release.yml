@@ -40,6 +40,15 @@ jobs:
           python3 -m pip install --upgrade pip
           pip install openai==0.28
 
+      - name: "Check if OPENAI_API_KEY is set"
+        run: |
+          if [ -z "$OPENAI_API_KEY" ]; then
+            echo "OPENAI_API_KEY is not set"
+            exit 1
+          fi
+          echo "OPENAI_API_KEY is set"
+          
+
       - name: Generate git diff
         run: |
           if [ "$(git rev-parse --is-shallow-repository)" = "true" ]; then
