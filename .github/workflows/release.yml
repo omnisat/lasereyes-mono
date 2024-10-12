@@ -3,13 +3,97 @@ name: Release
 on:
   push:
     branches:
-      - main
       - dev
+      - main
+permissions:  # Add this block
+  contents: write  # Grants write permissions to push commits
 
 jobs:
-  release:
+  generate-release-notes:
     runs-on: ubuntu-latest
+    environment: prod  # Specify your environment here if needed
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Ensure full history is checked out
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8.6.6
+
+      - name: Install Python dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          pip install openai==0.28 
+
+      - name: Generate git diff
+        run: |
+          if [ "$(git rev-parse --is-shallow-repository)" = "true" ]; then
+            git fetch --unshallow
+          fi
+          PREV_COMMIT=$(git rev-parse HEAD^1 || echo "No previous commit")
+          if [ "$PREV_COMMIT" != "No previous commit" ]; then
+            git diff $PREV_COMMIT HEAD > changes.diff
+          else
+            echo "No previous commit, skipping diff"
+            echo "" > changes.diff  # Empty diff if no previous commit
+          fi
+
+      - name: Check if OPENAI_API_KEY is set
+        run: |
+          if [ -z "$OPENAI_API_KEY" ]; then
+            echo "OPENAI_API_KEY is not set"
+            exit 1
+          else
+            echo "OPENAI_API_KEY is set"
+          fi
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+      - name: Generate Release Notes with GPT
+        run: |
+          python3 scripts/generate_release_notes.py
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+      - name: Set Git user
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"          
+
+      - name: Commit Detailed Release Notes
+        run: |
+          git add detailed_release_notes.md
+          git commit -m "Added detailed release notes for dev $(date +'%Y-%m-%d')"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Summarize Release Notes with GPT
+        run: |
+          python3 scripts/summarize_release_notes.py
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+      - name: Commit Summarized Release Notes
+        run: |
+          git add summary_release_notes.md
+          git commit -m "Added summarized release notes for dev $(date +'%Y-%m-%d')"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  changeset-rc-version:
+    runs-on: ubuntu-latest
+    needs: generate-release-notes
+    if: github.ref == 'refs/heads/dev'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -17,40 +101,131 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
-          cache: 'pnpm'
+          node-version: 20
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 6.32.9
+          version: 8.6.6
 
       - name: Install dependencies
         run: pnpm install
 
-      - name: Create Changesets version
+      # Run Changesets version for RC
+      - name: Run Changesets pre-release mode for RC
         run: |
-          if [ "${{ github.ref }}" == "refs/heads/dev" ]; then
-            pnpx changeset pre enter rc
-          fi
-          pnpx changeset version
+          pnpx changeset pre enter rc  # Enter RC mode
+          pnpx changeset version        # Bump RC version
 
-      - name: Push Changeset version update
+      # Commit the version bump and changelog
+      - name: Commit version bumps and changelog
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add .
-          git commit -m "Version Packages"
+          git commit -m "RC version bump"
           git push
-
-      - name: Create GitHub Release
-        uses: changesets/action@v1
-        with:
-          publish: false
-          version: false
-          changelog: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Echo publish action
-        run: echo "This is where the package would be published to npm."
+  publish-rc-release:
+    runs-on: ubuntu-latest
+    needs: changeset-rc-version
+    if: github.ref == 'refs/heads/dev'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8.6.6
+
+      - name: Install dependencies
+        run: pnpm install
+
+      # Publish the RC version to npm (or another registry)
+      - name: Publish RC to npm
+        run: pnpm publish --tag rc --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  changeset-stable-version:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    needs: publish-rc-release
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8.6.6
+
+      - name: Install dependencies
+        run: pnpm install
+
+      # Exit pre-release mode
+      - name: Exit RC mode
+        run: pnpx changeset pre exit
+
+      # Run Changesets version to bump versions and generate changelogs for stable release
+      - name: Run Changesets version
+        run: pnpx changeset version
+
+      # Commit the version bump and changelog
+      - name: Commit version bumps and changelog
+        run: |
+          git add .
+          git commit -m "Stable version bump"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish-stable-release:
+    runs-on: ubuntu-latest
+    needs: changeset-stable-version
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8.6.6
+
+      - name: Install dependencies
+        run: pnpm install
+
+      # Publish the stable version to npm
+      - name: Publish stable release to npm
+        run: pnpm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      # Create a GitHub Release with the summarized release notes
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        with:
+          tag_name: ${{ github.sha }}
+          release_name: "Stable Release ${{ github.sha }}"
+          body_path: summary_release_notes.md
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
