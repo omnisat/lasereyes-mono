@@ -59,7 +59,7 @@ jobs:
           else
             echo "::set-output name=in_pre_mode::false"
           fi
-#
+
 #      # Run Changesets pre-release mode for RC
 #      - name: Run Changesets pre-release mode for RC
 #        if: ${{ steps.check_lasereyes_changes.outputs.changed == 'true' && steps.check_pre_mode.outputs.in_pre_mode == 'false' && github.ref == 'refs/heads/dev' }}
@@ -69,6 +69,11 @@ jobs:
 #      - name: Exit pre-release mode for dev
 #        if: ${{ github.ref == 'refs/heads/dev' && steps.check_pre_mode.outputs.in_pre_mode == 'true' }}
 #        run: pnpm changeset pre exit
+
+      # Commit version bumps and changelog after changeset addition
+      - name: Run Changesets version bump
+        if: ${{ steps.check_lasereyes_changes.outputs.changed == 'true' }}
+        run: pnpm changeset version
 
       # Commit version bumps and changelog
       - name: Commit version bumps and changelog
