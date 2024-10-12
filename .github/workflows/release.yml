@@ -44,6 +44,17 @@ jobs:
             echo "::set-output name=changed::false"
           fi
 
+      # Check if already in pre-release mode, and exit if necessary
+      - name: Exit pre-release mode if active
+        if: steps.lasereyes-changes.outputs.changed == 'true'
+        run: |
+          if [ -f ".changeset/pre.json" ]; then
+            echo "Exiting pre-release mode"
+            pnpm dlx @changesets/cli pre exit
+          else
+            echo "Not in pre-release mode"
+          fi
+
       # Enter pre-release mode and version bump for lasereyes package
       - name: Run Changesets pre-release mode for RC
         if: steps.lasereyes-changes.outputs.changed == 'true'
