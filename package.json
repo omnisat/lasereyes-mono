@@ -3,6 +3,7 @@
   "private": true,
   "scripts": {
     "build": "turbo build",
+    "changeset": "changeset",
     "dev": "turbo dev",
     "dev:demo": "turbo dev --filter demo.lasereyes.build",
     "lint": "turbo lint",
