@@ -9,6 +9,7 @@ on:
 jobs:
   generate-release-notes:
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/dev'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -26,93 +27,61 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      # For generating release notes when merging to 'dev'
-      - name: Generate Release Notes for dev
-        if: github.ref == 'refs/heads/dev'
+      - name: Generate git diff
         run: |
-          # Get the diff between the previous commit and the current merge commit
           PREV_COMMIT=$(git rev-parse HEAD^1)
           git diff $PREV_COMMIT HEAD > changes.diff
-          
-          # Use GPT to generate release notes based on the diff
-          echo "Generating release notes with GPT..."
-          RELEASE_NOTES=$(python3 <<EOF
-  import openai
-  
-  openai.api_key = "${{ secrets.OPENAI_API_KEY }}"
 
-with open('changes.diff', 'r') as f:
-  diff_content = f.read()
-  
-  response = openai.Completion.create(
-  model="gpt-4",
-prompt=f"Generate detailed release notes based on this git diff: {diff_content}",
-    max_tokens=500
-)
+      # Use the external Python script to generate release notes
+      - name: Generate Release Notes with GPT
+        run: |
+          python3 scripts/generate_release_notes.py > RELEASE_NOTES.md
 
-print(response['choices'][0]['text'].strip())
-EOF
-          )
+      # Commit the generated release notes to the dev branch
+      - name: Commit Release Notes
+        run: |
+          git add RELEASE_NOTES.md
+          git commit -m "Generated release notes for dev"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-          echo "Release Notes: $RELEASE_NOTES"
-                                                                                                 
-                                                                                                 # Save release notes to a file
-                                                                                                 echo "$RELEASE_NOTES" > RELEASE_NOTES.md
-                                                                                                 
-                                                                                                 # Commit release notes to the dev branch
-                                                                                                 git add RELEASE_NOTES.md
-                                                                                                 git commit -m "Generated release notes for dev"
-                                                                                                 git push
+  summarize-release-notes:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    needs: generate-release-notes
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-summarize-release-notes:
-  runs-on: ubuntu-latest
-  needs: generate-release-notes
-  if: github.ref == 'refs/heads/main'
-  steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: 20
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8.6.6
 
-    - name: Setup pnpm
-      uses: pnpm/action-setup@v2
-      with:
-        version: 8.6.6
+      - name: Install dependencies
+        run: pnpm install
 
-    - name: Install dependencies
-      run: pnpm install
+      # Aggregate all release notes created in dev branch
+      - name: Aggregate Release Notes
+        run: |
+          git log --oneline --grep="Generated release notes for dev" --pretty=format:"%s%n%b" > release_notes_aggregated.txt
 
-    # Aggregate and summarize release notes when merging to 'main'
-    - name: Summarize Release Notes for main
-      run: |
-        # Aggregate all the release notes from the dev branch
-        RELEASE_NOTES=$(git log --oneline --grep="Generated release notes for dev" --pretty=format:"%s%n%b")
-        
-        echo "Summarizing release notes with GPT..."
-        SUMMARY_NOTES=$(python3 <<EOF
-  import openai
-  
-  openai.api_key = "${{ secrets.OPENAI_API_KEY }}"
-  
-  response = openai.Completion.create(
-  model="gpt-4",
-prompt=f"Summarize these release notes: {RELEASE_NOTES}",
-    max_tokens=500
-)
+      # Use the external Python script to summarize the release notes
+      - name: Summarize Release Notes with GPT
+        run: |
+          python3 scripts/summarize_release_notes.py > SUMMARY_RELEASE_NOTES.md
 
-print(response['choices'][0]['text'].strip())
-EOF
-          )
-
-          echo "Release Summary: $SUMMARY_NOTES"
-                                                                         
-                                                                         # Save summarized release notes to a file
-                                                                         echo "$SUMMARY_NOTES" > SUMMARY_RELEASE_NOTES.md
-                                                                         
-                                                                         # Commit summarized release notes to the main branch
-                                                                         git add SUMMARY_RELEASE_NOTES.md
-                                                                         git commit -m "Summarized release notes for main"
-                                                                         git push
+      # Commit the summarized release notes to the main branch
+      - name: Commit Summarized Release Notes
+        run: |
+          git add SUMMARY_RELEASE_NOTES.md
+          git commit -m "Summarized release notes for main"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
