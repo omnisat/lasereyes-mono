@@ -29,7 +29,11 @@ jobs:
         run: pnpm install
 
       - name: Create Changesets version
-        run: pnpx changeset version
+        run: |
+          if [ "${{ github.ref }}" == "refs/heads/dev" ]; then
+            pnpx changeset pre enter rc
+          fi
+          pnpx changeset version
 
       - name: Push Changeset version update
         run: |
@@ -48,6 +52,5 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Echo statement instead of publishing to npm (for now)
       - name: Echo publish action
         run: echo "This is where the package would be published to npm."
