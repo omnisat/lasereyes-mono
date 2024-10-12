@@ -35,8 +35,7 @@ jobs:
       - name: Add Changeset if lasereyes package changed
         run: |
           if [ "$changed" = "true" ]; then
-            pnpm changeset add --empty --force --commit \
-              --message "chore: auto-bump lasereyes version"
+            pnpm changeset add --empty --force --message "auto-bump lasereyes version"
           fi
 
       # Enter pre-release mode for RC if on dev
