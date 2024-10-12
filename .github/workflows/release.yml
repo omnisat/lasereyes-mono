@@ -5,6 +5,8 @@ on:
     branches:
       - dev
       - main
+permissions:  # Add this block
+  contents: write  # Grants write permissions to push commits
 
 jobs:
   generate-release-notes:
