@@ -10,6 +10,8 @@
     "@repo/typescript-config": "0.0.0"
   },
   "changesets": [
+    "breezy-seahorses-occur",
+    "fast-walls-kneel",
     "selfish-dolls-attend",
     "selfish-vans-own",
     "yellow-bananas-relate"
