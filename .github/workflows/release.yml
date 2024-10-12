@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0  # Ensure full history is fetched so changesets can check other branches
 
       - name: Setup Node.js
         uses: actions/setup-node@v2
@@ -41,6 +43,10 @@ jobs:
         if: env.changed == 'true'
         run: |
           pnpm changeset add --empty --force --message "chore: auto-bump lasereyes version"
+
+      # Fetch all branches for changeset to properly check
+      - name: Fetch all branches
+        run: git fetch --all
 
       # Check if already in pre-release mode on dev
       - name: Check pre-release mode
