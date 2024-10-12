@@ -33,34 +33,39 @@ jobs:
 
       # Automatically add a changeset if changes are detected
       - name: Add Changeset if lasereyes package changed
-        if: env.changed == 'true'
         run: |
-          pnpm dlx changeset add --empty --force --commit \
-            --message "chore: auto-bump lasereyes version"
+          if [ "$changed" = "true" ]; then
+            pnpm dlx changeset add --empty --force --commit \
+              --message "chore: auto-bump lasereyes version"
+          fi
 
       # Enter pre-release mode for RC if on dev
       - name: Run Changesets pre-release mode for RC
-        if: github.ref == 'refs/heads/dev' && env.changed == 'true'
+        if: github.ref == 'refs/heads/dev'
         run: |
-          pnpm dlx @changesets/cli pre enter rc
-          pnpm dlx @changesets/cli version
+          if [ "$changed" = "true" ]; then
+            pnpm dlx @changesets/cli pre enter rc
+            pnpm dlx @changesets/cli version
+          fi
 
       # Commit version bump
       - name: Commit version bumps and changelog
-        if: github.ref == 'refs/heads/dev' && env.changed == 'true'
+        if: github.ref == 'refs/heads/dev'
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add .
-          git commit -m "RC version bump for lasereyes"
-          git push origin dev
+          if [ "$changed" = "true" ]; then
+            git config --global user.name "github-actions[bot]"
+            git config --global user.email "github-actions[bot]@users.noreply.github.com"
+            git add .
+            git commit -m "RC version bump for lasereyes"
+            git push origin dev
+          fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   publish-rc-release:
     runs-on: ubuntu-latest
     needs: detect-changes-and-version
-    if: github.ref == 'refs/heads/dev' && env.changed == 'true'
+    if: github.ref == 'refs/heads/dev'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -74,13 +79,16 @@ jobs:
         run: pnpm install
 
       - name: Publish RC to npm
-        run: pnpm publish --tag rc --access public
+        run: |
+          if [ "$changed" = "true" ]; then
+            pnpm publish --tag rc --access public
+          fi
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   changeset-stable-version:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && env.changed == 'true'
+    if: github.ref == 'refs/heads/main'
     needs: publish-rc-release
     steps:
       - name: Checkout repository
@@ -100,25 +108,33 @@ jobs:
         run: pnpm install
 
       - name: Exit pre-release mode
-        run: pnpm dlx @changesets/cli pre exit
+        run: |
+          if [ "$changed" = "true" ]; then
+            pnpm dlx @changesets/cli pre exit
+          fi
 
       - name: Run Changesets version for stable
-        run: pnpm dlx @changesets/cli version
+        run: |
+          if [ "$changed" = "true" ]; then
+            pnpm dlx @changesets/cli version
+          fi
 
       - name: Commit version bumps and changelog for stable
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add .
-          git commit -m "Stable version bump for lasereyes"
-          git push origin main
+          if [ "$changed" = "true" ]; then
+            git config --global user.name "github-actions[bot]"
+            git config --global user.email "github-actions[bot]@users.noreply.github.com"
+            git add .
+            git commit -m "Stable version bump for lasereyes"
+            git push origin main
+          fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   publish-stable-release:
     runs-on: ubuntu-latest
     needs: changeset-stable-version
-    if: github.ref == 'refs/heads/main' && env.changed == 'true'
+    if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -132,7 +148,10 @@ jobs:
         run: pnpm install
 
       - name: Publish stable release to npm
-        run: pnpm publish --access public
+        run: |
+          if [ "$changed" = "true" ]; then
+            pnpm publish --access public
+          fi
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
