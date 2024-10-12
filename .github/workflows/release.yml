@@ -66,9 +66,9 @@ jobs:
         if: ${{ github.ref == 'refs/heads/dev' && steps.check_pre_mode.outputs.in_pre_mode == 'true' }}
         run: pnpm changeset pre exit
 
-      # Enter pre-release mode for RC if not already in pre mode
+  # Enter pre-release mode for RC if not already in pre mode
       - name: Enter pre-release mode for RC
-        if: ${{ steps.check_lasereyes_changes.outputs.changed == 'true' && steps.check_pre_mode.outputs.in_pre_mode == 'false' && github.ref == 'refs/heads/dev' }}
+        if: ${{ steps.check_pre_mode.outputs.in_pre_mode == 'false' && steps.check_lasereyes_changes.outputs.changed == 'true' && github.ref == 'refs/heads/dev' }}
         run: pnpm changeset pre enter rc
 
       # Run Changesets version bump for lasereyes
