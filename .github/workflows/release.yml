@@ -9,6 +9,7 @@ on:
 jobs:
   generate-release-notes:
     runs-on: ubuntu-latest
+    environment: prod
     if: github.ref == 'refs/heads/dev' && github.event_name != 'pull_request'
     steps:
       - name: Checkout repository
