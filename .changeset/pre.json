@@ -9,5 +9,8 @@
     "@omnisat/lasereyes-react": "0.0.2",
     "@repo/typescript-config": "0.0.0"
   },
-  "changesets": []
+  "changesets": [
+    "selfish-dolls-attend",
+    "selfish-vans-own"
+  ]
 }
