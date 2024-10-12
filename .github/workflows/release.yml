@@ -68,13 +68,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Commit version bumps and changelog
       - name: Commit version bumps and changelog
-        if: steps.lasereyes-changes.outputs.changed == 'true'
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add .
+          git add .changeset/pre.json
           git commit -m "RC version bump for lasereyes"
           git push origin dev
         env:
