@@ -9,13 +9,10 @@ on:
 jobs:
   generate-release-notes:
     runs-on: ubuntu-latest
-    environment: prod
-    if: github.ref == 'refs/heads/dev' && github.event_name != 'pull_request'
+    environment: prod  # Make sure to specify your environment name here
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # Ensure full history is checked out
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -27,55 +24,24 @@ jobs:
         with:
           version: 8.6.6
 
-      - name: Install dependencies
-        run: pnpm install
-
-      # Setup Python and install openai module
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.x'
-
       - name: Install Python dependencies
         run: |
           python3 -m pip install --upgrade pip
-          pip install openai==0.28
+          pip install openai
 
-      - name: "Check if OPENAI_API_KEY is set"
+      - name: Check if OPENAI_API_KEY is set
         run: |
           if [ -z "$OPENAI_API_KEY" ]; then
             echo "OPENAI_API_KEY is not set"
             exit 1
-          fi
-          echo "OPENAI_API_KEY is set"
-          
-
-      - name: Generate git diff
-        run: |
-          if [ "$(git rev-parse --is-shallow-repository)" = "true" ]; then
-            git fetch --unshallow
-          fi
-          PREV_COMMIT=$(git rev-parse HEAD^1 || echo "No previous commit")
-          if [ "$PREV_COMMIT" != "No previous commit" ]; then
-            git diff $PREV_COMMIT HEAD > changes.diff
           else
-            echo "No previous commit, skipping diff"
-            echo "" > changes.diff  # Empty diff if no previous commit
+            echo "OPENAI_API_KEY is set"
           fi
-
-      # Generate release notes using the external Python script
-      - name: Generate Release Notes with GPT
-        run: |
-          python3 scripts/generate_release_notes.py > releases/dev_release_notes_$(date +'%Y-%m-%d').md  # Store in releases directory
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
-
-      # Commit the release notes to the releases directory
-      - name: Commit Release Notes
+      - name: Generate Release Notes with GPT
         run: |
-          git add releases/
-          git commit -m "Added release notes for dev $(date +'%Y-%m-%d')"
-          git push
+          python3 scripts/generate_release_notes.py
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
