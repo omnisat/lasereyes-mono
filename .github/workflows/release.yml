@@ -13,6 +13,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Ensure full history is checked out
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -29,8 +31,16 @@ jobs:
 
       - name: Generate git diff
         run: |
-          PREV_COMMIT=$(git rev-parse HEAD^1)
-          git diff $PREV_COMMIT HEAD > changes.diff
+          if [ "$(git rev-parse --is-shallow-repository)" = "true" ]; then
+            git fetch --unshallow
+          fi
+          PREV_COMMIT=$(git rev-parse HEAD^1 || echo "No previous commit")
+          if [ "$PREV_COMMIT" != "No previous commit" ]; then
+            git diff $PREV_COMMIT HEAD > changes.diff
+          else
+            echo "No previous commit, skipping diff"
+            echo "" > changes.diff  # Empty diff if no previous commit
+          fi
 
       # Generate release notes using the external Python script
       - name: Generate Release Notes with GPT
