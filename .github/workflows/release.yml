@@ -31,6 +31,22 @@ jobs:
         run: |
           git diff --quiet HEAD^ HEAD -- packages/lasereyes || echo "changed=true" >> $GITHUB_ENV
 
+      - name: Exit pre-release mode if active
+        run: |
+          if pnpm changeset status | grep -q "pre mode"; then
+            pnpm changeset pre exit
+          fi
+                  
+
+      # Check if already in pre-release mode
+      - name: Check pre-release mode
+        run: |
+          if pnpm changeset status --since dev | grep -q "pre mode"; then
+            echo "pre_mode=true" >> $GITHUB_ENV
+          else
+            echo "pre_mode=false" >> $GITHUB_ENV
+          fi
+
       # Automatically add a changeset if changes are detected
       - name: Add Changeset if lasereyes package changed
         run: |
@@ -38,14 +54,6 @@ jobs:
             pnpm changeset add --empty --force --message "chore: auto-bump lasereyes version"
           fi
 
-      # Check if already in pre-release mode
-      - name: Check pre-release mode
-        run: |
-          if pnpm changeset status | grep -q "pre mode"; then
-            echo "pre_mode=true" >> $GITHUB_ENV
-          else
-            echo "pre_mode=false" >> $GITHUB_ENV
-          fi
 
       # Enter pre-release mode for RC if on dev and not already in pre mode
       - name: Run Changesets pre-release mode for RC
