@@ -43,6 +43,16 @@ jobs:
             echo "Lasereyes package did not change."
             echo "::set-output name=changed::false"
           fi
+
+      # Run Changesets if lasereyes package changed
+      - name: Run Changesets pre-release mode for RC
+        if: steps.lasereyes-changes.outputs.changed == 'true'
+        run: |
+          pnpx changeset pre enter rc  # Enter RC mode
+          pnpx changeset version        # Bump RC version
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       # Commit version bumps and changelog
       - name: Commit version bumps and changelog
         if: steps.lasereyes-changes.outputs.changed == 'true'
@@ -62,6 +72,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -89,6 +101,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -114,9 +128,11 @@ jobs:
       # Commit the stable version bump and changelog
       - name: Commit version bumps and changelog
         run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add .
           git commit -m "Stable version bump"
-          git push
+          git push origin main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -127,6 +143,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
