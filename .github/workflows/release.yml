@@ -3,8 +3,8 @@ name: Release
 on:
   push:
     branches:
-      - main
       - dev
+      - main
 
 jobs:
   generate-release-notes:
@@ -32,21 +32,124 @@ jobs:
           PREV_COMMIT=$(git rev-parse HEAD^1)
           git diff $PREV_COMMIT HEAD > changes.diff
 
+      # Generate release notes using the external Python script
       - name: Generate Release Notes with GPT
         run: |
-          python3 scripts/generate_release_notes.py > RELEASE_NOTES.md
+          python3 scripts/generate_release_notes.py > releases/dev_release_notes_$(date +'%Y-%m-%d').md  # Store in releases directory
 
+      # Commit the release notes to the releases directory
       - name: Commit Release Notes
         run: |
-          git add RELEASE_NOTES.md
-          git commit -m "Generated release notes for dev"
+          git add releases/
+          git commit -m "Added release notes for dev $(date +'%Y-%m-%d')"
           git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  publish-release:
+  changeset-rc-version:
     runs-on: ubuntu-latest
     needs: generate-release-notes
+    if: github.ref == 'refs/heads/dev'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8.6.6
+
+      - name: Install dependencies
+        run: pnpm install
+
+      # Run Changesets version for RC
+      - name: Run Changesets pre-release mode for RC
+        run: |
+          pnpx changeset pre enter rc  # Enter RC mode
+          pnpx changeset version        # Bump RC version
+
+      # Commit the version bump and changelog
+      - name: Commit version bumps and changelog
+        run: |
+          git add .
+          git commit -m "RC version bump"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish-rc-release:
+    runs-on: ubuntu-latest
+    needs: changeset-rc-version
+    if: github.ref == 'refs/heads/dev'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8.6.6
+
+      - name: Install dependencies
+        run: pnpm install
+
+      # Publish the RC version to npm (or another registry)
+      - name: Publish RC to npm
+        run: pnpm publish --tag rc --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  changeset-stable-version:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    needs: publish-rc-release
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8.6.6
+
+      - name: Install dependencies
+        run: pnpm install
+
+      # Exit pre-release mode
+      - name: Exit RC mode
+        run: pnpx changeset pre exit
+
+      # Run Changesets version to bump versions and generate changelogs for stable release
+      - name: Run Changesets version
+        run: pnpx changeset version
+
+      # Commit the version bump and changelog
+      - name: Commit version bumps and changelog
+        run: |
+          git add .
+          git commit -m "Stable version bump"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish-stable-release:
+    runs-on: ubuntu-latest
+    needs: changeset-stable-version
     if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout repository
@@ -65,22 +168,20 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      # Publish the stable version to npm
+      - name: Publish stable release to npm
+        run: pnpm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
       # Create a GitHub Release with the summarized release notes
       - name: Create GitHub Release
         uses: actions/create-release@v1
         with:
           tag_name: ${{ github.sha }}
-          release_name: "Release ${{ github.sha }}"
-          body_path: SUMMARY_RELEASE_NOTES.md
+          release_name: "Stable Release ${{ github.sha }}"
+          body_path: releases/main_summary_notes_$(date +'%Y-%m-%d').md
           draft: false
           prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Commit Release Notes to GitHub
-        run: |
-          git add SUMMARY_RELEASE_NOTES.md
-          git commit -m "Summarized release notes for main"
-          git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
