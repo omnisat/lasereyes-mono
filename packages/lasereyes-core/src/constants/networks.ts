@@ -36,7 +36,7 @@ export const FRACTAL_MAINNET = 'fractal mainnet'
 export const FRACTAL_TESTNET = 'fractal testnet'
 export const REGTEST = 'regtest'
 
-export const getXverseNetwork = (network: string) => {
+export const getSatsConnectNetwork = (network: string) => {
   if (network === MAINNET) return XVERSE_MAINNET
   if (network === TESTNET) return XVERSE_TESTNET
   if (network === SIGNET) return XVERSE_SIGNET

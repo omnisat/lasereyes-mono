@@ -3,6 +3,7 @@ import { MapStore, WritableAtom, subscribeKeys } from 'nanostores'
 import { Config, NetworkType, ProviderType } from '../types'
 import {
   LEATHER,
+  MAGIC_EDEN,
   OKX,
   ORANGE,
   OYL,
@@ -23,6 +24,7 @@ import OylProvider from './providers/oyl'
 import LeatherProvider from './providers/leather'
 import OrangeProvider from './providers/orange'
 import OkxProvider from './providers/okx.ts'
+import MagicEdenProvider from './providers/magic-eden.ts'
 
 export class LaserEyesClient {
   readonly $store: MapStore<LaserEyesStoreType>
@@ -44,6 +46,7 @@ export class LaserEyesClient {
     this.$network = stores.$network
     this.$providerMap = {
       [LEATHER]: new LeatherProvider(stores, this, config),
+      [MAGIC_EDEN]: new MagicEdenProvider(stores, this, config),
       [OKX]: new OkxProvider(stores, this, config),
       [ORANGE]: new OrangeProvider(stores, this, config),
       [OYL]: new OylProvider(stores, this, config),
