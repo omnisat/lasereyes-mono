@@ -10,7 +10,6 @@
 # lasereyes
 
 
-
 A common wallet interface for building JS/TS applications on Bitcoin.
 
 ![Version](https://img.shields.io/npm/v/@omnisat/lasereyes)
