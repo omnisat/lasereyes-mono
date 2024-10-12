@@ -21,6 +21,10 @@ jobs:
           node-version: 18
           cache: 'pnpm'
 
+      # Install pnpm
+      - name: Install pnpm
+        run: npm install -g pnpm
+
       - name: Install dependencies
         run: pnpm install
 
@@ -29,21 +33,21 @@ jobs:
 
   lint:
     runs-on: ubuntu-latest
-    needs: setup  # Avoid reinstalling dependencies
+    needs: setup
     steps:
       - name: Lint code
         run: pnpm lint
 
   test:
     runs-on: ubuntu-latest
-    needs: setup  # Avoid reinstalling dependencies
+    needs: setup
     steps:
       - name: Run tests
         run: pnpm test
 
   format:
     runs-on: ubuntu-latest
-    needs: setup  # Avoid reinstalling dependencies
+    needs: setup
     steps:
       - name: Format code
         run: pnpm format
