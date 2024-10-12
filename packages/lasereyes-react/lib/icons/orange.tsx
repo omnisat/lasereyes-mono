@@ -1,13 +1,13 @@
-import * as React from "react";
+import * as React from 'react'
 
 interface OrangeLogoProps extends React.SVGProps<SVGSVGElement> {
-  size?: number;
-  variant?: "first" | "second";
+  size?: number
+  variant?: 'first' | 'second'
 }
 
 const OrangeLogo: React.FC<OrangeLogoProps> = ({
   size = 42,
-  variant = "first",
+  variant = 'first',
   className,
   ...props
 }) => (
@@ -36,14 +36,14 @@ const OrangeLogo: React.FC<OrangeLogoProps> = ({
         <stop
           offset={0}
           style={{
-            stopColor: "rgb(5.098039%,5.490196%,7.058824%)",
+            stopColor: 'rgb(5.098039%,5.490196%,7.058824%)',
             stopOpacity: 1,
           }}
         />
         <stop
           offset={1}
           style={{
-            stopColor: "rgb(0%,0%,0%)",
+            stopColor: 'rgb(0%,0%,0%)',
             stopOpacity: 1,
           }}
         />
@@ -100,9 +100,9 @@ const OrangeLogo: React.FC<OrangeLogoProps> = ({
             width={42}
             height={42}
             style={{
-              fill: "rgb(0%,0%,0%)",
+              fill: 'rgb(0%,0%,0%)',
               fillOpacity: 0.6,
-              stroke: "none",
+              stroke: 'none',
             }}
           />
         </g>
@@ -121,9 +121,9 @@ const OrangeLogo: React.FC<OrangeLogoProps> = ({
             width={42}
             height={42}
             style={{
-              fill: "rgb(0%,0%,0%)",
+              fill: 'rgb(0%,0%,0%)',
               fillOpacity: 0.701961,
-              stroke: "none",
+              stroke: 'none',
             }}
           />
         </g>
@@ -148,9 +148,9 @@ const OrangeLogo: React.FC<OrangeLogoProps> = ({
             width={42}
             height={42}
             style={{
-              fill: "rgb(0%,0%,0%)",
+              fill: 'rgb(0%,0%,0%)',
               fillOpacity: 0.2,
-              stroke: "none",
+              stroke: 'none',
             }}
           />
         </g>
@@ -177,9 +177,9 @@ const OrangeLogo: React.FC<OrangeLogoProps> = ({
       <g clipPath="url(#clip1)" clipRule="nonzero">
         <path
           style={{
-            stroke: "none",
-            fillRule: "nonzero",
-            fill: "url(#radial0)",
+            stroke: 'none',
+            fillRule: 'nonzero',
+            fill: 'url(#radial0)',
           }}
           d="M 9.433594 0 L 32.566406 0 C 37.777344 0 42 4.222656 42 9.433594 L 42 32.566406 C 42 37.777344 37.777344 42 32.566406 42 L 9.433594 42 C 4.222656 42 0 37.777344 0 32.566406 L 0 9.433594 C 0 4.222656 4.222656 0 9.433594 0 Z M 9.433594 0 "
         />
@@ -189,5 +189,5 @@ const OrangeLogo: React.FC<OrangeLogoProps> = ({
       </g>
     </g>
   </svg>
-);
-export default OrangeLogo;
+)
+export default OrangeLogo

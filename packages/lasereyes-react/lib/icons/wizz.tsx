@@ -1,13 +1,13 @@
-import * as React from "react";
+import * as React from 'react'
 
 interface WizzLogoProps extends React.SVGProps<SVGSVGElement> {
-  size?: number;
-  variant?: "first" | "second";
+  size?: number
+  variant?: 'first' | 'second'
 }
 
 const WizzLogo: React.FC<WizzLogoProps> = ({
   size = 42,
-  variant = "first",
+  variant = 'first',
   className,
   ...props
 }) => {
@@ -54,7 +54,7 @@ const WizzLogo: React.FC<WizzLogoProps> = ({
         </clipPath>
       </defs>
     </svg>
-  );
-};
+  )
+}
 
-export { WizzLogo };
+export { WizzLogo }

@@ -1,5 +1,5 @@
-import axios from "axios";
-import { WALLET_NOT_INSTALLED_ERROR, WalletProvider } from ".";
+import axios from 'axios'
+import { WALLET_NOT_INSTALLED_ERROR, WalletProvider } from '.'
 import {
   NetworkType,
   WizzBalanceResponse,
@@ -8,147 +8,146 @@ import {
   WIZZ_MAINNET,
   getNetworkForWizz,
   WIZZ,
-} from "../..";
-import { getMempoolSpaceUrl } from "../../lib/urls";
-import * as bitcoin from "bitcoinjs-lib";
-import { listenKeys } from "nanostores";
+} from '../..'
+import { getMempoolSpaceUrl } from '../../lib/urls'
+import * as bitcoin from 'bitcoinjs-lib'
+import { listenKeys } from 'nanostores'
 
 export class WizzProvider extends WalletProvider {
   public get library(): any | undefined {
-    return (window as any).wizz;
+    return (window as any).wizz
   }
 
   public get network(): string {
-    return this.$network.get();
+    return this.$network.get()
   }
 
-  observer?: MutationObserver;
+  observer?: MutationObserver
 
   private handleNetworkChanged(_network: NetworkType) {
     // const foundNetwork = getNetworkForWizz(_network);
     // this.$network.set(foundNetwork);
-    this.parent.connect(WIZZ);
+    this.parent.connect(WIZZ)
   }
 
   private handleAccountsChanged(accounts: string[]) {
     if (!accounts.length) {
-      this.parent.disconnect();
-      return;
+      this.parent.disconnect()
+      return
     }
 
     if (this.$store.get().accounts[0] === accounts[0]) {
-      return;
+      return
     }
 
-    this.$store.setKey("accounts", accounts);
+    this.$store.setKey('accounts', accounts)
   }
 
   initialize(): void {
-    listenKeys(this.$store, ["provider"], (value) => {
+    listenKeys(this.$store, ['provider'], (value) => {
       if (value.provider === WIZZ) {
-        this.addLibraryListeners();
+        this.addLibraryListeners()
       } else {
-        this.removeLibraryListeners();
+        this.removeLibraryListeners()
       }
-    });
+    })
 
     this.observer = new window.MutationObserver(() => {
       if (this.library) {
-        this.$store.setKey("hasProvider", {
+        this.$store.setKey('hasProvider', {
           ...this.$store.get().hasProvider,
           [WIZZ]: true,
-        });
-        this.observer?.disconnect();
+        })
+        this.observer?.disconnect()
       }
-    });
-    this.observer.observe(document, { childList: true, subtree: true });
+    })
+    this.observer.observe(document, { childList: true, subtree: true })
   }
   private removeLibraryListeners() {
     this.library?.removeListener(
-      "networkChanged",
+      'networkChanged',
       this.handleNetworkChanged.bind(this)
-    );
+    )
     this.library?.removeListener(
-      "accountsChanged",
+      'accountsChanged',
       this.handleAccountsChanged.bind(this)
-    );
+    )
   }
 
   private addLibraryListeners() {
-    this.library?.on("networkChanged", this.handleNetworkChanged.bind(this));
-    this.library?.on("accountsChanged", this.handleAccountsChanged.bind(this));
+    this.library?.on('networkChanged', this.handleNetworkChanged.bind(this))
+    this.library?.on('accountsChanged', this.handleAccountsChanged.bind(this))
   }
 
   dispose(): void {
-    this.observer?.disconnect();
-    this.removeLibraryListeners();
+    this.observer?.disconnect()
+    this.removeLibraryListeners()
   }
   async connect(): Promise<void> {
-    if (!this.library) throw WALLET_NOT_INSTALLED_ERROR;
-    const wizzAccounts = await this.library.requestAccounts();
-    if (!wizzAccounts) throw new Error("No accounts found");
-    const wizzPubKey = await this.library.getPublicKey();
-    if (!wizzPubKey) throw new Error("No public key found");
-    this.$store.setKey("accounts", wizzAccounts);
-    this.$store.setKey("address", wizzAccounts[0]);
-    this.$store.setKey("paymentAddress", wizzAccounts[0]);
-    this.$store.setKey("publicKey", wizzPubKey);
-    this.$store.setKey("paymentPublicKey", wizzPubKey);
+    if (!this.library) throw WALLET_NOT_INSTALLED_ERROR
+    const wizzAccounts = await this.library.requestAccounts()
+    if (!wizzAccounts) throw new Error('No accounts found')
+    const wizzPubKey = await this.library.getPublicKey()
+    if (!wizzPubKey) throw new Error('No public key found')
+    this.$store.setKey('accounts', wizzAccounts)
+    this.$store.setKey('address', wizzAccounts[0])
+    this.$store.setKey('paymentAddress', wizzAccounts[0])
+    this.$store.setKey('publicKey', wizzPubKey)
+    this.$store.setKey('paymentPublicKey', wizzPubKey)
 
-    this.$store.setKey("provider", WIZZ);
+    this.$store.setKey('provider', WIZZ)
     await this.getNetwork().then((network) => {
       if (network && this.config?.network !== network) {
-        this.parent.switchNetwork(network);
+        this.parent.switchNetwork(network)
       }
-    });
-    await this.parent.getBalance();
-    this.$store.setKey("connected", true);
+    })
+    await this.parent.getBalance()
+    this.$store.setKey('connected', true)
   }
 
   async requestAccounts(): Promise<string[]> {
-    return await this.library.requestAccounts();
+    return await this.library.requestAccounts()
   }
 
   async getNetwork(): Promise<NetworkType | undefined> {
-    const wizzNetwork = await this.library?.getNetwork();
-    return wizzNetwork ? getNetworkForWizz(wizzNetwork) : undefined;
+    const wizzNetwork = await this.library?.getNetwork()
+    return wizzNetwork ? getNetworkForWizz(wizzNetwork) : undefined
   }
 
   async switchNetwork(_network: NetworkType): Promise<void> {
     if (_network === FRACTAL_TESTNET || _network === FRACTAL_MAINNET) {
-      return await this.library.switchNetwork(WIZZ_MAINNET);
+      return await this.library.switchNetwork(WIZZ_MAINNET)
     }
 
-    const wantedNetwork = getNetworkForWizz(_network);
-    await this.library?.switchNetwork(wantedNetwork);
-    this.$network.set(_network);
-    await this.parent.getBalance();
+    const wantedNetwork = getNetworkForWizz(_network)
+    await this.library?.switchNetwork(wantedNetwork)
+    this.$network.set(_network)
+    await this.parent.getBalance()
   }
   async getPublicKey(): Promise<string | undefined> {
-    return await this.library?.getPublicKey();
+    return await this.library?.getPublicKey()
   }
 
   async getBalance(): Promise<string | number | bigint> {
-    const balanceResponse: WizzBalanceResponse =
-      await this.library.getBalance();
-    return balanceResponse.total;
+    const balanceResponse: WizzBalanceResponse = await this.library.getBalance()
+    return balanceResponse.total
   }
 
   async getInscriptions(): Promise<any[]> {
-    return await this.library.getInscriptions(0, 10);
+    return await this.library.getInscriptions(0, 10)
   }
 
   async sendBTC(to: string, amount: number): Promise<string> {
-    const txId = await this.library?.sendBitcoin(to, amount);
+    const txId = await this.library?.sendBitcoin(to, amount)
     if (txId) {
-      return txId;
+      return txId
     } else {
-      throw new Error("Error sending BTC");
+      throw new Error('Error sending BTC')
     }
   }
 
   async signMessage(message: string): Promise<string> {
-    return await this.library?.signMessage(message);
+    return await this.library?.signMessage(message)
   }
 
   async signPsbt(
@@ -159,34 +158,34 @@ export class WizzProvider extends WalletProvider {
     broadcast?: boolean | undefined
   ): Promise<
     | {
-        signedPsbtHex: string | undefined;
-        signedPsbtBase64: string | undefined;
-        txId?: string | undefined;
+        signedPsbtHex: string | undefined
+        signedPsbtBase64: string | undefined
+        txId?: string | undefined
       }
     | undefined
   > {
     const signedPsbt = await this.library?.signPsbt(psbtHex, {
       autoFinalized: finalize,
       broadcast: false,
-    });
+    })
 
-    const psbtSignedPsbt = bitcoin.Psbt.fromHex(signedPsbt);
+    const psbtSignedPsbt = bitcoin.Psbt.fromHex(signedPsbt)
 
-    let txId;
+    let txId
     if (finalize && broadcast) {
-      txId = await this.pushPsbt(signedPsbt);
+      txId = await this.pushPsbt(signedPsbt)
     }
 
     return {
       signedPsbtHex: psbtSignedPsbt.toHex(),
       signedPsbtBase64: psbtSignedPsbt.toBase64(),
       txId: txId,
-    };
+    }
   }
 
   async pushPsbt(tx: string): Promise<string | undefined> {
     return await axios
       .post(`${getMempoolSpaceUrl(this.$network.get())}/api/tx`, tx)
-      .then((res) => res.data);
+      .then((res) => res.data)
   }
 }

@@ -1,17 +1,17 @@
-import * as React from "react";
+import * as React from 'react'
 
 interface PhantomLogoProps extends React.SVGProps<SVGSVGElement> {
-  size?: number;
-  variant?: "first" | "second";
+  size?: number
+  variant?: 'first' | 'second'
 }
 
 const PhantomLogo: React.FC<PhantomLogoProps> = ({
   size = 42,
-  variant = "first",
+  variant = 'first',
   className,
   ...props
 }) => {
-  if (variant === "first") {
+  if (variant === 'first') {
     return (
       <svg
         className={className}
@@ -40,7 +40,7 @@ const PhantomLogo: React.FC<PhantomLogoProps> = ({
           </clipPath>
         </defs>
       </svg>
-    );
+    )
   }
 
   return (
@@ -71,7 +71,7 @@ const PhantomLogo: React.FC<PhantomLogoProps> = ({
         </clipPath>
       </defs>
     </svg>
-  );
-};
+  )
+}
 
-export { PhantomLogo };
+export { PhantomLogo }

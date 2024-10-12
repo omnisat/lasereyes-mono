@@ -11,9 +11,12 @@ import {
 
 import App from '@/components/App'
 import { useState } from 'react'
-import dynamic from "next/dynamic";
+import dynamic from 'next/dynamic'
 
-const DynamicLaserEyesProvider = dynamic(() => import('@omnisat/lasereyes-react').then((mod) => mod.LaserEyesProvider), { ssr: false });
+const DynamicLaserEyesProvider = dynamic(
+  () => import('@omnisat/lasereyes-react').then((mod) => mod.LaserEyesProvider),
+  { ssr: false }
+)
 
 export default function Home() {
   const [network, setNetwork] = useState<

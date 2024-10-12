@@ -1,16 +1,16 @@
-import * as lib from "./src";
+import * as lib from './src'
 
-globalThis.lasereyes = lib;
-(window as any).lasereyes = lib;
+globalThis.lasereyes = lib
+;(window as any).lasereyes = lib
 
-const client = new lib.LaserEyesClient(lib.createStores());
-globalThis.lasereyesClient = client;
-(window as any).lasereyesClient = client;
+const client = new lib.LaserEyesClient(lib.createStores())
+globalThis.lasereyesClient = client
+;(window as any).lasereyesClient = client
 
 client.$store.listen((state) => {
-  console.log("state changed", state);
-});
+  console.log('state changed', state)
+})
 
 client.$network.listen((network) => {
-  console.log("Network changed", network);
-});
+  console.log('Network changed', network)
+})

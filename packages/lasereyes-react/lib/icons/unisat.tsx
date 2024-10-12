@@ -1,13 +1,13 @@
-import * as React from "react";
+import * as React from 'react'
 
 interface UnisatLogoProps extends React.SVGProps<SVGSVGElement> {
-  size?: number;
-  variant?: "first" | "second";
+  size?: number
+  variant?: 'first' | 'second'
 }
 
 const UnisatLogo: React.FC<UnisatLogoProps> = ({
   size = 42,
-  variant = "first",
+  variant = 'first',
   className,
   ...props
 }) => {
@@ -84,7 +84,7 @@ const UnisatLogo: React.FC<UnisatLogoProps> = ({
         </clipPath>
       </defs>
     </svg>
-  );
-};
+  )
+}
 
-export { UnisatLogo };
+export { UnisatLogo }

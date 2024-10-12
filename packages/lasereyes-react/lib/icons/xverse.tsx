@@ -1,13 +1,13 @@
-import * as React from "react";
+import * as React from 'react'
 
 interface XverseLogoProps extends React.SVGProps<SVGSVGElement> {
-  size?: number;
-  variant?: "first" | "second";
+  size?: number
+  variant?: 'first' | 'second'
 }
 
 const XverseLogo: React.FC<XverseLogoProps> = ({
   size = 42,
-  variant = "first",
+  variant = 'first',
   className,
   ...props
 }) => {
@@ -41,7 +41,7 @@ const XverseLogo: React.FC<XverseLogoProps> = ({
         </clipPath>
       </defs>
     </svg>
-  );
-};
+  )
+}
 
-export { XverseLogo };
+export { XverseLogo }

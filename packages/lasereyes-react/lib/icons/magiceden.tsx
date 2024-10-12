@@ -1,13 +1,13 @@
-import * as React from "react";
+import * as React from 'react'
 
 interface MagicedenLogoProps extends React.SVGProps<SVGSVGElement> {
-  size?: number;
-  variant?: "first" | "second";
+  size?: number
+  variant?: 'first' | 'second'
 }
 
 const MagicEdenLogo: React.FC<MagicedenLogoProps> = ({
   size = 42,
-  variant = "first",
+  variant = 'first',
   className,
   ...props
 }) => {
@@ -59,7 +59,7 @@ const MagicEdenLogo: React.FC<MagicedenLogoProps> = ({
         </clipPath>
       </defs>
     </svg>
-  );
-};
+  )
+}
 
-export { MagicEdenLogo };
+export { MagicEdenLogo }
