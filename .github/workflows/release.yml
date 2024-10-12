@@ -48,7 +48,7 @@ jobs:
       - name: Fetch all branches
         run: git fetch --all
 
-      # Check if already in pre-release mode on dev and exit if necessary
+      # Exit pre-release mode if already in pre-mode
       - name: Check pre-release mode
         run: |
           if pnpm changeset status | grep -q "pre mode"; then
