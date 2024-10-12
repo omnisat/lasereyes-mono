@@ -16,6 +16,9 @@ A common wallet interface for building React applications on Bitcoin.
 
 ---
 
+
+
+
 ## Don't Trust, Verify
 
 [Try It Out](https://demo.lasereyes.build)
