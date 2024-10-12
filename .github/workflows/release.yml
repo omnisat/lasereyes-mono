@@ -43,7 +43,8 @@ jobs:
 
       - name: Add Changeset if lasereyes package changed
         if: ${{ env.changed == 'true' }}
-        run: pnpm changeset add --empty --force --message "chore: auto-bump lasereyes version"
+        run: |
+          pnpm changeset add --empty --force --message "chore: auto-bump lasereyes version"
 
       - name: Fetch all branches
         run: git fetch --all
