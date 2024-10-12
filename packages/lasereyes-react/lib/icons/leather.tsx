@@ -1,17 +1,17 @@
-import * as React from "react";
+import * as React from 'react'
 
 interface LeatherLogoProps extends React.SVGProps<SVGSVGElement> {
-  size?: number;
-  variant?: "first" | "second";
+  size?: number
+  variant?: 'first' | 'second'
 }
 
 const LeatherLogo: React.FC<LeatherLogoProps> = ({
   size = 42,
-  variant = "first",
+  variant = 'first',
   className,
   ...props
 }) => {
-  if (variant === "first") {
+  if (variant === 'first') {
     return (
       <svg
         className={className}
@@ -28,7 +28,7 @@ const LeatherLogo: React.FC<LeatherLogoProps> = ({
           fill="#F5F1ED"
         />
       </svg>
-    );
+    )
   }
 
   return (
@@ -47,7 +47,7 @@ const LeatherLogo: React.FC<LeatherLogoProps> = ({
         fill="#12100F"
       />
     </svg>
-  );
-};
+  )
+}
 
-export { LeatherLogo };
+export { LeatherLogo }

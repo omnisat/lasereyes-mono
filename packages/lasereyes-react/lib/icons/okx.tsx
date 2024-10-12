@@ -1,13 +1,13 @@
-import * as React from "react";
+import * as React from 'react'
 
 interface OkxLogoProps extends React.SVGProps<SVGSVGElement> {
-  size?: number;
-  variant?: "first" | "second";
+  size?: number
+  variant?: 'first' | 'second'
 }
 
 const OkxLogo: React.FC<OkxLogoProps> = ({
   size = 42,
-  variant = "first",
+  variant = 'first',
   className,
   ...props
 }) => {
@@ -39,7 +39,7 @@ const OkxLogo: React.FC<OkxLogoProps> = ({
         </clipPath>
       </defs>
     </svg>
-  );
-};
+  )
+}
 
-export { OkxLogo };
+export { OkxLogo }

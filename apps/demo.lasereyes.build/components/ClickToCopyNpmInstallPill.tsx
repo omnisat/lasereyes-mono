@@ -39,7 +39,7 @@ export const ClickToCopyNpmInstallPill = ({
     <div
       className={cn(
         badgeVariants({ variant: 'outline' }),
-        'self-end font-windows text-xs gap-3 transition-all  text-[#a7a7a8] select-none border-[#3c393f] p-0 cursor-pointer   ',
+        'self-end font-windows text-xs gap-3 transition-all  text-white select-none border-[#3c393f] p-0 cursor-pointer   ',
         className
       )}
     >

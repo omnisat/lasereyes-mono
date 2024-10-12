@@ -14,10 +14,10 @@ A common wallet interface for building React applications on Bitcoin.
 ![Version](https://img.shields.io/npm/v/@omnisat/lasereyes)
 ![license](https://img.shields.io/github/license/omnisat/lasereyes.svg?style=flat-square)
 
-
 ---
 
 ## Don't Trust, Verify
+
 [Try It Out](https://demo.lasereyes.build)
 
 ## Documentation
