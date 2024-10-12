@@ -43,6 +43,17 @@ jobs:
             echo "Lasereyes package did not change."
             echo "::set-output name=changed::false"
           fi
+      # Commit version bumps and changelog
+      - name: Commit version bumps and changelog
+        if: steps.lasereyes-changes.outputs.changed == 'true'
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "RC version bump for lasereyes"
+          git push origin dev
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   publish-rc-release:
     runs-on: ubuntu-latest
