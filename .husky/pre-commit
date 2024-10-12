@@ -1,0 +1,3 @@
+#!/bin/sh
+pnpx @changesets/cli version
+git add .changeset/
