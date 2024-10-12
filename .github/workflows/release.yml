@@ -3,13 +3,13 @@ name: Release
 on:
   push:
     branches:
-      - dev
       - main
+      - dev
 
 jobs:
-  generate-release-notes:
+  release:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/dev'
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -17,71 +17,40 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 18
+          cache: 'pnpm'
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 8.6.6
+          version: 6.32.9
 
       - name: Install dependencies
         run: pnpm install
 
-      - name: Generate git diff
+      - name: Create Changesets version
         run: |
-          PREV_COMMIT=$(git rev-parse HEAD^1)
-          git diff $PREV_COMMIT HEAD > changes.diff
+          if [ "${{ github.ref }}" == "refs/heads/dev" ]; then
+            pnpx changeset pre enter rc
+          fi
+          pnpx changeset version
 
-      # Use the external Python script to generate release notes
-      - name: Generate Release Notes with GPT
+      - name: Push Changeset version update
         run: |
-          python3 scripts/generate_release_notes.py > RELEASE_NOTES.md
-
-      # Commit the generated release notes to the dev branch
-      - name: Commit Release Notes
-        run: |
-          git add RELEASE_NOTES.md
-          git commit -m "Generated release notes for dev"
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "Version Packages"
           git push
+
+      - name: Create GitHub Release
+        uses: changesets/action@v1
+        with:
+          publish: false
+          version: false
+          changelog: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  summarize-release-notes:
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    needs: generate-release-notes
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 8.6.6
-
-      - name: Install dependencies
-        run: pnpm install
-
-      # Aggregate all release notes created in dev branch
-      - name: Aggregate Release Notes
-        run: |
-          git log --oneline --grep="Generated release notes for dev" --pretty=format:"%s%n%b" > release_notes_aggregated.txt
-
-      # Use the external Python script to summarize the release notes
-      - name: Summarize Release Notes with GPT
-        run: |
-          python3 scripts/summarize_release_notes.py > SUMMARY_RELEASE_NOTES.md
-
-      # Commit the summarized release notes to the main branch
-      - name: Commit Summarized Release Notes
-        run: |
-          git add SUMMARY_RELEASE_NOTES.md
-          git commit -m "Summarized release notes for main"
-          git push
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Echo publish action
+        run: echo "This is where the package would be published to npm."
