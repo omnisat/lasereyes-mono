@@ -54,12 +54,19 @@ jobs:
           if pnpm changeset status | grep -q "pre mode"; then
             echo "Already in pre-release mode, exiting pre mode..."
             pnpm changeset pre exit
+          else
+            echo "Not in pre-release mode."
           fi
 
       # Run Changesets pre-release mode for RC
       - name: Run Changesets pre-release mode for RC
         if: github.ref == 'refs/heads/dev' && env.changed == 'true'
-        run: pnpm changeset pre enter rc
+        run: |
+          if ! pnpm changeset status | grep -q "pre mode"; then
+            pnpm changeset pre enter rc
+          else
+            echo "Already in pre-release mode, skipping entering pre-release mode."
+          fi
 
       # Commit version bumps and changelog
       - name: Commit version bumps and changelog
