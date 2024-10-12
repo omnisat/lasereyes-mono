@@ -11,7 +11,7 @@
 
 
 
-A common wallet interface for building React applications on Bitcoin.
+A common wallet interface for building JS/TS applications on Bitcoin.
 
 ![Version](https://img.shields.io/npm/v/@omnisat/lasereyes)
 ![license](https://img.shields.io/github/license/omnisat/lasereyes.svg?style=flat-square)
@@ -38,7 +38,7 @@ Contributions to Lasereyes are greatly appreciated! If you're interested in cont
 
 ## Sponsors
 
-If you find Laser Eyes useful or use it for work, please consider [sponsoring Laser Eyes](https://github.com/sponsors/omnisat). Thank you 🙏
+If you find Lasereyes useful or use it for work, please consider [sponsoring Laser Eyes](https://github.com/sponsors/omnisat). Thank you 🙏
 
 <p>
 <a href="https://www.utxo.management/" style="margin-right: 40px;">

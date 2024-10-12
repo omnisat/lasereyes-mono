@@ -48,8 +48,8 @@ jobs:
       - name: Run Changesets pre-release mode for RC
         if: steps.lasereyes-changes.outputs.changed == 'true'
         run: |
-          pnpx changeset pre enter rc  # Enter RC mode
-          pnpx changeset version        # Bump RC version
+          pnpm dlx @changesets/cli pre enter rc  # Enter RC mode
+          pnpm dlx @changesets/cli version       # Bump RC version
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -119,11 +119,11 @@ jobs:
 
       # Exit pre-release mode
       - name: Exit RC mode
-        run: pnpx changeset pre exit
+        run: pnpm dlx @changesets/cli pre exit
 
       # Run Changesets version to bump versions and generate changelogs for stable release
       - name: Run Changesets version
-        run: pnpx changeset version
+        run: pnpm dlx @changesets/cli version
 
       # Commit the stable version bump and changelog
       - name: Commit version bumps and changelog
