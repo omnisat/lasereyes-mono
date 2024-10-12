@@ -18,7 +18,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: 16
+          node-version: 18  # Update Node.js to version 18 or higher
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v2
@@ -48,7 +48,7 @@ jobs:
       - name: Fetch all branches
         run: git fetch --all
 
-      # Check if already in pre-release mode on dev
+      # Check if already in pre-release mode on dev and exit if necessary
       - name: Check pre-release mode
         run: |
           if pnpm changeset status | grep -q "pre mode"; then
