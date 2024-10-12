@@ -32,15 +32,16 @@ jobs:
 
       # Check if lasereyes package changed
       - name: Check if lasereyes package changed
+        id: check_lasereyes_changes
         run: |
           if pnpm changeset status | grep -q lasereyes; then
-            echo "changed=true" >> $GITHUB_ENV
+            echo "::set-output name=changed::true"
           else
-            echo "changed=false" >> $GITHUB_ENV
+            echo "::set-output name=changed::false"
           fi
 
       - name: Add Changeset if lasereyes package changed
-        if: ${{ env.changed == 'true' }}
+        if: ${{ steps.check_lasereyes_changes.outputs.changed == 'true' }}
         run: |
           pnpm changeset add --empty --force --message "chore: auto-bump lasereyes version"
 
@@ -49,26 +50,27 @@ jobs:
 
       # Check pre-release mode
       - name: Check pre-release mode
+        id: check_pre_mode
         run: |
           if pnpm changeset status | grep -q "pre mode"; then
-            echo "in_pre_mode=true" >> $GITHUB_ENV
+            echo "::set-output name=in_pre_mode::true"
           else
-            echo "in_pre_mode=false" >> $GITHUB_ENV
+            echo "::set-output name=in_pre_mode::false"
           fi
 
       # Run Changesets pre-release mode for RC
       - name: Run Changesets pre-release mode for RC
-        if: ${{ env.changed == 'true' && env.in_pre_mode == 'false' && github.ref == 'refs/heads/dev' }}
+        if: ${{ steps.check_lasereyes_changes.outputs.changed == 'true' && steps.check_pre_mode.outputs.in_pre_mode == 'false' && github.ref == 'refs/heads/dev' }}
         run: pnpm changeset pre enter rc
 
       # Exit pre-release mode after merge to dev
       - name: Exit pre-release mode for dev
-        if: ${{ github.ref == 'refs/heads/dev' && env.in_pre_mode == 'true' }}
+        if: ${{ github.ref == 'refs/heads/dev' && steps.check_pre_mode.outputs.in_pre_mode == 'true' }}
         run: pnpm changeset pre exit
 
       # Commit version bumps and changelog
       - name: Commit version bumps and changelog
-        if: ${{ env.changed == 'true' }}
+        if: ${{ steps.check_lasereyes_changes.outputs.changed == 'true' }}
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
@@ -79,12 +81,12 @@ jobs:
 
       # Run Changesets version for main
       - name: Run Changesets version for main
-        if: ${{ github.ref == 'refs/heads/main' && env.changed == 'true' }}
+        if: ${{ github.ref == 'refs/heads/main' && steps.check_lasereyes_changes.outputs.changed == 'true' }}
         run: pnpm changeset version
 
       # Commit version bumps and changelog for main
       - name: Commit version bumps and changelog for main
-        if: ${{ github.ref == 'refs/heads/main' && env.changed == 'true' }}
+        if: ${{ github.ref == 'refs/heads/main' && steps.check_lasereyes_changes.outputs.changed == 'true' }}
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
