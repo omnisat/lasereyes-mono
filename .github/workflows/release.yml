@@ -3,39 +3,10 @@ name: Release
 on:
   push:
     branches:
-      - dev
       - main
-  pull_request:
-    branches:
-      - dev  # Ensure we run the workflow for PRs targeting the dev branch
+      - dev
 
 jobs:
-  # This job will run for every PR to the dev branch, ensuring tests are run
-  test-pr-to-dev:
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request' && github.base_ref == 'dev'
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 8.6.6
-
-      - name: Install dependencies
-        run: pnpm install
-
-      # Run tests
-      - name: Run Tests
-        run: pnpm test
-
-  # This job generates release notes when PRs are merged into dev
   generate-release-notes:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/dev' && github.event_name != 'pull_request'
@@ -73,10 +44,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  summarize-release-notes:
+  publish-release:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
     needs: generate-release-notes
+    if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -94,15 +65,19 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Aggregate Release Notes
-        run: |
-          git log --oneline --grep="Generated release notes for dev" --pretty=format:"%s%n%b" > release_notes_aggregated.txt
+      # Create a GitHub Release with the summarized release notes
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        with:
+          tag_name: ${{ github.sha }}
+          release_name: "Release ${{ github.sha }}"
+          body_path: SUMMARY_RELEASE_NOTES.md
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Summarize Release Notes with GPT
-        run: |
-          python3 scripts/summarize_release_notes.py > SUMMARY_RELEASE_NOTES.md
-
-      - name: Commit Summarized Release Notes
+      - name: Commit Release Notes to GitHub
         run: |
           git add SUMMARY_RELEASE_NOTES.md
           git commit -m "Summarized release notes for main"
