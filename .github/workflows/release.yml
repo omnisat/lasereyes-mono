@@ -57,6 +57,9 @@ jobs:
       - name: Generate Release Notes with GPT
         run: |
           python3 scripts/generate_release_notes.py > releases/dev_release_notes_$(date +'%Y-%m-%d').md  # Store in releases directory
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
 
       # Commit the release notes to the releases directory
       - name: Commit Release Notes
