@@ -15,10 +15,9 @@ import {
   FRACTAL_TESTNET,
   SIGNET,
   TESTNET4,
-  // WalletIcon,
   ORANGE,
 } from '@omnisat/lasereyes-core'
-import { useLaserEyes } from '@omnisat/lasereyes-react'
+import { useLaserEyes, WalletIcon } from '@omnisat/lasereyes-react'
 import {
   Card,
   CardContent,
@@ -373,7 +372,7 @@ const WalletCard = ({
             'uppercase text-white text-center flex flex-row items-center justify-center gap-2'
           }
         >
-          {/*<WalletIcon walletName={walletName} size={42} />*/}
+          <WalletIcon walletName={walletName} size={42} />
           {walletName.replace('-', ' ')}
         </CardTitle>
       </CardHeader>

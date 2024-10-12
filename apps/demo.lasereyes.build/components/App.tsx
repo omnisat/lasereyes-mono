@@ -17,7 +17,7 @@ import {
   ORANGE,
   XVERSE,
 } from '@omnisat/lasereyes-core'
-import { useLaserEyes } from '@omnisat/lasereyes-react'
+import { useLaserEyes, WalletIcon } from '@omnisat/lasereyes-react'
 import { satoshisToBTC } from '@/lib/btc'
 import { cn, truncateString } from '@/lib/utils'
 import ClickToCopy from '@/components/ClickToCopy'
@@ -189,7 +189,7 @@ const App = ({
                   provider?.length > 0 ? 'text-white' : 'text-gray-500'
                 )}
               >
-                {/*{provider && <WalletIcon walletName={provider} size={24} />}{' '}*/}
+                {provider && <WalletIcon walletName={provider} size={24} />}{' '}
                 {provider?.length > 0 ? provider : '--'}
               </span>
             </div>
