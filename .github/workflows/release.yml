@@ -45,6 +45,7 @@ jobs:
             echo "pre_mode=true" >> $GITHUB_ENV
           else
             echo "pre_mode=false" >> $GITHUB_ENV
+          fi
 
       # Enter pre-release mode for RC if on dev and not already in pre mode
       - name: Run Changesets pre-release mode for RC
