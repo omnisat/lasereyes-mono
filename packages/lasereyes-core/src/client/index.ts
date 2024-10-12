@@ -24,9 +24,9 @@ import { WizzProvider } from './providers/wizz'
 import OylProvider from './providers/oyl'
 import LeatherProvider from './providers/leather'
 import OrangeProvider from './providers/orange'
-import OkxProvider from './providers/okx.ts'
-import MagicEdenProvider from './providers/magic-eden.ts'
-import PhantomProvider from './providers/phantom.ts'
+import OkxProvider from './providers/okx'
+import MagicEdenProvider from './providers/magic-eden'
+import PhantomProvider from './providers/phantom'
 
 export class LaserEyesClient {
   readonly $store: MapStore<LaserEyesStoreType>
