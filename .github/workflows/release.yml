@@ -3,13 +3,17 @@ name: Release
 on:
   push:
     branches:
-      - main
       - dev
+      - main
+  pull_request:
+    branches:
+      - dev  # Ensure we run the workflow for PRs targeting the dev branch
 
 jobs:
-  release:
+  # This job will run for every PR to the dev branch, ensuring tests are run
+  test-pr-to-dev:
     runs-on: ubuntu-latest
-
+    if: github.event_name == 'pull_request' && github.base_ref == 'dev'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -17,40 +21,91 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
-          cache: 'pnpm'
+          node-version: 20
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 6.32.9
+          version: 8.6.6
 
       - name: Install dependencies
         run: pnpm install
 
-      - name: Create Changesets version
-        run: |
-          if [ "${{ github.ref }}" == "refs/heads/dev" ]; then
-            pnpx changeset pre enter rc
-          fi
-          pnpx changeset version
+      # Run tests
+      - name: Run Tests
+        run: pnpm test
 
-      - name: Push Changeset version update
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add .
-          git commit -m "Version Packages"
-          git push
+  # This job generates release notes when PRs are merged into dev
+  generate-release-notes:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/dev' && github.event_name != 'pull_request'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Create GitHub Release
-        uses: changesets/action@v1
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          publish: false
-          version: false
-          changelog: true
+          node-version: 20
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8.6.6
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Generate git diff
+        run: |
+          PREV_COMMIT=$(git rev-parse HEAD^1)
+          git diff $PREV_COMMIT HEAD > changes.diff
+
+      - name: Generate Release Notes with GPT
+        run: |
+          python3 scripts/generate_release_notes.py > RELEASE_NOTES.md
+
+      - name: Commit Release Notes
+        run: |
+          git add RELEASE_NOTES.md
+          git commit -m "Generated release notes for dev"
+          git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Echo publish action
-        run: echo "This is where the package would be published to npm."
+  summarize-release-notes:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    needs: generate-release-notes
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8.6.6
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Aggregate Release Notes
+        run: |
+          git log --oneline --grep="Generated release notes for dev" --pretty=format:"%s%n%b" > release_notes_aggregated.txt
+
+      - name: Summarize Release Notes with GPT
+        run: |
+          python3 scripts/summarize_release_notes.py > SUMMARY_RELEASE_NOTES.md
+
+      - name: Commit Summarized Release Notes
+        run: |
+          git add SUMMARY_RELEASE_NOTES.md
+          git commit -m "Summarized release notes for main"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
