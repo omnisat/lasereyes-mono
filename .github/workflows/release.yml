@@ -1,4 +1,4 @@
-name: Release
+name: Release Workflow
 
 on:
   push:
@@ -9,68 +9,67 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
+
     steps:
+      # Checkout the repository
       - name: Checkout repository
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0  # Ensure full history is fetched so changesets can check other branches
+        uses: actions/checkout@v3
 
+      # Setup Node.js
       - name: Setup Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
-          node-version: 18  # Update Node.js to version 18 or higher
+          node-version: '18.x'
 
+      # Setup pnpm
       - name: Setup pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 8.6.6
+          version: 8.x
 
+      # Install dependencies
       - name: Install dependencies
         run: pnpm install
 
-      # Check if lasereyes package has changed
+      # Check if lasereyes package changed
       - name: Check if lasereyes package changed
         id: lasereyes-changes
         run: |
-          changed="false"
-          if git diff --name-only HEAD^ HEAD | grep "packages/lasereyes"; then
-            changed="true"
-          fi
+          changed=$(pnpm changeset status | grep -q lasereyes && echo "true" || echo "false")
           echo "changed=$changed" >> $GITHUB_ENV
 
-      # Add a changeset if lasereyes package changed
+      # Add Changeset if lasereyes package changed
       - name: Add Changeset if lasereyes package changed
         if: env.changed == 'true'
         run: |
           pnpm changeset add --empty --force --message "chore: auto-bump lasereyes version"
 
-      # Fetch all branches for changeset to properly check
+      # Fetch all branches
       - name: Fetch all branches
         run: git fetch --all
 
-      # Exit pre-release mode if already in pre-mode
+      # Check if already in pre-release mode
       - name: Check pre-release mode
+        id: pre-release-check
         run: |
           if pnpm changeset status | grep -q "pre mode"; then
-            echo "Already in pre-release mode, exiting pre mode..."
-            pnpm changeset pre exit
+            echo "in_pre_mode=true" >> $GITHUB_ENV
           else
-            echo "Not in pre-release mode."
-          fi
+            echo "in_pre_mode=false" >> $GITHUB_ENV
 
-      # Run Changesets pre-release mode for RC
+      # Run Changesets pre-release mode for RC if not already in pre-mode
       - name: Run Changesets pre-release mode for RC
-        if: github.ref == 'refs/heads/dev' && env.changed == 'true'
-        run: |
-          if ! pnpm changeset status | grep -q "pre mode"; then
-            pnpm changeset pre enter rc
-          else
-            echo "Already in pre-release mode, skipping entering pre-release mode."
-          fi
+        if: env.changed == 'true' && env.in_pre_mode == 'false'
+        run: pnpm changeset pre enter rc
+
+      # Exit pre-release mode after merge to dev
+      - name: Exit pre-release mode for dev
+        if: github.ref == 'refs/heads/dev' && env.in_pre_mode == 'true'
+        run: pnpm changeset pre exit
 
       # Commit version bumps and changelog
       - name: Commit version bumps and changelog
-        if: github.ref == 'refs/heads/dev' && env.changed == 'true'
+        if: env.changed == 'true'
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
@@ -90,5 +89,5 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add .
-          git commit -m "Release version bump for lasereyes"
+          git commit -m "Version bump after merge to main"
           git push origin main
