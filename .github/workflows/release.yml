@@ -35,7 +35,7 @@ jobs:
       - name: Add Changeset if lasereyes package changed
         run: |
           if [ "$changed" = "true" ]; then
-            pnpm dlx changeset add --empty --force --commit \
+            pnpm changeset add --empty --force --commit \
               --message "chore: auto-bump lasereyes version"
           fi
 
@@ -44,8 +44,8 @@ jobs:
         if: github.ref == 'refs/heads/dev'
         run: |
           if [ "$changed" = "true" ]; then
-            pnpm dlx @changesets/cli pre enter rc
-            pnpm dlx @changesets/cli version
+            pnpm changeset pre enter rc
+            pnpm changeset version
           fi
 
       # Commit version bump
@@ -110,13 +110,13 @@ jobs:
       - name: Exit pre-release mode
         run: |
           if [ "$changed" = "true" ]; then
-            pnpm dlx @changesets/cli pre exit
+            pnpm changeset pre exit
           fi
 
       - name: Run Changesets version for stable
         run: |
           if [ "$changed" = "true" ]; then
-            pnpm dlx @changesets/cli version
+            pnpm changeset version
           fi
 
       - name: Commit version bumps and changelog for stable
