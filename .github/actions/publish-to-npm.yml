@@ -1,0 +1,19 @@
+name: Publish to NPM
+
+description: "Publishes a package to NPM with a given tag"
+
+inputs:
+  package_dir:
+    description: "The directory of the package to publish"
+    required: true
+  tag:
+    description: "The tag to publish the package with"
+    required: true
+
+runs:
+  using: "bash"
+  steps:
+    - name: Publish package
+      run: |
+        cd ${{ inputs.package_dir }}
+        pnpm publish --access public --tag ${{ inputs.tag }}
