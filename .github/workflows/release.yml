@@ -103,7 +103,7 @@ jobs:
         run: |
           git checkout dev
           git pull origin dev
-          git merge origin/main
+          git merge -X theirs origin/main  # This will favor changes from main in case of conflict
           cd packages/lasereyes
           npm version prerelease --preid=rc
           cd ../../
