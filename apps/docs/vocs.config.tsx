@@ -1,4 +1,4 @@
-import { defineConfig } from "vocs";
+import { defineConfig } from 'vocs'
 
 export default defineConfig({
   head: (
@@ -20,52 +20,53 @@ export default defineConfig({
     </>
   ),
 
-  title: "Laser Eyes",
-  description: "Web Hooks For Bitcoin Ordinals",
+  title: 'Laser Eyes',
+  rootDir: './docs/',
+  description: 'Web Hooks For Bitcoin Ordinals',
   sidebar: [
     {
-      text: "Getting Started",
-      link: "/docs/getting-started",
+      text: 'Getting Started',
+      link: '/docs/getting-started',
     },
     {
-      text: "The Why",
-      link: "/docs/why",
+      text: 'The Why',
+      link: '/docs/why',
     },
     {
-      text: "Contributing",
-      link: "/docs/contributing",
+      text: 'Contributing',
+      link: '/docs/contributing',
     },
   ],
   topNav: [
-    { text: "Docs", link: "/docs/getting-started" },
-    { text: "Try It Out", link: "https://demo.lasereyes.build" },
+    { text: 'Docs', link: '/docs/getting-started' },
+    { text: 'Try It Out', link: 'https://demo.lasereyes.build' },
     {
-      text: "Laser Eyes",
+      text: 'Laser Eyes',
       items: [
         {
-          text: "Contributing",
-          link: "/docs/contributing",
+          text: 'Contributing',
+          link: '/docs/contributing',
         },
       ],
     },
   ],
   iconUrl: {
-    light: "/LaserEyesIcon.svg",
-    dark: "/LaserEyesIcon.svg",
+    light: '/LaserEyesIcon.svg',
+    dark: '/LaserEyesIcon.svg',
   },
   logoUrl: {
-    light: "/LogoLight.svg",
-    dark: "/LogoDark.svg",
+    light: '/LogoLight.svg',
+    dark: '/LogoDark.svg',
   },
   socials: [
     {
-      icon: "github",
-      link: "https://github.com/omnisat",
+      icon: 'github',
+      link: 'https://github.com/omnisat',
     },
 
     {
-      icon: "x",
-      link: "https://x.com/Omnisats",
+      icon: 'x',
+      link: 'https://x.com/Omnisats',
     },
   ],
   sponsors: [
@@ -83,54 +84,54 @@ export default defineConfig({
     //   ],
     // },
     {
-      name: "Ecosystem Partner",
+      name: 'Ecosystem Partner',
       height: 60,
       items: [
         [
           {
-            name: "UTXO",
-            link: "https://www.utxo.management/",
-            image: "/utxo.svg",
+            name: 'UTXO',
+            link: 'https://www.utxo.management/',
+            image: '/utxo.svg',
           },
           {
-            name: "OrdinalsBot",
-            link: "https://ordinalsbot.com/",
-            image: "/OrdinalsBot.svg",
+            name: 'OrdinalsBot',
+            link: 'https://ordinalsbot.com/',
+            image: '/OrdinalsBot.svg',
           },
         ],
         [
           {
-            name: "Layer 1 Foundation",
-            link: "https://layer1.foundation/",
-            image: "/l1f-logo-default.svg",
+            name: 'Layer 1 Foundation',
+            link: 'https://layer1.foundation/',
+            image: '/l1f-logo-default.svg',
           },
           {
-            name: "CTRL",
-            link: "https://seizectrl.io",
-            image: "/CTRL.svg",
+            name: 'CTRL',
+            link: 'https://seizectrl.io',
+            image: '/CTRL.svg',
           },
           {
-            name: "Sat Ventures",
-            link: "https://satsventures.com/",
-            image: "/satsventure.svg",
+            name: 'Sat Ventures',
+            link: 'https://satsventures.com/',
+            image: '/satsventure.svg',
           },
         ],
       ],
     },
     {
-      name: "Start Ups",
+      name: 'Start Ups',
       height: 30,
       items: [
         [
           {
-            name: "Leather Wallet",
-            link: "https://leather.io/",
-            image: "/Leather.svg",
+            name: 'Leather Wallet',
+            link: 'https://leather.io/',
+            image: '/Leather.svg',
           },
           {
-            name: "Orange Wallet",
-            link: "https://www.orangecrypto.com/",
-            image: "/OrangeWalletLogo.svg",
+            name: 'Orange Wallet',
+            link: 'https://www.orangecrypto.com/',
+            image: '/OrangeWalletLogo.svg',
           },
         ],
       ],
@@ -138,15 +139,15 @@ export default defineConfig({
   ],
   font: {
     default: {
-      google: "Windows",
+      google: 'Windows',
     },
   },
   theme: {
-    accentColor: "#FF701E",
-    colorScheme: "dark",
+    accentColor: '#FF701E',
+    colorScheme: 'dark',
   },
   editLink: {
-    pattern: "https://github.com/wevm/viem/edit/main/site/pages/:path",
-    text: "Suggest changes to this page",
+    pattern: 'https://github.com/wevm/viem/edit/main/site/pages/:path',
+    text: 'Suggest changes to this page',
   },
-});
+})
