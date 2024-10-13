@@ -1,4 +1,20 @@
 
+# Release Notes
+
+#### Version: v0.0.28
+
+## Updates
+
+- The package version of '@omnisat/lasereyes' has been upgraded from "0.0.29" to "0.0.30-rc.0"
+  
+Please note that this is a release candidate version, so it might not be completely stable or might contain bugs. The purpose is to gather feedback and make improvements before the final stable version is released. 
+
+As always, the main distribution of this package can be found in the "./dist/index.js" and the UMD build can be found at "./dist/index.umd.cjs". 
+
+Please let us know if you encounter any issues or have feedback on this version, your input is invaluable for our progress. 
+
+Thank you for supporting our work. We are looking forward to serving you better with each update.
+
 # Release Notes: v0.0.26 to v0.0.28-rc.0
 
 ## Updated Information
