@@ -117,6 +117,17 @@ jobs:
           PREV_COMMIT=$(git rev-parse HEAD^1)
           git diff $PREV_COMMIT HEAD > changes.diff
 
+      - name: Check if OPENAI_API_KEY is set
+        run: |
+          if [ -z "$OPENAI_API_KEY" ]; then
+            echo "OPENAI_API_KEY is not set"
+            exit 1
+          else
+            echo "OPENAI_API_KEY is set"
+          fi
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
       # GPT Step: Use GPT to generate release notes
       - name: Generate release notes with GPT
         if: ${{ env.changed == 'true' }}
