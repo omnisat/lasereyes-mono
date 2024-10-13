@@ -1,4 +1,16 @@
 
+# Release Notes: v0.0.26 to v0.0.28-rc.0
+
+## Updated Information
+The package version for "@omnisat/lasereyes" has been incremented from v0.0.27 to v0.0.28-rc.0. 
+
+## General Changes
+- Updated the package version in the package.json file of "@omnisat/lasereyes" from "0.0.27" to "0.0.28-rc.0".
+- No changes have been made to the "name", "private", "type", "main", and "module" fields in the package.json file.
+
+## NOTE:
+This release (v0.0.28-rc.0) appears to be a release candidate (as indicated by the 'rc.0' suffix). This version might not be fully tested and could contain incomplete features. Therefore, it is recommended to use this version carefully in production systems.
+
 ## Lasereyes v0.0.26-rc.0 Release Notes
 
 In this release, only the version number has been updated. No feature enhancements or issue fixes were detailed.
