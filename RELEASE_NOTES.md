@@ -1,4 +1,22 @@
 
+# Release Notes
+
+## Configurations
+
+- The git user is now configured in the GitHub workflow release.yml file. The user email is set to "github-actions[bot]@users.noreply.github.com" and the username set to "github-actions[bot]".
+
+## `lasereyes-react` package
+
+- Updated the version of the `lasereyes-react` package from `0.0.1` to `0.0.0-rc.18` in both, the package.json and the package-lock.json files.
+
+- An additional test line was added to the README.md file of `lasereyes-react`.
+
+## `lasereyes` package
+
+- Downgraded the version of the `lasereyes` package from `0.0.38` to `0.0.37-rc.17` in the package.json file.
+
+All of these changes are meant to better the reliability and functionality of the package. Please update your packages to these versions for an improved user experience.
+
 # Release Notes: v0.0.36
 
 ## Detailed Updates:
