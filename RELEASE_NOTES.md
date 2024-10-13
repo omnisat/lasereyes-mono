@@ -1,4 +1,14 @@
 
+# Release Notes
+Version: v0.0.32-rc.0
+
+## Changes
+- The package version has been updated from "0.0.31" to "0.0.32-rc.0". This signifies that we have moved onto the next release cycle. 
+
+Please note that this is a release candidate version(-rc.0), meaning it's not the final version. Rather, it's a version we believe to be stable and includes all features we intend to deliver, but it's not yet thoroughly tested to be declared as stable.
+
+Remember to update your dependencies to ensure compatibility with this new version.
+
 # Release Notes for v0.0.31-rc.0
 
 ## Updates:
