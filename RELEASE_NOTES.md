@@ -1,4 +1,16 @@
 
+Release Notes:
+## Version: 0.0.22-rc.0
+
+#### Changes:
+- Updated the package version from 0.0.21 to 0.0.22-rc.0. 
+
+Please note that this version is a release candidate, which means that it isn't deemed stable yet. It's meant for testing the next release's functionality in a real-world scenario.
+
+As always, you are more than welcome to participate in the testing. Your feedback helps us greatly in improving the product!
+
+Please continue using the package and report back any bugs, issues you encounter, or improvements you'd like to see. Your help is very much appreciated!
+
 # Release Notes for @omnisat/lasereyes version 0.0.20-rc.0
 
 ## Changes:
