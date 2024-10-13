@@ -2,8 +2,4 @@
 
 # Getting Started
 
-
-
-
-
-
+# Contributing
