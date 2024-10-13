@@ -56,7 +56,7 @@ jobs:
             echo "lasereyes_react_changed=false" >> $GITHUB_ENV
           fi
 
-      # Bump and publish RC versions for lasereyes-core (dev)
+      # Bump version for lasereyes-core (dev)
       - name: Bump version for lasereyes-core (dev)
         if: ${{ env.lasereyes_core_changed == 'true' && github.ref == 'refs/heads/dev' }}
         run: |
@@ -66,6 +66,19 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      # Commit version bump for lasereyes-core (dev)
+      - name: Commit version bump for lasereyes-core (dev)
+        if: ${{ env.lasereyes_core_changed == 'true' && github.ref == 'refs/heads/dev' }}
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add packages/lasereyes-core/package.json
+          git commit -m "RC version bump for lasereyes-core"
+          git push origin dev
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Publish lasereyes-core (RC) to npm
       - name: Publish lasereyes-core (RC) to npm
         if: ${{ env.lasereyes_core_changed == 'true' && github.ref == 'refs/heads/dev' }}
         run: |
@@ -74,7 +87,7 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      # Bump and publish RC versions for lasereyes-react (dev)
+      # Bump version for lasereyes-react (dev)
       - name: Bump version for lasereyes-react (dev)
         if: ${{ env.lasereyes_react_changed == 'true' && github.ref == 'refs/heads/dev' }}
         run: |
@@ -84,6 +97,19 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      # Commit version bump for lasereyes-react (dev)
+      - name: Commit version bump for lasereyes-react (dev)
+        if: ${{ env.lasereyes_react_changed == 'true' && github.ref == 'refs/heads/dev' }}
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add packages/lasereyes-react/package.json
+          git commit -m "RC version bump for lasereyes-react"
+          git push origin dev
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Publish lasereyes-react (RC) to npm
       - name: Publish lasereyes-react (RC) to npm
         if: ${{ env.lasereyes_react_changed == 'true' && github.ref == 'refs/heads/dev' }}
         run: |
@@ -102,6 +128,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      # Commit version bumps and changelog for dev
       - name: Commit version bumps and changelog for dev
         if: ${{ (env.lasereyes_changed == 'true' || env.lasereyes_core_changed == 'true' || env.lasereyes_react_changed == 'true') && github.ref == 'refs/heads/dev' }}
         run: |
@@ -179,28 +206,16 @@ jobs:
           git checkout dev
           git pull origin dev
           git merge -X theirs origin/main
-          if [ "${{ env.lasereyes_changed }}" == "true" ]; then
-            cd packages/lasereyes
-            npm version prerelease --preid=rc
-            cd ../../
-          fi
-          if [ "${{ env.lasereyes_core_changed }}" == "true" ]; then
-            cd packages/lasereyes-core
-            npm version prerelease --preid=rc
-            cd ../../
-          fi
-          if [ "${{ env.lasereyes_react_changed }}" == "true" ]; then
-            cd packages/lasereyes-react
-            npm version prerelease --preid=rc
-            cd ../../
-          fi
+          cd packages/lasereyes
+          npm version prerelease --preid=rc
+          cd ../../
           git add .
-          git commit -m "Bump dev version after main sync for lasereyes packages"
+          git commit -m "Bump dev version after main sync"
           git push origin dev
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Install Python and generate release notes only for lasereyes
+      # Python and Release Notes steps (for lasereyes package only)
       - name: Setup Python
         if: ${{ github.ref == 'refs/heads/main' && env.lasereyes_changed == 'true' }}
         uses: actions/setup-python@v4
@@ -240,7 +255,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Ensure single "v" in tag_name
       - name: Ensure single "v" in tag_name
         id: ensure_v
         run: |
@@ -250,7 +264,6 @@ jobs:
             echo "tag_name=v${{ env.lasereyes_version }}" >> $GITHUB_ENV
           fi
 
-      # Create GitHub release only for lasereyes
       - name: Create GitHub Release
         if: ${{ env.lasereyes_changed == 'true' }}
         uses: actions/create-release@v1
