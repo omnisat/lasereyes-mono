@@ -14,7 +14,12 @@ jobs:
     environment: prod
     strategy:
       matrix:
-        package: [lasereyes, lasereyes-core, lasereyes-react]  # Use a matrix to handle all packages dynamically
+        package: [lasereyes, lasereyes-core, lasereyes-react]
+
+    outputs:
+      lasereyes_changed: ${{ steps.check_package_changes.outputs.lasereyes_changed }}
+      lasereyes_core_changed: ${{ steps.check_package_changes.outputs.lasereyes_core_changed }}
+      lasereyes_react_changed: ${{ steps.check_package_changes.outputs.lasereyes_react_changed }}
 
     steps:
       - name: Checkout repository
@@ -44,27 +49,33 @@ jobs:
         run: |
           if git diff --name-only HEAD^1 HEAD | grep -q "packages/lasereyes/"; then
             echo "lasereyes_changed=true" >> $GITHUB_ENV
+            echo "::set-output name=lasereyes_changed::true"
           else
             echo "lasereyes_changed=false" >> $GITHUB_ENV
+            echo "::set-output name=lasereyes_changed::false"
           fi
 
           if git diff --name-only HEAD^1 HEAD | grep -q "packages/lasereyes-core/"; then
             echo "lasereyes_core_changed=true" >> $GITHUB_ENV
+            echo "::set-output name=lasereyes_core_changed::true"
           else
             echo "lasereyes_core_changed=false" >> $GITHUB_ENV
+            echo "::set-output name=lasereyes_core_changed::false"
           fi
 
           if git diff --name-only HEAD^1 HEAD | grep -q "packages/lasereyes-react/"; then
             echo "lasereyes_react_changed=true" >> $GITHUB_ENV
+            echo "::set-output name=lasereyes_react_changed::true"
           else
             echo "lasereyes_react_changed=false" >> $GITHUB_ENV
+            echo "::set-output name=lasereyes_react_changed::false"
           fi
 
   # Bumping versions for dev branch (pre-release)
   bump-versions-dev:
     runs-on: ubuntu-latest
     needs: release
-    if: github.ref == 'refs/heads/dev'  # Ensure this job only runs for the dev branch
+    if: github.ref == 'refs/heads/dev'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -85,7 +96,7 @@ jobs:
         run: pnpm install
 
       - name: Bump version for lasereyes-core (dev)
-        if: ${{ env.lasereyes_core_changed == 'true' }}
+        if: ${{ needs.release.outputs.lasereyes_core_changed == 'true' }}
         run: |
           cd packages/lasereyes-core
           npm version prerelease --preid=rc
@@ -94,7 +105,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Bump version for lasereyes-react (dev)
-        if: ${{ env.lasereyes_react_changed == 'true' }}
+        if: ${{ needs.release.outputs.lasereyes_react_changed == 'true' }}
         run: |
           cd packages/lasereyes-react
           npm version prerelease --preid=rc
@@ -103,7 +114,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Bump version for lasereyes (dev)
-        if: ${{ (env.lasereyes_changed == 'true' || env.lasereyes_core_changed == 'true' || env.lasereyes_react_changed == 'true') }}
+        if: ${{ needs.release.outputs.lasereyes_changed == 'true' || needs.release.outputs.lasereyes_core_changed == 'true' || needs.release.outputs.lasereyes_react_changed == 'true' }}
         run: |
           cd packages/lasereyes
           npm version prerelease --preid=rc
@@ -112,7 +123,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Commit version bumps for dev
-        if: ${{ (env.lasereyes_changed == 'true' || env.lasereyes_core_changed == 'true' || env.lasereyes_react_changed == 'true') }}
+        if: ${{ needs.release.outputs.lasereyes_changed == 'true' || needs.release.outputs.lasereyes_core_changed == 'true' || needs.release.outputs.lasereyes_react_changed == 'true' }}
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
@@ -126,7 +137,7 @@ jobs:
   bump-versions-main:
     runs-on: ubuntu-latest
     needs: release
-    if: github.ref == 'refs/heads/main'  # Ensure this job only runs for the main branch
+    if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -147,7 +158,7 @@ jobs:
         run: pnpm install
 
       - name: Bump version for lasereyes-core (main)
-        if: ${{ env.lasereyes_core_changed == 'true' }}
+        if: ${{ needs.release.outputs.lasereyes_core_changed == 'true' }}
         run: |
           cd packages/lasereyes-core
           npm version patch
@@ -156,7 +167,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Bump version for lasereyes-react (main)
-        if: ${{ env.lasereyes_react_changed == 'true' }}
+        if: ${{ needs.release.outputs.lasereyes_react_changed == 'true' }}
         run: |
           cd packages/lasereyes-react
           npm version patch
@@ -165,7 +176,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Bump version for lasereyes (main)
-        if: ${{ (env.lasereyes_changed == 'true' || env.lasereyes_core_changed == 'true' || env.lasereyes_react_changed == 'true') }}
+        if: ${{ needs.release.outputs.lasereyes_changed == 'true' || needs.release.outputs.lasereyes_core_changed == 'true' || needs.release.outputs.lasereyes_react_changed == 'true' }}
         id: bump_lasereyes
         run: |
           cd packages/lasereyes
@@ -176,7 +187,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Commit version bumps for main
-        if: ${{ (env.lasereyes_changed == 'true' || env.lasereyes_core_changed == 'true' || env.lasereyes_react_changed == 'true') }}
+        if: ${{ needs.release.outputs.lasereyes_changed == 'true' || needs.release.outputs.lasereyes_core_changed == 'true' || needs.release.outputs.lasereyes_react_changed == 'true' }}
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
@@ -192,7 +203,7 @@ jobs:
   sync-main-to-dev:
     runs-on: ubuntu-latest
     needs: bump-versions-main
-    if: github.ref == 'refs/heads/main'  # Ensure this job only runs for the main branch
+    if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -225,7 +236,7 @@ jobs:
   generate-release:
     runs-on: ubuntu-latest
     needs: bump-versions-main
-    if: github.ref == 'refs/heads/main'  # Ensure this job only runs for the main branch
+    if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
