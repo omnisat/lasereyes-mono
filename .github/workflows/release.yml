@@ -268,7 +268,7 @@ jobs:
 
       - name: Generate release notes with GPT
         run: |
-          python3 scripts/generate_release_notes.py ${{ env.lasereyes_version }}
+          python3 scripts/generate_release_notes.py ${{ steps.bump_lasereyes.outputs.lasereyes_version }}
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
