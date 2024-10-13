@@ -5,7 +5,6 @@ on:
     branches:
       - dev
       - main
-
 permissions:
   contents: write
 
@@ -86,6 +85,23 @@ jobs:
           git commit -m "Version bump after merge to main for lasereyes"
           git pull --rebase origin main
           git push origin main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Sync main back into dev and bump dev's version again
+      - name: Sync main to dev and bump dev version after merge
+        if: ${{ github.ref == 'refs/heads/main' && env.changed == 'true' }}
+        run: |
+          git checkout dev
+          git pull origin dev
+          git merge origin/main
+          cd packages/lasereyes
+          # Bump the dev version as a pre-release
+          npm version prerelease --preid=rc
+          cd ../../
+          git add .
+          git commit -m "Bump dev version after main sync"
+          git push origin dev
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
