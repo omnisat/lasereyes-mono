@@ -1,4 +1,19 @@
 
+# Release Notes
+
+### Package
+Lasereyes by Omnisat
+
+### Version
+Updated to version 0.0.24-rc.0 (from previous version 0.0.23)
+
+### Changes
+This update does not include any feature or usability changes, but it represents a new release candidate (rc). The functionality remains same as per the previous 0.0.23 version.
+
+Please continue to test and report any found issues. As this is a pre-release version, it's recommended not to deploy it into production environments as the final version might still have changes based on feedback from testing of this release candidate.
+
+As always, we appreciate your continued support and assistance in testing this version.
+
 Release Notes:
 ## Version: 0.0.22-rc.0
 
