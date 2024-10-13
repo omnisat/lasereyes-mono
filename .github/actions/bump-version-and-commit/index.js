@@ -1,32 +1,28 @@
 const core = require('@actions/core')
-const exec = require('@actions/exec')
 const { execSync } = require('child_process')
 
-async function run() {
-  try {
-    const packageDir = core.getInput('package_dir')
-    const versionType = core.getInput('version_type')
-    const preid = core.getInput('preid') || ''
+try {
+  const packageDir = core.getInput('package_dir')
+  const preid = core.getInput('preid') || ''
+  const isMainBranch = core.getBooleanInput('is_main') || false
 
-    // Navigate to the package directory
-    process.chdir(packageDir)
+  // Set Git configuration in case it's not set
+  execSync(
+    'git config --global user.email "github-actions[bot]@users.noreply.github.com"'
+  )
+  execSync('git config --global user.name "github-actions[bot]"')
 
-    // Determine the version bump command
-    let bumpCommand = `npm version ${versionType}`
-    if (versionType === 'prerelease' && preid) {
-      bumpCommand += ` --preid=${preid}`
-    }
-
-    // Execute the bump command
-    execSync(bumpCommand, { stdio: 'inherit' })
-
-    // Commit the version bump
-    await exec.exec('git add .')
-    await exec.exec('git commit -m "Version bump in ' + packageDir + '"')
-    await exec.exec('git push')
-  } catch (error) {
-    core.setFailed(error.message)
+  // Bump the version
+  if (preid) {
+    execSync(`npm version prerelease --preid=${preid}`, { cwd: packageDir })
+  } else {
+    execSync('npm version patch', { cwd: packageDir })
   }
-}
 
-run()
+  // Commit the changes
+  execSync('git add .')
+  execSync(`git commit -m "Version bump in ${packageDir}"`)
+  execSync('git push origin dev')
+} catch (error) {
+  core.setFailed(error.message)
+}

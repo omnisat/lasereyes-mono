@@ -92,13 +92,18 @@ jobs:
           package_dir: "packages/lasereyes-core"
           npm_tag: "rc"
 
-      # Bump version for lasereyes-react (dev)
       - name: Bump version for lasereyes-react (dev)
         if: ${{ env.lasereyes_react_changed == 'true' && github.ref == 'refs/heads/dev' }}
         uses: ./.github/actions/bump-version-and-commit
         with:
           package_dir: "packages/lasereyes-react"
           preid: "rc"
+        env:
+          GIT_AUTHOR_NAME: "github-actions[bot]"
+          GIT_AUTHOR_EMAIL: "github-actions[bot]@users.noreply.github.com"
+          GIT_COMMITTER_NAME: "github-actions[bot]"
+          GIT_COMMITTER_EMAIL: "github-actions[bot]@users.noreply.github.com"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # Commit version bump for lasereyes-react (dev)
       - name: Commit version bump for lasereyes-react (dev)
