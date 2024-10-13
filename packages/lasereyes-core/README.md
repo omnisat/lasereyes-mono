@@ -22,21 +22,21 @@ A common wallet interface for building React applications on Bitcoin.
 
 ## Documentation
 
-For documentation and guides, visit [Laser Eyes Docs](https://lasereyes.build/).
+For documentation and guides, visit [Lasereyes Docs](https://lasereyes.build/).
 
 ## Community
 
 For help, discussion about best practices, or any other conversation that would benefit from being searchable:
 
-[Discuss Laser Eyes on GitHub](https://github.com/omnisat/lasereyes/discussions)
+[Discuss Lasereyes on GitHub](https://github.com/omnisat/lasereyes/discussions)
 
 ## Contributing
 
-Contributions to Wagmi are greatly appreciated! If you're interested in contributing to Wagmi, please read the [Contributing Guide](https://wagmi.sh/dev/contributing) **before submitting a pull request**.
+Contributions to Lasereyes are greatly appreciated! If you're interested in contributing to Lasereyes, please read the [Contributing Guide](https://wagmi.sh/dev/contributing) **before submitting a pull request**.
 
 ## Sponsors
 
-If you find Laser Eyes useful or use it for work, please consider [sponsoring Laser Eyes](https://github.com/sponsors/omnisat). Thank you 🙏
+If you find Laser Eyes useful or use it for work, please consider [sponsoring Lasereyes](https://github.com/sponsors/omnisat). Thank you 🙏
 
 <p>
 <a href="https://www.utxo.management/" style="margin-right: 40px;">
