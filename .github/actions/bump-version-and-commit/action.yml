@@ -1,31 +1,15 @@
-name: Bump Version and Commit
-
-description: "Handles version bumping and committing for packages"
-
+name: "Bump version and commit"
+description: "Bumps the version of a package and commits the changes"
 inputs:
   package_dir:
     description: "The directory of the package to bump"
     required: true
   version_type:
-    description: "The type of version bump (prerelease, patch)"
+    description: "The type of version bump (patch, minor, major, or prerelease)"
     required: true
   preid:
-    description: "The preid for prerelease"
+    description: "The prerelease identifier (used only for prerelease)"
     required: false
-
 runs:
-  using: "bash"
-  steps:
-    - name: Bump version
-      run: |
-        cd ${{ inputs.package_dir }}
-        npm version ${{ inputs.version_type }}${{ inputs.preid && ' --preid=' + inputs.preid }}
-        cd ../../
-
-    - name: Commit version bump
-      run: |
-        git config --global user.name "github-actions[bot]"
-        git config --global user.email "github-actions[bot]@users.noreply.github.com"
-        git add ${{ inputs.package_dir }}/package.json
-        git commit -m "Version bump for ${{ inputs.package_dir }}"
-        git push origin ${{ github.ref_name }}
+  using: "node12"
+  main: "index.js"
