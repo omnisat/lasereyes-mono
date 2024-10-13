@@ -1,5 +1,15 @@
 
 # Release Notes
+
+## Version: v0.0.33-rc.0
+
+In this new release, the main highlight is the version bump of `@omnisat/lasereyes` from version `0.0.32` to `0.0.33-rc.0`. This new version is a release candidate and this change reflects the preparation for the next potential stable release. 
+
+No other documented changes were made to the codebase in this update. 
+
+Please note: This release, being a release candidate, is not intended for production use. It is released for testing purposes, to catch any critical issues before the final release.
+
+# Release Notes
 Version: v0.0.32-rc.0
 
 ## Changes
