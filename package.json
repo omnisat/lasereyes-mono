@@ -3,6 +3,7 @@
   "private": true,
   "scripts": {
     "build": "turbo build",
+    "changeset": "changeset",
     "dev": "turbo dev",
     "dev:demo": "turbo dev --filter demo.lasereyes.build",
     "lint": "turbo lint",
@@ -10,6 +11,7 @@
     "test": "vitest run",
     "test:watch": "vitest --watch",
     "test:coverage": "vitest run --coverage",
+    "publish": "echo 'No publish script found'",
     "prepare": "husky"
   },
   "devDependencies": {
