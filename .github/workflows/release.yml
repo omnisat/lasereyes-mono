@@ -78,11 +78,11 @@ jobs:
 
       - name: Bump version for lasereyes (main)
         if: ${{ env.changed == 'true' && github.ref == 'refs/heads/main' }}
+        id: bump
         run: |
           cd packages/lasereyes
           new_version=$(npm version patch)
           echo "new_version=${new_version}" >> $GITHUB_ENV
-          npm version patch
           cd ../../
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -105,7 +105,7 @@ jobs:
         run: |
           git checkout dev
           git pull origin dev
-          git merge -X theirs origin/main  # This will favor changes from main in case of conflict
+          git merge -X theirs origin/main
           cd packages/lasereyes
           npm version prerelease --preid=rc
           cd ../../
@@ -155,7 +155,7 @@ jobs:
       - name: Set is_rc variable
         id: set_is_rc
         run: |
-          if [[ "${{ steps.bump.outputs.new_version }}" == *"-rc"* ]]; then
+          if [[ "${{ env.new_version }}" == *"-rc"* ]]; then
             echo "is_rc=true" >> $GITHUB_ENV
           else
             echo "is_rc=false" >> $GITHUB_ENV
@@ -170,7 +170,6 @@ jobs:
             echo "tag_name=v${{ env.new_version }}" >> $GITHUB_ENV
           fi
 
-
       - name: Create GitHub Release
         if: ${{ env.changed == 'true' && github.ref == 'refs/heads/main' && env.is_rc == 'false' }}
         uses: actions/create-release@v1
@@ -182,7 +181,6 @@ jobs:
           body_path: detailed_release_notes.md
           draft: false
           prerelease: false
-
 
       - name: Post Setup pnpm
         run: echo "Workflow completed!"
