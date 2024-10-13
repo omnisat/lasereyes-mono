@@ -136,7 +136,7 @@ jobs:
       - name: Generate release notes with GPT
         if: ${{ env.changed == 'true' && github.ref == 'refs/heads/main' }}
         run: |
-          python3 scripts/generate_release_notes.py
+          python3 scripts/generate_release_notes.py ${{ env.new_version }}
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
