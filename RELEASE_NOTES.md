@@ -1,4 +1,24 @@
 
+# Release Notes
+
+## Version v0.0.34
+
+### Packages Updated
+  
+  - **@omnisat/lasereyes-core**
+    - Version bumped from `0.0.5-rc.3` to `0.0.5-rc.4`.
+  
+  - **@omnisat/lasereyes-react**
+    - Updated `package-lock.json` and `package.json` files.
+      - Version bumped from `0.0.3-rc.2` to `0.0.3-rc.3` in both files.
+  
+  - **@omnisat/lasereyes**
+    - Version updated from `0.0.34` to `0.0.35-rc.0` in the `package.json` file.
+
+### Summary
+  
+  This release primarily involves updates to the package versions across the libraries for `@omnisat/lasereyes-core`, `@omnisat/lasereyes-react`, and `@omnisat/lasereyes`. No notable features or bug fixes were introduced in this version.
+
 # Release Notes - Version v0.0.33
 
 ## General
