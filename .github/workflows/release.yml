@@ -138,6 +138,11 @@ jobs:
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
+      - name: Print generated release notes
+        if: ${{ env.changed == 'true' && github.ref == 'refs/heads/main' }}
+        run: |
+          cat detailed_release_notes.md
+
       - name: Commit generated release notes
         if: ${{ env.changed == 'true' && github.ref == 'refs/heads/main' }}
         run: |
