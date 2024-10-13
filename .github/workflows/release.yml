@@ -56,16 +56,7 @@ jobs:
             echo "lasereyes_react_changed=false" >> $GITHUB_ENV
           fi
 
-      # Bump versions for each package as needed
-      - name: Bump version for lasereyes (dev)
-        if: ${{ env.lasereyes_changed == 'true' && github.ref == 'refs/heads/dev' }}
-        run: |
-          cd packages/lasereyes
-          npm version prerelease --preid=rc
-          cd ../../
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
+      # Bump versions for lasereyes-core and lasereyes-react, but do not release them individually
       - name: Bump version for lasereyes-core (dev)
         if: ${{ env.lasereyes_core_changed == 'true' && github.ref == 'refs/heads/dev' }}
         run: |
@@ -79,6 +70,16 @@ jobs:
         if: ${{ env.lasereyes_react_changed == 'true' && github.ref == 'refs/heads/dev' }}
         run: |
           cd packages/lasereyes-react
+          npm version prerelease --preid=rc
+          cd ../../
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Bump version for lasereyes based on any changes to lasereyes-core or lasereyes-react
+      - name: Bump version for lasereyes (dev)
+        if: ${{ (env.lasereyes_changed == 'true' || env.lasereyes_core_changed == 'true' || env.lasereyes_react_changed == 'true') && github.ref == 'refs/heads/dev' }}
+        run: |
+          cd packages/lasereyes
           npm version prerelease --preid=rc
           cd ../../
         env:
@@ -98,34 +99,12 @@ jobs:
 
       # Bump versions for main branch (patch releases)
       - name: Bump version for lasereyes (main)
-        if: ${{ env.lasereyes_changed == 'true' && github.ref == 'refs/heads/main' }}
+        if: ${{ (env.lasereyes_changed == 'true' || env.lasereyes_core_changed == 'true' || env.lasereyes_react_changed == 'true') && github.ref == 'refs/heads/main' }}
         id: bump_lasereyes
         run: |
           cd packages/lasereyes
           new_version=$(npm version patch)
           echo "lasereyes_version=${new_version}" >> $GITHUB_ENV
-          cd ../../
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Bump version for lasereyes-core (main)
-        if: ${{ env.lasereyes_core_changed == 'true' && github.ref == 'refs/heads/main' }}
-        id: bump_lasereyes_core
-        run: |
-          cd packages/lasereyes-core
-          new_version=$(npm version patch)
-          echo "lasereyes_core_version=${new_version}" >> $GITHUB_ENV
-          cd ../../
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Bump version for lasereyes-react (main)
-        if: ${{ env.lasereyes_react_changed == 'true' && github.ref == 'refs/heads/main' }}
-        id: bump_lasereyes_react
-        run: |
-          cd packages/lasereyes-react
-          new_version=$(npm version patch)
-          echo "lasereyes_react_version=${new_version}" >> $GITHUB_ENV
           cd ../../
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -170,9 +149,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Install Python dependencies only when merging to main and generating release notes
+      # Install Python and generate release notes only for lasereyes
       - name: Setup Python and install dependencies
-        if: ${{ github.ref == 'refs/heads/main' && (env.lasereyes_changed == 'true' || env.lasereyes_core_changed == 'true' || env.lasereyes_react_changed == 'true') }}
+        if: ${{ github.ref == 'refs/heads/main' && env.lasereyes_changed == 'true' }}
         uses: actions/setup-python@v4
         with:
           python-version: '3.x'
@@ -183,20 +162,20 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
       - name: Generate git diff
-        if: ${{ github.ref == 'refs/heads/main' }}
+        if: ${{ github.ref == 'refs/heads/main' && env.lasereyes_changed == 'true' }}
         run: |
           PREV_COMMIT=$(git rev-parse HEAD^1)
           git diff $PREV_COMMIT HEAD > changes.diff
 
       - name: Generate release notes with GPT
-        if: ${{ github.ref == 'refs/heads/main' && (env.lasereyes_changed == 'true' || env.lasereyes_core_changed == 'true' || env.lasereyes_react_changed == 'true') }}
+        if: ${{ github.ref == 'refs/heads/main' && env.lasereyes_changed == 'true' }}
         run: |
-          python3 scripts/generate_release_notes.py ${{ env.lasereyes_version || env.lasereyes_core_version || env.lasereyes_react_version }}
+          python3 scripts/generate_release_notes.py ${{ env.lasereyes_version }}
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
       - name: Concatenate release notes
-        if: ${{ github.ref == 'refs/heads/main' && (env.lasereyes_changed == 'true' || env.lasereyes_core_changed == 'true' || env.lasereyes_react_changed == 'true') }}
+        if: ${{ github.ref == 'refs/heads/main' && env.lasereyes_changed == 'true' }}
         run: |
           git checkout main
           git pull origin main
@@ -207,14 +186,15 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      # Create GitHub release only for lasereyes
       - name: Create GitHub Release
-        if: ${{ env.lasereyes_changed == 'true' || env.lasereyes_core_changed == 'true' || env.lasereyes_react_changed == 'true' }}
+        if: ${{ env.lasereyes_changed == 'true' }}
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: "v${{ env.lasereyes_version || env.lasereyes_core_version || env.lasereyes_react_version }}"
-          release_name: "Release ${{ env.lasereyes_version || env.lasereyes_core_version || env.lasereyes_react_version }}"
+          tag_name: "${{ env.lasereyes_version }}"
+          release_name: "Release ${{ env.lasereyes_version }}"
           body_path: detailed_release_notes.md
           draft: false
           prerelease: false
