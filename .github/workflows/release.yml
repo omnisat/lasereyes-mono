@@ -161,14 +161,24 @@ jobs:
             echo "is_rc=false" >> $GITHUB_ENV
           fi
 
+      - name: Ensure single "v" in tag_name
+        id: ensure_v
+        run: |
+          if [[ "${{ env.new_version }}" == v* ]]; then
+            echo "tag_name=${{ env.new_version }}" >> $GITHUB_ENV
+          else
+            echo "tag_name=v${{ env.new_version }}" >> $GITHUB_ENV
+          fi
+
+
       - name: Create GitHub Release
         if: ${{ env.changed == 'true' && github.ref == 'refs/heads/main' && env.is_rc == 'false' }}
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: "v${{ env.new_version }}"
-          release_name: "Release v${{ env.new_version }}"
+          tag_name: "${{ env.tag_name }}"
+          release_name: "Release ${{ env.tag_name }}"
           body_path: detailed_release_notes.md
           draft: false
           prerelease: false
