@@ -98,6 +98,25 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # Bump versions for main branch (patch releases)
+      # Patch all changed packages (no RC) when merging to main
+      - name: Bump version for lasereyes-core (main)
+        if: ${{ env.lasereyes_core_changed == 'true' && github.ref == 'refs/heads/main' }}
+        run: |
+          cd packages/lasereyes-core
+          npm version patch
+          cd ../../
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Bump version for lasereyes-react (main)
+        if: ${{ env.lasereyes_react_changed == 'true' && github.ref == 'refs/heads/main' }}
+        run: |
+          cd packages/lasereyes-react
+          npm version patch
+          cd ../../
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Bump version for lasereyes (main)
         if: ${{ (env.lasereyes_changed == 'true' || env.lasereyes_core_changed == 'true' || env.lasereyes_react_changed == 'true') && github.ref == 'refs/heads/main' }}
         id: bump_lasereyes

@@ -55,5 +55,3 @@ If you find Laser Eyes useful or use it for work, please consider [sponsoring La
 <br>
 
 [Sponsor Laser Eyes](https://github.com/sponsors/omnisat)
-
-<br />
