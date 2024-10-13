@@ -2,13 +2,6 @@
 
 # Getting Started
 
-
-
-
-
-
-
-g
-
+# Contributing
 
 

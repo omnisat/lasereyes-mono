@@ -1,7 +1,7 @@
 {
   "name": "@omnisat/lasereyes-react",
   "private": false,
-  "version": "0.0.4",
+  "version": "0.0.0-rc.3",
   "type": "module",
   "main": "./dist/index.umd.cjs",
   "module": "./dist/index.js",
@@ -45,5 +45,8 @@
     "typescript-eslint": "^8.0.1",
     "vite": "^5.4.1",
     "vite-plugin-dts": "^4.2.1"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

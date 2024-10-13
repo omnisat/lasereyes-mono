@@ -1,0 +1,22 @@
+{
+  "name": "Docs",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vocs dev",
+    "build": "vocs build",
+    "preview": "vocs preview"
+  },
+  "dependencies": {
+    "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
+    "@omnisat/lasereyes": "^0.0.30",
+    "react": "latest",
+    "react-dom": "latest",
+    "vocs": "^1.0.0-alpha.52"
+  },
+  "devDependencies": {
+    "@types/react": "latest",
+    "typescript": "latest"
+  }
+}
