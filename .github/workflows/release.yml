@@ -137,22 +137,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  # Merge dev into main via PR (no direct commits to main)
-  create-pr-to-main:
-    runs-on: ubuntu-latest
-    needs: bump-versions-dev
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
-      - name: Create a pull request to merge dev into main
-        run: |
-          gh pr create --title "Merge dev into main" --body "Release candidate ready to be merged into main" --base main --head dev
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
   # Sync main branch back to dev after PR is merged
   sync-main-to-dev:
     runs-on: ubuntu-latest
@@ -188,7 +172,7 @@ jobs:
   # Generate release notes and create GitHub release
   generate-release:
     runs-on: ubuntu-latest
-    needs: create-pr-to-main
+    needs: bump-versions-dev
     if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout repository
