@@ -227,11 +227,13 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Sync main to dev with conflict resolution
+      - name: Sync main to dev with conflict resolution for package files
         run: |
           git checkout dev
           git pull origin dev
-          git merge -X theirs origin/main  # Automatically resolve conflicts using 'theirs' strategy
+          git merge -X ours --no-commit origin/main
+          git add packages/lasereyes-react/package-lock.json packages/lasereyes-react/package.json packages/lasereyes/package.json
+          git commit -m "Merge main into dev with conflict resolution for package files"
           git push origin dev
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -266,7 +268,7 @@ jobs:
 
       - name: Generate release notes with GPT
         run: |
-          python3 scripts/generate_release_notes.py ${{ steps.bump_lasereyes.outputs.lasereyes_version }}
+          python3 scripts/generate_release_notes.py ${{ env.lasereyes_version }}
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
@@ -284,10 +286,10 @@ jobs:
       - name: Ensure single "v" in tag_name
         id: ensure_v
         run: |
-          if [[ "${{ steps.bump_lasereyes.outputs.lasereyes_version }}" == v* ]]; then
-            echo "tag_name=${{ steps.bump_lasereyes.outputs.lasereyes_version }}" >> $GITHUB_ENV
+          if [[ "${{ env.lasereyes_version }}" == v* ]]; then
+            echo "tag_name=${{ env.lasereyes_version }}" >> $GITHUB_ENV
           else
-            echo "tag_name=v${{ steps.bump_lasereyes.outputs.lasereyes_version }}" >> $GITHUB_ENV
+            echo "tag_name=v${{ env.lasereyes_version }}" >> $GITHUB_ENV
           fi
 
       - name: Create GitHub Release
