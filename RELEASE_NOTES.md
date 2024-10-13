@@ -1,4 +1,23 @@
 
+## Release Notes for Version: v0.0.35
+
+In this new version, several updates have been made to the packages, mainly targeting:
+
+1. **Lasereyes-core:**
+
+   The package version has been upgraded from `v0.0.5` to a release candidate `v0.0.6-rc.0`. This release candidate will undergo further testing before a full version update. 
+
+2. **Lasereyes-react:**
+
+    Both the `package.json` and `package-lock.json` files have been updated. The package version has been updated from `v0.0.3` to a release candidate version `v0.0.4-rc.0` reflecting potential upcoming changes expected to be fully implemented in the version `0.0.4`.
+
+3. **Lasereyes:**
+
+    The package version has been updated from `v0.0.35` to a release candidate `v0.0.36-rc.0`.
+
+
+Please note that all the updates are related to the versions of the packages. More information about any new features or fixes will be provided as they come in future updates. Until then, the users can continue with the same feature set as the previous version.
+
 # Release Notes
 
 ## Version v0.0.34
