@@ -11,7 +11,7 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
-
+    environment: prod
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -44,11 +44,21 @@ jobs:
             echo "changed=false" >> $GITHUB_ENV
           fi
 
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install Python dependencies
+        if: ${{ env.changed == 'true' }}
+        run: |
+          python -m pip install --upgrade pip
+          pip install openai==0.28
+
       - name: Bump version for lasereyes (dev)
         if: ${{ env.changed == 'true' && github.ref == 'refs/heads/dev' }}
         run: |
           cd packages/lasereyes
-          # Increment the version by a patch and mark it as an RC
           npm version prerelease --preid=rc
           cd ../../
         env:
@@ -70,7 +80,6 @@ jobs:
         if: ${{ env.changed == 'true' && github.ref == 'refs/heads/main' }}
         run: |
           cd packages/lasereyes
-          # Increment the version by a patch for main
           npm version patch
           cd ../../
         env:
@@ -88,7 +97,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Sync main back into dev and bump dev's version again
       - name: Sync main to dev and bump dev version after merge
         if: ${{ github.ref == 'refs/heads/main' && env.changed == 'true' }}
         run: |
@@ -96,7 +104,6 @@ jobs:
           git pull origin dev
           git merge origin/main
           cd packages/lasereyes
-          # Bump the dev version as a pre-release
           npm version prerelease --preid=rc
           cd ../../
           git add .
@@ -104,6 +111,46 @@ jobs:
           git push origin dev
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate git diff
+        if: ${{ github.ref == 'refs/heads/main' }}
+        run: |
+          PREV_COMMIT=$(git rev-parse HEAD^1)
+          git diff $PREV_COMMIT HEAD > changes.diff
+
+      - name: Check if OPENAI_API_KEY is set
+        if: ${{ github.ref == 'refs/heads/main' }}
+        run: |
+          if [ -z "$OPENAI_API_KEY" ]; then
+            echo "OPENAI_API_KEY is not set"
+            exit 1
+          else
+            echo "OPENAI_API_KEY is set"
+          fi
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+      - name: Generate release notes with GPT
+        if: ${{ env.changed == 'true' && github.ref == 'refs/heads/main' }}
+        run: |
+          python3 scripts/generate_release_notes.py
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+      - name: Commit generated release notes
+        if: ${{ env.changed == 'true' && github.ref == 'refs/heads/main' }}
+        run: |
+          git add RELEASE_NOTES.md
+          git commit -m "Updated release notes with GPT"
+          git push origin main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish package (placeholder)
+        if: ${{ env.changed == 'true' && github.ref == 'refs/heads/main' }}
+        run: |
+          echo "Publishing @omnisat/lasereyes..."
+          # In the future, replace with actual publishing logic, e.g., pnpm publish
 
       - name: Post Setup pnpm
         run: echo "Workflow completed!"
