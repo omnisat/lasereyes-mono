@@ -80,6 +80,8 @@ jobs:
         if: ${{ env.changed == 'true' && github.ref == 'refs/heads/main' }}
         run: |
           cd packages/lasereyes
+          new_version=$(npm version patch)
+          echo "new_version=${new_version}" >> $GITHUB_ENV
           npm version patch
           cd ../../
         env:
@@ -165,8 +167,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: "v${{ steps.bump.outputs.new_version }}"
-          release_name: "Release v${{ steps.bump.outputs.new_version }}"
+          tag_name: "v${{ env.new_version }}"
+          release_name: "Release v${{ env.new_version }}"
           body_path: detailed_release_notes.md
           draft: false
           prerelease: false
