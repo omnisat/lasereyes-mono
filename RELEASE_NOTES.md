@@ -1,4 +1,27 @@
 
+# Release Notes - Version v0.0.33
+
+## General
+
+New version v0.0.33 brings a few important updates across several packages. Enhancement in package versions are introduced in this update. 
+
+### Details
+
+Here is the summary of the version changes:
+
+- **@omnisat/lasereyes-core**
+  The version has been updated from v0.0.5-rc.2 to v0.0.5-rc.3.
+
+- **lasereyes-react**
+  The versions in both `package-lock.json` and `package.json` files have been updated from v0.0.3-rc.1 to v0.0.3-rc.2.
+
+- **@omnisat/lasereyes**
+  The version has been updated from v0.0.33 to v0.0.34-rc.0.
+
+Please note the new changes and update your packages accordingly for optimal performance and latest features.
+
+Remember to always start with backing up your application and data before applying any updates. Make sure to test in a controlled environment that resembles your production environment before moving forward with these upgrades in your production environment.
+
 # Release Notes
 
 ## Version: v0.0.33-rc.0
