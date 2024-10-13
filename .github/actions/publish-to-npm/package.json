@@ -1,9 +1,0 @@
-{
-  "name": "publish-to-npm",
-  "version": "1.0.0",
-  "main": "index.js",
-  "dependencies": {
-    "@actions/core": "^1.10.0",
-    "@actions/exec": "^1.1.0"
-  }
-}
