@@ -1,4 +1,12 @@
 
+# Release Notes for v0.0.31-rc.0
+
+## Updates:
+
+1. Version Upgrade: The package has been upgraded from version `0.0.30` to version `0.0.31-rc.0`.
+
+No additional changes have been made in the package's modules or structure as per the git diff provided. Please ensure to update your dependencies to stay up-to-date with the latest features and improvements of the "@omnisat/lasereyes" package.
+
 # Release Notes
 
 #### Version: v0.0.28
