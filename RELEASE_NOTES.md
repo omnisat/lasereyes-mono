@@ -1,4 +1,31 @@
 
+# Release Notes: v0.0.36
+
+## Detailed Updates:
+
+### General:
+
+- Transitioned to new versioning format for the package, now using release candidate (rc) versioning. 
+
+### Package Updates:
+
+1. `@omnisat/lasereyes-core`:
+    - The package version has been updated from "0.0.6" to "0.0.7-rc.0".
+
+2. `lasereyes-react`:
+    - The package version in the package-lock.json file was updated from "0.0.4" to "0.0.5-rc.0".
+    - The package version in the package.json file got updated from "0.0.4" to "0.0.5-rc.0".
+
+3. `@omnisat/lasereyes`:
+    - The package version in the package.json file was updated from "0.0.36" to "0.0.37-rc.0".
+
+#### Please note: 
+A release candidate (RC) version number indicates that the developers think the software is ready for its final release but want to make sure through testing; more changes may come before the final release, but they should be minor.
+
+The updated packages should now be tested thoroughly before the final release. 
+
+These changes help to better track the progress of new features and bug fixes, by providing an advanced snapshot of what's changing in each package.
+
 ## Release Notes for Version: v0.0.35
 
 In this new version, several updates have been made to the packages, mainly targeting:
