@@ -38,22 +38,23 @@ jobs:
       - name: Check if lasereyes package changed
         id: check_lasereyes_changes
         run: |
-          if git diff --name-only HEAD^1 HEAD | grep -q 'packages/lasereyes/'; then
+          if pnpm changeset status | grep -q lasereyes; then
             echo "changed=true" >> $GITHUB_ENV
           else
             echo "changed=false" >> $GITHUB_ENV
           fi
 
-      - name: Bump version for lasereyes (dev)
-        if: ${{ env.changed == 'true' && github.ref == 'refs/heads/dev' }}
+      - name: Add Changeset if lasereyes package changed
+        if: ${{ env.changed == 'true' }}
         run: |
-          cd packages/lasereyes
-          # Increment the version by a patch and mark it as an RC
-          npm version prerelease --preid=rc
-          cd ../../
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          pnpm changeset add --empty --force --message "chore: auto-bump lasereyes version (patch)"
 
+      # On Dev: Run version bump for RC versions
+      - name: Run Changesets version bump for dev
+        if: ${{ env.changed == 'true' && github.ref == 'refs/heads/dev' }}
+        run: pnpm changeset version
+
+      # Commit version bumps and changelog for dev
       - name: Commit version bumps and changelog for dev
         if: ${{ env.changed == 'true' && github.ref == 'refs/heads/dev' }}
         run: |
@@ -66,18 +67,25 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Bump version for lasereyes (main)
-        if: ${{ env.changed == 'true' && github.ref == 'refs/heads/main' }}
+      # On Main: Bump stable version
+      - name: Run Changesets version bump for main
+        if: ${{ github.ref == 'refs/heads/main' && env.changed == 'true' }}
         run: |
-          cd packages/lasereyes
-          # Increment the version by a patch for main
-          npm version patch
-          cd ../../
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Check the current version in package.json
+          CURRENT_VERSION=$(cat packages/lasereyes/package.json | grep '"version":' | sed 's/[",]//g' | awk '{print $2}')
+          
+          # If it's an RC version (e.g., 0.0.8-rc.0), strip the RC and increment to stable (e.g., 0.0.8)
+          if [[ $CURRENT_VERSION == *"-rc"* ]]; then
+            STABLE_VERSION=$(echo $CURRENT_VERSION | sed 's/-rc.[0-9]*//')
+            pnpm version $STABLE_VERSION
+          else
+            # Otherwise, just do a patch version increment
+            pnpm version patch
+          fi
 
+      # Commit version bumps and changelog for main
       - name: Commit version bumps and changelog for main
-        if: ${{ env.changed == 'true' && github.ref == 'refs/heads/main' }}
+        if: ${{ github.ref == 'refs/heads/main' && env.changed == 'true' }}
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
@@ -88,22 +96,14 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Sync main back into dev and bump dev's version again
-      - name: Sync main to dev and bump dev version after merge
+      # On Dev: Bump to the next rc version after merge to main
+      - name: Bump RC version for dev after merging to main
         if: ${{ github.ref == 'refs/heads/main' && env.changed == 'true' }}
         run: |
-          git checkout dev
-          git pull origin dev
-          git merge origin/main
-          cd packages/lasereyes
-          # Bump the dev version as a pre-release
-          npm version prerelease --preid=rc
-          cd ../../
-          git add .
-          git commit -m "Bump dev version after main sync"
-          git push origin dev
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CURRENT_VERSION=$(cat packages/lasereyes/package.json | grep '"version":' | sed 's/[",]//g' | awk '{print $2}')
+          # Increment to the next rc version (e.g., from 0.0.8 -> 0.0.9-rc.0)
+          NEXT_RC_VERSION=$(echo $CURRENT_VERSION | awk -F. -v OFS=. '{$NF = $NF + 1; print}')
+          pnpm version $NEXT_RC_VERSION-rc.0
 
       - name: Post Setup pnpm
         run: echo "Workflow completed!"
