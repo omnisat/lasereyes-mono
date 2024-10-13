@@ -1,4 +1,17 @@
 
+## Lasereyes v0.0.26-rc.0 Release Notes
+
+In this release, only the version number has been updated. No feature enhancements or issue fixes were detailed.
+
+### Changes:
+- Updated the package's version from `0.0.25` to `0.0.26-rc.0`. 
+
+As this version suggests, this is a release candidate (rc.0) for the 0.0.26 version of the Lasereyes package. This will undergo testing before it is officially released as version 0.0.26. 
+
+Note: Since there were no other changes mentioned, it's assumed that improvements, bug fixes, or feature additions have not been incorporated in this update. 
+
+Ensure that the compatibility and functionalities align with your dependencies before updating to this version.
+
 # Release Notes
 
 ### Package
