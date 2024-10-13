@@ -32,7 +32,11 @@ For help, discussion about best practices, or any other conversation that would 
 
 ## Contributing
 
+<<<<<<< Updated upstream
 Contributions to Lasereyes are greatly appreciated! If you're interested in contributing to Lasereyes, please read the [Contributing Guide](https://wagmi.sh/dev/contributing) **before submitting a pull request**.
+=======
+Contributions to Laser Eyes are greatly appreciated! If you're interested in contributing to this open source library, please read the [Contributing Guide](https://www.lasereyes.build/docs/contributing) **before submitting a pull request**.
+>>>>>>> Stashed changes
 
 ## Sponsors
 
