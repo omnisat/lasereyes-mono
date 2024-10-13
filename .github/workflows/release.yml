@@ -227,11 +227,13 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Sync main to dev with conflict resolution
+      - name: Sync main to dev with conflict resolution for package files
         run: |
           git checkout dev
           git pull origin dev
-          git merge -X theirs origin/main  # Automatically resolve conflicts using 'theirs' strategy
+          git merge -X ours --no-commit origin/main
+          git add packages/lasereyes-react/package-lock.json packages/lasereyes-react/package.json packages/lasereyes/package.json
+          git commit -m "Merge main into dev with conflict resolution for package files"
           git push origin dev
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
