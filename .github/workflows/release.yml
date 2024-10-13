@@ -48,7 +48,6 @@ jobs:
         if: ${{ env.changed == 'true' && github.ref == 'refs/heads/dev' }}
         run: |
           cd packages/lasereyes
-          # Increment the version by a patch and mark it as an RC
           npm version prerelease --preid=rc
           cd ../../
         env:
@@ -70,7 +69,6 @@ jobs:
         if: ${{ env.changed == 'true' && github.ref == 'refs/heads/main' }}
         run: |
           cd packages/lasereyes
-          # Increment the version by a patch for main
           npm version patch
           cd ../../
         env:
@@ -96,7 +94,6 @@ jobs:
           git pull origin dev
           git merge origin/main
           cd packages/lasereyes
-          # Bump the dev version as a pre-release
           npm version prerelease --preid=rc
           cd ../../
           git add .
@@ -104,6 +101,30 @@ jobs:
           git push origin dev
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # GPT Step: Use GPT to generate release notes
+      - name: Generate release notes with GPT
+        if: ${{ env.changed == 'true' }}
+        run: |
+          python3 scripts/generate_release_notes.py
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+      - name: Commit generated release notes
+        if: ${{ env.changed == 'true' }}
+        run: |
+          git add RELEASE_NOTES.md
+          git commit -m "Updated release notes with GPT"
+          git push origin dev
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Publishing Step (currently just echoing a placeholder string)
+      - name: Publish package (placeholder)
+        if: ${{ env.changed == 'true' }}
+        run: |
+          echo "Publishing @omnisat/lasereyes..."
+          # In the future, replace with actual publishing logic, e.g., pnpm publish
 
       - name: Post Setup pnpm
         run: echo "Workflow completed!"
