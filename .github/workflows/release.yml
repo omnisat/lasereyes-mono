@@ -38,20 +38,21 @@ jobs:
       - name: Check if lasereyes package changed
         id: check_lasereyes_changes
         run: |
-          if pnpm changeset status | grep -q lasereyes; then
+          if git diff --name-only HEAD^1 HEAD | grep -q 'packages/lasereyes/'; then
             echo "changed=true" >> $GITHUB_ENV
           else
             echo "changed=false" >> $GITHUB_ENV
           fi
 
-      - name: Add Changeset if lasereyes package changed
-        if: ${{ env.changed == 'true' }}
-        run: |
-          pnpm changeset add --empty --force --message "chore: auto-bump lasereyes version (patch)"
-
-      - name: Run Changesets version bump for dev
+      - name: Bump version for lasereyes (dev)
         if: ${{ env.changed == 'true' && github.ref == 'refs/heads/dev' }}
-        run: pnpm changeset version
+        run: |
+          cd packages/lasereyes
+          # Increment the version by a patch and mark it as an RC
+          npm version prerelease --preid=rc
+          cd ../../
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Commit version bumps and changelog for dev
         if: ${{ env.changed == 'true' && github.ref == 'refs/heads/dev' }}
@@ -65,9 +66,15 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Run Changesets version bump for main
+      - name: Bump version for lasereyes (main)
         if: ${{ env.changed == 'true' && github.ref == 'refs/heads/main' }}
-        run: pnpm changeset version
+        run: |
+          cd packages/lasereyes
+          # Increment the version by a patch for main
+          npm version patch
+          cd ../../
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Commit version bumps and changelog for main
         if: ${{ env.changed == 'true' && github.ref == 'refs/heads/main' }}
