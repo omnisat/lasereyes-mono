@@ -137,6 +137,7 @@ jobs:
 
   # Bumping versions for main branch (patch releases) after manual PR merge
   bump-versions-main:
+    environment: prod
     runs-on: ubuntu-latest
     needs: release
     if: github.ref == 'refs/heads/main'
@@ -238,6 +239,7 @@ jobs:
 
   # Generate release notes and create GitHub release
   generate-release:
+    environment: prod
     runs-on: ubuntu-latest
     needs: bump-versions-main
     if: github.ref == 'refs/heads/main'
