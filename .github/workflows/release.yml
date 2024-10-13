@@ -140,7 +140,7 @@ jobs:
       - name: Commit generated release notes
         if: ${{ env.changed == 'true' && github.ref == 'refs/heads/main' }}
         run: |
-          git add RELEASE_NOTES.md
+          git add detailed_release_notes.md  # Fix the file name here
           git commit -m "Updated release notes with GPT"
           git push origin main
         env:
