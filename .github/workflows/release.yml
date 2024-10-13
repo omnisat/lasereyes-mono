@@ -113,11 +113,13 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Generate git diff
+        if: ${{ github.ref == 'refs/heads/main' }}
         run: |
           PREV_COMMIT=$(git rev-parse HEAD^1)
           git diff $PREV_COMMIT HEAD > changes.diff
 
       - name: Check if OPENAI_API_KEY is set
+        if: ${{ github.ref == 'refs/heads/main' }}
         run: |
           if [ -z "$OPENAI_API_KEY" ]; then
             echo "OPENAI_API_KEY is not set"
@@ -128,26 +130,24 @@ jobs:
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
-      # GPT Step: Use GPT to generate release notes
       - name: Generate release notes with GPT
-        if: ${{ env.changed == 'true' }}
+        if: ${{ env.changed == 'true' && github.ref == 'refs/heads/main' }}
         run: |
           python3 scripts/generate_release_notes.py
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
       - name: Commit generated release notes
-        if: ${{ env.changed == 'true' }}
+        if: ${{ env.changed == 'true' && github.ref == 'refs/heads/main' }}
         run: |
           git add RELEASE_NOTES.md
           git commit -m "Updated release notes with GPT"
-          git push origin dev
+          git push origin main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Publishing Step (currently just echoing a placeholder string)
       - name: Publish package (placeholder)
-        if: ${{ env.changed == 'true' }}
+        if: ${{ env.changed == 'true' && github.ref == 'refs/heads/main' }}
         run: |
           echo "Publishing @omnisat/lasereyes..."
           # In the future, replace with actual publishing logic, e.g., pnpm publish
