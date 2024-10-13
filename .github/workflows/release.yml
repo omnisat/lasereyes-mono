@@ -3,8 +3,8 @@ name: Release
 on:
   push:
     branches:
-      - dev
-      - main
+      - dev  # No direct changes to main, everything goes through dev
+
 permissions:
   contents: write
 
@@ -137,76 +137,25 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  # Bumping versions for main branch (patch releases)
-  bump-versions-main:
+  # Merge dev into main via PR (no direct commits to main)
+  create-pr-to-main:
     runs-on: ubuntu-latest
-    needs: release
-    if: github.ref == 'refs/heads/main'
+    needs: bump-versions-dev
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-
-      - name: Setup pnpm
+      - name: Create a pull request to merge dev into main
         run: |
-          corepack enable
-          corepack prepare pnpm@8.6.6 --activate
-
-      - name: Install dependencies
-        run: pnpm install
-
-      - name: Bump version for lasereyes-core (main)
-        if: ${{ needs.release.outputs.lasereyes_core_changed == 'true' }}
-        run: |
-          cd packages/lasereyes-core
-          npm version patch
-          cd ../../
+          gh pr create --title "Merge dev into main" --body "Release candidate ready to be merged into main" --base main --head dev
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Bump version for lasereyes-react (main)
-        if: ${{ needs.release.outputs.lasereyes_react_changed == 'true' }}
-        run: |
-          cd packages/lasereyes-react
-          npm version patch
-          cd ../../
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Bump version for lasereyes (main)
-        if: ${{ needs.release.outputs.lasereyes_changed == 'true' || needs.release.outputs.lasereyes_core_changed == 'true' || needs.release.outputs.lasereyes_react_changed == 'true' }}
-        id: bump_lasereyes
-        run: |
-          cd packages/lasereyes
-          new_version=$(npm version patch)
-          echo "lasereyes_version=${new_version}" >> $GITHUB_ENV
-          cd ../../
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Commit version bumps for main
-        if: ${{ needs.release.outputs.lasereyes_changed == 'true' || needs.release.outputs.lasereyes_core_changed == 'true' || needs.release.outputs.lasereyes_react_changed == 'true' }}
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git checkout main
-          git pull origin main
-          git add .
-          git commit -m "Version bump after merge to main for packages"
-          git push origin main
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  # Sync main branch to dev after changes to main
+  # Sync main branch back to dev after PR is merged
   sync-main-to-dev:
     runs-on: ubuntu-latest
-    needs: bump-versions-main
     if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout repository
@@ -231,9 +180,7 @@ jobs:
         run: |
           git checkout dev
           git pull origin dev
-          git merge -X ours --no-commit origin/main
-          git add packages/lasereyes-react/package-lock.json packages/lasereyes-react/package.json packages/lasereyes/package.json
-          git commit -m "Merge main into dev with conflict resolution for package files"
+          git merge -X theirs origin/main || true
           git push origin dev
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -241,7 +188,7 @@ jobs:
   # Generate release notes and create GitHub release
   generate-release:
     runs-on: ubuntu-latest
-    needs: bump-versions-main
+    needs: create-pr-to-main
     if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout repository
