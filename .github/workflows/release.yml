@@ -90,9 +90,10 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout main
+          git pull origin main
           git add .
           git commit -m "Version bump after merge to main for lasereyes"
-          git pull --rebase origin main
           git push origin main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -102,7 +103,7 @@ jobs:
         run: |
           git checkout dev
           git pull origin dev
-          git merge -X theirs origin/main  # This will favor changes from main in case of conflict
+          git merge origin/main
           cd packages/lasereyes
           npm version prerelease --preid=rc
           cd ../../
@@ -111,7 +112,6 @@ jobs:
           git push origin dev
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
 
       - name: Generate git diff
         if: ${{ github.ref == 'refs/heads/main' }}
@@ -138,26 +138,27 @@ jobs:
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
-      - name: Print generated release notes
+      - name: Concatenate release notes
         if: ${{ env.changed == 'true' && github.ref == 'refs/heads/main' }}
         run: |
-          cat detailed_release_notes.md
-
-      - name: Commit generated release notes
-        if: ${{ env.changed == 'true' && github.ref == 'refs/heads/main' }}
-        run: |
-          git checkout main  # Ensure you're on main
-          git add detailed_release_notes.md
-          git commit -m "Updated release notes with GPT"
+          echo -e "\n$(cat detailed_release_notes.md)\n$(cat RELEASE_NOTES.md)" > RELEASE_NOTES.md
+          git add RELEASE_NOTES.md
+          git commit -m "Updated RELEASE_NOTES.md with new release"
           git push origin main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Publish package (placeholder)
+      - name: Create GitHub Release
         if: ${{ env.changed == 'true' && github.ref == 'refs/heads/main' }}
-        run: |
-          echo "Publishing @omnisat/lasereyes..."
-          # In the future, replace with actual publishing logic, e.g., pnpm publish
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: "v${{ steps.bump.outputs.new_version }}"  # Or a manually defined tag
+          release_name: "Release v${{ steps.bump.outputs.new_version }}"
+          body_path: detailed_release_notes.md
+          draft: false
+          prerelease: false
 
       - name: Post Setup pnpm
         run: echo "Workflow completed!"
