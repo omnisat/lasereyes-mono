@@ -266,7 +266,7 @@ jobs:
 
       - name: Generate release notes with GPT
         run: |
-          python3 scripts/generate_release_notes.py ${{ env.lasereyes_version }}
+          python3 scripts/generate_release_notes.py ${{ steps.bump_lasereyes.outputs.lasereyes_version }}
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
@@ -284,10 +284,10 @@ jobs:
       - name: Ensure single "v" in tag_name
         id: ensure_v
         run: |
-          if [[ "${{ env.lasereyes_version }}" == v* ]]; then
-            echo "tag_name=${{ env.lasereyes_version }}" >> $GITHUB_ENV
+          if [[ "${{ steps.bump_lasereyes.outputs.lasereyes_version }}" == v* ]]; then
+            echo "tag_name=${{ steps.bump_lasereyes.outputs.lasereyes_version }}" >> $GITHUB_ENV
           else
-            echo "tag_name=v${{ env.lasereyes_version }}" >> $GITHUB_ENV
+            echo "tag_name=v${{ steps.bump_lasereyes.outputs.lasereyes_version }}" >> $GITHUB_ENV
           fi
 
       - name: Create GitHub Release
