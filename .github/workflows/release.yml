@@ -3,12 +3,14 @@ name: Release
 on:
   push:
     branches:
-      - dev
-      - main
+      - dev  # Continue working through dev, no direct pushes to main
+      - main  # Also watch for merges into main
+
 permissions:
   contents: write
 
 jobs:
+  # This job handles everything when pushing to dev
   release:
     runs-on: ubuntu-latest
     environment: prod
@@ -122,25 +124,20 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Pull latest changes from dev
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git pull origin dev
-
       - name: Commit version bumps for dev
         if: ${{ needs.release.outputs.lasereyes_changed == 'true' || needs.release.outputs.lasereyes_core_changed == 'true' || needs.release.outputs.lasereyes_react_changed == 'true' }}
         run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add .
           git commit -m "RC version bump for packages"
           git push origin dev
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  # Bumping versions for main branch (patch releases)
+  # Bumping versions for main branch (patch releases) after manual PR merge
   bump-versions-main:
     runs-on: ubuntu-latest
-    needs: release
     if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout repository
@@ -203,7 +200,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  # Sync main branch to dev after changes to main
+  # Sync main branch back to dev after PR is merged
   sync-main-to-dev:
     runs-on: ubuntu-latest
     needs: bump-versions-main
@@ -231,9 +228,7 @@ jobs:
         run: |
           git checkout dev
           git pull origin dev
-          git merge -X ours --no-commit origin/main
-          git add packages/lasereyes-react/package-lock.json packages/lasereyes-react/package.json packages/lasereyes/package.json
-          git commit -m "Merge main into dev with conflict resolution for package files"
+          git merge -X theirs origin/main || true
           git push origin dev
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -268,7 +263,7 @@ jobs:
 
       - name: Generate release notes with GPT
         run: |
-          python3 scripts/generate_release_notes.py ${{ env.lasereyes_version }}
+          python3 scripts/generate_release_notes.py ${{ steps.bump_lasereyes.outputs.lasereyes_version }}
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 

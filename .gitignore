@@ -38,3 +38,5 @@ yarn-error.log*
 *.pem
 .idea
 .vscode
+package-lock.json
+package-lock.json
