@@ -112,6 +112,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Generate git diff
+        run: |
+          PREV_COMMIT=$(git rev-parse HEAD^1)
+          git diff $PREV_COMMIT HEAD > changes.diff
+
       # GPT Step: Use GPT to generate release notes
       - name: Generate release notes with GPT
         if: ${{ env.changed == 'true' }}
