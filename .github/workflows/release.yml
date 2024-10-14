@@ -33,23 +33,24 @@ jobs:
             # Merging to dev: compare the latest commit against its parent
             echo "diff_target=HEAD^1" >> $GITHUB_ENV
           elif [ "${{ github.ref }}" == "refs/heads/main" ]; then
-            # Merging to main: compare dev branch against main branch
-            merge_base=$(git merge-base origin/main origin/dev)
-            echo "diff_target=$merge_base" >> $GITHUB_ENV
+            # Merging to main: compare the remote dev branch against the remote main branch
+            echo "diff_target=origin/main" >> $GITHUB_ENV
+            echo "compare_branch=origin/dev" >> $GITHUB_ENV
           fi
 
       - name: Debug - Print diff output
         run: |
           echo "Changes based on diff strategy:"
-          git diff --name-only ${{ env.diff_target }} HEAD
+          git diff --name-only ${{ env.diff_target }} ${{ env.compare_branch }}
 
       - name: Check if packages changed
         id: check
         run: |
           diff_target=${{ env.diff_target }}
+          compare_branch=${{ env.compare_branch }}
 
           # Check lasereyes package (added or modified files only)
-          if git diff --name-only --diff-filter=AM $diff_target HEAD -- packages/lasereyes/ | grep -q '^packages/lasereyes/'; then
+          if git diff --name-only --diff-filter=AM $diff_target $compare_branch -- packages/lasereyes/ | grep -q '^packages/lasereyes/'; then
             echo "lasereyes_changed=true" >> $GITHUB_ENV
             echo "lasereyes_changed=true" >> $GITHUB_OUTPUT
           else
@@ -58,7 +59,7 @@ jobs:
           fi
 
           # Check lasereyes-core package (added or modified files only)
-          if git diff --name-only --diff-filter=AM $diff_target HEAD -- packages/lasereyes-core/ | grep -q '^packages/lasereyes-core/'; then
+          if git diff --name-only --diff-filter=AM $diff_target $compare_branch -- packages/lasereyes-core/ | grep -q '^packages/lasereyes-core/'; then
             echo "lasereyes_core_changed=true" >> $GITHUB_ENV
             echo "lasereyes_core_changed=true" >> $GITHUB_OUTPUT
           else
@@ -67,14 +68,13 @@ jobs:
           fi
 
           # Check lasereyes-react package (added or modified files only)
-          if git diff --name-only --diff-filter=AM $diff_target HEAD -- packages/lasereyes-react/ | grep -q '^packages/lasereyes-react/'; then
+          if git diff --name-only --diff-filter=AM $diff_target $compare_branch -- packages/lasereyes-react/ | grep -q '^packages/lasereyes-react/'; then
             echo "lasereyes_react_changed=true" >> $GITHUB_ENV
             echo "lasereyes_react_changed=true" >> $GITHUB_OUTPUT
           else
             echo "lasereyes_react_changed=false" >> $GITHUB_ENV
             echo "lasereyes_react_changed=false" >> $GITHUB_OUTPUT
           fi
-
 
 
 
