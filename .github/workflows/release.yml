@@ -29,23 +29,28 @@ jobs:
       - name: Check if packages changed
         id: check
         run: |
-          if git diff --name-only $(git merge-base origin/main HEAD) HEAD | grep -q "packages/lasereyes/"; then
+          merge_base=$(git merge-base origin/main HEAD)
+          
+          # Check lasereyes package
+          if git diff --name-only --diff-filter=M $merge_base HEAD -- packages/lasereyes/ | grep -q .; then
             echo "lasereyes_changed=true" >> $GITHUB_ENV
             echo "lasereyes_changed=true" >> $GITHUB_OUTPUT
           else
             echo "lasereyes_changed=false" >> $GITHUB_ENV
             echo "lasereyes_changed=false" >> $GITHUB_OUTPUT
           fi
-
-          if git diff --name-only $(git merge-base origin/main HEAD) HEAD | grep -q "packages/lasereyes-core/"; then
+          
+          # Check lasereyes-core package
+          if git diff --name-only --diff-filter=M $merge_base HEAD -- packages/lasereyes-core/ | grep -q .; then
             echo "lasereyes_core_changed=true" >> $GITHUB_ENV
             echo "lasereyes_core_changed=true" >> $GITHUB_OUTPUT
           else
             echo "lasereyes_core_changed=false" >> $GITHUB_ENV
             echo "lasereyes_core_changed=false" >> $GITHUB_OUTPUT
           fi
-
-          if git diff --name-only $(git merge-base origin/main HEAD) HEAD | grep -q "packages/lasereyes-react/"; then
+          
+          # Check lasereyes-react package
+          if git diff --name-only --diff-filter=M $merge_base HEAD -- packages/lasereyes-react/ | grep -q .; then
             echo "lasereyes_react_changed=true" >> $GITHUB_ENV
             echo "lasereyes_react_changed=true" >> $GITHUB_OUTPUT
           else
