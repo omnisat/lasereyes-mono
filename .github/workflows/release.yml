@@ -101,6 +101,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Configure git user
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"          
+
       - name: Commit RC version bumps
         if: ${{ needs.check-package-changes.outputs.lasereyes_changed == 'true' || needs.check-package-changes.outputs.lasereyes_core_changed == 'true' || needs.check-package-changes.outputs.lasereyes_react_changed == 'true' }}
         run: |
@@ -158,6 +163,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Configure git user
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"          
+
       - name: Commit stable version bumps for main
         if: ${{ needs.check-package-changes.outputs.lasereyes_changed == 'true' || needs.check-package-changes.outputs.lasereyes_core_changed == 'true' || needs.check-package-changes.outputs.lasereyes_react_changed == 'true' }}
         run: |
@@ -200,6 +210,11 @@ jobs:
           python3 scripts/generate_release_notes.py
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+      - name: Configure git user
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"          
 
       - name: Concatenate release notes
         run: |
