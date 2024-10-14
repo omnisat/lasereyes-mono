@@ -201,6 +201,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Configure git user
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+
       - name: Checkout dev branch
         run: |
           git checkout dev
@@ -208,11 +213,6 @@ jobs:
           git merge origin/main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Configure git user
-        run: |
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git config --global user.name "github-actions[bot]"
 
       - name: Push merge to dev
         run: |
