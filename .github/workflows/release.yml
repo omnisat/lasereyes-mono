@@ -63,7 +63,7 @@ jobs:
             echo "lasereyes_react_changed=false" >> $GITHUB_OUTPUT
           fi
 
-  # Bump RC version in dev branch (parallelized)
+    # Bump RC version in dev branch
   bump-rc-in-dev:
     runs-on: ubuntu-latest
     needs: check-package-changes
@@ -90,10 +90,31 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Bump version for ${{ matrix.package }}
-        if: ${{ needs.check-package-changes.outputs[format('{0}_changed', matrix.package)] == 'true' }}
+      - name: Check package changes for ${{ matrix.package }}
         run: |
-          cd packages/${{ matrix.package }}
+          echo "Package changed status: ${{ needs.check-package-changes.outputs[ matrix.package + '_changed'] }}"
+
+      # Instead of using dynamic conditions, explicitly check for each package:
+      - name: Bump lasereyes version
+        if: matrix.package == 'lasereyes' && needs.check-package-changes.outputs.lasereyes_changed == 'true'
+        run: |
+          cd packages/lasereyes
+          npm version prerelease --preid=rc
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Bump lasereyes-core version
+        if: matrix.package == 'lasereyes-core' && needs.check-package-changes.outputs.lasereyes_core_changed == 'true'
+        run: |
+          cd packages/lasereyes-core
+          npm version prerelease --preid=rc
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Bump lasereyes-react version
+        if: matrix.package == 'lasereyes-react' && needs.check-package-changes.outputs.lasereyes_react_changed == 'true'
+        run: |
+          cd packages/lasereyes-react
           npm version prerelease --preid=rc
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -104,7 +125,10 @@ jobs:
           git config --global user.name "github-actions[bot]"
 
       - name: Commit RC version bumps for ${{ matrix.package }}
-        if: ${{ needs.check-package-changes.outputs[format('{0}_changed', matrix.package)] == 'true' }}
+        if: |
+          (matrix.package == 'lasereyes' && needs.check-package-changes.outputs.lasereyes_changed == 'true') ||
+          (matrix.package == 'lasereyes-core' && needs.check-package-changes.outputs.lasereyes_core_changed == 'true') ||
+          (matrix.package == 'lasereyes-react' && needs.check-package-changes.outputs.lasereyes_react_changed == 'true')
         run: |
           git add .
           git commit -m "RC version bump for ${{ matrix.package }}"
