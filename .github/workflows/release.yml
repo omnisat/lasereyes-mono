@@ -183,6 +183,24 @@ jobs:
     needs: promote-to-stable-in-main
     if: github.ref == 'refs/heads/main'
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Setup pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@8.6.6 --activate
+
+      - name: Install dependencies
+        run: pnpm install
+
       - name: Checkout dev branch
         run: |
           git checkout dev
