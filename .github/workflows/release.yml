@@ -26,10 +26,30 @@ jobs:
       - name: Fetch all branches
         run: git fetch --all
 
+      - name: Determine diff comparison strategy
+        id: diff-strategy
+        run: |
+          if [ "${{ github.ref }}" == "refs/heads/dev" ]; then
+            # Merging to dev: compare the latest commit against its parent
+            echo "diff_target=HEAD^1" >> $GITHUB_ENV
+          elif [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            # Merging to main: compare dev branch against main branch
+            merge_base=$(git merge-base origin/main HEAD)
+            echo "diff_target=$merge_base" >> $GITHUB_ENV
+          fi
+
+      - name: Debug - Print diff output
+        run: |
+          echo "Changes based on diff strategy:"
+          git diff --name-only ${{ env.diff_target }} HEAD
+
       - name: Check if packages changed
         id: check
         run: |
-          if git diff --name-only $(git merge-base origin/main HEAD) HEAD | grep -q "packages/lasereyes/"; then
+          diff_target=${{ env.diff_target }}
+
+          # Check lasereyes package (added or modified files only)
+          if git diff --name-only --diff-filter=AM $diff_target HEAD -- packages/lasereyes/ | grep -q '^packages/lasereyes/'; then
             echo "lasereyes_changed=true" >> $GITHUB_ENV
             echo "lasereyes_changed=true" >> $GITHUB_OUTPUT
           else
@@ -37,7 +57,8 @@ jobs:
             echo "lasereyes_changed=false" >> $GITHUB_OUTPUT
           fi
 
-          if git diff --name-only $(git merge-base origin/main HEAD) HEAD | grep -q "packages/lasereyes-core/"; then
+          # Check lasereyes-core package (added or modified files only)
+          if git diff --name-only --diff-filter=AM $diff_target HEAD -- packages/lasereyes-core/ | grep -q '^packages/lasereyes-core/'; then
             echo "lasereyes_core_changed=true" >> $GITHUB_ENV
             echo "lasereyes_core_changed=true" >> $GITHUB_OUTPUT
           else
@@ -45,13 +66,16 @@ jobs:
             echo "lasereyes_core_changed=false" >> $GITHUB_OUTPUT
           fi
 
-          if git diff --name-only $(git merge-base origin/main HEAD) HEAD | grep -q "packages/lasereyes-react/"; then
+          # Check lasereyes-react package (added or modified files only)
+          if git diff --name-only --diff-filter=AM $diff_target HEAD -- packages/lasereyes-react/ | grep -q '^packages/lasereyes-react/'; then
             echo "lasereyes_react_changed=true" >> $GITHUB_ENV
             echo "lasereyes_react_changed=true" >> $GITHUB_OUTPUT
           else
             echo "lasereyes_react_changed=false" >> $GITHUB_ENV
             echo "lasereyes_react_changed=false" >> $GITHUB_OUTPUT
           fi
+
+
 
   # Release candidate bumps in dev branch
   bump-rc-in-dev:
@@ -77,6 +101,12 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Check the is changed for all packages
+        run: |
+          echo ${{ needs.check-package-changes.outputs.lasereyes_changed }}
+          echo ${{ needs.check-package-changes.outputs.lasereyes_core_changed }}
+          echo ${{ needs.check-package-changes.outputs.lasereyes_react_changed }}
+
       - name: Bump lasereyes-core to next RC version
         if: ${{ needs.check-package-changes.outputs.lasereyes_core_changed == 'true' }}
         run: |
@@ -94,7 +124,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Bump lasereyes to next RC version
-        if: ${{ needs.check-package-changes.outputs.lasereyes_changed == 'true' }}
+        if: ${{  needs.check-package-changes.outputs.lasereyes_changed == 'true' || needs.check-package-changes.outputs.lasereyes_core_changed == 'true' || needs.check-package-changes.outputs.lasereyes_react_changed == 'true' }}
         run: |
           cd packages/lasereyes
           npm version prerelease --preid=rc
@@ -201,6 +231,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Configure git user
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+
       - name: Checkout dev branch
         run: |
           git checkout dev
@@ -208,11 +243,6 @@ jobs:
           git merge origin/main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Configure git user
-        run: |
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git config --global user.name "github-actions[bot]"
 
       - name: Push merge to dev
         run: |
