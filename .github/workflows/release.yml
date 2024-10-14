@@ -49,26 +49,20 @@ jobs:
         run: |
           if git diff --name-only HEAD^1 HEAD | grep -q "packages/lasereyes/"; then
             echo "lasereyes_changed=true" >> $GITHUB_ENV
-            echo "::set-output name=lasereyes_changed::true"
           else
             echo "lasereyes_changed=false" >> $GITHUB_ENV
-            echo "::set-output name=lasereyes_changed::false"
           fi
 
           if git diff --name-only HEAD^1 HEAD | grep -q "packages/lasereyes-core/"; then
             echo "lasereyes_core_changed=true" >> $GITHUB_ENV
-            echo "::set-output name=lasereyes_core_changed::true"
           else
             echo "lasereyes_core_changed=false" >> $GITHUB_ENV
-            echo "::set-output name=lasereyes_core_changed::false"
           fi
 
           if git diff --name-only HEAD^1 HEAD | grep -q "packages/lasereyes-react/"; then
             echo "lasereyes_react_changed=true" >> $GITHUB_ENV
-            echo "::set-output name=lasereyes_react_changed::true"
           else
             echo "lasereyes_react_changed=false" >> $GITHUB_ENV
-            echo "::set-output name=lasereyes_react_changed::false"
           fi
 
   # Bumping versions for dev branch (pre-release)
@@ -76,6 +70,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: release
     if: github.ref == 'refs/heads/dev'
+    strategy:
+      matrix:
+        package: [lasereyes, lasereyes-core, lasereyes-react]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -95,32 +92,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Bump version for lasereyes-core (dev)
-        if: ${{ needs.release.outputs.lasereyes_core_changed == 'true' }}
+      - name: Bump version for ${{ matrix.package }} (dev)
+        if: ${{ env["${{ matrix.package }}_changed"] == 'true' }}
         run: |
-          cd packages/lasereyes-core
+          cd packages/${{ matrix.package }}
           npm version prerelease --preid=rc
-          cd ../../
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Bump version for lasereyes-react (dev)
-        if: ${{ needs.release.outputs.lasereyes_react_changed == 'true' }}
-        run: |
-          cd packages/lasereyes-react
-          npm version prerelease --preid=rc
-          cd ../../
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Bump version for lasereyes (dev)
-        if: ${{ needs.release.outputs.lasereyes_changed == 'true' || needs.release.outputs.lasereyes_core_changed == 'true' || needs.release.outputs.lasereyes_react_changed == 'true' }}
-        run: |
-          cd packages/lasereyes
-          npm version prerelease --preid=rc
-          new_version=$(node -p "require('./package.json').version")
-          echo "lasereyes_version=${new_version}" >> $GITHUB_ENV
-          echo "::set-output name=lasereyes_version::${new_version}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -143,11 +119,17 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Cleanup old RC versions
+        run: git tag -d $(git tag | grep rc) || echo "No RC tags to remove"
+
   # Bumping versions for main branch (patch releases)
   bump-versions-main:
     runs-on: ubuntu-latest
     needs: release
     if: github.ref == 'refs/heads/main'
+    strategy:
+      matrix:
+        package: [lasereyes, lasereyes-core, lasereyes-react]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -167,32 +149,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Bump version for lasereyes-core (main)
-        if: ${{ needs.release.outputs.lasereyes_core_changed == 'true' }}
+      - name: Bump version for ${{ matrix.package }} (main)
+        if: ${{ env["${{ matrix.package }}_changed"] == 'true' }}
         run: |
-          cd packages/lasereyes-core
+          cd packages/${{ matrix.package }}
           npm version patch
-          cd ../../
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Bump version for lasereyes-react (main)
-        if: ${{ needs.release.outputs.lasereyes_react_changed == 'true' }}
-        run: |
-          cd packages/lasereyes-react
-          npm version patch
-          cd ../../
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Bump version for lasereyes (main)
-        if: ${{ needs.release.outputs.lasereyes_changed == 'true' || needs.release.outputs.lasereyes_core_changed == 'true' || needs.release.outputs.lasereyes_react_changed == 'true' }}
-        id: bump_lasereyes
-        run: |
-          cd packages/lasereyes
-          new_version=$(npm version patch)
-          echo "lasereyes_version=${new_version}" >> $GITHUB_ENV
-          echo "::set-output name=lasereyes_version::${new_version}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -216,7 +177,7 @@ jobs:
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install openai==0.28
+          pip install openai==0.28 requests
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
@@ -227,8 +188,9 @@ jobs:
 
       - name: Generate release notes with GPT
         run: |
+          set -e
           echo "Running generate_release_notes.py with version: ${{ needs.bump-versions-main.outputs.lasereyes_version }}"
-          python3 scripts/generate_release_notes.py "${{ needs.bump-versions-main.outputs.lasereyes_version }}"
+          python3 scripts/generate_release_notes.py "${{ needs.bump-versions-main.outputs.lasereyes_version }}" || echo "Failed to generate release notes"
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
