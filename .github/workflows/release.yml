@@ -26,37 +26,43 @@ jobs:
       - name: Fetch all branches
         run: git fetch --all
 
+      - name: Debug - Print diff output
+        run: |
+          echo "Changes between merge base and HEAD:"
+          git diff --name-only $(git merge-base origin/main HEAD) HEAD
+
       - name: Check if packages changed
         id: check
         run: |
           merge_base=$(git merge-base origin/main HEAD)
-          
-          # Check lasereyes package
-          if git diff --name-only --diff-filter=M $merge_base HEAD -- packages/lasereyes/ | grep -q .; then
+
+          # Check lasereyes package (added or modified files only)
+          if git diff --name-only --diff-filter=AM $merge_base HEAD -- packages/lasereyes/ | grep -q .; then
             echo "lasereyes_changed=true" >> $GITHUB_ENV
             echo "lasereyes_changed=true" >> $GITHUB_OUTPUT
           else
             echo "lasereyes_changed=false" >> $GITHUB_ENV
             echo "lasereyes_changed=false" >> $GITHUB_OUTPUT
           fi
-          
-          # Check lasereyes-core package
-          if git diff --name-only --diff-filter=M $merge_base HEAD -- packages/lasereyes-core/ | grep -q .; then
+
+          # Check lasereyes-core package (added or modified files only)
+          if git diff --name-only --diff-filter=AM $merge_base HEAD -- packages/lasereyes-core/ | grep -q .; then
             echo "lasereyes_core_changed=true" >> $GITHUB_ENV
             echo "lasereyes_core_changed=true" >> $GITHUB_OUTPUT
           else
             echo "lasereyes_core_changed=false" >> $GITHUB_ENV
             echo "lasereyes_core_changed=false" >> $GITHUB_OUTPUT
           fi
-          
-          # Check lasereyes-react package
-          if git diff --name-only --diff-filter=M $merge_base HEAD -- packages/lasereyes-react/ | grep -q .; then
+
+          # Check lasereyes-react package (added or modified files only)
+          if git diff --name-only --diff-filter=AM $merge_base HEAD -- packages/lasereyes-react/ | grep -q .; then
             echo "lasereyes_react_changed=true" >> $GITHUB_ENV
             echo "lasereyes_react_changed=true" >> $GITHUB_OUTPUT
           else
             echo "lasereyes_react_changed=false" >> $GITHUB_ENV
             echo "lasereyes_react_changed=false" >> $GITHUB_OUTPUT
           fi
+
 
   # Release candidate bumps in dev branch
   bump-rc-in-dev:
