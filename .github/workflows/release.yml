@@ -63,8 +63,7 @@ jobs:
             echo "lasereyes_react_changed=false" >> $GITHUB_OUTPUT
           fi
 
-    # Bump RC version in dev branch
-  bump-rc-in-dev:
+    bump-rc-in-dev:
     runs-on: ubuntu-latest
     needs: check-package-changes
     if: github.ref == 'refs/heads/dev'
@@ -89,10 +88,6 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install
-
-      - name: Check package changes for ${{ matrix.package }}
-        run: |
-          echo "Package changed status: ${{ needs.check-package-changes.outputs[ matrix.package + '_changed'] }}"
 
       # Instead of using dynamic conditions, explicitly check for each package:
       - name: Bump lasereyes version
