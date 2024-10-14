@@ -77,6 +77,12 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Check the is changed for all packages
+        run: |
+          echo ${{ needs.check-package-changes.outputs.lasereyes_changed }}
+          echo ${{ needs.check-package-changes.outputs.lasereyes_core_changed }}
+          echo ${{ needs.check-package-changes.outputs.lasereyes_react_changed }}
+
       - name: Bump lasereyes-core to next RC version
         if: ${{ needs.check-package-changes.outputs.lasereyes_core_changed == 'true' }}
         run: |
