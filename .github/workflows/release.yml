@@ -100,6 +100,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Always bump version for lasereyes (dev)
+        run: |
+          cd packages/lasereyes
+          npm version prerelease --preid=rc
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Output version for debug
         run: |
           echo "Captured version: ${{ env.lasereyes_version }}"
@@ -153,6 +160,13 @@ jobs:
         if: ${{ env["${{ matrix.package }}_changed"] == 'true' }}
         run: |
           cd packages/${{ matrix.package }}
+          npm version patch
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Always bump version for lasereyes (main)
+        run: |
+          cd packages/lasereyes
           npm version patch
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
