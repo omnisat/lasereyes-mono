@@ -291,10 +291,10 @@ jobs:
       - name: Ensure single "v" in tag_name
         id: ensure_v
         run: |
-          if [[ "${{ env.lasereyes_version }}" == v* ]]; then
-            echo "tag_name=${{ env.lasereyes_version }}" >> $GITHUB_ENV
+          if [[ "${{ needs.bump-versions-main.outputs.lasereyes_version }}" == v* ]]; then
+          echo "tag_name=${{ needs.bump-versions-main.outputs.lasereyes_version }}" >> $GITHUB_ENV
           else
-            echo "tag_name=v${{ env.lasereyes_version }}" >> $GITHUB_ENV
+          echo "tag_name=v${{ needs.bump-versions-main.outputs.lasereyes_version }}" >> $GITHUB_ENV
           fi
 
       - name: Create GitHub Release
