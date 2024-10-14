@@ -8,6 +8,7 @@ export default defineConfig({
   plugins: [
     react(),
     dts({
+      insertTypesEntry: true, // Adds an entry point for types, ensuring `types` is correctly referenced in package.json
       tsconfigPath: resolve(__dirname, './tsconfig.build.json'),
     }),
   ],

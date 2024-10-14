@@ -6,7 +6,7 @@ import axios from 'axios'
 import { getBTCBalance } from '../../lib/helpers'
 import { UNISAT } from '../../constants/wallets'
 import { listenKeys } from 'nanostores'
-import { getMempoolSpaceUrl } from '../../lib/urls.ts'
+import { getMempoolSpaceUrl } from '../../lib/urls'
 
 export default class UnisatProvider extends WalletProvider {
   public get library(): any | undefined {

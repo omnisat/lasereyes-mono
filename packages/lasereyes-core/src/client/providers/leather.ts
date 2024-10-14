@@ -13,11 +13,11 @@ import { getBTCBalance } from '../../lib/helpers'
 import { LEATHER, P2TR, P2WPKH } from '../../constants/wallets'
 import { listenKeys, MapStore } from 'nanostores'
 import { persistentMap } from '@nanostores/persistent'
-import { LaserEyesStoreType } from '../types.ts'
+import { LaserEyesStoreType } from '../types'
 import { SIGNET, TESTNET, TESTNET4 } from '../../constants'
 import { RpcErrorCode } from 'sats-connect'
 import axios from 'axios'
-import { getMempoolSpaceUrl } from '../../lib/urls.ts'
+import { getMempoolSpaceUrl } from '../../lib/urls'
 
 const keysToPersist = [
   'address',

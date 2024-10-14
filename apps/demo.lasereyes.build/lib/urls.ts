@@ -5,8 +5,8 @@ import {
   FRACTAL_TESTNET,
   FRACTAL_MAINNET,
   TESTNET4,
+  NetworkType,
 } from '@omnisat/lasereyes-react'
-import { NetworkType } from '@omnisat/lasereyes-core'
 
 export const MEMPOOL_SPACE_URL = 'https://mempool.space'
 export const MEMPOOL_SPACE_TESTNET_URL = 'https://mempool.space/testnet'

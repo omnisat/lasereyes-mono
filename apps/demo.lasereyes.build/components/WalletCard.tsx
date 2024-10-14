@@ -16,8 +16,9 @@ import {
   SIGNET,
   TESTNET4,
   ORANGE,
-} from '@omnisat/lasereyes-core'
-import { useLaserEyes, WalletIcon } from '@omnisat/lasereyes-react'
+  useLaserEyes,
+  WalletIcon,
+} from '@omnisat/lasereyes-react'
 import {
   Card,
   CardContent,

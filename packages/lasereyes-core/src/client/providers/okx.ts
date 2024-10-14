@@ -17,7 +17,7 @@ import { getBTCBalance } from '../../lib/helpers'
 import { listenKeys, MapStore } from 'nanostores'
 import { persistentMap } from '@nanostores/persistent'
 import axios from 'axios'
-import { getMempoolSpaceUrl } from '../../lib/urls.ts'
+import { getMempoolSpaceUrl } from '../../lib/urls'
 
 const keysToPersist = [
   'address',
