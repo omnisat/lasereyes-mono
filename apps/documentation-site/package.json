@@ -1,5 +1,5 @@
 {
-  "name": "docs",
+  "name": "documentation-site",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
-    "@omnisat/lasereyes": "^0.0.30",
+    "@omnisat/lasereyes": "workspace:*",
     "react": "latest",
     "react-dom": "latest",
     "vocs": "^1.0.0-alpha.52"

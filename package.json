@@ -6,6 +6,7 @@
     "changeset": "changeset",
     "dev": "turbo dev",
     "dev:demo": "turbo dev --filter demo.lasereyes.build",
+    "dev:docs": "turbo dev --filter documentation-site",
     "dev:react": "turbo dev --filter react-ui",
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",

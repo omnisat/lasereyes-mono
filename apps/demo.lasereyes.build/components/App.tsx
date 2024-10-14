@@ -16,8 +16,9 @@ import {
   WIZZ,
   ORANGE,
   XVERSE,
-} from '@omnisat/lasereyes-core'
-import { useLaserEyes, WalletIcon } from '@omnisat/lasereyes-react'
+  useLaserEyes,
+  WalletIcon,
+} from '@omnisat/lasereyes'
 import { satoshisToBTC } from '@/lib/btc'
 import { cn, truncateString } from '@/lib/utils'
 import ClickToCopy from '@/components/ClickToCopy'
