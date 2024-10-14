@@ -10,15 +10,13 @@ permissions:
   contents: write
 
 jobs:
+  # Check for changes and output flags
   check-package-changes:
     runs-on: ubuntu-latest
     outputs:
       lasereyes_changed: ${{ steps.check.outputs.lasereyes_changed }}
       lasereyes_core_changed: ${{ steps.check.outputs.lasereyes_core_changed }}
       lasereyes_react_changed: ${{ steps.check.outputs.lasereyes_react_changed }}
-    strategy:
-      matrix:
-        package: [ lasereyes, lasereyes-core, lasereyes-react ]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -37,17 +35,33 @@ jobs:
             echo "diff_target=HEAD^1" >> $GITHUB_ENV
           fi
 
-      - name: Check if ${{ matrix.package }} package changed
+      - name: Check if packages changed
         id: check
         run: |
           diff_target=${{ env.diff_target }}
 
-          if git diff --name-only --diff-filter=AM $diff_target HEAD -- packages/${{ matrix.package }}/ | grep -q '^packages/${{ matrix.package }}/'; then
-            echo "${{ matrix.package }}_changed=true" >> $GITHUB_ENV
-            echo "${{ matrix.package }}_changed=true" >> $GITHUB_OUTPUT
+          if git diff --name-only --diff-filter=AM $diff_target HEAD -- packages/lasereyes/ | grep -q '^packages/lasereyes/'; then
+            echo "lasereyes_changed=true" >> $GITHUB_ENV
+            echo "lasereyes_changed=true" >> $GITHUB_OUTPUT
           else
-            echo "${{ matrix.package }}_changed=false" >> $GITHUB_ENV
-            echo "${{ matrix.package }}_changed=false" >> $GITHUB_OUTPUT
+            echo "lasereyes_changed=false" >> $GITHUB_ENV
+            echo "lasereyes_changed=false" >> $GITHUB_OUTPUT
+          fi
+
+          if git diff --name-only --diff-filter=AM $diff_target HEAD -- packages/lasereyes-core/ | grep -q '^packages/lasereyes-core/'; then
+            echo "lasereyes_core_changed=true" >> $GITHUB_ENV
+            echo "lasereyes_core_changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "lasereyes_core_changed=false" >> $GITHUB_ENV
+            echo "lasereyes_core_changed=false" >> $GITHUB_OUTPUT
+          fi
+
+          if git diff --name-only --diff-filter=AM $diff_target HEAD -- packages/lasereyes-react/ | grep -q '^packages/lasereyes-react/'; then
+            echo "lasereyes_react_changed=true" >> $GITHUB_ENV
+            echo "lasereyes_react_changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "lasereyes_react_changed=false" >> $GITHUB_ENV
+            echo "lasereyes_react_changed=false" >> $GITHUB_OUTPUT
           fi
 
   # Bump RC version in dev branch (parallelized)
