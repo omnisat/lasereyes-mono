@@ -5,7 +5,7 @@ import { createSendBtcPsbt, getBTCBalance } from '../../lib/helpers'
 import { OYL } from '../../constants/wallets'
 import { listenKeys, MapStore } from 'nanostores'
 import { persistentMap } from '@nanostores/persistent'
-import { LaserEyesStoreType } from '../types.ts'
+import { LaserEyesStoreType } from '../types'
 
 const keysToPersist = [
   'address',

@@ -6,6 +6,11 @@
     "module": "ESNext",
     "skipLibCheck": true,
 
+    "declaration": true,
+    "declarationMap": true,
+    "composite": true,  // Required for emitDeclarationOnly
+    "outDir": "dist",
+
     /* Bundler mode */
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
@@ -20,7 +25,8 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "paths": {
-      "@": ["./lib"]
+      "@": ["./lib"],
+      "@omnisat/lasereyes-core": ["../lasereyes-core/dist"]
     }
   },
   "include": ["lib"]

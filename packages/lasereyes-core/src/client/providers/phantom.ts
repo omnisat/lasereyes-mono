@@ -15,7 +15,7 @@ import {
   getBTCBalance,
 } from '../../lib/helpers'
 import { listenKeys } from 'nanostores'
-import { getMempoolSpaceUrl } from '../../lib/urls.ts'
+import { getMempoolSpaceUrl } from '../../lib/urls'
 import { fromOutputScript } from 'bitcoinjs-lib/src/address'
 
 export default class PhantomProvider extends WalletProvider {

@@ -181,12 +181,9 @@ importers:
 
   apps/react-ui:
     dependencies:
-      '@omnisat/lasereyes-core':
+      '@omnisat/lasereyes':
         specifier: workspace:*
-        version: link:../../packages/lasereyes-core
-      '@omnisat/lasereyes-react':
-        specifier: workspace:*
-        version: link:../../packages/lasereyes-react
+        version: link:../../packages/lasereyes
       '@testing-library/jest-dom':
         specifier: ^5.17.0
         version: 5.17.0
