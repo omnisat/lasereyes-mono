@@ -77,7 +77,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Bump version for lasereyes-core (RC)
+      - name: Bump lasereyes-core to next RC version
         if: ${{ needs.check-package-changes.outputs.lasereyes_core_changed == 'true' }}
         run: |
           cd packages/lasereyes-core
@@ -85,7 +85,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Bump version for lasereyes-react (RC)
+      - name: Bump lasereyes-react to next RC version
         if: ${{ needs.check-package-changes.outputs.lasereyes_react_changed == 'true' }}
         run: |
           cd packages/lasereyes-react
@@ -93,8 +93,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Bump version for lasereyes (RC)
-        if: ${{ needs.check-package-changes.outputs.lasereyes_changed == 'true' || needs.check-package-changes.outputs.lasereyes_core_changed == 'true' || needs.check-package-changes.outputs.lasereyes_react_changed == 'true' }}
+      - name: Bump lasereyes to next RC version
+        if: ${{ needs.check-package-changes.outputs.lasereyes_changed == 'true' }}
         run: |
           cd packages/lasereyes
           npm version prerelease --preid=rc
@@ -104,7 +104,7 @@ jobs:
       - name: Configure git user
         run: |
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git config --global user.name "github-actions[bot]"          
+          git config --global user.name "github-actions[bot]"
 
       - name: Commit RC version bumps
         if: ${{ needs.check-package-changes.outputs.lasereyes_changed == 'true' || needs.check-package-changes.outputs.lasereyes_core_changed == 'true' || needs.check-package-changes.outputs.lasereyes_react_changed == 'true' }}
@@ -115,7 +115,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  # Promote to stable version when merging to main
+  # Promote to stable version in main
   promote-to-stable-in-main:
     runs-on: ubuntu-latest
     needs: check-package-changes
@@ -166,7 +166,7 @@ jobs:
       - name: Configure git user
         run: |
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git config --global user.name "github-actions[bot]"          
+          git config --global user.name "github-actions[bot]"
 
       - name: Commit stable version bumps for main
         if: ${{ needs.check-package-changes.outputs.lasereyes_changed == 'true' || needs.check-package-changes.outputs.lasereyes_core_changed == 'true' || needs.check-package-changes.outputs.lasereyes_react_changed == 'true' }}
@@ -177,74 +177,41 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  # Generate release notes and create GitHub release
-#  generate-release-notes:
-#    runs-on: ubuntu-latest
-#    needs: promote-to-stable-in-main
-#    steps:
-#      - name: Checkout repository
-#        uses: actions/checkout@v3
-#        with:
-#          fetch-depth: 0
-#
-#      - name: Setup Python
-#        uses: actions/setup-python@v4
-#        with:
-#          python-version: '3.x'
-#
-#      - name: Install Python dependencies
-#        run: |
-#          python -m pip install --upgrade pip
-#          pip install openai==0.28 requests
-#        env:
-#          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-#
-#      - name: Generate git diff
-#        run: |
-#          PREV_COMMIT=$(git rev-parse HEAD^1)
-#          git diff $PREV_COMMIT HEAD > changes.diff
-#
-#      - name: Generate release notes with GPT
-#        run: |
-#          set -e
-#          python3 scripts/generate_release_notes.py
-#        env:
-#          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-#
-#      - name: Configure git user
-#        run: |
-#          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-#          git config --global user.name "github-actions[bot]"
-#
-#      - name: Concatenate release notes
-#        run: |
-#          echo -e "\n$(cat detailed_release_notes.md)\n$(cat RELEASE_NOTES.md)" > RELEASE_NOTES.md
-#          git add RELEASE_NOTES.md
-#          git commit -m "Updated RELEASE_NOTES.md with new release"
-#          git push origin main
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#
-#      - name: Create GitHub Release
-#        uses: actions/create-release@v1
-#        with:
-#          tag_name: "${{ github.ref }}"
-#          release_name: "Release ${{ github.ref }}"
-#          body_path: RELEASE_NOTES.md
-#          draft: false
-#          prerelease: false
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  # After promoting to main, update dev to the next RC version
-  bump-next-rc-in-dev:
+  # Merge main into dev to sync branches
+  merge-main-into-dev:
     runs-on: ubuntu-latest
     needs: promote-to-stable-in-main
+    if: github.ref == 'refs/heads/main'
     steps:
-      - name: Checkout repository
+      - name: Checkout dev branch
+        run: |
+          git checkout dev
+          git fetch origin
+          git merge origin/main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure git user
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+
+      - name: Push merge to dev
+        run: |
+          git push origin dev
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Bump next RC version in dev
+  bump-next-rc-in-dev:
+    runs-on: ubuntu-latest
+    needs: merge-main-into-dev
+    steps:
+      - name: Checkout dev branch
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
+          ref: dev
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
@@ -282,6 +249,11 @@ jobs:
           npm version prerelease --preid=rc
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure git user
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
 
       - name: Commit RC version bumps for dev
         if: ${{ needs.check-package-changes.outputs.lasereyes_changed == 'true' || needs.check-package-changes.outputs.lasereyes_core_changed == 'true' || needs.check-package-changes.outputs.lasereyes_react_changed == 'true' }}
