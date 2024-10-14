@@ -11,6 +11,12 @@ import {
 
 import App from '@/components/App'
 import { useState } from 'react'
+import dynamic from 'next/dynamic'
+
+const DynamicLaserEyesProvider = dynamic(
+  () => import('@omnisat/lasereyes-react').then((mod) => mod.LaserEyesProvider),
+  { ssr: false }
+)
 
 export default function Home() {
   const [network, setNetwork] = useState<
@@ -22,8 +28,8 @@ export default function Home() {
     | typeof FRACTAL_TESTNET
   >(MAINNET)
   return (
-    <LaserEyesProvider config={{ network }}>
+    <DynamicLaserEyesProvider config={{ network }}>
       <App setNetwork={setNetwork} />
-    </LaserEyesProvider>
+    </DynamicLaserEyesProvider>
   )
 }
