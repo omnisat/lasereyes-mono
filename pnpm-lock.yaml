@@ -44,9 +44,6 @@ importers:
       '@omnisat/lasereyes':
         specifier: workspace:*
         version: link:../../packages/lasereyes
-      '@omnisat/lasereyes-core':
-        specifier: workspace:*
-        version: link:../../packages/lasereyes-core
       '@omnisat/lasereyes-react':
         specifier: workspace:*
         version: link:../../packages/lasereyes-react
