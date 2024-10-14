@@ -94,7 +94,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Bump lasereyes to next RC version
-        if: ${{ needs.check-package-changes.outputs.lasereyes_changed == 'true' }}
+        if: ${{  needs.check-package-changes.outputs.lasereyes_changed == 'true' || needs.check-package-changes.outputs.lasereyes_core_changed == 'true' || needs.check-package-changes.outputs.lasereyes_react_changed == 'true' }}
         run: |
           cd packages/lasereyes
           npm version prerelease --preid=rc
