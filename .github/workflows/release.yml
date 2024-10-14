@@ -199,6 +199,7 @@ jobs:
   # Generate release notes and create GitHub release
   generate-release:
     runs-on: ubuntu-latest
+    environment: prod
     needs: bump-versions-main
     if: github.ref == 'refs/heads/main'
     steps:
