@@ -1,4 +1,16 @@
 
+# Release Notes 
+
+## Enhancements
+- The environment for the GitHub action workflow 'generate-release' is now set to 'prod'.
+
+## Package Updates
+- Updated `lasereyes-core` package version from `0.0.0-rc.2` to `0.0.0-rc.3`.
+- Updated `lasereyes` package version from `0.0.37-rc.18` to `0.0.37-rc.19`.
+
+## Documentation
+- A test line has been added to the `README.md` file in the `lasereyes-core` package folder.
+
 # Release Notes
 
 In this update, we've made several changes and improvements.
