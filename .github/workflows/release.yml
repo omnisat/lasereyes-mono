@@ -126,7 +126,7 @@ jobs:
 
       - name: Output version for debug
         run: |
-        echo "Captured version: ${{ env.lasereyes_version }}"
+          echo "Captured version: ${{ env.lasereyes_version }}"
 
       - name: Pull latest changes from dev
         run: |
