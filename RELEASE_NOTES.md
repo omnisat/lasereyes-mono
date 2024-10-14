@@ -1,6 +1,24 @@
 
 # Release Notes
 
+In this update, we've made several changes and improvements.
+
+## Changes
+
+### Update in GitHub Action Workflow Configuration
+
+- The method to ensure single 'v' in `tag_name` has been modified. Now instead of taking `tag_name` from the `env.lasereyes_version` environment variable, it takes from `needs.bump-versions-main.outputs.lasereyes_version` output. This change is made in the `.github/workflows/release.yml` file.
+
+### Updates in Documentation
+
+- In `lasereyes-core` package, a new paragraph "test" has been inserted at the end of the README file.
+
+- Similarly, in `lasereyes-react` package, one more paragraph named "test" has also been added at the end of the README file.
+
+Please make sure to update your cloned repositories to reflect these changes.
+
+# Release Notes
+
 ## Configurations
 
 - The git user is now configured in the GitHub workflow release.yml file. The user email is set to "github-actions[bot]@users.noreply.github.com" and the username set to "github-actions[bot]".
