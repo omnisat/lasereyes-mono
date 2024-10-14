@@ -1,7 +1,6 @@
 import React from 'react'
 import './App.css'
-import { MAINNET } from '@omnisat/lasereyes-core'
-import { LaserEyesProvider } from '@omnisat/lasereyes-react'
+import { LaserEyesProvider, MAINNET } from '@omnisat/lasereyes'
 import UnisatCard from './unisat-card'
 
 function App() {

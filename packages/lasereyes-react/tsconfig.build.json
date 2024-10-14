@@ -6,6 +6,10 @@
     "module": "ESNext",
     "skipLibCheck": true,
 
+    "declaration": true,
+    "declarationMap": true,
+    "composite": true,  // Add this line
+
     /* Bundler mode */
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
