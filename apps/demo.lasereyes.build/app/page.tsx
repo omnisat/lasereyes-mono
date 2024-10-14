@@ -6,7 +6,6 @@ import {
   SIGNET,
   TESTNET,
   TESTNET4,
-  LaserEyesProvider,
 } from '@omnisat/lasereyes'
 
 import App from '@/components/App'
