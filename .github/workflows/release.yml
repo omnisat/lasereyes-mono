@@ -125,7 +125,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Output version for debug
-        run: echo "Captured version: ${{ env.lasereyes_version }}"
+        run: |
+          echo "Captured version: ${{ env.lasereyes_version }}"
 
       - name: Pull latest changes from dev
         run: |
