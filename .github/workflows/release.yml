@@ -10,13 +10,12 @@ permissions:
   contents: write
 
 jobs:
-  # Check for changes and output flags
   check-package-changes:
     runs-on: ubuntu-latest
     outputs:
-      lasereyes_changed: ${{ steps.check-lasers.outputs.lasereyes_changed }}
-      lasereyes_core_changed: ${{ steps.check-lasers.outputs.lasereyes_core_changed }}
-      lasereyes_react_changed: ${{ steps.check-lasers.outputs.lasereyes_react_changed }}
+      lasereyes_changed: ${{ steps.set-outputs.outputs.lasereyes_changed }}
+      lasereyes_core_changed: ${{ steps.set-outputs.outputs.lasereyes_core_changed }}
+      lasereyes_react_changed: ${{ steps.set-outputs.outputs.lasereyes_react_changed }}
     strategy:
       matrix:
         package: [ lasereyes, lasereyes-core, lasereyes-react ]
@@ -54,11 +53,12 @@ jobs:
             echo "${{ matrix.package }}_changed=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Debugging output
+      - name: Set package outputs
+        id: set-outputs
         run: |
-          echo "Checking changes for ${{ matrix.package }}"
-          echo "Changes detected: ${{ steps.check-lasers.outputs.${{ matrix.package }}_changed }}"
-
+          echo "lasereyes_changed=${{ env.lasereyes_changed }}" >> $GITHUB_OUTPUT
+          echo "lasereyes_core_changed=${{ env.lasereyes_core_changed }}" >> $GITHUB_OUTPUT
+          echo "lasereyes_react_changed=${{ env.lasereyes_react_changed }}" >> $GITHUB_OUTPUT
 
   # Bump RC version in dev branch (parallelized)
   bump-rc-in-dev:
