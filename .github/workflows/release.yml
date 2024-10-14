@@ -34,7 +34,7 @@ jobs:
             echo "diff_target=HEAD^1" >> $GITHUB_ENV
           elif [ "${{ github.ref }}" == "refs/heads/main" ]; then
             # Merging to main: compare dev branch against main branch
-            merge_base=$(git merge-base origin/main HEAD)
+            merge_base=$(git merge-base origin/main origin/dev)
             echo "diff_target=$merge_base" >> $GITHUB_ENV
           fi
 
@@ -74,6 +74,7 @@ jobs:
             echo "lasereyes_react_changed=false" >> $GITHUB_ENV
             echo "lasereyes_react_changed=false" >> $GITHUB_OUTPUT
           fi
+
 
 
 
