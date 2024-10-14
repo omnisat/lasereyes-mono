@@ -52,7 +52,7 @@ type PersistedKey = (typeof keysToPersist)[number]
 const ORANGE_WALLET_PERSISTENCE_KEY = 'ORANGE_CONNECTED_WALLET_STATE'
 export default class OrangeProvider extends WalletProvider {
   public get library(): any | undefined {
-    return (window as any)?.OrangeWalletProviders.OrangeBitcoinProvider
+    return (window as any)?.OrangeWalletProviders?.OrangeBitcoinProvider
   }
 
   public get network(): NetworkType {
@@ -120,7 +120,7 @@ export default class OrangeProvider extends WalletProvider {
 
     this.observer = new window.MutationObserver(() => {
       const orangeLib = (window as any)?.OrangeWalletProviders
-        .OrangeBitcoinProvider
+        ?.OrangeBitcoinProvider
 
       if (orangeLib) {
         this.$store.setKey('hasProvider', {
