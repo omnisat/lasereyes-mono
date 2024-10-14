@@ -3,14 +3,12 @@ name: Release
 on:
   push:
     branches:
-      - dev  # Continue working through dev, no direct pushes to main
-      - main  # Also watch for merges into main
-
+      - dev
+      - main
 permissions:
   contents: write
 
 jobs:
-  # This job handles everything when pushing to dev
   release:
     runs-on: ubuntu-latest
     environment: prod
@@ -120,24 +118,32 @@ jobs:
         run: |
           cd packages/lasereyes
           npm version prerelease --preid=rc
-          cd ../../
+          new_version=$(node -p "require('./package.json').version")
+          echo "lasereyes_version=${new_version}" >> $GITHUB_ENV
+          echo "::set-output name=lasereyes_version::${new_version}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Output version for debug
+        run: echo "Captured version: ${{ env.lasereyes_version }}"
+
+      - name: Pull latest changes from dev
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git pull origin dev
 
       - name: Commit version bumps for dev
         if: ${{ needs.release.outputs.lasereyes_changed == 'true' || needs.release.outputs.lasereyes_core_changed == 'true' || needs.release.outputs.lasereyes_react_changed == 'true' }}
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add .
           git commit -m "RC version bump for packages"
           git push origin dev
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  # Bumping versions for main branch (patch releases) after manual PR merge
+  # Bumping versions for main branch (patch releases)
   bump-versions-main:
-    environment: prod
     runs-on: ubuntu-latest
     needs: release
     if: github.ref == 'refs/heads/main'
@@ -164,8 +170,7 @@ jobs:
         if: ${{ needs.release.outputs.lasereyes_core_changed == 'true' }}
         run: |
           cd packages/lasereyes-core
-          new_version=$(npm version patch)
-          echo "lasereyes_core_version=${new_version}" >> $GITHUB_ENV
+          npm version patch
           cd ../../
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -174,8 +179,7 @@ jobs:
         if: ${{ needs.release.outputs.lasereyes_react_changed == 'true' }}
         run: |
           cd packages/lasereyes-react
-          new_version=$(npm version patch)
-          echo "lasereyes_react_version=${new_version}" >> $GITHUB_ENV
+          npm version patch
           cd ../../
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -187,59 +191,12 @@ jobs:
           cd packages/lasereyes
           new_version=$(npm version patch)
           echo "lasereyes_version=${new_version}" >> $GITHUB_ENV
-          cd ../../
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Commit version bumps for main
-        if: ${{ needs.release.outputs.lasereyes_changed == 'true' || needs.release.outputs.lasereyes_core_changed == 'true' || needs.release.outputs.lasereyes_react_changed == 'true' }}
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git checkout main
-          git pull origin main
-          git add .
-          git commit -m "Version bump after merge to main for packages"
-          git push origin main
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  # Sync main branch back to dev after PR is merged
-  sync-main-to-dev:
-    runs-on: ubuntu-latest
-    needs: bump-versions-main
-    if: github.ref == 'refs/heads/main'
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-
-      - name: Setup pnpm
-        run: |
-          corepack enable
-          corepack prepare pnpm@8.6.6 --activate
-
-      - name: Install dependencies
-        run: pnpm install
-
-      - name: Sync main to dev with conflict resolution for package files
-        run: |
-          git checkout dev
-          git pull origin dev
-          git merge -X theirs origin/main || true
-          git push origin dev
+          echo "::set-output name=lasereyes_version::${new_version}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   # Generate release notes and create GitHub release
   generate-release:
-    environment: prod
     runs-on: ubuntu-latest
     needs: bump-versions-main
     if: github.ref == 'refs/heads/main'
@@ -268,7 +225,8 @@ jobs:
 
       - name: Generate release notes with GPT
         run: |
-          python3 scripts/generate_release_notes.py "${{ env.lasereyes_version }}"
+          echo "Running generate_release_notes.py with version: ${{ needs.bump-versions-main.outputs.lasereyes_version }}"
+          python3 scripts/generate_release_notes.py "${{ needs.bump-versions-main.outputs.lasereyes_version }}"
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
@@ -292,12 +250,13 @@ jobs:
         id: ensure_v
         run: |
           if [[ "${{ needs.bump-versions-main.outputs.lasereyes_version }}" == v* ]]; then
-          echo "tag_name=${{ needs.bump-versions-main.outputs.lasereyes_version }}" >> $GITHUB_ENV
+            echo "tag_name=${{ needs.bump-versions-main.outputs.lasereyes_version }}" >> $GITHUB_ENV
           else
-          echo "tag_name=v${{ needs.bump-versions-main.outputs.lasereyes_version }}" >> $GITHUB_ENV
+            echo "tag_name=v${{ needs.bump-versions-main.outputs.lasereyes_version }}" >> $GITHUB_ENV
           fi
 
       - name: Create GitHub Release
+        if: steps.ensure_v.outcome == 'success'
         uses: actions/create-release@v1
         with:
           tag_name: "${{ env.tag_name }}"
