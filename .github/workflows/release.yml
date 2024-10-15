@@ -128,6 +128,12 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
 
+      - name: Pull latest changes
+        run: |
+          git pull --rebase origin dev
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Commit RC version bumps for ${{ matrix.package }}
         if: |
           (matrix.package == 'lasereyes' && 
