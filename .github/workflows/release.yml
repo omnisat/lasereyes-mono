@@ -105,21 +105,21 @@ jobs:
                 "${{ needs.check-package-changes.outputs.lasereyes_core_changed }}" == "true" || \
                 "${{ needs.check-package-changes.outputs.lasereyes_react_changed }}" == "true" ]]; then
               cd packages/lasereyes
-              npm version prerelease --preid=rc
+              pnpm version prerelease --preid=rc
               cd ../..
           fi
 
           # Bump lasereyes-core if changed
           if [[ "${{ needs.check-package-changes.outputs.lasereyes_core_changed }}" == "true" ]]; then
               cd packages/lasereyes-core
-              npm version prerelease --preid=rc
+              pnpm version prerelease --preid=rc
               cd ../..
           fi
 
           # Bump lasereyes-react if changed
           if [[ "${{ needs.check-package-changes.outputs.lasereyes_react_changed }}" == "true" ]]; then
               cd packages/lasereyes-react
-              npm version prerelease --preid=rc
+              pnpm version prerelease --preid=rc
               cd ../..
           fi
         env:
@@ -182,7 +182,7 @@ jobs:
           needs.check-package-changes.outputs.lasereyes_react_changed == 'true'
         run: |
           cd packages/lasereyes
-          npm version patch
+          pnpm version patch
           cd ../..
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -191,7 +191,7 @@ jobs:
         if: needs.check-package-changes.outputs.lasereyes_core_changed == 'true'
         run: |
           cd packages/lasereyes-core
-          npm version patch
+          pnpm version patch
           npm publish --access public
           cd ../..
         env:
@@ -201,7 +201,7 @@ jobs:
         if: needs.check-package-changes.outputs.lasereyes_react_changed == 'true'
         run: |
           cd packages/lasereyes-react
-          npm version patch
+          pnpm version patch
           npm publish --access public
           cd ../..
 
@@ -299,19 +299,19 @@ jobs:
           needs.check-package-changes.outputs.lasereyes_react_changed == 'true'
         run: |
           cd packages/lasereyes
-          npm version prerelease --preid=rc
+          pnpm version prerelease --preid=rc
 
       - name: Bump lasereyes-core version if changed
         if: needs.check-package-changes.outputs.lasereyes_core_changed == 'true'
         run: |
           cd packages/lasereyes-core
-          npm version prerelease --preid=rc
+          pnpm version prerelease --preid=rc
 
       - name: Bump lasereyes-react version if changed
         if: needs.check-package-changes.outputs.lasereyes_react_changed == 'true'
         run: |
           cd packages/lasereyes-react
-          npm version prerelease --preid=rc
+          pnpm version prerelease --preid=rc
 
       - name: Configure git user
         run: |
