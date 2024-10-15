@@ -72,9 +72,6 @@ jobs:
       (needs.check-package-changes.outputs.lasereyes_changed == 'true' ||
       needs.check-package-changes.outputs.lasereyes_core_changed == 'true' ||
       needs.check-package-changes.outputs.lasereyes_react_changed == 'true')
-    strategy:
-      matrix:
-        package: [lasereyes, lasereyes-core, lasereyes-react]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -94,65 +91,44 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      # Check if the specific package has changed, then bump the version
-      - name: Bump lasereyes version
-        # Bump lasereyes if **any** of the subpackages or lasereyes has changed
-        if: matrix.package == 'lasereyes' &&
-          (needs.check-package-changes.outputs.lasereyes_changed == 'true' ||
-          needs.check-package-changes.outputs.lasereyes_core_changed == 'true' ||
-          needs.check-package-changes.outputs.lasereyes_react_changed == 'true')
+      - name: Bump versions sequentially if packages changed
         run: |
-          cd packages/lasereyes
-          npm version prerelease --preid=rc
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Bump lasereyes if any package has changed
+          if [[ "${{ needs.check-package-changes.outputs.lasereyes_changed }}" == "true" || \
+                "${{ needs.check-package-changes.outputs.lasereyes_core_changed }}" == "true" || \
+                "${{ needs.check-package-changes.outputs.lasereyes_react_changed }}" == "true" ]]; then
+              cd packages/lasereyes
+              npm version prerelease --preid=rc
+              cd ../..
+          fi
 
-      - name: Bump lasereyes-core version
-        if: matrix.package == 'lasereyes-core' && needs.check-package-changes.outputs.lasereyes_core_changed == 'true'
-        run: |
-          cd packages/lasereyes-core
-          npm version prerelease --preid=rc
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Bump lasereyes-core if changed
+          if [[ "${{ needs.check-package-changes.outputs.lasereyes_core_changed }}" == "true" ]]; then
+              cd packages/lasereyes-core
+              npm version prerelease --preid=rc
+              cd ../..
+          fi
 
-      - name: Bump lasereyes-react version
-        if: matrix.package == 'lasereyes-react' && needs.check-package-changes.outputs.lasereyes_react_changed == 'true'
-        run: |
-          cd packages/lasereyes-react
-          npm version prerelease --preid=rc
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Bump lasereyes-react if changed
+          if [[ "${{ needs.check-package-changes.outputs.lasereyes_react_changed }}" == "true" ]]; then
+              cd packages/lasereyes-react
+              npm version prerelease --preid=rc
+              cd ../..
+          fi
 
       - name: Configure git user
         run: |
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
 
-      - name: Stash changes
-        run: |
-          git stash
-
-      - name: Pull latest changes
+      - name: Pull latest changes before push
         run: |
           git pull --rebase origin dev
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Apply stash
-        run: |
-          git stash pop
-
-      - name: Commit RC version bumps for ${{ matrix.package }}
-        if: |
-          (matrix.package == 'lasereyes' && 
-           (needs.check-package-changes.outputs.lasereyes_changed == 'true' || 
-            needs.check-package-changes.outputs.lasereyes_core_changed == 'true' || 
-            needs.check-package-changes.outputs.lasereyes_react_changed == 'true')) ||
-          (matrix.package == 'lasereyes-core' && needs.check-package-changes.outputs.lasereyes_core_changed == 'true') ||
-          (matrix.package == 'lasereyes-react' && needs.check-package-changes.outputs.lasereyes_react_changed == 'true')
+      - name: Commit RC version bumps for all packages
         run: |
           git add .
-          git commit -m "RC version bump for ${{ matrix.package }}"
+          git commit -m "RC version bump for all changed packages"
           git push origin dev
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
