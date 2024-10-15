@@ -247,14 +247,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  # Bump next RC version in dev after merge from main
   bump-next-rc-in-dev:
     runs-on: ubuntu-latest
     needs: merge-main-into-dev
-    if: github.ref == 'refs/heads/dev'
-    strategy:
-      matrix:
-        package: [lasereyes, lasereyes-core, lasereyes-react]
+    if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -275,28 +271,38 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Bump version for ${{ matrix.package }}
+      - name: Bump lasereyes version if any package changed
         if: needs.check-package-changes.outputs.lasereyes_changed == 'true' ||
           needs.check-package-changes.outputs.lasereyes_core_changed == 'true' ||
           needs.check-package-changes.outputs.lasereyes_react_changed == 'true'
         run: |
-          cd packages/${{ matrix.package }}
+          cd packages/lasereyes
           npm version prerelease --preid=rc
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Bump lasereyes-core version if changed
+        if: needs.check-package-changes.outputs.lasereyes_core_changed == 'true'
+        run: |
+          cd packages/lasereyes-core
+          npm version prerelease --preid=rc
+
+      - name: Bump lasereyes-react version if changed
+        if: needs.check-package-changes.outputs.lasereyes_react_changed == 'true'
+        run: |
+          cd packages/lasereyes-react
+          npm version prerelease --preid=rc
 
       - name: Configure git user
         run: |
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
 
-      - name: Commit RC version bumps for ${{ matrix.package }}
+      - name: Commit RC version bumps for all packages
         if: needs.check-package-changes.outputs.lasereyes_changed == 'true' ||
           needs.check-package-changes.outputs.lasereyes_core_changed == 'true' ||
           needs.check-package-changes.outputs.lasereyes_react_changed == 'true'
         run: |
           git add .
-          git commit -m "Next RC version bump for ${{ matrix.package }}"
+          git commit -m "Next RC version bump for all changed packages"
           git push origin dev
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
