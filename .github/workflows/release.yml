@@ -72,6 +72,7 @@ jobs:
       (needs.check-package-changes.outputs.lasereyes_changed == 'true' ||
       needs.check-package-changes.outputs.lasereyes_core_changed == 'true' ||
       needs.check-package-changes.outputs.lasereyes_react_changed == 'true')
+    environment: prod
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -90,6 +91,12 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install
+
+      - name: Create .npmrc file
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Bump versions sequentially if packages changed
         run: |
@@ -115,6 +122,8 @@ jobs:
               npm version prerelease --preid=rc
               cd ../..
           fi
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Configure git user
         run: |
@@ -154,12 +163,6 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install
-
-      # Add build step for lasereyes package
-      - name: Build lasereyes if any package changed
-        if: needs.check-package-changes.outputs.lasereyes_changed == 'true'
-        run: |
-          pnpm build
 
       - name: Create .npmrc file
         run: |
