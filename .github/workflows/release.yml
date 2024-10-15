@@ -158,6 +158,32 @@ jobs:
         run: pnpm install
 
       - name: Promote ${{ matrix.package }} to stable version
+        run: |
+          cd packages/${{ matrix.package }}
+
+          # Log the current version
+          echo "Current version from package.json: $(jq -r '.version' package.json)"
+
+          # Log the git diff to see what changes are being detected
+          echo "Git diff output for package changes:"
+          git diff --name-only
+
+          # Capture the version that npm would bump to and log it
+          echo "Running npm version patch to see what version it wants to bump to"
+          npm version --no-git-tag-version patch || true
+
+          # Actual bump process
+          CURRENT_VERSION=$(jq -r '.version' package.json)
+          if npm version --no-git-tag-version patch | grep -q "$CURRENT_VERSION"; then
+            echo "Version already at latest stable, skipping bump."
+          else
+            echo "Bumping version for ${{ matrix.package }}"
+            npm version --no-git-tag-version patch
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Promote ${{ matrix.package }} to stable version
         # Check if the package has changed and bump version accordingly
         if: matrix.package == 'lasereyes' &&
           (needs.check-package-changes.outputs.lasereyes_changed == 'true' ||
