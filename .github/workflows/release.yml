@@ -158,25 +158,7 @@ jobs:
       - name: Build lasereyes if any package changed
         if: needs.check-package-changes.outputs.lasereyes_changed == 'true'
         run: |
-          cd packages/lasereyes
           pnpm build
-          cd ../..
-
-      # Add build step for lasereyes-core package
-      - name: Build lasereyes-core if changed
-        if: needs.check-package-changes.outputs.lasereyes_core_changed == 'true'
-        run: |
-          cd packages/lasereyes-core
-          pnpm build
-          cd ../..
-
-      # Add build step for lasereyes-react package
-      - name: Build lasereyes-react if changed
-        if: needs.check-package-changes.outputs.lasereyes_react_changed == 'true'
-        run: |
-          cd packages/lasereyes-react
-          pnpm build
-          cd ../..
 
       - name: Promote lasereyes version if any package changed
         if: needs.check-package-changes.outputs.lasereyes_changed == 'true' ||
