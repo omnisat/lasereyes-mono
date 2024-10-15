@@ -10,6 +10,7 @@ permissions:
   contents: write
 
 jobs:
+  # Check for package changes
   check-package-changes:
     runs-on: ubuntu-latest
     outputs:
@@ -63,12 +64,14 @@ jobs:
             echo "lasereyes_react_changed=false" >> $GITHUB_OUTPUT
           fi
 
+  # Bump RC version in dev branch only if necessary, and skip if it's on the main branch
   bump-rc-in-dev:
     runs-on: ubuntu-latest
     needs: check-package-changes
-    if: needs.check-package-changes.outputs.lasereyes_changed == 'true' ||
+    if: github.ref == 'refs/heads/dev' &&
+      (needs.check-package-changes.outputs.lasereyes_changed == 'true' ||
       needs.check-package-changes.outputs.lasereyes_core_changed == 'true' ||
-      needs.check-package-changes.outputs.lasereyes_react_changed == 'true'
+      needs.check-package-changes.outputs.lasereyes_react_changed == 'true')
     strategy:
       matrix:
         package: [lasereyes, lasereyes-core, lasereyes-react]
@@ -91,7 +94,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      # Check if the specific package has changed, then bump the version
       - name: Bump lasereyes version
         if: matrix.package == 'lasereyes' && needs.check-package-changes.outputs.lasereyes_changed == 'true'
         run: |
@@ -133,7 +135,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-
   # Promote to stable version in main
   promote-to-stable-in-main:
     runs-on: ubuntu-latest
@@ -162,7 +163,9 @@ jobs:
         run: pnpm install
 
       - name: Promote ${{ matrix.package }} to stable version
-        if: ${{ needs.check-package-changes.outputs[format('{0}_changed', matrix.package)] == 'true' }}
+        if: needs.check-package-changes.outputs.lasereyes_changed == 'true' ||
+          needs.check-package-changes.outputs.lasereyes_core_changed == 'true' ||
+          needs.check-package-changes.outputs.lasereyes_react_changed == 'true'
         run: |
           cd packages/${{ matrix.package }}
           npm version --no-git-tag-version $(npm version patch | cut -d'-' -f1)
@@ -175,7 +178,9 @@ jobs:
           git config --global user.name "github-actions[bot]"
 
       - name: Commit stable version bumps for ${{ matrix.package }}
-        if: ${{ needs.check-package-changes.outputs[format('{0}_changed', matrix.package)] == 'true' }}
+        if: needs.check-package-changes.outputs.lasereyes_changed == 'true' ||
+          needs.check-package-changes.outputs.lasereyes_core_changed == 'true' ||
+          needs.check-package-changes.outputs.lasereyes_react_changed == 'true'
         run: |
           git add .
           git commit -m "Promote ${{ matrix.package }} to stable version"
@@ -225,10 +230,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  # Bump next RC version in dev (parallelized)
+  # Bump next RC version in dev after merge from main
   bump-next-rc-in-dev:
     runs-on: ubuntu-latest
     needs: merge-main-into-dev
+    if: github.ref == 'refs/heads/dev'
     strategy:
       matrix:
         package: [lasereyes, lasereyes-core, lasereyes-react]
@@ -253,7 +259,9 @@ jobs:
         run: pnpm install
 
       - name: Bump version for ${{ matrix.package }}
-        if: ${{ needs.check-package-changes.outputs[format('{0}_changed', matrix.package)] == 'true' }}
+        if: needs.check-package-changes.outputs.lasereyes_changed == 'true' ||
+          needs.check-package-changes.outputs.lasereyes_core_changed == 'true' ||
+          needs.check-package-changes.outputs.lasereyes_react_changed == 'true'
         run: |
           cd packages/${{ matrix.package }}
           npm version prerelease --preid=rc
@@ -266,7 +274,9 @@ jobs:
           git config --global user.name "github-actions[bot]"
 
       - name: Commit RC version bumps for ${{ matrix.package }}
-        if: ${{ needs.check-package-changes.outputs[format('{0}_changed', matrix.package)] == 'true' }}
+        if: needs.check-package-changes.outputs.lasereyes_changed == 'true' ||
+          needs.check-package-changes.outputs.lasereyes_core_changed == 'true' ||
+          needs.check-package-changes.outputs.lasereyes_react_changed == 'true'
         run: |
           git add .
           git commit -m "Next RC version bump for ${{ matrix.package }}"
