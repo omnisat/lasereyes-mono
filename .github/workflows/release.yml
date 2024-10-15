@@ -72,6 +72,7 @@ jobs:
       (needs.check-package-changes.outputs.lasereyes_changed == 'true' ||
       needs.check-package-changes.outputs.lasereyes_core_changed == 'true' ||
       needs.check-package-changes.outputs.lasereyes_react_changed == 'true')
+    environment: prod
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
