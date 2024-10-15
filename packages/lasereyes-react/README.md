@@ -3,7 +3,3 @@
 # Getting Started
 
 # Contributing
-
-
-
-
