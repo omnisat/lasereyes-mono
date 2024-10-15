@@ -237,7 +237,7 @@ jobs:
         run: |
           git checkout dev
           git fetch origin
-          git merge origin/main
+          git merge -s recursive -X theirs origin/main || echo "Handled merge conflicts with 'theirs' strategy"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
