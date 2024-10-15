@@ -169,6 +169,8 @@ jobs:
           npm version patch
           npm publish --access public
           cd ../..
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Promote lasereyes-core version
         if: needs.check-package-changes.outputs.lasereyes_core_changed == 'true'
@@ -177,6 +179,8 @@ jobs:
           npm version patch
           npm publish --access public
           cd ../..
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Promote lasereyes-react version
         if: needs.check-package-changes.outputs.lasereyes_react_changed == 'true'
