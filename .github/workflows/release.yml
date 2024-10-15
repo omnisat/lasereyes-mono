@@ -180,7 +180,6 @@ jobs:
         run: |
           cd packages/lasereyes
           npm version patch
-#          npm publish --access public
           cd ../..
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
