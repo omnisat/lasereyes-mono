@@ -1,5 +1,5 @@
 # Lasereyes React
 
-# Getting Started
+## Getting Started
 
-# Contributing
+## Contributing
