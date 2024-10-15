@@ -6,8 +6,10 @@
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "skipLibCheck": true,
 
+    "outDir": "./dist",
     "declaration": true,
     "declarationMap": true,
+
 
     /* Bundler mode */
     "moduleResolution": "bundler",
@@ -21,4 +23,5 @@
     "noFallthroughCasesInSwitch": true
   },
   "include": ["src/**/*"],
+  "exclude": ["dist"]
 }

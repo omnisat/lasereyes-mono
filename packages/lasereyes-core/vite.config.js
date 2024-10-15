@@ -7,6 +7,7 @@ export default defineConfig({
   build: {
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
+      outputDir: 'dist/types',
       name: 'LaserEyes',
       fileName: 'index',
     },
