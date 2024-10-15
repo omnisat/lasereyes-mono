@@ -92,6 +92,12 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Create .npmrc file
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
       - name: Bump versions sequentially if packages changed
         run: |
           # Bump lasereyes if any package has changed
@@ -159,12 +165,6 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install
-
-      # Add build step for lasereyes package
-      - name: Build lasereyes if any package changed
-        if: needs.check-package-changes.outputs.lasereyes_changed == 'true'
-        run: |
-          pnpm build
 
       - name: Create .npmrc file
         run: |
