@@ -154,43 +154,55 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      # Add build step for lasereyes package
+      - name: Build lasereyes if any package changed
+        if: needs.check-package-changes.outputs.lasereyes_changed == 'true'
+        run: |
+          cd packages/lasereyes
+          pnpm build
+          cd ../..
+
+      # Add build step for lasereyes-core package
+      - name: Build lasereyes-core if changed
+        if: needs.check-package-changes.outputs.lasereyes_core_changed == 'true'
+        run: |
+          cd packages/lasereyes-core
+          pnpm build
+          cd ../..
+
+      # Add build step for lasereyes-react package
+      - name: Build lasereyes-react if changed
+        if: needs.check-package-changes.outputs.lasereyes_react_changed == 'true'
+        run: |
+          cd packages/lasereyes-react
+          pnpm build
+          cd ../..
+
       - name: Promote lasereyes version if any package changed
         if: needs.check-package-changes.outputs.lasereyes_changed == 'true' ||
           needs.check-package-changes.outputs.lasereyes_core_changed == 'true' ||
           needs.check-package-changes.outputs.lasereyes_react_changed == 'true'
         run: |
           cd packages/lasereyes
-          CURRENT_VERSION=$(jq -r '.version' package.json)
-          if npm version --no-git-tag-version patch | grep -q "$CURRENT_VERSION"; then
-            echo "Version already at latest stable, skipping bump."
-          else
-            echo "Bumping version for lasereyes"
-            npm version --no-git-tag-version patch
-          fi
+          npm version patch
+          npm publish --access public
+          cd ../..
 
       - name: Promote lasereyes-core version
         if: needs.check-package-changes.outputs.lasereyes_core_changed == 'true'
         run: |
           cd packages/lasereyes-core
-          CURRENT_VERSION=$(jq -r '.version' package.json)
-          if npm version --no-git-tag-version patch | grep -q "$CURRENT_VERSION"; then
-            echo "Version already at latest stable, skipping bump."
-          else
-            echo "Bumping version for lasereyes-core"
-            npm version --no-git-tag-version patch
-          fi
+          npm version patch
+          npm publish --access public
+          cd ../..
 
       - name: Promote lasereyes-react version
         if: needs.check-package-changes.outputs.lasereyes_react_changed == 'true'
         run: |
           cd packages/lasereyes-react
-          CURRENT_VERSION=$(jq -r '.version' package.json)
-          if npm version --no-git-tag-version patch | grep -q "$CURRENT_VERSION"; then
-            echo "Version already at latest stable, skipping bump."
-          else
-            echo "Bumping version for lasereyes-react"
-            npm version --no-git-tag-version patch
-          fi
+          npm version patch
+          npm publish --access public
+          cd ../..
 
       - name: Configure git user
         run: |
