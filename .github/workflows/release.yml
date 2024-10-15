@@ -164,6 +164,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Build all packages
+        run: pnpm -r build
+
       - name: Create .npmrc file
         run: |
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
