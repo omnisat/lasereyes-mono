@@ -183,28 +183,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Promote ${{ matrix.package }} to stable version
-        # Check if the package has changed and bump version accordingly
-        if: matrix.package == 'lasereyes' &&
-          (needs.check-package-changes.outputs.lasereyes_changed == 'true' ||
-          needs.check-package-changes.outputs.lasereyes_core_changed == 'true' ||
-          needs.check-package-changes.outputs.lasereyes_react_changed == 'true') ||
-          (matrix.package == 'lasereyes-core' && needs.check-package-changes.outputs.lasereyes_core_changed == 'true') ||
-          (matrix.package == 'lasereyes-react' && needs.check-package-changes.outputs.lasereyes_react_changed == 'true')
-        run: |
-          cd packages/${{ matrix.package }}
-          CURRENT_VERSION=$(npm version --no-git-tag-version patch | cut -d'-' -f1)
-
-          # Check if the version was already bumped and only bump if necessary
-          if [ "$CURRENT_VERSION" != "$(cat package.json | jq -r '.version')" ]; then
-            npm version --no-git-tag-version $(npm version patch | cut -d'-' -f1)
-          else
-            echo "Version already at latest stable, skipping bump."
-          fi
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-
       - name: Configure git user
         run: |
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
