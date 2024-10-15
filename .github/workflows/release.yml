@@ -128,11 +128,19 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
 
+      - name: Stash changes
+        run: |
+          git stash
+
       - name: Pull latest changes
         run: |
           git pull --rebase origin dev
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Apply stash
+        run: |
+          git stash pop
 
       - name: Commit RC version bumps for ${{ matrix.package }}
         if: |
@@ -148,6 +156,7 @@ jobs:
           git push origin dev
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 
   # Promote to stable version in main
   promote-to-stable-in-main:
