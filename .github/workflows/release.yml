@@ -271,6 +271,13 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      # Debugging Step: Log the outputs to check if they're correctly set
+      - name: Log outputs from check-package-changes
+        run: |
+          echo "Lasereyes changed: ${{ needs.check-package-changes.outputs.lasereyes_changed }}"
+          echo "Lasereyes-core changed: ${{ needs.check-package-changes.outputs.lasereyes_core_changed }}"
+          echo "Lasereyes-react changed: ${{ needs.check-package-changes.outputs.lasereyes_react_changed }}"
+
       - name: Bump lasereyes version if any package changed
         if: needs.check-package-changes.outputs.lasereyes_changed == 'true' ||
           needs.check-package-changes.outputs.lasereyes_core_changed == 'true' ||
