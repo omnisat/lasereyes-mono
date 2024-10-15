@@ -161,6 +161,18 @@ jobs:
         run: |
           pnpm build
 
+      - name: Create .npmrc file
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Debug NPM Token
+        run: |
+          echo "NODE_AUTH_TOKEN is set to: ${NODE_AUTH_TOKEN}"
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
       - name: Promote lasereyes version if any package changed
         if: needs.check-package-changes.outputs.lasereyes_changed == 'true' ||
           needs.check-package-changes.outputs.lasereyes_core_changed == 'true' ||
