@@ -106,6 +106,7 @@ jobs:
           if [[ "${{ needs.check-package-changes.outputs.lasereyes_core_changed }}" == "true" ]]; then
               cd packages/lasereyes-core
               npm version prerelease --preid=rc
+              npm publish --access public
               cd ../..
           fi
 
@@ -113,8 +114,11 @@ jobs:
           if [[ "${{ needs.check-package-changes.outputs.lasereyes_react_changed }}" == "true" ]]; then
               cd packages/lasereyes-react
               npm version prerelease --preid=rc
+              npm publish --access public
               cd ../..
           fi
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Configure git user
         run: |
