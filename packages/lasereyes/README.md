@@ -1,72 +1,82 @@
-<p align="center">
-  <a href="https://lasereyesdocs.vercel.app/">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="./lasereyes.png">
-      <img alt="Laser Eyes" src="./lasereyes.png" width="auto" height="60">
-    </picture>
-  </a>
-</p>
+![lasereyes_logo](../../lasereyes.png)
+# lasereyes 
 
-# lasereyes
+`@omnisat/lasereyes` is the main package that bundles both `lasereyes-core` and `lasereyes-react`, offering a unified interface for Bitcoin wallet integration in both framework-agnostic and React-based environments. This package simplifies wallet interactions across various Bitcoin wallets, making it easy for developers to build dApps with Bitcoin support.
 
+## Key Features
 
-A common wallet interface for building JS/TS applications on Bitcoin.
+- **Unified Wallet Interface**: Simplifies Bitcoin wallet integration by providing a common interface for multiple wallet providers.
+- **Framework-Agnostic**: `lasereyes-core` can be used in any JavaScript or TypeScript environment, not tied to any specific framework.
+- **React Support**: `lasereyes-react` offers React hooks, context providers, and wallet icons for seamless integration into React applications.
 
-![Version](https://img.shields.io/npm/v/@omnisat/lasereyes)
-![license](https://img.shields.io/github/license/omnisat/lasereyes.svg?style=flat-square)
+## Packages
 
----
+This package exports two core packages:
 
-## Don't Trust, Verify
+1. **[lasereyes-core](../lasereyes-core/README.md)**: The framework-agnostic core logic for wallet interactions.
+2. **[lasereyes-react](../lasereyes-react/README.md)**: React-specific components, including hooks, providers, and wallet icons.
 
-[Try It Out](https://demo.lasereyes.build)
+## Installation
 
-## Documentation
+To install the `@omnisat/lasereyes` package:
 
-For documentation and guides, visit [Lasereyes Docs](https://lasereyes.build/).
+```bash
+pnpm add @omnisat/lasereyes
+```
 
-## Community
+## Usage
 
-For help, discussion about best practices, or any other conversation that would benefit from being searchable:
+`@omnisat/lasereyes` provides both framework-agnostic and React-specific integrations. You can use it in either environment based on your app’s requirements.
 
+### Example Usage (React)
 
+```typescript
+import { LaserEyesProvider, useWallet } from '@omnisat/lasereyes-react';
 
-[Discuss Laser Eyes on GitHub](https://github.com/omnisat/lasereyes/discussions)
+function App() {
+  return (
+    <LaserEyesProvider network="mainnet">
+      <WalletInfo />
+    </LaserEyesProvider>
+  );
+}
+
+function WalletInfo() {
+  const { wallet, connect } = useWallet();
+
+  return (
+    <div>
+      {wallet ? (
+        <p>Connected: {wallet.address}</p>
+      ) : (
+        <button onClick={connect}>Connect Wallet</button>
+      )}
+    </div>
+  );
+}
+```
+
+## Development
+
+To develop the `@omnisat/lasereyes` package within the monorepo:
+
+1. Clone the repository and navigate to the monorepo root.
+2. Install dependencies:
+
+```bash
+pnpm install
+```
+
+3. Run the development build:
+
+```bash
+pnpm dev
+```
 
 ## Contributing
 
-Contributions to Lasereyes are greatly appreciated! If you're interested in contributing to Lasereyes, please read the [Contributing Guide](https://wagmi.sh/dev/contributing) **before submitting a pull request**.
+Contributions are welcome! Feel free to submit pull requests or open issues for bug fixes, feature enhancements, or documentation improvements.
 
-## Sponsors
+## License
 
-If you find Lasereyes useful or use it for work, please consider [sponsoring Lasereyes](https://github.com/sponsors/omnisat). Thank you 🙏
-
-<p>
-<a href="https://www.utxo.management/" style="margin-right: 40px;">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="./github/main/content/sponsors/utxo-dark-mode.svg">
-    <img alt="UTXO Management" src="./github/main/content/sponsors/utxo-dark-mode.svg" width="auto" height="70">
-  </picture>
-</a>
-<a href="https://satsventures.com/">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="./github/main/content/sponsors/sat-ventures-dark-mode.svg">
-    <img alt="Sats Ventures" src="./github/main/content/sponsors/sat-ventures-dark-mode.svg" width="auto" height="70">
-  </picture>
-</a>
-</p>
-<br>
-
-[Sponsor Laser Eyes](https://github.com/sponsors/omnisat)
-test
-test
-test
-test
-test
-test
-test
-test
-test
-test
-test
-test
+`@omnisat/lasereyes` is MIT licensed.

@@ -1,7 +1,82 @@
-# Lasereyes React
+# lasereyes-react 
 
-## Getting Started
+`@omnisat/lasereyes-react` is a React-specific package built on top of `lasereyes-core`. It provides React hooks, context providers, and wallet icons to make it easy to integrate Bitcoin wallet support into React applications.
+
+This package simplifies the interaction between your React app and various Bitcoin wallets, allowing you to focus on building dApps with a seamless user experience.
+
+## Key Concepts
+
+### Provider
+The `@omnisat/lasereyes-react` package exports a `Provider` component that wraps your React application, providing access to wallet functionality throughout your app via React context.
+
+Example of setting up the provider:
+
+```typescript
+import { LaserEyesProvider } from '@omnisat/lasereyes-react';
+
+function App() {
+  return (
+    <LaserEyesProvider network="mainnet">
+      {/* Rest of your application */}
+    </LaserEyesProvider>
+  );
+}
+```
+
+### Hooks
+`@omnisat/lasereyes-react` provides hooks to interact with wallets within your React components. The most commonly used hook is `useWallet`, which allows you to access the connected wallet and its state.
+
+Example of using the `useWallet` hook:
+
+```typescript
+import { useWallet } from '@omnisat/lasereyes-react';
+
+function WalletInfo() {
+  const { wallet, connect } = useWallet();
+
+  return (
+    <div>
+      {wallet ? (
+        <p>Connected: {wallet.address}</p>
+      ) : (
+        <button onClick={connect}>Connect Wallet</button>
+      )}
+    </div>
+  );
+}
+```
+
+### Icons
+`@omnisat/lasereyes-react` also exports SVG wallet icons as React components, making it easy to include visual wallet indicators in your app.
+
+Example of using a wallet icon:
+
+```typescript
+import { UnisatIcon } from '@omnisat/lasereyes-react/icons';
+
+function WalletDisplay() {
+  return <UnisatIcon />;
+}
+```
+
+## Installation
+
+To install `@omnisat/lasereyes-react`, use:
+
+```bash
+pnpm add @omnisat/lasereyes-react
+```
+
+## Features
+- **React Hooks**: Easily manage wallet connections and state in your components.
+- **Provider Component**: Wrap your app with the `LaserEyesProvider` to enable wallet access across your React tree.
+- **Wallet Icons**: Use pre-built wallet icons as React components for visual integration.
+
+## Usage
+Set up `@omnisat/lasereyes-react` by wrapping your app with the `LaserEyesProvider` and using the provided hooks (like `useWallet`) to interact with wallets.
 
 ## Contributing
+Contributions are welcome! Feel free to submit pull requests or open issues in the GitHub repository.
 
 ## License
+`@omnisat/lasereyes-react` is MIT licensed.
