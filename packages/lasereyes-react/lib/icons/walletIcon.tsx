@@ -18,7 +18,9 @@ import {
   WIZZ,
   ORANGE,
   OYL,
+  OP_NET,
 } from '@omnisat/lasereyes-core'
+import OpNetIcon from './op_net.tsx'
 
 const WalletIcon = ({
   size,
@@ -49,6 +51,8 @@ const WalletIcon = ({
     return <OylLogo size={size} className={className} variant={variant} />
   } else if (walletName === ORANGE) {
     return <OrangeLogo size={size} className={className} variant={variant} />
+  } else if (walletName === OP_NET) {
+    return <OpNetIcon size={size} className={className} variant={variant} />
   } else {
     return <LeatherLogo size={size} className={className} variant={variant} />
   }

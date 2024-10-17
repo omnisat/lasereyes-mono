@@ -18,6 +18,7 @@ import {
   ORANGE,
   useLaserEyes,
   WalletIcon,
+  OP_NET,
 } from '@omnisat/lasereyes-react'
 import {
   Card,
@@ -52,6 +53,7 @@ const WalletCard = ({
     | typeof OYL
     | typeof MAGIC_EDEN
     | typeof OKX
+    | typeof OP_NET
     | typeof LEATHER
     | typeof ORANGE
     | typeof PHANTOM
@@ -89,6 +91,7 @@ const WalletCard = ({
     hasPhantom,
     hasWizz,
     hasOrange,
+    hasOpNet,
     sendBTC,
     signMessage,
     signPsbt,
@@ -120,6 +123,7 @@ const WalletCard = ({
     oyl: hasOyl,
     [MAGIC_EDEN]: hasMagicEden,
     okx: hasOkx,
+    op_net: hasOpNet,
     leather: hasLeather,
     phantom: hasPhantom,
     wizz: hasWizz,
