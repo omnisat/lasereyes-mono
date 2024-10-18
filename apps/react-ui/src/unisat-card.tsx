@@ -1,7 +1,8 @@
 import { useLaserEyes, UNISAT } from '@omnisat/lasereyes'
 
 export default function UnisatCard() {
-  const { connected, connect, disconnect, address, publicKey } = useLaserEyes()
+  const { connected, connect, disconnect, address, balance, publicKey } =
+    useLaserEyes()
   return (
     <div className="card">
       <div className="card-body">
@@ -19,6 +20,9 @@ export default function UnisatCard() {
 
       <h6>Public Key</h6>
       <p>{publicKey}</p>
+
+      <h6>Balance</h6>
+      <p>{balance}</p>
 
       <button
         className="btn btn-primary"

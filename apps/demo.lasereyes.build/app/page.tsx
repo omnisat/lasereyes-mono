@@ -13,7 +13,7 @@ import { useState } from 'react'
 import dynamic from 'next/dynamic'
 
 const DynamicLaserEyesProvider = dynamic(
-  () => import('@omnisat/lasereyes-react').then((mod) => mod.LaserEyesProvider),
+  () => import('@omnisat/lasereyes').then((mod) => mod.LaserEyesProvider),
   { ssr: false }
 )
 

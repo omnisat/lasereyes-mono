@@ -10,6 +10,7 @@ import {
   WIZZ,
   XVERSE,
   ORANGE,
+  OP_NET,
 } from '../constants/wallets'
 import { NetworkType } from '../types'
 import { LaserEyesStoreType } from './types'
@@ -44,6 +45,7 @@ export function createStores(): {
         [XVERSE]: false,
         [OYL]: false,
         [MAGIC_EDEN]: false,
+        [OP_NET]: false,
         [OKX]: false,
         [LEATHER]: false,
         [PHANTOM]: false,

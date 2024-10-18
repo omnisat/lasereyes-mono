@@ -9,6 +9,7 @@ const initialContext = {
   hasMagicEden: false,
   hasOkx: false,
   hasOrange: false,
+  hasOpNet: false,
   hasLeather: false,
   hasPhantom: false,
   hasWizz: false,

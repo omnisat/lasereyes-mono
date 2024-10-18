@@ -67,7 +67,19 @@ export default class OylProvider extends WalletProvider {
   }
 
   initialize() {
-    console.log('initializing')
+    if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+      this.observer = new window.MutationObserver(() => {
+        const oylLib = (window as any)?.oyl
+        if (oylLib) {
+          this.$store.setKey('hasProvider', {
+            ...this.$store.get().hasProvider,
+            [OYL]: true,
+          })
+          this.observer?.disconnect()
+        }
+      })
+      this.observer.observe(document, { childList: true, subtree: true })
+    }
     listenKeys(this.$store, ['provider'], (newStore) => {
       if (newStore.provider !== OYL) {
         if (this.removeSubscriber) {
@@ -87,18 +99,6 @@ export default class OylProvider extends WalletProvider {
         )
       }
     })
-
-    this.observer = new window.MutationObserver(() => {
-      const oylLib = (window as any)?.oyl
-      if (oylLib) {
-        this.$store.setKey('hasProvider', {
-          ...this.$store.get().hasProvider,
-          [OYL]: true,
-        })
-        this.observer?.disconnect()
-      }
-    })
-    this.observer.observe(document, { childList: true, subtree: true })
   }
 
   dispose() {

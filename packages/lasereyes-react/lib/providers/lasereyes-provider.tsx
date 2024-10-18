@@ -59,6 +59,7 @@ export default function LaserEyesProvider({
         hasOkx: hasProvider.okx ?? false,
         hasOyl: hasProvider.oyl ?? false,
         hasOrange: hasProvider.orange ?? false,
+        hasOpNet: hasProvider.op_net ?? false,
         hasPhantom: hasProvider.phantom ?? false,
         hasUnisat: hasProvider.unisat ?? false,
         hasWizz: hasProvider.wizz ?? false,

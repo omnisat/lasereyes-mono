@@ -18,7 +18,8 @@ import {
   XVERSE,
   useLaserEyes,
   WalletIcon,
-} from '@omnisat/lasereyes'
+  OP_NET,
+} from '@omnisat/lasereyes-react'
 import { satoshisToBTC } from '@/lib/btc'
 import { cn, truncateString } from '@/lib/utils'
 import ClickToCopy from '@/components/ClickToCopy'
@@ -55,6 +56,7 @@ const App = ({
     MAGIC_EDEN,
     OKX,
     ORANGE,
+    OP_NET,
     OYL,
     PHANTOM,
     UNISAT,
@@ -446,6 +448,7 @@ const App = ({
                 | typeof OYL
                 | typeof MAGIC_EDEN
                 | typeof OKX
+                | typeof OP_NET
                 | typeof ORANGE
                 | typeof LEATHER
                 | typeof PHANTOM
