@@ -1,3 +1,4 @@
+'use client'
 import { MapStore, WritableAtom } from 'nanostores'
 import { LaserEyesStoreType } from '../types'
 import { Config, NetworkType, ProviderType } from '../../types'

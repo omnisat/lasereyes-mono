@@ -1,6 +1,6 @@
 # lasereyes-react 
 
-`@omnisat/lasereyes-react` is a React-specific package built on top of `lasereyes-core`. It provides React hooks, context providers, and wallet icons to make it easy to integrate Bitcoin wallet support into React applications.
+`@omnisat/lasereyes-react` is a React-specific package built on top of `lasereyes-core`. It provides React hooks, context providers, and wallet icon components to make it easy to integrate Bitcoin wallet support into React applications.
 
 This package simplifies the interaction between your React app and various Bitcoin wallets, allowing you to focus on building dApps with a seamless user experience.
 
@@ -24,20 +24,22 @@ function App() {
 ```
 
 ### Hooks
-`@omnisat/lasereyes-react` provides hooks to interact with wallets within your React components. The most commonly used hook is `useWallet`, which allows you to access the connected wallet and its state.
+`@omnisat/lasereyes-react` provides hooks to interact with wallets within your React components. The most commonly used hook is `useLaserEyes`, which allows you to access the connected wallet and its state.
 
-Example of using the `useWallet` hook:
+Example of using the `useLaserEyes` hook:
 
 ```typescript
-import { useWallet } from '@omnisat/lasereyes-react';
+// must be a child of a component that is wrapped with LaserEyesProvider
+
+import { useLaserEyes } from '@omnisat/lasereyes-react';
 
 function WalletInfo() {
-  const { wallet, connect } = useWallet();
+  const { address, connect } = useLaserEyes();
 
   return (
     <div>
-      {wallet ? (
-        <p>Connected: {wallet.address}</p>
+      {address ? (
+        <p>Connected: {address}</p>
       ) : (
         <button onClick={connect}>Connect Wallet</button>
       )}
@@ -52,24 +54,32 @@ function WalletInfo() {
 Example of using a wallet icon:
 
 ```typescript
-import { UnisatIcon } from '@omnisat/lasereyes-react/icons';
+import { UnisatLogo } from '@omnisat/lasereyes-react';
 
 function WalletDisplay() {
-  return <UnisatIcon />;
+  return <UnisatLogo size={size} className={className} variant={variant} />;
 }
 ```
 
-## Installation
+or you could use the `WalletIcon` component to display a wallet icon based on the wallet's name:
 
-To install `@omnisat/lasereyes-react`, use:
+``` jsx
+import { WalletIcon, UNISAT, XVERSE } from '@omnisat/lasereyes-react';
 
-```bash
-pnpm add @omnisat/lasereyes-react
+const WalletConnectPage = () => {
+  return (
+    <div>
+      {[UNISAT, XVERSE].map((walletName) => (
+        <WalletIcon key={walletName} walletName={walletName} size={45} className={"mx-4"} />
+      ))
+    </div>
+  );
+};
 ```
 
 ## Features
 - **React Hooks**: Easily manage wallet connections and state in your components.
-- **Provider Component**: Wrap your app with the `LaserEyesProvider` to enable wallet access across your React tree.
+- **Provider Component**: Wrap your app with the `LaserEyesProvider` to enable wallet access across your React tree with `useLaserEyes`.
 - **Wallet Icons**: Use pre-built wallet icons as React components for visual integration.
 
 ## Usage

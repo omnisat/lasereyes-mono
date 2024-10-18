@@ -98,6 +98,21 @@ export default class OrangeProvider extends WalletProvider {
   }
 
   initialize(): void {
+    if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+      this.observer = new window.MutationObserver(() => {
+        const orangeLib = (window as any)?.OrangeWalletProviders
+          ?.OrangeBitcoinProvider
+
+        if (orangeLib) {
+          this.$store.setKey('hasProvider', {
+            ...this.$store.get().hasProvider,
+            [ORANGE]: true,
+          })
+          this.observer?.disconnect()
+        }
+      })
+      this.observer?.observe(document, { childList: true, subtree: true })
+    }
     listenKeys(this.$store, ['provider'], (newVal) => {
       if (newVal.provider !== ORANGE) {
         if (this.removeSubscriber) {
@@ -117,20 +132,6 @@ export default class OrangeProvider extends WalletProvider {
         )
       }
     })
-
-    this.observer = new window.MutationObserver(() => {
-      const orangeLib = (window as any)?.OrangeWalletProviders
-        ?.OrangeBitcoinProvider
-
-      if (orangeLib) {
-        this.$store.setKey('hasProvider', {
-          ...this.$store.get().hasProvider,
-          [ORANGE]: true,
-        })
-        this.observer?.disconnect()
-      }
-    })
-    this.observer?.observe(document, { childList: true, subtree: true })
   }
 
   dispose() {

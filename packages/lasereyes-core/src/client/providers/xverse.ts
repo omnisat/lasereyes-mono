@@ -105,18 +105,19 @@ export default class XVerseProvider extends WalletProvider {
         )
       }
     })
-
-    this.observer = new window.MutationObserver(() => {
-      const xverseLib = (window as any)?.XverseProviders?.BitcoinProvider
-      if (xverseLib) {
-        this.$store.setKey('hasProvider', {
-          ...this.$store.get().hasProvider,
-          [XVERSE]: true,
-        })
-        this.observer?.disconnect()
-      }
-    })
-    this.observer.observe(document, { childList: true, subtree: true })
+    if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+      this.observer = new window.MutationObserver(() => {
+        const xverseLib = (window as any)?.XverseProviders?.BitcoinProvider
+        if (xverseLib) {
+          this.$store.setKey('hasProvider', {
+            ...this.$store.get().hasProvider,
+            [XVERSE]: true,
+          })
+          this.observer?.disconnect()
+        }
+      })
+      this.observer.observe(document, { childList: true, subtree: true })
+    }
   }
 
   dispose() {

@@ -19,17 +19,20 @@ export default class UnisatProvider extends WalletProvider {
   observer?: MutationObserver
 
   initialize() {
-    this.observer = new window.MutationObserver(() => {
-      if (this.library) {
-        this.$store.setKey('hasProvider', {
-          ...this.$store.get().hasProvider,
-          [UNISAT]: true,
-        })
-        this.observer?.disconnect()
-      }
-    })
+    if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+      this.observer = new window.MutationObserver(() => {
+        if (this.library) {
+          this.$store.setKey('hasProvider', {
+            ...this.$store.get().hasProvider,
+            [UNISAT]: true,
+          })
+          this.observer?.disconnect()
+        }
+      })
 
-    this.observer.observe(document, { childList: true, subtree: true })
+      this.observer.observe(document, { childList: true, subtree: true })
+    }
+
     listenKeys(this.$store, ['provider'], (newStore) => {
       if (newStore.provider !== UNISAT) {
         this.removeListeners()
