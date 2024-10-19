@@ -8,7 +8,7 @@
 
     "declaration": true,
     "declarationMap": true,
-    "composite": true,  // Required for emitDeclarationOnly
+    "composite": true,
     "outDir": "dist",
 
     /* Bundler mode */
