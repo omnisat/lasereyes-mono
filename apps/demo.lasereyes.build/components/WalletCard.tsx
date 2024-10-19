@@ -197,6 +197,7 @@ const WalletCard = ({
       | typeof OYL
       | typeof MAGIC_EDEN
       | typeof OKX
+      | typeof OP_NET
       | typeof LEATHER
       | typeof PHANTOM
       | typeof WIZZ
