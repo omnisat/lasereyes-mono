@@ -236,10 +236,11 @@ const WalletCard = ({
                   }
                   target={'_blank'}
                   className={
-                    'flex flex-row gap-2 font-black hover:text-orange-400 items-center justify-center'
+                    'flex flex-row gap-2 text-gray-600 text-center font-black hover:text-orange-400 items-center justify-center'
                   }
                 >
-                  View token generation source <ImNewTab />
+                  How does this work? <br /> Click here to view the source{' '}
+                  <ImNewTab size={20} />
                 </Link>
               </div>
             )}
