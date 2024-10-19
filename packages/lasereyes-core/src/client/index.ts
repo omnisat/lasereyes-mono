@@ -89,13 +89,15 @@ export class LaserEyesClient {
   }
 
   private handleIsInitializingChanged(value: boolean) {
-    if (!value) {
-      const defaultWallet = localStorage?.getItem(
-        LOCAL_STORAGE_DEFAULT_WALLET
-      ) as ProviderType | undefined
-      if (defaultWallet) {
-        this.$store.setKey('provider', defaultWallet)
-        this.connect(defaultWallet)
+    if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+      if (!value) {
+        const defaultWallet = localStorage?.getItem(
+          LOCAL_STORAGE_DEFAULT_WALLET
+        ) as ProviderType | undefined
+        if (defaultWallet) {
+          this.$store.setKey('provider', defaultWallet)
+          this.connect(defaultWallet)
+        }
       }
     }
   }

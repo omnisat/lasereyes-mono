@@ -19,7 +19,7 @@ import {
   useLaserEyes,
   WalletIcon,
   OP_NET,
-} from '@omnisat/lasereyes-react'
+} from '@omnisat/lasereyes'
 import { satoshisToBTC } from '@/lib/btc'
 import { cn, truncateString } from '@/lib/utils'
 import ClickToCopy from '@/components/ClickToCopy'

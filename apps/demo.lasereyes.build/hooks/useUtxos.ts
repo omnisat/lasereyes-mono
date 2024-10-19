@@ -9,7 +9,7 @@ import {
   FRACTAL_TESTNET,
   SIGNET,
   TESTNET4,
-} from '@omnisat/lasereyes-react'
+} from '@omnisat/lasereyes'
 
 const useUtxos = (
   address: string,

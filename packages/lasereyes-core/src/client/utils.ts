@@ -16,11 +16,13 @@ import { NetworkType } from '../types'
 import { LaserEyesStoreType } from './types'
 
 export function triggerDOMShakeHack() {
-  setTimeout(() => {
-    const node = document.createTextNode(' ')
-    document.body.appendChild(node)
-    node.remove()
-  }, 1500)
+  if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+    setTimeout(() => {
+      const node = document.createTextNode(' ')
+      document.body.appendChild(node)
+      node.remove()
+    }, 1500)
+  }
 }
 
 export function createStores(): {

@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    // reactStrictMode: false,
+    transpilePackages: ['@omnisat/lasereyes-react', '@omnisat/lasereyes'],
 };
 
 export default nextConfig;
