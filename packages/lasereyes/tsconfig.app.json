@@ -24,6 +24,10 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
+    "paths": {
+      "@omnisat/lasereyes-core": ["../lasereyes-core/dist"],
+      "@omnisat/lasereyes-react": ["../lasereyes-react/dist"]
+    }
   },
   "include": ["index.ts"]
 }
