@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "@omnisat/lasereyes-core": "workspace:*",
-    "@omnisat/lasereyes-react": "workspace:*",
+    "@omnisat/lasereyes-react": "workspace:*"
   },
   "publishConfig": {
     "access": "public"
