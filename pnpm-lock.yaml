@@ -176,7 +176,7 @@ importers:
   apps/react-ui:
     dependencies:
       '@omnisat/lasereyes':
-        specifier: workspace:*
+        specifier: latest
         version: link:../../packages/lasereyes
       '@testing-library/jest-dom':
         specifier: ^5.17.0
