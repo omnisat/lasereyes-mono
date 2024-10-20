@@ -42,7 +42,7 @@ importers:
         specifier: ^1.1.1
         version: 1.1.1
       '@omnisat/lasereyes':
-        specifier: workspace:*
+        specifier: latest
         version: link:../../packages/lasereyes
       '@radix-ui/react-avatar':
         specifier: ^1.1.0
@@ -154,7 +154,7 @@ importers:
         specifier: ^0.2.3
         version: 0.2.3(esbuild@0.24.0)
       '@omnisat/lasereyes':
-        specifier: workspace:*
+        specifier: latest
         version: link:../../packages/lasereyes
       react:
         specifier: latest
