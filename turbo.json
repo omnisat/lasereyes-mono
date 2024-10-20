@@ -1,10 +1,15 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "ui": "tui",
-  "tasks": {
+  "pipeline": {
     "build": {
-      "dependsOn": ["^build"],
-      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        ".env*"
+      ],
       "outputs": [
         ".next/**",
         "build/**",
@@ -13,12 +18,26 @@
       ]
     },
     "lint": {
-      "dependsOn": ["^lint"]
+      "dependsOn": [
+        "^lint"
+      ]
     },
     "dev": {
-      "dependsOn": ["^build"],
+      "dependsOn": [
+        "^build"
+      ],
       "cache": false,
       "persistent": true
+    },
+    "apps/**": {
+      "dependsOn": [
+        "packages/**"
+      ]
+    },
+    "packages/**": {
+      "outputs": [
+        "dist/**"
+      ]
     }
   }
 }
