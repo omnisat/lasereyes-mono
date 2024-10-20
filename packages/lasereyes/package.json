@@ -30,8 +30,7 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "prepublishOnly": "npm run build",
-    "lint": "eslint .",
-
+    "lint": "eslint ."
   },
   "devDependencies": {
     "@vitejs/plugin-react-swc": "^3.5.0",
