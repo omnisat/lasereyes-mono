@@ -179,18 +179,7 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Promote lasereyes version if any package changed
-        if: needs.check-package-changes.outputs.lasereyes_changed == 'true' ||
-          needs.check-package-changes.outputs.lasereyes_core_changed == 'true' ||
-          needs.check-package-changes.outputs.lasereyes_react_changed == 'true'
-        run: |
-          cd packages/lasereyes
-          pnpm version patch
-          pnpm publish --access public --no-git-checks          
-          cd ../..
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
+      # Promote lasereyes-core first
       - name: Promote lasereyes-core version
         if: needs.check-package-changes.outputs.lasereyes_core_changed == 'true'
         run: |
@@ -201,6 +190,7 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
+      # Then promote lasereyes-react
       - name: Promote lasereyes-react version
         if: needs.check-package-changes.outputs.lasereyes_react_changed == 'true'
         run: |
@@ -208,6 +198,37 @@ jobs:
           pnpm version patch
           pnpm publish --access public --no-git-checks
           cd ../..
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      # Update lasereyes dependencies to point to new stable versions
+      - name: Update dependencies in lasereyes package.json
+        if: needs.check-package-changes.outputs.lasereyes_core_changed == 'true' || needs.check-package-changes.outputs.lasereyes_react_changed == 'true'
+        run: |
+          # Get new stable versions of dependencies
+          CORE_VERSION=$(cd packages/lasereyes-core && node -p "require('./package.json').version")
+          REACT_VERSION=$(cd packages/lasereyes-react && node -p "require('./package.json').version")
+          echo "New lasereyes-core version: $CORE_VERSION"
+          echo "New lasereyes-react version: $REACT_VERSION"
+          # Update dependencies in lasereyes package.json
+          cd packages/lasereyes
+          node -e "let pkg=require('./package.json'); pkg.dependencies['lasereyes-core']='$CORE_VERSION'; pkg.dependencies['lasereyes-react']='$REACT_VERSION'; require('fs').writeFileSync('./package.json', JSON.stringify(pkg, null, 2));"
+          cd ../..
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      # Now promote lasereyes
+      - name: Promote lasereyes version
+        if: needs.check-package-changes.outputs.lasereyes_changed == 'true' ||
+          needs.check-package-changes.outputs.lasereyes_core_changed == 'true' ||
+          needs.check-package-changes.outputs.lasereyes_react_changed == 'true'
+        run: |
+          cd packages/lasereyes
+          pnpm version patch
+          pnpm publish --access public --no-git-checks          
+          cd ../..
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Configure git user
         run: |
