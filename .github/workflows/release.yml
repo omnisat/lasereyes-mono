@@ -90,7 +90,7 @@ jobs:
           corepack prepare pnpm@8.6.6 --activate
 
       - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+        run: pnpm install
 
       - name: Create .npmrc file
         run: |
@@ -204,12 +204,10 @@ jobs:
       - name: Update dependencies in lasereyes package.json
         if: needs.check-package-changes.outputs.lasereyes_core_changed == 'true' || needs.check-package-changes.outputs.lasereyes_react_changed == 'true'
         run: |
-          # Get new stable versions of dependencies
           CORE_VERSION=$(cd packages/lasereyes-core && node -p "require('./package.json').version")
           REACT_VERSION=$(cd packages/lasereyes-react && node -p "require('./package.json').version")
           echo "New lasereyes-core version: $CORE_VERSION"
           echo "New lasereyes-react version: $REACT_VERSION"
-          # Update dependencies in lasereyes package.json
           cd packages/lasereyes
           node -e "let pkg=require('./package.json'); pkg.dependencies['lasereyes-core']='$CORE_VERSION'; pkg.dependencies['lasereyes-react']='$REACT_VERSION'; require('fs').writeFileSync('./package.json', JSON.stringify(pkg, null, 2));"
           cd ../..
