@@ -106,6 +106,7 @@ jobs:
                 "${{ needs.check-package-changes.outputs.lasereyes_react_changed }}" == "true" ]]; then
               cd packages/lasereyes
               pnpm version prerelease --preid=rc
+              pnpm publish --access public --no-git-checks
               cd ../..
           fi
 
@@ -113,6 +114,7 @@ jobs:
           if [[ "${{ needs.check-package-changes.outputs.lasereyes_core_changed }}" == "true" ]]; then
               cd packages/lasereyes-core
               pnpm version prerelease --preid=rc
+              pnpm publish --access public --no-git-checks
               cd ../..
           fi
 
@@ -120,6 +122,7 @@ jobs:
           if [[ "${{ needs.check-package-changes.outputs.lasereyes_react_changed }}" == "true" ]]; then
               cd packages/lasereyes-react
               pnpm version prerelease --preid=rc
+              pnpm publish --access public --no-git-checks
               cd ../..
           fi
         env:
@@ -204,12 +207,10 @@ jobs:
       - name: Update dependencies in lasereyes package.json
         if: needs.check-package-changes.outputs.lasereyes_core_changed == 'true' || needs.check-package-changes.outputs.lasereyes_react_changed == 'true'
         run: |
-          # Get new stable versions of dependencies
           CORE_VERSION=$(cd packages/lasereyes-core && node -p "require('./package.json').version")
           REACT_VERSION=$(cd packages/lasereyes-react && node -p "require('./package.json').version")
           echo "New lasereyes-core version: $CORE_VERSION"
           echo "New lasereyes-react version: $REACT_VERSION"
-          # Update dependencies in lasereyes package.json
           cd packages/lasereyes
           node -e "let pkg=require('./package.json'); pkg.dependencies['lasereyes-core']='$CORE_VERSION'; pkg.dependencies['lasereyes-react']='$REACT_VERSION'; require('fs').writeFileSync('./package.json', JSON.stringify(pkg, null, 2));"
           cd ../..
