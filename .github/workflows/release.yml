@@ -139,7 +139,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 
-  # Promote to stable version in main
   promote-to-stable-in-main:
     runs-on: ubuntu-latest
     needs: check-package-changes
