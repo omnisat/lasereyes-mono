@@ -186,7 +186,7 @@ jobs:
         run: |
           cd packages/lasereyes
           pnpm version patch
-          pnpm publish --access public --no-git-checks          
+#          pnpm publish --access public --no-git-checks
           cd ../..
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
