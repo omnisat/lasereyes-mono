@@ -1,7 +1,7 @@
 {
   "name": "@omnisat/lasereyes",
   "private": false,
-  "version": "0.0.83",
+  "version": "0.0.84",
   "type": "module",
   "main": "./dist/index.umd.cjs",
   "module": "./dist/index.js",
@@ -30,9 +30,7 @@
   },
   "dependencies": {
     "@omnisat/lasereyes-core": "workspace:*",
-    "@omnisat/lasereyes-react": "workspace:*",
-    "lasereyes-core": "0.0.14",
-    "lasereyes-react": "0.0.10"
+    "@omnisat/lasereyes-react": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

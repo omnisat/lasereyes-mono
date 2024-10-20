@@ -209,7 +209,7 @@ jobs:
           echo "New lasereyes-core version: $CORE_VERSION"
           echo "New lasereyes-react version: $REACT_VERSION"
           cd packages/lasereyes
-          node -e "let pkg=require('./package.json'); pkg.dependencies['lasereyes-core']='$CORE_VERSION'; pkg.dependencies['lasereyes-react']='$REACT_VERSION'; require('fs').writeFileSync('./package.json', JSON.stringify(pkg, null, 2));"
+          node -e "let pkg=require('./package.json'); pkg.dependencies['@omnisat/lasereyes-core']='$CORE_VERSION'; pkg.dependencies['@omnisat/lasereyes-react']='$REACT_VERSION'; require('fs').writeFileSync('./package.json', JSON.stringify(pkg, null, 2));"
           cd ../..
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
