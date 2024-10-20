@@ -379,10 +379,16 @@ jobs:
           PREV_COMMIT=$(git rev-parse HEAD^1)
           git diff $PREV_COMMIT HEAD > changes.diff
 
+      - name: Get lasereyes version
+        id: get_version
+        run: |
+          VERSION=$(node -p "require('./packages/lasereyes/package.json').version")
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
       - name: Generate release notes with GPT
         run: |
           set -e
-          python3 scripts/generate_release_notes.py
+          python3 scripts/generate_release_notes.py $VERSION
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
