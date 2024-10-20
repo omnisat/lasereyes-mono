@@ -105,5 +105,3 @@ If you find Laser Eyes useful or use it for work, please consider [sponsoring La
 <h4 style="text-align: center; font-size: 1.5em; margin-top: 20px; margin-bottom: 20px;">
   <a href="https://github.com/sponsors/omnisat">Become A Sponsor</a>
 </h4>
-
-<br />
