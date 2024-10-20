@@ -13,16 +13,6 @@
     ".": {
       "import": "./dist/index.js",
       "require": "./dist/index.umd.cjs"
-    },
-    "./lasereyes-core": {
-      "import": "./dist/core/index.js",
-      "require": "./dist/core/index.umd.cjs",
-      "types": "./dist/core/index.d.ts"
-    },
-    "./lasereyes-react": {
-      "import": "./dist/react/index.js",
-      "require": "./dist/react/index.umd.cjs",
-      "types": "./dist/react/index.d.ts"
     }
   },
   "scripts": {
