@@ -29,9 +29,5 @@
       "@omnisat/lasereyes-react": ["../lasereyes-react/dist"]
     }
   },
-  "references": [
-    { "path": "../lasereyes-core" },
-    { "path": "../lasereyes-react" }
-  ],
   "include": ["index.ts"]
 }
