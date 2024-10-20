@@ -31,8 +31,6 @@
   "dependencies": {
     "@omnisat/lasereyes-core": "workspace:*",
     "@omnisat/lasereyes-react": "workspace:*",
-    "lasereyes-core": "0.0.13-rc.1",
-    "lasereyes-react": "0.0.9"
   },
   "publishConfig": {
     "access": "public"
