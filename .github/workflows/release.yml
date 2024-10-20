@@ -90,7 +90,7 @@ jobs:
           corepack prepare pnpm@8.6.6 --activate
 
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --no-frozen-lockfile
 
       - name: Create .npmrc file
         run: |
@@ -139,7 +139,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 
-  # Promote to stable version in main
   promote-to-stable-in-main:
     runs-on: ubuntu-latest
     needs: check-package-changes
@@ -162,7 +161,7 @@ jobs:
           corepack prepare pnpm@8.6.6 --activate
 
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --no-frozen-lockfile
 
       - name: Build all packages
         run: pnpm -r build
@@ -264,7 +263,7 @@ jobs:
           corepack prepare pnpm@8.6.6 --activate
 
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --no-frozen-lockfile
 
       - name: Configure git user
         run: |
@@ -309,7 +308,7 @@ jobs:
           corepack prepare pnpm@8.6.6 --activate
 
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --no-frozen-lockfile
 
       # Debugging Step: Log the outputs to check if they're correctly set
       - name: Log outputs from check-package-changes
