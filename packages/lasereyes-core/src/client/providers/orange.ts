@@ -390,4 +390,12 @@ export default class OrangeProvider extends WalletProvider {
       .post(`${getMempoolSpaceUrl(this.network)}/api/tx`, payload)
       .then((res) => res.data)
   }
+
+  async inscribe(
+    content: string,
+    mimeType: string
+  ): Promise<string | string[]> {
+    console.log(content, mimeType)
+    throw UNSUPPORTED_PROVIDER_METHOD_ERROR
+  }
 }

@@ -401,4 +401,12 @@ export default class MagicEdenProvider extends WalletProvider {
       .post(`${getMempoolSpaceUrl(this.network)}/api/tx`, _tx)
       .then((res) => res.data)
   }
+
+  async inscribe(
+    content: string,
+    mimeType: string
+  ): Promise<string | string[]> {
+    console.log(content, mimeType)
+    throw UNSUPPORTED_PROVIDER_METHOD_ERROR
+  }
 }

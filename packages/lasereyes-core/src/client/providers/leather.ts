@@ -300,4 +300,12 @@ export default class LeatherProvider extends WalletProvider {
   async switchNetwork(): Promise<void> {
     throw UNSUPPORTED_PROVIDER_METHOD_ERROR
   }
+
+  async inscribe(
+    content: string,
+    mimeType: string
+  ): Promise<string | string[]> {
+    console.log('inscribe', content, mimeType)
+    throw UNSUPPORTED_PROVIDER_METHOD_ERROR
+  }
 }

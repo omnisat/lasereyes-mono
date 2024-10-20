@@ -68,4 +68,9 @@ export abstract class WalletProvider {
   >
 
   abstract pushPsbt(tx: string): Promise<string | undefined>
+
+  abstract inscribe(
+    content: string,
+    mimeType: string
+  ): Promise<string | string[]>
 }

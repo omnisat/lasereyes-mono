@@ -355,4 +355,12 @@ export default class XVerseProvider extends WalletProvider {
   pushPsbt(_tx: string): Promise<string | undefined> {
     throw UNSUPPORTED_PROVIDER_METHOD_ERROR
   }
+
+  async inscribe(
+    content: string,
+    mimeType: string
+  ): Promise<string | string[]> {
+    console.log(content, mimeType)
+    throw UNSUPPORTED_PROVIDER_METHOD_ERROR
+  }
 }

@@ -1,5 +1,5 @@
 import * as bitcoin from 'bitcoinjs-lib'
-import { WalletProvider } from '.'
+import { UNSUPPORTED_PROVIDER_METHOD_ERROR, WalletProvider } from '.'
 import {
   FRACTAL_MAINNET,
   FRACTAL_TESTNET,
@@ -249,5 +249,13 @@ export default class OkxProvider extends WalletProvider {
     return await axios
       .post(`${getMempoolSpaceUrl(this.network)}/api/tx`, _tx)
       .then((res) => res.data)
+  }
+
+  async inscribe(
+    content: string,
+    mimeType: string
+  ): Promise<string | string[]> {
+    console.log(content, mimeType)
+    throw UNSUPPORTED_PROVIDER_METHOD_ERROR
   }
 }

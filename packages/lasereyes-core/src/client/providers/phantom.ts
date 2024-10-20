@@ -1,6 +1,6 @@
 import * as bitcoin from 'bitcoinjs-lib'
 import axios from 'axios'
-import { WalletProvider } from '.'
+import { UNSUPPORTED_PROVIDER_METHOD_ERROR, WalletProvider } from '.'
 import {
   getNetworkForUnisat,
   getUnisatNetwork,
@@ -264,5 +264,13 @@ export default class PhantomProvider extends WalletProvider {
     await this.library?.switchChain(wantedNetwork)
     this.$network.set(network)
     await this.getBalance()
+  }
+
+  async inscribe(
+    content: string,
+    mimeType: string
+  ): Promise<string | string[]> {
+    console.log(content, mimeType)
+    throw UNSUPPORTED_PROVIDER_METHOD_ERROR
   }
 }

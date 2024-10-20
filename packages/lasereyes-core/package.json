@@ -22,12 +22,15 @@
     "prepublishOnly": "npm run build"
   },
   "devDependencies": {
+    "@types/node": "^22.7.7",
     "typescript": "^5.5.3",
     "vite": "^5.4.1",
     "vite-plugin-dts": "^4.2.1"
   },
   "dependencies": {
     "@bitcoinerlab/secp256k1": "^1.1.1",
+    "@cmdcode/crypto-utils": "^2.4.6",
+    "@cmdcode/tapscript": "^1.4.6",
     "@nanostores/persistent": "^0.10.2",
     "@orangecrypto/orange-connect": "^1.2.2",
     "axios": "^1.7.7",
