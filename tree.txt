@@ -196,7 +196,7 @@
 │   │   │   │       ├── context.ts.html
 │   │   │   │       ├── hooks.ts.html
 │   │   │   │       └── index.html
-│   │   │   └── vite.config.ts.html
+│   │   │   └── vite.config.ts.old.html
 │   │   ├── prettify.css
 │   │   ├── prettify.js
 │   │   ├── sort-arrow-sprite.png
@@ -232,10 +232,10 @@
 │   │   ├── lasereyes.png
 │   │   ├── package.json
 │   │   ├── tsconfig.json
-│   │   ├── vite.config.ts
-│   │   ├── vite.config.ts.timestamp-1728692186883-f366a0fd55908.mjs
-│   │   ├── vite.config.ts.timestamp-1728696648717-9171ac22dcbb5.mjs
-│   │   └── vite.config.ts.timestamp-1728696838105-31fdfbf786678.mjs
+│   │   ├── vite.config.ts.old
+│   │   ├── vite.config.ts.old.timestamp-1728692186883-f366a0fd55908.mjs
+│   │   ├── vite.config.ts.old.timestamp-1728696648717-9171ac22dcbb5.mjs
+│   │   └── vite.config.ts.old.timestamp-1728696838105-31fdfbf786678.mjs
 │   ├── lasereyes-core
 │   │   ├── README.md
 │   │   ├── __tests__
@@ -273,7 +273,7 @@
 │   │   │       └── index.ts
 │   │   ├── tsconfig.json
 │   │   ├── tsconfig.tsbuildinfo
-│   │   └── vite.config.ts
+│   │   └── vite.config.ts.old
 │   ├── lasereyes-react
 │   │   ├── README.md
 │   │   ├── eslint.config.js
@@ -305,7 +305,7 @@
 │   │   ├── tsconfig.json
 │   │   ├── tsconfig.node.json
 │   │   ├── tsconfig.node.tsbuildinfo
-│   │   └── vite.config.ts
+│   │   └── vite.config.ts.old
 │   └── typescript-config
 │       ├── base.json
 │       ├── nextjs.json
