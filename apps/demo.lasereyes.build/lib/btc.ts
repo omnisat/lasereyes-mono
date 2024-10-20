@@ -11,7 +11,7 @@ import {
   SIGNET,
   TESTNET,
   TESTNET4,
-} from '@omnisat/lasereyes-react'
+} from '@omnisat/lasereyes'
 import * as bitcoin from 'bitcoinjs-lib'
 import { Psbt } from 'bitcoinjs-lib'
 import * as ecc2 from '@bitcoinerlab/secp256k1'

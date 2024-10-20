@@ -5,6 +5,7 @@ import {
   LEATHER,
   MAGIC_EDEN,
   OKX,
+  OP_NET,
   ORANGE,
   OYL,
   PHANTOM,
@@ -27,6 +28,7 @@ import OrangeProvider from './providers/orange'
 import OkxProvider from './providers/okx'
 import MagicEdenProvider from './providers/magic-eden'
 import PhantomProvider from './providers/phantom'
+import OpNetProvider from './providers/op-net'
 
 export class LaserEyesClient {
   readonly $store: MapStore<LaserEyesStoreType>
@@ -50,6 +52,7 @@ export class LaserEyesClient {
       [LEATHER]: new LeatherProvider(stores, this, config),
       [MAGIC_EDEN]: new MagicEdenProvider(stores, this, config),
       [OKX]: new OkxProvider(stores, this, config),
+      [OP_NET]: new OpNetProvider(stores, this, config),
       [ORANGE]: new OrangeProvider(stores, this, config),
       [OYL]: new OylProvider(stores, this, config),
       [PHANTOM]: new PhantomProvider(stores, this, config),
@@ -86,13 +89,15 @@ export class LaserEyesClient {
   }
 
   private handleIsInitializingChanged(value: boolean) {
-    if (!value) {
-      const defaultWallet = localStorage?.getItem(
-        LOCAL_STORAGE_DEFAULT_WALLET
-      ) as ProviderType | undefined
-      if (defaultWallet) {
-        this.$store.setKey('provider', defaultWallet)
-        this.connect(defaultWallet)
+    if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+      if (!value) {
+        const defaultWallet = localStorage?.getItem(
+          LOCAL_STORAGE_DEFAULT_WALLET
+        ) as ProviderType | undefined
+        if (defaultWallet) {
+          this.$store.setKey('provider', defaultWallet)
+          this.connect(defaultWallet)
+        }
       }
     }
   }

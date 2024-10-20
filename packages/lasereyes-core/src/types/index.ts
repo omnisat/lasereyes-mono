@@ -16,6 +16,7 @@ import {
   PHANTOM,
   WIZZ,
   ORANGE,
+  OP_NET,
 } from '../constants/wallets'
 
 export type NetworkType =
@@ -36,6 +37,7 @@ export type ProviderType =
   | typeof PHANTOM
   | typeof WIZZ
   | typeof ORANGE
+  | typeof OP_NET
 
 export type Config = {
   network:

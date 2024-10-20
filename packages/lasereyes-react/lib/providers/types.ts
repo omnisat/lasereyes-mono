@@ -16,6 +16,7 @@ export type LaserEyesContextType = {
   hasUnisat: boolean
   hasXverse: boolean
   hasOrange: boolean
+  hasOpNet: boolean
   hasOyl: boolean
   hasMagicEden: boolean
   hasOkx: boolean

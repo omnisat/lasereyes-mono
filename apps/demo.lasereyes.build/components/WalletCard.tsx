@@ -18,7 +18,8 @@ import {
   ORANGE,
   useLaserEyes,
   WalletIcon,
-} from '@omnisat/lasereyes-react'
+  OP_NET,
+} from '@omnisat/lasereyes'
 import {
   Card,
   CardContent,
@@ -52,6 +53,7 @@ const WalletCard = ({
     | typeof OYL
     | typeof MAGIC_EDEN
     | typeof OKX
+    | typeof OP_NET
     | typeof LEATHER
     | typeof ORANGE
     | typeof PHANTOM
@@ -89,6 +91,7 @@ const WalletCard = ({
     hasPhantom,
     hasWizz,
     hasOrange,
+    hasOpNet,
     sendBTC,
     signMessage,
     signPsbt,
@@ -120,6 +123,7 @@ const WalletCard = ({
     oyl: hasOyl,
     [MAGIC_EDEN]: hasMagicEden,
     okx: hasOkx,
+    op_net: hasOpNet,
     leather: hasLeather,
     phantom: hasPhantom,
     wizz: hasWizz,
@@ -193,6 +197,7 @@ const WalletCard = ({
       | typeof OYL
       | typeof MAGIC_EDEN
       | typeof OKX
+      | typeof OP_NET
       | typeof LEATHER
       | typeof PHANTOM
       | typeof WIZZ
@@ -232,10 +237,11 @@ const WalletCard = ({
                   }
                   target={'_blank'}
                   className={
-                    'flex flex-row gap-2 font-black hover:text-orange-400 items-center justify-center'
+                    'flex flex-row gap-2 text-gray-600 text-center font-black hover:text-orange-400 items-center justify-center'
                   }
                 >
-                  View token generation source <ImNewTab />
+                  How does this work? <br /> Click here to view the source{' '}
+                  <ImNewTab size={20} />
                 </Link>
               </div>
             )}

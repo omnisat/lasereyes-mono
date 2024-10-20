@@ -8,7 +8,7 @@
 
     "declaration": true,
     "declarationMap": true,
-    "composite": true,
+    "composite": true,  // Required for emitDeclarationOnly
     "outDir": "dist",
 
     /* Bundler mode */
@@ -25,9 +25,9 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "paths": {
-      "@": ["./lib"],
-      "@omnisat/lasereyes-core": ["../lasereyes-core/dist"]
+      "@omnisat/lasereyes-core": ["../lasereyes-core/dist"],
+      "@omnisat/lasereyes-react": ["../lasereyes-react/dist"]
     }
   },
-  "include": ["lib"]
+  "include": ["index.ts"]
 }

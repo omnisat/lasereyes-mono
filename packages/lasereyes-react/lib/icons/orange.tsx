@@ -14,8 +14,8 @@ const OrangeLogo: React.FC<OrangeLogoProps> = ({
   <svg
     xmlns="http://www.w3.org/2000/svg"
     xmlnsXlink="http://www.w3.org/1999/xlink"
-    width="42px"
-    height="42px"
+    width={size}
+    height={size}
     viewBox="0 0 42 42"
     {...props}
   >

@@ -1,16 +1,16 @@
 import * as bitcoin from 'bitcoinjs-lib'
 import { WalletProvider } from '.'
 import { getNetworkForUnisat, getUnisatNetwork } from '../../constants/networks'
-import { ProviderType, NetworkType } from '../../types'
+import { NetworkType, ProviderType } from '../../types'
 import axios from 'axios'
 import { getBTCBalance } from '../../lib/helpers'
-import { UNISAT } from '../../constants/wallets'
+import { OP_NET } from '../../constants/wallets'
 import { listenKeys } from 'nanostores'
 import { getMempoolSpaceUrl } from '../../lib/urls'
 
-export default class UnisatProvider extends WalletProvider {
+export default class OpNetProvider extends WalletProvider {
   public get library(): any | undefined {
-    return (window as any).unisat
+    return (window as any).opnet
   }
 
   public get network(): NetworkType {
@@ -24,7 +24,7 @@ export default class UnisatProvider extends WalletProvider {
         if (this.library) {
           this.$store.setKey('hasProvider', {
             ...this.$store.get().hasProvider,
-            [UNISAT]: true,
+            [OP_NET]: true,
           })
           this.observer?.disconnect()
         }
@@ -32,9 +32,8 @@ export default class UnisatProvider extends WalletProvider {
 
       this.observer.observe(document, { childList: true, subtree: true })
     }
-
     listenKeys(this.$store, ['provider'], (newStore) => {
-      if (newStore.provider !== UNISAT) {
+      if (newStore.provider !== OP_NET) {
         this.removeListeners()
         return
       }
@@ -78,7 +77,7 @@ export default class UnisatProvider extends WalletProvider {
 
     this.$store.setKey('accounts', accounts)
     if (accounts.length > 0) {
-      this.parent.connect(UNISAT)
+      this.parent.connect(OP_NET)
     } else {
       this.parent.disconnect()
     }
@@ -88,43 +87,43 @@ export default class UnisatProvider extends WalletProvider {
     if (this.network !== foundNetwork) {
       this.switchNetwork(foundNetwork)
     }
-    this.parent.connect(UNISAT)
+    this.parent.connect(OP_NET)
   }
 
   async connect(_: ProviderType): Promise<void> {
-    if (!this.library) throw new Error("Unisat isn't installed")
-    const unisatAccounts = await this.library.requestAccounts()
-    if (!unisatAccounts) throw new Error('No accounts found')
-    const unisatPubKey = await this.library.getPublicKey()
-    if (!unisatPubKey) throw new Error('No public key found')
-    this.$store.setKey('accounts', unisatAccounts)
-    this.$store.setKey('address', unisatAccounts[0])
-    this.$store.setKey('paymentAddress', unisatAccounts[0])
-    this.$store.setKey('publicKey', unisatPubKey)
-    this.$store.setKey('paymentPublicKey', unisatPubKey)
-    this.$store.setKey('provider', UNISAT)
+    if (!this.library) throw new Error("OP_NET isn't installed")
+    const opNetAccounts = await this.library.requestAccounts()
+    if (!opNetAccounts) throw new Error('No accounts found')
+    const opNetPubKey = await this.library.getPublicKey()
+    if (!opNetPubKey) throw new Error('No public key found')
+    this.$store.setKey('accounts', opNetAccounts)
+    this.$store.setKey('address', opNetAccounts[0])
+    this.$store.setKey('paymentAddress', opNetAccounts[0])
+    this.$store.setKey('publicKey', opNetPubKey)
+    this.$store.setKey('paymentPublicKey', opNetPubKey)
+    this.$store.setKey('provider', OP_NET)
     await this.getNetwork().then((network) => {
       if (this.config?.network !== network) {
         this.switchNetwork(network)
       }
     })
     // TODO: Confirm if this is necessary and why
-    getBTCBalance(unisatAccounts[0], this.network).then((totalBalance) => {
+    getBTCBalance(opNetAccounts[0], this.network).then((totalBalance) => {
       this.$store.setKey('balance', totalBalance)
     })
     this.$store.setKey('connected', true)
   }
 
   async getNetwork() {
-    const unisatNetwork = (await this.library?.getChain()) as {
+    const opNetNetwork = (await this.library?.getChain()) as {
       enum: string
       name: string
       network: string
     }
-    if (!unisatNetwork) {
+    if (!opNetNetwork) {
       return this.network
     }
-    return getNetworkForUnisat(unisatNetwork.enum) as NetworkType
+    return getNetworkForUnisat(opNetNetwork.enum) as NetworkType
   }
   async sendBTC(to: string, amount: number): Promise<string> {
     const txId = await this.library?.sendBitcoin(to, amount)

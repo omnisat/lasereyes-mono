@@ -1,0 +1,327 @@
+.
+├── LICENSE
+├── Makefile
+├── README.md
+├── RELEASE_NOTES.md
+├── apps
+│   ├── demo.lasereyes.build
+│   │   ├── CHANGELOG.md
+│   │   ├── README.md
+│   │   ├── app
+│   │   │   ├── PxPlus_IBM_VGA8.ttf
+│   │   │   ├── PxPlus_IBM_VGA8.woff
+│   │   │   ├── PxPlus_IBM_VGA8.woff2
+│   │   │   ├── Windows_Command.ttf
+│   │   │   ├── Windows_Regular.ttf
+│   │   │   ├── api
+│   │   │   │   └── authorize
+│   │   │   │       └── route.ts
+│   │   │   ├── favicon.ico
+│   │   │   ├── globals.css
+│   │   │   ├── layout.tsx
+│   │   │   └── page.tsx
+│   │   ├── components
+│   │   │   ├── App.tsx
+│   │   │   ├── ClickToCopy.tsx
+│   │   │   ├── ClickToCopyNpmInstallPill.tsx
+│   │   │   ├── WalletCard.tsx
+│   │   │   └── ui
+│   │   │       ├── avatar.tsx
+│   │   │       ├── badge.tsx
+│   │   │       ├── button.tsx
+│   │   │       ├── card.tsx
+│   │   │       ├── chart.tsx
+│   │   │       ├── checkbox.tsx
+│   │   │       ├── input.tsx
+│   │   │       ├── select.tsx
+│   │   │       ├── sonner.d.ts
+│   │   │       ├── sonner.d.ts.map
+│   │   │       ├── sonner.js
+│   │   │       ├── sonner.tsx
+│   │   │       └── tooltip.tsx
+│   │   ├── components.json
+│   │   ├── hooks
+│   │   │   └── useUtxos.ts
+│   │   ├── lib
+│   │   │   ├── btc.ts
+│   │   │   ├── const.ts
+│   │   │   ├── github.ts
+│   │   │   ├── urls.ts
+│   │   │   ├── utils.d.ts
+│   │   │   ├── utils.d.ts.map
+│   │   │   ├── utils.js
+│   │   │   └── utils.ts
+│   │   ├── next-env.d.ts
+│   │   ├── next.config.mjs
+│   │   ├── package.json
+│   │   ├── postcss.config.mjs
+│   │   ├── public
+│   │   │   ├── lasereyes_connected.svg
+│   │   │   ├── lasereyes_disconnected.svg
+│   │   │   ├── next.svg
+│   │   │   └── vercel.svg
+│   │   ├── tailwind.config.ts
+│   │   ├── tsconfig.json
+│   │   ├── tsconfig.tsbuildinfo
+│   │   ├── types
+│   │   │   └── btc.ts
+│   │   └── yarn-error.log
+│   ├── documentation-site
+│   │   ├── README.md
+│   │   ├── docs
+│   │   │   ├── components
+│   │   │   │   ├── container.tsx
+│   │   │   │   └── test.tsx
+│   │   │   ├── index.mdx
+│   │   │   ├── pages
+│   │   │   │   ├── docs
+│   │   │   │   │   ├── contributing.mdx
+│   │   │   │   │   ├── getting-started.mdx
+│   │   │   │   │   ├── license.mdx
+│   │   │   │   │   └── why.mdx
+│   │   │   │   └── index.mdx
+│   │   │   ├── public
+│   │   │   │   ├── CTRL.svg
+│   │   │   │   ├── ExampleTest.png
+│   │   │   │   ├── EyeIcon.svg
+│   │   │   │   ├── LaserEyesIcon.svg
+│   │   │   │   ├── Leather.svg
+│   │   │   │   ├── LogoDark.svg
+│   │   │   │   ├── LogoLight.svg
+│   │   │   │   ├── OmnisatMain.svg
+│   │   │   │   ├── OmnisatTextBlack.svg
+│   │   │   │   ├── OrangeWalletLogo.svg
+│   │   │   │   ├── OrdinalsBot.svg
+│   │   │   │   ├── colosseum-light.svg
+│   │   │   │   ├── colosseum.svg
+│   │   │   │   ├── examplefile.png
+│   │   │   │   ├── l1f-logo-default.svg
+│   │   │   │   ├── logo-utxo.svg
+│   │   │   │   ├── modified_pattern.svg
+│   │   │   │   ├── og-image.png
+│   │   │   │   ├── omnibg.svg
+│   │   │   │   ├── pattern-randomized.svg
+│   │   │   │   ├── patternsquare.svg
+│   │   │   │   ├── satsventure.svg
+│   │   │   │   └── utxo.svg
+│   │   │   ├── snippets
+│   │   │   │   ├── ConnectWallet.tsx
+│   │   │   │   └── app.tsx
+│   │   │   └── styles.css
+│   │   ├── github
+│   │   │   └── FUNDING.yml
+│   │   ├── package.json
+│   │   ├── tailwind.config.cjs
+│   │   ├── tsconfig.json
+│   │   └── vocs.config.tsx
+│   └── react-ui
+│       ├── README.md
+│       ├── build
+│       │   ├── asset-manifest.json
+│       │   ├── favicon.ico
+│       │   ├── index.html
+│       │   ├── logo192.png
+│       │   ├── logo512.png
+│       │   ├── manifest.json
+│       │   ├── robots.txt
+│       │   └── static
+│       │       ├── css
+│       │       │   ├── main.2eac7bbb.css
+│       │       │   └── main.2eac7bbb.css.map
+│       │       └── js
+│       │           ├── 900.8e7c2a0e.chunk.js
+│       │           ├── 900.8e7c2a0e.chunk.js.map
+│       │           ├── main.fa903228.js
+│       │           ├── main.fa903228.js.LICENSE.txt
+│       │           └── main.fa903228.js.map
+│       ├── package.json
+│       ├── public
+│       │   ├── favicon.ico
+│       │   ├── index.html
+│       │   ├── logo192.png
+│       │   ├── logo512.png
+│       │   ├── manifest.json
+│       │   └── robots.txt
+│       ├── src
+│       │   ├── App.css
+│       │   ├── App.tsx
+│       │   ├── index.css
+│       │   ├── index.tsx
+│       │   ├── logo.svg
+│       │   ├── react-app-env.d.ts
+│       │   ├── reportWebVitals.ts
+│       │   ├── setupTests.ts
+│       │   └── unisat-card.tsx
+│       └── tsconfig.json
+├── coverage
+│   ├── clover.xml
+│   ├── coverage-final.json
+│   ├── lcov-report
+│   │   ├── base.css
+│   │   ├── block-navigation.js
+│   │   ├── favicon.png
+│   │   ├── index.html
+│   │   ├── lasereyes
+│   │   │   ├── index.html
+│   │   │   └── index.ts.html
+│   │   ├── lasereyes-core
+│   │   │   ├── index.html
+│   │   │   ├── index.ts.html
+│   │   │   └── src
+│   │   │       ├── client
+│   │   │       │   ├── index.html
+│   │   │       │   ├── index.ts.html
+│   │   │       │   ├── providers
+│   │   │       │   │   ├── index.html
+│   │   │       │   │   ├── index.ts.html
+│   │   │       │   │   ├── wizz.ts.html
+│   │   │       │   │   └── xverse.ts.html
+│   │   │       │   └── utils.ts.html
+│   │   │       ├── constants
+│   │   │       │   ├── index.html
+│   │   │       │   ├── index.ts.html
+│   │   │       │   ├── networks.ts.html
+│   │   │       │   ├── settings.ts.html
+│   │   │       │   └── wallets.ts.html
+│   │   │       ├── index.html
+│   │   │       ├── index.ts.html
+│   │   │       ├── lib
+│   │   │       │   ├── index.html
+│   │   │       │   └── urls.ts.html
+│   │   │       └── vite-env.d.ts.html
+│   │   ├── lasereyes-react
+│   │   │   ├── index.html
+│   │   │   ├── lib
+│   │   │   │   └── providers
+│   │   │   │       ├── context.ts.html
+│   │   │   │       ├── hooks.ts.html
+│   │   │   │       └── index.html
+│   │   │   └── vite.config.ts.old.html
+│   │   ├── prettify.css
+│   │   ├── prettify.js
+│   │   ├── sort-arrow-sprite.png
+│   │   └── sorter.js
+│   └── lcov.info
+├── detailed_release_notes.md
+├── github
+│   ├── FUNDING.yml
+│   └── main
+│       └── content
+│           └── sponsors
+│               ├── blife.svg
+│               ├── ctrl.svg
+│               ├── l1f.svg
+│               ├── leather.svg
+│               ├── orangewallet.svg
+│               ├── ordinals-bot.svg
+│               ├── sats-ventures.svg
+│               └── utxo.svg
+├── lasereyes.png
+├── package.json
+├── packages
+│   ├── eslint-config
+│   │   ├── README.md
+│   │   ├── library.js
+│   │   ├── next.js
+│   │   ├── package.json
+│   │   └── react-internal.js
+│   ├── lasereyes
+│   │   ├── CHANGELOG.md
+│   │   ├── README.md
+│   │   ├── index.ts
+│   │   ├── lasereyes.png
+│   │   ├── package.json
+│   │   ├── tsconfig.json
+│   │   ├── vite.config.ts.old
+│   │   ├── vite.config.ts.old.timestamp-1728692186883-f366a0fd55908.mjs
+│   │   ├── vite.config.ts.old.timestamp-1728696648717-9171ac22dcbb5.mjs
+│   │   └── vite.config.ts.old.timestamp-1728696838105-31fdfbf786678.mjs
+│   ├── lasereyes-core
+│   │   ├── README.md
+│   │   ├── __tests__
+│   │   │   └── core.test.ts
+│   │   ├── index.html
+│   │   ├── index.ts
+│   │   ├── package.json
+│   │   ├── src
+│   │   │   ├── client
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── providers
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   ├── leather.ts
+│   │   │   │   │   ├── magic-eden.ts
+│   │   │   │   │   ├── okx.ts
+│   │   │   │   │   ├── op-net.ts
+│   │   │   │   │   ├── orange.ts
+│   │   │   │   │   ├── oyl.ts
+│   │   │   │   │   ├── phantom.ts
+│   │   │   │   │   ├── unisat.ts
+│   │   │   │   │   ├── wizz.ts
+│   │   │   │   │   └── xverse.ts
+│   │   │   │   ├── types.ts
+│   │   │   │   └── utils.ts
+│   │   │   ├── constants
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── networks.ts
+│   │   │   │   ├── settings.ts
+│   │   │   │   └── wallets.ts
+│   │   │   ├── index.ts
+│   │   │   ├── lib
+│   │   │   │   ├── helpers.ts
+│   │   │   │   └── urls.ts
+│   │   │   └── types
+│   │   │       └── index.ts
+│   │   ├── tsconfig.json
+│   │   ├── tsconfig.tsbuildinfo
+│   │   └── vite.config.ts.old
+│   ├── lasereyes-react
+│   │   ├── README.md
+│   │   ├── eslint.config.js
+│   │   ├── index.html
+│   │   ├── lib
+│   │   │   ├── icons
+│   │   │   │   ├── index.tsx
+│   │   │   │   ├── leather.tsx
+│   │   │   │   ├── magiceden.tsx
+│   │   │   │   ├── okx.tsx
+│   │   │   │   ├── op_net.tsx
+│   │   │   │   ├── orange.tsx
+│   │   │   │   ├── oyl.tsx
+│   │   │   │   ├── phantom.tsx
+│   │   │   │   ├── unisat.tsx
+│   │   │   │   ├── walletIcon.tsx
+│   │   │   │   ├── wizz.tsx
+│   │   │   │   └── xverse.tsx
+│   │   │   ├── index.ts
+│   │   │   └── providers
+│   │   │       ├── context.ts
+│   │   │       ├── hooks.ts
+│   │   │       ├── lasereyes-provider.tsx
+│   │   │       └── types.ts
+│   │   ├── package.json
+│   │   ├── tsconfig.app.json
+│   │   ├── tsconfig.app.tsbuildinfo
+│   │   ├── tsconfig.build.json
+│   │   ├── tsconfig.json
+│   │   ├── tsconfig.node.json
+│   │   ├── tsconfig.node.tsbuildinfo
+│   │   └── vite.config.ts.old
+│   └── typescript-config
+│       ├── base.json
+│       ├── nextjs.json
+│       ├── package.json
+│       └── react-library.json
+├── pnpm-lock.yaml
+├── pnpm-workspace.yaml
+├── prompts
+│   ├── ci-cd.md
+│   └── lasereyes.md
+├── releases
+├── scripts
+│   ├── generate_release_notes.py
+│   └── summarize_release_notes.py
+├── tree.txt
+├── turbo.json
+└── vitest.config.ts
+
+62 directories, 263 files

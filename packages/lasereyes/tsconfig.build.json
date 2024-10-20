@@ -8,8 +8,7 @@
 
     "declaration": true,
     "declarationMap": true,
-    "composite": true,
-    "outDir": "dist",
+    "composite": true,  // Add this line
 
     /* Bundler mode */
     "moduleResolution": "bundler",
@@ -24,10 +23,6 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "paths": {
-      "@": ["./lib"],
-      "@omnisat/lasereyes-core": ["../lasereyes-core/dist"]
-    }
   },
-  "include": ["lib"]
+  "include": ["index.ts"]
 }

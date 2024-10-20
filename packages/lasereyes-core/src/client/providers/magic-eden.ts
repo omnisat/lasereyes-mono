@@ -92,6 +92,20 @@ export default class MagicEdenProvider extends WalletProvider {
   }
 
   initialize(): void {
+    if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+      this.observer = new window.MutationObserver(() => {
+        const xverseLib = (window as any)?.magicEden.bitcoin
+        if (xverseLib) {
+          this.$store.setKey('hasProvider', {
+            ...this.$store.get().hasProvider,
+            [MAGIC_EDEN]: true,
+          })
+          this.observer?.disconnect()
+        }
+      })
+      this.observer.observe(document, { childList: true, subtree: true })
+    }
+
     listenKeys(this.$store, ['provider'], (newVal) => {
       if (newVal.provider !== MAGIC_EDEN) {
         if (this.removeSubscriber) {
@@ -111,18 +125,6 @@ export default class MagicEdenProvider extends WalletProvider {
         )
       }
     })
-
-    this.observer = new window.MutationObserver(() => {
-      const xverseLib = (window as any)?.magicEden.bitcoin
-      if (xverseLib) {
-        this.$store.setKey('hasProvider', {
-          ...this.$store.get().hasProvider,
-          [MAGIC_EDEN]: true,
-        })
-        this.observer?.disconnect()
-      }
-    })
-    this.observer.observe(document, { childList: true, subtree: true })
   }
 
   dispose() {
