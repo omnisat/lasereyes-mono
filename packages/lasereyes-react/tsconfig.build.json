@@ -27,5 +27,8 @@
       "@": ["./lib"]
     }
   },
-  "include": ["lib"]
+  "include": ["lib"],
+  "references": [
+    { "path": "../lasereyes-core" },
+  ]
 }
