@@ -242,11 +242,11 @@ importers:
   packages/lasereyes:
     dependencies:
       '@omnisat/lasereyes-core':
-        specifier: 0.0.17
-        version: 0.0.17(typescript@5.6.3)
+        specifier: 0.0.18
+        version: 0.0.18(typescript@5.6.3)
       '@omnisat/lasereyes-react':
-        specifier: 0.0.13
-        version: 0.0.13(@popperjs/core@2.11.8)(typescript@5.6.3)(vite@5.4.9)
+        specifier: 0.0.14
+        version: 0.0.14(@popperjs/core@2.11.8)(typescript@5.6.3)(vite@5.4.9)
     devDependencies:
       '@vitejs/plugin-react-swc':
         specifier: ^3.5.0
@@ -4020,8 +4020,8 @@ packages:
     engines: {node: '>=12.4.0'}
     dev: true
 
-  /@omnisat/lasereyes-core@0.0.17(typescript@5.6.3):
-    resolution: {integrity: sha512-raS1FCRX/KUXOnSm0SIXjHLbPLsjPXY1HmcSXc0mWdV9wCWiIHNdT4O1gwRQkTiuTR/LNasnysy8Xwu2fBIyCA==}
+  /@omnisat/lasereyes-core@0.0.18(typescript@5.6.3):
+    resolution: {integrity: sha512-uzAvRefNfZLgFkYIpvHWdhLFIKlhfshi0AWiB+3qKx8NgVRdim4+FvjcBcWKST4IGHMAU8UEeyRAxAZW2JYlbw==}
     dependencies:
       '@bitcoinerlab/secp256k1': 1.1.1
       '@nanostores/persistent': 0.10.2(nanostores@0.11.3)
@@ -4036,11 +4036,11 @@ packages:
       - typescript
     dev: false
 
-  /@omnisat/lasereyes-react@0.0.13(@popperjs/core@2.11.8)(typescript@5.6.3)(vite@5.4.9):
-    resolution: {integrity: sha512-n+VUofDX1HYsWyDbLVrFrc07WsF9hH9f94lIRnYQgCdJ7cgZJMhLEMJ9V7hZTjcFGEZMXsIhdvZLQz6xac6bbQ==}
+  /@omnisat/lasereyes-react@0.0.14(@popperjs/core@2.11.8)(typescript@5.6.3)(vite@5.4.9):
+    resolution: {integrity: sha512-ZoaMWr/6np4T+tR+mwNq0iSRm3PaiApsvcDacUioupE7CnZWZFi/6RGy9e1V4ugiFn3g7kWWRJ0ZLaX+qBjpbQ==}
     dependencies:
       '@nanostores/react': 0.7.3(nanostores@0.11.3)(react@18.3.1)
-      '@omnisat/lasereyes-core': 0.0.17(typescript@5.6.3)
+      '@omnisat/lasereyes-core': 0.0.18(typescript@5.6.3)
       bootstrap: 5.3.3(@popperjs/core@2.11.8)
       nanostores: 0.11.3
       react: 18.3.1
