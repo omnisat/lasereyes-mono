@@ -14,6 +14,7 @@
         ".next/**",
         "build/**",
         "docs/dist/**",
+        "dist/**",
         "!.next/cache/**"
       ]
     },
