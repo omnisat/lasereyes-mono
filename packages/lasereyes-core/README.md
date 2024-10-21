@@ -1,4 +1,4 @@
-# lasereyes-core 
+# lasereyes-core
 
 `@omnisat/lasereyes-core` is the framework-agnostic core library of the lasereyes suite, designed to provide the core logic for Bitcoin wallet integration into dApps. It abstracts wallet-specific interactions and offers a unified interface, enabling developers to interact with various Bitcoin wallets seamlessly.
 
@@ -7,6 +7,7 @@ This package is not tied to any specific framework and can be used in any TypeSc
 ## Key Concepts
 
 ### Client
+
 The `Client` in `@omnisat/lasereyes-core` manages wallet connections, facilitates communication with different Bitcoin wallets, and handles user authentication and transactions. It serves as the entry point for initializing and interacting with wallet providers.
 
 Example of initializing the LaserEyesClient on a web page:
@@ -15,30 +16,25 @@ We'll create a LaserEyesClient instance and connect it to the XVERSE wallet when
 
 ```typescript
 // src/index.ts
-import {
-    LaserEyesClient,
-    createStores,
-    XVERSE,
-} from "@omnisat/lasereyes-core";
+import { LaserEyesClient, createStores, XVERSE } from '@omnisat/lasereyes-core'
 
+const client = new LaserEyesClient(createStores())
 
-const client = new LaserEyesClient(
-    createStores(),
-);
+const button = document.getElementById('click-me')
 
-const button = document.getElementById("click-me");
-
-button?.addEventListener("click", () => {
-    client.connect(XVERSE).then(() => {
-        console.log("Wallet address:");
-    });
-});
+button?.addEventListener('click', () => {
+  client.connect(XVERSE).then(() => {
+    console.log('Wallet address:')
+  })
+})
 ```
 
 ### Provider
+
 Each wallet supported by `@omnisat/lasereyes-core` is implemented through a `WalletProvider` class. The `WalletProvider` is responsible for interacting with the underlying wallet's API, such as sending transactions, signing messages, and querying balances.
 
 Providers are modular, making it easy to add support for additional wallets. Current supported wallets include:
+
 - **Leather**
 - **Magic Eden**
 - **OKX**
@@ -56,22 +52,27 @@ To install `@omnisat/lasereyes-core`, choose one of the following package manage
 ```bash
 npm install @omnisat/lasereyes-core
 ```
+
 ```bash
 yarn add @omnisat/lasereyes-core
 ```
+
 ```bash
 pnpm install @omnisat/lasereyes-core
 ```
+
 ```bash
 bun install @omnisat/lasereyes-core
 ```
 
 ## Features
+
 - **Unified Wallet Interface**: Interact with multiple Bitcoin wallets through a single interface.
 - **Modular Providers**: Easily extend the library by adding new wallet providers.
 - **Network Support**: Supports multiple Bitcoin networks such as **mainnet**, **testnet3**, **testnet4**, **fractal**, **fractal testnet**, **signet**.
 
 ## Docs
+
 ### LaserEyesClient
 
 The `LaserEyesClient` class is a core component for managing interactions with multiple Bitcoin wallet providers in a unified way. It utilizes the `nanostores` library for reactive state management and supports various wallet providers such as Leather, Unisat, and XVerse, among others.
@@ -93,14 +94,15 @@ constructor(
 ```
 
 - **Parameters:**
-    - `stores`: An object containing the following:
-        - `$store`: A `MapStore<LaserEyesStoreType>` that stores the application state.
-        - `$network`: A `WritableAtom<NetworkType>` that tracks the current network type.
-    - `config`: An optional `Config` object for initial configuration, such as the network setting.
+
+  - `stores`: An object containing the following:
+    - `$store`: A `MapStore<LaserEyesStoreType>` that stores the application state.
+    - `$network`: A `WritableAtom<NetworkType>` that tracks the current network type.
+  - `config`: An optional `Config` object for initial configuration, such as the network setting.
 
 - **Initialization:**
-    - The constructor initializes the wallet provider map and subscribes to network and initialization-related changes.
-    - It triggers a check for default wallet setup and network configuration if provided in the `config`.
+  - The constructor initializes the wallet provider map and subscribes to network and initialization-related changes.
+  - It triggers a check for default wallet setup and network configuration if provided in the `config`.
 
 ---
 
@@ -123,7 +125,8 @@ async connect(defaultWallet: ProviderType): Promise<void>
 ```
 
 - **Parameters:**
-    - `defaultWallet`: The wallet provider to connect to.
+
+  - `defaultWallet`: The wallet provider to connect to.
 
 - **Error Handling:** Throws an error if the wallet provider is unsupported or the connection fails.
 
@@ -154,7 +157,7 @@ switchNetwork(network: NetworkType): void
 ```
 
 - **Parameters:**
-    - `network`: The new network to switch to.
+  - `network`: The new network to switch to.
 
 ### `sendBTC(to: string, amount: number)`
 
@@ -165,8 +168,9 @@ async sendBTC(to: string, amount: number): Promise<string>
 ```
 
 - **Parameters:**
-    - `to`: The recipient's Bitcoin address.
-    - `amount`: The amount of Bitcoin to send (in satoshis).
+
+  - `to`: The recipient's Bitcoin address.
+  - `amount`: The amount of Bitcoin to send (in satoshis).
 
 - **Error Handling:** Throws errors if no wallet is connected or the provider does not support the operation.
 
@@ -179,8 +183,8 @@ async signMessage(message: string, toSignAddress?: string): Promise<string>
 ```
 
 - **Parameters:**
-    - `message`: The message to sign.
-    - `toSignAddress`: Optional. The address to sign the message with.
+  - `message`: The message to sign.
+  - `toSignAddress`: Optional. The address to sign the message with.
 
 ### `signPsbt(tx: string, finalize = false, broadcast = false)`
 
@@ -191,9 +195,9 @@ async signPsbt(tx: string, finalize?: boolean, broadcast?: boolean): Promise<str
 ```
 
 - **Parameters:**
-    - `tx`: The PSBT in base64 or hex format.
-    - `finalize`: Whether to finalize the PSBT.
-    - `broadcast`: Whether to broadcast the PSBT after signing.
+  - `tx`: The PSBT in base64 or hex format.
+  - `finalize`: Whether to finalize the PSBT.
+  - `broadcast`: Whether to broadcast the PSBT after signing.
 
 ### `pushPsbt(tx: string)`
 
@@ -204,7 +208,7 @@ async pushPsbt(tx: string): Promise<void>
 ```
 
 - **Parameters:**
-    - `tx`: The PSBT in base64 or hex format.
+  - `tx`: The PSBT in base64 or hex format.
 
 ### `getPublicKey()`
 
@@ -264,16 +268,9 @@ The `$providerMap` is a record of supported wallet providers that includes insta
 ## Example Usage
 
 ```ts
-import {
-  LaserEyesClient,
-  createStores,
-  XVERSE,
-} from "@omnisat/lasereyes-core";
+import { LaserEyesClient, createStores, XVERSE } from '@omnisat/lasereyes-core'
 
-
-const client = new LaserEyesClient(
-        createStores(),
-);
+const client = new LaserEyesClient(createStores())
 
 // Connect to Unisat wallet
 await client.connect(XVERSE)
@@ -290,7 +287,9 @@ const signature = await client.signMessage('Hello, Laser Eyes!')
 This documentation provides an overview of the `LaserEyesClient` class, its constructor, and the main methods it offers for interacting with various Bitcoin wallet providers.
 
 ## Contributing
+
 If you'd like to contribute to `@omnisat/lasereyes-core`, feel free to submit pull requests or open issues on the GitHub repository.
 
 ## License
-`@omnisat/lasereyes-core` is MIT licensed.
+
+`@omnisat/lasereyes-core` is MIT licensed
