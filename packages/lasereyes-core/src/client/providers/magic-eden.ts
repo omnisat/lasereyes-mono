@@ -94,8 +94,8 @@ export default class MagicEdenProvider extends WalletProvider {
   initialize(): void {
     if (typeof window !== 'undefined' && typeof document !== 'undefined') {
       this.observer = new window.MutationObserver(() => {
-        const xverseLib = (window as any)?.magicEden?.bitcoin
-        if (xverseLib) {
+        const magicEdenLib = (window as any)?.magicEden?.bitcoin
+        if (magicEdenLib) {
           this.$store.setKey('hasProvider', {
             ...this.$store.get().hasProvider,
             [MAGIC_EDEN]: true,
@@ -239,7 +239,10 @@ export default class MagicEdenProvider extends WalletProvider {
         // @ts-ignore
         sendResponse = response
       },
-      onCancel: () => alert('Canceled'),
+      onCancel: () => {
+        console.error('Request canceled')
+        throw new Error('User canceled the request')
+      },
     } as SendBtcTransactionOptions)
     // @ts-ignore
     if (!sendResponse) throw new Error('Error sending BTC')
@@ -269,7 +272,8 @@ export default class MagicEdenProvider extends WalletProvider {
           signedMessage = response
         },
         onCancel: () => {
-          alert('Request canceled')
+          console.error('Request canceled')
+          throw new Error('User canceled the request')
         },
       })
 

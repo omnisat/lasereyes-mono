@@ -11,6 +11,7 @@ import dynamic from 'next/dynamic'
 
 import App from '@/components/App'
 import { useState } from 'react'
+import { UtxoProvider } from '@/hooks/useUtxos'
 
 const DynamicLasereyesProvider = dynamic(
   () => import('@omnisat/lasereyes').then((mod) => mod.LaserEyesProvider),
@@ -28,7 +29,9 @@ export default function Home() {
   >(MAINNET)
   return (
     <DynamicLasereyesProvider config={{ network }}>
-      <App setNetwork={setNetwork} />
+      <UtxoProvider>
+        <App setNetwork={setNetwork} />
+      </UtxoProvider>
     </DynamicLasereyesProvider>
   )
 }
