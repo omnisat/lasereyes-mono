@@ -46,7 +46,7 @@ type PersistedKey = (typeof keysToPersist)[number]
 const MAGIC_EDEN_WALLET_PERSISTENCE_KEY = 'MAGIC_EDEN_CONNECTED_WALLET_STATE'
 export default class MagicEdenProvider extends WalletProvider {
   public get library(): any | undefined {
-    return (window as any).magicEden.bitcoin
+    return (window as any)?.magicEden?.bitcoin
   }
 
   public get network(): NetworkType {
@@ -94,7 +94,7 @@ export default class MagicEdenProvider extends WalletProvider {
   initialize(): void {
     if (typeof window !== 'undefined' && typeof document !== 'undefined') {
       this.observer = new window.MutationObserver(() => {
-        const xverseLib = (window as any)?.magicEden.bitcoin
+        const xverseLib = (window as any)?.magicEden?.bitcoin
         if (xverseLib) {
           this.$store.setKey('hasProvider', {
             ...this.$store.get().hasProvider,
