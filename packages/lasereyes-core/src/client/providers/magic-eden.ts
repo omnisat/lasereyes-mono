@@ -26,12 +26,11 @@ import {
   findPaymentAddress,
   getBTCBalance,
   getBitcoinNetwork,
+  broadcastTx,
 } from '../../lib/helpers'
 import { MapStore, listenKeys } from 'nanostores'
 import { persistentMap } from '@nanostores/persistent'
 import { fromOutputScript } from 'bitcoinjs-lib/src/address'
-import axios from 'axios'
-import { getMempoolSpaceUrl } from '../../lib/urls'
 
 const keysToPersist = [
   'address',
@@ -397,9 +396,7 @@ export default class MagicEdenProvider extends WalletProvider {
     }
   }
   async pushPsbt(_tx: string): Promise<string | undefined> {
-    return await axios
-      .post(`${getMempoolSpaceUrl(this.network)}/api/tx`, _tx)
-      .then((res) => res.data)
+    return await broadcastTx(_tx, this.network)
   }
 
   async inscribe(

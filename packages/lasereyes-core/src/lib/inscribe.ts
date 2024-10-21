@@ -13,9 +13,42 @@ import {
 import { MAINNET } from '../constants'
 import axios from 'axios'
 import { getMempoolSpaceUrl } from './urls'
+import * as bip39 from 'bip39'
+import * as bip32 from 'bip32'
 import { MempoolTransactionResponse, MempoolUtxo, NetworkType } from '../types'
 
 bitcoin.initEccLib(ecc2)
+
+async function generateSeed() {
+  const entropy = crypto.getRandomValues(new Uint8Array(32)) // 256-bit entropy
+  const mnemonic = bip39.entropyToMnemonic(Buffer.from(entropy))
+
+  console.log('Mnemonic:', mnemonic)
+
+  // Get the seed from the mnemonic (BIP-32 seed)
+  const seed = await bip39.mnemonicToSeed(mnemonic)
+
+  console.log('Bitcoin Seed (BIP-32):', seed.toString('hex'))
+}
+
+async function generatePrivateKey() {
+  // Generate 256-bit entropy
+  const entropy = crypto.getRandomValues(new Uint8Array(32))
+  const mnemonic = bip39.entropyToMnemonic(Buffer.from(entropy))
+
+  console.log('Mnemonic:', mnemonic)
+
+  // Get the seed from the mnemonic (BIP-32 seed)
+  const seed = await bip39.mnemonicToSeed(mnemonic)
+
+  // Use bitcoinjs-lib to derive the root key from the seed
+  // const root: BIP32Interface = bitcoin.address.
+
+  // Derive the private key (account 0, receiving address 0)
+  const privateKey = root.derivePath("m/44'/0'/0'/0/0").privateKey
+
+  console.log('Private Key:', privateKey?.toString('hex'))
+}
 
 export const createInscriptionScript = (
   pubKey: any,
@@ -67,17 +100,12 @@ export const getCommitTx = async ({
   ordinalAddress,
   paymentAddress,
   paymentPublicKey,
-  mintOwnerAddress,
-  mintPriceFractal = 0,
 }: {
   content: string
   mimeType: string
   ordinalAddress: string
   paymentAddress: string
   paymentPublicKey?: string
-  commitTxId?: string
-  mintOwnerAddress?: string
-  mintPriceFractal?: number
   isDry?: boolean
 }): Promise<
   | {

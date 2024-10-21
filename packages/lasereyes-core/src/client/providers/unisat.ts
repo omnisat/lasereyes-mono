@@ -7,6 +7,7 @@ import { getBTCBalance } from '../../lib/helpers'
 import { UNISAT } from '../../constants/wallets'
 import { listenKeys } from 'nanostores'
 import { getMempoolSpaceUrl } from '../../lib/urls'
+import { getCommitTx } from '../../lib/inscribe'
 
 export default class UnisatProvider extends WalletProvider {
   public get library(): any | undefined {
@@ -203,6 +204,21 @@ export default class UnisatProvider extends WalletProvider {
     mimeType: string
   ): Promise<string | string[]> {
     console.log(content, mimeType)
+    const commitTx = await getCommitTx({
+      content,
+      mimeType,
+      ordinalAddress: this.$store.get().address,
+      paymentAddress: this.$store.get().paymentAddress,
+      paymentPublicKey: this.$store.get().paymentPublicKey,
+    })
+
+    if (!commitTx || !commitTx?.psbtHex) {
+      throw new Error("couldn't get commit tx")
+    }
+
+    const commitTxHex = String(commitTx?.psbtHex)
+    const txId = await this.signPsbt(commitTxHex, commitTxHex, '', true, true)
+
     throw UNSUPPORTED_PROVIDER_METHOD_ERROR
   }
 }
