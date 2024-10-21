@@ -11,7 +11,6 @@
   },
   "dependencies": {
     "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
-    "@omnisat/lasereyes": "workspace:*",
     "react": "latest",
     "react-dom": "latest",
     "vocs": "^1.0.0-alpha.52"

@@ -243,7 +243,7 @@ importers:
     dependencies:
       '@omnisat/lasereyes-core':
         specifier: 0.0.22
-        version: link:../lasereyes-core
+        version: 0.0.22(typescript@5.6.3)
       '@omnisat/lasereyes-react':
         specifier: 0.0.17-rc.0
         version: link:../lasereyes-react
@@ -4019,6 +4019,22 @@ packages:
     resolution: {integrity: sha512-nn5ozdjYQpUCZlWGuxcJY/KpxkWQs4DcbMCmKojjyrYDEAGy4Ce19NN4v5MduafTwJlbKc99UA8YhSVqq9yPZA==}
     engines: {node: '>=12.4.0'}
     dev: true
+
+  /@omnisat/lasereyes-core@0.0.22(typescript@5.6.3):
+    resolution: {integrity: sha512-CpSWqI2vlre7WIHfTVDDTeDbOF9eKh8z0C6rMk/TtEBtRHUDzIuE0U5El2yeHkyTuENw+6TW58mnXuP1t58ZCg==}
+    dependencies:
+      '@bitcoinerlab/secp256k1': 1.1.1
+      '@nanostores/persistent': 0.10.2(nanostores@0.11.3)
+      '@orangecrypto/orange-connect': 1.2.2
+      axios: 1.7.7
+      bitcoinjs-lib: 7.0.0-rc.0(typescript@5.6.3)
+      buffer: 6.0.3
+      nanostores: 0.11.3
+      sats-connect: 2.8.3(typescript@5.6.3)
+    transitivePeerDependencies:
+      - debug
+      - typescript
+    dev: false
 
   /@orangecrypto/orange-connect@1.2.2:
     resolution: {integrity: sha512-cv1TP+pan+Zx5yKuQHQsTIhABi2YlyTUZbzJgLbIB7fT1cA4plZiIS9GEJN7eD7wc60Fr/yumMV3zTIL5eSZ8w==}

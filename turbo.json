@@ -13,6 +13,7 @@
       "outputs": [
         ".next/**",
         "build/**",
+        "docs/**",
         "docs/dist/**",
         "dist/**",
         "!.next/cache/**"
