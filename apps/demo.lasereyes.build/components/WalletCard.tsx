@@ -32,13 +32,13 @@ import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 import { useEffect, useRef, useState } from 'react'
 import { createPsbt } from '@/lib/btc'
-import useUtxos from '@/hooks/useUtxos'
 import { getMempoolSpaceUrl } from '@/lib/urls'
 import { clsx } from 'clsx'
 import axios from 'axios'
 import Link from 'next/link'
 import { ImNewTab } from 'react-icons/im'
 import { cn } from '@/lib/utils'
+import { useUtxos } from '@/hooks/useUtxos'
 
 const WalletCard = ({
   walletName,
@@ -106,16 +106,6 @@ const WalletCard = ({
   const [broadcast, setBroadcast] = useState<boolean>(false)
   const [unsigned, setUnsigned] = useState<string | undefined>()
   const [signed, setSigned] = useState<string | undefined>()
-  const { utxos, loading, fetch } = useUtxos(
-    paymentAddress,
-    network as
-      | typeof MAINNET
-      | typeof TESTNET
-      | typeof TESTNET4
-      | typeof SIGNET
-      | typeof FRACTAL_MAINNET
-      | typeof FRACTAL_TESTNET
-  )
 
   const hasWallet = {
     unisat: hasUnisat,
@@ -129,6 +119,11 @@ const WalletCard = ({
     wizz: hasWizz,
     orange: hasOrange,
   }
+
+  const isConnected = provider === walletName
+  const isMissingWallet = !hasWallet[walletName]
+
+  const { utxos } = useUtxos()
 
   useEffect(() => {
     if (utxos.length > 0 && connected && !hasRun.current && !hasError) {
@@ -363,9 +358,6 @@ const WalletCard = ({
       }
     }
   }
-
-  const isConnected = provider === walletName
-  const isMissingWallet = !hasWallet[walletName]
 
   return (
     <Card

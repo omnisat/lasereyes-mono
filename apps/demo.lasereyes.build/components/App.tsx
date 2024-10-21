@@ -131,7 +131,7 @@ const App = ({
           }
           alt={address ? 'Laser Eyes Connected' : 'Laser Eyes Disconnected'}
           width={300}
-          height={300}
+          height={47}
         />
         <Link
           className={cn(

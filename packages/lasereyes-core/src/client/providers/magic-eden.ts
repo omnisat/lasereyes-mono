@@ -94,8 +94,8 @@ export default class MagicEdenProvider extends WalletProvider {
   initialize(): void {
     if (typeof window !== 'undefined' && typeof document !== 'undefined') {
       this.observer = new window.MutationObserver(() => {
-        const xverseLib = (window as any)?.magicEden?.bitcoin
-        if (xverseLib) {
+        const magicEdenLib = (window as any)?.magicEden?.bitcoin
+        if (magicEdenLib) {
           this.$store.setKey('hasProvider', {
             ...this.$store.get().hasProvider,
             [MAGIC_EDEN]: true,
