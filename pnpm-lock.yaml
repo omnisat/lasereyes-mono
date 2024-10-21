@@ -242,8 +242,8 @@ importers:
   packages/lasereyes:
     dependencies:
       '@omnisat/lasereyes-core':
-        specifier: 0.0.21
-        version: 0.0.21(typescript@5.6.3)
+        specifier: 0.0.22
+        version: 0.0.22(typescript@5.6.3)
       '@omnisat/lasereyes-react':
         specifier: 0.0.17-rc.0
         version: link:../lasereyes-react
@@ -4020,8 +4020,8 @@ packages:
     engines: {node: '>=12.4.0'}
     dev: true
 
-  /@omnisat/lasereyes-core@0.0.21(typescript@5.6.3):
-    resolution: {integrity: sha512-LiQ22L3bAuxGfzX4gd+rRtocIIKf5B78V6iUxa273vuhELL6NFsKAnPs9ASooOXV9dvZBhZcdM2elZYH253/6Q==}
+  /@omnisat/lasereyes-core@0.0.22(typescript@5.6.3):
+    resolution: {integrity: sha512-CpSWqI2vlre7WIHfTVDDTeDbOF9eKh8z0C6rMk/TtEBtRHUDzIuE0U5El2yeHkyTuENw+6TW58mnXuP1t58ZCg==}
     dependencies:
       '@bitcoinerlab/secp256k1': 1.1.1
       '@nanostores/persistent': 0.10.2(nanostores@0.11.3)
