@@ -28,7 +28,7 @@ type UtxoContextType = {
 const UtxoContext = createContext<UtxoContextType | undefined>(undefined)
 
 export const UtxoProvider: React.FC<{
-  network?: NetworkType
+  network: NetworkType
   children: React.ReactNode
 }> = ({ children, network }) => {
   const { address } = useLaserEyes()
