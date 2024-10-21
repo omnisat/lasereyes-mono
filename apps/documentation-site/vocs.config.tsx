@@ -21,6 +21,7 @@ export default defineConfig({
   ),
   title: 'Laser Eyes',
   description: 'Web Hooks For Bitcoin Ordinals',
+  rootDir: './docs',
   sidebar: [
     {
       text: 'Getting Started',

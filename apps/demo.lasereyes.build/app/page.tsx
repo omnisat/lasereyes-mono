@@ -29,7 +29,7 @@ export default function Home() {
   >(MAINNET)
   return (
     <DynamicLasereyesProvider config={{ network }}>
-      <UtxoProvider>
+      <UtxoProvider network={network}>
         <App setNetwork={setNetwork} />
       </UtxoProvider>
     </DynamicLasereyesProvider>
