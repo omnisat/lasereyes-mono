@@ -61,6 +61,7 @@ export class LaserEyesClient {
       [WIZZ]: new WizzProvider(stores, this, config),
     }
     this.$network.subscribe(this.watchNetworkChange.bind(this))
+
     subscribeKeys(this.$store, ['isInitializing'], (v) =>
       this.handleIsInitializingChanged(v.isInitializing)
     )
