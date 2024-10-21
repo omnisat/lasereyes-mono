@@ -153,9 +153,6 @@ importers:
       '@esbuild-plugins/node-globals-polyfill':
         specifier: ^0.2.3
         version: 0.2.3(esbuild@0.24.0)
-      '@omnisat/lasereyes':
-        specifier: workspace:*
-        version: link:../../packages/lasereyes
       react:
         specifier: latest
         version: 18.3.1
