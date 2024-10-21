@@ -20,7 +20,7 @@ import { fromOutputScript } from 'bitcoinjs-lib/src/address'
 
 export default class PhantomProvider extends WalletProvider {
   public get library(): any | undefined {
-    return (window as any).phantom.bitcoin
+    return (window as any)?.phantom?.bitcoin
   }
 
   public get network(): NetworkType {

@@ -40,7 +40,7 @@ type PersistedKey = (typeof keysToPersist)[number]
 const XVERSE_WALLET_PERSISTENCE_KEY = 'XVERSE_CONNECTED_WALLET_STATE'
 export default class XVerseProvider extends WalletProvider {
   public get library(): any | undefined {
-    return (window as any).BitcoinProvider
+    return (window as any)?.BitcoinProvider
   }
 
   public get network(): NetworkType {
