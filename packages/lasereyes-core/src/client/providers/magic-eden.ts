@@ -239,7 +239,10 @@ export default class MagicEdenProvider extends WalletProvider {
         // @ts-ignore
         sendResponse = response
       },
-      onCancel: () => alert('Canceled'),
+      onCancel: () => {
+        console.error('Request canceled')
+        throw new Error('User canceled the request')
+      },
     } as SendBtcTransactionOptions)
     // @ts-ignore
     if (!sendResponse) throw new Error('Error sending BTC')
@@ -269,7 +272,8 @@ export default class MagicEdenProvider extends WalletProvider {
           signedMessage = response
         },
         onCancel: () => {
-          alert('Request canceled')
+          console.error('Request canceled')
+          throw new Error('User canceled the request')
         },
       })
 

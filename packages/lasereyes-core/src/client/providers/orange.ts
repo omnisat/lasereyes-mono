@@ -267,7 +267,9 @@ export default class OrangeProvider extends WalletProvider {
       onFinish: (response: string) => {
         signature = response
       },
-      onCancel: () => alert('Signature request canceled'),
+      onCancel: () => {
+        throw new Error('User canceled the request')
+      },
     }
 
     await signMessageOrange(signMessageOptions)
@@ -341,6 +343,7 @@ export default class OrangeProvider extends WalletProvider {
           type: getOrangeNetwork(this.network),
         },
         psbtBase64: toSignPsbt.toBase64(),
+        message: toSignPsbt.toBase64(),
         broadcast: broadcast,
         inputsToSign: inputsToSign,
       },
@@ -360,7 +363,10 @@ export default class OrangeProvider extends WalletProvider {
           signedPsbtBase64 = signedPsbt.toBase64()
         }
       },
-      onCancel: () => console.log('Canceled'),
+      onCancel: () => {
+        console.error('Request canceled')
+        throw new Error('User canceled the request')
+      },
     } as OrangeSignTransactionOptions
 
     await signPsbtOrange(signPsbtOptions)

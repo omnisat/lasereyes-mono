@@ -335,7 +335,10 @@ export default class XVerseProvider extends WalletProvider {
           signedPsbtBase64 = signedPsbt.toBase64()
         }
       },
-      onCancel: () => console.log('Canceled'),
+      onCancel: () => {
+        console.error('Request canceled')
+        throw new Error('User canceled the request')
+      },
     }
 
     // @ts-ignore
