@@ -1,4 +1,4 @@
-![lasereyes_logo](./lasereyes.png)
+![lasereyes_logo](./.github/assets/lasereyes.png)
 
 # LaserEyes
 
@@ -47,28 +47,28 @@ If you find Laser Eyes useful or use it for work, please consider [sponsoring La
 <p style="display: flex; justify-content: center; align-items: center; gap: 60px; flex-wrap: wrap;">
   <a href="https://www.utxo.management/">
     <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="./github/main/content/sponsors/utxo.svg">
-      <img alt="UTXO Management" src="./github/main/content/sponsors/utxo.svg" width="auto" height="100">
+      <source media="(prefers-color-scheme: dark)" srcset="./.github/assets/utxo.svg">
+      <img alt="UTXO Management" src="./.github/assets/utxo.svg" width="auto" height="100">
     </picture>
   </a>
   <a href="https://ordinalsbot.com/">
     <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="./github/main/content/sponsors/ordinals-bot.svg">
-      <img alt="Ordinals Bot" src="./github/main/content/sponsors/ordinals-bot.svg" width="auto" height="60">
+      <source media="(prefers-color-scheme: dark)" srcset="./.github/assets/ordinals-bot.svg">
+      <img alt="Ordinals Bot" src="./.github/assets/ordinals-bot.svg" width="auto" height="60">
     </picture>
   </a>
 </p>
 <p style="display: flex; justify-content: center; align-items: center; gap: 60px; flex-wrap: wrap;">
   <a href="https://l1f.io/">
     <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="./github/main/content/sponsors/l1f.svg">
-      <img alt="L1F" src="./github/main/content/sponsors/l1f.svg" width="auto" height="60">
+      <source media="(prefers-color-scheme: dark)" srcset="./.github/assets/l1f.svg">
+      <img alt="L1F" src="./.github/assets/l1f.svg" width="auto" height="60">
     </picture>
   </a>
   <a href="https://x.com/BLIFEProtocol">
     <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="./github/main/content/sponsors/blife.svg">
-      <img alt="L1F" src="./github/main/content/sponsors/blife.svg" width="auto" height="120">
+      <source media="(prefers-color-scheme: dark)" srcset="./.github/assets/blife.svg">
+      <img alt="L1F" src="./.github/assets/blife.svg" width="auto" height="120">
     </picture>
   </a>
 </p>
@@ -77,26 +77,26 @@ If you find Laser Eyes useful or use it for work, please consider [sponsoring La
 <p style="display: flex; justify-content: center; align-items: center; gap: 40px; flex-wrap: wrap;">
   <a href="https://www.seizectrl.io/">
     <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="./github/main/content/sponsors/ctrl.svg">
-      <img alt="Seize CTRL" src="./github/main/content/sponsors/ctrl.svg" width="auto" height="50">
+      <source media="(prefers-color-scheme: dark)" srcset="./.github/assets/ctrl.svg">
+      <img alt="Seize CTRL" src="./.github/assets/ctrl.svg" width="auto" height="50">
     </picture>
   </a>
-    <a href="https://satsventures.com/">
+  <a href="https://satsventures.com/">
     <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="./github/main/content/sponsors/sats-ventures.svg">
-      <img alt="Seize CTRL" src="./github/main/content/sponsors/sats-ventures.svg" width="auto" height="50">
+      <source media="(prefers-color-scheme: dark)" srcset="./.github/assets/sats-ventures.svg">
+      <img alt="Seize CTRL" src="./.github/assets/sats-ventures.svg" width="auto" height="50">
     </picture>
   </a>
-    <a href="https://leather.io/">
+  <a href="https://leather.io/">
     <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="./github/main/content/sponsors/leather.svg">
-      <img alt="Leather" src="./github/main/content/sponsors/leather.svg" width="auto" height="50">
+      <source media="(prefers-color-scheme: dark)" srcset="./.github/assets/leather.svg">
+      <img alt="Leather" src="./.github/assets/leather.svg" width="auto" height="50">
     </picture>
   </a>
   <a href="https://www.orangecrypto.com/">
     <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="./github/main/content/sponsors/orangewallet.svg">
-      <img alt="Orange Wallet" src="./github/main/content/sponsors/orangewallet.svg" width="auto" height="50">
+      <source media="(prefers-color-scheme: dark)" srcset="./.github/assets/orangewallet.svg">
+      <img alt="Orange Wallet" src="./.github/assets/orangewallet.svg" width="auto" height="50">
     </picture>
   </a>
 </p>
