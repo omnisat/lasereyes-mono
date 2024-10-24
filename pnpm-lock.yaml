@@ -239,10 +239,10 @@ importers:
   packages/lasereyes:
     dependencies:
       '@omnisat/lasereyes-core':
-        specifier: workspace:*
+        specifier: 0.0.25-rc.3
         version: link:../lasereyes-core
       '@omnisat/lasereyes-react':
-        specifier: workspace:*
+        specifier: 0.0.17
         version: link:../lasereyes-react
     devDependencies:
       '@vitejs/plugin-react-swc':
