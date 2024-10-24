@@ -42,7 +42,7 @@ importers:
         specifier: ^1.1.1
         version: 1.1.1
       '@omnisat/lasereyes':
-        specifier: workspace:*
+        specifier: latest
         version: link:../../packages/lasereyes
       '@radix-ui/react-avatar':
         specifier: ^1.1.0
@@ -239,10 +239,10 @@ importers:
   packages/lasereyes:
     dependencies:
       '@omnisat/lasereyes-core':
-        specifier: 0.0.23
-        version: 0.0.23(typescript@5.6.3)
+        specifier: workspace:*
+        version: link:../lasereyes-core
       '@omnisat/lasereyes-react':
-        specifier: 0.0.17-rc.0
+        specifier: workspace:*
         version: link:../lasereyes-react
     devDependencies:
       '@vitejs/plugin-react-swc':
@@ -4016,22 +4016,6 @@ packages:
     resolution: {integrity: sha512-nn5ozdjYQpUCZlWGuxcJY/KpxkWQs4DcbMCmKojjyrYDEAGy4Ce19NN4v5MduafTwJlbKc99UA8YhSVqq9yPZA==}
     engines: {node: '>=12.4.0'}
     dev: true
-
-  /@omnisat/lasereyes-core@0.0.23(typescript@5.6.3):
-    resolution: {integrity: sha512-0IwKgBjTgYwdYX9TImwFhQYWgALw2FFF6hkaGCvh7v9QVdkvtUN4e26J6ZGtQYPrQriyOGDq7rCFrReIW9TyVw==}
-    dependencies:
-      '@bitcoinerlab/secp256k1': 1.1.1
-      '@nanostores/persistent': 0.10.2(nanostores@0.11.3)
-      '@orangecrypto/orange-connect': 1.2.2
-      axios: 1.7.7
-      bitcoinjs-lib: 7.0.0-rc.0(typescript@5.6.3)
-      buffer: 6.0.3
-      nanostores: 0.11.3
-      sats-connect: 2.8.3(typescript@5.6.3)
-    transitivePeerDependencies:
-      - debug
-      - typescript
-    dev: false
 
   /@orangecrypto/orange-connect@1.2.2:
     resolution: {integrity: sha512-cv1TP+pan+Zx5yKuQHQsTIhABi2YlyTUZbzJgLbIB7fT1cA4plZiIS9GEJN7eD7wc60Fr/yumMV3zTIL5eSZ8w==}
