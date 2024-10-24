@@ -10,7 +10,7 @@ import { getMempoolSpaceUrl } from '../../lib/urls'
 
 export default class OpNetProvider extends WalletProvider {
   public get library(): any | undefined {
-    return (window as any).opnet
+    return (window as any)?.opnet
   }
 
   public get network(): NetworkType {
@@ -50,6 +50,7 @@ export default class OpNetProvider extends WalletProvider {
   }
 
   removeListeners() {
+    if (!this.library) return
     this.library.removeListener(
       'accountsChanged',
       this.handleAccountsChanged.bind(this)
