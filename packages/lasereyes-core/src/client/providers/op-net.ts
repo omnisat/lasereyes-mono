@@ -50,6 +50,7 @@ export default class OpNetProvider extends WalletProvider {
   }
 
   removeListeners() {
+    if (!this.library) return
     this.library.removeListener(
       'accountsChanged',
       this.handleAccountsChanged.bind(this)

@@ -1,3 +1,4 @@
+'use client'
 import { ReactNode, useMemo } from 'react'
 import { LaserEyesContext } from './context'
 import {

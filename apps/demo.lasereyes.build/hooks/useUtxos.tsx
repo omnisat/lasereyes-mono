@@ -8,16 +8,7 @@ import React, {
 import useSWR from 'swr'
 import { IMempoolUtxo } from '@/types/btc'
 import { getMempoolSpaceUrl } from '@/lib/urls'
-import {
-  MAINNET,
-  TESTNET,
-  FRACTAL_MAINNET,
-  FRACTAL_TESTNET,
-  SIGNET,
-  TESTNET4,
-  useLaserEyes,
-  NetworkType,
-} from '@omnisat/lasereyes'
+import { useLaserEyes, NetworkType } from '@omnisat/lasereyes'
 
 type UtxoContextType = {
   utxos: IMempoolUtxo[]
