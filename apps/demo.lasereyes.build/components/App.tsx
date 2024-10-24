@@ -56,6 +56,7 @@ const App = ({
     MAGIC_EDEN,
     OKX,
     ORANGE,
+    OP_NET,
     OYL,
     PHANTOM,
     UNISAT,

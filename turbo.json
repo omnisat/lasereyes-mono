@@ -26,10 +26,7 @@
     },
     "dev": {
       "dependsOn": [
-        "^build",
-        "@omnisat/lasereyes-core#build",
-        "@omnisat/lasereyes-react#build",
-        "@omnisat/lasereyes#build"
+        "^build"
       ],
       "cache": false,
       "persistent": true
@@ -40,27 +37,6 @@
       ]
     },
     "packages/**": {
-      "outputs": [
-        "dist/**"
-      ]
-    },
-    "packages/lasereyes-core": {
-      "outputs": [
-        "dist/**"
-      ]
-    },
-    "packages/lasereyes-react": {
-      "dependsOn": [
-        "packages/lasereyes-core"
-      ],
-      "outputs": [
-        "dist/**"
-      ]
-    },
-    "packages/lasereyes": {
-      "dependsOn": [
-        "packages/lasereyes-react"
-      ],
       "outputs": [
         "dist/**"
       ]
