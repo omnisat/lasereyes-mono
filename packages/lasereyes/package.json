@@ -29,8 +29,8 @@
     "vite-plugin-dts": "^4.2.1"
   },
   "dependencies": {
-    "@omnisat/lasereyes-core": "0.0.25-rc.3",
-    "@omnisat/lasereyes-react": "0.0.17"
+    "@omnisat/lasereyes-core": "workspace:*",
+    "@omnisat/lasereyes-react": "workspace:*"
   },
   "publishConfig": {
     "access": "public"
