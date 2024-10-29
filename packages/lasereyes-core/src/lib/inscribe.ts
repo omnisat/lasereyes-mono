@@ -21,7 +21,7 @@ const bip32 = BIP32Factory(ecc2)
 
 bitcoin.initEccLib(ecc2)
 
-export const inscribeContent = async ({
+export const inscribe = async ({
   content,
   mimeType,
   ordinalAddress,
