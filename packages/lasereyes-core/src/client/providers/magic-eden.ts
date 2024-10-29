@@ -155,6 +155,8 @@ export default class MagicEdenProvider extends WalletProvider {
         onFinish: (response: any) => {
           const foundAddress = findOrdinalsAddress(response.addresses)
           const foundPaymentAddress = findPaymentAddress(response.addresses)
+          if (!foundAddress || !foundPaymentAddress)
+            throw new Error('No address found')
           if (foundAddress && foundPaymentAddress) {
             this.$store.setKey('provider', MAGIC_EDEN)
             this.$store.setKey('address', foundAddress.address)
@@ -169,7 +171,7 @@ export default class MagicEdenProvider extends WalletProvider {
             String(response.addresses[1].publicKey)
           )
 
-          getBTCBalance(foundPaymentAddress.address, this.network).then(
+          getBTCBalance(String(foundPaymentAddress.address), this.network).then(
             (totalBalance) => {
               this.$store.setKey('balance', totalBalance)
             }

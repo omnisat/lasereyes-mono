@@ -33,14 +33,16 @@ export const getBitcoinNetwork = (
 }
 
 export const findOrdinalsAddress = (
-  addresses: { purpose: string; address: string }[]
+  addresses: { purpose: string; address: string; publicKey: string }[]
 ) => {
   return addresses.find(
     ({ purpose }: { purpose: string }) => purpose === 'ordinals'
   )
 }
 
-export const findPaymentAddress = (addresses: any) => {
+export const findPaymentAddress = (
+  addresses: { purpose: string; address: string; publicKey: string }[]
+) => {
   return addresses.find(
     ({ purpose }: { purpose: string }) => purpose === 'payment'
   )

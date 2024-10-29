@@ -80,9 +80,9 @@ const App = ({
   const [signedPsbt, setSignedPsbt] = useState<
     | string
     | {
-        signedPsbtHex: string
-        signedPsbtBase64: string
-      }
+      signedPsbtHex: string
+      signedPsbtBase64: string
+    }
     | undefined
   >()
 
@@ -137,7 +137,8 @@ const App = ({
             badgeVariants({ variant: 'outline' }),
             'self-end mb-1.5 text-orange-500 border-orange-500 hover:border-white hover:bg-white hover:text-black transition-all text-md'
           )}
-          href={'https://github.com/omnisat/lasereyes'}
+          href={'https://github.com/omnisat/lasereyes-mono'}
+          target={'_blank'}
         >
           {pkgVersion ? `v ${pkgVersion}` : '--'}
         </Link>
@@ -442,16 +443,16 @@ const App = ({
             key={walletName}
             walletName={
               walletName as
-                | typeof UNISAT
-                | typeof XVERSE
-                | typeof OYL
-                | typeof MAGIC_EDEN
-                | typeof OKX
-                | typeof OP_NET
-                | typeof ORANGE
-                | typeof LEATHER
-                | typeof PHANTOM
-                | typeof WIZZ
+              | typeof UNISAT
+              | typeof XVERSE
+              | typeof OYL
+              | typeof MAGIC_EDEN
+              | typeof OKX
+              | typeof OP_NET
+              | typeof ORANGE
+              | typeof LEATHER
+              | typeof PHANTOM
+              | typeof WIZZ
             }
             setSignature={setSignature}
             unsignedPsbt={unsignedPsbt}

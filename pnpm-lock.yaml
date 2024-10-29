@@ -239,11 +239,11 @@ importers:
   packages/lasereyes:
     dependencies:
       '@omnisat/lasereyes-core':
-        specifier: 0.0.26
-        version: 0.0.26(typescript@5.6.3)
+        specifier: workspace:*
+        version: link:../lasereyes-core
       '@omnisat/lasereyes-react':
-        specifier: 0.0.19
-        version: 0.0.19(@popperjs/core@2.11.8)(typescript@5.6.3)(vite@5.4.9)
+        specifier: workspace:*
+        version: link:../lasereyes-react
     devDependencies:
       '@vitejs/plugin-react-swc':
         specifier: ^3.5.0
@@ -4016,40 +4016,6 @@ packages:
     resolution: {integrity: sha512-nn5ozdjYQpUCZlWGuxcJY/KpxkWQs4DcbMCmKojjyrYDEAGy4Ce19NN4v5MduafTwJlbKc99UA8YhSVqq9yPZA==}
     engines: {node: '>=12.4.0'}
     dev: true
-
-  /@omnisat/lasereyes-core@0.0.26(typescript@5.6.3):
-    resolution: {integrity: sha512-vDEKk/YD/tc1lk7f7Hjai3JOZ7iV4KMKOpUV1+rU/IrXO2gpWNeeElHmI7l3rPvOSXvzAQlBf3N9yUkIuTptNQ==}
-    dependencies:
-      '@bitcoinerlab/secp256k1': 1.1.1
-      '@nanostores/persistent': 0.10.2(nanostores@0.11.3)
-      '@orangecrypto/orange-connect': 1.2.2
-      axios: 1.7.7
-      bitcoinjs-lib: 7.0.0-rc.0(typescript@5.6.3)
-      buffer: 6.0.3
-      nanostores: 0.11.3
-      sats-connect: 2.8.3(typescript@5.6.3)
-    transitivePeerDependencies:
-      - debug
-      - typescript
-    dev: false
-
-  /@omnisat/lasereyes-react@0.0.19(@popperjs/core@2.11.8)(typescript@5.6.3)(vite@5.4.9):
-    resolution: {integrity: sha512-RzxH6lSw4KrnoWiZPsmvlNYwPt+nrRAoOK1y5GVJAE+UFZ4Tmna/xdodsXZ7OiAtC5fKhWRj/Ozw6hwDTHNu9A==}
-    dependencies:
-      '@nanostores/react': 0.7.3(nanostores@0.11.3)(react@18.3.1)
-      '@omnisat/lasereyes-core': 0.0.26(typescript@5.6.3)
-      bootstrap: 5.3.3(@popperjs/core@2.11.8)
-      nanostores: 0.11.3
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
-      vite-plugin-ssr: 0.4.142(vite@5.4.9)
-    transitivePeerDependencies:
-      - '@popperjs/core'
-      - debug
-      - react-streaming
-      - typescript
-      - vite
-    dev: false
 
   /@orangecrypto/orange-connect@1.2.2:
     resolution: {integrity: sha512-cv1TP+pan+Zx5yKuQHQsTIhABi2YlyTUZbzJgLbIB7fT1cA4plZiIS9GEJN7eD7wc60Fr/yumMV3zTIL5eSZ8w==}
