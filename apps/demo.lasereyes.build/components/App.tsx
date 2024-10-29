@@ -80,9 +80,9 @@ const App = ({
   const [signedPsbt, setSignedPsbt] = useState<
     | string
     | {
-      signedPsbtHex: string
-      signedPsbtBase64: string
-    }
+        signedPsbtHex: string
+        signedPsbtBase64: string
+      }
     | undefined
   >()
 
@@ -154,7 +154,7 @@ const App = ({
           docs
         </Link>
         <Link
-          href={'https://github.com/omnisat/lasereyes/tree/main/example'}
+          href={'https://github.com/omnisat/lasereyes-mono/tree/main/apps'}
           target={'_blank'}
           className={
             'self-end font-windows text-white hover:text-orange-500 transition-all'
@@ -443,16 +443,16 @@ const App = ({
             key={walletName}
             walletName={
               walletName as
-              | typeof UNISAT
-              | typeof XVERSE
-              | typeof OYL
-              | typeof MAGIC_EDEN
-              | typeof OKX
-              | typeof OP_NET
-              | typeof ORANGE
-              | typeof LEATHER
-              | typeof PHANTOM
-              | typeof WIZZ
+                | typeof UNISAT
+                | typeof XVERSE
+                | typeof OYL
+                | typeof MAGIC_EDEN
+                | typeof OKX
+                | typeof OP_NET
+                | typeof ORANGE
+                | typeof LEATHER
+                | typeof PHANTOM
+                | typeof WIZZ
             }
             setSignature={setSignature}
             unsignedPsbt={unsignedPsbt}

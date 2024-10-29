@@ -360,12 +360,13 @@ const WalletCard = ({
     }
   }
 
-  const inscribeWithWallet = async () => {
+  const [isInscribeModalOpen, setIsInscribeModalOpen] = useState(false)
+  const [inscriptionText, setInscriptionText] = useState('')
+
+  const inscribeWithWallet = async (text: string) => {
     try {
       const inscriptionTxId = await inscribe(
-        Buffer.from('Inscribed 100% clientside with Laser Eyes').toString(
-          'base64'
-        ),
+        Buffer.from(text).toString('base64'),
         'text/plain;charset=utf-8'
       )
       toast.success(
@@ -527,7 +528,7 @@ const WalletCard = ({
               className={'w-full bg-[#232225]'}
               disabled={isMissingWallet || !isConnected}
               variant={!isConnected ? 'secondary' : 'default'}
-              onClick={() => (!isConnected ? null : inscribeWithWallet())}
+              onClick={() => setIsInscribeModalOpen(true)}
             >
               inscribe
             </Button>
@@ -535,6 +536,42 @@ const WalletCard = ({
         </div>
       </CardContent>
       <CardFooter></CardFooter>
+      {isInscribeModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-[#323035] p-8 w-[500px] flex flex-col items-center">
+            <h2 className="text-2xl font-bold mb-6 text-center text-white">
+              Edit and inscribe whatever you would like
+            </h2>
+            <input
+              type="text"
+              value={
+                inscriptionText || 'Inscribed 100% clientside with Laser Eyes'
+              }
+              onChange={(e) => setInscriptionText(e.target.value)}
+              className="border p-4 mb-6 w-full bg-[#232225] text-white border-[#3c393f] focus:outline-none text-center"
+            />
+            <div className="flex gap-4 justify-center">
+              <button
+                onClick={() => {
+                  if (inscriptionText) {
+                    inscribeWithWallet(inscriptionText)
+                    setIsInscribeModalOpen(false)
+                  }
+                }}
+                className="px-6 py-3 bg-orange-500 text-white hover:bg-orange-600"
+              >
+                Inscribe
+              </button>
+              <button
+                onClick={() => setIsInscribeModalOpen(false)}
+                className="px-6 py-3 bg-[#232225] text-white hover:bg-[#3c393f]"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </Card>
   )
 }
