@@ -7,6 +7,7 @@ import {
   MAINNET,
   createConfig,
   createStores,
+  ContentType,
 } from '@omnisat/lasereyes-core'
 import { useStore } from '@nanostores/react'
 
@@ -89,7 +90,7 @@ export default function LaserEyesProvider({
         switchNetwork: async (network) => {
           await client.switchNetwork.call(client, network)
         },
-        inscribe: async (content, mimeType) =>
+        inscribe: async (content, mimeType: ContentType) =>
           (await client.inscribe.call(client, content, mimeType)) ?? '',
       }}
     >

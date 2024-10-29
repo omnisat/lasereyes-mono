@@ -1,11 +1,10 @@
 import * as bitcoin from 'bitcoinjs-lib'
 import { WalletProvider } from '.'
 import { getNetworkForUnisat, getUnisatNetwork } from '../../constants/networks'
-import { ContentType, NetworkType, ProviderType } from '../../types'
+import { NetworkType, ProviderType } from '../../types'
 import { broadcastTx, getBTCBalance } from '../../lib/helpers'
 import { OP_NET } from '../../constants/wallets'
 import { listenKeys } from 'nanostores'
-import { inscribeContent } from '../../lib/inscribe'
 
 export default class OpNetProvider extends WalletProvider {
   public get library(): any | undefined {
@@ -193,19 +192,5 @@ export default class OpNetProvider extends WalletProvider {
     await this.library?.switchChain(wantedNetwork)
     this.$network.set(network)
     await this.getBalance()
-  }
-
-  async inscribe(
-    content: string,
-    mimeType: ContentType
-  ): Promise<string | string[]> {
-    return await inscribeContent({
-      content,
-      mimeType,
-      ordinalAddress: this.$store.get().address,
-      paymentAddress: this.$store.get().paymentAddress,
-      paymentPublicKey: this.$store.get().paymentPublicKey,
-      signPsbt: this.signPsbt.bind(this),
-    })
   }
 }

@@ -1,6 +1,6 @@
 import { MapStore, WritableAtom, subscribeKeys } from 'nanostores'
 
-import { Config, NetworkType, ProviderType } from '../types'
+import { Config, ContentType, NetworkType, ProviderType } from '../types'
 import {
   LEATHER,
   MAGIC_EDEN,
@@ -301,7 +301,7 @@ export class LaserEyesClient {
     }
   }
 
-  async inscribe(content: string, mimeType: string) {
+  async inscribe(content: string, mimeType: ContentType) {
     if (!this.$store.get().provider) return
     if (this.$providerMap[this.$store.get().provider!]) {
       try {

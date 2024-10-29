@@ -20,7 +20,6 @@ import {
   SIGNET,
   FRACTAL_TESTNET,
   LaserEyesStoreType,
-  ContentType,
 } from '../..'
 import {
   findOrdinalsAddress,
@@ -32,7 +31,6 @@ import {
 import { MapStore, listenKeys } from 'nanostores'
 import { persistentMap } from '@nanostores/persistent'
 import { fromOutputScript } from 'bitcoinjs-lib/src/address'
-import { inscribeContent } from '../../lib/inscribe'
 
 const keysToPersist = [
   'address',
@@ -399,19 +397,5 @@ export default class MagicEdenProvider extends WalletProvider {
   }
   async pushPsbt(_tx: string): Promise<string | undefined> {
     return await broadcastTx(_tx, this.network)
-  }
-
-  async inscribe(
-    content: string,
-    mimeType: ContentType
-  ): Promise<string | string[]> {
-    return await inscribeContent({
-      content,
-      mimeType,
-      ordinalAddress: this.$store.get().address,
-      paymentAddress: this.$store.get().paymentAddress,
-      paymentPublicKey: this.$store.get().paymentPublicKey,
-      signPsbt: this.signPsbt.bind(this),
-    })
   }
 }

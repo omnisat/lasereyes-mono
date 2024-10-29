@@ -8,7 +8,7 @@ import {
   PHANTOM,
   TESTNET,
 } from '../../constants'
-import { ProviderType, NetworkType, ContentType } from '../../types'
+import { ProviderType, NetworkType } from '../../types'
 import {
   createSendBtcPsbt,
   getBitcoinNetwork,
@@ -17,7 +17,6 @@ import {
 import { listenKeys } from 'nanostores'
 import { getMempoolSpaceUrl } from '../../lib/urls'
 import { fromOutputScript } from 'bitcoinjs-lib/src/address'
-import { inscribeContent } from '../../lib/inscribe'
 
 export default class PhantomProvider extends WalletProvider {
   public get library(): any | undefined {
@@ -264,19 +263,5 @@ export default class PhantomProvider extends WalletProvider {
     await this.library?.switchChain(wantedNetwork)
     this.$network.set(network)
     await this.getBalance()
-  }
-
-  async inscribe(
-    content: string,
-    mimeType: ContentType
-  ): Promise<string | string[]> {
-    return await inscribeContent({
-      content,
-      mimeType,
-      ordinalAddress: this.$store.get().address,
-      paymentAddress: this.$store.get().paymentAddress,
-      paymentPublicKey: this.$store.get().paymentPublicKey,
-      signPsbt: this.signPsbt.bind(this),
-    })
   }
 }

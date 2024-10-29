@@ -8,7 +8,6 @@ import {
   LeatherAddress,
   LeatherRequestSignResponse,
   SignPsbtRequestParams,
-  ContentType,
 } from '../../types'
 import { getBTCBalance } from '../../lib/helpers'
 import { LEATHER, P2TR, P2WPKH } from '../../constants/wallets'
@@ -19,7 +18,6 @@ import { SIGNET, TESTNET, TESTNET4 } from '../../constants'
 import { RpcErrorCode } from 'sats-connect'
 import axios from 'axios'
 import { getMempoolSpaceUrl } from '../../lib/urls'
-import { inscribeContent } from '../../lib/inscribe'
 
 const keysToPersist = [
   'address',
@@ -301,19 +299,5 @@ export default class LeatherProvider extends WalletProvider {
 
   async switchNetwork(): Promise<void> {
     throw UNSUPPORTED_PROVIDER_METHOD_ERROR
-  }
-
-  async inscribe(
-    content: string,
-    mimeType: ContentType
-  ): Promise<string | string[]> {
-    return await inscribeContent({
-      content,
-      mimeType,
-      ordinalAddress: this.$store.get().address,
-      paymentAddress: this.$store.get().paymentAddress,
-      paymentPublicKey: this.$store.get().paymentPublicKey,
-      signPsbt: this.signPsbt.bind(this),
-    })
   }
 }
