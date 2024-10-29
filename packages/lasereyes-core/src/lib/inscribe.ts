@@ -58,7 +58,14 @@ export const inscribeContent = async ({
     }
 
     const commitTxHex = String(commitTx?.psbtHex)
-    const response = await signPsbt(commitTxHex, commitTxHex, '', true, false)
+    const commitTxBase64 = String(commitTx?.psbtBase64)
+    const response = await signPsbt(
+      null,
+      commitTxHex,
+      commitTxBase64,
+      true,
+      false
+    )
     if (!response) throw new Error('sign psbt failed')
     const psbt = bitcoin.Psbt.fromHex(response?.signedPsbtHex || '')
     const extracted = psbt.extractTransaction()
