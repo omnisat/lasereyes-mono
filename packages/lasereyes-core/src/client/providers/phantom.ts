@@ -103,9 +103,8 @@ export default class PhantomProvider extends WalletProvider {
   }
 
   async connect(_: ProviderType): Promise<void> {
-    if (!this.library) throw new Error("Unisat isn't installed")
+    if (!this.library) throw new Error("Phantom isn't installed")
     const phantomAccounts = await this.library.requestAccounts()
-    console.log('phantomAccounts', phantomAccounts)
     if (!phantomAccounts) throw new Error('No accounts found')
     this.$store.setKey('accounts', phantomAccounts)
 
