@@ -17,7 +17,7 @@ import {
 import { listenKeys } from 'nanostores'
 import { getMempoolSpaceUrl } from '../../lib/urls'
 import { fromOutputScript } from 'bitcoinjs-lib/src/address'
-import { inscribe } from '../../lib/inscribe'
+import { inscribeContent } from '../../lib/inscribe'
 
 export default class PhantomProvider extends WalletProvider {
   public get library(): any | undefined {
@@ -271,7 +271,7 @@ export default class PhantomProvider extends WalletProvider {
     content: string,
     mimeType: string
   ): Promise<string | string[]> {
-    return await inscribe({
+    return await inscribeContent({
       content,
       mimeType,
       ordinalAddress: this.$store.get().address,

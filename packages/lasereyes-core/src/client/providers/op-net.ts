@@ -5,7 +5,7 @@ import { NetworkType, ProviderType } from '../../types'
 import { broadcastTx, getBTCBalance } from '../../lib/helpers'
 import { OP_NET } from '../../constants/wallets'
 import { listenKeys } from 'nanostores'
-import { inscribe } from '../../lib/inscribe'
+import { inscribeContent } from '../../lib/inscribe'
 
 export default class OpNetProvider extends WalletProvider {
   public get library(): any | undefined {
@@ -199,7 +199,7 @@ export default class OpNetProvider extends WalletProvider {
     content: string,
     mimeType: string
   ): Promise<string | string[]> {
-    return await inscribe({
+    return await inscribeContent({
       content,
       mimeType,
       ordinalAddress: this.$store.get().address,

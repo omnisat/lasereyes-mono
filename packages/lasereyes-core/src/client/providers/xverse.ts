@@ -26,7 +26,7 @@ import {
 } from '../../lib/helpers'
 import { MapStore, listenKeys } from 'nanostores'
 import { persistentMap } from '@nanostores/persistent'
-import { inscribe } from '../../lib/inscribe'
+import { inscribeContent } from '../../lib/inscribe'
 
 const keysToPersist = [
   'address',
@@ -361,7 +361,7 @@ export default class XVerseProvider extends WalletProvider {
     content: string,
     mimeType: string
   ): Promise<string | string[]> {
-    return await inscribe({
+    return await inscribeContent({
       content,
       mimeType,
       ordinalAddress: this.$store.get().address,

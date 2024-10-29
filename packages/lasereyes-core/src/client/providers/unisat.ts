@@ -7,7 +7,7 @@ import { getBTCBalance } from '../../lib/helpers'
 import { UNISAT } from '../../constants/wallets'
 import { listenKeys } from 'nanostores'
 import { getMempoolSpaceUrl } from '../../lib/urls'
-import { inscribe } from '../../lib/inscribe'
+import { inscribeContent } from '../../lib/inscribe'
 
 export default class UnisatProvider extends WalletProvider {
   public get library(): any | undefined {
@@ -203,7 +203,7 @@ export default class UnisatProvider extends WalletProvider {
     content: string,
     mimeType: string
   ): Promise<string | string[]> {
-    return await inscribe({
+    return await inscribeContent({
       content,
       mimeType,
       ordinalAddress: this.$store.get().address,

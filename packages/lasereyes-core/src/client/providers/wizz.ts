@@ -11,7 +11,7 @@ import {
 import * as bitcoin from 'bitcoinjs-lib'
 import { listenKeys } from 'nanostores'
 import { broadcastTx } from '../../lib/helpers'
-import { inscribe } from '../../lib/inscribe'
+import { inscribeContent } from '../../lib/inscribe'
 
 export class WizzProvider extends WalletProvider {
   public get library(): any | undefined {
@@ -193,7 +193,7 @@ export class WizzProvider extends WalletProvider {
     content: string,
     mimeType: string
   ): Promise<string | string[]> {
-    return await inscribe({
+    return await inscribeContent({
       content,
       mimeType,
       ordinalAddress: this.$store.get().address,
