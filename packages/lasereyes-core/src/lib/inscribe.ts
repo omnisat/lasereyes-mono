@@ -182,18 +182,12 @@ export const getCommitTx = async ({
   | undefined
 > => {
   try {
-    console.log('Content:', content)
-    console.log('Mime Type:', mimeType)
-    console.log('Ordinal Address:', ordinalAddress)
-    console.log('Payment Address:', paymentAddress)
-    console.log('Payment Public Key:', paymentPublicKey)
     const contentSize = Buffer.from(content).length
     if (contentSize > 390000)
       throw new Error('Content size is too large, must be less than 390kb')
 
     const { fastestFee } = await getRecommendedFees(MAINNET)
     const secret = privKey
-    console.log(privKey)
     const pubKey = ecc.keys.get_pubkey(String(secret), true)
     const psbt = new bitcoin.Psbt({
       network: bitcoin.networks.bitcoin,
@@ -205,17 +199,12 @@ export const getCommitTx = async ({
       mimeType
     )
 
-    console.log({ inscriberAddress })
     // give me estimated size for a blank btc tx
     const estimatedSize = 5 * 34
     const commitSatsNeeded = Math.floor(estimatedSize * fastestFee)
     const revealSatsNeeded =
       Math.floor((contentSize * fastestFee) / 3) + 1000 + 546
-
-    console.log({ revealSatsNeeded })
-
     const inscribeFees = Math.floor(commitSatsNeeded + revealSatsNeeded)
-
     const utxosGathered: MempoolUtxo[] = await getAddressUtxos(
       paymentAddress,
       MAINNET
@@ -235,7 +224,6 @@ export const getCommitTx = async ({
 
     let redeemScript
     if (ordinalAddress !== paymentAddress && paymentPublicKey) {
-      console.log('adding redeem')
       redeemScript = getRedeemScript(paymentPublicKey, MAINNET)
     }
 
@@ -243,7 +231,6 @@ export const getCommitTx = async ({
     const addressScript = await bitcoin.address.toOutputScript(paymentAddress)
     let counter = 0
     for await (const utxo of filteredUtxos) {
-      console.log('adding input', paymentPublicKey)
       psbt.addInput({
         hash: utxo.txid,
         index: utxo.vout,
@@ -301,9 +288,6 @@ export const executeReveal = async ({
   isDry?: boolean
 }) => {
   try {
-    console.log({ content })
-    console.log({ mimeType })
-    console.log({ privKey })
     const secret = privKey ?? String(process.env['MCND_PRIVATE_KEY'])
     const secKey = ecc.keys.get_seckey(secret)
     const pubKey = ecc.keys.get_pubkey(secret, true)
@@ -320,8 +304,6 @@ export const executeReveal = async ({
     if (commitTxOutputValue === 0 || !commitTxOutputValue) {
       throw new Error('ERROR GETTING FIRST INPUT VALUE')
     }
-
-    console.log({ commitTxOutputValue })
 
     const txData = Tx.create({
       vin: [
