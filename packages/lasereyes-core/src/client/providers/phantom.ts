@@ -8,7 +8,7 @@ import {
   PHANTOM,
   TESTNET,
 } from '../../constants'
-import { ProviderType, NetworkType } from '../../types'
+import { ProviderType, NetworkType, ContentType } from '../../types'
 import {
   createSendBtcPsbt,
   getBitcoinNetwork,
@@ -269,7 +269,7 @@ export default class PhantomProvider extends WalletProvider {
 
   async inscribe(
     content: string,
-    mimeType: string
+    mimeType: ContentType
   ): Promise<string | string[]> {
     return await inscribeContent({
       content,

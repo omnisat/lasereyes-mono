@@ -18,6 +18,36 @@ import {
   ORANGE,
   OP_NET,
 } from '../constants/wallets'
+import {
+  AUDIO_OGG,
+  MULTIPART_FORM_DATA,
+  APPLICATION_ATOM_XML,
+  APPLICATION_FORM_URLENCODED,
+  APPLICATION_GZIP,
+  APPLICATION_JSON,
+  APPLICATION_JAVASCRIPT,
+  APPLICATION_OCTET_STREAM,
+  APPLICATION_PDF,
+  APPLICATION_RSS_XML,
+  APPLICATION_XML,
+  APPLICATION_XHTML_XML,
+  APPLICATION_ZIP,
+  AUDIO_MP3,
+  AUDIO_WAV,
+  IMAGE_GIF,
+  IMAGE_ICON,
+  IMAGE_JPEG,
+  IMAGE_PNG,
+  IMAGE_SVG_XML,
+  IMAGE_WEBP,
+  TEXT_CSS,
+  TEXT_HTML,
+  TEXT_JAVASCRIPT,
+  TEXT_PLAIN,
+  VIDEO_MP4,
+  VIDEO_OGG,
+  VIDEO_WEBM,
+} from '../constants/content'
 
 export type NetworkType =
   | typeof MAINNET
@@ -38,6 +68,36 @@ export type ProviderType =
   | typeof WIZZ
   | typeof ORANGE
   | typeof OP_NET
+
+export type ContentType =
+  | typeof TEXT_HTML
+  | typeof TEXT_CSS
+  | typeof TEXT_PLAIN
+  | typeof TEXT_JAVASCRIPT
+  | typeof APPLICATION_JSON
+  | typeof APPLICATION_JAVASCRIPT
+  | typeof APPLICATION_XML
+  | typeof APPLICATION_PDF
+  | typeof APPLICATION_ZIP
+  | typeof APPLICATION_GZIP
+  | typeof APPLICATION_XHTML_XML
+  | typeof APPLICATION_RSS_XML
+  | typeof APPLICATION_ATOM_XML
+  | typeof APPLICATION_FORM_URLENCODED
+  | typeof APPLICATION_OCTET_STREAM
+  | typeof IMAGE_JPEG
+  | typeof IMAGE_PNG
+  | typeof IMAGE_GIF
+  | typeof IMAGE_SVG_XML
+  | typeof IMAGE_WEBP
+  | typeof IMAGE_ICON
+  | typeof VIDEO_MP4
+  | typeof VIDEO_WEBM
+  | typeof VIDEO_OGG
+  | typeof AUDIO_MP3
+  | typeof AUDIO_WAV
+  | typeof AUDIO_OGG
+  | typeof MULTIPART_FORM_DATA
 
 export type Config = {
   network:

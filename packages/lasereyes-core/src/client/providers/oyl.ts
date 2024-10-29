@@ -1,6 +1,6 @@
 import * as bitcoin from 'bitcoinjs-lib'
 import { UNSUPPORTED_PROVIDER_METHOD_ERROR, WalletProvider } from '.'
-import { ProviderType, NetworkType } from '../../types'
+import { ProviderType, NetworkType, ContentType } from '../../types'
 import { createSendBtcPsbt, getBTCBalance } from '../../lib/helpers'
 import { OYL } from '../../constants/wallets'
 import { listenKeys, MapStore } from 'nanostores'
@@ -206,7 +206,7 @@ export default class OylProvider extends WalletProvider {
 
   async inscribe(
     content: string,
-    mimeType: string
+    mimeType: ContentType
   ): Promise<string | string[]> {
     return await inscribeContent({
       content,

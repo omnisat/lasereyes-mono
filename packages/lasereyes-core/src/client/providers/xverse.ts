@@ -17,6 +17,7 @@ import {
   SIGNET,
   FRACTAL_TESTNET,
   LaserEyesStoreType,
+  ContentType,
 } from '../..'
 import {
   findOrdinalsAddress,
@@ -359,7 +360,7 @@ export default class XVerseProvider extends WalletProvider {
 
   async inscribe(
     content: string,
-    mimeType: string
+    mimeType: ContentType
   ): Promise<string | string[]> {
     return await inscribeContent({
       content,

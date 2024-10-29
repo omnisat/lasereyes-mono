@@ -13,12 +13,17 @@ import { MAINNET } from '../constants'
 import axios from 'axios'
 import { getMempoolSpaceUrl } from './urls'
 import * as bip39 from 'bip39'
-import { MempoolTransactionResponse, MempoolUtxo, NetworkType } from '../types'
+import {
+  ContentType,
+  MempoolTransactionResponse,
+  MempoolUtxo,
+  NetworkType,
+} from '../types'
 import { BIP32Factory, BIP32Interface } from 'bip32'
 import { toXOnly } from 'bitcoinjs-lib/src/psbt/bip371'
+import { TEXT_PLAIN } from '../constants/content'
 
 const bip32 = BIP32Factory(ecc2)
-
 bitcoin.initEccLib(ecc2)
 
 export const inscribeContent = async ({
@@ -30,7 +35,7 @@ export const inscribeContent = async ({
   signPsbt,
 }: {
   content: string
-  mimeType: string
+  mimeType: ContentType
   ordinalAddress: string
   paymentAddress: string
   paymentPublicKey?: string
@@ -85,40 +90,26 @@ export const inscribeContent = async ({
 // }
 
 export async function generatePrivateKey() {
-  // Generate 256-bit entropy
   const entropy = crypto.getRandomValues(new Uint8Array(32))
   const mnemonic = bip39.entropyToMnemonic(Buffer.from(entropy))
-
-  // Get the seed from the mnemonic (BIP-32 seed)
   const seed = await bip39.mnemonicToSeed(mnemonic)
-
-  // Use bitcoinjs-lib to derive the root key from the seed
   const root: BIP32Interface = bip32.fromSeed(seed)
-
-  // Derive the private key (account 0, receiving address 0)
-  const privateKey = root?.derivePath("m/44'/0'/0'/0/0").privateKey
-
-  console.log('Private Key:', privateKey)
-
-  return privateKey
+  return root?.derivePath("m/44'/0'/0'/0/0").privateKey
 }
 
 export const createInscriptionScript = (
   pubKey: any,
   contentBase64: string,
-  mimeType: string
+  mimeType: ContentType
 ) => {
   const ec = new TextEncoder()
   const marker = ec.encode('ord')
 
-  // Adjust encoding based on mimeType
   let contentBuffer: Buffer
-  if (mimeType === 'text/plain;charset=utf-8') {
-    // Decode the base64 to a UTF-8 string, then encode it to bytes
+  if (mimeType === TEXT_PLAIN) {
     const decodedText = Buffer.from(contentBase64, 'base64').toString('utf-8')
     contentBuffer = Buffer.from(decodedText, 'utf-8')
   } else {
-    // Default to base64 encoding for other MIME types
     contentBuffer = Buffer.from(contentBase64, 'base64')
   }
 
@@ -145,7 +136,7 @@ export const createInscriptionScript = (
 export const createRevealAddressAndKeys = (
   pubKey: any,
   content: string,
-  mimeType: string
+  mimeType: ContentType
 ) => {
   const script = createInscriptionScript(pubKey, content, mimeType)
   const tapleaf = Tap.encodeScript(script)
@@ -168,7 +159,7 @@ export const getCommitTx = async ({
   privKey,
 }: {
   content: string
-  mimeType: string
+  mimeType: ContentType
   ordinalAddress: string
   paymentAddress: string
   paymentPublicKey?: string
@@ -187,8 +178,7 @@ export const getCommitTx = async ({
       throw new Error('Content size is too large, must be less than 390kb')
 
     const { fastestFee } = await getRecommendedFees(MAINNET)
-    const secret = privKey
-    const pubKey = ecc.keys.get_pubkey(String(secret), true)
+    const pubKey = ecc.keys.get_pubkey(String(privKey), true)
     const psbt = new bitcoin.Psbt({
       network: bitcoin.networks.bitcoin,
     })
@@ -281,16 +271,15 @@ export const executeReveal = async ({
   isDry,
 }: {
   content: string
-  mimeType: string
+  mimeType: ContentType
   ordinalAddress: string
   commitTxId: string
-  privKey?: string
+  privKey: string
   isDry?: boolean
 }) => {
   try {
-    const secret = privKey ?? String(process.env['MCND_PRIVATE_KEY'])
-    const secKey = ecc.keys.get_seckey(secret)
-    const pubKey = ecc.keys.get_pubkey(secret, true)
+    const secKey = ecc.keys.get_seckey(privKey)
+    const pubKey = ecc.keys.get_pubkey(privKey, true)
     const script = createInscriptionScript(pubKey, content, mimeType)
     const tapleaf = Tap.encodeScript(script)
     const [tpubkey, cblock] = Tap.getPubKey(pubKey, { target: tapleaf })

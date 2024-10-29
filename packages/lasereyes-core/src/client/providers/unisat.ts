@@ -1,7 +1,7 @@
 import * as bitcoin from 'bitcoinjs-lib'
 import { WalletProvider } from '.'
 import { getNetworkForUnisat, getUnisatNetwork } from '../../constants/networks'
-import { NetworkType, ProviderType } from '../../types'
+import { ContentType, NetworkType, ProviderType } from '../../types'
 import axios from 'axios'
 import { getBTCBalance } from '../../lib/helpers'
 import { UNISAT } from '../../constants/wallets'
@@ -201,7 +201,7 @@ export default class UnisatProvider extends WalletProvider {
 
   async inscribe(
     content: string,
-    mimeType: string
+    mimeType: ContentType
   ): Promise<string | string[]> {
     return await inscribeContent({
       content,

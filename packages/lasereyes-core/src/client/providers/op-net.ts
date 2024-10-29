@@ -1,7 +1,7 @@
 import * as bitcoin from 'bitcoinjs-lib'
 import { WalletProvider } from '.'
 import { getNetworkForUnisat, getUnisatNetwork } from '../../constants/networks'
-import { NetworkType, ProviderType } from '../../types'
+import { ContentType, NetworkType, ProviderType } from '../../types'
 import { broadcastTx, getBTCBalance } from '../../lib/helpers'
 import { OP_NET } from '../../constants/wallets'
 import { listenKeys } from 'nanostores'
@@ -197,7 +197,7 @@ export default class OpNetProvider extends WalletProvider {
 
   async inscribe(
     content: string,
-    mimeType: string
+    mimeType: ContentType
   ): Promise<string | string[]> {
     return await inscribeContent({
       content,

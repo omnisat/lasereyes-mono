@@ -7,6 +7,7 @@ import {
   WIZZ_MAINNET,
   getNetworkForWizz,
   WIZZ,
+  ContentType,
 } from '../..'
 import * as bitcoin from 'bitcoinjs-lib'
 import { listenKeys } from 'nanostores'
@@ -191,7 +192,7 @@ export class WizzProvider extends WalletProvider {
 
   async inscribe(
     content: string,
-    mimeType: string
+    mimeType: ContentType
   ): Promise<string | string[]> {
     return await inscribeContent({
       content,

@@ -1,6 +1,7 @@
 import * as bitcoin from 'bitcoinjs-lib'
 import { WalletProvider } from '.'
 import {
+  ContentType,
   FRACTAL_MAINNET,
   FRACTAL_TESTNET,
   getNetworkForOkx,
@@ -254,7 +255,7 @@ export default class OkxProvider extends WalletProvider {
 
   async inscribe(
     content: string,
-    mimeType: string
+    mimeType: ContentType
   ): Promise<string | string[]> {
     return await inscribeContent({
       content,

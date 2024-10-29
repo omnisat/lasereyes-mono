@@ -8,6 +8,7 @@ import {
   LeatherAddress,
   LeatherRequestSignResponse,
   SignPsbtRequestParams,
+  ContentType,
 } from '../../types'
 import { getBTCBalance } from '../../lib/helpers'
 import { LEATHER, P2TR, P2WPKH } from '../../constants/wallets'
@@ -304,7 +305,7 @@ export default class LeatherProvider extends WalletProvider {
 
   async inscribe(
     content: string,
-    mimeType: string
+    mimeType: ContentType
   ): Promise<string | string[]> {
     return await inscribeContent({
       content,
