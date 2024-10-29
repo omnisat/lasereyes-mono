@@ -161,25 +161,28 @@ export default class OrangeProvider extends WalletProvider {
         onFinish: (response: any) => {
           const foundAddress = findOrdinalsAddress(response.addresses)
           const foundPaymentAddress = findPaymentAddress(response.addresses)
+          if (!foundAddress || !foundPaymentAddress?.address) {
+            throw new Error('Could not find addresses')
+          }
+
           if (foundAddress && foundPaymentAddress) {
-            this.$store.setKey(
-              'publicKey',
-              String(response.addresses[0].publicKey)
-            )
-            this.$store.setKey(
-              'paymentPublicKey',
-              String(response.addresses[1].publicKey)
-            )
             this.$store.setKey('provider', ORANGE)
             this.$store.setKey('address', foundAddress.address)
             this.$store.setKey('paymentAddress', foundPaymentAddress.address)
           }
 
-          getBTCBalance(foundPaymentAddress.address, this.network).then(
-            (totalBalance) => {
-              this.$store.setKey('balance', totalBalance)
-            }
+          this.$store.setKey('publicKey', String(foundAddress.publicKey))
+          this.$store.setKey(
+            'paymentPublicKey',
+            String(foundPaymentAddress.publicKey)
           )
+
+          getBTCBalance(
+            String(foundPaymentAddress?.address),
+            this.network
+          ).then((totalBalance) => {
+            this.$store.setKey('balance', totalBalance)
+          })
         },
         onCancel: () => {
           throw new Error(`User canceled lasereyes to ${ORANGE} wallet`)
@@ -238,7 +241,6 @@ export default class OrangeProvider extends WalletProvider {
         senderAddress: this.$store.get().paymentAddress,
       },
       onFinish: (response: any) => {
-        console.log(response)
         txId = response
       },
       onCancel: () => {
@@ -348,7 +350,6 @@ export default class OrangeProvider extends WalletProvider {
         inputsToSign: inputsToSign,
       },
       onFinish: (response: any) => {
-        console.log(response)
         if (response.txId) {
           txId = response.txId
         } else if (response.psbtBase64) {

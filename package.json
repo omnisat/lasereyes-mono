@@ -3,6 +3,9 @@
   "private": true,
   "scripts": {
     "build": "turbo build",
+    "build:core": "turbo build --filter @omnisat/lasereyes-core",
+    "build:react": "turbo build --filter @omnisat/lasereyes-react",
+    "build:lasereyes": "turbo build --filter @omnisat/lasereyes",
     "dev": "turbo dev",
     "dev:demo": "turbo dev --filter demo.lasereyes.build",
     "dev:docs": "turbo dev --filter documentation-site",
