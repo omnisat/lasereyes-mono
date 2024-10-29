@@ -3,7 +3,6 @@ import * as ecc from '@cmdcode/crypto-utils'
 import { Address, Signer, Tap, Tx } from '@cmdcode/tapscript'
 import * as bitcoin from 'bitcoinjs-lib'
 import * as ecc2 from '@bitcoinerlab/secp256k1'
-import { Buffer } from 'buffer'
 import {
   broadcastTx,
   calculateValueOfUtxosGathered,
@@ -14,40 +13,94 @@ import { MAINNET } from '../constants'
 import axios from 'axios'
 import { getMempoolSpaceUrl } from './urls'
 import * as bip39 from 'bip39'
-import * as bip32 from 'bip32'
 import { MempoolTransactionResponse, MempoolUtxo, NetworkType } from '../types'
+import { BIP32Factory, BIP32Interface } from 'bip32'
+import { toXOnly } from 'bitcoinjs-lib/src/psbt/bip371'
+
+const bip32 = BIP32Factory(ecc2)
 
 bitcoin.initEccLib(ecc2)
 
-async function generateSeed() {
-  const entropy = crypto.getRandomValues(new Uint8Array(32)) // 256-bit entropy
-  const mnemonic = bip39.entropyToMnemonic(Buffer.from(entropy))
+export const inscribeContent = async ({
+  content,
+  mimeType,
+  ordinalAddress,
+  paymentAddress,
+  paymentPublicKey,
+  signPsbt,
+}: {
+  content: string
+  mimeType: string
+  ordinalAddress: string
+  paymentAddress: string
+  paymentPublicKey?: string
+  signPsbt: any
+}) => {
+  try {
+    const privKeyBuff = await generatePrivateKey()
+    const privKey = Buffer.from(privKeyBuff!).toString('hex')
+    const commitTx = await getCommitTx({
+      content,
+      mimeType,
+      ordinalAddress,
+      paymentAddress,
+      paymentPublicKey,
+      privKey,
+    })
 
-  console.log('Mnemonic:', mnemonic)
+    if (!commitTx || !commitTx?.psbtHex) {
+      throw new Error("couldn't get commit tx")
+    }
 
-  // Get the seed from the mnemonic (BIP-32 seed)
-  const seed = await bip39.mnemonicToSeed(mnemonic)
-
-  console.log('Bitcoin Seed (BIP-32):', seed.toString('hex'))
+    const commitTxHex = String(commitTx?.psbtHex)
+    const response = await signPsbt(commitTxHex, commitTxHex, '', true, false)
+    if (!response) throw new Error('sign psbt failed')
+    const psbt = bitcoin.Psbt.fromHex(response?.signedPsbtHex || '')
+    const extracted = psbt.extractTransaction()
+    const commitTxId = await broadcastTx(extracted.toHex(), MAINNET)
+    if (!commitTxId) throw new Error('commit tx failed')
+    return await executeReveal({
+      content,
+      mimeType,
+      ordinalAddress,
+      privKey,
+      commitTxId,
+    })
+  } catch (e) {
+    throw e
+  }
 }
 
-async function generatePrivateKey() {
+// export async function generateSeed() {
+//   const entropy = crypto.getRandomValues(new Uint8Array(32)) // 256-bit entropy
+//   const mnemonic = bip39.entropyToMnemonic(Buffer.from(entropy))
+//
+//   console.log('Mnemonic:', mnemonic)
+//
+//   // Get the seed from the mnemonic (BIP-32 seed)
+//   const seed = await bip39.mnemonicToSeed(mnemonic)
+//
+//   console.log('Bitcoin Seed (BIP-32):', seed.toString('hex'))
+//   return seed
+// }
+
+export async function generatePrivateKey() {
   // Generate 256-bit entropy
   const entropy = crypto.getRandomValues(new Uint8Array(32))
   const mnemonic = bip39.entropyToMnemonic(Buffer.from(entropy))
-
-  console.log('Mnemonic:', mnemonic)
 
   // Get the seed from the mnemonic (BIP-32 seed)
   const seed = await bip39.mnemonicToSeed(mnemonic)
 
   // Use bitcoinjs-lib to derive the root key from the seed
-  // const root: BIP32Interface = bitcoin.address.
+  const root: BIP32Interface = bip32.fromSeed(seed)
 
   // Derive the private key (account 0, receiving address 0)
-  const privateKey = root.derivePath("m/44'/0'/0'/0/0").privateKey
+  const privateKey = root?.derivePath("m/44'/0'/0'/0/0").privateKey
 
-  console.log('Private Key:', privateKey?.toString('hex'))
+  console.log('Private Key:', privateKey)
+
+  return privateKey
 }
 
 export const createInscriptionScript = (
@@ -57,7 +110,19 @@ export const createInscriptionScript = (
 ) => {
   const ec = new TextEncoder()
   const marker = ec.encode('ord')
-  const contentBuffer = Buffer.from(contentBase64, 'base64')
+
+  // Adjust encoding based on mimeType
+  let contentBuffer: Buffer
+  if (mimeType === 'text/plain;charset=utf-8') {
+    // Decode the base64 to a UTF-8 string, then encode it to bytes
+    const decodedText = Buffer.from(contentBase64, 'base64').toString('utf-8')
+    contentBuffer = Buffer.from(decodedText, 'utf-8')
+  } else {
+    // Default to base64 encoding for other MIME types
+    contentBuffer = Buffer.from(contentBase64, 'base64')
+  }
+
+  // Split content into chunks of 520 bytes
   const contentChunks = []
   for (let i = 0; i < contentBuffer.length; i += 520) {
     contentChunks.push(contentBuffer.slice(i, i + 520))
@@ -100,12 +165,14 @@ export const getCommitTx = async ({
   ordinalAddress,
   paymentAddress,
   paymentPublicKey,
+  privKey,
 }: {
   content: string
   mimeType: string
   ordinalAddress: string
   paymentAddress: string
   paymentPublicKey?: string
+  privKey: string
   isDry?: boolean
 }): Promise<
   | {
@@ -115,12 +182,18 @@ export const getCommitTx = async ({
   | undefined
 > => {
   try {
+    console.log('Content:', content)
+    console.log('Mime Type:', mimeType)
+    console.log('Ordinal Address:', ordinalAddress)
+    console.log('Payment Address:', paymentAddress)
+    console.log('Payment Public Key:', paymentPublicKey)
     const contentSize = Buffer.from(content).length
     if (contentSize > 390000)
       throw new Error('Content size is too large, must be less than 390kb')
 
     const { fastestFee } = await getRecommendedFees(MAINNET)
-    const secret = process.env['MCND_PRIVATE_KEY']
+    const secret = privKey
+    console.log(privKey)
     const pubKey = ecc.keys.get_pubkey(String(secret), true)
     const psbt = new bitcoin.Psbt({
       network: bitcoin.networks.bitcoin,
@@ -132,14 +205,16 @@ export const getCommitTx = async ({
       mimeType
     )
 
+    console.log({ inscriberAddress })
     // give me estimated size for a blank btc tx
     const estimatedSize = 5 * 34
     const commitSatsNeeded = Math.floor(estimatedSize * fastestFee)
-    const revealSatsNeeded = Math.floor((contentSize * fastestFee) / 3)
+    const revealSatsNeeded =
+      Math.floor((contentSize * fastestFee) / 3) + 1000 + 546
 
-    const inscribeFees = Math.floor(
-      commitSatsNeeded + revealSatsNeeded + mintPriceFractal
-    )
+    console.log({ revealSatsNeeded })
+
+    const inscribeFees = Math.floor(commitSatsNeeded + revealSatsNeeded)
 
     const utxosGathered: MempoolUtxo[] = await getAddressUtxos(
       paymentAddress,
@@ -160,6 +235,7 @@ export const getCommitTx = async ({
 
     let redeemScript
     if (ordinalAddress !== paymentAddress && paymentPublicKey) {
+      console.log('adding redeem')
       redeemScript = getRedeemScript(paymentPublicKey, MAINNET)
     }
 
@@ -167,10 +243,12 @@ export const getCommitTx = async ({
     const addressScript = await bitcoin.address.toOutputScript(paymentAddress)
     let counter = 0
     for await (const utxo of filteredUtxos) {
+      console.log('adding input', paymentPublicKey)
       psbt.addInput({
         hash: utxo.txid,
         index: utxo.vout,
         witnessUtxo: { value: BigInt(utxo.value), script: addressScript },
+        tapInternalKey: toXOnly(Buffer.from(paymentPublicKey!, 'hex')),
       })
 
       if (ordinalAddress !== paymentAddress && paymentPublicKey) {
@@ -190,13 +268,6 @@ export const getCommitTx = async ({
       value: BigInt(revealSatsNeeded),
       address: inscriberAddress,
     })
-
-    if (mintPriceFractal && mintOwnerAddress) {
-      psbt.addOutput({
-        value: BigInt(mintPriceFractal),
-        address: mintOwnerAddress,
-      })
-    }
 
     if (reimbursement > 546) {
       psbt.addOutput({
@@ -219,16 +290,21 @@ export const executeReveal = async ({
   mimeType,
   ordinalAddress,
   commitTxId,
+  privKey,
   isDry,
 }: {
   content: string
   mimeType: string
   ordinalAddress: string
   commitTxId: string
+  privKey?: string
   isDry?: boolean
 }) => {
   try {
-    const secret = String(process.env['MCND_PRIVATE_KEY'])
+    console.log({ content })
+    console.log({ mimeType })
+    console.log({ privKey })
+    const secret = privKey ?? String(process.env['MCND_PRIVATE_KEY'])
     const secKey = ecc.keys.get_seckey(secret)
     const pubKey = ecc.keys.get_pubkey(secret, true)
     const script = createInscriptionScript(pubKey, content, mimeType)
@@ -237,13 +313,15 @@ export const executeReveal = async ({
 
     const txResult = await waitForTransaction(String(commitTxId))
     if (!txResult) {
-      return { error: 'ERROR WAITING FOR COMMIT TX' }
+      throw new Error('ERROR WAITING FOR COMMIT TX')
     }
 
     const commitTxOutputValue = await getOutputValueByVOutIndex(commitTxId, 0)
     if (commitTxOutputValue === 0 || !commitTxOutputValue) {
-      return { error: 'ERROR GETTING FIRST INPUT VALUE' }
+      throw new Error('ERROR GETTING FIRST INPUT VALUE')
     }
+
+    console.log({ commitTxOutputValue })
 
     const txData = Tx.create({
       vin: [
@@ -267,7 +345,7 @@ export const executeReveal = async ({
     const sig = Signer.taproot.sign(secKey, txData, 0, { extension: tapleaf })
     txData.vin[0].witness = [sig, script, cblock]
     if (isDry) {
-      return { transferInscriptionTxId: Tx.util.getTxid(txData) }
+      return Tx.util.getTxid(txData)
     }
 
     return await broadcastTx(Tx.encode(txData).hex, MAINNET)
@@ -350,7 +428,7 @@ export async function getOutputValueByVOutIndex(
       const rawTx: any = await getTransaction(commitTxId)
 
       if (rawTx && rawTx.vout && rawTx.vout.length > 0) {
-        return Math.floor(rawTx.vout[vOut].value * 100000000)
+        return Math.floor(rawTx.vout[vOut].value)
       }
 
       if (Date.now() - startTime > timeout) {

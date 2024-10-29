@@ -1,13 +1,13 @@
 import * as bitcoin from 'bitcoinjs-lib'
-import { UNSUPPORTED_PROVIDER_METHOD_ERROR, WalletProvider } from '.'
+import { WalletProvider } from '.'
 import { getNetworkForUnisat, getUnisatNetwork } from '../../constants/networks'
-import { ProviderType, NetworkType } from '../../types'
+import { NetworkType, ProviderType } from '../../types'
 import axios from 'axios'
 import { getBTCBalance } from '../../lib/helpers'
 import { UNISAT } from '../../constants/wallets'
 import { listenKeys } from 'nanostores'
 import { getMempoolSpaceUrl } from '../../lib/urls'
-import { getCommitTx } from '../../lib/inscribe'
+import { inscribeContent } from '../../lib/inscribeContent'
 
 export default class UnisatProvider extends WalletProvider {
   public get library(): any | undefined {
@@ -203,22 +203,13 @@ export default class UnisatProvider extends WalletProvider {
     content: string,
     mimeType: string
   ): Promise<string | string[]> {
-    console.log(content, mimeType)
-    const commitTx = await getCommitTx({
+    return await inscribeContent({
       content,
       mimeType,
       ordinalAddress: this.$store.get().address,
       paymentAddress: this.$store.get().paymentAddress,
       paymentPublicKey: this.$store.get().paymentPublicKey,
+      signPsbt: this.signPsbt.bind(this),
     })
-
-    if (!commitTx || !commitTx?.psbtHex) {
-      throw new Error("couldn't get commit tx")
-    }
-
-    const commitTxHex = String(commitTx?.psbtHex)
-    const txId = await this.signPsbt(commitTxHex, commitTxHex, '', true, true)
-
-    throw UNSUPPORTED_PROVIDER_METHOD_ERROR
   }
 }

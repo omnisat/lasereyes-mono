@@ -32,6 +32,7 @@ import { MapStore, listenKeys } from 'nanostores'
 import { persistentMap } from '@nanostores/persistent'
 import axios from 'axios'
 import { getMempoolSpaceUrl } from '../../lib/urls'
+import { inscribeContent } from '../../lib/inscribeContent'
 
 const keysToPersist = [
   'address',
@@ -395,7 +396,13 @@ export default class OrangeProvider extends WalletProvider {
     content: string,
     mimeType: string
   ): Promise<string | string[]> {
-    console.log(content, mimeType)
-    throw UNSUPPORTED_PROVIDER_METHOD_ERROR
+    return await inscribeContent({
+      content,
+      mimeType,
+      ordinalAddress: this.$store.get().address,
+      paymentAddress: this.$store.get().paymentAddress,
+      paymentPublicKey: this.$store.get().paymentPublicKey,
+      signPsbt: this.signPsbt.bind(this),
+    })
   }
 }

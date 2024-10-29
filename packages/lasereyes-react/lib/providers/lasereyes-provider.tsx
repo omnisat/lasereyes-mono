@@ -89,6 +89,8 @@ export default function LaserEyesProvider({
         switchNetwork: async (network) => {
           await client.switchNetwork.call(client, network)
         },
+        inscribe: async (content, mimeType) =>
+          (await client.inscribe.call(client, content, mimeType)) ?? '',
       }}
     >
       {children}

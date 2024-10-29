@@ -1,8 +1,4 @@
-import {
-  UNSUPPORTED_PROVIDER_METHOD_ERROR,
-  WALLET_NOT_INSTALLED_ERROR,
-  WalletProvider,
-} from '.'
+import { WALLET_NOT_INSTALLED_ERROR, WalletProvider } from '.'
 import {
   NetworkType,
   WizzBalanceResponse,
@@ -15,6 +11,7 @@ import {
 import * as bitcoin from 'bitcoinjs-lib'
 import { listenKeys } from 'nanostores'
 import { broadcastTx } from '../../lib/helpers'
+import { inscribeContent } from '../../lib/inscribeContent'
 
 export class WizzProvider extends WalletProvider {
   public get library(): any | undefined {
@@ -196,7 +193,13 @@ export class WizzProvider extends WalletProvider {
     content: string,
     mimeType: string
   ): Promise<string | string[]> {
-    console.log(content, mimeType)
-    throw UNSUPPORTED_PROVIDER_METHOD_ERROR
+    return await inscribeContent({
+      content,
+      mimeType,
+      ordinalAddress: this.$store.get().address,
+      paymentAddress: this.$store.get().paymentAddress,
+      paymentPublicKey: this.$store.get().paymentPublicKey,
+      signPsbt: this.signPsbt.bind(this),
+    })
   }
 }

@@ -18,6 +18,7 @@ import { SIGNET, TESTNET, TESTNET4 } from '../../constants'
 import { RpcErrorCode } from 'sats-connect'
 import axios from 'axios'
 import { getMempoolSpaceUrl } from '../../lib/urls'
+import { inscribeContent } from '../../lib/inscribeContent'
 
 const keysToPersist = [
   'address',
@@ -305,7 +306,13 @@ export default class LeatherProvider extends WalletProvider {
     content: string,
     mimeType: string
   ): Promise<string | string[]> {
-    console.log('inscribe', content, mimeType)
-    throw UNSUPPORTED_PROVIDER_METHOD_ERROR
+    return await inscribeContent({
+      content,
+      mimeType,
+      ordinalAddress: this.$store.get().address,
+      paymentAddress: this.$store.get().paymentAddress,
+      paymentPublicKey: this.$store.get().paymentPublicKey,
+      signPsbt: this.signPsbt.bind(this),
+    })
   }
 }
