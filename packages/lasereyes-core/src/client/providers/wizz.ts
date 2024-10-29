@@ -1,4 +1,3 @@
-import axios from 'axios'
 import { WALLET_NOT_INSTALLED_ERROR, WalletProvider } from '.'
 import {
   NetworkType,
@@ -9,9 +8,9 @@ import {
   getNetworkForWizz,
   WIZZ,
 } from '../..'
-import { getMempoolSpaceUrl } from '../../lib/urls'
 import * as bitcoin from 'bitcoinjs-lib'
 import { listenKeys } from 'nanostores'
+import { broadcastTx } from '../../lib/helpers'
 
 export class WizzProvider extends WalletProvider {
   public get library(): any | undefined {
@@ -186,8 +185,6 @@ export class WizzProvider extends WalletProvider {
   }
 
   async pushPsbt(tx: string): Promise<string | undefined> {
-    return await axios
-      .post(`${getMempoolSpaceUrl(this.$network.get())}/api/tx`, tx)
-      .then((res) => res.data)
+    return await broadcastTx(tx, this.$network.get())
   }
 }

@@ -1,4 +1,9 @@
-import { MAINNET, NetworkType, ProviderType } from '@omnisat/lasereyes-core'
+import {
+  ContentType,
+  MAINNET,
+  NetworkType,
+  ProviderType,
+} from '@omnisat/lasereyes-core'
 import { createContext } from 'react'
 import { LaserEyesContextType } from './types'
 
@@ -45,7 +50,7 @@ const initialContext = {
   pushPsbt: async (_tx: string) => {
     return ''
   },
-  inscribe: async (_content: any) => '',
+  inscribe: async (_content: any, _: ContentType) => '',
   isCreatingCommit: false,
   isInscribing: false,
 }

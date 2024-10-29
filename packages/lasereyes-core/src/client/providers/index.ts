@@ -1,7 +1,8 @@
 import { MapStore, WritableAtom } from 'nanostores'
 import { LaserEyesStoreType } from '../types'
-import { Config, NetworkType, ProviderType } from '../../types'
+import { Config, ContentType, NetworkType, ProviderType } from '../../types'
 import { LaserEyesClient } from '..'
+import { inscribeContent } from '../../lib/inscribe'
 
 export const UNSUPPORTED_PROVIDER_METHOD_ERROR = new Error(
   "The connected wallet doesn't support this method..."
@@ -68,4 +69,18 @@ export abstract class WalletProvider {
   >
 
   abstract pushPsbt(tx: string): Promise<string | undefined>
+
+  async inscribe(
+    content: string,
+    mimeType: ContentType
+  ): Promise<string | string[]> {
+    return await inscribeContent({
+      content,
+      mimeType,
+      ordinalAddress: this.$store.get().address,
+      paymentAddress: this.$store.get().paymentAddress,
+      paymentPublicKey: this.$store.get().paymentPublicKey,
+      signPsbt: this.signPsbt.bind(this),
+    })
+  }
 }

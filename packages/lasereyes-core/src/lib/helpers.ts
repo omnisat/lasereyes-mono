@@ -10,7 +10,7 @@ import {
   TESTNET4,
 } from '../constants/networks'
 import axios from 'axios'
-import { MempoolUtxo } from '../types'
+import { MempoolUtxo, NetworkType } from '../types'
 import { getMempoolSpaceUrl } from './urls'
 import * as ecc from '@bitcoinerlab/secp256k1'
 
@@ -237,4 +237,17 @@ export function getRedeemScript(
 
 export function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
+export function calculateValueOfUtxosGathered(utxoArray: MempoolUtxo[]) {
+  return utxoArray?.reduce((prev, currentValue) => prev + currentValue.value, 0)
+}
+
+export async function broadcastTx(
+  txHex: string,
+  network: NetworkType
+): Promise<string> {
+  return await axios
+    .post(`${getMempoolSpaceUrl(network)}/api/tx`, txHex)
+    .then((res) => res.data)
 }

@@ -1,7 +1,7 @@
 import * as bitcoin from 'bitcoinjs-lib'
 import { WalletProvider } from '.'
 import { getNetworkForUnisat, getUnisatNetwork } from '../../constants/networks'
-import { ProviderType, NetworkType } from '../../types'
+import { NetworkType, ProviderType } from '../../types'
 import axios from 'axios'
 import { getBTCBalance } from '../../lib/helpers'
 import { UNISAT } from '../../constants/wallets'

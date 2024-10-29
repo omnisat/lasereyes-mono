@@ -95,6 +95,7 @@ const WalletCard = ({
     sendBTC,
     signMessage,
     signPsbt,
+    inscribe,
     pushPsbt,
     switchNetwork,
   } = useLaserEyes()
@@ -359,6 +360,33 @@ const WalletCard = ({
     }
   }
 
+  const inscribeWithWallet = async () => {
+    try {
+      const inscriptionTxId = await inscribe(
+        Buffer.from('Inscribed 100% clientside with Laser Eyes').toString(
+          'base64'
+        ),
+        'text/plain;charset=utf-8'
+      )
+      toast.success(
+        <span className={'flex flex-col gap-1 items-center justify-center'}>
+          <span className={'font-black'}>View on mempool.space</span>
+          <a
+            target={'_blank'}
+            href={`${getMempoolSpaceUrl(network as typeof MAINNET | typeof TESTNET)}/tx/${inscriptionTxId}`}
+            className={'underline text-blue-600 text-xs'}
+          >
+            {inscriptionTxId}
+          </a>
+        </span>
+      )
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message)
+      }
+    }
+  }
+
   return (
     <Card
       className={
@@ -494,6 +522,14 @@ const WalletCard = ({
               onClick={() => (!isConnected ? null : push())}
             >
               push PSBT
+            </Button>
+            <Button
+              className={'w-full bg-[#232225]'}
+              disabled={isMissingWallet || !isConnected}
+              variant={!isConnected ? 'secondary' : 'default'}
+              onClick={() => (!isConnected ? null : inscribeWithWallet())}
+            >
+              inscribe
             </Button>
           </div>
         </div>
