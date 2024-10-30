@@ -1,12 +1,11 @@
 import * as bitcoin from 'bitcoinjs-lib'
 import { UNSUPPORTED_PROVIDER_METHOD_ERROR, WalletProvider } from '.'
-import { ProviderType, NetworkType, ContentType } from '../../types'
+import { ProviderType, NetworkType } from '../../types'
 import { createSendBtcPsbt, getBTCBalance } from '../../lib/helpers'
 import { OYL } from '../../constants/wallets'
 import { listenKeys, MapStore } from 'nanostores'
 import { persistentMap } from '@nanostores/persistent'
 import { LaserEyesStoreType } from '../types'
-import { inscribeContent } from '../../lib/inscribe'
 
 const keysToPersist = [
   'address',
@@ -202,19 +201,5 @@ export default class OylProvider extends WalletProvider {
 
   async switchNetwork(): Promise<void> {
     throw UNSUPPORTED_PROVIDER_METHOD_ERROR
-  }
-
-  async inscribe(
-    content: string,
-    mimeType: ContentType
-  ): Promise<string | string[]> {
-    return await inscribeContent({
-      content,
-      mimeType,
-      ordinalAddress: this.$store.get().address,
-      paymentAddress: this.$store.get().paymentAddress,
-      paymentPublicKey: this.$store.get().paymentPublicKey,
-      signPsbt: this.signPsbt.bind(this),
-    })
   }
 }

@@ -7,12 +7,10 @@ import {
   WIZZ_MAINNET,
   getNetworkForWizz,
   WIZZ,
-  ContentType,
 } from '../..'
 import * as bitcoin from 'bitcoinjs-lib'
 import { listenKeys } from 'nanostores'
 import { broadcastTx } from '../../lib/helpers'
-import { inscribeContent } from '../../lib/inscribe'
 
 export class WizzProvider extends WalletProvider {
   public get library(): any | undefined {
@@ -188,19 +186,5 @@ export class WizzProvider extends WalletProvider {
 
   async pushPsbt(tx: string): Promise<string | undefined> {
     return await broadcastTx(tx, this.$network.get())
-  }
-
-  async inscribe(
-    content: string,
-    mimeType: ContentType
-  ): Promise<string | string[]> {
-    return await inscribeContent({
-      content,
-      mimeType,
-      ordinalAddress: this.$store.get().address,
-      paymentAddress: this.$store.get().paymentAddress,
-      paymentPublicKey: this.$store.get().paymentPublicKey,
-      signPsbt: this.signPsbt.bind(this),
-    })
   }
 }

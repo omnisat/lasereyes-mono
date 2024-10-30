@@ -21,7 +21,6 @@ import {
   LaserEyesStoreType,
   getOrangeNetwork,
   ORANGE,
-  ContentType,
 } from '../..'
 import {
   findOrdinalsAddress,
@@ -33,7 +32,6 @@ import { MapStore, listenKeys } from 'nanostores'
 import { persistentMap } from '@nanostores/persistent'
 import axios from 'axios'
 import { getMempoolSpaceUrl } from '../../lib/urls'
-import { inscribeContent } from '../../lib/inscribe'
 
 const keysToPersist = [
   'address',
@@ -391,19 +389,5 @@ export default class OrangeProvider extends WalletProvider {
     return await axios
       .post(`${getMempoolSpaceUrl(this.network)}/api/tx`, payload)
       .then((res) => res.data)
-  }
-
-  async inscribe(
-    content: string,
-    mimeType: ContentType
-  ): Promise<string | string[]> {
-    return await inscribeContent({
-      content,
-      mimeType,
-      ordinalAddress: this.$store.get().address,
-      paymentAddress: this.$store.get().paymentAddress,
-      paymentPublicKey: this.$store.get().paymentPublicKey,
-      signPsbt: this.signPsbt.bind(this),
-    })
   }
 }

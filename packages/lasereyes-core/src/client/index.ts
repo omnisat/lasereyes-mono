@@ -1,6 +1,6 @@
 import { MapStore, WritableAtom, subscribeKeys } from 'nanostores'
 
-import { Config, NetworkType, ProviderType } from '../types'
+import { Config, ContentType, NetworkType, ProviderType } from '../types'
 import {
   LEATHER,
   MAGIC_EDEN,
@@ -8,7 +8,7 @@ import {
   // OP_NET,
   ORANGE,
   OYL,
-  PHANTOM,
+  // PHANTOM,
   UNISAT,
   WIZZ,
   XVERSE,
@@ -27,7 +27,7 @@ import LeatherProvider from './providers/leather'
 import OrangeProvider from './providers/orange'
 import OkxProvider from './providers/okx'
 import MagicEdenProvider from './providers/magic-eden'
-import PhantomProvider from './providers/phantom'
+// import PhantomProvider from './providers/phantom'
 // import OpNetProvider from './providers/op-net'
 
 export class LaserEyesClient {
@@ -55,7 +55,7 @@ export class LaserEyesClient {
       // [OP_NET]: new OpNetProvider(stores, this, config),
       [ORANGE]: new OrangeProvider(stores, this, config),
       [OYL]: new OylProvider(stores, this, config),
-      [PHANTOM]: new PhantomProvider(stores, this, config),
+      // [PHANTOM]: new PhantomProvider(stores, this, config),
       [UNISAT]: new UnisatProvider(stores, this, config),
       [XVERSE]: new XVerseProvider(stores, this, config),
       [WIZZ]: new WizzProvider(stores, this, config),
@@ -301,7 +301,7 @@ export class LaserEyesClient {
     }
   }
 
-  async inscribe(content: string, mimeType: string) {
+  async inscribe(content: string, mimeType: ContentType) {
     if (!this.$store.get().provider) return
     if (this.$providerMap[this.$store.get().provider!]) {
       try {
