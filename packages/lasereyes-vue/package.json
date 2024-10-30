@@ -1,0 +1,39 @@
+{
+  "name": "@omnisat/lasereyes-vue",
+  "private": false,
+  "version": "0.0.1",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc -b && vite build",
+    "preview": "vite preview",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "@nanostores/vue": "^0.10.0",
+    "@omnisat/lasereyes-core": "workspace:*",
+    "nanostores": "^0.11.3",
+    "vue": "^3.4.37"
+  },
+  "devDependencies": {
+    "@types/node": "^22.5.2",
+    "@vitejs/plugin-vue": "^5.1.2",
+    "typescript": "^5.5.3",
+    "vite": "^5.4.6",
+    "vite-plugin-dts": "^4.1.0",
+    "vue-tsc": "^2.1.6"
+  }
+}

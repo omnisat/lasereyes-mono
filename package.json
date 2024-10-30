@@ -10,6 +10,7 @@
     "dev:demo": "turbo dev --filter demo.lasereyes.build",
     "dev:docs": "turbo dev --filter documentation-site",
     "dev:react": "turbo dev --filter react-ui",
+    "dev:vue": "turbo dev --filter vue-ui",
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "test": "vitest run",
