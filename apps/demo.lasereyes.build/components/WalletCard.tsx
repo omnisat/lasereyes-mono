@@ -127,7 +127,13 @@ const WalletCard = ({
   const { utxos } = useUtxos()
 
   useEffect(() => {
-    if (utxos.length > 0 && connected && !hasRun.current && !hasError) {
+    if (
+      utxos.length > 0 &&
+      connected &&
+      isConnected &&
+      !hasRun.current &&
+      !hasError
+    ) {
       hasRun.current = true
       createPsbt(
         utxos,
@@ -154,7 +160,19 @@ const WalletCard = ({
           toast.error(e.message)
         })
     }
-  }, [utxos, balance, network, connected])
+  }, [
+    utxos,
+    balance,
+    network,
+    connected,
+    isConnected,
+    hasError,
+    paymentAddress,
+    paymentPublicKey,
+    unsigned,
+    setUnsignedPsbt,
+    setSignedPsbt,
+  ])
 
   useEffect(() => {
     setUnsigned(undefined)

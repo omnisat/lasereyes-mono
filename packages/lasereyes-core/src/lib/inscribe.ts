@@ -6,10 +6,12 @@ import * as ecc2 from '@bitcoinerlab/secp256k1'
 import {
   broadcastTx,
   calculateValueOfUtxosGathered,
+  getAddressType,
   getAddressUtxos,
+  getBitcoinNetwork,
   getRedeemScript,
 } from './helpers'
-import { MAINNET } from '../constants'
+import { MAINNET, P2SH } from '../constants'
 import axios from 'axios'
 import { getMempoolSpaceUrl } from './urls'
 import * as bip39 from 'bip39'
@@ -235,7 +237,7 @@ export const getCommitTx = async ({
         tapInternalKey: toXOnly(Buffer.from(paymentPublicKey!, 'hex')),
       })
 
-      if (ordinalAddress !== paymentAddress && paymentPublicKey) {
+      if (getAddressType(paymentAddress, getBitcoinNetwork(MAINNET)) === P2SH) {
         psbt.updateInput(counter, { redeemScript })
       }
       counter++
