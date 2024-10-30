@@ -48,7 +48,7 @@ export type LaserEyesContextType = {
   >
   pushPsbt: (tx: string) => Promise<string | undefined>
   inscribe: (
-    content: string,
+    contentBase64: string,
     mimeType: ContentType
   ) => Promise<string | string[]>
 }

@@ -384,7 +384,7 @@ const WalletCard = ({
         Buffer.from('Inscribed 100% clientside with Laser Eyes').toString(
           'base64'
         ),
-        'text/plain;charset=utf-8'
+        'text/plain'
       )
       toast.success(
         <span className={'flex flex-col gap-1 items-center justify-center'}>
