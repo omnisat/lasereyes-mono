@@ -209,7 +209,7 @@ export const getCommitTx = async ({
       MAINNET
     )
     const filteredUtxos = utxosGathered
-      .filter((utxo: MempoolUtxo) => utxo.value > 10000)
+      .filter((utxo: MempoolUtxo) => utxo.value > 3000)
       .sort((a, b) => b.value - a.value)
 
     const amountRetrieved = calculateValueOfUtxosGathered(filteredUtxos)
