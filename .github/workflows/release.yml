@@ -17,6 +17,7 @@ jobs:
       lasereyes_changed: ${{ steps.check.outputs.lasereyes_changed }}
       lasereyes_core_changed: ${{ steps.check.outputs.lasereyes_core_changed }}
       lasereyes_react_changed: ${{ steps.check.outputs.lasereyes_react_changed }}
+      lasereyes_vue_changed: ${{ steps.check.outputs.lasereyes_vue_changed }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -64,6 +65,14 @@ jobs:
             echo "lasereyes_react_changed=false" >> $GITHUB_OUTPUT
           fi
 
+          if git diff --name-only --diff-filter=AM $diff_target HEAD -- packages/lasereyes-vue/ | grep -q '^packages/lasereyes-vue/'; then
+            echo "lasereyes_vue_changed=true" >> $GITHUB_ENV
+            echo "lasereyes_vue_changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "lasereyes_vue_changed=false" >> $GITHUB_ENV
+            echo "lasereyes_vue_changed=false" >> $GITHUB_OUTPUT
+          fi
+
   # Bump RC version in dev branch only if necessary, and skip if it's on the main branch
   bump-rc-in-dev:
     runs-on: ubuntu-latest
@@ -71,7 +80,8 @@ jobs:
     if: github.ref == 'refs/heads/dev' &&
       (needs.check-package-changes.outputs.lasereyes_changed == 'true' ||
       needs.check-package-changes.outputs.lasereyes_core_changed == 'true' ||
-      needs.check-package-changes.outputs.lasereyes_react_changed == 'true')
+      needs.check-package-changes.outputs.lasereyes_react_changed == 'true' ||
+      needs.check-package-changes.outputs.lasereyes_vue_changed == 'true')
     environment: prod
     steps:
       - name: Checkout repository
@@ -103,6 +113,7 @@ jobs:
           # Bump lasereyes if any package has changed
           if [[ "${{ needs.check-package-changes.outputs.lasereyes_changed }}" == "true" || \
                 "${{ needs.check-package-changes.outputs.lasereyes_core_changed }}" == "true" || \
+                "${{ needs.check-package-changes.outputs.lasereyes_vue_changed }}" == "true" || \
                 "${{ needs.check-package-changes.outputs.lasereyes_react_changed }}" == "true" ]]; then
               cd packages/lasereyes
               pnpm version prerelease --preid=rc
@@ -122,6 +133,13 @@ jobs:
               pnpm version prerelease --preid=rc
               cd ../..
           fi
+
+          # Bump lasereyes-vue if changed
+          if [[ "${{ needs.check-package-changes.outputs.lasereyes_vue_changed }}" == "true" ]]; then
+              cd packages/lasereyes-vue
+              pnpm version prerelease --preid=rc
+              cd ../..
+          fi
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
@@ -137,7 +155,6 @@ jobs:
           git push origin dev
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
 
   promote-to-stable-in-main:
     runs-on: ubuntu-latest
