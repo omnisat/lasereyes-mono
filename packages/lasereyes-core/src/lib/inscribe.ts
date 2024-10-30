@@ -29,14 +29,14 @@ const bip32 = BIP32Factory(ecc2)
 bitcoin.initEccLib(ecc2)
 
 export const inscribeContent = async ({
-  content,
+  contentBase64,
   mimeType,
   ordinalAddress,
   paymentAddress,
   paymentPublicKey,
   signPsbt,
 }: {
-  content: string
+  contentBase64: string
   mimeType: ContentType
   ordinalAddress: string
   paymentAddress: string
@@ -47,7 +47,7 @@ export const inscribeContent = async ({
     const privKeyBuff = await generatePrivateKey()
     const privKey = Buffer.from(privKeyBuff!).toString('hex')
     const commitTx = await getCommitTx({
-      content,
+      contentBase64,
       mimeType,
       ordinalAddress,
       paymentAddress,
@@ -74,7 +74,7 @@ export const inscribeContent = async ({
     const commitTxId = await broadcastTx(extracted.toHex(), MAINNET)
     if (!commitTxId) throw new Error('commit tx failed')
     return await executeReveal({
-      content,
+      contentBase64,
       mimeType,
       ordinalAddress,
       privKey,
@@ -160,14 +160,14 @@ export const createRevealAddressAndKeys = (
 }
 
 export const getCommitTx = async ({
-  content,
+  contentBase64,
   mimeType,
   ordinalAddress,
   paymentAddress,
   paymentPublicKey,
   privKey,
 }: {
-  content: string
+  contentBase64: string
   mimeType: ContentType
   ordinalAddress: string
   paymentAddress: string
@@ -182,7 +182,7 @@ export const getCommitTx = async ({
   | undefined
 > => {
   try {
-    const contentSize = Buffer.from(content).length
+    const contentSize = Buffer.from(contentBase64).length
     if (contentSize > 390000)
       throw new Error('Content size is too large, must be less than 390kb')
 
@@ -194,7 +194,7 @@ export const getCommitTx = async ({
 
     const { inscriberAddress } = createRevealAddressAndKeys(
       pubKey,
-      content,
+      contentBase64,
       mimeType
     )
 
@@ -272,14 +272,14 @@ export const getCommitTx = async ({
 }
 
 export const executeReveal = async ({
-  content,
+  contentBase64,
   mimeType,
   ordinalAddress,
   commitTxId,
   privKey,
   isDry,
 }: {
-  content: string
+  contentBase64: string
   mimeType: ContentType
   ordinalAddress: string
   commitTxId: string
@@ -289,7 +289,7 @@ export const executeReveal = async ({
   try {
     const secKey = ecc.keys.get_seckey(privKey)
     const pubKey = ecc.keys.get_pubkey(privKey, true)
-    const script = createInscriptionScript(pubKey, content, mimeType)
+    const script = createInscriptionScript(pubKey, contentBase64, mimeType)
     const tapleaf = Tap.encodeScript(script)
     const [tpubkey, cblock] = Tap.getPubKey(pubKey, { target: tapleaf })
 

@@ -71,11 +71,11 @@ export abstract class WalletProvider {
   abstract pushPsbt(tx: string): Promise<string | undefined>
 
   async inscribe(
-    content: string,
+    contentBase64: string,
     mimeType: ContentType
   ): Promise<string | string[]> {
     return await inscribeContent({
-      content,
+      contentBase64,
       mimeType,
       ordinalAddress: this.$store.get().address,
       paymentAddress: this.$store.get().paymentAddress,
