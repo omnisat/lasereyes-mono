@@ -71,7 +71,7 @@ bun install @omnisat/lasereyes-core
 - **Modular Providers**: Easily extend the library by adding new wallet providers.
 - **Network Support**: Supports multiple Bitcoin networks such as **mainnet**, **testnet3**, **testnet4**, **fractal**, **fractal testnet**, **signet**.
 
-## Docs
+## Documentation
 
 ### LaserEyesClient
 
@@ -108,13 +108,6 @@ constructor(
 
 ## Methods
 
-### `dispose()`
-
-Disposes of all wallet providers by calling their respective `dispose()` methods.
-
-```ts
-dispose(): void
-```
 
 ### `connect(defaultWallet: ProviderType)`
 
@@ -210,6 +203,22 @@ async pushPsbt(tx: string): Promise<void>
 - **Parameters:**
   - `tx`: The PSBT in base64 or hex format.
 
+### `inscribe(content: string, mimeType: ContentType)`
+
+```ts
+async inscribe(content: string, mimeType: ContentType): Promise<string | string[]>
+```
+
+Inscribe content onto the blockchain.
+
+**Parameters:**
+- `content` (string): The content to be inscribed, encoded in Base64.
+- `mimeType` (ContentType): The MIME type of the content.
+
+**Returns:**
+- `Promise<string | string[]>`: A promise that resolves to the transaction ID(s) of the inscribed content.
+
+
 ### `getPublicKey()`
 
 Retrieves the public key of the connected wallet provider.
@@ -232,6 +241,14 @@ Fetches any inscriptions (NFTs) associated with the connected wallet.
 
 ```ts
 async getInscriptions(): Promise<any[]>
+```
+
+### `dispose()`
+
+Disposes of all wallet providers by calling their respective `dispose()` methods.
+
+```ts
+dispose(): void
 ```
 
 ---
@@ -282,6 +299,179 @@ await client.sendBTC('recipient-address', 1000)
 const signature = await client.signMessage('Hello, Laser Eyes!')
 ```
 
+
+## Usage
+
+### Importing the Library
+
+```typescript
+import { LaserEyesClient, createStores, createConfig } from 'lasereyes-core'
+```
+
+### Initializing the Client
+
+First, create the necessary stores and configuration:
+
+```typescript
+const stores = createStores()
+const config = createConfig({ network: 'mainnet' }) // or 'testnet', 'signet', etc.
+```
+
+Then, initialize the `LaserEyesClient`:
+
+```typescript
+const client = new LaserEyesClient(stores, config)
+```
+
+### Connecting to a Wallet
+
+Connect to a wallet provider (e.g., 'unisat'):
+
+```typescript
+await client.connect('unisat') // Replace 'unisat' with your desired wallet provider
+```
+
+### Requesting Accounts
+
+Request the accounts from the connected wallet:
+
+```typescript
+const accounts = await client.requestAccounts()
+console.log(accounts)
+```
+
+### Sending BTC
+
+Send BTC to a recipient address:
+
+```typescript
+await client.sendBTC('recipientAddress', amount)
+```
+
+### Signing a Message
+
+Sign a message with the connected wallet:
+
+```typescript
+const signedMessage = await client.signMessage('message to sign')
+console.log(signedMessage)
+```
+
+### Signing a PSBT
+
+Sign a Partially Signed Bitcoin Transaction (PSBT):
+
+```typescript
+const signedPsbt = await client.signPsbt('psbtHex')
+console.log(signedPsbt)
+```
+
+
+### Getting the Public Key
+
+Retrieve the public key from the connected wallet:
+
+```typescript
+const publicKey = await client.getPublicKey()
+console.log(publicKey)
+```
+
+### Getting the Balance
+
+Get the balance of the connected wallet:
+
+```typescript
+const balance = await client.getBalance()
+console.log(balance)
+```
+
+### Getting Inscriptions
+
+Retrieve inscriptions from the connected wallet:
+
+```typescript
+const inscriptions = await client.getInscriptions()
+console.log(inscriptions)
+```
+
+### Disconnecting
+
+Disconnect from the wallet:
+
+```typescript
+client.disconnect()
+```
+
+
+### Inscribing Content
+
+To inscribe content using the `inscribe` method, follow these steps:
+
+1. **Initialize the Client**: Ensure you have initialized the `LaserEyesClient` with the necessary stores and configuration.
+2. **Connect to a Wallet**: Connect to a wallet provider.
+3. **Inscribe Content**: Use the `inscribe` method to inscribe content.
+
+#### Example
+
+```typescript
+import { LaserEyesClient, createStores, createConfig } from '@omnisat/lasereyes-core';
+import { TEXT_PLAIN } from '@omnisat/lasereyes-core';
+
+const stores = createStores();
+const config = createConfig({ network: 'mainnet' });
+const client = new LaserEyesClient(stores, config);
+
+client.connect('unisat').then(async () => {
+  const contentBase64 = Buffer.from('Hello, LaserEyes!').toString('base64');
+  const mimeType = TEXT_PLAIN;
+  try {
+    const txId = await client.inscribe(contentBase64, mimeType);
+    console.log('Inscription txId:', txId);
+  } catch (error) {
+    console.error('Error inscribing content:', error);
+  }
+});
+```
+
+## Network Configuration
+
+The network configuration can be set to different Bitcoin networks such as 'mainnet', 'testnet', 'signet', etc. These are exported as consts from the `@omnisat/lasereyes-core` package.
+
+## Extending the Library
+
+### Adding a New Wallet Provider
+
+To add a new wallet provider, extend the `WalletProvider` abstract class and implement the required methods.:
+
+```typescript
+export abstract class WalletProvider {
+  // Constructor and properties
+
+  abstract initialize(): void
+  abstract dispose(): void
+  abstract connect(defaultWallet: ProviderType): Promise<void>
+  abstract requestAccounts(): Promise<string[]>
+  abstract getNetwork(): Promise<NetworkType | undefined>
+  abstract getPublicKey(): Promise<string | undefined>
+  abstract getBalance(): Promise<bigint | string | number>
+  abstract getInscriptions(): Promise<any[]>
+  abstract sendBTC(to: string, amount: number): Promise<string>
+  abstract signMessage(message: string, toSignAddress?: string): Promise<string>
+  abstract signPsbt(
+    tx: string,
+    psbtHex: string,
+    psbtBase64: string,
+    finalize?: boolean,
+    broadcast?: boolean
+  ): Promise<{
+    signedPsbtHex: string | undefined
+    signedPsbtBase64: string | undefined
+    txId?: string
+  } | undefined>
+  abstract pushPsbt(tx: string): Promise<string | undefined>
+}
+```
+
 ---
 
 This documentation provides an overview of the `LaserEyesClient` class, its constructor, and the main methods it offers for interacting with various Bitcoin wallet providers.
@@ -294,6 +484,6 @@ If you'd like to contribute to `@omnisat/lasereyes-core`, feel free to submit pu
 
 `@omnisat/lasereyes-core` is MIT licensed
 
+## Conclusion
 
-
-
+LaserEyes Core provides a robust and flexible interface for interacting with various Bitcoin wallet providers. By following the above documentation, you can easily integrate LaserEyes Core into your project and extend its functionality as needed.
