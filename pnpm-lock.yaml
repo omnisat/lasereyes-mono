@@ -278,6 +278,9 @@ importers:
       '@omnisat/lasereyes-react':
         specifier: workspace:*
         version: link:../lasereyes-react
+      bip39:
+        specifier: ^3.1.0
+        version: 3.1.0
     devDependencies:
       '@types/bip39':
         specifier: ^3.0.0
@@ -386,6 +389,9 @@ importers:
       '@vitejs/plugin-react-swc':
         specifier: ^3.5.0
         version: 3.7.1(vite@5.4.10)
+      bip39:
+        specifier: ^3.1.0
+        version: 3.1.0
       eslint:
         specifier: ^9.9.0
         version: 9.13.0

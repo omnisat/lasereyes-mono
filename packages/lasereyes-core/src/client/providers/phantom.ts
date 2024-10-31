@@ -1,13 +1,7 @@
 import * as bitcoin from 'bitcoinjs-lib'
 import axios from 'axios'
 import { WalletProvider } from '.'
-import {
-  getNetworkForUnisat,
-  getUnisatNetwork,
-  MAINNET,
-  PHANTOM,
-  TESTNET,
-} from '../../constants'
+import { getUnisatNetwork, MAINNET, PHANTOM, TESTNET } from '../../constants'
 import { ProviderType, NetworkType } from '../../types'
 import {
   createSendBtcPsbt,
@@ -45,35 +39,35 @@ export default class PhantomProvider extends WalletProvider {
 
     listenKeys(this.$store, ['provider'], (newStore) => {
       if (newStore.provider !== PHANTOM) {
-        this.removeListeners()
+        // this.removeListeners()
         return
       }
       this.library.requestAccounts().then((accounts: string[]) => {
         this.handleAccountsChanged(accounts)
       })
-      this.addListeners()
+      // this.addListeners()
     })
   }
 
-  addListeners() {
-    this.library.on('accountsChanged', this.handleAccountsChanged.bind(this))
-    this.library.on('networkChanged', this.handleNetworkChanged.bind(this))
-  }
-
-  removeListeners() {
-    this.library.removeListener(
-      'accountsChanged',
-      this.handleAccountsChanged.bind(this)
-    )
-    this.library.removeListener(
-      'networkChanged',
-      this.handleNetworkChanged.bind(this)
-    )
-  }
+  // addListeners() {
+  //   this.library.on('accountsChanged', this.handleAccountsChanged.bind(this))
+  //   this.library.on('networkChanged', this.handleNetworkChanged.bind(this))
+  // }
+  //
+  // removeListeners() {
+  //   this.library.removeListener(
+  //     'accountsChanged',
+  //     this.handleAccountsChanged.bind(this)
+  //   )
+  //   this.library.removeListener(
+  //     'networkChanged',
+  //     this.handleNetworkChanged.bind(this)
+  //   )
+  // }
 
   dispose() {
     this.observer?.disconnect()
-    this.removeListeners()
+    // this.removeListeners()
   }
 
   private handleAccountsChanged(accounts: string[]) {
@@ -93,13 +87,14 @@ export default class PhantomProvider extends WalletProvider {
       this.parent.disconnect()
     }
   }
-  private handleNetworkChanged(network: NetworkType) {
-    const foundNetwork = getNetworkForUnisat(network)
-    if (this.network !== foundNetwork) {
-      this.switchNetwork(foundNetwork)
-    }
-    this.parent.connect(PHANTOM)
-  }
+
+  // private handleNetworkChanged(network: NetworkType) {
+  //   const foundNetwork = getNetworkForUnisat(network)
+  //   if (this.network !== foundNetwork) {
+  //     this.switchNetwork(foundNetwork)
+  //   }
+  //   this.parent.connect(PHANTOM)
+  // }
 
   async connect(_: ProviderType): Promise<void> {
     if (!this.library) throw new Error("Phantom isn't installed")

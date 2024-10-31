@@ -29,5 +29,5 @@
       "@omnisat/lasereyes-core": ["../lasereyes-core/dist"]
     }
   },
-  "include": ["lib"]
+  "include": ["lib/**/*"]
 }
