@@ -10,9 +10,10 @@ import {
   TESTNET4,
 } from '../constants/networks'
 import axios from 'axios'
-import { MempoolUtxo } from '../types'
+import { MempoolUtxo, NetworkType } from '../types'
 import { getMempoolSpaceUrl } from './urls'
 import * as ecc from '@bitcoinerlab/secp256k1'
+import { P2PKH, P2SH, P2SH_P2WPKH, P2TR, P2WPKH, P2WSH } from '../constants'
 
 bitcoin.initEccLib(ecc)
 
@@ -237,4 +238,51 @@ export function getRedeemScript(
 
 export function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
+export function calculateValueOfUtxosGathered(utxoArray: MempoolUtxo[]) {
+  return utxoArray?.reduce((prev, currentValue) => prev + currentValue.value, 0)
+}
+
+export async function broadcastTx(
+  txHex: string,
+  network: NetworkType
+): Promise<string> {
+  return await axios
+    .post(`${getMempoolSpaceUrl(network)}/api/tx`, txHex)
+    .then((res) => res.data)
+}
+
+export const getAddressType = (
+  address: string,
+  network: bitcoin.Network
+): string => {
+  try {
+    const decoded = bitcoin.address.fromBase58Check(address)
+
+    // Check the address version for P2PKH or P2SH
+    if (decoded.version === network.pubKeyHash) return P2PKH
+    if (decoded.version === network.scriptHash) {
+      // It's a P2SH, but let's check if it wraps a SegWit script
+      const script = bitcoin.script.decompile(decoded.hash)
+      if (script && script.length === 2 && script[0] === bitcoin.opcodes.OP_0) {
+        return P2SH_P2WPKH
+      }
+      return P2SH
+    }
+  } catch (e) {
+    // If fromBase58Check fails, try Bech32 (for SegWit addresses)
+    try {
+      const decoded = bitcoin.address.fromBech32(address)
+
+      // Handle Bech32-based addresses (SegWit P2WPKH, P2WSH, P2TR)
+      if (decoded.version === 0 && decoded.data.length === 20) return P2WPKH
+      if (decoded.version === 0 && decoded.data.length === 32) return P2WSH
+      if (decoded.version === 1 && decoded.data.length === 32) return P2TR
+    } catch (e2) {
+      return 'unknown'
+    }
+  }
+
+  return 'unknown'
 }

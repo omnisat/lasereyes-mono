@@ -1,15 +1,12 @@
 {
+  "extends": "./tsconfig.json",
+  "include": ["lib/**/*"],
   "compilerOptions": {
     "target": "ES2020",
     "useDefineForClassFields": true,
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "module": "ESNext",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "skipLibCheck": true,
-
-    "declaration": true,
-    "declarationMap": true,
-    "composite": true,
-    "outDir": "dist",
 
     /* Bundler mode */
     "moduleResolution": "bundler",
@@ -17,17 +14,23 @@
     "isolatedModules": true,
     "moduleDetection": "force",
     "noEmit": true,
-    "jsx": "react-jsx",
+    "jsx": "preserve",
 
     /* Linting */
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
-    "paths": {
-      "@": ["./lib"],
-      "@omnisat/lasereyes-core": ["../lasereyes-core/dist"]
-    }
+    "noFallthroughCasesInSwitch": true
   },
-  "include": ["lib/**/*"]
+
+  /* Linting */
+  "strict": true,
+  "noUnusedLocals": true,
+  "noUnusedParameters": true,
+  "noFallthroughCasesInSwitch": true,
+
+  "baseUrl": ".",
+  "paths": {
+    "@/*": ["./lib/*"]
+  }
 }

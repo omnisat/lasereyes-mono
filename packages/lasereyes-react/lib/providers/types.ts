@@ -1,4 +1,4 @@
-import { NetworkType, ProviderType } from '@omnisat/lasereyes-core'
+import { ContentType, NetworkType, ProviderType } from '@omnisat/lasereyes-core'
 
 export type LaserEyesContextType = {
   isInitializing: boolean
@@ -47,4 +47,8 @@ export type LaserEyesContextType = {
     | undefined
   >
   pushPsbt: (tx: string) => Promise<string | undefined>
+  inscribe: (
+    contentBase64: string,
+    mimeType: ContentType
+  ) => Promise<string | string[]>
 }
