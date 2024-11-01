@@ -251,10 +251,10 @@ importers:
   packages/lasereyes:
     dependencies:
       '@omnisat/lasereyes-core':
-        specifier: workspace:*
+        specifier: 0.0.30
         version: link:../lasereyes-core
       '@omnisat/lasereyes-react':
-        specifier: workspace:*
+        specifier: 0.0.23
         version: link:../lasereyes-react
       bip39:
         specifier: ^3.1.0
