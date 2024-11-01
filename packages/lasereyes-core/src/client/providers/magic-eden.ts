@@ -7,18 +7,15 @@ import {
   BitcoinNetworkType,
   SendBtcTransactionOptions,
   MessageSigningProtocols,
+  signTransaction,
 } from 'sats-connect'
-import { UNSUPPORTED_PROVIDER_METHOD_ERROR, WalletProvider } from '.'
+import { WalletProvider } from '.'
 import {
   ProviderType,
   NetworkType,
   MAGIC_EDEN,
   getSatsConnectNetwork,
   MAINNET,
-  TESTNET,
-  TESTNET4,
-  SIGNET,
-  FRACTAL_TESTNET,
   LaserEyesStoreType,
 } from '../..'
 import {
@@ -26,23 +23,14 @@ import {
   findPaymentAddress,
   getBTCBalance,
   getBitcoinNetwork,
-  broadcastTx,
 } from '../../lib/helpers'
 import { MapStore, listenKeys } from 'nanostores'
 import { persistentMap } from '@nanostores/persistent'
 import { fromOutputScript } from 'bitcoinjs-lib/src/address'
-
-const keysToPersist = [
-  'address',
-  'paymentAddress',
-  'publicKey',
-  'paymentPublicKey',
-  'balance',
-] as const
-
-type PersistedKey = (typeof keysToPersist)[number]
+import { keysToPersist, PersistedKey } from '../utils'
 
 const MAGIC_EDEN_WALLET_PERSISTENCE_KEY = 'MAGIC_EDEN_CONNECTED_WALLET_STATE'
+
 export default class MagicEdenProvider extends WalletProvider {
   public get library(): any | undefined {
     return (window as any)?.magicEden?.bitcoin
@@ -190,36 +178,6 @@ export default class MagicEdenProvider extends WalletProvider {
     }
   }
 
-  async requestAccounts(): Promise<string[]> {
-    return [this.$store.get().address, this.$store.get().paymentAddress]
-  }
-
-  async getNetwork(): Promise<NetworkType | undefined> {
-    const { address } = this.$store.get()
-
-    if (
-      address.slice(0, 1) === 't' &&
-      [TESTNET, TESTNET4, SIGNET, FRACTAL_TESTNET].includes(this.network)
-    ) {
-      return this.network
-    }
-
-    return MAINNET
-  }
-
-  getPublicKey(): Promise<string | undefined> {
-    throw UNSUPPORTED_PROVIDER_METHOD_ERROR
-  }
-
-  async getBalance(): Promise<string | number | bigint> {
-    const { paymentAddress } = this.$store.get()
-    return await getBTCBalance(paymentAddress, this.network)
-  }
-
-  getInscriptions(): Promise<any[]> {
-    throw UNSUPPORTED_PROVIDER_METHOD_ERROR
-  }
-
   async sendBTC(to: string, amount: number): Promise<string> {
     let sendResponse: { txid: string }
     await sendBtcTransaction({
@@ -298,6 +256,7 @@ export default class MagicEdenProvider extends WalletProvider {
       }
     | undefined
   > {
+    console.log('signPsbt', psbtBase64, _finalize, broadcast)
     const { address, paymentAddress } = this.$store.get()
     const toSignPsbt = bitcoin.Psbt.fromBase64(String(psbtBase64), {
       network: getBitcoinNetwork(this.network),
@@ -339,6 +298,7 @@ export default class MagicEdenProvider extends WalletProvider {
     }
 
     let txId, signedPsbtHex, signedPsbtBase64
+    let signedPsbt: bitcoin.Psbt | undefined
     const magicEdenNetwork = getSatsConnectNetwork(this.network)
 
     const signPsbtOptions = {
@@ -352,14 +312,11 @@ export default class MagicEdenProvider extends WalletProvider {
         broadcast: broadcast,
         inputsToSign: inputsToSign,
       },
-      onFinish: (response: { psbtBase64: string; txId: string }) => {
+      onFinish: async (response: { psbtBase64: string; txId: string }) => {
         if (response.psbtBase64) {
-          const signedPsbt = bitcoin.Psbt.fromBase64(
-            String(response.psbtBase64),
-            {
-              network: getBitcoinNetwork(this.network),
-            }
-          )
+          signedPsbt = bitcoin.Psbt.fromBase64(String(response.psbtBase64), {
+            network: getBitcoinNetwork(this.network),
+          })
 
           signedPsbtHex = signedPsbt.toHex()
           signedPsbtBase64 = signedPsbt.toBase64()
@@ -377,14 +334,27 @@ export default class MagicEdenProvider extends WalletProvider {
 
     // @ts-ignore
     await signTransaction(signPsbtOptions)
-    if (broadcast) {
-      const signed = bitcoin.Psbt.fromBase64(String(signedPsbtBase64))
-      const finalized = signed.finalizeAllInputs()
-      const extracted = finalized.extractTransaction()
-      const txId = await this.pushPsbt(extracted.toHex())
+
+    if (!signedPsbt) {
+      throw new Error('signature failed')
+    }
+
+    if (_finalize || broadcast) {
+      signedPsbt.finalizeAllInputs()
+      const signedTx = signedPsbt.extractTransaction()
+      signedPsbtHex = signedTx.toHex()
+      if (broadcast) {
+        txId = await this.pushPsbt(signedPsbtHex)
+        return {
+          signedPsbtHex,
+          signedPsbtBase64,
+          txId,
+        }
+      }
+
       return {
-        signedPsbtHex: extracted.toHex(),
-        signedPsbtBase64: 'test',
+        signedPsbtHex,
+        signedPsbtBase64,
         txId,
       }
     } else {
@@ -394,8 +364,5 @@ export default class MagicEdenProvider extends WalletProvider {
         txId,
       }
     }
-  }
-  async pushPsbt(_tx: string): Promise<string | undefined> {
-    return await broadcastTx(_tx, this.network)
   }
 }

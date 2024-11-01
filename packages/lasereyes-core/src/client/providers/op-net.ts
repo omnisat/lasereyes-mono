@@ -2,7 +2,7 @@ import * as bitcoin from 'bitcoinjs-lib'
 import { WalletProvider } from '.'
 import { getNetworkForUnisat, getUnisatNetwork } from '../../constants/networks'
 import { NetworkType, ProviderType } from '../../types'
-import { broadcastTx, getBTCBalance } from '../../lib/helpers'
+import { getBTCBalance } from '../../lib/helpers'
 import { OP_NET } from '../../constants/wallets'
 import { listenKeys } from 'nanostores'
 
@@ -124,14 +124,17 @@ export default class OpNetProvider extends WalletProvider {
     }
     return getNetworkForUnisat(opNetNetwork.enum) as NetworkType
   }
+
   async sendBTC(to: string, amount: number): Promise<string> {
     const txId = await this.library?.sendBitcoin(to, amount)
     if (!txId) throw new Error('Transaction failed')
     return txId
   }
+
   async signMessage(message: string, _?: string | undefined): Promise<string> {
     return await this.library?.signMessage(message)
   }
+
   async signPsbt(
     _: string,
     psbtHex: string,
@@ -167,13 +170,11 @@ export default class OpNetProvider extends WalletProvider {
       txId: undefined,
     }
   }
-  async pushPsbt(tx: string): Promise<string | undefined> {
-    return await broadcastTx(tx, this.network)
-  }
 
   async getPublicKey() {
     return await this.library?.getPublicKey()
   }
+
   async getBalance() {
     const bal = await this.library.getBalance()
     return bal.total

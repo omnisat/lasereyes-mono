@@ -255,15 +255,13 @@ export async function broadcastTx(
 
 export const getAddressType = (
   address: string,
-  network: bitcoin.Network
+  network: NetworkType
 ): string => {
   try {
+    const btcNetwork = getBitcoinNetwork(network)
     const decoded = bitcoin.address.fromBase58Check(address)
-
-    // Check the address version for P2PKH or P2SH
-    if (decoded.version === network.pubKeyHash) return P2PKH
-    if (decoded.version === network.scriptHash) {
-      // It's a P2SH, but let's check if it wraps a SegWit script
+    if (decoded.version === btcNetwork.pubKeyHash) return P2PKH
+    if (decoded.version === btcNetwork.scriptHash) {
       const script = bitcoin.script.decompile(decoded.hash)
       if (script && script.length === 2 && script[0] === bitcoin.opcodes.OP_0) {
         return P2SH_P2WPKH
@@ -271,11 +269,8 @@ export const getAddressType = (
       return P2SH
     }
   } catch (e) {
-    // If fromBase58Check fails, try Bech32 (for SegWit addresses)
     try {
       const decoded = bitcoin.address.fromBech32(address)
-
-      // Handle Bech32-based addresses (SegWit P2WPKH, P2WSH, P2TR)
       if (decoded.version === 0 && decoded.data.length === 20) return P2WPKH
       if (decoded.version === 0 && decoded.data.length === 32) return P2WSH
       if (decoded.version === 1 && decoded.data.length === 32) return P2TR

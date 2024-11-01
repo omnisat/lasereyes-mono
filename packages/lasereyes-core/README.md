@@ -2,7 +2,7 @@
 
 `@omnisat/lasereyes-core` is the framework-agnostic core library of the lasereyes suite, designed to provide the core logic for Bitcoin wallet integration into dApps. It abstracts wallet-specific interactions and offers a unified interface, enabling developers to interact with various Bitcoin wallets seamlessly.
 
-This package is not tied to any specific framework and can be used in any TypeScript or JavaScript environment.
+This package is not tied to any specific framework and can be used in any TypeScript or JavaScript environment.\
 
 ## Key Concepts
 

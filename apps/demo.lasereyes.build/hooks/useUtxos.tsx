@@ -22,8 +22,8 @@ export const UtxoProvider: React.FC<{
   network: NetworkType
   children: React.ReactNode
 }> = ({ children, network }) => {
-  const { address } = useLaserEyes()
-  const mempoolUrl = `${getMempoolSpaceUrl(network)}/api/address/${address}/utxo`
+  const { paymentAddress } = useLaserEyes()
+  const mempoolUrl = `${getMempoolSpaceUrl(network)}/api/address/${paymentAddress}/utxo`
   const [utxos, setUtxos] = useState<IMempoolUtxo[]>([])
 
   const fetcher = useCallback(async (url: string) => {
@@ -35,13 +35,13 @@ export const UtxoProvider: React.FC<{
   }, [])
 
   const { data: utxosData, error } = useSWR<IMempoolUtxo[]>(
-    address && network && mempoolUrl,
+    paymentAddress && network && mempoolUrl,
     fetcher
   )
 
   useEffect(() => {
     setUtxos([])
-  }, [network, address])
+  }, [network, paymentAddress])
 
   useEffect(() => {
     if (utxosData) {

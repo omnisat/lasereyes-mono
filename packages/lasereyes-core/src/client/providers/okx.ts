@@ -13,21 +13,9 @@ import {
   TESTNET,
   TESTNET4,
 } from '../..'
-import { getBTCBalance } from '../../lib/helpers'
 import { listenKeys, MapStore } from 'nanostores'
 import { persistentMap } from '@nanostores/persistent'
-import axios from 'axios'
-import { getMempoolSpaceUrl } from '../../lib/urls'
-
-const keysToPersist = [
-  'address',
-  'paymentAddress',
-  'publicKey',
-  'paymentPublicKey',
-  'balance',
-] as const
-
-type PersistedKey = (typeof keysToPersist)[number]
+import { keysToPersist, PersistedKey } from '../utils'
 
 const OKX_WALLET_PERSISTENCE_KEY = 'OKX_CONNECTED_WALLET_STATE'
 
@@ -186,11 +174,6 @@ export default class OkxProvider extends WalletProvider {
     return await library?.getPublicKey()
   }
 
-  async getBalance(): Promise<string | number | bigint> {
-    const { paymentAddress } = this.$store.get()
-    return await getBTCBalance(paymentAddress, this.network)
-  }
-
   async getInscriptions(): Promise<any[]> {
     const library = this.library
     return await library.getInscriptions(0, 10)
@@ -243,11 +226,5 @@ export default class OkxProvider extends WalletProvider {
       signedPsbtBase64: psbtSignedPsbt.toBase64(),
       txId: undefined,
     }
-  }
-
-  async pushPsbt(_tx: string): Promise<string | undefined> {
-    return await axios
-      .post(`${getMempoolSpaceUrl(this.network)}/api/tx`, _tx)
-      .then((res) => res.data)
   }
 }

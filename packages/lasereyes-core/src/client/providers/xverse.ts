@@ -4,6 +4,8 @@ import {
   RpcErrorCode,
   getAddress,
   request,
+  signTransaction,
+  SignTransactionOptions,
 } from 'sats-connect'
 import { UNSUPPORTED_PROVIDER_METHOD_ERROR, WalletProvider } from '.'
 import {
@@ -26,16 +28,7 @@ import {
 } from '../../lib/helpers'
 import { MapStore, listenKeys } from 'nanostores'
 import { persistentMap } from '@nanostores/persistent'
-
-const keysToPersist = [
-  'address',
-  'paymentAddress',
-  'publicKey',
-  'paymentPublicKey',
-  'balance',
-] as const
-
-type PersistedKey = (typeof keysToPersist)[number]
+import { keysToPersist, PersistedKey } from '../utils'
 
 const XVERSE_WALLET_PERSISTENCE_KEY = 'XVERSE_CONNECTED_WALLET_STATE'
 export default class XVerseProvider extends WalletProvider {
@@ -310,6 +303,7 @@ export default class XVerseProvider extends WalletProvider {
     }
 
     let txId, signedPsbtHex, signedPsbtBase64
+    let signedPsbt: bitcoin.Psbt | undefined
 
     const xverseNetwork = getSatsConnectNetwork(this.network)
 
@@ -327,12 +321,9 @@ export default class XVerseProvider extends WalletProvider {
         if (response.txId) {
           txId = response.txId
         } else if (response.psbtBase64) {
-          const signedPsbt = bitcoin.Psbt.fromBase64(
-            String(response.psbtBase64),
-            {
-              network: getBitcoinNetwork(this.network),
-            }
-          )
+          signedPsbt = bitcoin.Psbt.fromBase64(String(response.psbtBase64), {
+            network: getBitcoinNetwork(this.network),
+          })
 
           signedPsbtHex = signedPsbt.toHex()
           signedPsbtBase64 = signedPsbt.toBase64()
@@ -342,17 +333,23 @@ export default class XVerseProvider extends WalletProvider {
         console.error('Request canceled')
         throw new Error('User canceled the request')
       },
+    } as SignTransactionOptions
+
+    await signTransaction(signPsbtOptions)
+    if (!signedPsbt) {
+      throw new Error('Error signing psbt')
     }
 
-    // @ts-ignore
-    await signTransaction(signPsbtOptions)
+    if (_finalize) {
+      signedPsbt!.finalizeAllInputs()
+      signedPsbtHex = signedPsbt.toHex()
+      signedPsbtBase64 = signedPsbt.toBase64()
+    }
+
     return {
       signedPsbtHex,
       signedPsbtBase64,
       txId,
     }
-  }
-  pushPsbt(_tx: string): Promise<string | undefined> {
-    throw UNSUPPORTED_PROVIDER_METHOD_ERROR
   }
 }

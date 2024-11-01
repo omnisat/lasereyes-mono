@@ -10,7 +10,6 @@ import {
 } from '../..'
 import * as bitcoin from 'bitcoinjs-lib'
 import { listenKeys } from 'nanostores'
-import { broadcastTx } from '../../lib/helpers'
 
 export class WizzProvider extends WalletProvider {
   public get library(): any | undefined {
@@ -182,9 +181,5 @@ export class WizzProvider extends WalletProvider {
       signedPsbtBase64: psbtSignedPsbt.toBase64(),
       txId: txId,
     }
-  }
-
-  async pushPsbt(tx: string): Promise<string | undefined> {
-    return await broadcastTx(tx, this.$network.get())
   }
 }
