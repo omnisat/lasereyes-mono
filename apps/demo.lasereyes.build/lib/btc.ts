@@ -50,16 +50,13 @@ export const getAddressType = (
       // It's a P2SH, but let's check if it wraps a SegWit script
       const script = bitcoin.script.decompile(decoded.hash)
       if (script && script.length === 2 && script[0] === bitcoin.opcodes.OP_0) {
-        return P2SH_P2WPKH // Nested SegWit (P2SH-P2WPKH)
+        return P2SH_P2WPKH
       }
       return P2SH
     }
   } catch (e) {
-    // If fromBase58Check fails, try Bech32 (for SegWit addresses)
     try {
       const decoded = bitcoin.address.fromBech32(address)
-
-      // Handle Bech32-based addresses (SegWit P2WPKH, P2WSH, P2TR)
       if (decoded.version === 0 && decoded.data.length === 20) return P2WPKH
       if (decoded.version === 0 && decoded.data.length === 32) return P2WSH
       if (decoded.version === 1 && decoded.data.length === 32) return P2TR
@@ -106,7 +103,6 @@ export async function createPsbt(
   console.log({ addressType })
 
   if (addressType === P2SH) {
-    console.log('fetching tx hex')
     const txHexResponse = await axios.get(
       `${getMempoolSpaceUrl(network)}/api/tx/${utxoWithMostValue.txid}/hex`
     )
@@ -121,7 +117,6 @@ export async function createPsbt(
     // if (
     //   getAddressType(outputAddress, getBtcJsNetwork(network)) === P2SH_P2WPKH
     // ) {
-    console.log('adding redeem script')
     const redeemScript = getRedeemScript(paymentPublicKey, network)
     psbt.updateInput(0, { redeemScript })
     // }
