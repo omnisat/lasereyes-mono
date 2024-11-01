@@ -25,6 +25,7 @@
   "dependencies": {
     "@nanostores/vue": "^0.10.0",
     "@omnisat/lasereyes-core": "workspace:*",
+    "bip39": "^3.1.0",
     "nanostores": "^0.11.3",
     "vue": "^3.4.37"
   },

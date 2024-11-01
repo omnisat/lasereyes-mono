@@ -403,6 +403,9 @@ importers:
       '@omnisat/lasereyes-core':
         specifier: workspace:*
         version: link:../lasereyes-core
+      bip39:
+        specifier: ^3.1.0
+        version: 3.1.0
       nanostores:
         specifier: ^0.11.3
         version: 0.11.3
