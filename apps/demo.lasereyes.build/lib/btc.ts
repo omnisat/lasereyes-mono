@@ -100,7 +100,6 @@ export async function createPsbt(
   }
 
   const addressType = getAddressType(outputAddress, btcNetwork)
-  console.log({ addressType })
 
   if (addressType === P2SH) {
     const txHexResponse = await axios.get(

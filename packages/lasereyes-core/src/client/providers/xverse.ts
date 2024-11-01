@@ -320,17 +320,7 @@ export default class XVerseProvider extends WalletProvider {
         throw new Error('User canceled the request')
       },
     } as SignTransactionOptions
-
     await signTransaction(signPsbtOptions)
-    if (!signedPsbt) {
-      throw new Error('Error signing psbt')
-    }
-
-    if (_finalize) {
-      signedPsbt!.finalizeAllInputs()
-      signedPsbtHex = signedPsbt.toHex()
-      signedPsbtBase64 = signedPsbt.toBase64()
-    }
 
     return {
       signedPsbtHex,
