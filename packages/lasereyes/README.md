@@ -9,6 +9,8 @@
 - **Unified Wallet Interface**: Simplifies Bitcoin wallet integration by providing a common interface for multiple wallet providers.
 - **Framework-Agnostic**: `lasereyes-core` can be used in any JavaScript or TypeScript environment, not tied to any specific framework.
 - **React Support**: `lasereyes-react` offers React hooks, context providers, and wallet icons for seamless integration into React applications.
+- **Vue Support** (coming soon): `lasereyes-vue` offers a Vue hook, context providers, and wallet icons for seamless integration into Vue applications.
+- **Angular Support** (coming soon): `lasereyes-angular` offers a Angular hook, context providers, and wallet icons for seamless integration into Angular applications.
 
 ## Packages
 
