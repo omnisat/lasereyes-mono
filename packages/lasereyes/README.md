@@ -1,5 +1,6 @@
-![lasereyes_logo](../../lasereyes.png)
-# lasereyes 
+![lasereyes_logo](https://github.com/omnisat/lasereyes-mono/blob/main/.github/assets/lasereyes.png?raw=true)
+
+# lasereyes
 
 `@omnisat/lasereyes` is the main package that bundles both `lasereyes-core` and `lasereyes-react`, offering a unified interface for Bitcoin wallet integration in both framework-agnostic and React-based environments. This package simplifies wallet interactions across various Bitcoin wallets, making it easy for developers to build dApps with Bitcoin support.
 
@@ -8,13 +9,15 @@
 - **Unified Wallet Interface**: Simplifies Bitcoin wallet integration by providing a common interface for multiple wallet providers.
 - **Framework-Agnostic**: `lasereyes-core` can be used in any JavaScript or TypeScript environment, not tied to any specific framework.
 - **React Support**: `lasereyes-react` offers React hooks, context providers, and wallet icons for seamless integration into React applications.
+- **Vue Support** (coming soon): `lasereyes-vue` offers a Vue hook, context providers, and wallet icons for seamless integration into Vue applications.
+- **Angular Support** (coming soon): `lasereyes-angular` offers a Angular hook, context providers, and wallet icons for seamless integration into Angular applications.
 
 ## Packages
 
 This package exports two core packages:
 
-1. **[lasereyes-core](../lasereyes-core/README.md)**: The framework-agnostic core logic for wallet interactions.
-2. **[lasereyes-react](../lasereyes-react/README.md)**: React-specific components, including hooks, providers, and wallet icons.
+1. **[lasereyes-core](https://github.com/omnisat/lasereyes-mono/tree/main/packages/lasereyes-core)**: The framework-agnostic core logic for wallet interactions.
+2. **[lasereyes-react](https://github.com/omnisat/lasereyes-mono/tree/main/packages/lasereyes-react)**: React-specific components, including hooks, providers, and wallet icons.
 
 ## Installation
 
@@ -81,5 +84,6 @@ Contributions are welcome! Feel free to submit pull requests or open issues for 
 
 `@omnisat/lasereyes` is MIT licensed.
 
+If you find Laser Eyes useful or use it for work, please consider [sponsoring Laser Eyes](https://github.com/sponsors/omnisat). Thank you 🙏
 
-
+<br/>

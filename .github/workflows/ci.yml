@@ -31,7 +31,7 @@ jobs:
         run: pnpm install
 
       - name: Build
-        run: pnpm run build --filter @omnisat/lasereyes
+        run: pnpm run build --filter="@omnisat*"
 
   test:
     runs-on: ubuntu-latest

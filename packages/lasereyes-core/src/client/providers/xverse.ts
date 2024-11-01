@@ -7,7 +7,7 @@ import {
   signTransaction,
   SignTransactionOptions,
 } from 'sats-connect'
-import { UNSUPPORTED_PROVIDER_METHOD_ERROR, WalletProvider } from '.'
+import { WalletProvider } from '.'
 import {
   ProviderType,
   NetworkType,
@@ -177,10 +177,6 @@ export default class XVerseProvider extends WalletProvider {
     }
   }
 
-  async requestAccounts(): Promise<string[]> {
-    return [this.$store.get().address, this.$store.get().paymentAddress]
-  }
-
   async getNetwork(): Promise<NetworkType | undefined> {
     const { address } = this.$store.get()
 
@@ -193,18 +189,7 @@ export default class XVerseProvider extends WalletProvider {
 
     return MAINNET
   }
-  getPublicKey(): Promise<string | undefined> {
-    throw UNSUPPORTED_PROVIDER_METHOD_ERROR
-  }
 
-  async getBalance(): Promise<string | number | bigint> {
-    const { paymentAddress } = this.$store.get()
-    return await getBTCBalance(paymentAddress, this.network)
-  }
-
-  getInscriptions(): Promise<any[]> {
-    throw UNSUPPORTED_PROVIDER_METHOD_ERROR
-  }
   async sendBTC(to: string, amount: number): Promise<string> {
     const response = await request('sendTransfer', {
       recipients: [
@@ -224,6 +209,7 @@ export default class XVerseProvider extends WalletProvider {
       }
     }
   }
+
   async signMessage(
     message: string,
     toSignAddress?: string | undefined
@@ -334,17 +320,7 @@ export default class XVerseProvider extends WalletProvider {
         throw new Error('User canceled the request')
       },
     } as SignTransactionOptions
-
     await signTransaction(signPsbtOptions)
-    if (!signedPsbt) {
-      throw new Error('Error signing psbt')
-    }
-
-    if (_finalize) {
-      signedPsbt!.finalizeAllInputs()
-      signedPsbtHex = signedPsbt.toHex()
-      signedPsbtBase64 = signedPsbt.toBase64()
-    }
 
     return {
       signedPsbtHex,

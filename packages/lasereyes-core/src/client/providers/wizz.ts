@@ -23,8 +23,6 @@ export class WizzProvider extends WalletProvider {
   observer?: MutationObserver
 
   private handleNetworkChanged(_network: NetworkType) {
-    // const foundNetwork = getNetworkForWizz(_network);
-    // this.$network.set(foundNetwork);
     this.parent.connect(WIZZ)
   }
 

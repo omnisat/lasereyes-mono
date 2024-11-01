@@ -124,14 +124,17 @@ export default class UnisatProvider extends WalletProvider {
     }
     return getNetworkForUnisat(unisatNetwork.enum) as NetworkType
   }
+
   async sendBTC(to: string, amount: number): Promise<string> {
     const txId = await this.library?.sendBitcoin(to, amount)
     if (!txId) throw new Error('Transaction failed')
     return txId
   }
+
   async signMessage(message: string, _?: string | undefined): Promise<string> {
     return await this.library?.signMessage(message)
   }
+
   async signPsbt(
     _: string,
     psbtHex: string,
