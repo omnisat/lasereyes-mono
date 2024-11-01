@@ -65,3 +65,21 @@ export function createConfig({ network }: { network: NetworkType }) {
     network,
   }
 }
+
+export const keysToPersist = [
+  'address',
+  'paymentAddress',
+  'publicKey',
+  'paymentPublicKey',
+  'balance',
+] as const
+
+export type PersistedKey = (typeof keysToPersist)[number]
+
+export const fromHexString = (hexString: string): Uint8Array => {
+  const matches = hexString.match(/.{1,2}/g)
+  if (!matches) {
+    throw new Error('Invalid hex string')
+  }
+  return Uint8Array.from(matches.map((byte) => parseInt(byte, 16)))
+}

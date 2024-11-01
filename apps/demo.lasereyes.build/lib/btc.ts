@@ -101,7 +101,11 @@ export async function createPsbt(
   if (!script) {
     throw new Error('Invalid output address')
   }
-  if (getAddressType(outputAddress, getBtcJsNetwork(network)) === P2SH) {
+
+  const addressType = getAddressType(outputAddress, btcNetwork)
+  console.log({ addressType })
+
+  if (addressType === P2SH) {
     console.log('fetching tx hex')
     const txHexResponse = await axios.get(
       `${getMempoolSpaceUrl(network)}/api/tx/${utxoWithMostValue.txid}/hex`
@@ -114,7 +118,6 @@ export async function createPsbt(
       nonWitnessUtxo: Buffer.from(txHex, 'hex'),
     })
 
-    // If the address type is Nested SegWit (P2SH-P2WPKH), add redeemScript
     // if (
     //   getAddressType(outputAddress, getBtcJsNetwork(network)) === P2SH_P2WPKH
     // ) {
@@ -123,7 +126,6 @@ export async function createPsbt(
     psbt.updateInput(0, { redeemScript })
     // }
   } else {
-    // Handle P2PKH (legacy) with witnessUtxo
     psbt.addInput({
       hash: utxoWithMostValue.txid,
       index: utxoWithMostValue.vout,

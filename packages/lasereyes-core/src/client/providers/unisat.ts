@@ -2,11 +2,9 @@ import * as bitcoin from 'bitcoinjs-lib'
 import { WalletProvider } from '.'
 import { getNetworkForUnisat, getUnisatNetwork } from '../../constants/networks'
 import { NetworkType, ProviderType } from '../../types'
-import axios from 'axios'
 import { getBTCBalance } from '../../lib/helpers'
 import { UNISAT } from '../../constants/wallets'
 import { listenKeys } from 'nanostores'
-import { getMempoolSpaceUrl } from '../../lib/urls'
 
 export default class UnisatProvider extends WalletProvider {
   public get library(): any | undefined {
@@ -168,11 +166,6 @@ export default class UnisatProvider extends WalletProvider {
       signedPsbtBase64: psbtSignedPsbt.toBase64(),
       txId: undefined,
     }
-  }
-  async pushPsbt(tx: string): Promise<string | undefined> {
-    return await axios
-      .post(`${getMempoolSpaceUrl(this.network)}/api/tx`, tx)
-      .then((res) => res.data)
   }
 
   async getPublicKey() {

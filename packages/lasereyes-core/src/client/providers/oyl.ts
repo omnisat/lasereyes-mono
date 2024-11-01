@@ -6,16 +6,7 @@ import { OYL } from '../../constants/wallets'
 import { listenKeys, MapStore } from 'nanostores'
 import { persistentMap } from '@nanostores/persistent'
 import { LaserEyesStoreType } from '../types'
-
-const keysToPersist = [
-  'address',
-  'paymentAddress',
-  'publicKey',
-  'paymentPublicKey',
-  'balance',
-] as const
-
-type PersistedKey = (typeof keysToPersist)[number]
+import { keysToPersist, PersistedKey } from '../utils'
 
 const OYL_WALLET_PERSISTENCE_KEY = 'OYL_CONNECTED_WALLET_STATE'
 

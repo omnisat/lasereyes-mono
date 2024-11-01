@@ -3,6 +3,15 @@ import { LaserEyesStoreType } from '../types'
 import { Config, ContentType, NetworkType, ProviderType } from '../../types'
 import { LaserEyesClient } from '..'
 import { inscribeContent } from '../../lib/inscribe'
+import { broadcastTx, getBTCBalance } from '../../lib/helpers'
+import * as bitcoin from 'bitcoinjs-lib'
+import {
+  FRACTAL_TESTNET,
+  MAINNET,
+  SIGNET,
+  TESTNET,
+  TESTNET4,
+} from '../../constants'
 
 export const UNSUPPORTED_PROVIDER_METHOD_ERROR = new Error(
   "The connected wallet doesn't support this method..."
@@ -34,20 +43,39 @@ export abstract class WalletProvider {
 
   abstract connect(defaultWallet: ProviderType): Promise<void>
 
-  abstract requestAccounts(): Promise<string[]>
+  async requestAccounts(): Promise<string[]> {
+    return [this.$store.get().address, this.$store.get().paymentAddress]
+  }
 
   switchNetwork(_network: NetworkType): void {
     this.parent.disconnect()
     throw UNSUPPORTED_PROVIDER_METHOD_ERROR
   }
 
-  abstract getNetwork(): Promise<NetworkType | undefined>
+  async getNetwork(): Promise<NetworkType | undefined> {
+    const { address } = this.$store.get()
+    if (
+      address.slice(0, 1) === 't' &&
+      [TESTNET, TESTNET4, SIGNET, FRACTAL_TESTNET].includes(this.$network.get())
+    ) {
+      return this.$network.get()
+    }
 
-  abstract getPublicKey(): Promise<string | undefined>
+    return MAINNET
+  }
 
-  abstract getBalance(): Promise<bigint | string | number>
+  async getPublicKey(): Promise<string | undefined> {
+    return this.$store.get().publicKey
+  }
 
-  abstract getInscriptions(): Promise<any[]>
+  async getBalance(): Promise<string | number | bigint> {
+    const { paymentAddress } = this.$store.get()
+    return await getBTCBalance(paymentAddress, this.$network.get())
+  }
+
+  async getInscriptions(): Promise<any[]> {
+    throw UNSUPPORTED_PROVIDER_METHOD_ERROR
+  }
 
   abstract sendBTC(to: string, amount: number): Promise<string>
 
@@ -68,7 +96,16 @@ export abstract class WalletProvider {
     | undefined
   >
 
-  abstract pushPsbt(tx: string): Promise<string | undefined>
+  async pushPsbt(_tx: string): Promise<string | undefined> {
+    let payload = _tx
+    if (!payload.startsWith('02')) {
+      console.log('extracting tx...')
+      const psbtObj = bitcoin.Psbt.fromHex(payload)
+      payload = psbtObj.extractTransaction().toHex()
+    }
+
+    return await broadcastTx(payload, this.$network.get())
+  }
 
   async inscribe(
     contentBase64: string,

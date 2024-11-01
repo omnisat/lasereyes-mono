@@ -8,10 +8,9 @@ import {
   calculateValueOfUtxosGathered,
   getAddressType,
   getAddressUtxos,
-  getBitcoinNetwork,
   getRedeemScript,
 } from './helpers'
-import { MAINNET, P2SH } from '../constants'
+import { MAINNET, P2SH, P2TR } from '../constants'
 import axios from 'axios'
 import { getMempoolSpaceUrl } from './urls'
 import * as bip39 from 'bip39'
@@ -41,7 +40,20 @@ export const inscribeContent = async ({
   ordinalAddress: string
   paymentAddress: string
   paymentPublicKey?: string
-  signPsbt: any
+  signPsbt: (
+    tx: string,
+    psbtHex: string,
+    psbtBase64: string,
+    finalize?: boolean,
+    broadcast?: boolean
+  ) => Promise<
+    | {
+        signedPsbtHex: string | undefined
+        signedPsbtBase64: string | undefined
+        txId?: string
+      }
+    | undefined
+  >
 }) => {
   try {
     const privKeyBuff = await generatePrivateKey()
@@ -49,7 +61,6 @@ export const inscribeContent = async ({
     const commitTx = await getCommitTx({
       contentBase64,
       mimeType,
-      ordinalAddress,
       paymentAddress,
       paymentPublicKey,
       privKey,
@@ -62,7 +73,7 @@ export const inscribeContent = async ({
     const commitTxHex = String(commitTx?.psbtHex)
     const commitTxBase64 = String(commitTx?.psbtBase64)
     const response = await signPsbt(
-      null,
+      '',
       commitTxHex,
       commitTxBase64,
       true,
@@ -85,91 +96,15 @@ export const inscribeContent = async ({
   }
 }
 
-// export async function generateSeed() {
-//   const entropy = crypto.getRandomValues(new Uint8Array(32)) // 256-bit entropy
-//   const mnemonic = bip39.entropyToMnemonic(Buffer.from(entropy))
-//
-//   console.log('Mnemonic:', mnemonic)
-//
-//   // Get the seed from the mnemonic (BIP-32 seed)
-//   const seed = await bip39.mnemonicToSeed(mnemonic)
-//
-//   console.log('Bitcoin Seed (BIP-32):', seed.toString('hex'))
-//   return seed
-// }
-
-export async function generatePrivateKey() {
-  const entropy = crypto.getRandomValues(new Uint8Array(32))
-  const mnemonic = bip39.entropyToMnemonic(Buffer.from(entropy))
-  const seed = await bip39.mnemonicToSeed(mnemonic)
-  const root: BIP32Interface = bip32.fromSeed(seed)
-  return root?.derivePath("m/44'/0'/0'/0/0").privateKey
-}
-
-export const createInscriptionScript = (
-  pubKey: any,
-  contentBase64: string,
-  mimeType: ContentType
-) => {
-  const ec = new TextEncoder()
-  const marker = ec.encode('ord')
-
-  let contentBuffer: Buffer
-  if (mimeType === TEXT_PLAIN) {
-    const decodedText = Buffer.from(contentBase64, 'base64').toString('utf-8')
-    contentBuffer = Buffer.from(decodedText, 'utf-8')
-  } else {
-    contentBuffer = Buffer.from(contentBase64, 'base64')
-  }
-
-  // Split content into chunks of 520 bytes
-  const contentChunks = []
-  for (let i = 0; i < contentBuffer.length; i += 520) {
-    contentChunks.push(contentBuffer.slice(i, i + 520))
-  }
-
-  return [
-    pubKey,
-    'OP_CHECKSIG',
-    'OP_0',
-    'OP_IF',
-    marker,
-    '01',
-    ec.encode(mimeType),
-    'OP_0',
-    ...contentChunks.map((chunk) => chunk),
-    'OP_ENDIF',
-  ]
-}
-
-export const createRevealAddressAndKeys = (
-  pubKey: any,
-  content: string,
-  mimeType: ContentType
-) => {
-  const script = createInscriptionScript(pubKey, content, mimeType)
-  const tapleaf = Tap.encodeScript(script)
-  const [tpubkey] = Tap.getPubKey(pubKey, { target: tapleaf })
-  const inscriberAddress = Address.p2tr.fromPubKey(tpubkey)
-
-  return {
-    inscriberAddress,
-    tpubkey,
-    tapleaf,
-  }
-}
-
 export const getCommitTx = async ({
   contentBase64,
   mimeType,
-  ordinalAddress,
   paymentAddress,
   paymentPublicKey,
   privKey,
 }: {
   contentBase64: string
   mimeType: ContentType
-  ordinalAddress: string
   paymentAddress: string
   paymentPublicKey?: string
   privKey: string
@@ -198,7 +133,6 @@ export const getCommitTx = async ({
       mimeType
     )
 
-    // give me estimated size for a blank btc tx
     const estimatedSize = 5 * 34
     const commitSatsNeeded = Math.floor(estimatedSize * fastestFee)
     const revealSatsNeeded =
@@ -221,25 +155,29 @@ export const getCommitTx = async ({
       throw new Error('insufficient funds')
     }
 
-    let redeemScript
-    if (ordinalAddress !== paymentAddress && paymentPublicKey) {
-      redeemScript = getRedeemScript(paymentPublicKey, MAINNET)
-    }
-
     let accSats = 0
     const addressScript = await bitcoin.address.toOutputScript(paymentAddress)
     let counter = 0
     for await (const utxo of filteredUtxos) {
+      const paymentAddressType = getAddressType(paymentAddress, MAINNET)
+      console.log({ paymentAddressType })
       psbt.addInput({
         hash: utxo.txid,
         index: utxo.vout,
         witnessUtxo: { value: BigInt(utxo.value), script: addressScript },
-        tapInternalKey: toXOnly(Buffer.from(paymentPublicKey!, 'hex')),
       })
 
-      if (getAddressType(paymentAddress, getBitcoinNetwork(MAINNET)) === P2SH) {
+      if (paymentAddressType === P2TR) {
+        psbt.updateInput(counter, {
+          tapInternalKey: toXOnly(Buffer.from(paymentPublicKey!, 'hex')),
+        })
+      }
+
+      if (paymentAddressType === P2SH) {
+        let redeemScript = getRedeemScript(paymentPublicKey!, MAINNET)
         psbt.updateInput(counter, { redeemScript })
       }
+
       counter++
       accSats += utxo.value
 
@@ -331,6 +269,67 @@ export const executeReveal = async ({
     return await broadcastTx(Tx.encode(txData).hex, MAINNET)
   } catch (e: any) {
     throw e
+  }
+}
+
+export async function generatePrivateKey() {
+  const entropy = crypto.getRandomValues(new Uint8Array(32))
+  const mnemonic = bip39.entropyToMnemonic(Buffer.from(entropy))
+  const seed = await bip39.mnemonicToSeed(mnemonic)
+  const root: BIP32Interface = bip32.fromSeed(seed)
+  return root?.derivePath("m/44'/0'/0'/0/0").privateKey
+}
+
+export const createInscriptionScript = (
+  pubKey: any,
+  contentBase64: string,
+  mimeType: ContentType
+) => {
+  const ec = new TextEncoder()
+  const marker = ec.encode('ord')
+
+  let contentBuffer: Buffer
+  if (mimeType === TEXT_PLAIN) {
+    const decodedText = Buffer.from(contentBase64, 'base64').toString('utf-8')
+    contentBuffer = Buffer.from(decodedText, 'utf-8')
+  } else {
+    contentBuffer = Buffer.from(contentBase64, 'base64')
+  }
+
+  // Split content into chunks of 520 bytes
+  const contentChunks = []
+  for (let i = 0; i < contentBuffer.length; i += 520) {
+    contentChunks.push(contentBuffer.slice(i, i + 520))
+  }
+
+  return [
+    pubKey,
+    'OP_CHECKSIG',
+    'OP_0',
+    'OP_IF',
+    marker,
+    '01',
+    ec.encode(mimeType),
+    'OP_0',
+    ...contentChunks.map((chunk) => chunk),
+    'OP_ENDIF',
+  ]
+}
+
+export const createRevealAddressAndKeys = (
+  pubKey: any,
+  content: string,
+  mimeType: ContentType
+) => {
+  const script = createInscriptionScript(pubKey, content, mimeType)
+  const tapleaf = Tap.encodeScript(script)
+  const [tpubkey] = Tap.getPubKey(pubKey, { target: tapleaf })
+  const inscriberAddress = Address.p2tr.fromPubKey(tpubkey)
+
+  return {
+    inscriberAddress,
+    tpubkey,
+    tapleaf,
   }
 }
 

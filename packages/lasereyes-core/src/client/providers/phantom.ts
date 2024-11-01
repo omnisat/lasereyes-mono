@@ -1,5 +1,4 @@
 import * as bitcoin from 'bitcoinjs-lib'
-import axios from 'axios'
 import { WalletProvider } from '.'
 import { getUnisatNetwork, MAINNET, PHANTOM, TESTNET } from '../../constants'
 import { ProviderType, NetworkType } from '../../types'
@@ -9,8 +8,8 @@ import {
   getBTCBalance,
 } from '../../lib/helpers'
 import { listenKeys } from 'nanostores'
-import { getMempoolSpaceUrl } from '../../lib/urls'
 import { fromOutputScript } from 'bitcoinjs-lib/src/address'
+import { fromHexString } from '../utils'
 
 export default class PhantomProvider extends WalletProvider {
   public get library(): any | undefined {
@@ -49,22 +48,6 @@ export default class PhantomProvider extends WalletProvider {
     })
   }
 
-  // addListeners() {
-  //   this.library.on('accountsChanged', this.handleAccountsChanged.bind(this))
-  //   this.library.on('networkChanged', this.handleNetworkChanged.bind(this))
-  // }
-  //
-  // removeListeners() {
-  //   this.library.removeListener(
-  //     'accountsChanged',
-  //     this.handleAccountsChanged.bind(this)
-  //   )
-  //   this.library.removeListener(
-  //     'networkChanged',
-  //     this.handleNetworkChanged.bind(this)
-  //   )
-  // }
-
   dispose() {
     this.observer?.disconnect()
     // this.removeListeners()
@@ -88,14 +71,6 @@ export default class PhantomProvider extends WalletProvider {
     }
   }
 
-  // private handleNetworkChanged(network: NetworkType) {
-  //   const foundNetwork = getNetworkForUnisat(network)
-  //   if (this.network !== foundNetwork) {
-  //     this.switchNetwork(foundNetwork)
-  //   }
-  //   this.parent.connect(PHANTOM)
-  // }
-
   async connect(_: ProviderType): Promise<void> {
     if (!this.library) throw new Error("Phantom isn't installed")
     const phantomAccounts = await this.library.requestAccounts()
@@ -114,7 +89,7 @@ export default class PhantomProvider extends WalletProvider {
     this.$store.setKey('publicKey', taproot.publicKey)
     this.$store.setKey('paymentPublicKey', payment.publicKey)
     this.$store.setKey('provider', PHANTOM)
-    getBTCBalance(phantomAccounts[0], this.network).then((totalBalance) => {
+    getBTCBalance(payment.address, this.network).then((totalBalance) => {
       this.$store.setKey('balance', totalBalance)
     })
     this.$store.setKey('connected', true)
@@ -209,7 +184,7 @@ export default class PhantomProvider extends WalletProvider {
       inputsToSign.push(paymentsAddressData)
     }
 
-    const signedPsbt = await this.library.signPsbt(psbtHex, {
+    const signedPsbt = await this.library.signPSBT(fromHexString(psbtHex), {
       inputsToSign,
     })
 
@@ -229,20 +204,6 @@ export default class PhantomProvider extends WalletProvider {
       signedPsbtBase64: psbtSignedPsbt.toBase64(),
       txId: undefined,
     }
-  }
-  async pushPsbt(tx: string): Promise<string | undefined> {
-    return await axios
-      .post(`${getMempoolSpaceUrl(this.network)}/api/tx`, tx)
-      .then((res) => res.data)
-  }
-
-  async getPublicKey() {
-    return this.$store.get().publicKey
-  }
-
-  async getBalance() {
-    const bal = await this.library.getBalance()
-    return bal.total
   }
 
   async getInscriptions(): Promise<any[]> {

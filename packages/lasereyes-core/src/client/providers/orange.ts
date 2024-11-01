@@ -9,7 +9,7 @@ import orange, {
   SendBtcTransactionOptions,
 } from '@orangecrypto/orange-connect'
 
-import { UNSUPPORTED_PROVIDER_METHOD_ERROR, WalletProvider } from '.'
+import { WalletProvider } from '.'
 import {
   ProviderType,
   NetworkType,
@@ -30,24 +30,14 @@ import {
 } from '../../lib/helpers'
 import { MapStore, listenKeys } from 'nanostores'
 import { persistentMap } from '@nanostores/persistent'
-import axios from 'axios'
-import { getMempoolSpaceUrl } from '../../lib/urls'
 
-const keysToPersist = [
-  'address',
-  'paymentAddress',
-  'publicKey',
-  'paymentPublicKey',
-  'balance',
-] as const
+import { keysToPersist, PersistedKey } from '../utils'
 
 const {
   signMessage: signMessageOrange,
   sendBtcTransaction: sendBtcTxOrange,
   signTransaction: signPsbtOrange,
 } = orange
-
-type PersistedKey = (typeof keysToPersist)[number]
 
 const ORANGE_WALLET_PERSISTENCE_KEY = 'ORANGE_CONNECTED_WALLET_STATE'
 export default class OrangeProvider extends WalletProvider {
@@ -196,10 +186,6 @@ export default class OrangeProvider extends WalletProvider {
     }
   }
 
-  async requestAccounts(): Promise<string[]> {
-    return [this.$store.get().address, this.$store.get().paymentAddress]
-  }
-
   async getNetwork(): Promise<NetworkType | undefined> {
     const { address } = this.$store.get()
 
@@ -211,18 +197,6 @@ export default class OrangeProvider extends WalletProvider {
     }
 
     return MAINNET
-  }
-  getPublicKey(): Promise<string | undefined> {
-    throw UNSUPPORTED_PROVIDER_METHOD_ERROR
-  }
-
-  async getBalance(): Promise<string | number | bigint> {
-    const { paymentAddress } = this.$store.get()
-    return await getBTCBalance(paymentAddress, this.network)
-  }
-
-  getInscriptions(): Promise<any[]> {
-    throw UNSUPPORTED_PROVIDER_METHOD_ERROR
   }
 
   async sendBTC(to: string, amount: number): Promise<string> {
@@ -339,6 +313,7 @@ export default class OrangeProvider extends WalletProvider {
     }
 
     let txId, signedPsbtHex, signedPsbtBase64
+    let signedPsbt: bitcoin.Psbt | undefined
     const signPsbtOptions = {
       payload: {
         network: {
@@ -350,15 +325,13 @@ export default class OrangeProvider extends WalletProvider {
         inputsToSign: inputsToSign,
       },
       onFinish: (response: any) => {
+        console.log('response', response)
         if (response.txId) {
           txId = response.txId
         } else if (response.psbtBase64) {
-          const signedPsbt = bitcoin.Psbt.fromBase64(
-            String(response.psbtBase64),
-            {
-              network: getBitcoinNetwork(this.network),
-            }
-          )
+          signedPsbt = bitcoin.Psbt.fromBase64(String(response.psbtBase64), {
+            network: getBitcoinNetwork(this.network),
+          })
 
           signedPsbtHex = signedPsbt.toHex()
           signedPsbtBase64 = signedPsbt.toBase64()
@@ -368,26 +341,28 @@ export default class OrangeProvider extends WalletProvider {
         console.error('Request canceled')
         throw new Error('User canceled the request')
       },
+      onError: (error: any) => {
+        console.error('Error signing psbt:', error)
+        throw new Error('Error signing psbt')
+      },
     } as OrangeSignTransactionOptions
 
     await signPsbtOrange(signPsbtOptions)
+
+    if (!signedPsbt) {
+      throw new Error('Error signing psbt')
+    }
+
+    if (_finalize) {
+      signedPsbt!.finalizeAllInputs()
+      signedPsbtHex = signedPsbt.toHex()
+      signedPsbtBase64 = signedPsbt.toBase64()
+    }
+
     return {
       signedPsbtHex,
       signedPsbtBase64,
       txId,
     }
-  }
-
-  async pushPsbt(_tx: string): Promise<string | undefined> {
-    let payload = _tx
-    if (!payload.startsWith('02')) {
-      const psbtObj = bitcoin.Psbt.fromHex(payload)
-      psbtObj.finalizeAllInputs()
-      payload = psbtObj.extractTransaction().toHex()
-    }
-
-    return await axios
-      .post(`${getMempoolSpaceUrl(this.network)}/api/tx`, payload)
-      .then((res) => res.data)
   }
 }

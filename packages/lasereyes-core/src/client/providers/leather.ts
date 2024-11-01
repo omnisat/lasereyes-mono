@@ -1,5 +1,5 @@
 import * as bitcoin from 'bitcoinjs-lib'
-import { UNSUPPORTED_PROVIDER_METHOD_ERROR, WalletProvider } from '.'
+import { WalletProvider } from '.'
 import {
   ProviderType,
   NetworkType,
@@ -16,18 +16,7 @@ import { persistentMap } from '@nanostores/persistent'
 import { LaserEyesStoreType } from '../types'
 import { SIGNET, TESTNET, TESTNET4 } from '../../constants'
 import { RpcErrorCode } from 'sats-connect'
-import axios from 'axios'
-import { getMempoolSpaceUrl } from '../../lib/urls'
-
-const keysToPersist = [
-  'address',
-  'paymentAddress',
-  'publicKey',
-  'paymentPublicKey',
-  'balance',
-] as const
-
-type PersistedKey = (typeof keysToPersist)[number]
+import { keysToPersist, PersistedKey } from '../utils'
 
 const LEATHER_WALLET_PERSISTENCE_KEY = 'LEATHER_CONNECTED_WALLET_STATE'
 
@@ -253,13 +242,6 @@ export default class LeatherProvider extends WalletProvider {
       }
     }
   }
-  async pushPsbt(tx: string): Promise<string | undefined> {
-    const decoded = bitcoin.Psbt.fromHex(tx)
-    const extracted = decoded.extractTransaction()
-    return await axios
-      .post(`${getMempoolSpaceUrl(this.network)}/api/tx`, extracted.toHex())
-      .then((res) => res.data)
-  }
 
   async getPublicKey() {
     const { result } = (await this.library.request(
@@ -274,6 +256,7 @@ export default class LeatherProvider extends WalletProvider {
     }
     return taprootAddress.publicKey
   }
+
   async getBalance() {
     const bal = await getBTCBalance(
       this.$store.get().paymentAddress,
@@ -281,10 +264,6 @@ export default class LeatherProvider extends WalletProvider {
     )
     this.$store.setKey('balance', bal)
     return bal.toString()
-  }
-
-  async getInscriptions(): Promise<any[]> {
-    throw UNSUPPORTED_PROVIDER_METHOD_ERROR
   }
 
   async requestAccounts(): Promise<string[]> {
@@ -295,9 +274,5 @@ export default class LeatherProvider extends WalletProvider {
     const accounts = addresses.map((address: LeatherAddress) => address.address)
     this.$store.setKey('accounts', accounts)
     return accounts
-  }
-
-  async switchNetwork(): Promise<void> {
-    throw UNSUPPORTED_PROVIDER_METHOD_ERROR
   }
 }
