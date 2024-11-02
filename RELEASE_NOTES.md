@@ -1,4 +1,25 @@
 
+# Release Notes for Version: 0.0.103-rc.18
+
+## Updates
+1. In our Github action workflow for releases, we've added a new command to rebase the main branch from origin after the release notes commit is done. This will help to synchronize the main branch with any new commits made during the build process, ensuring that the following push to the main branch is up-to-date.
+
+2. We've updated the version of `lasereyes-core` from `0.0.32` to `0.0.33-rc.3`. 
+
+3. We've updated the version of `lasereyes-react` from `0.0.25` to `0.0.26-rc.7`.
+
+4. Version of the `lasereyes` package has been updated from `0.0.102` to `0.0.103-rc.18`. 
+
+5. We now use `workspace:*` for dependencies on `@omnisat/lasereyes-core` and `@omnisat/lasereyes-react`. 
+
+## Dependency Changes
+1. In `lasereyes` package, the dependencies for `@omnisat/lasereyes-core` and `@omnisat/lasereyes-react` have switched from specific versions to workspace:*. This designates that the local versions of these packages should be used, which can speed up the development process as changes in the local packages are immediately available.
+
+2. Our `pnpm-lock.yaml` file has been updated to indicate this shift to using the workspace packages. Now, instead of pointing to a specific version of the `lasereyes-core` and `lasereyes-react` packages, they point to the local workspace version.
+
+## Misc
+Two empty line spaces have been added to the end of the `@omnisat/lasereyes-react` README.md file.
+
 # Release Notes 
 
 ## Enhancements
