@@ -374,7 +374,6 @@ jobs:
     needs:
       - bump-rc-in-dev
       - promote-to-stable-in-main
-    if: needs.bump-rc-in-dev.result == 'success' || needs.bump-rc-in-dev.result == 'skipped' || needs.promote-to-stable-in-main.result == 'success' || needs.promote-to-stable-in-main.result == 'skipped'
     environment: prod
     steps:
       - name: Checkout repository

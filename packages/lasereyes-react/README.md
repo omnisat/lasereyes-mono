@@ -23,11 +23,6 @@ function App() {
 }
 ```
 
-
-
-
-
-
 ### Hooks
 `@omnisat/lasereyes-react` provides hooks to interact with wallets within your React components. The most commonly used hook is `useLaserEyes`, which allows you to access the connected wallet and its state.
 
