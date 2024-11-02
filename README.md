@@ -28,7 +28,7 @@ Don't trust verify [Try Out The Demo Here](https://demo.lasereyes.build)
 - Xverse
 
 ## Why Laser Eyes?
-<img alt="herding_cats.gif" src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExN3ZsZnUwNXdydTB6a3oyNDBmNTRwajJvdW5[…]uNDh0bCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/7MIULHLEeZyKs/giphy.gif">
+<img alt="herding_cats.gif" src="httpshttps://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbW92cmM4MDExcGE1NmJtZjhka2N3M25wNm4zeDR5cWQ4YzFnNzZiNiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/7MIULHLEeZyKs/giphy.gif">
 
 
 

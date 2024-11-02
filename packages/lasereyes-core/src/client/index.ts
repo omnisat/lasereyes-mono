@@ -16,7 +16,7 @@ import {
 import { LOCAL_STORAGE_DEFAULT_WALLET } from '../constants/settings'
 import { WalletProvider } from './providers'
 import UnisatProvider from './providers/unisat'
-import { isBase64, isHex } from '../lib/helpers'
+import { isBase64, isHex } from '../lib/utils'
 import * as bitcoin from 'bitcoinjs-lib'
 import { LaserEyesStoreType } from './types'
 import { triggerDOMShakeHack } from './utils'

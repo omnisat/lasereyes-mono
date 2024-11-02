@@ -251,11 +251,11 @@ importers:
   packages/lasereyes:
     dependencies:
       '@omnisat/lasereyes-core':
-        specifier: 0.0.33
-        version: 0.0.33(typescript@5.6.3)
+        specifier: workspace:*
+        version: link:../lasereyes-core
       '@omnisat/lasereyes-react':
-        specifier: 0.0.26
-        version: 0.0.26(@popperjs/core@2.11.8)(typescript@5.6.3)(vite@5.4.10)
+        specifier: workspace:*
+        version: link:../lasereyes-react
       bip39:
         specifier: ^3.1.0
         version: 3.1.0

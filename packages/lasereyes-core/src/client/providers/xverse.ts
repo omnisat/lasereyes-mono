@@ -310,6 +310,9 @@ export default class XVerseProvider extends WalletProvider {
           signedPsbt = bitcoin.Psbt.fromBase64(String(response.psbtBase64), {
             network: getBitcoinNetwork(this.network),
           })
+          if (_finalize) {
+            signedPsbt!.finalizeAllInputs()
+          }
 
           signedPsbtHex = signedPsbt.toHex()
           signedPsbtBase64 = signedPsbt.toBase64()
