@@ -260,7 +260,9 @@ jobs:
   # Merge main into dev to sync branches
   merge-main-into-dev:
     runs-on: ubuntu-latest
-    needs: promote-to-stable-in-main
+    needs:
+      - promote-to-stable-in-main
+      - generate-release-notes-main
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -369,11 +371,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 
-  generate-release-notes:
+  generate-release-notes-dev:
     runs-on: ubuntu-latest
-    needs:
-      - bump-rc-in-dev
-      - promote-to-stable-in-main
+    needs: bump-rc-in-dev
+    if: github.ref == 'refs/heads/dev'
+    continue-on-error: true
     environment: prod
     steps:
       - name: Checkout repository
@@ -402,7 +404,50 @@ jobs:
         id: extract-version
         run: |
           NEW_VERSION=$(node -p "require('./packages/lasereyes/package.json').version")
-          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV          
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+
+      - name: Generate release notes with GPT
+        run: |
+          set -e
+          python3 scripts/generate_release_notes.py ${{ env.NEW_VERSION }}
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+  # Generate and commit release notes for the main branch
+  generate-release-notes-main:
+    runs-on: ubuntu-latest
+    needs: promote-to-stable-in-main
+    if: github.ref == 'refs/heads/main'
+    continue-on-error: true
+    environment: prod
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install openai==0.28 requests
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+      - name: Generate git diff
+        run: |
+          PREV_COMMIT=$(git rev-parse HEAD^1)
+          git diff $PREV_COMMIT HEAD > changes.diff
+
+      - name: Extract new version
+        id: extract-version
+        run: |
+          NEW_VERSION=$(node -p "require('./packages/lasereyes/package.json').version")
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
 
       - name: Generate release notes with GPT
         run: |
@@ -416,8 +461,7 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
 
-      - name: Concatenate release notes
-        if: github.ref == 'refs/heads/main'
+      - name: Commit and push release notes
         run: |
           echo -e "\n$(cat detailed_release_notes.md)\n$(cat RELEASE_NOTES.md)" > RELEASE_NOTES.md
           git add RELEASE_NOTES.md
@@ -427,7 +471,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create GitHub Release
-        if: github.ref == 'refs/heads/main'
         uses: actions/create-release@v1
         with:
           tag_name: "${{ github.ref }}"
@@ -437,3 +480,4 @@ jobs:
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
