@@ -371,6 +371,7 @@ jobs:
   generate-release-notes:
     runs-on: ubuntu-latest
     needs: bump-rc-in-dev
+    environment: prod
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
