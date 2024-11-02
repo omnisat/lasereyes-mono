@@ -371,6 +371,7 @@ jobs:
   generate-release-notes:
     runs-on: ubuntu-latest
     needs: [bump-rc-in-dev, promote-to-stable-in-main]
+    if: needs.bump-rc-in-dev.result == 'success' || needs.promote-to-stable-in-main.result == 'success'
     environment: prod
     steps:
       - name: Checkout repository
