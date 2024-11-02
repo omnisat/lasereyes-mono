@@ -371,7 +371,7 @@ jobs:
   generate-release-notes:
     runs-on: ubuntu-latest
     needs: [bump-rc-in-dev, promote-to-stable-in-main]
-    if: needs.bump-rc-in-dev.result == 'success' || needs.promote-to-stable-in-main.result == 'success'
+    if: needs.bump-rc-in-dev.status == 'success' || needs.promote-to-stable-in-main.status == 'success'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
