@@ -1,3 +1,6 @@
+![lasereyes_logo](https://github.com/omnisat/lasereyes-mono/blob/main/.github/assets/lasereyes.png?raw=true)
+
+
 # lasereyes-core
 
 `@omnisat/lasereyes-core` is the framework-agnostic core library of the lasereyes suite, designed to provide the core logic for Bitcoin wallet integration into dApps. It abstracts wallet-specific interactions and offers a unified interface, enabling developers to interact with various Bitcoin wallets seamlessly.
