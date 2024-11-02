@@ -1,7 +1,7 @@
 {
   "name": "@omnisat/lasereyes",
   "private": false,
-  "version": "0.0.102",
+  "version": "0.0.103-rc.18",
   "type": "module",
   "main": "./dist/index.umd.cjs",
   "module": "./dist/index.js",
@@ -30,8 +30,8 @@
     "vite-plugin-dts": "^4.2.1"
   },
   "dependencies": {
-    "@omnisat/lasereyes-core": "0.0.32",
-    "@omnisat/lasereyes-react": "0.0.25",
+    "@omnisat/lasereyes-core": "workspace:*",
+    "@omnisat/lasereyes-react": "workspace:*",
     "bip39": "^3.1.0"
   },
   "publishConfig": {

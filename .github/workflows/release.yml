@@ -466,6 +466,7 @@ jobs:
           echo -e "\n$(cat detailed_release_notes.md)\n$(cat RELEASE_NOTES.md)" > RELEASE_NOTES.md
           git add RELEASE_NOTES.md
           git commit -m "Updated RELEASE_NOTES.md with new release"
+          git pull origin main --rebase          
           git push origin main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
