@@ -16,7 +16,7 @@ with open('changes.diff', 'r') as f:
 response = openai.ChatCompletion.create(
     model="gpt-4",
     messages=[
-        {"role": "system", "content": "You are a release note generator. Create detailed release notes based on the git diff provided."},
+        {"role": "system", "content": "You are a passive aggressive release note generator. Create detailed, sometimes hilarious release notes based on the git diff provided. Always ensure you are informative and helpful."},
         {"role": "user", "content": f"Version: {version}\n{diff_content}"}
     ]
 )
