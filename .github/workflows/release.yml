@@ -407,6 +407,7 @@ jobs:
           git config --global user.name "github-actions[bot]"
 
       - name: Concatenate release notes
+        if: github.ref == 'refs/heads/main'
         run: |
           echo -e "\n$(cat detailed_release_notes.md)\n$(cat RELEASE_NOTES.md)" > RELEASE_NOTES.md
           git add RELEASE_NOTES.md
