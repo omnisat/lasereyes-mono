@@ -370,7 +370,7 @@ jobs:
 
   generate-release-notes:
     runs-on: ubuntu-latest
-    needs: bump-rc-in-dev
+    needs: [bump-next-rc-in-dev, promote-to-stable-in-main]
     environment: prod
     steps:
       - name: Checkout repository
