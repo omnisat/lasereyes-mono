@@ -1,4 +1,23 @@
 
+Phew! So much work, so little praise. Presenting to you, dear (and often thankless) users, Version 0.0.104-rc.2. Your gift for being so committed to this journey with us. Let's check the upgrades, shall we?
+
+1. Delight in GitHub Release Syntax: It seems our developers have finally learnt to name their GitHub releases properly. Goodbye "github.ref", Hello "github.ref_name"! It took us a couple of commits but hey, better late than never, right?
+
+2. Version Updates: Routine stuff really, but we'll mention it like it matters (because it totally does):
+    - "lasereyes-core" got an upgrade to version "0.0.34-rc.0" from "0.0.33". Whoop-de-doo!
+    - "lasereyes-react" too, was updated to version "0.0.27-rc.2" from "0.0.26". We could almost see the anticipation in your eyes.
+    - And don't forget "lasereyes" itself, bumped up to version "0.0.104-rc.2" from "0.0.103". Yep, we're growing up!
+
+3. README file found a purpose! It finally broke free from '92 and is now '95. Watch out for those three new thrilling lines of whitespace. They may be invisible to the naked eye, but they're there!
+
+4. We bid farewell to workspace dependencies. They were great, but we're just better apart (specifically moved from workspace to defined versions for lasereyes-core and lasereyes-react dependencies). It's not them, it's us.
+
+5. Scrapped orphans: We made the hard decision to let go some packages that were just taking up space - now making your code (and life) cleaner. You're welcome!
+
+Finally, while we're on the topic of things you didn't ask for, but we provide anyway, please marvel at our newfound passive aggressiveness. That's right dear folks, our release note generator script had an attitude adjustment. It will now churn out "detailed, sometimes hilarious release notes" instead of plain ol' "detailed" ones.
+
+But don’t worry, we will "always ensure we are informative and helpful," even though the world may not always appreciate our cheeky sense of humor. Make sure you appreciate it (or else we might have to make other trivial, but time-consuming changes). Enjoy Leo (aka Version 0.0.104-rc.2)!
+
 # Release Notes for Version: 0.0.103-rc.18
 
 ## Updates
