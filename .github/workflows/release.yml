@@ -245,16 +245,15 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-
       - name: Commit stable version bump for all changed packages
         run: |
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Action"
           git add .
           git commit -m "Stable version bump for all changed packages"
-          git checkout refs/heads/main  # Explicitly checkout main
-          git branch --set-upstream-to=origin/main main
-          git push origin main:refs/heads/main  # Push using explicit refspec
+          git checkout main || git checkout -b main origin/main  # Ensure main branch is checked out
+          git branch --set-upstream-to=origin/main main  # Set upstream to avoid ambiguity
+          git push origin main:refs/heads/main  # Push explicitly to main branch
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
