@@ -245,18 +245,14 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Configure git user
-        run: |
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git config --global user.name "github-actions[bot]"
 
-      - name: Set tracking branch
-        run: git branch --set-upstream-to=origin/main main
-
-      - name: Commit stable version bumps for all packages
+      - name: Commit stable version bump for all changed packages
         run: |
+          git config --global user.email "action@github.com"
+          git config --global user.name "GitHub Action"
           git add .
           git commit -m "Stable version bump for all changed packages"
+          git branch --set-upstream-to=origin/main main  # Ensure tracking is set
           git push origin HEAD:main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
