@@ -252,8 +252,9 @@ jobs:
           git config --global user.name "GitHub Action"
           git add .
           git commit -m "Stable version bump for all changed packages"
-          git checkout main  # Ensure you're on the correct branch
-          git push origin main:refs/heads/main  # Use the explicit refspec
+          git checkout refs/heads/main  # Explicitly checkout main
+          git branch --set-upstream-to=origin/main main
+          git push origin main:refs/heads/main  # Push using explicit refspec
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
