@@ -249,6 +249,7 @@ jobs:
         run: |
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Action"
+          git fetch --prune  # Clean up stale references
           git add .
           git commit -m "Stable version bump for all changed packages"
           git checkout main || git checkout -b main origin/main  # Ensure main branch is checked out
