@@ -250,6 +250,9 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
 
+      - name: Set tracking branch
+        run: git branch --set-upstream-to=origin/main main
+
       - name: Commit stable version bumps for all packages
         run: |
           git add .
