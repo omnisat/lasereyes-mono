@@ -30,13 +30,17 @@ bitcoin.initEccLib(ecc2)
 export const inscribeContent = async ({
   contentBase64,
   mimeType,
+  quantity = 1,
+  inscriptions,
   ordinalAddress,
   paymentAddress,
   paymentPublicKey,
   signPsbt,
 }: {
-  contentBase64: string
-  mimeType: ContentType
+  contentBase64?: string
+  mimeType?: ContentType
+  quantity?: number
+  inscriptions?: { content: string; mimeType: ContentType }[]
   ordinalAddress: string
   paymentAddress: string
   paymentPublicKey?: string
@@ -56,11 +60,22 @@ export const inscribeContent = async ({
   >
 }) => {
   try {
+    if (!contentBase64 && !inscriptions) {
+      throw new Error('contentBase64 or inscriptions is required')
+    }
     const privKeyBuff = await generatePrivateKey()
     const privKey = Buffer.from(privKeyBuff!).toString('hex')
+    const ixs = inscriptions
+      ? inscriptions
+      : Array(quantity).fill({
+          content: contentBase64,
+          mimeType,
+        })
+
+    console.log('INSCRIPTIONS', ixs)
+
     const commitTx = await getCommitTx({
-      contentBase64,
-      mimeType,
+      inscriptions: ixs,
       paymentAddress,
       paymentPublicKey,
       privKey,
@@ -85,8 +100,7 @@ export const inscribeContent = async ({
     const commitTxId = await broadcastTx(extracted.toHex(), MAINNET)
     if (!commitTxId) throw new Error('commit tx failed')
     return await executeReveal({
-      contentBase64,
-      mimeType,
+      inscriptions: ixs,
       ordinalAddress,
       privKey,
       commitTxId,
@@ -97,14 +111,12 @@ export const inscribeContent = async ({
 }
 
 export const getCommitTx = async ({
-  contentBase64,
-  mimeType,
+  inscriptions,
   paymentAddress,
   paymentPublicKey,
   privKey,
 }: {
-  contentBase64: string
-  mimeType: ContentType
+  inscriptions: { content: string; mimeType: ContentType }[]
   paymentAddress: string
   paymentPublicKey?: string
   privKey: string
@@ -117,7 +129,11 @@ export const getCommitTx = async ({
   | undefined
 > => {
   try {
-    const contentSize = Buffer.from(contentBase64).length
+    const quantity = inscriptions.length
+    const contentSize = inscriptions.reduce(
+      (a, b) => a + Buffer.from(b.content).length,
+      0
+    )
     if (contentSize > 390000)
       throw new Error('Content size is too large, must be less than 390kb')
 
@@ -129,14 +145,13 @@ export const getCommitTx = async ({
 
     const { inscriberAddress } = createRevealAddressAndKeys(
       pubKey,
-      contentBase64,
-      mimeType
+      inscriptions
     )
 
-    const estimatedSize = 5 * 34
-    const commitSatsNeeded = Math.floor(estimatedSize * fastestFee)
+    const estimatedSize = 5 * 34 * quantity
+    const commitSatsNeeded = Math.floor(estimatedSize * fastestFee * quantity)
     const revealSatsNeeded =
-      Math.floor((contentSize * fastestFee) / 3) + 1000 + 546
+      Math.floor((contentSize * fastestFee) / 3) + 1000 + 546 * quantity
     const inscribeFees = Math.floor(commitSatsNeeded + revealSatsNeeded)
     const utxosGathered: MempoolUtxo[] = await getAddressUtxos(
       paymentAddress,
@@ -210,15 +225,13 @@ export const getCommitTx = async ({
 }
 
 export const executeReveal = async ({
-  contentBase64,
-  mimeType,
+  inscriptions,
   ordinalAddress,
   commitTxId,
   privKey,
   isDry,
 }: {
-  contentBase64: string
-  mimeType: ContentType
+  inscriptions: { content: string; mimeType: ContentType }[]
   ordinalAddress: string
   commitTxId: string
   privKey: string
@@ -227,7 +240,7 @@ export const executeReveal = async ({
   try {
     const secKey = ecc.keys.get_seckey(privKey)
     const pubKey = ecc.keys.get_pubkey(privKey, true)
-    const script = createInscriptionScript(pubKey, contentBase64, mimeType)
+    const script = createInscriptionScript(pubKey, inscriptions)
     const tapleaf = Tap.encodeScript(script)
     const [tpubkey, cblock] = Tap.getPubKey(pubKey, { target: tapleaf })
 
@@ -253,10 +266,10 @@ export const executeReveal = async ({
         },
       ],
       vout: [
-        {
+        ...Array(inscriptions.length).fill({
           value: 546,
           scriptPubKey: Address.toScriptPubKey(ordinalAddress),
-        },
+        }),
       ],
     })
 
@@ -282,46 +295,67 @@ export async function generatePrivateKey() {
 
 export const createInscriptionScript = (
   pubKey: any,
-  contentBase64: string,
-  mimeType: ContentType
+  inscriptions: { content: string; mimeType: ContentType }[]
 ) => {
   const ec = new TextEncoder()
   const marker = ec.encode('ord')
+  const INSCRIPTION_SIZE = 546 // Constant for inscription size
 
-  let contentBuffer: Buffer
-  if (mimeType === TEXT_PLAIN) {
-    const decodedText = Buffer.from(contentBase64, 'base64').toString('utf-8')
-    contentBuffer = Buffer.from(decodedText, 'utf-8')
-  } else {
-    contentBuffer = Buffer.from(contentBase64, 'base64')
+  // Function to create content chunks for each inscription
+  const createContentChunks = (
+    contentBase64: string,
+    mimeType: ContentType
+  ) => {
+    let contentBuffer: Buffer
+    if (mimeType === TEXT_PLAIN) {
+      const decodedText = Buffer.from(contentBase64, 'base64').toString('utf-8')
+      contentBuffer = Buffer.from(decodedText, 'utf-8')
+    } else {
+      contentBuffer = Buffer.from(contentBase64, 'base64')
+    }
+
+    // Split content into chunks of 520 bytes
+    const contentChunks = []
+    for (let i = 0; i < contentBuffer.length; i += 520) {
+      contentChunks.push(contentBuffer.slice(i, i + 520))
+    }
+
+    return contentChunks
   }
 
-  // Split content into chunks of 520 bytes
-  const contentChunks = []
-  for (let i = 0; i < contentBuffer.length; i += 520) {
-    contentChunks.push(contentBuffer.slice(i, i + 520))
-  }
+  // Construct the script starting with pubKey and OP_CHECKSIG
+  const script: any = [pubKey, 'OP_CHECKSIG']
 
-  return [
-    pubKey,
-    'OP_CHECKSIG',
-    'OP_0',
-    'OP_IF',
-    marker,
-    '01',
-    ec.encode(mimeType),
-    'OP_0',
-    ...contentChunks.map((chunk) => chunk),
-    'OP_ENDIF',
-  ]
+  // Add envelopes for each inscription
+  inscriptions.forEach((inscription, index) => {
+    const { content, mimeType } = inscription
+    const contentChunks = createContentChunks(content, mimeType)
+
+    // Start the inscription envelope
+    script.push('OP_0', 'OP_IF', marker, '01', ec.encode(mimeType), 'OP_0')
+
+    // Add pointer logic only if it's not the first inscription
+    if (index > 0) {
+      const pointer = INSCRIPTION_SIZE * (index + 1)
+      const pointerBuffer = Buffer.from([pointer])
+
+      script.push(Buffer.from([0x02])) // Pointer tag
+      script.push(pointerBuffer) // Pointer value in minimal format
+    }
+
+    // Add content chunks and close the conditional block
+    script.push(...contentChunks.map((chunk) => chunk), 'OP_ENDIF')
+  })
+
+  // Return the complete script with all envelopes
+  return script
 }
 
 export const createRevealAddressAndKeys = (
   pubKey: any,
-  content: string,
-  mimeType: ContentType
+  inscriptions: { content: string; mimeType: ContentType }[]
 ) => {
-  const script = createInscriptionScript(pubKey, content, mimeType)
+  const script = createInscriptionScript(pubKey, inscriptions)
   const tapleaf = Tap.encodeScript(script)
   const [tpubkey] = Tap.getPubKey(pubKey, { target: tapleaf })
   const inscriberAddress = Address.p2tr.fromPubKey(tpubkey)

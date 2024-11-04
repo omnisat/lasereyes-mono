@@ -30,7 +30,7 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPsbt } from '@/lib/btc'
 import { getMempoolSpaceUrl } from '@/lib/urls'
 import { clsx } from 'clsx'
@@ -39,6 +39,7 @@ import Link from 'next/link'
 import { ImNewTab } from 'react-icons/im'
 import { cn } from '@/lib/utils'
 import { useUtxos } from '@/hooks/useUtxos'
+import { Input } from '@/components/ui/input'
 
 const WalletCard = ({
   walletName,
@@ -107,6 +108,10 @@ const WalletCard = ({
   const [broadcast, setBroadcast] = useState<boolean>(false)
   const [unsigned, setUnsigned] = useState<string | undefined>()
   const [signed, setSigned] = useState<string | undefined>()
+
+  const [inscriptionText, setInscriptionText] = useState<string>(
+    'Inscribed 100% clientside with Laser Eyes'
+  )
 
   const hasWallet = {
     unisat: hasUnisat,
@@ -378,12 +383,10 @@ const WalletCard = ({
     }
   }
 
-  const inscribeWithWallet = async () => {
+  const inscribeWithWallet = useCallback(async () => {
     try {
       const inscriptionTxId = await inscribe(
-        Buffer.from('Inscribed 100% clientside with Laser Eyes').toString(
-          'base64'
-        ),
+        Buffer.from(inscriptionText).toString('base64'),
         'text/plain'
       )
       toast.success(
@@ -403,7 +406,7 @@ const WalletCard = ({
         toast.error(error.message)
       }
     }
-  }
+  }, [inscribe, inscriptionText, network])
 
   return (
     <Card
@@ -490,7 +493,7 @@ const WalletCard = ({
               }
             >
               <Button
-                className={'w-full bg-[#232225]'}
+                className={'w-full bg-[#232225] disabled:text-[#737275]'}
                 disabled={isMissingWallet || !isConnected || !unsigned}
                 variant={!isConnected ? 'secondary' : 'default'}
                 onClick={() => (!isConnected ? null : signUnsignedPsbt())}
@@ -513,10 +516,9 @@ const WalletCard = ({
               </Button>
               <Button
                 className={clsx(
-                  finalize || provider !== UNISAT
-                    ? 'text-white'
-                    : 'bg-[#232225]',
-                  'shrink disabled:text-gray-500 disabled'
+                  finalize || provider !== UNISAT ? 'text-white' : '',
+                  'shrink disabled:text-gray-500 disabled ',
+                  broadcast ? 'text-orange-500' : 'bg-[#232225]'
                 )}
                 disabled={
                   isMissingWallet ||
@@ -524,9 +526,7 @@ const WalletCard = ({
                   (!finalize && provider !== XVERSE) ||
                   !unsigned
                 }
-                variant={
-                  broadcast ? 'destructive' : finalize ? 'ghost' : 'default'
-                }
+                variant={broadcast ? 'ghost' : 'ghost'}
                 onClick={() => setBroadcast(!broadcast)}
               >
                 broadcast
@@ -534,15 +534,26 @@ const WalletCard = ({
             </span>
 
             <Button
-              className={'w-full bg-[#232225]'}
+              className={'w-full bg-[#232225] disabled:text-[#737275]'}
               disabled={isMissingWallet || !isConnected || !signed || !unsigned}
               variant={!isConnected ? 'secondary' : 'default'}
               onClick={() => (!isConnected ? null : push())}
             >
               push PSBT
             </Button>
+            <div className={'border-b border-2 border-[#232225] w-full my-2'} />
+            <Input
+              className={cn(
+                'w-full bg-[#232225] border-none disabled:text-[#737275] text-center',
+                ''
+              )}
+              placeholder={'Inscribe some text...'}
+              value={inscriptionText}
+              disabled={isMissingWallet || !isConnected}
+              onChange={(e) => setInscriptionText(e.target.value)}
+            />
             <Button
-              className={'w-full bg-[#232225]'}
+              className={'w-full bg-[#232225] disabled:text-[#737275]'}
               disabled={isMissingWallet || !isConnected}
               variant={!isConnected ? 'secondary' : 'default'}
               onClick={() => (!isConnected ? null : inscribeWithWallet())}
