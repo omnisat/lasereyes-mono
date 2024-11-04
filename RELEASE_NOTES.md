@@ -1,4 +1,21 @@
 
+## Version: 0.0.114-rc.1
+#### Tiny step forward, giant leap for kind
+
+- We've updated the `version` of `@omnisat/lasereyes-core` from `0.0.38` to `0.0.39-rc.1` - a minor bump. But, you know, even the Moon is reached by small steps, and we all know what's happened there, right?
+    
+- In the file `op-net.ts`, we've added `?` after `this.library` for method `removeListener`. Now, if `this.library` decides to play hide and seek game, we're prepared. We're always one step ahead.
+
+- Similar changes in the file `unisat.ts` are also observed. `if (!this.library) return` is the new mantra for method `removeListener`. We believe in treating every code file with equality.
+
+- Paving way for the future, `version` in `@omnisat/lasereyes-react` has been moved up from `0.0.30` to `0.0.31-rc.0`. Small progress, but we never despise humble beginnings.
+
+- Following the trend, `version` in `lasereyes` got an update from `0.0.113` to `0.0.114-rc.1`. We're keeping up with the trend, aren't we?
+
+- Lastly, a teensy-weensy change in `generate_release_notes.py`.  Someone was kind enough to correct the spellings of `anything` and `other`. We truly believe that every letter counts, literally!
+
+Leaps and bounds are reserved for superheroes. For us, slight numerical tweaks are our bread and butter. So here’s to many more atomic yet significant bumps in versions to come! Cheers!
+
 **Version: 0.0.113-rc.18**
 
 # "You'll Never See These Updates Coming" Release Notes
