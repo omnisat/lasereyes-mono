@@ -1,7 +1,26 @@
 {
   "name": "@omnisat/lasereyes",
+  "description": "Simplifies wallet interactions across various Bitcoin wallets, making it easy for developers to build dApps with Bitcoin support",
+  "keywords": [
+    "bitcoin",
+    "ordinals",
+    "bitcoin wallets",
+    "react",
+    "web3",
+    "dapps",
+    "blockchain",
+    "crypto"
+  ],
+  "homepage": "https://lasereyes.build",
+  "bugs": {
+    "url": "https://github.com/omnisat/lasereyes-mono/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/omnisat/lasereyes-mono.git"
+  },
   "private": false,
-  "version": "0.0.111-rc.12",
+  "version": "0.0.112-rc.14",
   "type": "module",
   "main": "./dist/index.umd.cjs",
   "module": "./dist/index.js",
@@ -34,6 +53,7 @@
     "@omnisat/lasereyes-react": "workspace:*",
     "bip39": "^3.1.0"
   },
+  "license": "MIT",
   "publishConfig": {
     "access": "public"
   }
