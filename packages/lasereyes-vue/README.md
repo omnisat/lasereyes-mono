@@ -1,5 +1,7 @@
 # lasereyes-vue
 
+Set up guide
+
 `@omnisat/lasereyes-vue` is a Vue-specific package built on top of `lasereyes-core`. It provides Vue composables and wallet functionality to make it easy to integrate Bitcoin wallet support into Vue applications.
 
 This package simplifies the interaction between your Vue app and various Bitcoin wallets, allowing you to focus on building dApps with a seamless user experience.
