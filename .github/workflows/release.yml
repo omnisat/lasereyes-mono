@@ -113,7 +113,6 @@ jobs:
           # Bump lasereyes if any package has changed
           if [[ "${{ needs.check-package-changes.outputs.lasereyes_changed }}" == "true" || \
                 "${{ needs.check-package-changes.outputs.lasereyes_core_changed }}" == "true" || \
-                "${{ needs.check-package-changes.outputs.lasereyes_vue_changed }}" == "true" || \
                 "${{ needs.check-package-changes.outputs.lasereyes_react_changed }}" == "true" ]]; then
               cd packages/lasereyes
               pnpm version prerelease --preid=rc
@@ -218,6 +217,16 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
+      - name: Promote lasereyes-vue version
+        if: needs.check-package-changes.outputs.lasereyes_vue_changed == 'true'
+        run: |
+          cd packages/lasereyes-vue
+          pnpm version patch
+          pnpm publish --access public --no-git-checks
+          cd ../..
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
       # Update lasereyes dependencies to point to new stable versions
       - name: Update dependencies in lasereyes package.json
         if: needs.check-package-changes.outputs.lasereyes_core_changed == 'true' || needs.check-package-changes.outputs.lasereyes_react_changed == 'true'
@@ -231,7 +240,6 @@ jobs:
           cd ../..
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
       # Now promote lasereyes
       - name: Promote lasereyes version
         if: needs.check-package-changes.outputs.lasereyes_changed == 'true' ||
@@ -334,6 +342,7 @@ jobs:
           echo "Lasereyes changed: ${{ needs.check-package-changes.outputs.lasereyes_changed }}"
           echo "Lasereyes-core changed: ${{ needs.check-package-changes.outputs.lasereyes_core_changed }}"
           echo "Lasereyes-react changed: ${{ needs.check-package-changes.outputs.lasereyes_react_changed }}"
+          echo "Lasereyes-react changed: ${{ needs.check-package-changes.outputs.lasereyes_vue_changed }}"
 
       - name: Bump lasereyes version if any package changed
         if: needs.check-package-changes.outputs.lasereyes_changed == 'true' ||
@@ -355,6 +364,12 @@ jobs:
           cd packages/lasereyes-react
           pnpm version prerelease --preid=rc
 
+      - name: Bump lasereyes-vue version if changed
+        if: needs.check-package-changes.outputs.lasereyes_vue_changed == 'true'
+        run: |
+          cd packages/lasereyes-vue
+          pnpm version prerelease --preid=rc
+
       - name: Configure git user
         run: |
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
@@ -363,14 +378,14 @@ jobs:
       - name: Commit RC version bumps for all packages
         if: needs.check-package-changes.outputs.lasereyes_changed == 'true' ||
           needs.check-package-changes.outputs.lasereyes_core_changed == 'true' ||
-          needs.check-package-changes.outputs.lasereyes_react_changed == 'true'
+          needs.check-package-changes.outputs.lasereyes_react_changed == 'true' ||
+          needs.check-package-changes.outputs.lasereyes_vue_changed == 'true'
         run: |
           git add .
           git commit -m "Next RC version bump for all changed packages"
           git push origin dev
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
 
   generate-release-notes-dev:
     runs-on: ubuntu-latest
@@ -475,8 +490,8 @@ jobs:
       - name: Create GitHub Release
         uses: actions/create-release@v1
         with:
-          tag_name: "${{ env.NEW_VERSION }}"
-          release_name: "Release ${{ env.NEW_VERSION }}"
+          tag_name: '${{ env.NEW_VERSION }}'
+          release_name: 'Release ${{ env.NEW_VERSION }}'
           body_path: RELEASE_NOTES.md
           draft: false
           prerelease: false
