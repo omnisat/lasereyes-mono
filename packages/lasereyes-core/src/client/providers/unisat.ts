@@ -49,11 +49,12 @@ export default class UnisatProvider extends WalletProvider {
   }
 
   removeListeners() {
-    this.library.removeListener(
+    if (!this.library) return
+    this.library?.removeListener(
       'accountsChanged',
       this.handleAccountsChanged.bind(this)
     )
-    this.library.removeListener(
+    this.library?.removeListener(
       'networkChanged',
       this.handleNetworkChanged.bind(this)
     )

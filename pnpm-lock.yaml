@@ -251,10 +251,10 @@ importers:
   packages/lasereyes:
     dependencies:
       '@omnisat/lasereyes-core':
-        specifier: workspace:*
+        specifier: 0.0.38
         version: link:../lasereyes-core
       '@omnisat/lasereyes-react':
-        specifier: workspace:*
+        specifier: 0.0.30
         version: link:../lasereyes-react
       bip39:
         specifier: ^3.1.0
@@ -3603,44 +3603,6 @@ packages:
     resolution: {integrity: sha512-nn5ozdjYQpUCZlWGuxcJY/KpxkWQs4DcbMCmKojjyrYDEAGy4Ce19NN4v5MduafTwJlbKc99UA8YhSVqq9yPZA==}
     engines: {node: '>=12.4.0'}
     dev: true
-
-  /@omnisat/lasereyes-core@0.0.33(typescript@5.6.3):
-    resolution: {integrity: sha512-CXalcXIh6oICllKi36pLj6NeyWf2sgBmph4Sh8fc8EWtPx5CJIvdq/SHdO+M1TyWymAYuXQzGC8e3eJ6fulZ9w==}
-    dependencies:
-      '@bitcoinerlab/secp256k1': 1.1.1
-      '@cmdcode/crypto-utils': 2.4.6
-      '@cmdcode/tapscript': 1.4.6
-      '@nanostores/persistent': 0.10.2(nanostores@0.11.3)
-      '@orangecrypto/orange-connect': 1.2.2
-      axios: 1.7.7
-      bip32: 5.0.0-rc.0(typescript@5.6.3)
-      bip39: 3.1.0
-      bitcoinjs-lib: 7.0.0-rc.0(typescript@5.6.3)
-      buffer: 6.0.3
-      nanostores: 0.11.3
-      sats-connect: 2.8.3(typescript@5.6.3)
-    transitivePeerDependencies:
-      - debug
-      - typescript
-    dev: false
-
-  /@omnisat/lasereyes-react@0.0.26(@popperjs/core@2.11.8)(typescript@5.6.3)(vite@5.4.10):
-    resolution: {integrity: sha512-gpcqe4DP1DgFvych6Z8Ymj+Vb0JnoewbtlEJlr2383y4CAB2jOdUYDbePoDSOrWi+sT6Jtrt6r5uwfqU3COCzA==}
-    dependencies:
-      '@nanostores/react': 0.7.3(nanostores@0.11.3)(react@18.3.1)
-      '@omnisat/lasereyes-core': 0.0.33(typescript@5.6.3)
-      bootstrap: 5.3.3(@popperjs/core@2.11.8)
-      nanostores: 0.11.3
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
-      vite-plugin-ssr: 0.4.142(vite@5.4.10)
-    transitivePeerDependencies:
-      - '@popperjs/core'
-      - debug
-      - react-streaming
-      - typescript
-      - vite
-    dev: false
 
   /@orangecrypto/orange-connect@1.2.2:
     resolution: {integrity: sha512-cv1TP+pan+Zx5yKuQHQsTIhABi2YlyTUZbzJgLbIB7fT1cA4plZiIS9GEJN7eD7wc60Fr/yumMV3zTIL5eSZ8w==}
