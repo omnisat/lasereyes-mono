@@ -1,4 +1,22 @@
 
+**Version: 0.0.113-rc.18**
+
+# "You'll Never See These Updates Coming" Release Notes
+
+Oh hey there! Surprised to see you here, but since you are, let's talk about the changes in our swanky new update.
+
+1. **Your favorite @omnisat/lasereyes-core** couldn't stay at "0.0.36-rc.5", because well, change is the only constant in life. It now boasts a shiny version "0.0.38-rc.6". Nothing gets rid of Monday blues like new version numbers, amirite?
+
+2. In the spirit of the age-old tradition of "always leave things slightly better than you found them", **@omnisat/lasereyes-react** decided to shake things up from "0.0.29-rc.7" and stepped up to "0.0.30-rc.7". We’ve got a good feeling about the number '30'.
+
+3. Raising the stakes, we present to you eight – count 'em, EIGHT – new additions to your @omnisat/lasereyes-react exports. Welcome **LeatherLogo, MagicEdenLogo, OkxLogo, PhantomLogo, OylLogo, UnisatLogo, WizzLogo,** and **XverseLogo.** More is always better, except when it’s worse. In this case, we're certain it's better.
+
+4. Last, but not the least, the self-titled celebrity **@omnisat/lasereyes** has leapfrogged from the quaint "0.0.113-rc.16" to the majestic "0.0.113-rc.18". Yeah, you saw that right, we completely skipped 'rc.17'. Because we are mavericks who play by our own rules.
+
+So, buckle up, update your packages, and remember – we make these changes because we care... and because it's our job.
+
+Keep on shining folks! Until the next wave of updates sweeps us away!
+
 Phew! So much work, so little praise. Presenting to you, dear (and often thankless) users, Version 0.0.104-rc.2. Your gift for being so committed to this journey with us. Let's check the upgrades, shall we?
 
 1. Delight in GitHub Release Syntax: It seems our developers have finally learnt to name their GitHub releases properly. Goodbye "github.ref", Hello "github.ref_name"! It took us a couple of commits but hey, better late than never, right?
