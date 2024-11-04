@@ -1,4 +1,21 @@
 
+Release Notes Version: 0.0.115-rc3
+
+Dear user, we believe in continuous improvement, so here we are again with yet another version update. *Play celebratory trumpet sounds.* The upgrades might not be apparent, but boy, have we been working hard behind the scenes!
+
+1. **README.md Update:** The herding cats didn't seem to do the trick, so we have updated the gif file's source link. Now, crossing our fingers, the herding_cats.gif image should load just fine and not cause any 404 crisis. Thank your patience!
+
+2. **Lasereyes-core Version Update:** You might not have noticed, but we actually changed our lasereyes-core version from 0.0.39 to 0.0.40-rc.2. Yep, we're that attentive to details. Next stop, world domination!
+
+3. **Lasereyes-react Version Update:** We have also updated lasereyes-react. Goodbye version 0.0.31, let's welcome the new and slightly improved version 0.0.32-rc.1. Because improvements matter, no matter how small they appear.
+
+4. **Global Version Update:** And finally, we saved the best for the last. Drumrolls, please... we've nudged our global version from 0.0.114 to 0.0.115-rc.3! We're one step closer to version 1.0, friends. One jolly step closer.
+
+5. **Minor Dependencies Shift:** Lastly, we have changed the dependency requirements within the lasereyes package for "@omnisat/lasereyes-core" and "@omnisat/lasereyes-react". They now point to workspace:*. There will be no apparent changes or impact due to this update, but we thought you'd like to know... just because.
+
+CAUTION: Please avoid looking directly into the laser eyes. Enjoy the version update!
+- Faithfully yours, LaserEyes team.
+
 ## Version: 0.0.114-rc.1
 #### Tiny step forward, giant leap for kind
 
