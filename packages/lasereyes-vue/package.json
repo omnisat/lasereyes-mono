@@ -1,7 +1,7 @@
 {
   "name": "@omnisat/lasereyes-vue",
   "private": false,
-  "version": "0.0.2-rc.3",
+  "version": "0.0.2-rc.4",
   "type": "module",
   "files": [
     "dist"
