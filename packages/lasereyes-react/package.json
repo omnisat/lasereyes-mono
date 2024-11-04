@@ -1,7 +1,7 @@
 {
   "name": "@omnisat/lasereyes-react",
   "private": false,
-  "version": "0.0.31-rc.1",
+  "version": "0.0.32-rc.1",
   "type": "module",
   "main": "./dist/index.umd.cjs",
   "module": "./dist/index.js",
