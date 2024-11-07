@@ -25,6 +25,7 @@ enum ProviderEnumMap {
   WIZZ = 'wizz',
   ORANGE = 'orange',
   OYL = 'oyl',
+  PHANTOM = 'phantom',
   UNISAT = 'unisat',
   XVERSE = 'xverse',
 }
@@ -56,6 +57,10 @@ export const SUPPORTED_WALLETS: WalletInfo = {
   [ProviderEnumMap.ORANGE]: {
     name: ProviderEnumMap.ORANGE,
     url: 'https://www.orangewallet.com/',
+  },
+  [ProviderEnumMap.PHANTOM]: {
+    name: ProviderEnumMap.PHANTOM,
+    url: 'https://phantom.app/download',
   },
   [ProviderEnumMap.OYL]: {
     name: ProviderEnumMap.OYL,
