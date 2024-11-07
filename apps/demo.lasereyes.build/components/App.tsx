@@ -3,15 +3,11 @@ import WalletCard from '@/components/WalletCard'
 import { useEffect, useState } from 'react'
 import { clsx } from 'clsx'
 import {
-  FRACTAL_TESTNET,
   LEATHER,
   MAGIC_EDEN,
-  MAINNET,
   OKX,
   OYL,
   PHANTOM,
-  SIGNET,
-  TESTNET,
   UNISAT,
   WIZZ,
   ORANGE,
@@ -19,9 +15,8 @@ import {
   useLaserEyes,
   WalletIcon,
   OP_NET,
-  TESTNET4,
   SUPPORTED_WALLETS,
-  FRACTAL_MAINNET,
+  ProviderType,
 } from '@omnisat/lasereyes'
 import { satoshisToBTC } from '@/lib/btc'
 import { cn, truncateString } from '@/lib/utils'
@@ -32,7 +27,6 @@ import { Input } from '@/components/ui/input'
 import { getPackageVersion } from '@/lib/github'
 import { badgeVariants } from '@/components/ui/badge'
 import { FaExternalLinkAlt } from 'react-icons/fa'
-import { toast } from 'sonner'
 import { RxReload } from 'react-icons/rx'
 import { ClickToCopyNpmInstallPill } from '@/components/ClickToCopyNpmInstallPill'
 import { ImNewTab } from 'react-icons/im'
@@ -85,20 +79,6 @@ const App = () => {
   //   FRACTAL_TESTNET,
   //   FRACTAL_MAINNET,
   // ]
-
-  const switchNet = async (
-    n: typeof MAINNET | typeof TESTNET | typeof SIGNET | typeof FRACTAL_TESTNET
-  ) => {
-    try {
-      // await switchNetwork(
-      //   NETWORKS[NETWORKS.findIndex((net) => net === network) + 1]
-      // )
-      // setNetwork(n)
-    } catch (e) {
-      // @ts-ignore
-      toast.error(e.message)
-    }
-  }
 
   return (
     <div
@@ -408,29 +388,18 @@ const App = () => {
         </div>
       </div>
       <div className={'flex flex-wrap justify-center gap-8'}>
-        {Object.values(SUPPORTED_WALLETS).map((walletInfo) => (
-          <WalletCard
-            key={walletInfo.name}
-            wallet={walletInfo}
-            walletName={
-              walletInfo.name as
-                | typeof UNISAT
-                | typeof XVERSE
-                | typeof OYL
-                | typeof MAGIC_EDEN
-                | typeof OKX
-                | typeof OP_NET
-                | typeof ORANGE
-                | typeof LEATHER
-                | typeof PHANTOM
-                | typeof WIZZ
-            }
-            setSignature={setSignature}
-            unsignedPsbt={unsignedPsbt}
-            setUnsignedPsbt={setUnsignedPsbt}
-            setSignedPsbt={setSignedPsbt}
-          />
-        ))}
+        {Object.values(SUPPORTED_WALLETS).map(
+          (walletInfo: { name: ProviderType; url: string }) => (
+            <WalletCard
+              key={walletInfo.name}
+              wallet={walletInfo}
+              setSignature={setSignature}
+              unsignedPsbt={unsignedPsbt}
+              setUnsignedPsbt={setUnsignedPsbt}
+              setSignedPsbt={setSignedPsbt}
+            />
+          )
+        )}
       </div>
     </div>
   )

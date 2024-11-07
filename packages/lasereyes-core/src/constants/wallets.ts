@@ -18,37 +18,55 @@ export const P2PSH = 'p2psh'
 export const P2WSH = 'p2wsh'
 export const P2SH = 'p2sh'
 
-export const SUPPORTED_WALLETS = {
-  [LEATHER]: {
-    name: LEATHER,
+enum ProviderEnumMap {
+  LEATHER = 'leather',
+  MAGIC_EDEN = 'magic-eden',
+  OKX = 'okx',
+  WIZZ = 'wizz',
+  ORANGE = 'orange',
+  OYL = 'oyl',
+  UNISAT = 'unisat',
+  XVERSE = 'xverse',
+}
+
+type WalletInfo = {
+  [key in ProviderEnumMap]: {
+    name: ProviderEnumMap
+    url: string
+  }
+}
+
+export const SUPPORTED_WALLETS: WalletInfo = {
+  [ProviderEnumMap.LEATHER]: {
+    name: ProviderEnumMap.LEATHER,
     url: 'https://leather.io/install-extension',
   },
-  [MAGIC_EDEN]: {
-    name: MAGIC_EDEN,
+  [ProviderEnumMap.MAGIC_EDEN]: {
+    name: ProviderEnumMap.MAGIC_EDEN,
     url: 'https://wallet.magiceden.io/',
   },
-  [OKX]: {
-    name: OKX,
+  [ProviderEnumMap.OKX]: {
+    name: ProviderEnumMap.OKX,
     url: 'https://chromewebstore.google.com/detail/okx-wallet/mcohilncbfahbmgdjkbpemcciiolgcge',
   },
-  [WIZZ]: {
-    name: WIZZ,
+  [ProviderEnumMap.WIZZ]: {
+    name: ProviderEnumMap.WIZZ,
     url: 'https://wizzwallet.io/#extension',
   },
-  [ORANGE]: {
-    name: ORANGE,
+  [ProviderEnumMap.ORANGE]: {
+    name: ProviderEnumMap.ORANGE,
     url: 'https://www.orangewallet.com/',
   },
-  [OYL]: {
-    name: OYL,
+  [ProviderEnumMap.OYL]: {
+    name: ProviderEnumMap.OYL,
     url: 'https://www.oyl.io/#get-wallet',
   },
-  [UNISAT]: {
-    name: UNISAT,
+  [ProviderEnumMap.UNISAT]: {
+    name: ProviderEnumMap.UNISAT,
     url: 'https://unisat.io/download',
   },
-  [XVERSE]: {
-    name: XVERSE,
+  [ProviderEnumMap.XVERSE]: {
+    name: ProviderEnumMap.XVERSE,
     url: 'https://www.xverse.app/download',
   },
 }

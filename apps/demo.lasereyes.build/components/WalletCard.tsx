@@ -19,6 +19,7 @@ import {
   useLaserEyes,
   WalletIcon,
   OP_NET,
+  ProviderType,
 } from '@omnisat/lasereyes'
 import {
   Card,
@@ -49,17 +50,7 @@ const WalletCard = ({
   setSignedPsbt,
 }: {
   wallet: {
-    name:
-      | typeof UNISAT
-      | typeof XVERSE
-      | typeof OYL
-      | typeof MAGIC_EDEN
-      | typeof OKX
-      | typeof OP_NET
-      | typeof LEATHER
-      | typeof ORANGE
-      | typeof PHANTOM
-      | typeof WIZZ
+    name: ProviderType
     url: string
   }
   setSignature: (signature: string) => void
