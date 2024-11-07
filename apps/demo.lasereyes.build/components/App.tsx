@@ -21,6 +21,7 @@ import {
   OP_NET,
   TESTNET4,
   SUPPORTED_WALLETS,
+  FRACTAL_MAINNET,
 } from '@omnisat/lasereyes'
 import { satoshisToBTC } from '@/lib/btc'
 import { cn, truncateString } from '@/lib/utils'
@@ -36,17 +37,7 @@ import { RxReload } from 'react-icons/rx'
 import { ClickToCopyNpmInstallPill } from '@/components/ClickToCopyNpmInstallPill'
 import { ImNewTab } from 'react-icons/im'
 
-const App = ({
-  setNetwork,
-}: {
-  setNetwork: (
-    network:
-      | typeof MAINNET
-      | typeof TESTNET
-      | typeof SIGNET
-      | typeof FRACTAL_TESTNET
-  ) => void
-}) => {
+const App = () => {
   const {
     address,
     paymentAddress,
@@ -161,12 +152,7 @@ const App = ({
       <div className={'border border-[#3c393f] w-full text-xl grow pb-8'}>
         <div className={'flex flex-row items-center gap-4 '}>
           <div className={'grow'} />
-          <div
-            className={'flex flex-col p-4 items-center'}
-            onClick={() => switchNet(TESTNET4)}
-          >
-            {network}
-          </div>
+          <div className={'flex flex-col p-4 items-center'}>{network}</div>
         </div>
         <div
           className={'flex flex-col gap-2 text-center items-center break-all'}
