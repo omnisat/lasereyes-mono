@@ -1,6 +1,6 @@
 import * as bitcoin from 'bitcoinjs-lib'
 import { WalletProvider } from '.'
-import { getUnisatNetwork, MAINNET, PHANTOM, TESTNET } from '../../constants'
+import { MAINNET, PHANTOM, TESTNET } from '../../constants'
 import { ProviderType, NetworkType } from '../../types'
 import {
   createSendBtcPsbt,
@@ -184,14 +184,25 @@ export default class PhantomProvider extends WalletProvider {
       inputsToSign.push(paymentsAddressData)
     }
 
-    const signedPsbt = await this.library.signPSBT(fromHexString(psbtHex), {
-      inputsToSign,
-    })
+    const signedPsbt: Uint8Array = await this.library.signPSBT(
+      fromHexString(psbtHex),
+      {
+        inputsToSign,
+      }
+    )
 
-    const psbtSignedPsbt = bitcoin.Psbt.fromHex(signedPsbt)
+    const psbtSignedPsbt = bitcoin.Psbt.fromBuffer(signedPsbt)
 
-    if (finalize && broadcast) {
-      const txId = await this.pushPsbt(signedPsbt)
+    if (finalize) {
+      inputsToSign.forEach((inputData) => {
+        inputData.signingIndexes.forEach((index) => {
+          psbtSignedPsbt.finalizeInput(index)
+        })
+      })
+    }
+
+    if (broadcast) {
+      const txId = await this.pushPsbt(psbtSignedPsbt.toHex())
       return {
         signedPsbtHex: psbtSignedPsbt.toHex(),
         signedPsbtBase64: psbtSignedPsbt.toBase64(),
@@ -206,18 +217,7 @@ export default class PhantomProvider extends WalletProvider {
     }
   }
 
-  async getInscriptions(): Promise<any[]> {
-    return await this.library.getInscriptions(0, 10)
-  }
-
   async requestAccounts(): Promise<string[]> {
     return await this.library.requestAccounts()
-  }
-
-  async switchNetwork(network: NetworkType): Promise<void> {
-    const wantedNetwork = getUnisatNetwork(network)
-    await this.library?.switchChain(wantedNetwork)
-    this.$network.set(network)
-    await this.getBalance()
   }
 }

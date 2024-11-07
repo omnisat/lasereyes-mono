@@ -42,23 +42,26 @@ import { useUtxos } from '@/hooks/useUtxos'
 import { Input } from '@/components/ui/input'
 
 const WalletCard = ({
-  walletName,
+  wallet,
   setSignature,
   unsignedPsbt,
   setUnsignedPsbt,
   setSignedPsbt,
 }: {
-  walletName:
-    | typeof UNISAT
-    | typeof XVERSE
-    | typeof OYL
-    | typeof MAGIC_EDEN
-    | typeof OKX
-    | typeof OP_NET
-    | typeof LEATHER
-    | typeof ORANGE
-    | typeof PHANTOM
-    | typeof WIZZ
+  wallet: {
+    name:
+      | typeof UNISAT
+      | typeof XVERSE
+      | typeof OYL
+      | typeof MAGIC_EDEN
+      | typeof OKX
+      | typeof OP_NET
+      | typeof LEATHER
+      | typeof ORANGE
+      | typeof PHANTOM
+      | typeof WIZZ
+    url: string
+  }
   setSignature: (signature: string) => void
   unsignedPsbt: string | undefined
   setUnsignedPsbt: (psbt: string) => void
@@ -72,6 +75,7 @@ const WalletCard = ({
       | undefined
   ) => void
 }) => {
+  const walletName = wallet.name
   const {
     isInitializing,
     connect,
@@ -436,22 +440,41 @@ const WalletCard = ({
             >
               {isConnected ? 'connected' : 'disconnected'}
             </Badge>
-            <Button
-              className={'w-full bg-[#232225] '}
-              disabled={isMissingWallet}
-              variant={'default'}
-              onClick={() =>
-                isConnected ? disconnect() : connectWallet(walletName)
-              }
-            >
-              {isInitializing
-                ? 'initializing..'
-                : isMissingWallet
-                  ? 'missing wallet'
-                  : isConnected
-                    ? 'disconnect'
-                    : 'connect'}
-            </Button>
+            {isMissingWallet ? (
+              <Link
+                href={wallet.url}
+                target={'_blank'}
+                className={
+                  'flex flex-row gap-2 items-center w-full justify-center'
+                }
+              >
+                <Button
+                  className={
+                    'w-full bg-[#232225] flex flex-row gap-2 items-center'
+                  }
+                  variant={'default'}
+                >
+                  Download <ImNewTab />
+                </Button>
+              </Link>
+            ) : (
+              <Button
+                className={'w-full bg-[#232225] '}
+                disabled={isMissingWallet}
+                variant={'default'}
+                onClick={() =>
+                  isConnected ? disconnect() : connectWallet(walletName)
+                }
+              >
+                {isInitializing
+                  ? 'initializing..'
+                  : isMissingWallet
+                    ? 'missing wallet'
+                    : isConnected
+                      ? 'disconnect'
+                      : 'connect'}
+              </Button>
+            )}
           </div>
 
           <div className={'flex flex-col space-between items-center gap-2'}>
