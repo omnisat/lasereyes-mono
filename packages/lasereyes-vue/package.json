@@ -1,7 +1,7 @@
 {
   "name": "@omnisat/lasereyes-vue",
   "private": false,
-  "version": "0.0.2",
+  "version": "0.0.3-rc.6",
   "type": "module",
   "files": [
     "dist"
@@ -36,5 +36,8 @@
     "vite": "^5.4.6",
     "vite-plugin-dts": "^4.1.0",
     "vue-tsc": "^2.1.6"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

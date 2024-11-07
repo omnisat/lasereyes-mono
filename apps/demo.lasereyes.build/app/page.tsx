@@ -19,7 +19,7 @@ const DynamicLasereyesProvider = dynamic(
 )
 
 export default function Home() {
-  const [network, setNetwork] = useState<
+  const [network] = useState<
     | typeof MAINNET
     | typeof TESTNET
     | typeof TESTNET4
@@ -30,7 +30,7 @@ export default function Home() {
   return (
     <DynamicLasereyesProvider config={{ network }}>
       <UtxoProvider network={network}>
-        <App setNetwork={setNetwork} />
+        <App />
       </UtxoProvider>
     </DynamicLasereyesProvider>
   )

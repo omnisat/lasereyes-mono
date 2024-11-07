@@ -3,15 +3,11 @@ import WalletCard from '@/components/WalletCard'
 import { useEffect, useState } from 'react'
 import { clsx } from 'clsx'
 import {
-  FRACTAL_TESTNET,
   LEATHER,
   MAGIC_EDEN,
-  MAINNET,
   OKX,
   OYL,
   PHANTOM,
-  SIGNET,
-  TESTNET,
   UNISAT,
   WIZZ,
   ORANGE,
@@ -19,6 +15,8 @@ import {
   useLaserEyes,
   WalletIcon,
   OP_NET,
+  SUPPORTED_WALLETS,
+  ProviderType,
 } from '@omnisat/lasereyes'
 import { satoshisToBTC } from '@/lib/btc'
 import { cn, truncateString } from '@/lib/utils'
@@ -29,39 +27,11 @@ import { Input } from '@/components/ui/input'
 import { getPackageVersion } from '@/lib/github'
 import { badgeVariants } from '@/components/ui/badge'
 import { FaExternalLinkAlt } from 'react-icons/fa'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import { toast } from 'sonner'
 import { RxReload } from 'react-icons/rx'
 import { ClickToCopyNpmInstallPill } from '@/components/ClickToCopyNpmInstallPill'
+import { ImNewTab } from 'react-icons/im'
 
-const App = ({
-  setNetwork,
-}: {
-  setNetwork: (
-    network:
-      | typeof MAINNET
-      | typeof TESTNET
-      | typeof SIGNET
-      | typeof FRACTAL_TESTNET
-  ) => void
-}) => {
-  const wallets = [
-    LEATHER,
-    MAGIC_EDEN,
-    OKX,
-    ORANGE,
-    OYL,
-    PHANTOM,
-    UNISAT,
-    WIZZ,
-    XVERSE,
-  ]
+const App = () => {
   const {
     address,
     paymentAddress,
@@ -80,9 +50,9 @@ const App = ({
   const [signedPsbt, setSignedPsbt] = useState<
     | string
     | {
-      signedPsbtHex: string
-      signedPsbtBase64: string
-    }
+        signedPsbtHex: string
+        signedPsbtBase64: string
+      }
     | undefined
   >()
 
@@ -101,21 +71,14 @@ const App = ({
   // @ts-ignore
   const total = satoshisToBTC(balance)
 
-  const switchNet = async (
-    network:
-      | typeof MAINNET
-      | typeof TESTNET
-      | typeof SIGNET
-      | typeof FRACTAL_TESTNET
-  ) => {
-    try {
-      await switchNetwork(network)
-      setNetwork(network)
-    } catch (e) {
-      // @ts-ignore
-      toast.error(e.message)
-    }
-  }
+  // const NETWORKS = [
+  //   MAINNET,
+  //   TESTNET,
+  //   TESTNET4,
+  //   SIGNET,
+  //   FRACTAL_TESTNET,
+  //   FRACTAL_MAINNET,
+  // ]
 
   return (
     <div
@@ -147,42 +110,29 @@ const App = ({
         <ClickToCopyNpmInstallPill className={'mr-6'} />
         <Link
           href={'https://www.lasereyes.build/docs/getting-started'}
+          target={'_blank'}
           className={
-            'self-end font-windows text-white hover:text-orange-500 transition-all'
+            'self-end font-windows text-white flex flex-row gap-2 items-center hover:text-orange-500 transition-all'
           }
         >
           docs
+          <ImNewTab />
         </Link>
         <Link
           href={'https://github.com/omnisat/lasereyes/tree/main/example'}
           target={'_blank'}
           className={
-            'self-end font-windows text-white hover:text-orange-500 transition-all'
+            'self-end font-windows text-white flex flex-row gap-2 items-center hover:text-orange-500 transition-all'
           }
         >
           view source
+          <ImNewTab />
         </Link>
       </div>
       <div className={'border border-[#3c393f] w-full text-xl grow pb-8'}>
         <div className={'flex flex-row items-center gap-4 '}>
           <div className={'grow'} />
-          <div className={'flex flex-col p-4 items-center'}>
-            <Select onValueChange={(e) => switchNet(e as any)}>
-              <SelectTrigger className="">
-                <SelectValue
-                  placeholder={network?.length > 0 ? network : '--'}
-                />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="mainnet">mainnet</SelectItem>
-                <SelectItem value="testnet">testnet</SelectItem>
-                <SelectItem value="testnet4">testnet4</SelectItem>
-                <SelectItem value="signet">signet</SelectItem>
-                <SelectItem value="fractal mainnet">fractal_mainnet</SelectItem>
-                <SelectItem value="fractal testnet">fractal_testnet</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          <div className={'flex flex-col p-4 items-center'}>{network}</div>
         </div>
         <div
           className={'flex flex-col gap-2 text-center items-center break-all'}
@@ -438,28 +388,18 @@ const App = ({
         </div>
       </div>
       <div className={'flex flex-wrap justify-center gap-8'}>
-        {wallets.map((walletName) => (
-          <WalletCard
-            key={walletName}
-            walletName={
-              walletName as
-              | typeof UNISAT
-              | typeof XVERSE
-              | typeof OYL
-              | typeof MAGIC_EDEN
-              | typeof OKX
-              | typeof OP_NET
-              | typeof ORANGE
-              | typeof LEATHER
-              | typeof PHANTOM
-              | typeof WIZZ
-            }
-            setSignature={setSignature}
-            unsignedPsbt={unsignedPsbt}
-            setUnsignedPsbt={setUnsignedPsbt}
-            setSignedPsbt={setSignedPsbt}
-          />
-        ))}
+        {Object.values(SUPPORTED_WALLETS).map(
+          (walletInfo: { name: ProviderType; url: string }) => (
+            <WalletCard
+              key={walletInfo.name}
+              wallet={walletInfo}
+              setSignature={setSignature}
+              unsignedPsbt={unsignedPsbt}
+              setUnsignedPsbt={setUnsignedPsbt}
+              setSignedPsbt={setSignedPsbt}
+            />
+          )
+        )}
       </div>
     </div>
   )
