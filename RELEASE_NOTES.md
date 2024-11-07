@@ -1,4 +1,23 @@
 
+Welcome to **Version 0.0.118-rc.1**! Make sure you had your coffee today, because we've got a well-rounded slate of updates that may require that extra caffeine boost. Here's what changed:
+
+**`lasereyes-core` package:**
+- Fanfare, please! We've ascended to **version 0.0.43-rc.0** from the old and rusting 0.0.42. If that's not worth a drum roll, I don't know what is.
+- Look who's shown up in our `ProviderEnumMap`! It's **Phantom**! Yes, we've added 'phantom' to our menagerie of supported wallet providers. You could say it 'appeared out of nowhere.'
+- But where, oh where, can you find this elusive Phantom? We're so glad you asked! Navigate to 'https://phantom.app/download', where you can download the Phantom wallet. See, we're full of helpful tips!
+
+**`lasereyes-react` package:**
+- We're marching to the beat of progress, and that means upgrading to **version 0.0.35-rc.0** from version 0.0.34. It's these small steps that make us feel warm and fuzzy inside.
+
+**`lasereyes-vue` package:**
+- Vue enthusiasts, rejoice! We've refined `lasereyes-vue` to **version 0.0.4-rc.0** from a respectable but slightly less shiny 0.0.3.
+
+**`lasereyes` package:**
+- The Mother of Packages has advanced to **version 0.0.118-rc.1**! This update might be your favorite; it's certainly ours.
+- While we're at it, we've updated dependencies too. You'll find `lasereyes-core` and `lasereyes-react` sitting comfortably in the workspace.
+
+Alright, back to your regularly scheduled programming activities! Go forth and conquer with these exquisite updates in your toolkit.
+
 Release Notes Version: 0.0.115-rc3
 
 Dear user, we believe in continuous improvement, so here we are again with yet another version update. *Play celebratory trumpet sounds.* The upgrades might not be apparent, but boy, have we been working hard behind the scenes!
