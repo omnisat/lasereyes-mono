@@ -25,6 +25,7 @@ import {
   findPaymentAddress,
   getBTCBalance,
   getBitcoinNetwork,
+  isMainnetNetwork,
 } from '../../lib/helpers'
 import { MapStore, listenKeys } from 'nanostores'
 import { persistentMap } from '@nanostores/persistent'
@@ -122,17 +123,22 @@ export default class XVerseProvider extends WalletProvider {
 
     try {
       if (address) {
-        this.restorePersistedValues()
-        getBTCBalance(paymentAddress, this.network).then((totalBalance) => {
-          this.$store.setKey('balance', totalBalance)
-        })
-        return
+        if (address.startsWith('tb1') && isMainnetNetwork(this.network)) {
+          this.disconnect()
+        } else {
+          this.restorePersistedValues()
+          getBTCBalance(paymentAddress, this.network).then((totalBalance) => {
+            this.$store.setKey('balance', totalBalance)
+          })
+          return
+        }
       }
+
       let xverseNetwork = getSatsConnectNetwork(this.network || MAINNET)
       const getAddressOptions = {
         payload: {
           purposes: ['ordinals', 'payment'],
-          message: 'Address for receiving Ordinals and payments',
+          message: 'Connecting with lasereyes',
           network: {
             type: xverseNetwork,
           },

@@ -270,3 +270,15 @@ export const getAddressType = (
 
   return 'unknown'
 }
+
+export const isTestnetNetwork = (network: NetworkType) => {
+  return network === TESTNET || network === TESTNET4 || network === SIGNET
+}
+
+export const isMainnetNetwork = (network: NetworkType) => {
+  return (
+    network === MAINNET ||
+    network === FRACTAL_MAINNET ||
+    network === FRACTAL_TESTNET
+  )
+}

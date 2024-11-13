@@ -19,19 +19,20 @@ type UtxoContextType = {
 const UtxoContext = createContext<UtxoContextType | undefined>(undefined)
 
 export const UtxoProvider: React.FC<{
-  network: NetworkType
   children: React.ReactNode
-}> = ({ children, network }) => {
-  const { paymentAddress } = useLaserEyes()
+}> = ({ children }) => {
+  const { paymentAddress, network } = useLaserEyes()
   const mempoolUrl = `${getMempoolSpaceUrl(network)}/api/address/${paymentAddress}/utxo`
   const [utxos, setUtxos] = useState<IMempoolUtxo[]>([])
 
   const fetcher = useCallback(async (url: string) => {
-    const response = await fetch(url)
-    if (!response.ok) {
-      throw new Error('Failed to fetch UTXOs')
-    }
-    return response.json()
+    try {
+      const response = await fetch(url)
+      if (!response.ok) {
+        throw new Error('Failed to fetch UTXOs')
+      }
+      return response.json()
+    } catch (e) {}
   }, [])
 
   const { data: utxosData, error } = useSWR<IMempoolUtxo[]>(

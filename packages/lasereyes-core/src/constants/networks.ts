@@ -39,7 +39,10 @@ export const REGTEST = 'regtest'
 export const getSatsConnectNetwork = (network: string) => {
   if (network === MAINNET) return XVERSE_MAINNET
   if (network === TESTNET) return XVERSE_TESTNET
+  if (network === TESTNET4) return XVERSE_TESTNET
   if (network === SIGNET) return XVERSE_SIGNET
+  if (network === FRACTAL_MAINNET) return XVERSE_MAINNET
+  if (network === FRACTAL_TESTNET) return XVERSE_MAINNET
   return XVERSE_MAINNET
 }
 
@@ -72,6 +75,10 @@ export const getWizzNetwork = (network: string) => {
 export const getOrangeNetwork = (network: string): BitcoinNetworkType => {
   if (network === MAINNET) return ORANGE_MAINNET as BitcoinNetworkType
   if (network === TESTNET) return ORANGE_TESTNET as BitcoinNetworkType
+  if (network === TESTNET4) return ORANGE_TESTNET as BitcoinNetworkType
+  if (network === SIGNET) return ORANGE_TESTNET as BitcoinNetworkType
+  if (network === FRACTAL_MAINNET) return ORANGE_MAINNET as BitcoinNetworkType
+  if (network === FRACTAL_TESTNET) return ORANGE_MAINNET as BitcoinNetworkType
   return ORANGE_MAINNET as BitcoinNetworkType
 }
 

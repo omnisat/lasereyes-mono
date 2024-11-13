@@ -3,20 +3,17 @@ import WalletCard from '@/components/WalletCard'
 import { useEffect, useState } from 'react'
 import { clsx } from 'clsx'
 import {
-  LEATHER,
-  MAGIC_EDEN,
-  OKX,
-  OYL,
-  PHANTOM,
-  UNISAT,
-  WIZZ,
-  ORANGE,
-  XVERSE,
+  FRACTAL_MAINNET,
+  FRACTAL_TESTNET,
+  MAINNET,
+  NetworkType,
+  ProviderType,
+  SIGNET,
+  SUPPORTED_WALLETS,
+  TESTNET,
+  TESTNET4,
   useLaserEyes,
   WalletIcon,
-  OP_NET,
-  SUPPORTED_WALLETS,
-  ProviderType,
 } from '@omnisat/lasereyes'
 import { satoshisToBTC } from '@/lib/btc'
 import { cn, truncateString } from '@/lib/utils'
@@ -30,8 +27,9 @@ import { FaExternalLinkAlt } from 'react-icons/fa'
 import { RxReload } from 'react-icons/rx'
 import { ClickToCopyNpmInstallPill } from '@/components/ClickToCopyNpmInstallPill'
 import { ImNewTab } from 'react-icons/im'
+import { toast } from 'sonner'
 
-const App = () => {
+const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
   const {
     address,
     paymentAddress,
@@ -56,6 +54,32 @@ const App = () => {
     | undefined
   >()
 
+  const switchN = () => {
+    try {
+      if (network === MAINNET) {
+        switchNetwork(TESTNET4)
+        setNetwork(TESTNET4)
+      } else if (network === TESTNET4) {
+        switchNetwork(TESTNET)
+        setNetwork(TESTNET)
+      } else if (network === TESTNET) {
+        switchNetwork(SIGNET)
+        setNetwork(SIGNET)
+      } else if (network === SIGNET) {
+        switchNetwork(FRACTAL_MAINNET)
+        setNetwork(FRACTAL_MAINNET)
+      } else if (network === FRACTAL_MAINNET) {
+        switchNetwork(FRACTAL_TESTNET)
+        setNetwork(FRACTAL_TESTNET)
+      } else {
+        switchNetwork(MAINNET)
+        setNetwork(MAINNET)
+      }
+    } catch (e: any) {
+      toast.error(e.message)
+    }
+  }
+
   useEffect(() => {
     getPackageVersion().then((version) => {
       setPkgVersion(version)
@@ -71,15 +95,6 @@ const App = () => {
   // @ts-ignore
   const total = satoshisToBTC(balance)
 
-  // const NETWORKS = [
-  //   MAINNET,
-  //   TESTNET,
-  //   TESTNET4,
-  //   SIGNET,
-  //   FRACTAL_TESTNET,
-  //   FRACTAL_MAINNET,
-  // ]
-
   return (
     <div
       className={
@@ -91,6 +106,8 @@ const App = () => {
           src={
             address ? '/lasereyes_connected.svg' : '/lasereyes_disconnected.svg'
           }
+          className={'w-auto h-auto'}
+          priority
           alt={address ? 'Laser Eyes Connected' : 'Laser Eyes Disconnected'}
           width={300}
           height={47}
@@ -132,7 +149,14 @@ const App = () => {
       <div className={'border border-[#3c393f] w-full text-xl grow pb-8'}>
         <div className={'flex flex-row items-center gap-4 '}>
           <div className={'grow'} />
-          <div className={'flex flex-col p-4 items-center'}>{network}</div>
+          <div
+            className={
+              'flex flex-col border border-[#3c393f] hover:underline cursor-pointer hover:text-orange-400 p-4 items-center'
+            }
+            onClick={() => switchN()}
+          >
+            {network}
+          </div>
         </div>
         <div
           className={'flex flex-col gap-2 text-center items-center break-all'}
