@@ -6,6 +6,7 @@ import {
   createSendBtcPsbt,
   getBitcoinNetwork,
   getBTCBalance,
+  isTestnetNetwork,
 } from '../../lib/helpers'
 import { listenKeys } from 'nanostores'
 import { fromOutputScript } from 'bitcoinjs-lib/src/address'
@@ -73,6 +74,10 @@ export default class PhantomProvider extends WalletProvider {
 
   async connect(_: ProviderType): Promise<void> {
     if (!this.library) throw new Error("Phantom isn't installed")
+    if (isTestnetNetwork(this.network)) {
+      throw new Error(`${this.network} is not supported by ${PHANTOM}`)
+    }
+
     const phantomAccounts = await this.library.requestAccounts()
     if (!phantomAccounts) throw new Error('No accounts found')
     this.$store.setKey('accounts', phantomAccounts)

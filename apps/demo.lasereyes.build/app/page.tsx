@@ -3,6 +3,7 @@ import {
   FRACTAL_MAINNET,
   FRACTAL_TESTNET,
   MAINNET,
+  NetworkType,
   SIGNET,
   TESTNET,
   TESTNET4,
@@ -10,7 +11,7 @@ import {
 import dynamic from 'next/dynamic'
 
 import App from '@/components/App'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { UtxoProvider } from '@/hooks/useUtxos'
 
 const DynamicLasereyesProvider = dynamic(
@@ -19,7 +20,7 @@ const DynamicLasereyesProvider = dynamic(
 )
 
 export default function Home() {
-  const [network] = useState<
+  const [network, setNetwork] = useState<
     | typeof MAINNET
     | typeof TESTNET
     | typeof TESTNET4
@@ -27,10 +28,33 @@ export default function Home() {
     | typeof FRACTAL_MAINNET
     | typeof FRACTAL_TESTNET
   >(MAINNET)
+
+  const [mounted, setMounted] = useState(false)
+
+  const switchNet = (net: NetworkType) => {
+    if (network === MAINNET) {
+      setNetwork(TESTNET4)
+    } else {
+      setNetwork(MAINNET)
+    }
+  }
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) {
+    return null
+  }
+
   return (
-    <DynamicLasereyesProvider config={{ network }}>
+    <DynamicLasereyesProvider
+      config={{
+        network: network,
+      }}
+    >
       <UtxoProvider network={network}>
-        <App />
+        <App setNetwork={switchNet} />
       </UtxoProvider>
     </DynamicLasereyesProvider>
   )

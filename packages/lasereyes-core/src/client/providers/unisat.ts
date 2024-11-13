@@ -82,7 +82,7 @@ export default class UnisatProvider extends WalletProvider {
       this.parent.disconnect()
     }
   }
-  private handleNetworkChanged(network: NetworkType) {
+  private handleNetworkChanged(network: string) {
     const foundNetwork = getNetworkForUnisat(network)
     if (this.network !== foundNetwork) {
       this.switchNetwork(foundNetwork)
@@ -94,6 +94,12 @@ export default class UnisatProvider extends WalletProvider {
     if (!this.library) throw new Error("Unisat isn't installed")
     const unisatAccounts = await this.library.requestAccounts()
     if (!unisatAccounts) throw new Error('No accounts found')
+    await this.getNetwork().then((network) => {
+      if (this.network !== network) {
+        console.log('Network changed')
+        this.switchNetwork(this.network)
+      }
+    })
     const unisatPubKey = await this.library.getPublicKey()
     if (!unisatPubKey) throw new Error('No public key found')
     this.$store.setKey('accounts', unisatAccounts)
@@ -102,12 +108,8 @@ export default class UnisatProvider extends WalletProvider {
     this.$store.setKey('publicKey', unisatPubKey)
     this.$store.setKey('paymentPublicKey', unisatPubKey)
     this.$store.setKey('provider', UNISAT)
-    await this.getNetwork().then((network) => {
-      if (this.config?.network !== network) {
-        this.switchNetwork(network)
-      }
-    })
-    // TODO: Confirm if this is necessary and why
+
+    // TODO: Confirm if this i necessary and why
     getBTCBalance(unisatAccounts[0], this.network).then((totalBalance) => {
       this.$store.setKey('balance', totalBalance)
     })
@@ -192,6 +194,5 @@ export default class UnisatProvider extends WalletProvider {
     const wantedNetwork = getUnisatNetwork(network)
     await this.library?.switchChain(wantedNetwork)
     this.$network.set(network)
-    await this.getBalance()
   }
 }

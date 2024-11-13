@@ -1,30 +1,32 @@
 import * as bitcoin from 'bitcoinjs-lib'
 import {
-  GetAddressOptions,
-  getAddress,
-  signMessage,
-  sendBtcTransaction,
   BitcoinNetworkType,
-  SendBtcTransactionOptions,
+  getAddress,
+  GetAddressOptions,
   MessageSigningProtocols,
+  sendBtcTransaction,
+  SendBtcTransactionOptions,
+  signMessage,
   signTransaction,
 } from 'sats-connect'
 import { WalletProvider } from '.'
 import {
-  ProviderType,
-  NetworkType,
-  MAGIC_EDEN,
   getSatsConnectNetwork,
-  MAINNET,
   LaserEyesStoreType,
+  MAGIC_EDEN,
+  MAINNET,
+  NetworkType,
+  ProviderType,
 } from '../..'
 import {
   findOrdinalsAddress,
   findPaymentAddress,
-  getBTCBalance,
   getBitcoinNetwork,
+  getBTCBalance,
+  isMainnetNetwork,
+  isTestnetNetwork,
 } from '../../lib/helpers'
-import { MapStore, listenKeys } from 'nanostores'
+import { listenKeys, MapStore } from 'nanostores'
 import { persistentMap } from '@nanostores/persistent'
 import { fromOutputScript } from 'bitcoinjs-lib/src/address'
 import { keysToPersist, PersistedKey } from '../utils'
@@ -123,18 +125,27 @@ export default class MagicEdenProvider extends WalletProvider {
 
     try {
       if (address) {
-        this.restorePersistedValues()
-        getBTCBalance(paymentAddress, this.network).then((totalBalance) => {
-          this.$store.setKey('balance', totalBalance)
-        })
-        return
+        if (address.startsWith('tb1') && isMainnetNetwork(this.network)) {
+          this.disconnect()
+        } else {
+          this.restorePersistedValues()
+          getBTCBalance(paymentAddress, this.network).then((totalBalance) => {
+            this.$store.setKey('balance', totalBalance)
+          })
+          return
+        }
       }
+
+      if (isTestnetNetwork(this.network)) {
+        throw new Error(`${this.network} is not supported by ${MAGIC_EDEN}`)
+      }
+
       let magicEdenNetwork = getSatsConnectNetwork(this.network || MAINNET)
       const getAddressOptions = {
         getProvider: async () => this.library,
         payload: {
           purposes: ['ordinals', 'payment'],
-          message: 'Address for receiving Ordinals and payments',
+          message: 'Connecting with lasereyes',
           network: {
             type: magicEdenNetwork,
           },

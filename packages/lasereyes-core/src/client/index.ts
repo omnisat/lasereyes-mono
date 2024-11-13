@@ -114,7 +114,6 @@ export class LaserEyesClient {
       await provider?.connect(defaultWallet)
       this.$store.setKey('connected', true)
     } catch (error) {
-      console.error(error)
       this.$store.setKey('isConnecting', false)
       this.disconnect()
       throw error
@@ -128,9 +127,9 @@ export class LaserEyesClient {
       throw new Error('No wallet provider connected')
     }
 
-    if (!this.$providerMap[this.$store.get().provider!]) {
-      throw new Error("The connected wallet doesn't support this method")
-    }
+    // if (!this.$providerMap[this.$store.get().provider!]) {
+    //   throw new Error("The connected wallet doesn't support request accounts")
+    // }
 
     try {
       return await this.$providerMap[
@@ -332,7 +331,7 @@ export class LaserEyesClient {
       } catch (error) {
         if (error instanceof Error) {
           if (error.message.toLowerCase().includes('not implemented')) {
-            throw new Error("The connected wallet doesn't support this method")
+            throw new Error("The connected wallet doesn't support getPublicKey")
           }
         }
         throw error
@@ -351,7 +350,7 @@ export class LaserEyesClient {
       } catch (error) {
         if (error instanceof Error) {
           if (error.message.toLowerCase().includes('not implemented')) {
-            throw new Error("The connected wallet doesn't support this method")
+            throw new Error("The connected wallet doesn't support getBalance")
           }
         }
         throw error

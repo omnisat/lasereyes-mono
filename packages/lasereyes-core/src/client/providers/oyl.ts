@@ -1,7 +1,11 @@
 import * as bitcoin from 'bitcoinjs-lib'
 import { UNSUPPORTED_PROVIDER_METHOD_ERROR, WalletProvider } from '.'
 import { ProviderType, NetworkType } from '../../types'
-import { createSendBtcPsbt, getBTCBalance } from '../../lib/helpers'
+import {
+  createSendBtcPsbt,
+  getBTCBalance,
+  isTestnetNetwork,
+} from '../../lib/helpers'
 import { OYL } from '../../constants/wallets'
 import { listenKeys, MapStore } from 'nanostores'
 import { persistentMap } from '@nanostores/persistent'
@@ -98,6 +102,10 @@ export default class OylProvider extends WalletProvider {
 
   async connect(_: ProviderType): Promise<void> {
     if (!this.library) throw new Error("Oyl isn't installed")
+    if (isTestnetNetwork(this.network)) {
+      throw new Error(`${this.network} is not supported by Oyl`)
+    }
+
     const { nativeSegwit, taproot } = await this.library.getAddresses()
     if (!nativeSegwit || !taproot) throw new Error('No accounts found')
     this.$store.setKey('address', taproot.address)
