@@ -53,7 +53,7 @@ export default function Home() {
         network: network,
       }}
     >
-      <UtxoProvider network={network}>
+      <UtxoProvider>
         <App setNetwork={switchNet} />
       </UtxoProvider>
     </DynamicLasereyesProvider>
