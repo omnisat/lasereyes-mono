@@ -26,6 +26,10 @@ If applicable, add screenshots or logs to help explain your problem.
 - Node Version: [e.g., 18.x]
 - Wallet Provider: [e.g., UniSat, Xverse]
 - Operating System: [e.g., macOS, Windows]
+- Framework: [e.g., React, Angular]
+- Framework Version: [e.g., 1.2.0]
+- Browser: [e.g., Chrome, Safari]
+- Browser Version: [e.g., 88.0.4324.150]
 
 **Additional context**
 Add any other context about the problem here.
