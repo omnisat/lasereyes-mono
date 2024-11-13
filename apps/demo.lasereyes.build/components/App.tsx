@@ -75,7 +75,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
         switchNetwork(MAINNET)
         setNetwork(MAINNET)
       }
-    } catch (e) {
+    } catch (e: any) {
       toast.error(e.message)
     }
   }
