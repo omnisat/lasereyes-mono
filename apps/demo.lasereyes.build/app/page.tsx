@@ -31,9 +31,17 @@ export default function Home() {
 
   const [mounted, setMounted] = useState(false)
 
-  const switchNet = (net: NetworkType) => {
+  const switchNet = () => {
     if (network === MAINNET) {
       setNetwork(TESTNET4)
+    } else if (network === TESTNET4) {
+      setNetwork(TESTNET)
+    } else if (network === TESTNET) {
+      setNetwork(SIGNET)
+    } else if (network === SIGNET) {
+      setNetwork(FRACTAL_MAINNET)
+    } else if (network === FRACTAL_MAINNET) {
+      setNetwork(FRACTAL_TESTNET)
     } else {
       setNetwork(MAINNET)
     }

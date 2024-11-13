@@ -3,10 +3,14 @@ import WalletCard from '@/components/WalletCard'
 import { useEffect, useState } from 'react'
 import { clsx } from 'clsx'
 import {
+  FRACTAL_MAINNET,
+  FRACTAL_TESTNET,
   MAINNET,
   NetworkType,
   ProviderType,
+  SIGNET,
   SUPPORTED_WALLETS,
+  TESTNET,
   TESTNET4,
   useLaserEyes,
   WalletIcon,
@@ -55,6 +59,18 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
       if (network === MAINNET) {
         switchNetwork(TESTNET4)
         setNetwork(TESTNET4)
+      } else if (network === TESTNET4) {
+        switchNetwork(TESTNET)
+        setNetwork(TESTNET)
+      } else if (network === TESTNET) {
+        switchNetwork(SIGNET)
+        setNetwork(SIGNET)
+      } else if (network === SIGNET) {
+        switchNetwork(FRACTAL_MAINNET)
+        setNetwork(FRACTAL_MAINNET)
+      } else if (network === FRACTAL_MAINNET) {
+        switchNetwork(FRACTAL_TESTNET)
+        setNetwork(FRACTAL_TESTNET)
       } else {
         switchNetwork(MAINNET)
         setNetwork(MAINNET)
@@ -78,15 +94,6 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
 
   // @ts-ignore
   const total = satoshisToBTC(balance)
-
-  // const NETWORKS = [
-  //   MAINNET,
-  //   TESTNET,
-  //   TESTNET4,
-  //   SIGNET,
-  //   FRACTAL_TESTNET,
-  //   FRACTAL_MAINNET,
-  // ]
 
   return (
     <div
