@@ -1,4 +1,36 @@
 
+Release Notes:
+
+**Version: 0.0.119-rc.1**
+
+## General Changes
+
+In this whimsically phenomenal update, (don't worry, the whimsy ends here), we've got an array of changes aimed at improving your interaction with our application. For starters, the version has been incrementally upped to 0.0.119-rc.1, which might not seem comedic, but trust me, you don't want to be laughing at this point.
+
+## Bug Reports and Issue templates
+
+There have been some structured adjustments when it comes to submitting your issues. We've added new templates for bug reports, document improvements, feature requests, security vulnerabilities, and support questions. So please make use of them and provide us with eloquent descriptions of all of your woes, cries, and pleads for enhancements to our code base.
+
+## Mainness and Testness... I mean Mainnet and Testnet! 
+
+Now onto application logic modifications. We've ensured that your mainnet and testnet existential crisis is lessened, by enabling you to easily switch between the different networks via a new function, `switchNet`. The addition of this function within the `Home` component and its accompanying calls within the `App` component ensures seamless navigation through the sprawling labyrinth of network options, lifting the burden of making these hefty decisions on your own.
+
+## React App Modifactions
+
+In line with this existential network crisis mitigation, some ad hoc component modifications have also been made within the React components. Your question and confusion of networks will now be handled elegantly with the addition of newly implemented error handling and conditional functionality. But beware, using `tb1` addresses on mainnet could lead to unexpected disconnection. We've added necessary checks and informative error messages to guide you on this journey.
+
+## Provider Updates
+
+The git diff has a mare's nest of modifications to several wallet providers. Notably, Thunderbird (I mean `UnisatProvider`, for all you XMen fans) received a renovation where a method previously deemed unnecessary has been stealthily brought back to the game. Check it out to see what's cooking!
+
+## Conclusion
+
+In conclusion, the joke's on you if you thought this was about making you chuckle. Our primary objective, like any good bureaucracy, is to enhance your user experience. Update to the new version and enjoy the refined, bug-less (we hope) world of our application. 
+
+Oh and if you're aware of any new jokes, please submit them via the new 'bug report' template under the label 'documentation'. Just kidding! Or am I? 
+
+That's all folks! Enjoy the new version! And remember, laughter is the best form of bug eradication!
+
 Welcome to **Version 0.0.118-rc.1**! Make sure you had your coffee today, because we've got a well-rounded slate of updates that may require that extra caffeine boost. Here's what changed:
 
 **`lasereyes-core` package:**
