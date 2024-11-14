@@ -2,11 +2,12 @@ const LaserEyesLogo = ({
   color = 'green',
   width = 135,
   height,
-  ...props
+  className = '',
 }: {
   color?: string
   width?: number
   height?: number
+  className?: string
 }) => {
   const aspectRatio = 135 / 56
   const calculatedHeight = height || width! / aspectRatio
@@ -20,7 +21,7 @@ const LaserEyesLogo = ({
         viewBox="0 0 135 56"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        {...props}
+        className={className}
       >
         <rect
           width={7.89036}
@@ -249,7 +250,7 @@ const LaserEyesLogo = ({
       viewBox="0 0 135 56"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      {...props}
+      className={className}
     >
       <rect
         width={7.89036}
