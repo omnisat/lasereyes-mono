@@ -118,6 +118,7 @@ export abstract class WalletProvider {
       paymentAddress: this.$store.get().paymentAddress,
       paymentPublicKey: this.$store.get().paymentPublicKey,
       signPsbt: this.signPsbt.bind(this),
+      network: this.$network.get(),
     })
   }
 }

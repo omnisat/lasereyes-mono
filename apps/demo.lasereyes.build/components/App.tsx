@@ -11,6 +11,7 @@ import {
   SIGNET,
   SUPPORTED_WALLETS,
   TESTNET,
+  LaserEyesLogo,
   TESTNET4,
   useLaserEyes,
   WalletIcon,
@@ -146,7 +147,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
           <ImNewTab />
         </Link>
       </div>
-      <div className={'border border-[#3c393f] w-full text-xl grow pb-8'}>
+      <div className={'border border-[#3c393f] w-full text-xl grow '}>
         <div className={'flex flex-row items-center gap-4 '}>
           <div className={'grow'} />
           <div
@@ -409,6 +410,10 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
               </div>
             </div>
           </div>
+        </div>
+        <div className={'flex flex-row items-center gap-4 '}>
+          <LaserEyesLogo className={'m-4'} width={48} />
+          <div className={'grow'} />
         </div>
       </div>
       <div className={'flex flex-wrap justify-center gap-8'}>

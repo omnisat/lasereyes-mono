@@ -11,4 +11,5 @@ export {
   UnisatLogo,
   WizzLogo,
   XverseLogo,
+  LaserEyesLogo,
 } from '@omnisat/lasereyes-react'
