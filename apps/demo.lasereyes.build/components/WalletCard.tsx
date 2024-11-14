@@ -380,8 +380,7 @@ const WalletCard = ({
     try {
       const inscriptionTxId = await inscribe(
         Buffer.from(inscriptionText).toString('base64'),
-        'text/plain',
-        network
+        'text/plain'
       )
       toast.success(
         <span className={'flex flex-col gap-1 items-center justify-center'}>
