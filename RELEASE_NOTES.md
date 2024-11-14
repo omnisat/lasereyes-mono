@@ -1,4 +1,26 @@
 
+In this release, there have been some significant adjustments across three core packages of the LaserEye project - LaserEyes Core, LaserEyes React, and LaserEyes itself. Let's break it down. Some will say these changes are out of this world, but don't worry, we remain grounded. 
+
+**@omnisat/lasereyes-core:**
+
+Our core library had a suitable increase from version 0.0.45-rc.2 to 0.0.45-rc.3. There may or may not be additional white spaces added to the README. We won't validate your life by divulging that information. 
+
+**@omnisat/lasereyes-react:**
+
+We moved LaserEyes React from version 0.0.39-rc.0 to 0.0.39-rc.1. Once again, an enigma is introduced via mysterious blank lines in the README file. These strange additions will continue to impress or confound - we're not mind readers, guys.
+
+**@omnisat/lasereyes:**
+
+The updates to LaserEyes are far more objective. We've leveled up from version 0.0.122-rc.1 to 0.0.122-rc.4. Don’t you feel better knowing that? We also made some tweaks to the example usage in the README, showing how to use LaserEyes with React. Frankly, it's revolutionary -  a sphere-shaped revolution, if you will. 
+
+In practice, we replaced `useWallet` with `useLaserEyes`. Don't confuse this with your ocular motor function, it will not improve your vision. Rather, it reflects changes in your connection status. But that seems self-evident, doesn't it? We still kept the `connect` function but have it now accept `UNISAT` as a parameter to tell you that you are, indeed, connecting to something. 
+
+The connection status confirmation is now given through `address` instead of `wallet` - sounds more homey, doesn't it? However, don't put that as your mailing address, you might not receive your Amazon packages.
+
+Dependencies have been updated to point to a workspace, giving us that cross-package synergy we all accidentally refer to during office stand-ups. 
+
+And that’s it for this release, aren’t you glad you read this? Stay tuned for more updates and thinly veiled inexplicable humor.
+
 # Release Notes
 
 Version: 0.0.121-rc.1
