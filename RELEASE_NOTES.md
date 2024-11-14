@@ -1,4 +1,24 @@
 
+# Release Notes
+
+Version: 0.0.121-rc.1
+
+## Updates in `@omnisat/lasereyes-react`
+
+We've successfully incremented your favorite package `@omnisat/lasereyes-react` from version `0.0.37` to `0.0.38-rc.0`. This shift may not have started a revolution, but surely your code is enjoying a breath of fresh air. 
+
+## Fine Tuning in `@omnisat/lasereyes`
+
+In our campaign to make the world a better place, we figured we'd start by changing version `0.0.120` of `@omnisat/lasereyes` to `0.0.121-rc.1`. Alas, the new version carries all the wisdom of its predecessor, plus some bonus rationale. 
+
+Now, remember those `@omnisat/lasereyes-core` and `@omnisat/lasereyes-react` dependencies? They're now secured with the power of `workspace:*`, unifying versions across your project like never before. 
+
+## Additional Tinkering
+
+Here's a tag you may not have been expecting: `bip39`, upgraded to `^3.1.0`. This surprising and unanticipated change was actually carried out in a smooth operation that did not involve a SWAT team. 
+
+That's it for this round of version changes. Remember, somewhere out there, a digit is laughing. Happy coding!
+
 ## Version 0.0.120-rc.4 Release Notes 
 
 In this update, numerous changes were implemented in order to harness the power of the Lasereyes platform more efficiently. We hope these changes will be as enlightening to you as a laser eye surgery. Without further ado, here are the changes brought in this new version.
