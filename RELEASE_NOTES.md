@@ -1,4 +1,22 @@
 
+## Version 0.0.120-rc.4 Release Notes 
+
+In this update, numerous changes were implemented in order to harness the power of the Lasereyes platform more efficiently. We hope these changes will be as enlightening to you as a laser eye surgery. Without further ado, here are the changes brought in this new version.
+
+- First up, we've had a minor re-adjustment in `WalletCard.tsx`. The transmission of network parameter in the `inscribe` function was judged unnecessary and has thus been omitted. Less is more, you know.
+
+- Our talented design team just couldn't resist adding a little extra shine to our `LaserEyesLogo`. The `className` attribute has now replaced the use of the `props` spread syntax to provide the `logo` SVG. The result is a more customizable logo, ready for any situation you feel needs a bit more Lasereyes sparkle. 
+
+- `lasereyes-react` libraries have been upgraded to version 0.0.37-rc.3. The libraries are fresher and improved—think of them like laser-sliced bread.
+
+- A change was also made to the `vite.config.ts` file in the `lasereyes-react` package. The `react()` function in the plugins array is now cast to `UserConfig["plugins"]`, shooting lasers at the risk of type assertion failure.
+
+- With the main `lasereyes` package, it's time to celebrate its upgrade to version 0.0.120-rc.4. Even numbers are not necessarily better, but they indicate continuous progress!
+
+- Lastly, please note that changes included in the `pnpm-lock.yaml` have not been described because, well, we agreed not to discuss the lock file or anything outside the main version changes, remember?
+
+We hope this release brings you improved performance, lovelier visuals, and a smoother experience overall. Enjoy the new Lasereyes experience!
+
 Release Notes:
 
 **Version: 0.0.119-rc.1**
