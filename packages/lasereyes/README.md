@@ -34,7 +34,7 @@ pnpm add @omnisat/lasereyes
 ### Example Usage (React)
 
 ```typescript
-import { LaserEyesProvider, useLaserEyes } from '@omnisat/lasereyes-react';
+import { LaserEyesProvider, useLaserEyes, UNISAT } from '@omnisat/lasereyes-react';
 
 function App() {
   return (
