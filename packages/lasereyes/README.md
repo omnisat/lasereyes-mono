@@ -34,11 +34,11 @@ pnpm add @omnisat/lasereyes
 ### Example Usage (React)
 
 ```typescript
-import { LaserEyesProvider, useLaserEyes, UNISAT } from '@omnisat/lasereyes-react';
+import { LaserEyesProvider, useLaserEyes, UNISAT, MAINNET } from '@omnisat/lasereyes-react';
 
 function App() {
   return (
-    <LaserEyesProvider network="mainnet">
+    <LaserEyesProvider config={{network: MAINNET}}>
       <WalletInfo />
     </LaserEyesProvider>
   );
