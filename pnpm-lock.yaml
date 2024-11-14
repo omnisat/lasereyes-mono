@@ -268,10 +268,10 @@ importers:
         version: 5.6.3
       vite:
         specifier: ^5.4.1
-        version: 5.4.10
+        version: 5.4.10(@types/node@22.8.4)
       vite-plugin-dts:
         specifier: ^4.2.1
-        version: 4.3.0(typescript@5.6.3)(vite@5.4.10)
+        version: 4.3.0(@types/node@22.8.4)(typescript@5.6.3)(vite@5.4.10)
 
   packages/lasereyes-core:
     dependencies:
@@ -5855,7 +5855,7 @@ packages:
       vite: ^4 || ^5
     dependencies:
       '@swc/core': 1.7.40
-      vite: 5.4.10
+      vite: 5.4.10(@types/node@22.8.4)
     transitivePeerDependencies:
       - '@swc/helpers'
     dev: true
@@ -5871,7 +5871,7 @@ packages:
       '@babel/plugin-transform-react-jsx-source': 7.25.9(@babel/core@7.26.0)
       '@types/babel__core': 7.20.5
       react-refresh: 0.14.2
-      vite: 5.4.10
+      vite: 5.4.10(@types/node@22.8.4)
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -5936,7 +5936,7 @@ packages:
       '@vitest/spy': 2.1.4
       estree-walker: 3.0.3
       magic-string: 0.30.12
-      vite: 5.4.10
+      vite: 5.4.10(@types/node@22.8.4)
     dev: true
 
   /@vitest/pretty-format@2.1.4:
@@ -13727,7 +13727,6 @@ packages:
       nanoid: 3.3.7
       picocolors: 1.1.1
       source-map-js: 1.2.1
-    dev: true
 
   /prelude-ls@1.1.2:
     resolution: {integrity: sha512-ESF23V4SKG6lVSGZgYNpbsiaAkdab6ZgOxe52p7+Kid3W3u3bxR4Vfd/o21dmN7jSt0IwgZ4v5MUd26FEtXE9w==}
@@ -16152,7 +16151,7 @@ packages:
       cac: 6.7.14
       debug: 4.3.7
       pathe: 1.1.2
-      vite: 5.4.10
+      vite: 5.4.10(@types/node@22.8.4)
     transitivePeerDependencies:
       - '@types/node'
       - less
@@ -16192,33 +16191,6 @@ packages:
       - supports-color
     dev: true
 
-  /vite-plugin-dts@4.3.0(typescript@5.6.3)(vite@5.4.10):
-    resolution: {integrity: sha512-LkBJh9IbLwL6/rxh0C1/bOurDrIEmRE7joC+jFdOEEciAFPbpEKOLSAr5nNh5R7CJ45cMbksTrFfy52szzC5eA==}
-    engines: {node: ^14.18.0 || >=16.0.0}
-    peerDependencies:
-      typescript: '*'
-      vite: '*'
-    peerDependenciesMeta:
-      vite:
-        optional: true
-    dependencies:
-      '@microsoft/api-extractor': 7.47.11(@types/node@22.8.4)
-      '@rollup/pluginutils': 5.1.3
-      '@volar/typescript': 2.4.8
-      '@vue/language-core': 2.1.6(typescript@5.6.3)
-      compare-versions: 6.1.1
-      debug: 4.3.7
-      kolorist: 1.8.0
-      local-pkg: 0.5.0
-      magic-string: 0.30.12
-      typescript: 5.6.3
-      vite: 5.4.10
-    transitivePeerDependencies:
-      - '@types/node'
-      - rollup
-      - supports-color
-    dev: true
-
   /vite-plugin-ssr@0.4.142(vite@5.4.10):
     resolution: {integrity: sha512-ZDgpocnTEUmhYxGgMah8ZNK1Sfy5CFVcdXu+Ll3zRtGIPyWT5vYvASs2BLYEneqantHpde2b31Khzb0hxmP62w==}
     engines: {node: '>=16.0.0'}
@@ -16244,44 +16216,6 @@ packages:
       source-map-support: 0.5.21
       vite: 5.4.10(@types/node@22.8.4)
     dev: false
-
-  /vite@5.4.10:
-    resolution: {integrity: sha512-1hvaPshuPUtxeQ0hsVH3Mud0ZanOLwVTneA1EgbAM5LhaZEqyPWGRQ7BtaMvUrTDeEaC8pxtj6a6jku3x4z6SQ==}
-    engines: {node: ^18.0.0 || >=20.0.0}
-    hasBin: true
-    peerDependencies:
-      '@types/node': ^18.0.0 || >=20.0.0
-      less: '*'
-      lightningcss: ^1.21.0
-      sass: '*'
-      sass-embedded: '*'
-      stylus: '*'
-      sugarss: '*'
-      terser: ^5.4.0
-    peerDependenciesMeta:
-      '@types/node':
-        optional: true
-      less:
-        optional: true
-      lightningcss:
-        optional: true
-      sass:
-        optional: true
-      sass-embedded:
-        optional: true
-      stylus:
-        optional: true
-      sugarss:
-        optional: true
-      terser:
-        optional: true
-    dependencies:
-      esbuild: 0.21.5
-      postcss: 8.4.48
-      rollup: 4.24.3
-    optionalDependencies:
-      fsevents: 2.3.3
-    dev: true
 
   /vite@5.4.10(@types/node@22.8.4):
     resolution: {integrity: sha512-1hvaPshuPUtxeQ0hsVH3Mud0ZanOLwVTneA1EgbAM5LhaZEqyPWGRQ7BtaMvUrTDeEaC8pxtj6a6jku3x4z6SQ==}
@@ -16316,7 +16250,7 @@ packages:
     dependencies:
       '@types/node': 22.8.4
       esbuild: 0.21.5
-      postcss: 8.4.47
+      postcss: 8.4.48
       rollup: 4.24.3
     optionalDependencies:
       fsevents: 2.3.3
@@ -16363,7 +16297,7 @@ packages:
       tinyexec: 0.3.1
       tinypool: 1.0.1
       tinyrainbow: 1.2.0
-      vite: 5.4.10
+      vite: 5.4.10(@types/node@22.8.4)
       vite-node: 2.1.4
       why-is-node-running: 2.3.0
     transitivePeerDependencies:
