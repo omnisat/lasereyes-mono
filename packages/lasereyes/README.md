@@ -34,7 +34,7 @@ pnpm add @omnisat/lasereyes
 ### Example Usage (React)
 
 ```typescript
-import { LaserEyesProvider, useWallet } from '@omnisat/lasereyes-react';
+import { LaserEyesProvider, useLaserEyes } from '@omnisat/lasereyes-react';
 
 function App() {
   return (
@@ -45,14 +45,14 @@ function App() {
 }
 
 function WalletInfo() {
-  const { wallet, connect } = useWallet();
+  const { address, connect } = useLaserEyes();
 
   return (
     <div>
-      {wallet ? (
-        <p>Connected: {wallet.address}</p>
+      {address ? (
+        <p>Connected: {address}</p>
       ) : (
-        <button onClick={connect}>Connect Wallet</button>
+        <button onClick={() => connect(UNISAT)}>Connect Wallet</button>
       )}
     </div>
   );
