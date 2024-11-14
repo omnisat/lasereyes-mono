@@ -96,7 +96,6 @@ export default class UnisatProvider extends WalletProvider {
     if (!unisatAccounts) throw new Error('No accounts found')
     await this.getNetwork().then((network) => {
       if (this.network !== network) {
-        console.log('Network changed')
         this.switchNetwork(this.network)
       }
     })

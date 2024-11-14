@@ -7,5 +7,6 @@ export * from './wizz'
 export * from './okx'
 export * from './magiceden'
 export * from './orange.tsx'
+export * from './lasereyes-logo.tsx'
 
 export * from './walletIcon'

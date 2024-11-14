@@ -8,9 +8,10 @@ import {
   calculateValueOfUtxosGathered,
   getAddressType,
   getAddressUtxos,
+  getBitcoinNetwork,
   getRedeemScript,
 } from './helpers'
-import { MAINNET, P2SH, P2TR } from '../constants'
+import { getCmDruidNetwork, MAINNET, P2SH, P2TR } from '../constants'
 import axios from 'axios'
 import { getMempoolSpaceUrl } from './urls'
 import * as bip39 from 'bip39'
@@ -36,6 +37,7 @@ export const inscribeContent = async ({
   paymentAddress,
   paymentPublicKey,
   signPsbt,
+  network = MAINNET,
 }: {
   contentBase64?: string
   mimeType?: ContentType
@@ -49,7 +51,8 @@ export const inscribeContent = async ({
     psbtHex: string,
     psbtBase64: string,
     finalize?: boolean,
-    broadcast?: boolean
+    broadcast?: boolean,
+    network?: NetworkType
   ) => Promise<
     | {
         signedPsbtHex: string | undefined
@@ -58,12 +61,13 @@ export const inscribeContent = async ({
       }
     | undefined
   >
+  network: NetworkType
 }) => {
   try {
     if (!contentBase64 && !inscriptions) {
       throw new Error('contentBase64 or inscriptions is required')
     }
-    const privKeyBuff = await generatePrivateKey()
+    const privKeyBuff = await generatePrivateKey(network)
     const privKey = Buffer.from(privKeyBuff!).toString('hex')
     const ixs = inscriptions
       ? inscriptions
@@ -72,13 +76,12 @@ export const inscribeContent = async ({
           mimeType,
         })
 
-    console.log('INSCRIPTIONS', ixs)
-
     const commitTx = await getCommitTx({
       inscriptions: ixs,
       paymentAddress,
       paymentPublicKey,
       privKey,
+      network,
     })
 
     if (!commitTx || !commitTx?.psbtHex) {
@@ -92,18 +95,20 @@ export const inscribeContent = async ({
       commitTxHex,
       commitTxBase64,
       true,
-      false
+      false,
+      network
     )
     if (!response) throw new Error('sign psbt failed')
     const psbt = bitcoin.Psbt.fromHex(response?.signedPsbtHex || '')
     const extracted = psbt.extractTransaction()
-    const commitTxId = await broadcastTx(extracted.toHex(), MAINNET)
+    const commitTxId = await broadcastTx(extracted.toHex(), network)
     if (!commitTxId) throw new Error('commit tx failed')
     return await executeReveal({
       inscriptions: ixs,
       ordinalAddress,
       privKey,
       commitTxId,
+      network,
     })
   } catch (e) {
     throw e
@@ -115,11 +120,13 @@ export const getCommitTx = async ({
   paymentAddress,
   paymentPublicKey,
   privKey,
+  network,
 }: {
   inscriptions: { content: string; mimeType: ContentType }[]
   paymentAddress: string
   paymentPublicKey?: string
   privKey: string
+  network: NetworkType
   isDry?: boolean
 }): Promise<
   | {
@@ -137,15 +144,16 @@ export const getCommitTx = async ({
     if (contentSize > 390000)
       throw new Error('Content size is too large, must be less than 390kb')
 
-    const { fastestFee } = await getRecommendedFees(MAINNET)
+    const { fastestFee } = await getRecommendedFees(network)
     const pubKey = ecc.keys.get_pubkey(String(privKey), true)
     const psbt = new bitcoin.Psbt({
-      network: bitcoin.networks.bitcoin,
+      network: getBitcoinNetwork(network),
     })
 
     const { inscriberAddress } = createRevealAddressAndKeys(
       pubKey,
-      inscriptions
+      inscriptions,
+      network
     )
 
     const estimatedSize = 5 * 34 * quantity
@@ -155,7 +163,7 @@ export const getCommitTx = async ({
     const inscribeFees = Math.floor(commitSatsNeeded + revealSatsNeeded)
     const utxosGathered: MempoolUtxo[] = await getAddressUtxos(
       paymentAddress,
-      MAINNET
+      network
     )
     const filteredUtxos = utxosGathered
       .filter((utxo: MempoolUtxo) => utxo.value > 3000)
@@ -171,10 +179,13 @@ export const getCommitTx = async ({
     }
 
     let accSats = 0
-    const addressScript = await bitcoin.address.toOutputScript(paymentAddress)
+    const addressScript = await bitcoin.address.toOutputScript(
+      paymentAddress,
+      getBitcoinNetwork(network)
+    )
     let counter = 0
     for await (const utxo of filteredUtxos) {
-      const paymentAddressType = getAddressType(paymentAddress, MAINNET)
+      const paymentAddressType = getAddressType(paymentAddress, network)
       console.log({ paymentAddressType })
       psbt.addInput({
         hash: utxo.txid,
@@ -189,7 +200,7 @@ export const getCommitTx = async ({
       }
 
       if (paymentAddressType === P2SH) {
-        let redeemScript = getRedeemScript(paymentPublicKey!, MAINNET)
+        let redeemScript = getRedeemScript(paymentPublicKey!, network)
         psbt.updateInput(counter, { redeemScript })
       }
 
@@ -229,12 +240,14 @@ export const executeReveal = async ({
   ordinalAddress,
   commitTxId,
   privKey,
+  network,
   isDry,
 }: {
   inscriptions: { content: string; mimeType: ContentType }[]
   ordinalAddress: string
   commitTxId: string
   privKey: string
+  network: NetworkType
   isDry?: boolean
 }) => {
   try {
@@ -244,12 +257,16 @@ export const executeReveal = async ({
     const tapleaf = Tap.encodeScript(script)
     const [tpubkey, cblock] = Tap.getPubKey(pubKey, { target: tapleaf })
 
-    const txResult = await waitForTransaction(String(commitTxId))
+    const txResult = await waitForTransaction(String(commitTxId), network)
     if (!txResult) {
       throw new Error('ERROR WAITING FOR COMMIT TX')
     }
 
-    const commitTxOutputValue = await getOutputValueByVOutIndex(commitTxId, 0)
+    const commitTxOutputValue = await getOutputValueByVOutIndex(
+      commitTxId,
+      0,
+      network
+    )
     if (commitTxOutputValue === 0 || !commitTxOutputValue) {
       throw new Error('ERROR GETTING FIRST INPUT VALUE')
     }
@@ -279,17 +296,17 @@ export const executeReveal = async ({
       return Tx.util.getTxid(txData)
     }
 
-    return await broadcastTx(Tx.encode(txData).hex, MAINNET)
+    return await broadcastTx(Tx.encode(txData).hex, network)
   } catch (e: any) {
     throw e
   }
 }
 
-export async function generatePrivateKey() {
+export async function generatePrivateKey(network: NetworkType) {
   const entropy = crypto.getRandomValues(new Uint8Array(32))
   const mnemonic = bip39.entropyToMnemonic(Buffer.from(entropy))
   const seed = await bip39.mnemonicToSeed(mnemonic)
-  const root: BIP32Interface = bip32.fromSeed(seed)
+  const root: BIP32Interface = bip32.fromSeed(seed, getBitcoinNetwork(network))
   return root?.derivePath("m/44'/0'/0'/0/0").privateKey
 }
 
@@ -353,12 +370,16 @@ export const createInscriptionScript = (
 
 export const createRevealAddressAndKeys = (
   pubKey: any,
-  inscriptions: { content: string; mimeType: ContentType }[]
+  inscriptions: { content: string; mimeType: ContentType }[],
+  network: NetworkType = MAINNET
 ) => {
   const script = createInscriptionScript(pubKey, inscriptions)
   const tapleaf = Tap.encodeScript(script)
   const [tpubkey] = Tap.getPubKey(pubKey, { target: tapleaf })
-  const inscriberAddress = Address.p2tr.fromPubKey(tpubkey)
+  const inscriberAddress = Address.p2tr.fromPubKey(
+    tpubkey,
+    getCmDruidNetwork(network)
+  )
 
   return {
     inscriberAddress,
@@ -393,12 +414,15 @@ export async function getRawTransaction(
   }
 }
 
-export async function waitForTransaction(txId: string): Promise<boolean> {
+export async function waitForTransaction(
+  txId: string,
+  network: NetworkType
+): Promise<boolean> {
   const timeout: number = 60000
   const startTime: number = Date.now()
   while (true) {
     try {
-      const rawTx: any = await getRawTransaction(txId)
+      const rawTx: any = await getRawTransaction(txId, network)
       if (rawTx) {
         console.log('Transaction found in mempool:', txId)
         return true
@@ -431,14 +455,15 @@ export const getRecommendedFees = async (network: NetworkType) => {
 
 export async function getOutputValueByVOutIndex(
   commitTxId: string,
-  vOut: number
+  vOut: number,
+  network: NetworkType
 ): Promise<number | null> {
   const timeout: number = 60000
   const startTime: number = Date.now()
 
   while (true) {
     try {
-      const rawTx: any = await getTransaction(commitTxId)
+      const rawTx: any = await getTransaction(commitTxId, network)
 
       if (rawTx && rawTx.vout && rawTx.vout.length > 0) {
         return Math.floor(rawTx.vout[vOut].value)

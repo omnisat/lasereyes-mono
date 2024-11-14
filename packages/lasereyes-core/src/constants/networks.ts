@@ -28,6 +28,11 @@ export const ORANGE_TESTNET = 'Testnet'
 
 export const LEATHER_MAINNET = 'mainnet'
 export const LEATHER_TESTNET = 'testnet'
+
+export const CMDRUID_MAINNET = 'main'
+export const CMDRUID_TESTNET = 'testnet'
+export const CMDRUID_SIGNET = 'signet'
+
 export const MAINNET = 'mainnet'
 export const SIGNET = 'signet'
 export const TESTNET = 'testnet'
@@ -80,6 +85,16 @@ export const getOrangeNetwork = (network: string): BitcoinNetworkType => {
   if (network === FRACTAL_MAINNET) return ORANGE_MAINNET as BitcoinNetworkType
   if (network === FRACTAL_TESTNET) return ORANGE_MAINNET as BitcoinNetworkType
   return ORANGE_MAINNET as BitcoinNetworkType
+}
+
+export const getCmDruidNetwork = (network: string) => {
+  if (network === MAINNET) return CMDRUID_MAINNET
+  if (network === TESTNET4) return CMDRUID_TESTNET
+  if (network === TESTNET) return CMDRUID_TESTNET
+  if (network === SIGNET) return CMDRUID_SIGNET
+  if (network === FRACTAL_MAINNET) return CMDRUID_MAINNET
+  if (network === FRACTAL_TESTNET) return CMDRUID_MAINNET
+  return CMDRUID_MAINNET
 }
 
 export const getNetworkForUnisat = (network: string) => {

@@ -294,8 +294,6 @@ const WalletCard = ({
       //@ts-ignore
       setSignedPsbt(signPsbtResponse)
 
-      console.log(signPsbtResponse)
-
       if (
         typeof signPsbtResponse.signedPsbtHex === 'string' &&
         !signPsbtResponse.txId
@@ -382,7 +380,8 @@ const WalletCard = ({
     try {
       const inscriptionTxId = await inscribe(
         Buffer.from(inscriptionText).toString('base64'),
-        'text/plain'
+        'text/plain',
+        network
       )
       toast.success(
         <span className={'flex flex-col gap-1 items-center justify-center'}>
