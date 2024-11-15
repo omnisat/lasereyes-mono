@@ -54,6 +54,19 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
       }
     | undefined
   >()
+  const [selectedColor, setSelectedColor] = useState<string>(
+    ['orange', 'pink', 'blue', 'darkBlue', 'yellow'][
+      Math.floor(Math.random() * 5)
+    ]
+  )
+
+  const pickRandomColor = () => {
+    setSelectedColor(
+      ['orange', 'pink', 'blue', 'darkBlue', 'yellow'][
+        Math.floor(Math.random() * 5)
+      ]
+    )
+  }
 
   const switchN = () => {
     try {
@@ -412,7 +425,12 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
           </div>
         </div>
         <div className={'flex flex-row items-center gap-4 '}>
-          <LaserEyesLogo className={'m-4'} width={48} />
+          <LaserEyesLogo
+            className={'m-4'}
+            width={48}
+            onClick={address ? () => null : () => pickRandomColor()}
+            color={address ? 'green' : selectedColor}
+          />
           <div className={'grow'} />
         </div>
       </div>
