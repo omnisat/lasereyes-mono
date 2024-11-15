@@ -54,13 +54,13 @@ export const SUPPORTED_WALLETS: WalletInfo = {
     name: ProviderEnumMap.ORANGE,
     url: 'https://www.orangewallet.com/',
   },
-  [ProviderEnumMap.PHANTOM]: {
-    name: ProviderEnumMap.PHANTOM,
-    url: 'https://phantom.app/download',
-  },
   [ProviderEnumMap.OYL]: {
     name: ProviderEnumMap.OYL,
     url: 'https://www.oyl.io/#get-wallet',
+  },
+  [ProviderEnumMap.PHANTOM]: {
+    name: ProviderEnumMap.PHANTOM,
+    url: 'https://phantom.app/download',
   },
   [ProviderEnumMap.UNISAT]: {
     name: ProviderEnumMap.UNISAT,
