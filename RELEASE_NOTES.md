@@ -1,4 +1,16 @@
 
+## Version 0.0.123-rc.4 Release Notes
+
+In the pursuit of fine craftsmanship and making your developer life just that much easier, we've managed to squeeze in some updates for this release.
+
+Manipulating the flux capacitor, we've introduced a new **Create .npmrc file** step within our GH Actions workflow. This step is just about as exciting as someone methodically folding laundry, but we promise it's important.
+
+This step **creates an .npmrc file** using scarcely believable lines of code. It elegantly writes your `${{ secrets.NPM_TOKEN }}`, (obtained from your GitHub secret) for authentication to npm registry into the .npmrc. And no, just to set the record straight, NODE_AUTH_TOKEN isn't a band name; it’s an environment variable used for npm authentication.
+
+Moreover, as part of our exquisite error handling, we've ensured that this step is skipped over if critical steps lead to a failure. Because let’s face it, adding a cherry on top of a disaster-cake isn't really that appetizing. 
+
+That's all folks! We promise to continue tweaking things behind the scenes to help keep you coding and not wrestling with workflow configurations. Stay tuned for more exciting (and definitely useful) updates in our next versions!
+
 In this release, there have been some significant adjustments across three core packages of the LaserEye project - LaserEyes Core, LaserEyes React, and LaserEyes itself. Let's break it down. Some will say these changes are out of this world, but don't worry, we remain grounded. 
 
 **@omnisat/lasereyes-core:**
