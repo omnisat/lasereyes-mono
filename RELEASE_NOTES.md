@@ -1,4 +1,24 @@
 
+# Release Notes: Version 0.0.123-rc.6
+
+This release - version 0.0.123-rc.6 - is a tour de force to excite even the most fatigued developers. We've managed to remove all those extra blank lines in our ReadMe files that were desperately clinging to existence, causing such unnecessary scroll fatigue. They're now vanished into the ether.
+
+## Details of Changes:
+
+### 1. LaserEyes Core: Version change 0.0.46-rc.1 -> 0.0.46-rc.2  
+The moment you've all been waiting for – a version change in the @omnisat/lasereyes-core in package.json file! Cherish this moment - there aren't many like this in life.
+
+### 2. LaserEyes React: Version change 0.0.40-rc.1 -> 0.0.40-rc.2  
+For those of you who were growing tired of the old version of @omnisat/lasereyes-react in our package.json file, rejoice! We've liberated you from the burden of an old version, by moving from 0.0.40-rc.1 to 0.0.40-rc.2. A giant leap for developer kind! 
+
+### 3. LaserEyes: Change of Installation Command  
+In the lasereyes README.md, we've replaced the command `pnpm add @omnisat/lasereyes` with `yarn add @omnisat/lasereyes`. Because why not? We thought it wasn't confusing enough, so we decided to turn some tables.
+
+### 4. LaserEyes: Version change 0.0.123-rc.4 -> 0.0.123-rc.6  
+At last, we've the long-awaited update in the heart of our project, the version change of @omnisat/lasereyes package from "0.0.123-rc.4" to "0.0.123-rc.6!". Please play fanfare music as you read this. 
+
+Thank you for your continued support and keep an eye out for thrilling changes in our upcoming releases.
+
 ## Version 0.0.123-rc.4 Release Notes
 
 In the pursuit of fine craftsmanship and making your developer life just that much easier, we've managed to squeeze in some updates for this release.
