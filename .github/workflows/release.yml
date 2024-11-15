@@ -192,6 +192,12 @@ jobs:
         if: steps.install_dependencies.outcome == 'failure' || steps.build_packages.outcome == 'failure'
         run: echo "critical_failure=true" >> $GITHUB_ENV
 
+      - name: Create .npmrc file
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
       # Skip the remaining steps if critical steps failed
       - name: Promote lasereyes-core version
         if: env.critical_failure != 'true' && needs.check-package-changes.outputs.lasereyes_core_changed == 'true'
