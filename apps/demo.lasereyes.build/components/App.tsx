@@ -11,8 +11,8 @@ import {
   SIGNET,
   SUPPORTED_WALLETS,
   TESTNET,
-  LaserEyesLogo,
   TESTNET4,
+  LaserEyesLogo,
   useLaserEyes,
   WalletIcon,
 } from '@omnisat/lasereyes'
