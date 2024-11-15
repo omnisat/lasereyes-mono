@@ -253,6 +253,29 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
+      - name: Revert dependencies in lasereyes package.json for local development
+        if: needs.check-package-changes.outputs.lasereyes_core_changed == 'true' || needs.check-package-changes.outputs.lasereyes_react_changed == 'true'
+        continue-on-error: true
+        run: |
+          cd packages/lasereyes
+          node -e "let pkg=require('./package.json'); pkg.dependencies['@omnisat/lasereyes-core']='workspace:*'; pkg.dependencies['@omnisat/lasereyes-react']='workspace:*'; require('fs').writeFileSync('./package.json', JSON.stringify(pkg, null, 2));"
+          cd ../..
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Commit stable version bump for all changed packages
+        run: |
+          git config --global user.email "action@github.com"
+          git config --global user.name "GitHub Action"
+          git fetch --prune  # Clean up stale references
+          git add .
+          git commit -m "Stable version bump for all changed packages"
+          git checkout main || git checkout -b main origin/main  # Ensure main branch is checked out
+          git branch --set-upstream-to=origin/main main  # Set upstream to avoid ambiguity
+          git push origin main:refs/heads/main  # Push explicitly to main branch
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Revert merge if critical steps failed
         if: env.critical_failure == 'true'
         run: |

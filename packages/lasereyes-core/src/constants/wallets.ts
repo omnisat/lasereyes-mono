@@ -50,25 +50,25 @@ export const SUPPORTED_WALLETS: WalletInfo = {
     name: ProviderEnumMap.OKX,
     url: 'https://chromewebstore.google.com/detail/okx-wallet/mcohilncbfahbmgdjkbpemcciiolgcge',
   },
-  [ProviderEnumMap.WIZZ]: {
-    name: ProviderEnumMap.WIZZ,
-    url: 'https://wizzwallet.io/#extension',
-  },
   [ProviderEnumMap.ORANGE]: {
     name: ProviderEnumMap.ORANGE,
     url: 'https://www.orangewallet.com/',
-  },
-  [ProviderEnumMap.PHANTOM]: {
-    name: ProviderEnumMap.PHANTOM,
-    url: 'https://phantom.app/download',
   },
   [ProviderEnumMap.OYL]: {
     name: ProviderEnumMap.OYL,
     url: 'https://www.oyl.io/#get-wallet',
   },
+  [ProviderEnumMap.PHANTOM]: {
+    name: ProviderEnumMap.PHANTOM,
+    url: 'https://phantom.app/download',
+  },
   [ProviderEnumMap.UNISAT]: {
     name: ProviderEnumMap.UNISAT,
     url: 'https://unisat.io/download',
+  },
+  [ProviderEnumMap.WIZZ]: {
+    name: ProviderEnumMap.WIZZ,
+    url: 'https://wizzwallet.io/#extension',
   },
   [ProviderEnumMap.XVERSE]: {
     name: ProviderEnumMap.XVERSE,
