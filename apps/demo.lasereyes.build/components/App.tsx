@@ -438,8 +438,9 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
           <LaserEyesLogo
             className={'m-4'}
             width={48}
-            onClick={address ? () => null : () => pickRandomColor()}
-            color={address ? 'green' : selectedColor}
+            color={
+              address ? ('green' as colorsType) : (selectedColor as colorsType)
+            }
           />
           <div className={'grow'} />
         </div>
