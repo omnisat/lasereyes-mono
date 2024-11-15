@@ -1,11 +1,7 @@
 import * as bitcoin from 'bitcoinjs-lib'
 import { UNSUPPORTED_PROVIDER_METHOD_ERROR, WalletProvider } from '.'
 import { ProviderType, NetworkType } from '../../types'
-import {
-  createSendBtcPsbt,
-  getBTCBalance,
-  isTestnetNetwork,
-} from '../../lib/helpers'
+import { createSendBtcPsbt, isTestnetNetwork } from '../../lib/helpers'
 import { OYL } from '../../constants/wallets'
 import { listenKeys, MapStore } from 'nanostores'
 import { persistentMap } from '@nanostores/persistent'
@@ -113,14 +109,7 @@ export default class OylProvider extends WalletProvider {
     this.$store.setKey('publicKey', taproot.publicKey)
     this.$store.setKey('paymentPublicKey', nativeSegwit.publicKey)
     this.$store.setKey('provider', OYL)
-
-    // TODO: Confirm if this is necessary and why
-    getBTCBalance(nativeSegwit.address, this.network).then((totalBalance) => {
-      this.$store.setKey('balance', totalBalance)
-    })
     this.$store.setKey('connected', true)
-    const balance = await this.getBalance()
-    if (balance) this.$store.setKey('balance', balance)
   }
 
   async getNetwork() {

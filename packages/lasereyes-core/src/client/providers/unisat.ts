@@ -2,7 +2,6 @@ import * as bitcoin from 'bitcoinjs-lib'
 import { WalletProvider } from '.'
 import { getNetworkForUnisat, getUnisatNetwork } from '../../constants/networks'
 import { NetworkType, ProviderType } from '../../types'
-import { getBTCBalance } from '../../lib/helpers'
 import { UNISAT } from '../../constants/wallets'
 import { listenKeys } from 'nanostores'
 
@@ -107,11 +106,6 @@ export default class UnisatProvider extends WalletProvider {
     this.$store.setKey('publicKey', unisatPubKey)
     this.$store.setKey('paymentPublicKey', unisatPubKey)
     this.$store.setKey('provider', UNISAT)
-
-    // TODO: Confirm if this i necessary and why
-    getBTCBalance(unisatAccounts[0], this.network).then((totalBalance) => {
-      this.$store.setKey('balance', totalBalance)
-    })
     this.$store.setKey('connected', true)
   }
 

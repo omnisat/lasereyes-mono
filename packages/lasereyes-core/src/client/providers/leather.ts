@@ -145,11 +145,6 @@ export default class LeatherProvider extends WalletProvider {
     this.$store.setKey('publicKey', taprootAddress.publicKey)
     this.$store.setKey('paymentPublicKey', segwitAddress.publicKey)
     this.$store.setKey('provider', LEATHER)
-
-    // TODO: Confirm if this is necessary and why
-    getBTCBalance(segwitAddress.address, this.network).then((totalBalance) => {
-      this.$store.setKey('balance', totalBalance)
-    })
     this.$store.setKey('connected', true)
   }
 

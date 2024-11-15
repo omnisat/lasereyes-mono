@@ -5,7 +5,6 @@ import { ProviderType, NetworkType } from '../../types'
 import {
   createSendBtcPsbt,
   getBitcoinNetwork,
-  getBTCBalance,
   isTestnetNetwork,
 } from '../../lib/helpers'
 import { listenKeys } from 'nanostores'
@@ -94,9 +93,6 @@ export default class PhantomProvider extends WalletProvider {
     this.$store.setKey('publicKey', taproot.publicKey)
     this.$store.setKey('paymentPublicKey', payment.publicKey)
     this.$store.setKey('provider', PHANTOM)
-    getBTCBalance(payment.address, this.network).then((totalBalance) => {
-      this.$store.setKey('balance', totalBalance)
-    })
     this.$store.setKey('connected', true)
   }
 

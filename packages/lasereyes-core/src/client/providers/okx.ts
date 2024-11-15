@@ -127,8 +127,6 @@ export default class OkxProvider extends WalletProvider {
       this.$store.setKey('publicKey', okxAccounts.publicKey)
       this.$store.setKey('paymentPublicKey', okxAccounts.publicKey)
       this.$store.setKey('accounts', [okxAccounts])
-      const balance = await this.library?.getBalance()
-      this.$store.setKey('balance', balance.total)
       this.$store.setKey('provider', OKX)
       this.$store.setKey('connected', true)
     } catch (e) {
