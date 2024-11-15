@@ -240,6 +240,7 @@ jobs:
           cd ../..
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
       # Now promote lasereyes
       - name: Promote lasereyes version
         if: needs.check-package-changes.outputs.lasereyes_changed == 'true' ||
@@ -249,6 +250,16 @@ jobs:
           cd packages/lasereyes
           pnpm version patch
           pnpm publish --access public --no-git-checks          
+          cd ../..
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Revert dependencies in lasereyes package.json for local development
+        if: needs.check-package-changes.outputs.lasereyes_core_changed == 'true' || needs.check-package-changes.outputs.lasereyes_react_changed == 'true'
+        continue-on-error: true
+        run: |
+          cd packages/lasereyes
+          node -e "let pkg=require('./package.json'); pkg.dependencies['@omnisat/lasereyes-core']='workspace:*'; pkg.dependencies['@omnisat/lasereyes-react']='workspace:*'; require('fs').writeFileSync('./package.json', JSON.stringify(pkg, null, 2));"
           cd ../..
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
