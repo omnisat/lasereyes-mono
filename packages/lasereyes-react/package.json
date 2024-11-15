@@ -1,7 +1,7 @@
 {
   "name": "@omnisat/lasereyes-react",
   "private": false,
-  "version": "0.0.39",
+  "version": "0.0.40-rc.1",
   "type": "module",
   "main": "./dist/index.umd.cjs",
   "module": "./dist/index.js",
@@ -28,9 +28,11 @@
     "@omnisat/lasereyes-core": "workspace:*",
     "bootstrap": "^5.3.3",
     "nanostores": "^0.11.3",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
     "vite-plugin-ssr": "^0.4.142"
+  },
+  "peerDependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",
@@ -43,6 +45,8 @@
     "eslint-plugin-react-hooks": "^5.1.0-rc.0",
     "eslint-plugin-react-refresh": "^0.4.9",
     "globals": "^15.9.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.0.1",
     "vite": "^5.4.1",

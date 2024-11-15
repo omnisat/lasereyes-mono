@@ -178,26 +178,23 @@ jobs:
           corepack prepare pnpm@8.6.6 --activate
 
       - name: Install dependencies
+        id: install_dependencies
         run: pnpm install --no-frozen-lockfile
+        continue-on-error: true
 
       - name: Build all packages
+        id: build_packages
         run: pnpm build --filter="@omnisat*"
+        continue-on-error: true
 
-      - name: Create .npmrc file
-        run: |
-          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      # Set a flag if either critical step fails
+      - name: Check for failure in critical steps
+        if: steps.install_dependencies.outcome == 'failure' || steps.build_packages.outcome == 'failure'
+        run: echo "critical_failure=true" >> $GITHUB_ENV
 
-      - name: Debug NPM Token
-        run: |
-          echo "NODE_AUTH_TOKEN is set to: ${NODE_AUTH_TOKEN}"
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      # Promote lasereyes-core first
+      # Skip the remaining steps if critical steps failed
       - name: Promote lasereyes-core version
-        if: needs.check-package-changes.outputs.lasereyes_core_changed == 'true'
+        if: env.critical_failure != 'true' && needs.check-package-changes.outputs.lasereyes_core_changed == 'true'
         run: |
           cd packages/lasereyes-core
           pnpm version patch
@@ -206,9 +203,8 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      # Then promote lasereyes-react
       - name: Promote lasereyes-react version
-        if: needs.check-package-changes.outputs.lasereyes_react_changed == 'true'
+        if: env.critical_failure != 'true' && needs.check-package-changes.outputs.lasereyes_react_changed == 'true'
         run: |
           cd packages/lasereyes-react
           pnpm version patch
@@ -218,7 +214,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Promote lasereyes-vue version
-        if: needs.check-package-changes.outputs.lasereyes_vue_changed == 'true'
+        if: env.critical_failure != 'true' && needs.check-package-changes.outputs.lasereyes_vue_changed == 'true'
         run: |
           cd packages/lasereyes-vue
           pnpm version patch
@@ -227,9 +223,9 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      # Update lasereyes dependencies to point to new stable versions
+      # Update dependencies in lasereyes package.json only if no critical failure
       - name: Update dependencies in lasereyes package.json
-        if: needs.check-package-changes.outputs.lasereyes_core_changed == 'true' || needs.check-package-changes.outputs.lasereyes_react_changed == 'true'
+        if: env.critical_failure != 'true' && (needs.check-package-changes.outputs.lasereyes_core_changed == 'true' || needs.check-package-changes.outputs.lasereyes_react_changed == 'true')
         run: |
           CORE_VERSION=$(cd packages/lasereyes-core && node -p "require('./package.json').version")
           REACT_VERSION=$(cd packages/lasereyes-react && node -p "require('./package.json').version")
@@ -240,11 +236,9 @@ jobs:
           cd ../..
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-      # Now promote lasereyes
+
       - name: Promote lasereyes version
-        if: needs.check-package-changes.outputs.lasereyes_changed == 'true' ||
-          needs.check-package-changes.outputs.lasereyes_core_changed == 'true' ||
-          needs.check-package-changes.outputs.lasereyes_react_changed == 'true'
+        if: env.critical_failure != 'true' && (needs.check-package-changes.outputs.lasereyes_changed == 'true' || needs.check-package-changes.outputs.lasereyes_core_changed == 'true' || needs.check-package-changes.outputs.lasereyes_react_changed == 'true')
         run: |
           cd packages/lasereyes
           pnpm version patch
@@ -253,18 +247,25 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Commit stable version bump for all changed packages
+      - name: Revert merge if critical steps failed
+        if: env.critical_failure == 'true'
         run: |
-          git config --global user.email "action@github.com"
-          git config --global user.name "GitHub Action"
-          git fetch --prune  # Clean up stale references
-          git add .
-          git commit -m "Stable version bump for all changed packages"
-          git checkout main || git checkout -b main origin/main  # Ensure main branch is checked out
-          git branch --set-upstream-to=origin/main main  # Set upstream to avoid ambiguity
-          git push origin main:refs/heads/main  # Push explicitly to main branch
+          PREV_MAIN_COMMIT=$(git rev-parse main^1)
+          git reset --hard $PREV_MAIN_COMMIT
+          git push origin main --force
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Reopen PR from dev to main if critical steps failed
+        if: env.critical_failure == 'true'
+        run: |
+          PR_NUMBER=$(gh pr list --state closed --base main --head dev --limit 1 --json number --jq '.[0].number')
+          if [ -n "$PR_NUMBER" ]; then
+            gh pr reopen $PR_NUMBER
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 
   # Merge main into dev to sync branches
   merge-main-into-dev:

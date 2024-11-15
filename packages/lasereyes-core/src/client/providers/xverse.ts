@@ -162,12 +162,6 @@ export default class XVerseProvider extends WalletProvider {
             'paymentPublicKey',
             String(response.addresses[1].publicKey)
           )
-
-          getBTCBalance(String(foundPaymentAddress.address), this.network).then(
-            (totalBalance) => {
-              this.$store.setKey('balance', totalBalance)
-            }
-          )
         },
         onCancel: () => {
           throw new Error(`User canceled lasereyes to ${XVERSE} wallet`)

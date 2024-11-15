@@ -11,8 +11,8 @@ import {
   SIGNET,
   SUPPORTED_WALLETS,
   TESTNET,
-  LaserEyesLogo,
   TESTNET4,
+  LaserEyesLogo,
   useLaserEyes,
   WalletIcon,
 } from '@omnisat/lasereyes'
@@ -54,6 +54,29 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
       }
     | undefined
   >()
+  type colorsType =
+    | 'orange'
+    | 'pink'
+    | 'blue'
+    | 'darkBlue'
+    | 'yellow'
+    | 'green'
+    | 'purple'
+    | 'red'
+  const colors = [
+    'orange',
+    'pink',
+    'blue',
+    'darkBlue',
+    'yellow',
+  ] as colorsType[]
+  const [selectedColor, setSelectedColor] = useState<colorsType>(
+    colors[Math.floor(Math.random() * 5)]
+  )
+
+  const pickRandomColor = () => {
+    setSelectedColor(colors[Math.floor(Math.random() * 5)])
+  }
 
   const switchN = () => {
     try {
@@ -412,7 +435,13 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
           </div>
         </div>
         <div className={'flex flex-row items-center gap-4 '}>
-          <LaserEyesLogo className={'m-4'} width={48} />
+          <LaserEyesLogo
+            className={'m-4'}
+            width={48}
+            color={
+              address ? ('green' as colorsType) : (selectedColor as colorsType)
+            }
+          />
           <div className={'grow'} />
         </div>
       </div>

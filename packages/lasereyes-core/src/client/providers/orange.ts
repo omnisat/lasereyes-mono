@@ -166,13 +166,6 @@ export default class OrangeProvider extends WalletProvider {
             'paymentPublicKey',
             String(foundPaymentAddress.publicKey)
           )
-
-          getBTCBalance(
-            String(foundPaymentAddress?.address),
-            this.network
-          ).then((totalBalance) => {
-            this.$store.setKey('balance', totalBalance)
-          })
         },
         onCancel: () => {
           throw new Error(`User canceled lasereyes to ${ORANGE} wallet`)
