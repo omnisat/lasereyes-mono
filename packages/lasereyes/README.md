@@ -24,7 +24,7 @@ This package exports two core packages:
 To install the `@omnisat/lasereyes` package:
 
 ```bash
-pnpm add @omnisat/lasereyes
+yarn add @omnisat/lasereyes
 ```
 
 ## Usage
