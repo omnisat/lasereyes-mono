@@ -54,18 +54,28 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
       }
     | undefined
   >()
-  const [selectedColor, setSelectedColor] = useState<string>(
-    ['orange', 'pink', 'blue', 'darkBlue', 'yellow'][
-      Math.floor(Math.random() * 5)
-    ]
+  type colorsType =
+    | 'orange'
+    | 'pink'
+    | 'blue'
+    | 'darkBlue'
+    | 'yellow'
+    | 'green'
+    | 'purple'
+    | 'red'
+  const colors = [
+    'orange',
+    'pink',
+    'blue',
+    'darkBlue',
+    'yellow',
+  ] as colorsType[]
+  const [selectedColor, setSelectedColor] = useState<colorsType>(
+    colors[Math.floor(Math.random() * 5)]
   )
 
   const pickRandomColor = () => {
-    setSelectedColor(
-      ['orange', 'pink', 'blue', 'darkBlue', 'yellow'][
-        Math.floor(Math.random() * 5)
-      ]
-    )
+    setSelectedColor(colors[Math.floor(Math.random() * 5)])
   }
 
   const switchN = () => {
