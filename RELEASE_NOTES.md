@@ -1,4 +1,24 @@
 
+# Release Notes
+
+## Version: 0.0.125-rc.8
+
+The sunny skies over the `lasereyes` repository are gleaming brighter than ever because we heard your mumbles! Folks from QA would be delighted to know and test in their over-caffeinated enthusiasm that we have a new release candidate available as Version 0.0.125-rc.8. Bonus? We've even bumped the versions of the packages. Let's get into it.
+
+### @omnisat/lasereyes-core [0.0.47-rc.5]
+
+The core package saw a version update from 0.0.46-rc.4 to 0.0.47-rc.5. This isn't just a number change but a hard-work-drenched improvement. We promise, not a single piece of cake was harmed during this transition! Strap up and prepare to experience enhancements of the sort you've never seen before.
+
+### @omnisat/lasereyes-react [0.0.42-rc.4]
+
+And we didn't stop at the core. No sir, we've gone farther! Our React package, in all its glory, evolved from version 0.0.41-rc.4 to version 0.0.42-rc.4. There may be no additional bite-sized burgers in this release, but we are definitely filling up on React goodness.
+
+### @omnisat/lasereyes-vue [0.0.8-rc.1]
+
+Our Vue package took some time for self-discovery and has metamorphized from version 0.0.7-rc.1 to version 0.0.8-rc.1. Though this might seem like just an incremental update, it’s like hiring your second cat, small change, monumental effect!
+
+Please do the needful to update to the latest versions where necessary and thank you for your continued support. Also, don't forget to drink some water between the caffeinated drinks. Please!
+
 # Release Notes: Version 0.0.123-rc.6
 
 This release - version 0.0.123-rc.6 - is a tour de force to excite even the most fatigued developers. We've managed to remove all those extra blank lines in our ReadMe files that were desperately clinging to existence, causing such unnecessary scroll fatigue. They're now vanished into the ether.
