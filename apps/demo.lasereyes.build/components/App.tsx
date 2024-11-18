@@ -49,9 +49,9 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
   const [signedPsbt, setSignedPsbt] = useState<
     | string
     | {
-        signedPsbtHex: string
-        signedPsbtBase64: string
-      }
+      signedPsbtHex: string
+      signedPsbtBase64: string
+    }
     | undefined
   >()
   type colorsType =
