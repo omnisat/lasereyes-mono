@@ -59,10 +59,10 @@ const WalletCard = ({
   setSignedPsbt: (
     psbt:
       | {
-          signedPsbtHex: string
-          signedPsbtBase64: string
-          txId?: string
-        }
+        signedPsbtHex: string
+        signedPsbtBase64: string
+        txId?: string
+      }
       | undefined
   ) => void
 }) => {
@@ -140,12 +140,12 @@ const WalletCard = ({
         paymentAddress,
         paymentPublicKey,
         network as
-          | typeof MAINNET
-          | typeof TESTNET
-          | typeof TESTNET4
-          | typeof SIGNET
-          | typeof FRACTAL_MAINNET
-          | typeof FRACTAL_TESTNET
+        | typeof MAINNET
+        | typeof TESTNET
+        | typeof TESTNET4
+        | typeof SIGNET
+        | typeof FRACTAL_MAINNET
+        | typeof FRACTAL_TESTNET
       )
         .then((psbt) => {
           if (psbt && psbt.toHex() !== unsigned) {
@@ -423,8 +423,8 @@ const WalletCard = ({
             <Badge
               variant={isConnected ? 'success' : 'outline'}
               className={cn(
-                'text-gray-500 border-gray-500',
-                isConnected ? 'text-white ' : ''
+                'text-gray-500 border-gray-600',
+                isConnected ? 'text-gray-900 border-gray-900' : ''
               )}
             >
               {isConnected ? 'connected' : 'disconnected'}
