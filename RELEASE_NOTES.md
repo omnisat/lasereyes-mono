@@ -1,4 +1,24 @@
 
+# Version: 0.0.126
+
+Oh look, we did some things. Surprise, surprise.
+
+To start, we improved the code structure in `App.tsx` and `WalletCard.tsx`. It's not like you'd notice, but we spent a bazillion cups of coffee to tweak that, so humor us. It was also necessary due to life-or-death alignment issues that lasted for approximately millimeters.
+
+Speaking of `WalletCard.tsx`, borderline ground-breaking changes have been made to the class names handling of the 'connected' badge. Breaking news, right?
+
+Since we were in a rather jolly mood, we boosted up the version of `lasereyes-core` to 0.0.48. Just making sure that the freshness of the code aligns with our coffee.
+
+Speaking of soaring numbers, `lasereyes-react` is now at version 0.0.43, and `lasereyes-vue` hit version 0.0.9. Clearly, you see we've been busy.
+
+But the pièce de résistance of this update - the `OpNetProvider`. After hours of soul-searching, we've reenabled it in our core client. Also, we beat around the bush in its code, because let's not lie, we all have those 'what was I thinking?' moments. I mean come on, we're coders, not fortune tellers. 
+
+Oh and remember `getBTCBalance`? Neither do we. So we sent it to a very long vacation. It won't be missed.
+
+And guess what? We even updated the provider enumerator and added the `OP_NET` in supported wallets. Yes, hold your breaths – we are revolutionary like that.
+
+No, there is no need to thank us.
+
 # Release Notes
 
 ## Version: 0.0.125-rc.8
