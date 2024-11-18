@@ -2,7 +2,6 @@ import * as bitcoin from 'bitcoinjs-lib'
 import { WalletProvider } from '.'
 import { getNetworkForUnisat, getUnisatNetwork } from '../../constants/networks'
 import { NetworkType, ProviderType } from '../../types'
-import { getBTCBalance } from '../../lib/helpers'
 import { OP_NET } from '../../constants/wallets'
 import { listenKeys } from 'nanostores'
 
@@ -106,10 +105,7 @@ export default class OpNetProvider extends WalletProvider {
         this.switchNetwork(network)
       }
     })
-    // TODO: Confirm if this is necessary and why
-    getBTCBalance(opNetAccounts[0], this.network).then((totalBalance) => {
-      this.$store.setKey('balance', totalBalance)
-    })
+
     this.$store.setKey('connected', true)
   }
 
@@ -143,10 +139,10 @@ export default class OpNetProvider extends WalletProvider {
     broadcast?: boolean | undefined
   ): Promise<
     | {
-        signedPsbtHex: string | undefined
-        signedPsbtBase64: string | undefined
-        txId?: string | undefined
-      }
+      signedPsbtHex: string | undefined
+      signedPsbtBase64: string | undefined
+      txId?: string | undefined
+    }
     | undefined
   > {
     const signedPsbt = await this.library?.signPsbt(psbtHex, {
@@ -192,6 +188,5 @@ export default class OpNetProvider extends WalletProvider {
     const wantedNetwork = getUnisatNetwork(network)
     await this.library?.switchChain(wantedNetwork)
     this.$network.set(network)
-    await this.getBalance()
   }
 }
