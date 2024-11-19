@@ -1,4 +1,34 @@
 
+# Release Notes
+
+## Version 0.0.127 Patch 
+
+### Lasereyes-Core
+
+Upgrade from `0.0.48` to `0.0.49`
+
+* XVerse Provider module has been enriched. An addition to the `MessageSigningProtocols` has been made which uses the BIP322 protocol during the request for 'signMessage'. This new protocol should enhance security and confirm the authenticity of messages in a bit more foolproof way.
+  
+* For those who find all things beautiful in perfect alignment, we've adjusted the spacing of some arguments. All you tidyfreaks can find solace in the sheer neatly packed lines of properties now.
+
+### Lasereyes-React
+
+Upgrade from `0.0.43` to `0.0.44`
+
+Not striving to make any big splash here, just some routine backstage adjustments to keep the lasereyes-react package tuned and humming smoothly. 
+
+### Lasereyes-Vue
+
+Upgrade from `0.0.9` to `0.0.10`
+
+Striking ten with lasereyes-vue. No core changes here either, just the next effortless gate in our endless journey of version updates.
+
+### Misc
+
+* Mysterious things do happen in code! A newline was found innocent and restored to its rightful place at the end of a file.
+
+Let's dive in the sea of codes again until we meet for the next release, folks! Live Long and Tidy.
+
 # Version: 0.0.126
 
 Oh look, we did some things. Surprise, surprise.
