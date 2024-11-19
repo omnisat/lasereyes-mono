@@ -22,11 +22,12 @@ enum ProviderEnumMap {
   LEATHER = 'leather',
   MAGIC_EDEN = 'magic-eden',
   OKX = 'okx',
-  WIZZ = 'wizz',
+  OP_NET = 'op_net',
   ORANGE = 'orange',
   OYL = 'oyl',
   PHANTOM = 'phantom',
   UNISAT = 'unisat',
+  WIZZ = 'wizz',
   XVERSE = 'xverse',
 }
 
@@ -49,6 +50,10 @@ export const SUPPORTED_WALLETS: WalletInfo = {
   [ProviderEnumMap.OKX]: {
     name: ProviderEnumMap.OKX,
     url: 'https://chromewebstore.google.com/detail/okx-wallet/mcohilncbfahbmgdjkbpemcciiolgcge',
+  },
+  [ProviderEnumMap.OP_NET]: {
+    name: ProviderEnumMap.OP_NET,
+    url: 'https://opnet.org/',
   },
   [ProviderEnumMap.ORANGE]: {
     name: ProviderEnumMap.ORANGE,
