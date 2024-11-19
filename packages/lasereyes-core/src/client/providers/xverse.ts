@@ -6,6 +6,7 @@ import {
   request,
   signTransaction,
   SignTransactionOptions,
+  MessageSigningProtocols,
 } from 'sats-connect'
 import { WalletProvider } from '.'
 import {
@@ -218,6 +219,7 @@ export default class XVerseProvider extends WalletProvider {
     const response = await request('signMessage', {
       address: tempAddy,
       message,
+      protocol: MessageSigningProtocols.BIP322,
     })
 
     if (response.status === 'success') {
@@ -238,10 +240,10 @@ export default class XVerseProvider extends WalletProvider {
     broadcast?: boolean | undefined
   ): Promise<
     | {
-        signedPsbtHex: string | undefined
-        signedPsbtBase64: string | undefined
-        txId?: string | undefined
-      }
+      signedPsbtHex: string | undefined
+      signedPsbtBase64: string | undefined
+      txId?: string | undefined
+    }
     | undefined
   > {
     const { address, paymentAddress } = this.$store.get()
@@ -310,6 +312,7 @@ export default class XVerseProvider extends WalletProvider {
           signedPsbt = bitcoin.Psbt.fromBase64(String(response.psbtBase64), {
             network: getBitcoinNetwork(this.network),
           })
+
           if (_finalize) {
             signedPsbt!.finalizeAllInputs()
           }
