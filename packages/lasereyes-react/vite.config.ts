@@ -6,7 +6,7 @@ import dts from 'vite-plugin-dts'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
-    react() as UserConfig["plugins"],
+    react() as UserConfig['plugins'],
     dts({
       insertTypesEntry: true, // Adds an entry point for types, ensuring `types` is correctly referenced in package.json
       tsconfigPath: resolve(__dirname, './tsconfig.build.json'),
@@ -24,7 +24,7 @@ export default defineConfig({
       fileName: 'index',
     },
     rollupOptions: {
-      external: ['react', 'react-dom'],
+      external: ['react', 'react-dom', 'react/jsx-runtime'],
       output: {
         globals: {
           react: 'React',
