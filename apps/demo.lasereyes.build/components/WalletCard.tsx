@@ -466,6 +466,7 @@ const WalletCard = ({
                 disabled={isMissingWallet}
                 variant={'default'}
                 onClick={() =>
+                  // @ts-ignore
                   isConnected ? disconnect() : connectWallet(walletName)
                 }
               >
