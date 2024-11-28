@@ -8,6 +8,7 @@ import {
   OKX,
   OYL,
   PHANTOM,
+  SPARROW,
   UNISAT,
   WIZZ,
   XVERSE,
@@ -30,7 +31,7 @@ function useDeepStore<T extends object>(store: MapStore<T>): Reactive<T> {
   const unsubscribe = store.subscribe((current: any, old: any) => {
     for (const key of Object.keys(current)) {
       if (current[key] === old?.[key]) continue
-      ;(state as Reactive<any>)[key] = current[key]
+        ; (state as Reactive<any>)[key] = current[key]
     }
   })
 
@@ -79,6 +80,7 @@ export function useLaserEyes() {
     hasMagicEden: computed(() => hasProvider.value[MAGIC_EDEN] ?? false),
     hasOkx: computed(() => hasProvider.value[OKX] ?? false),
     hasOyl: computed(() => hasProvider.value[OYL] ?? false),
+    hasSparrow: computed(() => hasProvider.value[SPARROW] ?? false),
     hasPhantom: computed(() => hasProvider.value[PHANTOM] ?? false),
     hasUnisat: computed(() => hasProvider.value[UNISAT] ?? false),
     hasWizz: computed(() => hasProvider.value[WIZZ] ?? false),
