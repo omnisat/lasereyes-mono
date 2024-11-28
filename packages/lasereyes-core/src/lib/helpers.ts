@@ -18,13 +18,7 @@ import { P2PKH, P2SH, P2SH_P2WPKH, P2TR, P2WPKH, P2WSH } from '../constants'
 bitcoin.initEccLib(ecc)
 
 export const getBitcoinNetwork = (
-  network:
-    | typeof MAINNET
-    | typeof TESTNET
-    | typeof TESTNET4
-    | typeof SIGNET
-    | typeof FRACTAL_MAINNET
-    | typeof FRACTAL_TESTNET
+  network: NetworkType,
 ) => {
   if (network === TESTNET || network === TESTNET4 || network === SIGNET) {
     return bitcoin.networks.testnet
@@ -51,13 +45,7 @@ export const findPaymentAddress = (
 
 export const getBTCBalance = async (
   address: string,
-  network:
-    | typeof MAINNET
-    | typeof TESTNET
-    | typeof TESTNET4
-    | typeof SIGNET
-    | typeof FRACTAL_MAINNET
-    | typeof FRACTAL_TESTNET
+  network: NetworkType,
 ): Promise<bigint> => {
   try {
     const utxos: MempoolUtxo[] | undefined = await getAddressUtxos(
@@ -96,13 +84,7 @@ export function estimateTxSize(
 
 export async function getAddressUtxos(
   address: string,
-  network:
-    | typeof MAINNET
-    | typeof TESTNET
-    | typeof TESTNET4
-    | typeof SIGNET
-    | typeof FRACTAL_MAINNET
-    | typeof FRACTAL_TESTNET
+  network: NetworkType,
 ) {
   if (address.startsWith('t')) {
     if (network === MAINNET) {
@@ -126,13 +108,7 @@ export async function createSendBtcPsbt(
   recipientAddress: string,
   amount: number,
   paymentPublicKey: string,
-  network:
-    | typeof MAINNET
-    | typeof TESTNET
-    | typeof TESTNET4
-    | typeof SIGNET
-    | typeof FRACTAL_MAINNET
-    | typeof FRACTAL_TESTNET,
+  network: NetworkType,
   feeRate: number = 7
 ) {
   const isTaprootOnly = address === paymentAddress
@@ -205,13 +181,7 @@ export async function createSendBtcPsbt(
 
 export function getRedeemScript(
   paymentPublicKey: string,
-  network:
-    | typeof MAINNET
-    | typeof TESTNET
-    | typeof TESTNET4
-    | typeof SIGNET
-    | typeof FRACTAL_MAINNET
-    | typeof FRACTAL_TESTNET
+  network: NetworkType
 ) {
   const p2wpkh = bitcoin.payments.p2wpkh({
     pubkey: Buffer.from(paymentPublicKey, 'hex'),

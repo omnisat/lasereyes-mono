@@ -1,11 +1,11 @@
 import {
   FRACTAL_MAINNET,
   FRACTAL_TESTNET,
-  MAINNET,
   SIGNET,
   TESTNET,
   TESTNET4,
 } from '../constants/networks'
+import { NetworkType } from '../types'
 
 export const MEMPOOL_SPACE_URL = 'https://mempool.space'
 export const MEMPOOL_SPACE_TESTNET_URL = 'https://mempool.space/testnet'
@@ -17,13 +17,7 @@ export const MEMPOOL_SPACE_FRACTAL_TESTNET_URL =
   'https://mempool-testnet.fractalbitcoin.io'
 
 export const getMempoolSpaceUrl = (
-  network:
-    | typeof MAINNET
-    | typeof TESTNET
-    | typeof TESTNET4
-    | typeof SIGNET
-    | typeof FRACTAL_MAINNET
-    | typeof FRACTAL_TESTNET
+  network: NetworkType
 ) =>
   network === TESTNET
     ? MEMPOOL_SPACE_TESTNET_URL
