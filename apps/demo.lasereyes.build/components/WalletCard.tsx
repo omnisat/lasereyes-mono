@@ -431,7 +431,7 @@ const WalletCard = ({
       </CardHeader>
       <CardContent>
         <div className={'flex flex-col gap-4'}>
-          {isSparrow && (<span className='text-center m-auto w-full text-xs'>all wallet interactions are executed in the browser's console</span>
+          {isSparrow && (<span className='text-center m-auto w-full text-xs'>all wallet interactions are executed in the browser console</span>
           )}
           <div className={'flex flex-row space-between items-center gap-6'}>
             <Badge
