@@ -40,4 +40,4 @@ yarn-error.log*
 .vscode
 package-lock.json
 **/*.tsbuildinfo
-
+wallet-info.txt

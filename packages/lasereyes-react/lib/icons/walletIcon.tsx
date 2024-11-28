@@ -7,6 +7,8 @@ import { PhantomLogo } from './phantom'
 import { UnisatLogo } from './unisat'
 import { OylLogo } from './oyl'
 import OrangeLogo from './orange'
+import OpNetIcon from './op_net.tsx'
+import SparrowLogo from './sparrow.tsx'
 import {
   ProviderType,
   XVERSE,
@@ -19,8 +21,8 @@ import {
   ORANGE,
   OYL,
   OP_NET,
+  SPARROW,
 } from '@omnisat/lasereyes-core'
-import OpNetIcon from './op_net.tsx'
 
 const WalletIcon = ({
   size,
@@ -43,6 +45,8 @@ const WalletIcon = ({
     return <MagicEdenLogo size={size} className={className} variant={variant} />
   } else if (walletName === OKX) {
     return <OkxLogo size={size} className={className} variant={variant} />
+  } else if (walletName === SPARROW) {
+    return <SparrowLogo size={size} className={className} variant={variant} />
   } else if (walletName === PHANTOM) {
     return <PhantomLogo size={size} className={className} variant={variant} />
   } else if (walletName === UNISAT) {

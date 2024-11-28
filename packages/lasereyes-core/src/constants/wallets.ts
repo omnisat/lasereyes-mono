@@ -26,6 +26,7 @@ enum ProviderEnumMap {
   OP_NET = 'op_net',
   ORANGE = 'orange',
   OYL = 'oyl',
+  SPARROW = 'sparrow',
   PHANTOM = 'phantom',
   UNISAT = 'unisat',
   WIZZ = 'wizz',
@@ -67,6 +68,10 @@ export const SUPPORTED_WALLETS: WalletInfo = {
   [ProviderEnumMap.PHANTOM]: {
     name: ProviderEnumMap.PHANTOM,
     url: 'https://phantom.app/download',
+  },
+  [ProviderEnumMap.SPARROW]: {
+    name: ProviderEnumMap.SPARROW,
+    url: 'https://sparrowwallet.com/',
   },
   [ProviderEnumMap.UNISAT]: {
     name: ProviderEnumMap.UNISAT,

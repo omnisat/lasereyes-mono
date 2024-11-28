@@ -20,6 +20,7 @@ import {
   WalletIcon,
   OP_NET,
   ProviderType,
+  SPARROW,
 } from '@omnisat/lasereyes'
 import {
   Card,
@@ -86,6 +87,7 @@ const WalletCard = ({
     hasLeather,
     hasPhantom,
     hasWizz,
+    hasSparrow,
     hasOrange,
     hasOpNet,
     sendBTC,
@@ -114,6 +116,7 @@ const WalletCard = ({
     oyl: hasOyl,
     [MAGIC_EDEN]: hasMagicEden,
     okx: hasOkx,
+    sparrow: hasSparrow,
     op_net: hasOpNet,
     leather: hasLeather,
     phantom: hasPhantom,
@@ -123,6 +126,7 @@ const WalletCard = ({
 
   const isConnected = provider === walletName
   const isMissingWallet = !hasWallet[walletName]
+  const isSparrow = provider === SPARROW && isConnected
 
   const { utxos } = useUtxos()
 
@@ -415,10 +419,20 @@ const WalletCard = ({
         >
           <WalletIcon walletName={walletName} size={42} />
           {walletName.replace('-', ' ')}
+          {isSparrow && (
+            <span className="flex flex-col gap-2">
+              <Badge variant={'success'} className={'text-gray-900'}>
+                beta
+              </Badge>
+            </span>
+          )}
+
         </CardTitle>
       </CardHeader>
       <CardContent>
         <div className={'flex flex-col gap-4'}>
+          {isSparrow && (<span className='text-center m-auto w-full text-xs'>all wallet interactions are executed in the browser's console</span>
+          )}
           <div className={'flex flex-row space-between items-center gap-6'}>
             <Badge
               variant={isConnected ? 'success' : 'outline'}
