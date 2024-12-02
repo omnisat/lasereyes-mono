@@ -207,9 +207,16 @@ export async function broadcastTx(
   txHex: string,
   network: NetworkType
 ): Promise<string> {
-  return await axios
-    .post(`${getMempoolSpaceUrl(network)}/api/tx`, txHex)
-    .then((res) => res.data)
+  const response = await axios.post(
+    `${getMempoolSpaceUrl(network)}/api/tx`,
+    txHex,
+    {
+      headers: {
+        'Content-Type': 'text/plain',
+      },
+    }
+  );
+  return response.data;
 }
 
 export const getAddressType = (

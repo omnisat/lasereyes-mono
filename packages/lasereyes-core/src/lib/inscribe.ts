@@ -55,10 +55,10 @@ export const inscribeContent = async ({
     network?: NetworkType
   ) => Promise<
     | {
-        signedPsbtHex: string | undefined
-        signedPsbtBase64: string | undefined
-        txId?: string
-      }
+      signedPsbtHex: string | undefined
+      signedPsbtBase64: string | undefined
+      txId?: string
+    }
     | undefined
   >
   network: NetworkType
@@ -72,9 +72,9 @@ export const inscribeContent = async ({
     const ixs = inscriptions
       ? inscriptions
       : Array(quantity).fill({
-          content: contentBase64,
-          mimeType,
-        })
+        content: contentBase64,
+        mimeType,
+      })
 
     const commitTx = await getCommitTx({
       inscriptions: ixs,
@@ -130,9 +130,9 @@ export const getCommitTx = async ({
   isDry?: boolean
 }): Promise<
   | {
-      psbtHex: string
-      psbtBase64: string
-    }
+    psbtHex: string
+    psbtBase64: string
+  }
   | undefined
 > => {
   try {
@@ -422,7 +422,7 @@ export async function waitForTransaction(
   const startTime: number = Date.now()
   while (true) {
     try {
-      const rawTx: any = await getRawTransaction(txId, network)
+      const rawTx: any = await getTransaction(txId, network)
       if (rawTx) {
         console.log('Transaction found in mempool:', txId)
         return true
