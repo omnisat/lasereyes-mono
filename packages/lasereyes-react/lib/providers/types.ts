@@ -20,6 +20,7 @@ export type LaserEyesContextType = {
   hasOyl: boolean
   hasMagicEden: boolean
   hasOkx: boolean
+  hasSparrow: boolean
   hasLeather: boolean
   hasPhantom: boolean
   hasWizz: boolean
@@ -40,10 +41,10 @@ export type LaserEyesContextType = {
     broadcast?: boolean
   ) => Promise<
     | {
-        signedPsbtHex: string | undefined
-        signedPsbtBase64: string | undefined
-        txId?: string
-      }
+      signedPsbtHex: string | undefined
+      signedPsbtBase64: string | undefined
+      txId?: string
+    }
     | undefined
   >
   pushPsbt: (tx: string) => Promise<string | undefined>

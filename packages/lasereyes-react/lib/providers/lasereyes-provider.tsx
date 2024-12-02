@@ -64,6 +64,7 @@ export default function LaserEyesProvider({
         hasOpNet: hasProvider.op_net ?? false,
         hasPhantom: hasProvider.phantom ?? false,
         hasUnisat: hasProvider.unisat ?? false,
+        hasSparrow: hasProvider.sparrow ?? false,
         hasWizz: hasProvider.wizz ?? false,
         hasXverse: hasProvider.xverse ?? false,
         connect: client.connect.bind(client),

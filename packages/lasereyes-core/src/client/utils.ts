@@ -11,6 +11,7 @@ import {
   XVERSE,
   ORANGE,
   OP_NET,
+  SPARROW,
 } from '../constants/wallets'
 import { NetworkType } from '../types'
 import { LaserEyesStoreType } from './types'
@@ -43,16 +44,17 @@ export function createStores(): {
       accounts: [],
       balance: undefined,
       hasProvider: {
-        [UNISAT]: false,
-        [XVERSE]: false,
-        [OYL]: false,
-        [MAGIC_EDEN]: false,
-        [OP_NET]: false,
-        [OKX]: false,
         [LEATHER]: false,
+        [UNISAT]: false,
+        [MAGIC_EDEN]: false,
+        [OKX]: false,
+        [OP_NET]: false,
+        [ORANGE]: false,
+        [OYL]: false,
+        [SPARROW]: true,
         [PHANTOM]: false,
         [WIZZ]: false,
-        [ORANGE]: false,
+        [XVERSE]: false,
       },
     }),
     $network: atom(MAINNET),

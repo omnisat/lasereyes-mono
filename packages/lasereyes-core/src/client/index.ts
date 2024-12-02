@@ -9,6 +9,7 @@ import {
   ORANGE,
   OYL,
   PHANTOM,
+  SPARROW,
   UNISAT,
   WIZZ,
   XVERSE,
@@ -29,6 +30,7 @@ import OkxProvider from './providers/okx'
 import MagicEdenProvider from './providers/magic-eden'
 import PhantomProvider from './providers/phantom'
 import OpNetProvider from './providers/op-net'
+import SparrowProvider from './providers/sparrow'
 
 export class LaserEyesClient {
   readonly $store: MapStore<LaserEyesStoreType>
@@ -56,6 +58,7 @@ export class LaserEyesClient {
       [ORANGE]: new OrangeProvider(stores, this, config),
       [OYL]: new OylProvider(stores, this, config),
       [PHANTOM]: new PhantomProvider(stores, this, config),
+      [SPARROW]: new SparrowProvider(stores, this, config),
       [UNISAT]: new UnisatProvider(stores, this, config),
       [XVERSE]: new XVerseProvider(stores, this, config),
       [WIZZ]: new WizzProvider(stores, this, config),

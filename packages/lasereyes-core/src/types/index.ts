@@ -17,6 +17,7 @@ import {
   WIZZ,
   ORANGE,
   OP_NET,
+  SPARROW,
 } from '../constants/wallets'
 import {
   AUDIO_OGG,
@@ -68,6 +69,8 @@ export type ProviderType =
   | typeof WIZZ
   | typeof ORANGE
   | typeof OP_NET
+  | typeof SPARROW
+
 
 export type ContentType =
   | typeof TEXT_HTML
@@ -101,12 +104,12 @@ export type ContentType =
 
 export type Config = {
   network:
-    | typeof MAINNET
-    | typeof TESTNET
-    | typeof TESTNET4
-    | typeof SIGNET
-    | typeof FRACTAL_MAINNET
-    | typeof FRACTAL_TESTNET
+  | typeof MAINNET
+  | typeof TESTNET
+  | typeof TESTNET4
+  | typeof SIGNET
+  | typeof FRACTAL_MAINNET
+  | typeof FRACTAL_TESTNET
 }
 
 export interface OYLBalanceResponse {
