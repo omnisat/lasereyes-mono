@@ -126,7 +126,7 @@ const WalletCard = ({
 
   const isConnected = provider === walletName
   const isMissingWallet = !hasWallet[walletName]
-  const isSparrow = provider === SPARROW && isConnected
+  const isSparrow = wallet.name === SPARROW
 
   const { utxos } = useUtxos()
 
