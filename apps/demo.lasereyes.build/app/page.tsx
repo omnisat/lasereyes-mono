@@ -3,7 +3,6 @@ import {
   FRACTAL_MAINNET,
   FRACTAL_TESTNET,
   MAINNET,
-  NetworkType,
   SIGNET,
   TESTNET,
   TESTNET4,
