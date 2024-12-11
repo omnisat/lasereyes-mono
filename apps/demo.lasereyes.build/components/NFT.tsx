@@ -6,17 +6,17 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ImNewTab } from "react-icons/im";
 import { cn } from "@/lib/utils";
-import DynamicSvgDisplay from "@/components/DynamicSvgDisplay";
+import { ContentType } from "@omnisat/lasereyes";
 
 const Inscription = ({
-  inscriptionId,
+  contentUrl,
   contentType,
   size,
   className,
   children,
 }: {
-  inscriptionId: string;
-  contentType: string;
+  contentUrl: string;
+  contentType: ContentType;
   size: number;
   children?: ReactNode;
   className?: string;
@@ -25,28 +25,28 @@ const Inscription = ({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [svgContent, setSvgContent] = useState<string | null>(null);
 
-  const getMimeType = (contentType: string) =>
+  const getMimeType = (contentType: ContentType) =>
     contentType.split(";")[0].trim().toLowerCase();
 
-  const isImageContentType = (contentType: string) =>
+  const isImageContentType = (contentType: ContentType) =>
     getMimeType(contentType).startsWith("image/") &&
     getMimeType(contentType) !== "image/gif" &&
     getMimeType(contentType) !== "image/svg+xml";
 
-  const isGifContentType = (contentType: string) =>
+  const isGifContentType = (contentType: ContentType) =>
     getMimeType(contentType) === "image/gif";
 
-  const isSvgContentType = (contentType: string) =>
+  const isSvgContentType = (contentType: ContentType) =>
     getMimeType(contentType) === "image/svg+xml";
 
-  const isHtmlContentType = (contentType: string) =>
+  const isHtmlContentType = (contentType: ContentType) =>
     getMimeType(contentType) === "text/html";
 
   useEffect(() => {
     if (
-      isSvgContentType(asset.effective_content_type)
+      isSvgContentType(contentType)
     ) {
-      fetch(asset.image_url)
+      fetch(contentUrl)
         .then((response) => response.text())
         .then((svg) => {
           setSvgContent(svg);
@@ -55,19 +55,19 @@ const Inscription = ({
           console.error("Error fetching SVG content:", error);
         });
     }
-  }, [asset]);
+  }, [contentUrl]);
 
   useEffect(() => {
     if (
-      asset &&
-      asset.effective_content_type &&
-      isImageContentType(asset.effective_content_type)
+      contentUrl &&
+      contentType &&
+      isImageContentType(contentType)
     ) {
       const canvas = canvasRef.current;
       if (canvas) {
         const ctx = canvas.getContext("2d");
         const img = new window.Image();
-        img.src = asset.image_url;
+        img.src = contentUrl;
         img.onload = () => {
           const maxCanvasSize = size;
           const aspectRatio = img.width / img.height;
@@ -75,15 +75,12 @@ const Inscription = ({
           let canvasWidth, canvasHeight;
 
           if (aspectRatio > 1) {
-            // Image is wider than tall
             canvasWidth = maxCanvasSize;
             canvasHeight = maxCanvasSize / aspectRatio;
           } else if (aspectRatio < 1) {
-            // Image is taller than wide
             canvasHeight = maxCanvasSize;
             canvasWidth = maxCanvasSize * aspectRatio;
           } else {
-            // Image is square
             canvasWidth = maxCanvasSize;
             canvasHeight = maxCanvasSize;
           }
@@ -91,7 +88,6 @@ const Inscription = ({
           canvas.width = canvasWidth;
           canvas.height = canvasHeight;
 
-          // Function to draw a rounded rectangle path
           const roundRect = (
             ctx: CanvasRenderingContext2D,
             x: number,
@@ -126,33 +122,33 @@ const Inscription = ({
         };
       }
     }
-  }, [asset, asset?.image_url, size]);
+  }, [contentUrl, size]);
 
   let content;
 
   if (
-    asset &&
-    asset.effective_content_type &&
-    isHtmlContentType(asset.effective_content_type)
+    contentUrl &&
+    contentType &&
+    isHtmlContentType(contentType)
   ) {
     content = (
       <iframe
-        src={asset.image_url}
-        width="100%"
+        src={contentUrl}
+        width={size}
         height={size}
         style={{ border: "none", borderRadius: "0.5rem" }}
         sandbox="allow-scripts allow-same-origin"
       />
     );
   } else if (
-    asset &&
-    asset.effective_content_type &&
-    isGifContentType(asset.effective_content_type)
+    contentUrl &&
+    contentType &&
+    isGifContentType(contentType)
   ) {
     content = (
       <img
-        src={asset.image_url}
-        alt={asset.asset_name}
+        src={contentUrl}
+        alt={"inscription"}
         style={{
           margin: "auto",
           display: "block",
@@ -162,23 +158,23 @@ const Inscription = ({
       />
     );
   } else if (
-    asset &&
-    asset.effective_content_type &&
-    isSvgContentType(asset.effective_content_type)
+    contentUrl &&
+    contentType &&
+    isSvgContentType(contentType)
   ) {
     content = svgContent ? (
       <DynamicSvgDisplay
         svgContent={svgContent}
-        baseUrl={new URL(asset.image_url).origin} // Pass base URL
+        baseUrl={new URL(contentUrl).origin} // Pass base URL
         size={size}
       />
     ) : (
       <div>Loading...</div>
     );
   } else if (
-    asset &&
-    asset.effective_content_type &&
-    isImageContentType(asset.effective_content_type)
+    contentUrl &&
+    contentType &&
+    isImageContentType(contentType)
   ) {
     content = (
       <canvas
@@ -204,6 +200,7 @@ const Inscription = ({
           alignItems: "center",
           justifyContent: "center",
           backgroundColor: "#0e1a15",
+          color: "#fff",
         }}
       >
         Unsupported content type
@@ -214,117 +211,17 @@ const Inscription = ({
   return (
     <Card
       className={cn(
-        `border h-full self-end w-full grow flex flex-col items-center hover:grow max-w-full mx-auto p-4 rounded justify-between`,
+        `border h-full self-end w-full grow flex flex-col items-center hover:grow max-w-full mx-auto p-1  rounded justify-between`,
         className,
       )}
     >
-      <CardHeader className="p-0 cursor-pointer transition-transform justify-end hover:scale-105">
-        <Link
-          href={
-            "/collections/" +
-            asset?.collection_name?.toLowerCase().replaceAll(" ", "-") +
-            "/" +
-            asset?.inscription_id
-          }
-        >
-          {content}
-        </Link>
+      <CardHeader className="p-0 cursor-pointer transition-transform overflow-hidden justify-end hover:scale-105">
+        {content}
       </CardHeader>
       <CardContent
         className={`p-0 w-full ${pathname === "/" ? "mt-0" : "mt-4"}`}
       >
-        <CardTitle className="text-white text-md">
-          {asset?.asset_name}
-        </CardTitle>
-        {listing?.price_fractal && (
-          <span className="flex text-lg  mt-2 justify-between gap-0 w-full">
-            <div className={"grow"} />
-            <span className="text-orange-300 flex flex-row gap-1 justify-center items-center">
-              {listing?.price_fractal} <FractalIcon size={12} />
-            </span>
-            <div className={"grow"} />
-          </span>
-        )}
-        <Link
-          target={"_blank"}
-          href={`https://fractal.ordstuff.info/inscription/${asset?.inscription_id}`}
-        >
-          <div
-            className={
-              "w-full self-center text-xs hover:text-yellow-500 items-center mt-2 justify-center flex flex-row gap-1 text-gray-400 text-center"
-            }
-          >
-            #{asset?.number}
-            <ImNewTab size={14} className={"-mt-0.5"} />
-          </div>
-        </Link>
-        {showCollectionName ? (
-          <Link
-            href={`/collections/${asset?.collection_name?.toLowerCase().replaceAll(" ", "-")}`}
-          >
-            <div
-              className={cn(
-                "text-center text-gray-400 hover:text-orange-300 text-xs",
-                getTailwindTextColor(asset?.collection_name || ""),
-              )}
-            >
-              {asset?.collection_name}
-            </div>
-          </Link>
-        ) : null}
         <div className="flex flex-col gap-1 w-full">
-          {listing && showBuyButton && (
-            <>
-              <BuyModal
-                disabled={listing.reserved}
-                asset={asset!}
-                listing={listing}
-              />
-            </>
-          )}
-          {pathname !== "/" && showTerminalLink && (
-            <div className="flex justify-center w-full">
-              <Button
-                onClick={() =>
-                  window.open(
-                    `https://www.fractalexplorer.io/inscription/${asset!.inscription_id}`,
-                    "_blank",
-                  )
-                }
-                className="w-full bg-[#404040] hover:bg-black text-xs sm:text-sm hover:scale-105 transition-transform text-white"
-              >
-                <img
-                  className="max-h-full mr-2"
-                  src="/terminal.png"
-                  alt="terminal"
-                />{" "}
-                <ImNewTab />
-              </Button>
-            </div>
-          )}
-          {(pathname === "/market" || pathname === "/") && showBuyButton && (
-            <div className="w-full">
-              <Link
-                href={`/collections/${asset?.collection_name?.toLowerCase().replaceAll(" ", "-") ||
-                  "unknown"
-                  }`}
-                className="w-full"
-              >
-                <Button className="w-full gap-2 bg-[#404040] rounded-sm hover:text-black text-xs sm:text-sm hover:scale-105 transition-transform text-white">
-                  View{" "}
-                  <span
-                    className={cn(
-                      getTailwindTextColor(asset?.collection_name ?? "fm"),
-                      "hover:text-black",
-                    )}
-                  >
-                    {/* {asset?.collection_name} */}
-                    Collection
-                  </span>
-                </Button>
-              </Link>
-            </div>
-          )}
           {children}
         </div>
       </CardContent>
@@ -400,4 +297,4 @@ const DynamicSvgDisplay = ({
   );
 };
 
-export default NFT;
+export default Inscription
