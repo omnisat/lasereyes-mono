@@ -35,7 +35,7 @@ export abstract class WalletProvider {
     this.initialize()
   }
 
-  disconnect(): void {}
+  disconnect(): void { }
 
   abstract initialize(): void
 
@@ -73,7 +73,8 @@ export abstract class WalletProvider {
     return await getBTCBalance(paymentAddress, this.$network.get())
   }
 
-  async getInscriptions(): Promise<any[]> {
+  async getInscriptions(offset?: number, limit?: number): Promise<any[]> {
+    console.log('getInscriptions not implemented', offset, limit)
     throw UNSUPPORTED_PROVIDER_METHOD_ERROR
   }
 
@@ -89,10 +90,10 @@ export abstract class WalletProvider {
     broadcast?: boolean
   ): Promise<
     | {
-        signedPsbtHex: string | undefined
-        signedPsbtBase64: string | undefined
-        txId?: string
-      }
+      signedPsbtHex: string | undefined
+      signedPsbtBase64: string | undefined
+      txId?: string
+    }
     | undefined
   >
 

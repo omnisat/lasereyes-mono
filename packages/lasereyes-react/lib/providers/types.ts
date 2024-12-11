@@ -32,7 +32,7 @@ export type LaserEyesContextType = {
   switchNetwork: (network: NetworkType) => Promise<void>
   getPublicKey: () => Promise<string>
   getBalance: () => Promise<string>
-  getInscriptions: () => Promise<any[]>
+  getInscriptions: (offset?: number, limit?: number) => Promise<any[]>
   sendBTC: (to: string, amount: number) => Promise<string>
   signMessage: (message: string, toSignAddress?: string) => Promise<string>
   signPsbt: (

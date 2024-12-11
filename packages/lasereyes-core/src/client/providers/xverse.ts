@@ -334,4 +334,18 @@ export default class XVerseProvider extends WalletProvider {
       txId,
     }
   }
+
+  async getInscriptions(offset?: number, limit?: number): Promise<any[]> {
+    const offsetValue = offset || 0
+    const limitValue = limit || 10
+    const response = await request('ord_getInscriptions', { offset: offsetValue, limit: limitValue });
+
+    if (response.status === 'success') {
+      console.log(response.result);
+      return response.result.inscriptions
+    } else {
+      console.error(response.error);
+      throw new Error('Error getting inscriptions');
+    }
+  }
 }

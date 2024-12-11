@@ -74,9 +74,6 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
     colors[Math.floor(Math.random() * 5)]
   )
 
-  const pickRandomColor = () => {
-    setSelectedColor(colors[Math.floor(Math.random() * 5)])
-  }
 
   const switchN = () => {
     try {
@@ -109,6 +106,13 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
       setPkgVersion(version)
     })
   }, [])
+
+
+  // useEffect(() => {
+  //   if (address) {
+  //     getInscriptions(0, 10).then((response) => setInscriptions(response.list))
+  //   }
+  // }, [address])
 
   useEffect(() => {
     setSignature('')

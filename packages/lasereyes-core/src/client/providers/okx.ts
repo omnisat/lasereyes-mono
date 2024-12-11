@@ -172,9 +172,9 @@ export default class OkxProvider extends WalletProvider {
     return await library?.getPublicKey()
   }
 
-  async getInscriptions(): Promise<any[]> {
+  async getInscriptions(offset: number, limit: number): Promise<any[]> {
     const library = this.library
-    return await library.getInscriptions(0, 10)
+    return await library.getInscriptions(offset, limit)
   }
 
   async sendBTC(to: string, amount: number): Promise<string> {
@@ -197,10 +197,10 @@ export default class OkxProvider extends WalletProvider {
     broadcast?: boolean | undefined
   ): Promise<
     | {
-        signedPsbtHex: string | undefined
-        signedPsbtBase64: string | undefined
-        txId?: string | undefined
-      }
+      signedPsbtHex: string | undefined
+      signedPsbtBase64: string | undefined
+      txId?: string | undefined
+    }
     | undefined
   > {
     const library = this.library

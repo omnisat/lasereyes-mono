@@ -71,8 +71,8 @@ export default function LaserEyesProvider({
         disconnect: client.disconnect.bind(client),
         getBalance: async () =>
           ((await client.getBalance.call(client)) ?? '').toString(),
-        getInscriptions: async () =>
-          (await client.getInscriptions.call(client)) ?? [],
+        getInscriptions: async (offset, limit) =>
+          (await client.getInscriptions.call(client, offset, limit)) ?? [],
         getNetwork: client.getNetwork.bind(client),
         getPublicKey: async () =>
           (await client.getPublicKey.call(client)) ?? '',

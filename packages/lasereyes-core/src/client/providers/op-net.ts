@@ -176,8 +176,8 @@ export default class OpNetProvider extends WalletProvider {
     return bal.total
   }
 
-  async getInscriptions(): Promise<any[]> {
-    return await this.library.getInscriptions(0, 10)
+  async getInscriptions(offset: number, limit: number): Promise<any[]> {
+    return await this.library.getInscriptions(offset, limit)
   }
 
   async requestAccounts(): Promise<string[]> {
