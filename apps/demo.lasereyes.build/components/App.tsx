@@ -39,6 +39,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
     network,
     getBalance,
     switchNetwork,
+    getInscriptions,
     provider,
     balance,
   } = useLaserEyes()
@@ -46,6 +47,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
   const [pkgVersion, setPkgVersion] = useState<string | undefined>()
   const [signature, setSignature] = useState<string>('')
   const [unsignedPsbt, setUnsignedPsbt] = useState<string | undefined>()
+  const [inscriptions, setInscriptions] = useState<any[]>()
   const [signedPsbt, setSignedPsbt] = useState<
     | string
     | {
@@ -109,6 +111,14 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
       setPkgVersion(version)
     })
   }, [])
+
+  console.log(inscriptions)
+
+  useEffect(() => {
+    if (address) {
+      getInscriptions(0, 10).then((response) => setInscriptions(response.list))
+    }
+  }, [address])
 
   useEffect(() => {
     setSignature('')
@@ -432,6 +442,18 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
                 </span>
               </div>
             </div>
+          </div>
+          <div className="flex flex-col gap-2">
+            <span className={clsx('font-black text-orange-500')}>
+              inscriptions
+            </span>
+            <div className="flex flex-row gap-4">{inscriptions?.map((inscription) => {
+              return (
+                <div key={inscription.id} className="flex flex-col gap-2">
+                  <span className="text-white">{inscription.id}</span>
+                </div>
+              )
+            })}</div>
           </div>
         </div>
         <div className={'flex flex-row items-center gap-4 '}>

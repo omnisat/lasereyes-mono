@@ -361,13 +361,16 @@ export class LaserEyesClient {
     }
   }
 
-  async getInscriptions() {
+  async getInscriptions(offset?: number, limit?: number) {
     if (!this.$store.get().provider) return
     if (this.$providerMap[this.$store.get().provider!]) {
       try {
         return await this.$providerMap[
           this.$store.get().provider!
-        ]?.getInscriptions()
+        ]?.getInscriptions(
+          offset,
+          limit
+        )
       } catch (error) {
         if (error instanceof Error) {
           if (error.message.toLowerCase().includes('not implemented')) {

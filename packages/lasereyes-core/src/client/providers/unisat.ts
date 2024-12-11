@@ -139,10 +139,10 @@ export default class UnisatProvider extends WalletProvider {
     broadcast?: boolean | undefined
   ): Promise<
     | {
-        signedPsbtHex: string | undefined
-        signedPsbtBase64: string | undefined
-        txId?: string | undefined
-      }
+      signedPsbtHex: string | undefined
+      signedPsbtBase64: string | undefined
+      txId?: string | undefined
+    }
     | undefined
   > {
     const signedPsbt = await this.library?.signPsbt(psbtHex, {
@@ -175,8 +175,10 @@ export default class UnisatProvider extends WalletProvider {
     return bal.total
   }
 
-  async getInscriptions(): Promise<any[]> {
-    return await this.library.getInscriptions(0, 10)
+  async getInscriptions(offset?: number, limit?: number): Promise<any[]> {
+    const offsetValue = offset || 0
+    const limitValue = limit || 10
+    return await this.library.getInscriptions(offsetValue, limitValue)
   }
 
   async requestAccounts(): Promise<string[]> {
