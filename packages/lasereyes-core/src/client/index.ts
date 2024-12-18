@@ -63,7 +63,7 @@ export class LaserEyesClient {
       [XVERSE]: new XVerseProvider(stores, this, config),
       [WIZZ]: new WizzProvider(stores, this, config),
     }
-    this.$network.subscribe(this.watchNetworkChange.bind(this))
+    this.$network.listen(this.watchNetworkChange.bind(this))
 
     subscribeKeys(this.$store, ['isInitializing'], (v) =>
       this.handleIsInitializingChanged(v.isInitializing)
