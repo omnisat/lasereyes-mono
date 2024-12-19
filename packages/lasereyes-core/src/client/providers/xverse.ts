@@ -4,8 +4,6 @@ import {
   RpcErrorCode,
   getAddress,
   request,
-  signTransaction,
-  SignTransactionOptions,
   MessageSigningProtocols,
 } from 'sats-connect'
 import { WalletProvider } from '.'
@@ -232,6 +230,7 @@ export default class XVerseProvider extends WalletProvider {
       }
     }
   }
+
   async signPsbt(
     _: string,
     __: string,
@@ -246,92 +245,93 @@ export default class XVerseProvider extends WalletProvider {
     }
     | undefined
   > {
-    const { address, paymentAddress } = this.$store.get()
-    const toSignPsbt = bitcoin.Psbt.fromBase64(String(psbtBase64), {
-      network: getBitcoinNetwork(this.network),
-    })
+    try {
+      const toSignPsbt = bitcoin.Psbt.fromBase64(String(psbtBase64), {
+        network: getBitcoinNetwork(this.network),
+      })
 
-    const inputs = toSignPsbt.data.inputs
-    const inputsToSign = []
-    const ordinalAddressData = {
-      address: address,
-      signingIndexes: [] as number[],
-    }
-    const paymentsAddressData = {
-      address: paymentAddress,
-      signingIndexes: [] as number[],
-    }
+      const address = this.$store.get().address
+      const paymentAddress = this.$store.get().paymentAddress
 
-    let counter = 0
-    for await (let input of inputs) {
-      if (input.witnessUtxo === undefined) {
-        paymentsAddressData.signingIndexes.push(Number(counter))
+      const inputs = toSignPsbt.data.inputs
+      let inputsToSign: Record<string, number[]> = {}
+      const ordinalAddressData: Record<string, number[]> = {
+        [address]: [] as number[],
+      }
+      const paymentsAddressData: Record<string, number[]> = {
+        [paymentAddress]: [] as number[],
+      }
+
+      let counter = 0
+      for await (let input of inputs) {
+        if (input.witnessUtxo === undefined) {
+          paymentsAddressData[paymentAddress].push(Number(counter))
+        } else {
+          const { script } = input.witnessUtxo!
+          const addressFromScript = bitcoin.address.fromOutputScript(
+            script,
+            getBitcoinNetwork(this.network)
+          )
+          if (addressFromScript === paymentAddress) {
+            paymentsAddressData[paymentAddress].push(Number(counter))
+          } else if (addressFromScript === address) {
+            ordinalAddressData[address].push(Number(counter))
+          }
+        }
+        counter++
+      }
+
+      if (ordinalAddressData[address].length > 0) {
+        inputsToSign = { ...inputsToSign, ...ordinalAddressData }
+      }
+
+      if (paymentsAddressData[paymentAddress].length > 0) {
+        inputsToSign = { ...inputsToSign, ...paymentsAddressData }
+      }
+
+      let txId, signedPsbtHex, signedPsbtBase64
+      let signedPsbt: bitcoin.Psbt | undefined
+
+      const response = await request("signPsbt",
+        {
+          psbt: psbtBase64,
+          broadcast: !!broadcast,
+          signInputs: inputsToSign,
+        }
+      );
+
+      if (response.status === 'success') {
+        signedPsbt = bitcoin.Psbt.fromBase64(response.result.psbt, { network: getBitcoinNetwork(this.network) });
+        txId = response.result.txid;
       } else {
-        const { script } = input.witnessUtxo!
-        const addressFromScript = bitcoin.address.fromOutputScript(
-          script,
-          getBitcoinNetwork(this.network)
-        )
-        if (addressFromScript === paymentAddress) {
-          paymentsAddressData.signingIndexes.push(Number(counter))
-        } else if (addressFromScript === address) {
-          ordinalAddressData.signingIndexes.push(Number(counter))
+        if (response.error.code === RpcErrorCode.USER_REJECTION) {
+          throw new Error('User canceled the request')
+        } else {
+          throw new Error('Error signing psbt')
         }
       }
 
-      counter++
-    }
+      if (!signedPsbt) {
+        throw new Error('Error signing psbt')
+      }
 
-    if (ordinalAddressData.signingIndexes.length > 0) {
-      inputsToSign.push(ordinalAddressData)
-    }
+      if (_finalize && !txId) {
+        signedPsbt!.finalizeAllInputs()
+        signedPsbtHex = signedPsbt.toHex()
+        signedPsbtBase64 = signedPsbt.toBase64()
+      } else {
+        signedPsbtHex = signedPsbt.toHex()
+        signedPsbtBase64 = signedPsbt.toBase64()
+      }
 
-    if (paymentsAddressData.signingIndexes.length > 0) {
-      inputsToSign.push(paymentsAddressData)
-    }
-
-    let txId, signedPsbtHex, signedPsbtBase64
-    let signedPsbt: bitcoin.Psbt | undefined
-
-    const xverseNetwork = getSatsConnectNetwork(this.network)
-
-    const signPsbtOptions = {
-      payload: {
-        network: {
-          type: xverseNetwork,
-        },
-        message: 'Sign Transaction',
-        psbtBase64: toSignPsbt.toBase64(),
-        broadcast: broadcast,
-        inputsToSign: inputsToSign,
-      },
-      onFinish: (response: { psbtBase64: string; txId: string }) => {
-        if (response.txId) {
-          txId = response.txId
-        } else if (response.psbtBase64) {
-          signedPsbt = bitcoin.Psbt.fromBase64(String(response.psbtBase64), {
-            network: getBitcoinNetwork(this.network),
-          })
-
-          if (_finalize) {
-            signedPsbt!.finalizeAllInputs()
-          }
-
-          signedPsbtHex = signedPsbt.toHex()
-          signedPsbtBase64 = signedPsbt.toBase64()
-        }
-      },
-      onCancel: () => {
-        console.error('Request canceled')
-        throw new Error('User canceled the request')
-      },
-    } as SignTransactionOptions
-    await signTransaction(signPsbtOptions)
-
-    return {
-      signedPsbtHex,
-      signedPsbtBase64,
-      txId,
+      return {
+        signedPsbtHex,
+        signedPsbtBase64,
+        txId,
+      }
+    } catch (e) {
+      console.error(e)
+      throw e
     }
   }
 
