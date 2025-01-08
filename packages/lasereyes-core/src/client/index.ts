@@ -82,14 +82,14 @@ export class LaserEyesClient {
       })
     }
 
-    subscribeKeys(
-      this.$store,
-      ['hasProvider'],
-      this.checkInitializationComplete.bind(this)
-    )
+    // subscribeKeys(
+    //   this.$store,
+    //   ['hasProvider'],
+    //   this.checkInitializationComplete.bind(this)
+    // )
 
     // Hack to trigger check for wallet providers
-    triggerDOMShakeHack()
+    triggerDOMShakeHack(() => this.$store.setKey('isInitializing', false))
   }
 
   private handleIsInitializingChanged(value: boolean) {
@@ -175,14 +175,6 @@ export class LaserEyesClient {
         }
       }
       throw error
-    }
-  }
-
-  checkInitializationComplete() {
-    if (
-      Object.values(this.$store.get().hasProvider).every((e) => e !== undefined)
-    ) {
-      this.$store.setKey('isInitializing', false)
     }
   }
 
