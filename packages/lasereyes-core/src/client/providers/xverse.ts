@@ -149,7 +149,6 @@ export default class XVerseProvider extends WalletProvider {
             throw new Error('Could not find the addresses')
           }
           if (foundAddress && foundPaymentAddress) {
-            this.$store.setKey('provider', XVERSE)
             this.$store.setKey('address', foundAddress.address)
             this.$store.setKey('paymentAddress', foundPaymentAddress.address)
           }
@@ -170,7 +169,6 @@ export default class XVerseProvider extends WalletProvider {
         },
       }
       await getAddress(getAddressOptions as GetAddressOptions)
-      this.$store.setKey('connected', true)
     } catch (e) {
       throw e
     }

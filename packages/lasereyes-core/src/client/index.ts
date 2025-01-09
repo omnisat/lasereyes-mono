@@ -82,14 +82,14 @@ export class LaserEyesClient {
       })
     }
 
-    subscribeKeys(
-      this.$store,
-      ['hasProvider'],
-      this.checkInitializationComplete.bind(this)
-    )
+    // subscribeKeys(
+    //   this.$store,
+    //   ['hasProvider'],
+    //   this.checkInitializationComplete.bind(this)
+    // )
 
     // Hack to trigger check for wallet providers
-    triggerDOMShakeHack()
+    triggerDOMShakeHack(() => this.$store.setKey('isInitializing', false))
   }
 
   private handleIsInitializingChanged(value: boolean) {
@@ -116,6 +116,7 @@ export class LaserEyesClient {
       const provider = this.$providerMap[defaultWallet]
       await provider?.connect(defaultWallet)
       this.$store.setKey('connected', true)
+      this.$store.setKey('provider', defaultWallet)
     } catch (error) {
       this.$store.setKey('isConnecting', false)
       this.disconnect()
@@ -175,14 +176,6 @@ export class LaserEyesClient {
         }
       }
       throw error
-    }
-  }
-
-  checkInitializationComplete() {
-    if (
-      Object.values(this.$store.get().hasProvider).every((e) => e !== undefined)
-    ) {
-      this.$store.setKey('isInitializing', false)
     }
   }
 

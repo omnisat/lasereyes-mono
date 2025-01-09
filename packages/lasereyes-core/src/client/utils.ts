@@ -16,12 +16,13 @@ import {
 import { NetworkType } from '../types'
 import { LaserEyesStoreType } from './types'
 
-export function triggerDOMShakeHack() {
+export function triggerDOMShakeHack(callback: VoidFunction) {
   if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
     setTimeout(() => {
       const node = document.createTextNode(' ')
       document.body.appendChild(node)
       node.remove()
+      callback()
     }, 1500)
   }
 }
@@ -44,17 +45,17 @@ export function createStores(): {
       accounts: [],
       balance: undefined,
       hasProvider: {
-        [LEATHER]: undefined,
-        [UNISAT]: undefined,
-        [MAGIC_EDEN]: undefined,
-        [OKX]: undefined,
-        [OP_NET]: undefined,
-        [ORANGE]: undefined,
-        [OYL]: undefined,
+        [LEATHER]: false,
+        [UNISAT]: false,
+        [MAGIC_EDEN]: false,
+        [OKX]: false,
+        [OP_NET]: false,
+        [ORANGE]: false,
+        [OYL]: false,
         [SPARROW]: true,
-        [PHANTOM]: undefined,
-        [WIZZ]: undefined,
-        [XVERSE]: undefined,
+        [PHANTOM]: false,
+        [WIZZ]: false,
+        [XVERSE]: false,
       },
     }),
     $network: atom(MAINNET),
