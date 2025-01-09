@@ -28,9 +28,9 @@ export const satoshisToBTC = (satoshis: number): string => {
 }
 
 export const getBtcJsNetwork = (network: string): bitcoin.networks.Network => {
-  return network === 'mainnet' ||
-    network === 'fractal_mainnet' ||
-    network === 'fractal_testnet'
+  return network === MAINNET ||
+    network === FRACTAL_MAINNET ||
+    network === FRACTAL_TESTNET
     ? bitcoin.networks.bitcoin
     : bitcoin.networks.testnet
 }
