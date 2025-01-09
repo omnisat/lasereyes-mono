@@ -116,6 +116,7 @@ export class LaserEyesClient {
       const provider = this.$providerMap[defaultWallet]
       await provider?.connect(defaultWallet)
       this.$store.setKey('connected', true)
+      this.$store.setKey('provider', defaultWallet)
     } catch (error) {
       this.$store.setKey('isConnecting', false)
       this.disconnect()
