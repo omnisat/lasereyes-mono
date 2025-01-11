@@ -1,0 +1,8 @@
+export interface Error {
+    message: string;
+    type: typeof WALLET_NOT_INSTALLED_ERROR | typeof WALLET_NOT_CONNECTED_ERROR | typeof NO_ACCOUNTS_ERROR;
+}
+
+export const WALLET_NOT_INSTALLED_ERROR = 'WALLET_NOT_INSTALLED';
+export const WALLET_NOT_CONNECTED_ERROR = 'WALLET_NOT_CONNECTED';
+export const NO_ACCOUNTS_ERROR = 'NO_ACCOUNTS';
