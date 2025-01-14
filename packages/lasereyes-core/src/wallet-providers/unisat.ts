@@ -53,35 +53,47 @@ export class UnisatWalletProvider extends WalletProvider {
     return [address, address]
   }
 
+  async _getAccounts(): Promise<string[]> {
+    return this.$store.get().accounts
+  }
+
   async _getPublicKeys(): Promise<[string, string]> {
     const publicKey = this.$store.get().publicKey
     return [publicKey, publicKey]
   }
 
   async _connect(network?: string): Promise<void> {
-    const accounts = await this.library.requestAccounts()
+    console.log('Connecting to Unisat Wallet. Network:', network)
+    const currentNetwork = await this._getNetwork()
+    console.log('Current network:', currentNetwork)
+    if (network && currentNetwork !== network) {
+      console.log('Switching network to', network, 'from', currentNetwork)
+      await this._switchNetwork(network)
+    }
+    const accounts = await this.library.getAccounts()
     const publicKey = await this.library.getPublicKey()
     if (!accounts || accounts.length === 0 || !publicKey) {
       throw { message: 'No Account found', type: NO_ACCOUNTS_ERROR }
     }
 
-    const currentNetwork = await this.getNetwork()
-    if (network && currentNetwork !== network) {
-      await this.switchNetwork(network)
-    }
-
+    this.removeEventListeners()
     this.library.on('accountsChanged', this.handleAccountsChanged.bind(this))
     this.library.on('networkChanged', this.handleNetworkChanged.bind(this))
-
     this.$store.set({
       accounts,
       address: accounts[0],
       publicKey,
     })
+    await this.emit('connected')
   }
 
   async _disconnect(): Promise<void> {
     this.$store.set({ accounts: [], address: '', publicKey: '' })
+    this.removeEventListeners()
+    this.emit('disconnected')
+  }
+
+  private removeEventListeners() {
     this.library.removeListener('accountsChanged', this.handleAccountsChanged)
     this.library.removeListener('networkChanged', this.handleNetworkChanged)
   }
@@ -133,19 +145,18 @@ export class UnisatWalletProvider extends WalletProvider {
   }
 
   async _switchNetwork(network: string): Promise<void> {
+    console.log('Switching network to (Unisat)', network)
     const wantedNetwork = getUnisatNetwork(network)
     await this.library.switchChain(wantedNetwork)
+    await this._connect()
   }
 
-  private async handleNetworkChanged(network: string) {
-    const foundNetwork = getNetworkForUnisat(network)
-    await this.connect()
-    this.emit('networkChanged', foundNetwork)
+  private async handleNetworkChanged() {
+    await this._connect()
   }
+
   private async handleAccountsChanged(accounts: string[]) {
     if (accounts.length === 0) return this.disconnect()
-
-    await this.connect()
-    this.emit('accountsChanged', accounts)
+    await this._connect()
   }
 }

@@ -4,7 +4,6 @@ import {
 } from './errors'
 
 export type SignPSBTOptions = {
-  transaction: string
   finalize?: boolean
   broadcast?: boolean
   psbtHex?: string
@@ -69,7 +68,7 @@ export abstract class WalletProvider {
     this.eventHandlers[event].push(callback)
   }
 
-  protected emit(event: string, ...args: any[]): void {
+  protected async emit(event: string, ...args: any[]): Promise<void> {
     if (!this.eventHandlers[event]) return
     for (const handler of this.eventHandlers[event]) {
       handler(...args)
@@ -86,6 +85,7 @@ export abstract class WalletProvider {
   protected abstract _getNetwork(): Promise<string>
   protected abstract _getBalance(): Promise<bigint>
   protected abstract _getAddresses(): Promise<[string, string]>
+  protected abstract _getAccounts(): Promise<string[]>
   protected abstract _getPublicKeys(): Promise<[string, string]>
   getNetwork(): Promise<string> {
     this._ensureConnected()
@@ -99,6 +99,10 @@ export abstract class WalletProvider {
     this._ensureConnected()
     return this._getAddresses()
   }
+  getAccounts(): Promise<string[]> {
+    this._ensureConnected()
+    return this._getAccounts()
+  }
   getPublicKeys(): Promise<[string, string]> {
     this._ensureConnected()
     return this._getPublicKeys()
@@ -111,14 +115,14 @@ export abstract class WalletProvider {
     if (this.connected) return Promise.resolve()
     if (!this.isConnectingPromise) {
       this.isConnectingPromise = new Promise((resolve, reject) => {
+        this.connected = true
         this._connect(network)
           .then(() => {
-            this.connected = true
             this.isConnectingPromise = null
             resolve()
-            this.emit('connect')
           })
           .catch((error) => {
+            this.connected = false
             reject(error)
           })
           .finally(() => {
@@ -135,7 +139,6 @@ export abstract class WalletProvider {
     await this._disconnect()
     this.connected = false
     this.isConnectingPromise = null
-    this.emit('disconnect')
   }
 
   protected abstract _signMessage(
@@ -148,9 +151,11 @@ export abstract class WalletProvider {
   }
 
   protected abstract _signPsbt(
-    options: SignPSBTOptions
+    options: Omit<SignPSBTOptions, 'transaction'>
   ): Promise<SignPSBTResult>
-  signPsbt(options: SignPSBTOptions): Promise<SignPSBTResult> {
+  signPsbt(
+    options: Omit<SignPSBTOptions, 'transaction'>
+  ): Promise<SignPSBTResult> {
     this._ensureConnected()
     return this._signPsbt(options)
   }
@@ -178,6 +183,5 @@ export abstract class WalletProvider {
   async switchNetwork(network: string): Promise<void> {
     this._ensureConnected()
     await this._switchNetwork(network)
-    this.emit('networkChanged', network)
   }
 }
