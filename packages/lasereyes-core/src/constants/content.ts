@@ -2,6 +2,7 @@ export const TEXT_HTML = 'text/html'
 export const TEXT_CSS = 'text/css'
 export const TEXT_PLAIN = 'text/plain'
 export const TEXT_JAVASCRIPT = 'text/javascript'
+export const TEXT_MARKDOWN = 'text/markdown'
 
 export const APPLICATION_JSON = 'application/json'
 export const APPLICATION_JAVASCRIPT = 'application/javascript'

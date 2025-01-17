@@ -48,6 +48,7 @@ import {
   VIDEO_MP4,
   VIDEO_OGG,
   VIDEO_WEBM,
+  TEXT_MARKDOWN,
 } from '../constants/content'
 
 export type NetworkType =
@@ -77,6 +78,7 @@ export type ContentType =
   | typeof TEXT_CSS
   | typeof TEXT_PLAIN
   | typeof TEXT_JAVASCRIPT
+  | typeof TEXT_MARKDOWN
   | typeof APPLICATION_JSON
   | typeof APPLICATION_JAVASCRIPT
   | typeof APPLICATION_XML
