@@ -483,7 +483,7 @@ This documentation provides an overview of the `LaserEyesClient` class, its cons
 
 ## Contributing
 
-If you'd like to contribute to `@omnisat/lasereyes-core`, feel free to submit pull requests or open issues on the GitHub repository.
+If you'd like to contribute to `@omnisat/lasereyes`, feel free to submit pull requests or open issues on the GitHub repository.
 
 ## License
 
