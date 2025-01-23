@@ -116,6 +116,7 @@ jobs:
                 "${{ needs.check-package-changes.outputs.lasereyes_react_changed }}" == "true" ]]; then
               cd packages/lasereyes
               pnpm version prerelease --preid=rc
+              pnpm publish --access public --no-git-checks --tag next
               cd ../..
           fi
 
@@ -123,6 +124,7 @@ jobs:
           if [[ "${{ needs.check-package-changes.outputs.lasereyes_core_changed }}" == "true" ]]; then
               cd packages/lasereyes-core
               pnpm version prerelease --preid=rc
+              pnpm publish --access public --no-git-checks --tag next
               cd ../..
           fi
 
@@ -130,6 +132,7 @@ jobs:
           if [[ "${{ needs.check-package-changes.outputs.lasereyes_react_changed }}" == "true" ]]; then
               cd packages/lasereyes-react
               pnpm version prerelease --preid=rc
+              pnpm publish --access public --no-git-checks --tag next
               cd ../..
           fi
 
@@ -137,6 +140,7 @@ jobs:
           if [[ "${{ needs.check-package-changes.outputs.lasereyes_vue_changed }}" == "true" ]]; then
               cd packages/lasereyes-vue
               pnpm version prerelease --preid=rc
+              pnpm publish --access public --no-git-checks --tag next
               cd ../..
           fi
         env:
