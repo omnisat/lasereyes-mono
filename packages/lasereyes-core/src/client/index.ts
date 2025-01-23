@@ -1,4 +1,4 @@
-import { MapStore, WritableAtom, subscribeKeys } from 'nanostores'
+import { MapStore, WritableAtom, listenKeys } from 'nanostores'
 
 import { Config, ContentType, NetworkType, ProviderType } from '../types'
 import {
@@ -36,8 +36,12 @@ export class LaserEyesClient {
   readonly $store: MapStore<LaserEyesStoreType>
   readonly $network: WritableAtom<NetworkType>
   readonly $providerMap: Partial<Record<ProviderType, WalletProvider>>
+  private disposed = false
 
   dispose() {
+    this.disposed = true
+    this.$store.off()
+    this.$network.off()
     Object.values(this.$providerMap).forEach((provider) => provider?.dispose())
   }
 
@@ -48,6 +52,7 @@ export class LaserEyesClient {
     },
     readonly config?: Config
   ) {
+    console.log('LaserEyesClient constructor')
     this.$store = stores.$store
     this.$network = stores.$network
     this.$providerMap = {
@@ -63,18 +68,27 @@ export class LaserEyesClient {
       [XVERSE]: new XVerseProvider(stores, this, config),
       [WIZZ]: new WizzProvider(stores, this, config),
     }
+  }
+
+  initialize() {
     this.$network.listen(this.watchNetworkChange.bind(this))
 
-    subscribeKeys(this.$store, ['isInitializing'], (v) =>
-      this.handleIsInitializingChanged(v.isInitializing)
-    )
+    listenKeys(this.$store, ['isInitializing'], (v, oldValue) => {
+      if (this.disposed) {
+        console.warn('Client disposed, ignoring isInitializing change')
+        return
+      }
 
-    if (config && config.network) {
-      this.$network.set(config.network)
+      if (v.isInitializing !== oldValue.isInitializing)
+        return this.handleIsInitializingChanged(v.isInitializing)
+    })
+
+    if (this.config && this.config.network) {
+      this.$network.set(this.config.network)
       this.getNetwork().then((foundNetwork) => {
         try {
-          if (config.network !== foundNetwork) {
-            this.switchNetwork(config.network)
+          if (this.config!.network !== foundNetwork) {
+            this.switchNetwork(this.config!.network)
           }
         } catch (e) {
           this.disconnect()
@@ -107,6 +121,11 @@ export class LaserEyesClient {
   }
 
   async connect(defaultWallet: ProviderType) {
+    if (this.disposed) {
+      console.warn('Client disposed, ignoring connect')
+      return
+    }
+
     this.$store.setKey('isConnecting', true)
     try {
       localStorage?.setItem(LOCAL_STORAGE_DEFAULT_WALLET, defaultWallet)
@@ -118,6 +137,7 @@ export class LaserEyesClient {
       this.$store.setKey('connected', true)
       this.$store.setKey('provider', defaultWallet)
     } catch (error) {
+      console.error('Error during connect:', error)
       this.$store.setKey('isConnecting', false)
       this.disconnect()
       throw error
@@ -360,10 +380,7 @@ export class LaserEyesClient {
       try {
         return await this.$providerMap[
           this.$store.get().provider!
-        ]?.getInscriptions(
-          offset,
-          limit
-        )
+        ]?.getInscriptions(offset, limit)
       } catch (error) {
         if (error instanceof Error) {
           if (error.message.toLowerCase().includes('not implemented')) {
