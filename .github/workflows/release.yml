@@ -100,7 +100,12 @@ jobs:
           corepack prepare pnpm@8.6.6 --activate
 
       - name: Install dependencies
-        run: pnpm install
+        id: install_dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Build all packages
+        id: build_packages
+        run: pnpm build --filter="@omnisat*"
 
       - name: Create .npmrc file
         run: |
