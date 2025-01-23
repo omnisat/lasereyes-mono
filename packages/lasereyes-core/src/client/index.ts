@@ -170,14 +170,19 @@ export class LaserEyesClient {
   }
 
   disconnect() {
-    this.$store.setKey('connected', false)
-    this.$store.setKey('provider', undefined)
-    this.$store.setKey('address', '')
-    this.$store.setKey('paymentAddress', '')
-    this.$store.setKey('publicKey', '')
-    this.$store.setKey('paymentPublicKey', '')
-    this.$store.setKey('balance', undefined)
-    this.$store.setKey('accounts', [])
+    this.$store.set({
+      provider: undefined,
+      address: '',
+      paymentAddress: '',
+      publicKey: '',
+      paymentPublicKey: '',
+      balance: undefined,
+      accounts: [],
+      connected: false,
+      isConnecting: false,
+      isInitializing: false,
+      hasProvider: this.$store.get().hasProvider,
+    })
     localStorage?.removeItem(LOCAL_STORAGE_DEFAULT_WALLET)
   }
 
