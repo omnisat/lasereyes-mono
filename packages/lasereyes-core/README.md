@@ -41,9 +41,11 @@ Providers are modular, making it easy to add support for additional wallets. Cur
 - **Leather**
 - **Magic Eden**
 - **OKX**
+- OP_NET
 - **Orange**
 - **Oyl**
 - **Phantom**
+- Sparrow (coming soon)
 - **UniSat**
 - **Wizz**
 - **Xverse**
