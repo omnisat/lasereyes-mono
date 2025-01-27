@@ -1,4 +1,4 @@
-import { ProviderType } from '../types'
+import { NetworkType, ProviderType } from '../types'
 
 export type LaserEyesStoreType = {
   provider: ProviderType | undefined
@@ -13,3 +13,13 @@ export type LaserEyesStoreType = {
   balance: bigint | undefined
   hasProvider: Record<ProviderType, boolean | undefined>
 }
+
+export interface SparrowWalletProvider {
+  requestAccounts(): Promise<string[]>
+  getPublicKey(): Promise<string>
+  getNetwork(): Promise<NetworkType>
+  switchNetwork(network: NetworkType): Promise<void>
+  signMessage(message: string): Promise<string>
+  signPsbt(psbtBase64: string): Promise<string>
+}
+

@@ -7,7 +7,7 @@ import {
 import { createContext } from 'react'
 import { LaserEyesContextType } from './types'
 
-const initialContext = {
+export const initialContext = {
   hasUnisat: false,
   hasXverse: false,
   hasOyl: false,

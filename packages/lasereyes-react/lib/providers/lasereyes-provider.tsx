@@ -1,6 +1,6 @@
 'use client'
-import { ReactNode, useMemo } from 'react'
-import { LaserEyesContext } from './context'
+import { ReactNode, useEffect, useMemo, useState } from 'react'
+import { LaserEyesContext, initialContext } from './context'
 import {
   Config,
   LaserEyesClient,
@@ -18,13 +18,13 @@ export default function LaserEyesProvider({
   config?: Config
   children: ReactNode | ReactNode[]
 }) {
-  const client = useMemo(() => {
-    const c = new LaserEyesClient(
-      createStores(),
-      createConfig(config ?? { network: MAINNET })
-    )
-    return c
-  }, [config])
+  const clientStores = useMemo(() => createStores(), [])
+  const clientConfig = useMemo(
+    () => createConfig(config ?? { network: MAINNET }),
+    [config]
+  )
+  const [client, setClient] = useState<LaserEyesClient | null>()
+
   const {
     address,
     paymentAddress,
@@ -37,9 +37,16 @@ export default function LaserEyesProvider({
     isConnecting,
     isInitializing,
     provider,
-  } = useStore(client.$store)
+  } = useStore(clientStores.$store)
   const library = {}
-  const network = useStore(client.$network)
+  const network = useStore(clientStores.$network)
+
+  useEffect(() => {
+    const c = new LaserEyesClient(clientStores, clientConfig)
+    setClient(c)
+    c.initialize()
+    return () => c.dispose()
+  }, [clientConfig, clientStores])
 
   return (
     <LaserEyesContext.Provider
@@ -67,32 +74,29 @@ export default function LaserEyesProvider({
         hasSparrow: hasProvider.sparrow ?? false,
         hasWizz: hasProvider.wizz ?? false,
         hasXverse: hasProvider.xverse ?? false,
-        connect: client.connect.bind(client),
-        disconnect: client.disconnect.bind(client),
+        connect: client?.connect.bind(client) ?? initialContext.connect,
+        disconnect: client?.disconnect.bind(client) ?? initialContext.disconnect,
         getBalance: async () =>
-          ((await client.getBalance.call(client)) ?? '').toString(),
+          ((await client?.getBalance.call(client)) ?? initialContext.getBalance())?.toString(),
         getInscriptions: async (offset, limit) =>
-          (await client.getInscriptions.call(client, offset, limit)) ?? [],
-        getNetwork: client.getNetwork.bind(client),
+          (await client?.getInscriptions.call(client, offset, limit)) ?? initialContext.getInscriptions(),
+        getNetwork: client?.getNetwork.bind(client) ?? initialContext.getNetwork,
         getPublicKey: async () =>
-          (await client.getPublicKey.call(client)) ?? '',
-        pushPsbt: client.pushPsbt.bind(client),
+          (await client?.getPublicKey.call(client)) ?? initialContext.getPublicKey(),
+        pushPsbt: client?.pushPsbt.bind(client) ?? initialContext.pushPsbt,
         signMessage: async (message: string, toSignAddress?: string) =>
-          (await client.signMessage.call(client, message, toSignAddress)) ?? '',
+          (await client?.signMessage.call(client, message, toSignAddress)) ?? initialContext.signMessage(message),
         requestAccounts: async () =>
-          (await client.requestAccounts.call(client)) ?? [],
+          (await client?.requestAccounts.call(client)) ?? initialContext.requestAccounts(),
         sendBTC: async (to, amount) =>
-          (await client.sendBTC.call(client, to, amount)) ?? '',
+          (await client?.sendBTC.call(client, to, amount)) ?? initialContext.sendBTC(to, amount),
         signPsbt: async (psbt, finalize, broadcast) =>
-          (await client.signPsbt.call(client, psbt, finalize, broadcast)) ?? {
-            signedPsbtBase64: '',
-            signedPsbtHex: '',
-          },
+          (await client?.signPsbt.call(client, psbt, finalize, broadcast)) ?? initialContext.signPsbt(psbt),
         switchNetwork: async (network) => {
-          await client.switchNetwork.call(client, network)
+          await client?.switchNetwork.call(client, network)
         },
         inscribe: async (content, mimeType: ContentType) =>
-          (await client.inscribe.call(client, content, mimeType)) ?? '',
+          (await client?.inscribe.call(client, content, mimeType)) ?? initialContext.inscribe(content, mimeType),
       }}
     >
       {children}
