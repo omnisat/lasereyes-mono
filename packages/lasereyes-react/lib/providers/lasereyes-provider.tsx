@@ -1,5 +1,5 @@
 'use client'
-import { ReactNode, useEffect, useMemo, useState } from 'react'
+import { ReactNode, useEffect, useMemo, useState, useCallback } from 'react'
 import { LaserEyesContext, initialContext } from './context'
 import {
   Config,
@@ -8,6 +8,8 @@ import {
   createConfig,
   createStores,
   ContentType,
+  ProviderType,
+  NetworkType,
 } from '@omnisat/lasereyes-core'
 import { useStore } from '@nanostores/react'
 
@@ -48,6 +50,30 @@ export default function LaserEyesProvider({
     return () => c.dispose()
   }, [clientConfig, clientStores])
 
+  const connect = useCallback(async (defaultWallet: ProviderType) => await client?.connect(defaultWallet), [client])
+  const disconnect = useCallback(() => client?.disconnect(), [client])
+  const getBalance = useCallback(async () =>
+    (await (client?.getBalance()  ?? initialContext.getBalance()))?.toString() ?? "", [client])
+  const getInscriptions = useCallback(async (offset?: number, limit?: number) =>
+    (await client?.getInscriptions(offset, limit)) ?? initialContext.getInscriptions(), [client])
+  const getNetwork = useCallback(() => client?.getNetwork() ?? initialContext.getNetwork(), [client])
+  const getPublicKey = useCallback(async () =>
+    (await client?.getPublicKey()) ?? initialContext.getPublicKey(), [client])
+  const pushPsbt = useCallback((tx: string) => client?.pushPsbt(tx) ?? initialContext.pushPsbt(tx), [client])
+  const signMessage = useCallback(async (message: string, toSignAddress?: string) =>
+    (await client?.signMessage(message, toSignAddress)) ?? initialContext.signMessage(message), [client])
+  const requestAccounts = useCallback(async () =>
+    (await client?.requestAccounts()) ?? initialContext.requestAccounts(), [client])
+  const sendBTC = useCallback(async (to: string, amount: number) =>
+    (await client?.sendBTC.call(client, to, amount)) ?? initialContext.sendBTC(to, amount), [client])
+  const signPsbt = useCallback(async (psbt: string, finalize?: boolean, broadcast?: boolean) =>
+    (await client?.signPsbt.call(client, psbt, finalize, broadcast)) ?? initialContext.signPsbt(psbt), [client])
+  const switchNetwork = useCallback(async (network: NetworkType) => {
+    await client?.switchNetwork.call(client, network)
+  }, [client])
+  const inscribe = useCallback(async (content: string, mimeType: ContentType) =>
+    (await client?.inscribe.call(client, content, mimeType)) ?? initialContext.inscribe(content, mimeType), [client])
+
   return (
     <LaserEyesContext.Provider
       value={{
@@ -74,29 +100,19 @@ export default function LaserEyesProvider({
         hasSparrow: hasProvider.sparrow ?? false,
         hasWizz: hasProvider.wizz ?? false,
         hasXverse: hasProvider.xverse ?? false,
-        connect: client?.connect.bind(client) ?? initialContext.connect,
-        disconnect: client?.disconnect.bind(client) ?? initialContext.disconnect,
-        getBalance: async () =>
-          ((await client?.getBalance.call(client)) ?? initialContext.getBalance())?.toString(),
-        getInscriptions: async (offset, limit) =>
-          (await client?.getInscriptions.call(client, offset, limit)) ?? initialContext.getInscriptions(),
-        getNetwork: client?.getNetwork.bind(client) ?? initialContext.getNetwork,
-        getPublicKey: async () =>
-          (await client?.getPublicKey.call(client)) ?? initialContext.getPublicKey(),
-        pushPsbt: client?.pushPsbt.bind(client) ?? initialContext.pushPsbt,
-        signMessage: async (message: string, toSignAddress?: string) =>
-          (await client?.signMessage.call(client, message, toSignAddress)) ?? initialContext.signMessage(message),
-        requestAccounts: async () =>
-          (await client?.requestAccounts.call(client)) ?? initialContext.requestAccounts(),
-        sendBTC: async (to, amount) =>
-          (await client?.sendBTC.call(client, to, amount)) ?? initialContext.sendBTC(to, amount),
-        signPsbt: async (psbt, finalize, broadcast) =>
-          (await client?.signPsbt.call(client, psbt, finalize, broadcast)) ?? initialContext.signPsbt(psbt),
-        switchNetwork: async (network) => {
-          await client?.switchNetwork.call(client, network)
-        },
-        inscribe: async (content, mimeType: ContentType) =>
-          (await client?.inscribe.call(client, content, mimeType)) ?? initialContext.inscribe(content, mimeType),
+        connect,
+        disconnect,
+        getBalance,
+        getInscriptions,
+        getNetwork,
+        getPublicKey,
+        pushPsbt,
+        signMessage,
+        requestAccounts,
+        sendBTC,
+        signPsbt,
+        switchNetwork,
+        inscribe,
       }}
     >
       {children}
