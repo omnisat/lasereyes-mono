@@ -100,7 +100,12 @@ jobs:
           corepack prepare pnpm@8.6.6 --activate
 
       - name: Install dependencies
-        run: pnpm install
+        id: install_dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Build all packages
+        id: build_packages
+        run: pnpm build --filter="@omnisat*"
 
       - name: Create .npmrc file
         run: |
@@ -116,6 +121,7 @@ jobs:
                 "${{ needs.check-package-changes.outputs.lasereyes_react_changed }}" == "true" ]]; then
               cd packages/lasereyes
               pnpm version prerelease --preid=rc
+              pnpm publish --access public --no-git-checks --tag next
               cd ../..
           fi
 
@@ -123,6 +129,7 @@ jobs:
           if [[ "${{ needs.check-package-changes.outputs.lasereyes_core_changed }}" == "true" ]]; then
               cd packages/lasereyes-core
               pnpm version prerelease --preid=rc
+              pnpm publish --access public --no-git-checks --tag next
               cd ../..
           fi
 
@@ -130,6 +137,7 @@ jobs:
           if [[ "${{ needs.check-package-changes.outputs.lasereyes_react_changed }}" == "true" ]]; then
               cd packages/lasereyes-react
               pnpm version prerelease --preid=rc
+              pnpm publish --access public --no-git-checks --tag next
               cd ../..
           fi
 
@@ -137,6 +145,7 @@ jobs:
           if [[ "${{ needs.check-package-changes.outputs.lasereyes_vue_changed }}" == "true" ]]; then
               cd packages/lasereyes-vue
               pnpm version prerelease --preid=rc
+              pnpm publish --access public --no-git-checks --tag next
               cd ../..
           fi
         env:

@@ -41,9 +41,11 @@ Providers are modular, making it easy to add support for additional wallets. Cur
 - **Leather**
 - **Magic Eden**
 - **OKX**
+- OP_NET
 - **Orange**
 - **Oyl**
 - **Phantom**
+- Sparrow (coming soon)
 - **UniSat**
 - **Wizz**
 - **Xverse**
@@ -481,7 +483,7 @@ This documentation provides an overview of the `LaserEyesClient` class, its cons
 
 ## Contributing
 
-If you'd like to contribute to `@omnisat/lasereyes-core`, feel free to submit pull requests or open issues on the GitHub repository.
+If you'd like to contribute to `@omnisat/lasereyes`, feel free to submit pull requests or open issues on the GitHub repository.
 
 ## License
 

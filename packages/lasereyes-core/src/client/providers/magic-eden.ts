@@ -255,10 +255,10 @@ export default class MagicEdenProvider extends WalletProvider {
     broadcast?: boolean | undefined
   ): Promise<
     | {
-      signedPsbtHex: string | undefined
-      signedPsbtBase64: string | undefined
-      txId?: string | undefined
-    }
+        signedPsbtHex: string | undefined
+        signedPsbtBase64: string | undefined
+        txId?: string | undefined
+      }
     | undefined
   > {
     console.log('signPsbt', psbtBase64, _finalize, broadcast)
@@ -269,11 +269,16 @@ export default class MagicEdenProvider extends WalletProvider {
 
     const inputs = toSignPsbt.data.inputs
     const inputsToSign = []
-    const ordinalAddressData = {
+    type InputAddressData = {
+      address: string
+      signingIndexes: number[]
+      sigHash?: number
+    }
+    const ordinalAddressData: InputAddressData = {
       address: address,
       signingIndexes: [] as number[],
     }
-    const paymentsAddressData = {
+    const paymentsAddressData: InputAddressData = {
       address: paymentAddress,
       signingIndexes: [] as number[],
     }
@@ -288,8 +293,16 @@ export default class MagicEdenProvider extends WalletProvider {
 
       if (addressFromScript === paymentAddress) {
         paymentsAddressData.signingIndexes.push(Number(counter))
+        if (input.sighashType) {
+          console.log("Updating sigHash for paymentsAddressData")
+          paymentsAddressData.sigHash = input.sighashType
+        }
       } else if (addressFromScript === address) {
         ordinalAddressData.signingIndexes.push(Number(counter))
+        if (input.sighashType) {
+          console.log("Updating sigHash for ordinalAddressData")
+          ordinalAddressData.sigHash = input.sighashType
+        }
       }
       counter++
     }
