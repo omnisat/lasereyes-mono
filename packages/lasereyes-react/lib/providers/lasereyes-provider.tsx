@@ -1,6 +1,6 @@
 'use client'
 import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
-import { initialContext, LaserEyesStoreContext } from './context'
+import { defaultMethods, LaserEyesStoreContext } from './context'
 import {
   Config,
   ContentType,
@@ -41,49 +41,49 @@ export default function LaserEyesProvider({
   const getBalance = useCallback(
     async () =>
       (
-        await (client?.getBalance() ?? initialContext.getBalance())
+        await (client?.getBalance() ?? defaultMethods.getBalance())
       )?.toString() ?? '',
     [client]
   )
   const getInscriptions = useCallback(
     async (offset?: number, limit?: number) =>
       (await client?.getInscriptions(offset, limit)) ??
-      initialContext.getInscriptions(),
+      defaultMethods.getInscriptions(),
     [client]
   )
   const getNetwork = useCallback(
-    () => client?.getNetwork() ?? initialContext.getNetwork(),
+    () => client?.getNetwork() ?? defaultMethods.getNetwork(),
     [client]
   )
   const getPublicKey = useCallback(
-    async () => (await client?.getPublicKey()) ?? initialContext.getPublicKey(),
+    async () => (await client?.getPublicKey()) ?? defaultMethods.getPublicKey(),
     [client]
   )
   const pushPsbt = useCallback(
-    (tx: string) => client?.pushPsbt(tx) ?? initialContext.pushPsbt(tx),
+    (tx: string) => client?.pushPsbt(tx) ?? defaultMethods.pushPsbt(),
     [client]
   )
   const signMessage = useCallback(
     async (message: string, toSignAddress?: string) =>
       (await client?.signMessage(message, toSignAddress)) ??
-      initialContext.signMessage(message),
+      defaultMethods.signMessage(),
     [client]
   )
   const requestAccounts = useCallback(
     async () =>
-      (await client?.requestAccounts()) ?? initialContext.requestAccounts(),
+      (await client?.requestAccounts()) ?? defaultMethods.requestAccounts(),
     [client]
   )
   const sendBTC = useCallback(
     async (to: string, amount: number) =>
       (await client?.sendBTC.call(client, to, amount)) ??
-      initialContext.sendBTC(to, amount),
+      defaultMethods.sendBTC(),
     [client]
   )
   const signPsbt = useCallback(
     async (psbt: string, finalize?: boolean, broadcast?: boolean) =>
       (await client?.signPsbt.call(client, psbt, finalize, broadcast)) ??
-      initialContext.signPsbt(psbt),
+      defaultMethods.signPsbt(),
     [client]
   )
   const switchNetwork = useCallback(
@@ -94,12 +94,17 @@ export default function LaserEyesProvider({
   const inscribe = useCallback(
     async (content: string, mimeType: ContentType) =>
       (await client?.inscribe.call(client, content, mimeType)) ??
-      initialContext.inscribe(content, mimeType),
+      defaultMethods.inscribe(),
     [client]
   )
 
-  const methods = useMemo(
-    () => ({
+  // TODO: Move method definitions into useMemo here
+  const methods = useMemo(() => {
+    if (!client) {
+      return defaultMethods
+    }
+
+    return {
       connect,
       disconnect,
       getBalance,
@@ -113,23 +118,23 @@ export default function LaserEyesProvider({
       signPsbt,
       switchNetwork,
       inscribe,
-    }),
-    [
-      connect,
-      disconnect,
-      getBalance,
-      getInscriptions,
-      getNetwork,
-      getPublicKey,
-      inscribe,
-      pushPsbt,
-      requestAccounts,
-      sendBTC,
-      signMessage,
-      signPsbt,
-      switchNetwork,
-    ]
-  )
+    }
+  }, [
+    client,
+    connect,
+    disconnect,
+    getBalance,
+    getInscriptions,
+    getNetwork,
+    getPublicKey,
+    inscribe,
+    pushPsbt,
+    requestAccounts,
+    sendBTC,
+    signMessage,
+    signPsbt,
+    switchNetwork,
+  ])
 
   return (
     <LaserEyesStoreContext.Provider

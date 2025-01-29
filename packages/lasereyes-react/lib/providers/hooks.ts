@@ -40,7 +40,7 @@ export function useLaserEyes<T>(
         hasXverse: store.hasProvider.xverse ?? false,
         ...methods,
       }
-      if (selector) {
+      if (typeof selector === 'function') {
         return selector(value)
       }
       return value
