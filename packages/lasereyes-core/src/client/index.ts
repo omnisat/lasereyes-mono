@@ -120,7 +120,6 @@ export class LaserEyesClient {
 
   async connect(defaultWallet: ProviderType) {
     if (this.disposed) {
-      console.warn('Client disposed, ignoring connect')
       return
     }
 
