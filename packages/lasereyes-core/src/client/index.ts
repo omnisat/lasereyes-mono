@@ -52,7 +52,6 @@ export class LaserEyesClient {
     },
     readonly config?: Config
   ) {
-    console.log('LaserEyesClient constructor')
     this.$store = stores.$store
     this.$network = stores.$network
     this.$providerMap = {
@@ -75,7 +74,6 @@ export class LaserEyesClient {
 
     listenKeys(this.$store, ['isInitializing'], (v, oldValue) => {
       if (this.disposed) {
-        console.warn('Client disposed, ignoring isInitializing change')
         return
       }
 
