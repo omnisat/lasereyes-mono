@@ -186,10 +186,12 @@ export class LaserEyesClient {
     localStorage?.removeItem(LOCAL_STORAGE_DEFAULT_WALLET)
   }
 
-  switchNetwork(network: NetworkType) {
+  async switchNetwork(network: NetworkType): Promise<void> {
     try {
       if (this.$store.get().provider) {
-        this.$providerMap[this.$store.get().provider!]?.switchNetwork(network)
+        await this.$providerMap[this.$store.get().provider!]?.switchNetwork(
+          network
+        )
       }
     } catch (error) {
       if (error instanceof Error) {
