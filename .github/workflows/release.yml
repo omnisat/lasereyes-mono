@@ -115,16 +115,6 @@ jobs:
 
       - name: Bump versions sequentially if packages changed
         run: |
-          # Bump lasereyes if any package has changed
-          if [[ "${{ needs.check-package-changes.outputs.lasereyes_changed }}" == "true" || \
-                "${{ needs.check-package-changes.outputs.lasereyes_core_changed }}" == "true" || \
-                "${{ needs.check-package-changes.outputs.lasereyes_react_changed }}" == "true" ]]; then
-              cd packages/lasereyes
-              pnpm version prerelease --preid=rc
-              pnpm publish --access public --no-git-checks --tag next
-              cd ../..
-          fi
-
           # Bump lasereyes-core if changed
           if [[ "${{ needs.check-package-changes.outputs.lasereyes_core_changed }}" == "true" ]]; then
               cd packages/lasereyes-core
@@ -132,10 +122,20 @@ jobs:
               pnpm publish --access public --no-git-checks --tag next
               cd ../..
           fi
-
+          
           # Bump lasereyes-react if changed
           if [[ "${{ needs.check-package-changes.outputs.lasereyes_react_changed }}" == "true" ]]; then
               cd packages/lasereyes-react
+              pnpm version prerelease --preid=rc
+              pnpm publish --access public --no-git-checks --tag next
+              cd ../..
+          fi
+          
+          # Bump lasereyes if any package has changed
+          if [[ "${{ needs.check-package-changes.outputs.lasereyes_changed }}" == "true" || \
+                "${{ needs.check-package-changes.outputs.lasereyes_core_changed }}" == "true" || \
+                "${{ needs.check-package-changes.outputs.lasereyes_react_changed }}" == "true" ]]; then
+              cd packages/lasereyes
               pnpm version prerelease --preid=rc
               pnpm publish --access public --no-git-checks --tag next
               cd ../..
@@ -378,18 +378,10 @@ jobs:
       # Debugging Step: Log the outputs to check if they're correctly set
       - name: Log outputs from check-package-changes
         run: |
-          echo "Lasereyes changed: ${{ needs.check-package-changes.outputs.lasereyes_changed }}"
           echo "Lasereyes-core changed: ${{ needs.check-package-changes.outputs.lasereyes_core_changed }}"
           echo "Lasereyes-react changed: ${{ needs.check-package-changes.outputs.lasereyes_react_changed }}"
-          echo "Lasereyes-react changed: ${{ needs.check-package-changes.outputs.lasereyes_vue_changed }}"
-
-      - name: Bump lasereyes version if any package changed
-        if: needs.check-package-changes.outputs.lasereyes_changed == 'true' ||
-          needs.check-package-changes.outputs.lasereyes_core_changed == 'true' ||
-          needs.check-package-changes.outputs.lasereyes_react_changed == 'true'
-        run: |
-          cd packages/lasereyes
-          pnpm version prerelease --preid=rc
+          echo "Lasereyes-vue changed: ${{ needs.check-package-changes.outputs.lasereyes_vue_changed }}"
+          echo "Lasereyes changed: ${{ needs.check-package-changes.outputs.lasereyes_changed }}"
 
       - name: Bump lasereyes-core version if changed
         if: needs.check-package-changes.outputs.lasereyes_core_changed == 'true'
@@ -407,6 +399,14 @@ jobs:
         if: needs.check-package-changes.outputs.lasereyes_vue_changed == 'true'
         run: |
           cd packages/lasereyes-vue
+          pnpm version prerelease --preid=rc
+
+      - name: Bump lasereyes version if any package changed
+        if: needs.check-package-changes.outputs.lasereyes_changed == 'true' ||
+          needs.check-package-changes.outputs.lasereyes_core_changed == 'true' ||
+          needs.check-package-changes.outputs.lasereyes_react_changed == 'true'
+        run: |
+          cd packages/lasereyes
           pnpm version prerelease --preid=rc
 
       - name: Configure git user
