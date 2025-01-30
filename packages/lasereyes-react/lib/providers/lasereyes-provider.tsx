@@ -1,17 +1,16 @@
 'use client'
-import { ReactNode, useEffect, useMemo, useState, useCallback } from 'react'
-import { LaserEyesContext, initialContext } from './context'
+import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
+import { defaultMethods, LaserEyesStoreContext } from './context'
 import {
   Config,
-  LaserEyesClient,
-  MAINNET,
+  ContentType,
   createConfig,
   createStores,
-  ContentType,
-  ProviderType,
+  LaserEyesClient,
+  MAINNET,
   NetworkType,
+  ProviderType,
 } from '@omnisat/lasereyes-core'
-import { useStore } from '@nanostores/react'
 
 export default function LaserEyesProvider({
   config,
@@ -25,97 +24,128 @@ export default function LaserEyesProvider({
     () => createConfig(config ?? { network: MAINNET }),
     [config]
   )
-  const [client, setClient] = useState<LaserEyesClient | null>()
-
-  const {
-    address,
-    paymentAddress,
-    publicKey,
-    paymentPublicKey,
-    accounts,
-    balance,
-    connected,
-    hasProvider,
-    isConnecting,
-    isInitializing,
-    provider,
-  } = useStore(clientStores.$store)
-  const library = {}
-  const network = useStore(clientStores.$network)
+  const [client, setClient] = useState<LaserEyesClient | null>(null)
 
   useEffect(() => {
     const c = new LaserEyesClient(clientStores, clientConfig)
-    setClient(c)
+    setClient(() => c)
     c.initialize()
     return () => c.dispose()
   }, [clientConfig, clientStores])
 
-  const connect = useCallback(async (defaultWallet: ProviderType) => await client?.connect(defaultWallet), [client])
+  const connect = useCallback(
+    async (defaultWallet: ProviderType) => await client?.connect(defaultWallet),
+    [client]
+  )
   const disconnect = useCallback(() => client?.disconnect(), [client])
-  const getBalance = useCallback(async () =>
-    (await (client?.getBalance()  ?? initialContext.getBalance()))?.toString() ?? "", [client])
-  const getInscriptions = useCallback(async (offset?: number, limit?: number) =>
-    (await client?.getInscriptions(offset, limit)) ?? initialContext.getInscriptions(), [client])
-  const getNetwork = useCallback(() => client?.getNetwork() ?? initialContext.getNetwork(), [client])
-  const getPublicKey = useCallback(async () =>
-    (await client?.getPublicKey()) ?? initialContext.getPublicKey(), [client])
-  const pushPsbt = useCallback((tx: string) => client?.pushPsbt(tx) ?? initialContext.pushPsbt(tx), [client])
-  const signMessage = useCallback(async (message: string, toSignAddress?: string) =>
-    (await client?.signMessage(message, toSignAddress)) ?? initialContext.signMessage(message), [client])
-  const requestAccounts = useCallback(async () =>
-    (await client?.requestAccounts()) ?? initialContext.requestAccounts(), [client])
-  const sendBTC = useCallback(async (to: string, amount: number) =>
-    (await client?.sendBTC.call(client, to, amount)) ?? initialContext.sendBTC(to, amount), [client])
-  const signPsbt = useCallback(async (psbt: string, finalize?: boolean, broadcast?: boolean) =>
-    (await client?.signPsbt.call(client, psbt, finalize, broadcast)) ?? initialContext.signPsbt(psbt), [client])
-  const switchNetwork = useCallback(async (network: NetworkType) => {
-    await client?.switchNetwork.call(client, network)
-  }, [client])
-  const inscribe = useCallback(async (content: string, mimeType: ContentType) =>
-    (await client?.inscribe.call(client, content, mimeType)) ?? initialContext.inscribe(content, mimeType), [client])
+  const getBalance = useCallback(
+    async () =>
+      (
+        await (client?.getBalance() ?? defaultMethods.getBalance())
+      )?.toString() ?? '',
+    [client]
+  )
+  const getInscriptions = useCallback(
+    async (offset?: number, limit?: number) =>
+      (await client?.getInscriptions(offset, limit)) ??
+      defaultMethods.getInscriptions(),
+    [client]
+  )
+  const getNetwork = useCallback(
+    () => client?.getNetwork() ?? defaultMethods.getNetwork(),
+    [client]
+  )
+  const getPublicKey = useCallback(
+    async () => (await client?.getPublicKey()) ?? defaultMethods.getPublicKey(),
+    [client]
+  )
+  const pushPsbt = useCallback(
+    (tx: string) => client?.pushPsbt(tx) ?? defaultMethods.pushPsbt(),
+    [client]
+  )
+  const signMessage = useCallback(
+    async (message: string, toSignAddress?: string) =>
+      (await client?.signMessage(message, toSignAddress)) ??
+      defaultMethods.signMessage(),
+    [client]
+  )
+  const requestAccounts = useCallback(
+    async () =>
+      (await client?.requestAccounts()) ?? defaultMethods.requestAccounts(),
+    [client]
+  )
+  const sendBTC = useCallback(
+    async (to: string, amount: number) =>
+      (await client?.sendBTC.call(client, to, amount)) ??
+      defaultMethods.sendBTC(),
+    [client]
+  )
+  const signPsbt = useCallback(
+    async (psbt: string, finalize?: boolean, broadcast?: boolean) =>
+      (await client?.signPsbt.call(client, psbt, finalize, broadcast)) ??
+      defaultMethods.signPsbt(),
+    [client]
+  )
+  const switchNetwork = useCallback(
+    async (network: NetworkType) =>
+      await client?.switchNetwork.call(client, network),
+    [client]
+  )
+  const inscribe = useCallback(
+    async (content: string, mimeType: ContentType) =>
+      (await client?.inscribe.call(client, content, mimeType)) ??
+      defaultMethods.inscribe(),
+    [client]
+  )
+
+  // TODO: Move method definitions into useMemo here
+  const methods = useMemo(() => {
+    if (!client) {
+      return defaultMethods
+    }
+
+    return {
+      connect,
+      disconnect,
+      getBalance,
+      getInscriptions,
+      getNetwork,
+      getPublicKey,
+      pushPsbt,
+      signMessage,
+      requestAccounts,
+      sendBTC,
+      signPsbt,
+      switchNetwork,
+      inscribe,
+    }
+  }, [
+    client,
+    connect,
+    disconnect,
+    getBalance,
+    getInscriptions,
+    getNetwork,
+    getPublicKey,
+    inscribe,
+    pushPsbt,
+    requestAccounts,
+    sendBTC,
+    signMessage,
+    signPsbt,
+    switchNetwork,
+  ])
 
   return (
-    <LaserEyesContext.Provider
+    <LaserEyesStoreContext.Provider
       value={{
-        paymentAddress,
-        address,
-        publicKey,
-        paymentPublicKey,
-        library,
-        network,
-        accounts,
-        balance: Number(balance),
-        connected,
-        isConnecting,
-        isInitializing,
-        provider,
-        hasLeather: hasProvider.leather ?? false,
-        hasMagicEden: hasProvider['magic-eden'] ?? false,
-        hasOkx: hasProvider.okx ?? false,
-        hasOyl: hasProvider.oyl ?? false,
-        hasOrange: hasProvider.orange ?? false,
-        hasOpNet: hasProvider.op_net ?? false,
-        hasPhantom: hasProvider.phantom ?? false,
-        hasUnisat: hasProvider.unisat ?? false,
-        hasSparrow: hasProvider.sparrow ?? false,
-        hasWizz: hasProvider.wizz ?? false,
-        hasXverse: hasProvider.xverse ?? false,
-        connect,
-        disconnect,
-        getBalance,
-        getInscriptions,
-        getNetwork,
-        getPublicKey,
-        pushPsbt,
-        signMessage,
-        requestAccounts,
-        sendBTC,
-        signPsbt,
-        switchNetwork,
-        inscribe,
+        $store: clientStores.$store,
+        $network: clientStores.$network,
+        client: client,
+        methods,
       }}
     >
       {children}
-    </LaserEyesContext.Provider>
+    </LaserEyesStoreContext.Provider>
   )
 }

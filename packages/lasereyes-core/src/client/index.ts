@@ -52,7 +52,6 @@ export class LaserEyesClient {
     },
     readonly config?: Config
   ) {
-    console.log('LaserEyesClient constructor')
     this.$store = stores.$store
     this.$network = stores.$network
     this.$providerMap = {
@@ -75,7 +74,6 @@ export class LaserEyesClient {
 
     listenKeys(this.$store, ['isInitializing'], (v, oldValue) => {
       if (this.disposed) {
-        console.warn('Client disposed, ignoring isInitializing change')
         return
       }
 
@@ -122,7 +120,6 @@ export class LaserEyesClient {
 
   async connect(defaultWallet: ProviderType) {
     if (this.disposed) {
-      console.warn('Client disposed, ignoring connect')
       return
     }
 
@@ -186,10 +183,12 @@ export class LaserEyesClient {
     localStorage?.removeItem(LOCAL_STORAGE_DEFAULT_WALLET)
   }
 
-  switchNetwork(network: NetworkType) {
+  async switchNetwork(network: NetworkType): Promise<void> {
     try {
       if (this.$store.get().provider) {
-        this.$providerMap[this.$store.get().provider!]?.switchNetwork(network)
+        await this.$providerMap[this.$store.get().provider!]?.switchNetwork(
+          network
+        )
       }
     } catch (error) {
       if (error instanceof Error) {

@@ -47,7 +47,7 @@ export abstract class WalletProvider {
     return [this.$store.get().address, this.$store.get().paymentAddress]
   }
 
-  switchNetwork(_network: NetworkType): void {
+  async switchNetwork(_network: NetworkType): Promise<void> {
     this.parent.disconnect()
     throw UNSUPPORTED_PROVIDER_METHOD_ERROR
   }
