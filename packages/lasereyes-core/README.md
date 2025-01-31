@@ -1,6 +1,5 @@
 ![lasereyes_logo](https://github.com/omnisat/lasereyes-mono/blob/main/.github/assets/lasereyes.png?raw=true)
 
-
 # lasereyes-core
 
 `@omnisat/lasereyes-core` is the framework-agnostic core library of the lasereyes suite, designed to provide the core logic for Bitcoin wallet integration into dApps. It abstracts wallet-specific interactions and offers a unified interface, enabling developers to interact with various Bitcoin wallets seamlessly.
@@ -113,7 +112,6 @@ constructor(
 
 ## Methods
 
-
 ### `connect(defaultWallet: ProviderType)`
 
 Connects to the specified wallet provider and updates the store accordingly.
@@ -217,12 +215,13 @@ async inscribe(content: string, mimeType: ContentType): Promise<string | string[
 Inscribe content onto the blockchain.
 
 **Parameters:**
+
 - `content` (string): The content to be inscribed, encoded in Base64.
 - `mimeType` (ContentType): The MIME type of the content.
 
 **Returns:**
-- `Promise<string | string[]>`: A promise that resolves to the transaction ID(s) of the inscribed content.
 
+- `Promise<string | string[]>`: A promise that resolves to the transaction ID(s) of the inscribed content.
 
 ### `getPublicKey()`
 
@@ -304,7 +303,6 @@ await client.sendBTC('recipient-address', 1000)
 const signature = await client.signMessage('Hello, Laser Eyes!')
 ```
 
-
 ## Usage
 
 ### Importing the Library
@@ -371,7 +369,6 @@ const signedPsbt = await client.signPsbt('psbtHex')
 console.log(signedPsbt)
 ```
 
-
 ### Getting the Public Key
 
 Retrieve the public key from the connected wallet:
@@ -407,7 +404,6 @@ Disconnect from the wallet:
 client.disconnect()
 ```
 
-
 ### Inscribing Content
 
 To inscribe content using the `inscribe` method, follow these steps:
@@ -419,23 +415,27 @@ To inscribe content using the `inscribe` method, follow these steps:
 #### Example
 
 ```typescript
-import { LaserEyesClient, createStores, createConfig } from '@omnisat/lasereyes-core';
-import { TEXT_PLAIN } from '@omnisat/lasereyes-core';
+import {
+  LaserEyesClient,
+  createStores,
+  createConfig,
+} from '@omnisat/lasereyes-core'
+import { TEXT_PLAIN } from '@omnisat/lasereyes-core'
 
-const stores = createStores();
-const config = createConfig({ network: 'mainnet' });
-const client = new LaserEyesClient(stores, config);
+const stores = createStores()
+const config = createConfig({ network: 'mainnet' })
+const client = new LaserEyesClient(stores, config)
 
 client.connect('unisat').then(async () => {
-  const contentBase64 = Buffer.from('Hello, LaserEyes!').toString('base64');
-  const mimeType = TEXT_PLAIN;
+  const contentBase64 = Buffer.from('Hello, LaserEyes!').toString('base64')
+  const mimeType = TEXT_PLAIN
   try {
-    const txId = await client.inscribe(contentBase64, mimeType);
-    console.log('Inscription txId:', txId);
+    const txId = await client.inscribe(contentBase64, mimeType)
+    console.log('Inscription txId:', txId)
   } catch (error) {
-    console.error('Error inscribing content:', error);
+    console.error('Error inscribing content:', error)
   }
-});
+})
 ```
 
 ## Network Configuration
@@ -468,11 +468,14 @@ export abstract class WalletProvider {
     psbtBase64: string,
     finalize?: boolean,
     broadcast?: boolean
-  ): Promise<{
-    signedPsbtHex: string | undefined
-    signedPsbtBase64: string | undefined
-    txId?: string
-  } | undefined>
+  ): Promise<
+    | {
+        signedPsbtHex: string | undefined
+        signedPsbtBase64: string | undefined
+        txId?: string
+      }
+    | undefined
+  >
   abstract pushPsbt(tx: string): Promise<string | undefined>
 }
 ```

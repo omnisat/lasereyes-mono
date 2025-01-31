@@ -237,10 +237,10 @@ export default class XVerseProvider extends WalletProvider {
     broadcast?: boolean | undefined
   ): Promise<
     | {
-      signedPsbtHex: string | undefined
-      signedPsbtBase64: string | undefined
-      txId?: string | undefined
-    }
+        signedPsbtHex: string | undefined
+        signedPsbtBase64: string | undefined
+        txId?: string | undefined
+      }
     | undefined
   > {
     try {
@@ -290,17 +290,17 @@ export default class XVerseProvider extends WalletProvider {
       let txId, signedPsbtHex, signedPsbtBase64
       let signedPsbt: bitcoin.Psbt | undefined
 
-      const response = await request("signPsbt",
-        {
-          psbt: psbtBase64,
-          broadcast: !!broadcast,
-          signInputs: inputsToSign,
-        }
-      );
+      const response = await request('signPsbt', {
+        psbt: psbtBase64,
+        broadcast: !!broadcast,
+        signInputs: inputsToSign,
+      })
 
       if (response.status === 'success') {
-        signedPsbt = bitcoin.Psbt.fromBase64(response.result.psbt, { network: getBitcoinNetwork(this.network) });
-        txId = response.result.txid;
+        signedPsbt = bitcoin.Psbt.fromBase64(response.result.psbt, {
+          network: getBitcoinNetwork(this.network),
+        })
+        txId = response.result.txid
       } else {
         if (response.error.code === RpcErrorCode.USER_REJECTION) {
           throw new Error('User canceled the request')
@@ -336,14 +336,17 @@ export default class XVerseProvider extends WalletProvider {
   async getInscriptions(offset?: number, limit?: number): Promise<any[]> {
     const offsetValue = offset || 0
     const limitValue = limit || 10
-    const response = await request('ord_getInscriptions', { offset: offsetValue, limit: limitValue });
+    const response = await request('ord_getInscriptions', {
+      offset: offsetValue,
+      limit: limitValue,
+    })
 
     if (response.status === 'success') {
-      console.log(response.result);
+      console.log(response.result)
       return response.result.inscriptions
     } else {
-      console.error(response.error);
-      throw new Error('Error getting inscriptions');
+      console.error(response.error)
+      throw new Error('Error getting inscriptions')
     }
   }
 }

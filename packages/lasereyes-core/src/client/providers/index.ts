@@ -35,7 +35,7 @@ export abstract class WalletProvider {
     this.initialize()
   }
 
-  disconnect(): void { }
+  disconnect(): void {}
 
   abstract initialize(): void
 
@@ -90,10 +90,10 @@ export abstract class WalletProvider {
     broadcast?: boolean
   ): Promise<
     | {
-      signedPsbtHex: string | undefined
-      signedPsbtBase64: string | undefined
-      txId?: string
-    }
+        signedPsbtHex: string | undefined
+        signedPsbtBase64: string | undefined
+        txId?: string
+      }
     | undefined
   >
 

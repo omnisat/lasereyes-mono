@@ -1,7 +1,7 @@
 ---
 name: 📚 Documentation Improvement
 about: Suggest changes or improvements to the documentation
-title: "[Docs]: "
+title: '[Docs]: '
 labels: documentation
 assignees: ''
 ---

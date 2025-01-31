@@ -17,9 +17,7 @@ import { P2PKH, P2SH, P2SH_P2WPKH, P2TR, P2WPKH, P2WSH } from '../constants'
 
 bitcoin.initEccLib(ecc)
 
-export const getBitcoinNetwork = (
-  network: NetworkType,
-) => {
+export const getBitcoinNetwork = (network: NetworkType) => {
   if (network === TESTNET || network === TESTNET4 || network === SIGNET) {
     return bitcoin.networks.testnet
   } else {
@@ -45,7 +43,7 @@ export const findPaymentAddress = (
 
 export const getBTCBalance = async (
   address: string,
-  network: NetworkType,
+  network: NetworkType
 ): Promise<bigint> => {
   try {
     const utxos: MempoolUtxo[] | undefined = await getAddressUtxos(
@@ -82,10 +80,7 @@ export function estimateTxSize(
   return baseTxSize + totalInputSize + totalOutputSize
 }
 
-export async function getAddressUtxos(
-  address: string,
-  network: NetworkType,
-) {
+export async function getAddressUtxos(address: string, network: NetworkType) {
   if (address.startsWith('t')) {
     if (network === MAINNET) {
       return []
@@ -215,8 +210,8 @@ export async function broadcastTx(
         'Content-Type': 'text/plain',
       },
     }
-  );
-  return response.data;
+  )
+  return response.data
 }
 
 export const getAddressType = (

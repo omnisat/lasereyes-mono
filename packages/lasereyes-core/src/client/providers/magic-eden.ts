@@ -294,13 +294,13 @@ export default class MagicEdenProvider extends WalletProvider {
       if (addressFromScript === paymentAddress) {
         paymentsAddressData.signingIndexes.push(Number(counter))
         if (input.sighashType) {
-          console.log("Updating sigHash for paymentsAddressData")
+          console.log('Updating sigHash for paymentsAddressData')
           paymentsAddressData.sigHash = input.sighashType
         }
       } else if (addressFromScript === address) {
         ordinalAddressData.signingIndexes.push(Number(counter))
         if (input.sighashType) {
-          console.log("Updating sigHash for ordinalAddressData")
+          console.log('Updating sigHash for ordinalAddressData')
           ordinalAddressData.sigHash = input.sighashType
         }
       }

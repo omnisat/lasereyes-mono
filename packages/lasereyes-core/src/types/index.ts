@@ -72,7 +72,6 @@ export type ProviderType =
   | typeof OP_NET
   | typeof SPARROW
 
-
 export type ContentType =
   | typeof TEXT_HTML
   | typeof TEXT_CSS
@@ -106,12 +105,12 @@ export type ContentType =
 
 export type Config = {
   network:
-  | typeof MAINNET
-  | typeof TESTNET
-  | typeof TESTNET4
-  | typeof SIGNET
-  | typeof FRACTAL_MAINNET
-  | typeof FRACTAL_TESTNET
+    | typeof MAINNET
+    | typeof TESTNET
+    | typeof TESTNET4
+    | typeof SIGNET
+    | typeof FRACTAL_MAINNET
+    | typeof FRACTAL_TESTNET
 }
 
 export interface OYLBalanceResponse {

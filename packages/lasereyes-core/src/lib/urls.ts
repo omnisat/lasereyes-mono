@@ -16,9 +16,7 @@ export const MEMPOOL_SPACE_FRACTAL_MAINNET_URL =
 export const MEMPOOL_SPACE_FRACTAL_TESTNET_URL =
   'https://mempool-testnet.fractalbitcoin.io'
 
-export const getMempoolSpaceUrl = (
-  network: NetworkType
-) =>
+export const getMempoolSpaceUrl = (network: NetworkType) =>
   network === TESTNET
     ? MEMPOOL_SPACE_TESTNET_URL
     : network === TESTNET4
