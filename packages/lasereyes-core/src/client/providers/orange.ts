@@ -34,10 +34,8 @@ import { persistentMap } from '@nanostores/persistent'
 
 import { keysToPersist, PersistedKey } from '../utils'
 
-const {
-  signMessage: signMessageOrange,
-  sendBtcTransaction: sendBtcTxOrange,
-} = orange
+const { signMessage: signMessageOrange, sendBtcTransaction: sendBtcTxOrange } =
+  orange
 
 const ORANGE_WALLET_PERSISTENCE_KEY = 'ORANGE_CONNECTED_WALLET_STATE'
 export default class OrangeProvider extends WalletProvider {
@@ -252,10 +250,10 @@ export default class OrangeProvider extends WalletProvider {
     broadcast?: boolean | undefined
   ): Promise<
     | {
-      signedPsbtHex: string | undefined
-      signedPsbtBase64: string | undefined
-      txId?: string | undefined
-    }
+        signedPsbtHex: string | undefined
+        signedPsbtBase64: string | undefined
+        txId?: string | undefined
+      }
     | undefined
   > {
     try {
@@ -274,7 +272,6 @@ export default class OrangeProvider extends WalletProvider {
       const paymentsAddressData: Record<string, number[]> = {
         [paymentAddress]: [] as number[],
       }
-
 
       let counter = 0
       for await (let input of inputs) {
@@ -307,17 +304,17 @@ export default class OrangeProvider extends WalletProvider {
       let txId, signedPsbtHex, signedPsbtBase64
       let signedPsbt: bitcoin.Psbt | undefined
 
-      const response = await request("signPsbt",
-        {
-          psbt: psbtBase64,
-          broadcast: !!broadcast,
-          signInputs: inputsToSign,
-        }
-      );
+      const response = await request('signPsbt', {
+        psbt: psbtBase64,
+        broadcast: !!broadcast,
+        signInputs: inputsToSign,
+      })
 
       if (response.status === 'success') {
-        signedPsbt = bitcoin.Psbt.fromBase64(response.result.psbt, { network: getBitcoinNetwork(this.network) });
-        txId = response.result.txid;
+        signedPsbt = bitcoin.Psbt.fromBase64(response.result.psbt, {
+          network: getBitcoinNetwork(this.network),
+        })
+        txId = response.result.txid
       } else {
         if (response.error.code === RpcErrorCode.USER_REJECTION) {
           throw new Error('User canceled the request')
@@ -329,7 +326,6 @@ export default class OrangeProvider extends WalletProvider {
       if (!signedPsbt) {
         throw new Error('Error signing psbt')
       }
-
 
       if (_finalize && !txId) {
         signedPsbt!.finalizeAllInputs()

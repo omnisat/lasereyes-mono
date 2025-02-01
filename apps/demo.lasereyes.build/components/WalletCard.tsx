@@ -60,10 +60,10 @@ const WalletCard = ({
   setSignedPsbt: (
     psbt:
       | {
-        signedPsbtHex: string
-        signedPsbtBase64: string
-        txId?: string
-      }
+          signedPsbtHex: string
+          signedPsbtBase64: string
+          txId?: string
+        }
       | undefined
   ) => void
 }) => {
@@ -144,12 +144,12 @@ const WalletCard = ({
         paymentAddress,
         paymentPublicKey,
         network as
-        | typeof MAINNET
-        | typeof TESTNET
-        | typeof TESTNET4
-        | typeof SIGNET
-        | typeof FRACTAL_MAINNET
-        | typeof FRACTAL_TESTNET
+          | typeof MAINNET
+          | typeof TESTNET
+          | typeof TESTNET4
+          | typeof SIGNET
+          | typeof FRACTAL_MAINNET
+          | typeof FRACTAL_TESTNET
       )
         .then((psbt) => {
           if (psbt && psbt.toHex() !== unsigned) {
@@ -426,12 +426,14 @@ const WalletCard = ({
               </Badge>
             </span>
           )}
-
         </CardTitle>
       </CardHeader>
       <CardContent>
         <div className={'flex flex-col gap-4'}>
-          {isSparrow && (<span className='text-center m-auto w-full text-xs'>all wallet interactions are executed in the browser console</span>
+          {isSparrow && (
+            <span className="text-center m-auto w-full text-xs">
+              all wallet interactions are executed in the browser console
+            </span>
           )}
           <div className={'flex flex-row space-between items-center gap-6'}>
             <Badge

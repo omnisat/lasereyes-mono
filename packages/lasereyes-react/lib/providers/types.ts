@@ -41,10 +41,10 @@ export type LaserEyesContextType = {
     broadcast?: boolean
   ) => Promise<
     | {
-      signedPsbtHex: string | undefined
-      signedPsbtBase64: string | undefined
-      txId?: string
-    }
+        signedPsbtHex: string | undefined
+        signedPsbtBase64: string | undefined
+        txId?: string
+      }
     | undefined
   >
   pushPsbt: (tx: string) => Promise<string | undefined>

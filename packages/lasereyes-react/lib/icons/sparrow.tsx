@@ -611,6 +611,6 @@ const SparrowLogo: React.FC<SparrowLogoProps> = ({
       />
     </g>
   </svg>
-);
+)
 
 export default SparrowLogo

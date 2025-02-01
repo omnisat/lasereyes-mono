@@ -197,10 +197,10 @@ export default class OkxProvider extends WalletProvider {
     broadcast?: boolean | undefined
   ): Promise<
     | {
-      signedPsbtHex: string | undefined
-      signedPsbtBase64: string | undefined
-      txId?: string | undefined
-    }
+        signedPsbtHex: string | undefined
+        signedPsbtBase64: string | undefined
+        txId?: string | undefined
+      }
     | undefined
   > {
     const library = this.library

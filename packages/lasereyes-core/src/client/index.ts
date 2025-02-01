@@ -1,4 +1,4 @@
-import { MapStore, WritableAtom, listenKeys } from 'nanostores'
+import { MapStore, WritableAtom, keepMount, listenKeys } from 'nanostores'
 
 import { Config, ContentType, NetworkType, ProviderType } from '../types'
 import {
@@ -40,8 +40,6 @@ export class LaserEyesClient {
 
   dispose() {
     this.disposed = true
-    this.$store.off()
-    this.$network.off()
     Object.values(this.$providerMap).forEach((provider) => provider?.dispose())
   }
 
@@ -52,9 +50,9 @@ export class LaserEyesClient {
     },
     readonly config?: Config
   ) {
-    console.log('LaserEyesClient constructor')
     this.$store = stores.$store
     this.$network = stores.$network
+    keepMount(this.$store)
     this.$providerMap = {
       [LEATHER]: new LeatherProvider(stores, this, config),
       [MAGIC_EDEN]: new MagicEdenProvider(stores, this, config),
@@ -75,7 +73,6 @@ export class LaserEyesClient {
 
     listenKeys(this.$store, ['isInitializing'], (v, oldValue) => {
       if (this.disposed) {
-        console.warn('Client disposed, ignoring isInitializing change')
         return
       }
 
@@ -113,7 +110,6 @@ export class LaserEyesClient {
           LOCAL_STORAGE_DEFAULT_WALLET
         ) as ProviderType | undefined
         if (defaultWallet) {
-          this.$store.setKey('provider', defaultWallet)
           this.connect(defaultWallet)
         }
       }
@@ -122,7 +118,7 @@ export class LaserEyesClient {
 
   async connect(defaultWallet: ProviderType) {
     if (this.disposed) {
-      console.warn('Client disposed, ignoring connect')
+      console.warn('Client disposed, cannot connect')
       return
     }
 
@@ -186,10 +182,12 @@ export class LaserEyesClient {
     localStorage?.removeItem(LOCAL_STORAGE_DEFAULT_WALLET)
   }
 
-  switchNetwork(network: NetworkType) {
+  async switchNetwork(network: NetworkType): Promise<void> {
     try {
       if (this.$store.get().provider) {
-        this.$providerMap[this.$store.get().provider!]?.switchNetwork(network)
+        await this.$providerMap[this.$store.get().provider!]?.switchNetwork(
+          network
+        )
       }
     } catch (error) {
       if (error instanceof Error) {

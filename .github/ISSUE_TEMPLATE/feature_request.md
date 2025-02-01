@@ -1,7 +1,7 @@
 ---
 name: 🚀 Feature Request
 about: Suggest an idea or enhancement for the library
-title: "[Feature]: "
+title: '[Feature]: '
 labels: enhancement
 assignees: ''
 ---

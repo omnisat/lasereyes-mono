@@ -13,3 +13,4 @@ export {
   XverseLogo,
   LaserEyesLogo,
 } from '@omnisat/lasereyes-react'
+export type { LaserEyesContextType } from '@omnisat/lasereyes-react'

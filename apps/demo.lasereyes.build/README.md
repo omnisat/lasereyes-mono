@@ -1,4 +1,5 @@
 ![lasereyes_logo](../../lasereyes.png)
+
 # LaserEyes Demo
 
 `demo.lasereyes.build` is a demo application designed to showcase the features of `@omnisat/lasereyes` and its integration into a dApp. This app demonstrates how to integrate Bitcoin wallets into a React/Next.js application using the `lasereyes` packages.

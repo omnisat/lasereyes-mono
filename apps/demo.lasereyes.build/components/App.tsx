@@ -49,9 +49,9 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
   const [signedPsbt, setSignedPsbt] = useState<
     | string
     | {
-      signedPsbtHex: string
-      signedPsbtBase64: string
-    }
+        signedPsbtHex: string
+        signedPsbtBase64: string
+      }
     | undefined
   >()
   type colorsType =
@@ -73,7 +73,6 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
   const [selectedColor, setSelectedColor] = useState<colorsType>(
     colors[Math.floor(Math.random() * 5)]
   )
-
 
   const switchN = () => {
     try {
@@ -106,7 +105,6 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
       setPkgVersion(version)
     })
   }, [])
-
 
   // useEffect(() => {
   //   if (address) {

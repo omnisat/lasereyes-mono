@@ -156,10 +156,10 @@ export class WizzProvider extends WalletProvider {
     broadcast?: boolean | undefined
   ): Promise<
     | {
-      signedPsbtHex: string | undefined
-      signedPsbtBase64: string | undefined
-      txId?: string | undefined
-    }
+        signedPsbtHex: string | undefined
+        signedPsbtBase64: string | undefined
+        txId?: string | undefined
+      }
     | undefined
   > {
     const signedPsbt = await this.library?.signPsbt(psbtHex, {

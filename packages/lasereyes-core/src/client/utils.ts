@@ -22,7 +22,7 @@ export function triggerDOMShakeHack(callback: VoidFunction) {
       const node = document.createTextNode(' ')
       document.body.appendChild(node)
       node.remove()
-      callback()
+      Promise.resolve().then(callback)
     }, 1500)
   }
 }

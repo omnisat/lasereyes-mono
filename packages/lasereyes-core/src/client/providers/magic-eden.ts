@@ -59,8 +59,16 @@ export default class MagicEdenProvider extends WalletProvider {
   restorePersistedValues() {
     const vals = this.$valueStore.get()
     for (const key of keysToPersist) {
+      if (key === 'balance') {
+        this.$store.setKey(key, BigInt(vals[key]))
+        continue
+      }
       this.$store.setKey(key, vals[key])
     }
+    this.$store.setKey(
+      'accounts',
+      [vals.address, vals.paymentAddress].filter(Boolean)
+    )
   }
 
   watchStateChange(
@@ -68,14 +76,24 @@ export default class MagicEdenProvider extends WalletProvider {
     _: LaserEyesStoreType | undefined,
     changedKey: keyof LaserEyesStoreType | undefined
   ) {
-    if (changedKey && newState.provider === MAGIC_EDEN) {
-      if (changedKey === 'balance') {
-        this.$valueStore.setKey('balance', newState.balance?.toString() ?? '')
-      } else if ((keysToPersist as readonly string[]).includes(changedKey)) {
-        this.$valueStore.setKey(
-          changedKey as PersistedKey,
-          newState[changedKey]?.toString() ?? ''
-        )
+    if (newState.provider === MAGIC_EDEN) {
+      if (changedKey) {
+        if (changedKey === 'balance') {
+          this.$valueStore.setKey('balance', newState.balance?.toString() ?? '')
+        } else if ((keysToPersist as readonly string[]).includes(changedKey)) {
+          this.$valueStore.setKey(
+            changedKey as PersistedKey,
+            newState[changedKey]?.toString() ?? ''
+          )
+        }
+      } else {
+        this.$valueStore.set({
+          address: newState.address,
+          paymentAddress: newState.paymentAddress,
+          paymentPublicKey: newState.paymentPublicKey,
+          publicKey: newState.publicKey,
+          balance: newState.balance?.toString() ?? '',
+        })
       }
     }
   }
@@ -128,10 +146,10 @@ export default class MagicEdenProvider extends WalletProvider {
         if (address.startsWith('tb1') && isMainnetNetwork(this.network)) {
           this.disconnect()
         } else {
-          this.restorePersistedValues()
           getBTCBalance(paymentAddress, this.network).then((totalBalance) => {
             this.$store.setKey('balance', totalBalance)
           })
+          this.restorePersistedValues()
           return
         }
       }
@@ -156,9 +174,12 @@ export default class MagicEdenProvider extends WalletProvider {
           if (!foundAddress || !foundPaymentAddress)
             throw new Error('No address found')
           if (foundAddress && foundPaymentAddress) {
-            this.$store.setKey('provider', MAGIC_EDEN)
             this.$store.setKey('address', foundAddress.address)
             this.$store.setKey('paymentAddress', foundPaymentAddress.address)
+            this.$store.setKey('accounts', [
+              foundAddress.address,
+              foundPaymentAddress.address,
+            ])
           }
           this.$store.setKey(
             'publicKey',
@@ -177,7 +198,6 @@ export default class MagicEdenProvider extends WalletProvider {
         },
       }
       await getAddress(getAddressOptions as GetAddressOptions)
-      this.$store.setKey('connected', true)
     } catch (e) {
       throw e
     }
@@ -294,13 +314,13 @@ export default class MagicEdenProvider extends WalletProvider {
       if (addressFromScript === paymentAddress) {
         paymentsAddressData.signingIndexes.push(Number(counter))
         if (input.sighashType) {
-          console.log("Updating sigHash for paymentsAddressData")
+          console.log('Updating sigHash for paymentsAddressData')
           paymentsAddressData.sigHash = input.sighashType
         }
       } else if (addressFromScript === address) {
         ordinalAddressData.signingIndexes.push(Number(counter))
         if (input.sighashType) {
-          console.log("Updating sigHash for ordinalAddressData")
+          console.log('Updating sigHash for ordinalAddressData')
           ordinalAddressData.sigHash = input.sighashType
         }
       }

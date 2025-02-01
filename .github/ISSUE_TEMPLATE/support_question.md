@@ -1,7 +1,7 @@
 ---
 name: ❓ Support/Question
 about: Ask a question or request guidance about using the library
-title: "[Support]: "
+title: '[Support]: '
 labels: question
 assignees: ''
 ---

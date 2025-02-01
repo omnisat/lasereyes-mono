@@ -35,7 +35,7 @@ export abstract class WalletProvider {
     this.initialize()
   }
 
-  disconnect(): void { }
+  disconnect(): void {}
 
   abstract initialize(): void
 
@@ -47,7 +47,7 @@ export abstract class WalletProvider {
     return [this.$store.get().address, this.$store.get().paymentAddress]
   }
 
-  switchNetwork(_network: NetworkType): void {
+  async switchNetwork(_network: NetworkType): Promise<void> {
     this.parent.disconnect()
     throw UNSUPPORTED_PROVIDER_METHOD_ERROR
   }
@@ -90,10 +90,10 @@ export abstract class WalletProvider {
     broadcast?: boolean
   ): Promise<
     | {
-      signedPsbtHex: string | undefined
-      signedPsbtBase64: string | undefined
-      txId?: string
-    }
+        signedPsbtHex: string | undefined
+        signedPsbtBase64: string | undefined
+        txId?: string
+      }
     | undefined
   >
 
