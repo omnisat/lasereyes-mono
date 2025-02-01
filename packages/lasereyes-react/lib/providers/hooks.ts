@@ -1,7 +1,7 @@
 import { useContext, useMemo } from 'react'
 import { LaserEyesStoreContext } from './context'
 import { LaserEyesContextType } from './types'
-import { computed, keepMount, onNotify } from 'nanostores'
+import { batched, keepMount, onNotify } from 'nanostores'
 import { useStore } from '@nanostores/react'
 import { compareValues } from '../utils/comparison'
 
@@ -13,7 +13,7 @@ export function useLaserEyes<T>(
   const { $network, $store, methods } = useContext(LaserEyesStoreContext)
 
   const $computedStore = useMemo(() => {
-    const computedStore = computed([$store, $network], (store, network) => {
+    const computedStore = batched([$store, $network], (store, network) => {
       const value = {
         paymentAddress: store.paymentAddress,
         address: store.address,

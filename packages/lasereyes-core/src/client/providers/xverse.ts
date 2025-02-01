@@ -57,8 +57,15 @@ export default class XVerseProvider extends WalletProvider {
   restorePersistedValues() {
     const vals = this.$valueStore.get()
     for (const key of keysToPersist) {
+      if (key === 'balance') {
+        this.$store.setKey(key, BigInt(vals[key]))
+      }
       this.$store.setKey(key, vals[key])
     }
+    this.$store.setKey(
+      'accounts',
+      [vals.address, vals.paymentAddress].filter(Boolean)
+    )
   }
 
   watchStateChange(
@@ -151,6 +158,10 @@ export default class XVerseProvider extends WalletProvider {
           if (foundAddress && foundPaymentAddress) {
             this.$store.setKey('address', foundAddress.address)
             this.$store.setKey('paymentAddress', foundPaymentAddress.address)
+            this.$store.setKey('accounts', [
+              foundAddress.address,
+              foundPaymentAddress.address,
+            ])
           }
           this.$store.setKey(
             'publicKey',
