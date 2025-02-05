@@ -13,7 +13,7 @@ import {
   OP_NET,
   SPARROW,
 } from '../constants/wallets'
-import { NetworkType } from '../types'
+import { NetworkType, ProviderType } from '../types'
 import { LaserEyesStoreType } from './types'
 
 export function triggerDOMShakeHack(callback: VoidFunction) {
@@ -78,6 +78,34 @@ export const keysToPersist = [
 ] as const
 
 export type PersistedKey = (typeof keysToPersist)[number]
+
+export function handleStateChangePersistence(
+  walletName: ProviderType,
+  newState: LaserEyesStoreType,
+  changedKey: keyof LaserEyesStoreType | undefined,
+  $valueStore: MapStore<Record<PersistedKey, string>>
+) {
+  if (newState.provider === walletName) {
+    if (changedKey) {
+      if (changedKey === 'balance') {
+        $valueStore.setKey('balance', newState.balance?.toString() ?? '')
+      } else if ((keysToPersist as readonly string[]).includes(changedKey)) {
+        $valueStore.setKey(
+          changedKey as PersistedKey,
+          newState[changedKey]?.toString() ?? ''
+        )
+      }
+    } else {
+      $valueStore.set({
+        address: newState.address,
+        paymentAddress: newState.paymentAddress,
+        paymentPublicKey: newState.paymentPublicKey,
+        publicKey: newState.publicKey,
+        balance: newState.balance?.toString() ?? '',
+      })
+    }
+  }
+}
 
 export const fromHexString = (hexString: string): Uint8Array => {
   const matches = hexString.match(/.{1,2}/g)
