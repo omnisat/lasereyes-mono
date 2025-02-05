@@ -28,7 +28,7 @@ import {
 } from '../../lib/helpers'
 import { MapStore, listenKeys } from 'nanostores'
 import { persistentMap } from '@nanostores/persistent'
-import { keysToPersist, PersistedKey } from '../utils'
+import { handleStateChangePersistence, keysToPersist, PersistedKey } from '../utils'
 
 const XVERSE_WALLET_PERSISTENCE_KEY = 'XVERSE_CONNECTED_WALLET_STATE'
 export default class XVerseProvider extends WalletProvider {
@@ -73,16 +73,7 @@ export default class XVerseProvider extends WalletProvider {
     _: LaserEyesStoreType | undefined,
     changedKey: keyof LaserEyesStoreType | undefined
   ) {
-    if (changedKey && newState.provider === XVERSE) {
-      if (changedKey === 'balance') {
-        this.$valueStore.setKey('balance', newState.balance?.toString() ?? '')
-      } else if ((keysToPersist as readonly string[]).includes(changedKey)) {
-        this.$valueStore.setKey(
-          changedKey as PersistedKey,
-          newState[changedKey]?.toString() ?? ''
-        )
-      }
-    }
+    handleStateChangePersistence(XVERSE, newState, changedKey, this.$valueStore)
   }
 
   initialize(): void {
