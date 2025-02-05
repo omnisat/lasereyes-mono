@@ -29,7 +29,11 @@ import {
 import { listenKeys, MapStore } from 'nanostores'
 import { persistentMap } from '@nanostores/persistent'
 import { fromOutputScript } from 'bitcoinjs-lib/src/address'
-import { keysToPersist, PersistedKey } from '../utils'
+import {
+  handleStateChangePersistence,
+  keysToPersist,
+  PersistedKey,
+} from '../utils'
 
 const MAGIC_EDEN_WALLET_PERSISTENCE_KEY = 'MAGIC_EDEN_CONNECTED_WALLET_STATE'
 
@@ -76,26 +80,12 @@ export default class MagicEdenProvider extends WalletProvider {
     _: LaserEyesStoreType | undefined,
     changedKey: keyof LaserEyesStoreType | undefined
   ) {
-    if (newState.provider === MAGIC_EDEN) {
-      if (changedKey) {
-        if (changedKey === 'balance') {
-          this.$valueStore.setKey('balance', newState.balance?.toString() ?? '')
-        } else if ((keysToPersist as readonly string[]).includes(changedKey)) {
-          this.$valueStore.setKey(
-            changedKey as PersistedKey,
-            newState[changedKey]?.toString() ?? ''
-          )
-        }
-      } else {
-        this.$valueStore.set({
-          address: newState.address,
-          paymentAddress: newState.paymentAddress,
-          paymentPublicKey: newState.paymentPublicKey,
-          publicKey: newState.publicKey,
-          balance: newState.balance?.toString() ?? '',
-        })
-      }
-    }
+    handleStateChangePersistence(
+      MAGIC_EDEN,
+      newState,
+      changedKey,
+      this.$valueStore
+    )
   }
 
   initialize(): void {
