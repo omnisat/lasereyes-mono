@@ -50,6 +50,7 @@ import {
   VIDEO_WEBM,
   TEXT_MARKDOWN,
 } from '../constants/content'
+import { BTC, RUNES } from '../constants/protocols'
 
 export type NetworkType =
   | typeof MAINNET
@@ -105,13 +106,33 @@ export type ContentType =
 
 export type Config = {
   network:
-    | typeof MAINNET
-    | typeof TESTNET
-    | typeof TESTNET4
-    | typeof SIGNET
-    | typeof FRACTAL_MAINNET
-    | typeof FRACTAL_TESTNET
+  | typeof MAINNET
+  | typeof TESTNET
+  | typeof TESTNET4
+  | typeof SIGNET
+  | typeof FRACTAL_MAINNET
+  | typeof FRACTAL_TESTNET
 }
+
+export type SendArgs = BTCSendArgs | RuneSendArgs
+
+export type Protocol = typeof BTC | typeof RUNES
+
+export interface BTCSendArgs {
+  fromAddress: string
+  toAddress: string
+  amount: number
+  network: NetworkType
+}
+
+export interface RuneSendArgs {
+  runeId: string
+  fromAddress: string
+  toAddress: string
+  amount: number
+  network: NetworkType
+}
+
 
 export interface OYLBalanceResponse {
   brc20s: {

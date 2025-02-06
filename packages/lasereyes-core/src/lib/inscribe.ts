@@ -6,26 +6,20 @@ import * as ecc2 from '@bitcoinerlab/secp256k1'
 import {
   broadcastTx,
   calculateValueOfUtxosGathered,
-  getAddressType,
   getAddressUtxos,
   getBitcoinNetwork,
-  getRedeemScript,
 } from './helpers'
 import { getCmDruidNetwork, MAINNET, P2SH, P2TR } from '../constants'
-import axios from 'axios'
-import { getMempoolSpaceUrl } from './urls'
-import * as bip39 from 'bip39'
 import {
   ContentType,
-  MempoolTransactionResponse,
   MempoolUtxo,
   NetworkType,
 } from '../types'
-import { BIP32Factory, BIP32Interface } from 'bip32'
 import { toXOnly } from 'bitcoinjs-lib/src/psbt/bip371'
 import { TEXT_PLAIN } from '../constants/content'
+import { generatePrivateKey, waitForTransaction, getOutputValueByVOutIndex, getAddressType, getRedeemScript } from './btc'
+import { getRecommendedFeesMempoolSpace } from './mempool-space'
 
-const bip32 = BIP32Factory(ecc2)
 bitcoin.initEccLib(ecc2)
 
 export const inscribeContent = async ({
@@ -55,10 +49,10 @@ export const inscribeContent = async ({
     network?: NetworkType
   ) => Promise<
     | {
-        signedPsbtHex: string | undefined
-        signedPsbtBase64: string | undefined
-        txId?: string
-      }
+      signedPsbtHex: string | undefined
+      signedPsbtBase64: string | undefined
+      txId?: string
+    }
     | undefined
   >
   network: NetworkType
@@ -72,11 +66,11 @@ export const inscribeContent = async ({
     const ixs = inscriptions
       ? inscriptions
       : Array(quantity).fill({
-          content: contentBase64,
-          mimeType,
-        })
+        content: contentBase64,
+        mimeType,
+      })
 
-    const commitTx = await getCommitTx({
+    const commitTx = await getCommitPsbt({
       inscriptions: ixs,
       paymentAddress,
       paymentPublicKey,
@@ -103,7 +97,7 @@ export const inscribeContent = async ({
     const extracted = psbt.extractTransaction()
     const commitTxId = await broadcastTx(extracted.toHex(), network)
     if (!commitTxId) throw new Error('commit tx failed')
-    return await executeReveal({
+    return await executeRevealTransaction({
       inscriptions: ixs,
       ordinalAddress,
       privKey,
@@ -115,7 +109,7 @@ export const inscribeContent = async ({
   }
 }
 
-export const getCommitTx = async ({
+export const getCommitPsbt = async ({
   inscriptions,
   paymentAddress,
   paymentPublicKey,
@@ -130,9 +124,9 @@ export const getCommitTx = async ({
   isDry?: boolean
 }): Promise<
   | {
-      psbtHex: string
-      psbtBase64: string
-    }
+    psbtHex: string
+    psbtBase64: string
+  }
   | undefined
 > => {
   try {
@@ -144,13 +138,13 @@ export const getCommitTx = async ({
     if (contentSize > 390000)
       throw new Error('Content size is too large, must be less than 390kb')
 
-    const { fastestFee } = await getRecommendedFees(network)
+    const { fastestFee } = await getRecommendedFeesMempoolSpace(network)
     const pubKey = ecc.keys.get_pubkey(String(privKey), true)
     const psbt = new bitcoin.Psbt({
       network: getBitcoinNetwork(network),
     })
 
-    const { inscriberAddress } = createRevealAddressAndKeys(
+    const { inscriberAddress } = createInscriptionRevealAddressAndKeys(
       pubKey,
       inscriptions,
       network
@@ -179,7 +173,7 @@ export const getCommitTx = async ({
     }
 
     let accSats = 0
-    const addressScript = await bitcoin.address.toOutputScript(
+    const addressScript = bitcoin.address.toOutputScript(
       paymentAddress,
       getBitcoinNetwork(network)
     )
@@ -235,7 +229,7 @@ export const getCommitTx = async ({
   }
 }
 
-export const executeReveal = async ({
+export const executeRevealTransaction = async ({
   inscriptions,
   ordinalAddress,
   commitTxId,
@@ -249,7 +243,7 @@ export const executeReveal = async ({
   privKey: string
   network: NetworkType
   isDry?: boolean
-}) => {
+}): Promise<string> => {
   try {
     const secKey = ecc.keys.get_seckey(privKey)
     const pubKey = ecc.keys.get_pubkey(privKey, true)
@@ -302,23 +296,14 @@ export const executeReveal = async ({
   }
 }
 
-export async function generatePrivateKey(network: NetworkType) {
-  const entropy = crypto.getRandomValues(new Uint8Array(32))
-  const mnemonic = bip39.entropyToMnemonic(Buffer.from(entropy))
-  const seed = await bip39.mnemonicToSeed(mnemonic)
-  const root: BIP32Interface = bip32.fromSeed(seed, getBitcoinNetwork(network))
-  return root?.derivePath("m/44'/0'/0'/0/0").privateKey
-}
-
 export const createInscriptionScript = (
   pubKey: any,
   inscriptions: { content: string; mimeType: ContentType }[]
 ) => {
   const ec = new TextEncoder()
   const marker = ec.encode('ord')
-  const INSCRIPTION_SIZE = 546 // Constant for inscription size
+  const INSCRIPTION_SIZE = 546
 
-  // Function to create content chunks for each inscription
   const createContentChunks = (
     contentBase64: string,
     mimeType: ContentType
@@ -331,7 +316,6 @@ export const createInscriptionScript = (
       contentBuffer = Buffer.from(contentBase64, 'base64')
     }
 
-    // Split content into chunks of 520 bytes
     const contentChunks = []
     for (let i = 0; i < contentBuffer.length; i += 520) {
       contentChunks.push(contentBuffer.slice(i, i + 520))
@@ -340,35 +324,25 @@ export const createInscriptionScript = (
     return contentChunks
   }
 
-  // Construct the script starting with pubKey and OP_CHECKSIG
   const script: any = [pubKey, 'OP_CHECKSIG']
-
-  // Add envelopes for each inscription
   inscriptions.forEach((inscription, index) => {
     const { content, mimeType } = inscription
     const contentChunks = createContentChunks(content, mimeType)
-
-    // Start the inscription envelope
     script.push('OP_0', 'OP_IF', marker, '01', ec.encode(mimeType), 'OP_0')
-
-    // Add pointer logic only if it's not the first inscription
     if (index > 0) {
       const pointer = INSCRIPTION_SIZE * (index + 1)
       const pointerBuffer = Buffer.from([pointer])
-
-      script.push(Buffer.from([0x02])) // Pointer tag
-      script.push(pointerBuffer) // Pointer value in minimal format
+      script.push(Buffer.from([0x02]))
+      script.push(pointerBuffer)
     }
 
-    // Add content chunks and close the conditional block
     script.push(...contentChunks.map((chunk) => chunk), 'OP_ENDIF')
   })
 
-  // Return the complete script with all envelopes
   return script
 }
 
-export const createRevealAddressAndKeys = (
+export const createInscriptionRevealAddressAndKeys = (
   pubKey: any,
   inscriptions: { content: string; mimeType: ContentType }[],
   network: NetworkType = MAINNET
@@ -388,99 +362,3 @@ export const createRevealAddressAndKeys = (
   }
 }
 
-export async function getTransaction(
-  txId: string,
-  network: NetworkType = MAINNET
-): Promise<MempoolTransactionResponse> {
-  try {
-    return await axios
-      .get(`${getMempoolSpaceUrl(network)}/api/tx/${txId}`)
-      .then((res) => res.data)
-  } catch (e: any) {
-    throw e
-  }
-}
-
-export async function getRawTransaction(
-  txId: string,
-  network: NetworkType = MAINNET
-): Promise<any> {
-  try {
-    return await axios
-      .get(`${getMempoolSpaceUrl(network)}/api/tx/${txId}/raw`)
-      .then((res) => res.data)
-  } catch (e: any) {
-    throw e
-  }
-}
-
-export async function waitForTransaction(
-  txId: string,
-  network: NetworkType
-): Promise<boolean> {
-  const timeout: number = 60000
-  const startTime: number = Date.now()
-  while (true) {
-    try {
-      const rawTx: any = await getTransaction(txId, network)
-      if (rawTx) {
-        console.log('Transaction found in mempool:', txId)
-        return true
-      }
-
-      if (Date.now() - startTime > timeout) {
-        return false
-      }
-
-      await new Promise((resolve) => setTimeout(resolve, 5000))
-    } catch (error) {
-      if (Date.now() - startTime > timeout) {
-        return false
-      }
-
-      await new Promise((resolve) => setTimeout(resolve, 5000))
-    }
-  }
-}
-
-export const getRecommendedFees = async (network: NetworkType) => {
-  return await axios
-    .get(`${getMempoolSpaceUrl(network)}/api/v1/fees/recommended`, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    .then((res) => res.data)
-}
-
-export async function getOutputValueByVOutIndex(
-  commitTxId: string,
-  vOut: number,
-  network: NetworkType
-): Promise<number | null> {
-  const timeout: number = 60000
-  const startTime: number = Date.now()
-
-  while (true) {
-    try {
-      const rawTx: any = await getTransaction(commitTxId, network)
-
-      if (rawTx && rawTx.vout && rawTx.vout.length > 0) {
-        return Math.floor(rawTx.vout[vOut].value)
-      }
-
-      if (Date.now() - startTime > timeout) {
-        return null
-      }
-
-      await new Promise((resolve) => setTimeout(resolve, 5000))
-    } catch (error) {
-      console.error('Error fetching transaction output value:', error)
-      if (Date.now() - startTime > timeout) {
-        return null
-      }
-
-      await new Promise((resolve) => setTimeout(resolve, 5000))
-    }
-  }
-}
