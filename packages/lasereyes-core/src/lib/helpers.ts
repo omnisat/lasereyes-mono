@@ -1,5 +1,4 @@
 import * as bitcoin from 'bitcoinjs-lib'
-import { Buffer } from 'buffer'
 
 import {
   FRACTAL_MAINNET,
@@ -13,7 +12,7 @@ import axios from 'axios'
 import { MempoolUtxo, NetworkType } from '../types'
 import { getMempoolSpaceUrl } from './urls'
 import * as ecc from '@bitcoinerlab/secp256k1'
-import { P2PKH, P2SH, P2SH_P2WPKH, P2TR, P2WPKH, P2WSH } from '../constants'
+import { getRedeemScript } from './btc'
 
 bitcoin.initEccLib(ecc)
 
@@ -174,21 +173,6 @@ export async function createSendBtcPsbt(
   }
 }
 
-export function getRedeemScript(
-  paymentPublicKey: string,
-  network: NetworkType
-) {
-  const p2wpkh = bitcoin.payments.p2wpkh({
-    pubkey: Buffer.from(paymentPublicKey, 'hex'),
-    network: getBitcoinNetwork(network),
-  })
-
-  const p2sh = bitcoin.payments.p2sh({
-    redeem: p2wpkh,
-    network: getBitcoinNetwork(network),
-  })
-  return p2sh?.redeem?.output
-}
 
 export function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms))
@@ -214,34 +198,6 @@ export async function broadcastTx(
   return response.data
 }
 
-export const getAddressType = (
-  address: string,
-  network: NetworkType
-): string => {
-  try {
-    const btcNetwork = getBitcoinNetwork(network)
-    const decoded = bitcoin.address.fromBase58Check(address)
-    if (decoded.version === btcNetwork.pubKeyHash) return P2PKH
-    if (decoded.version === btcNetwork.scriptHash) {
-      const script = bitcoin.script.decompile(decoded.hash)
-      if (script && script.length === 2 && script[0] === bitcoin.opcodes.OP_0) {
-        return P2SH_P2WPKH
-      }
-      return P2SH
-    }
-  } catch (e) {
-    try {
-      const decoded = bitcoin.address.fromBech32(address)
-      if (decoded.version === 0 && decoded.data.length === 20) return P2WPKH
-      if (decoded.version === 0 && decoded.data.length === 32) return P2WSH
-      if (decoded.version === 1 && decoded.data.length === 32) return P2TR
-    } catch (e2) {
-      return 'unknown'
-    }
-  }
-
-  return 'unknown'
-}
 
 export const isTestnetNetwork = (network: NetworkType) => {
   return network === TESTNET || network === TESTNET4 || network === SIGNET

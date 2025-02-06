@@ -1,6 +1,5 @@
 import { MapStore, WritableAtom, keepMount, listenKeys } from 'nanostores'
-
-import { Config, ContentType, NetworkType, ProviderType } from '../types'
+import { BTCSendArgs, Config, ContentType, NetworkType, Protocol, ProviderType, RuneSendArgs } from '../types'
 import {
   LEATHER,
   MAGIC_EDEN,
@@ -340,6 +339,27 @@ export class LaserEyesClient {
     }
   }
 
+  async send(protocol: Protocol, sendArgs: BTCSendArgs | RuneSendArgs) {
+    if (!this.$store.get().provider) return
+    if (this.$providerMap[this.$store.get().provider!]) {
+      try {
+        return await this.$providerMap[this.$store.get().provider!]?.send(
+          protocol,
+          sendArgs
+        )
+      } catch (error) {
+        if (error instanceof Error) {
+          if (error.message.toLowerCase().includes('not implemented')) {
+            throw new Error(
+              "The connected wallet doesn't support sending stuff..."
+            )
+          }
+        }
+        throw error
+      }
+    }
+  }
+
   async getPublicKey() {
     if (!this.$store.get().provider) return
     if (this.$providerMap[this.$store.get().provider!]) {
@@ -366,6 +386,30 @@ export class LaserEyesClient {
           await this.$providerMap[this.$store.get().provider!]!.getBalance()
         this.$store.setKey('balance', BigInt(bal))
         return bal
+      } catch (error) {
+        if (error instanceof Error) {
+          if (error.message.toLowerCase().includes('not implemented')) {
+            throw new Error("The connected wallet doesn't support getBalance")
+          }
+        }
+        throw error
+      }
+    }
+  }
+
+  async getMetaBalances(protocol: Protocol) {
+    if (!this.$store.get().provider) return
+    if (this.$providerMap[this.$store.get().provider!]) {
+      try {
+        if (!protocol) {
+          throw new Error('No protocol provided')
+        }
+
+        const balances =
+          await this.$providerMap[this.$store.get().provider!]!.getMetaBalances(protocol)
+        // TODO: Decide if we want to store these balances
+        // this.$store.setKey(`${protocol}Balances`, JSON.stringify(balances))
+        return balances
       } catch (error) {
         if (error instanceof Error) {
           if (error.message.toLowerCase().includes('not implemented')) {

@@ -1,4 +1,4 @@
-import { ContentType, NetworkType, ProviderType } from '@omnisat/lasereyes-core'
+import { ContentType, NetworkType, Protocol, ProviderType, SendArgs } from '@omnisat/lasereyes-core'
 
 export type LaserEyesContextType = {
   isInitializing: boolean
@@ -32,6 +32,7 @@ export type LaserEyesContextType = {
   switchNetwork: (network: NetworkType) => Promise<void>
   getPublicKey: () => Promise<string>
   getBalance: () => Promise<string>
+  getMetaBalances: (protocol: Protocol) => Promise<any>
   getInscriptions: (offset?: number, limit?: number) => Promise<any[]>
   sendBTC: (to: string, amount: number) => Promise<string>
   signMessage: (message: string, toSignAddress?: string) => Promise<string>
@@ -41,10 +42,10 @@ export type LaserEyesContextType = {
     broadcast?: boolean
   ) => Promise<
     | {
-        signedPsbtHex: string | undefined
-        signedPsbtBase64: string | undefined
-        txId?: string
-      }
+      signedPsbtHex: string | undefined
+      signedPsbtBase64: string | undefined
+      txId?: string
+    }
     | undefined
   >
   pushPsbt: (tx: string) => Promise<string | undefined>
@@ -52,4 +53,5 @@ export type LaserEyesContextType = {
     contentBase64: string,
     mimeType: ContentType
   ) => Promise<string | string[]>
+  send: (protocol: Protocol, sendArgs: SendArgs) => Promise<string>
 }

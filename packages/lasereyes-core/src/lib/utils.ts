@@ -8,3 +8,20 @@ export const isHex = (str: string): boolean => {
   const hexRegex = /^[a-fA-F0-9]+$/
   return hexRegex.test(str)
 }
+
+
+export const encodeVarint = (bigIntValue: any) => {
+  const bufferArray = []
+  let num = bigIntValue
+
+  do {
+    let byte = num & BigInt(0x7f)
+    num >>= BigInt(7)
+    if (num !== BigInt(0)) {
+      byte |= BigInt(0x80)
+    }
+    bufferArray.push(Number(byte))
+  } while (num !== BigInt(0))
+
+  return { varint: Buffer.from(bufferArray) }
+}
