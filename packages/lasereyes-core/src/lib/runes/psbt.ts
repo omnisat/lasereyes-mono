@@ -106,7 +106,6 @@ export const createRuneSendPsbt = async ({
   psbtHex: string
 }> => {
   try {
-    console.log("createRuneSendPsbt", fromAddress, fromPaymentAddress, fromPaymentPublicKey, toAddress, runeId, amount, network)
     const { fastestFee: feeRate } = await getRecommendedFeesMempoolSpace(network)
     const utxos = await getAddressUtxos(fromPaymentAddress, network)
     let sortedUtxos = utxos.sort((a: { value: number }, b: { value: number }) => b.value - a.value).filter((utxo: { value: number }) => utxo.value > 3000)
@@ -124,9 +123,6 @@ export const createRuneSendPsbt = async ({
     const minFee = estimateTxSize(outpoints.length, 2, 4)
     const calculatedFee = minFee * feeRate < 250 ? 250 : minFee * (feeRate)
     let finalFee = calculatedFee
-
-    console.log("fromAddress", fromAddress, getAddressType(fromAddress, network), "fromAddressPublicKey", fromAddressPublicKey)
-    console.log("fromPaymentAddress", fromPaymentAddress, getAddressType(fromPaymentAddress, network), "fromPaymentPublicKey", fromPaymentPublicKey)
 
     let counter = 0
     for await (const runeOutput of outpoints) {
@@ -152,6 +148,7 @@ export const createRuneSendPsbt = async ({
     for (let i = 0; i < sortedUtxos.length; i++) {
       const script = bitcoin.address.toOutputScript(fromPaymentAddress, getBitcoinNetwork(MAINNET))
       const utxo = sortedUtxos[i]
+
       if (paymentAddressType === P2TR) {
         psbt.addInput({
           hash: utxo.txid,
@@ -174,6 +171,17 @@ export const createRuneSendPsbt = async ({
             script,
           },
           redeemScript,
+        })
+      }
+
+      if (paymentAddressType === "p2wpkh") {
+        psbt.addInput({
+          hash: utxo.txid,
+          index: utxo.vout,
+          witnessUtxo: {
+            value: BigInt(utxo.value),
+            script,
+          },
         })
       }
     }

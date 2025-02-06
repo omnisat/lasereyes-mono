@@ -658,6 +658,7 @@ const WalletCard = ({
 
             <div className={'border-b border-2 border-[#232225] w-full my-2'} />
             <div className="flex flex-col w-full gap-2">
+
               <Select
                 onValueChange={(value) => {
                   const rune = runes?.find((r) => r.symbol === value);
@@ -679,6 +680,10 @@ const WalletCard = ({
                   )}
                 >
                   <SelectValue placeholder="Select a Rune" />
+                  <div className="grow" />
+                  <Badge variant={'success'} className={'text-gray-900'}>
+                    beta
+                  </Badge>
                 </SelectTrigger>
                 <SelectContent>
                   {runes?.map((rune, index) => (
