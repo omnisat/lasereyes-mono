@@ -160,6 +160,7 @@ export abstract class WalletProvider {
           runeId: runeArgs.runeId,
           amount: runeArgs.amount,
           ordinalAddress: this.$store.get().address,
+          ordinalPublicKey: this.$store.get().publicKey,
           paymentAddress: this.$store.get().paymentAddress,
           paymentPublicKey: this.$store.get().paymentPublicKey,
           toAddress: runeArgs.toAddress,
