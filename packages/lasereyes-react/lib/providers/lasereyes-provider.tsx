@@ -2,6 +2,7 @@
 import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
 import { defaultMethods, LaserEyesStoreContext } from './context'
 import {
+  BTCSendArgs,
   Config,
   ContentType,
   createConfig,
@@ -9,7 +10,9 @@ import {
   LaserEyesClient,
   MAINNET,
   NetworkType,
+  Protocol,
   ProviderType,
+  RuneSendArgs,
 } from '@omnisat/lasereyes-core'
 
 export default function LaserEyesProvider({
@@ -43,6 +46,11 @@ export default function LaserEyesProvider({
       (
         await (client?.getBalance() ?? defaultMethods.getBalance())
       )?.toString() ?? '',
+    [client]
+  )
+  const getMetaBalances = useCallback(
+    async (protocol: Protocol) =>
+      await client?.getMetaBalances(protocol) ?? defaultMethods.getMetaBalances(),
     [client]
   )
   const getInscriptions = useCallback(
@@ -97,6 +105,12 @@ export default function LaserEyesProvider({
       defaultMethods.inscribe(),
     [client]
   )
+  const send = useCallback(
+    async (protocol: Protocol, sendArgs: BTCSendArgs | RuneSendArgs) =>
+      (await client?.send.call(client, protocol, sendArgs)) ??
+      defaultMethods.send(),
+    [client]
+  )
 
   // TODO: Move method definitions into useMemo here
   const methods = useMemo(() => {
@@ -108,6 +122,7 @@ export default function LaserEyesProvider({
       connect,
       disconnect,
       getBalance,
+      getMetaBalances,
       getInscriptions,
       getNetwork,
       getPublicKey,
@@ -118,6 +133,7 @@ export default function LaserEyesProvider({
       signPsbt,
       switchNetwork,
       inscribe,
+      send
     }
   }, [
     client,

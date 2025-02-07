@@ -250,6 +250,9 @@ importers:
       '@cmdcode/tapscript':
         specifier: ^1.4.6
         version: 1.4.6
+      '@magiceden-oss/runestone-lib':
+        specifier: ^1.0.2
+        version: 1.0.2
       '@nanostores/persistent':
         specifier: ^0.10.2
         version: 0.10.2(nanostores@0.11.3)
@@ -3276,6 +3279,10 @@ packages:
 
   /@leichtgewicht/ip-codec@2.0.5:
     resolution: {integrity: sha512-Vo+PSpZG2/fmgmiNzYK9qWRh8h/CHrwD0mo1h1DzL4yzHNSfWYujGTYsWGreD000gcgmZ7K4Ys6Tx9TxtsKdDw==}
+    dev: false
+
+  /@magiceden-oss/runestone-lib@1.0.2:
+    resolution: {integrity: sha512-C4XoE7tHxxaWQNzovBIEndXGrTesotshnKQA8DXlnoVDvriD6G26ezUoj9AlEb2UAPbEijSga4Dtwd86Z0a1jg==}
     dev: false
 
   /@manypkg/find-root@1.1.0:

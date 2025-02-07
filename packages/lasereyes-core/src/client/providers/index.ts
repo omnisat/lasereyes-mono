@@ -1,6 +1,6 @@
 import { MapStore, WritableAtom } from 'nanostores'
 import { LaserEyesStoreType } from '../types'
-import { Config, ContentType, NetworkType, ProviderType } from '../../types'
+import { BTCSendArgs, Config, ContentType, NetworkType, Protocol, ProviderType, RuneSendArgs } from '../../types'
 import { LaserEyesClient } from '..'
 import { inscribeContent } from '../../lib/inscribe'
 import { broadcastTx, getBTCBalance } from '../../lib/helpers'
@@ -12,6 +12,9 @@ import {
   TESTNET,
   TESTNET4,
 } from '../../constants'
+import { BTC, RUNES } from '../../constants/protocols'
+import { sendRune } from '../../lib/runes/psbt'
+import { getAddressRunesBalances } from '../../lib/sandshrew'
 
 export const UNSUPPORTED_PROVIDER_METHOD_ERROR = new Error(
   "The connected wallet doesn't support this method..."
@@ -35,7 +38,7 @@ export abstract class WalletProvider {
     this.initialize()
   }
 
-  disconnect(): void {}
+  disconnect(): void { }
 
   abstract initialize(): void
 
@@ -73,6 +76,22 @@ export abstract class WalletProvider {
     return await getBTCBalance(paymentAddress, this.$network.get())
   }
 
+  async getMetaBalances(protocol: Protocol): Promise<any> {
+    switch (protocol) {
+      case BTC:
+        return await this.getBalance()
+      case RUNES:
+        const network = this.$network.get()
+        if (network !== MAINNET) {
+          throw new Error('Unsupported network')
+        }
+
+        return await getAddressRunesBalances(this.$store.get().address)
+      default:
+        throw new Error('Unsupported protocol')
+    }
+  }
+
   async getInscriptions(offset?: number, limit?: number): Promise<any[]> {
     console.log('getInscriptions not implemented', offset, limit)
     throw UNSUPPORTED_PROVIDER_METHOD_ERROR
@@ -90,17 +109,16 @@ export abstract class WalletProvider {
     broadcast?: boolean
   ): Promise<
     | {
-        signedPsbtHex: string | undefined
-        signedPsbtBase64: string | undefined
-        txId?: string
-      }
+      signedPsbtHex: string | undefined
+      signedPsbtBase64: string | undefined
+      txId?: string
+    }
     | undefined
   >
 
   async pushPsbt(_tx: string): Promise<string | undefined> {
     let payload = _tx
     if (!payload.startsWith('02')) {
-      console.log('extracting tx...')
       const psbtObj = bitcoin.Psbt.fromHex(payload)
       payload = psbtObj.extractTransaction().toHex()
     }
@@ -121,5 +139,36 @@ export abstract class WalletProvider {
       signPsbt: this.signPsbt.bind(this),
       network: this.$network.get(),
     })
+  }
+
+  async send(protocol: Protocol, sendArgs: BTCSendArgs | RuneSendArgs) {
+    switch (protocol) {
+      case BTC:
+        return await this.sendBTC(sendArgs.toAddress, sendArgs.amount)
+      case RUNES:
+        const network = this.$network.get()
+        if (network !== MAINNET) {
+          throw new Error('Unsupported network')
+        }
+
+        const runeArgs = sendArgs as RuneSendArgs;
+        if (!runeArgs.runeId || !runeArgs.amount || !runeArgs.toAddress) {
+          throw new Error('Missing required parameters')
+        }
+
+        return await sendRune({
+          runeId: runeArgs.runeId,
+          amount: runeArgs.amount,
+          ordinalAddress: this.$store.get().address,
+          ordinalPublicKey: this.$store.get().publicKey,
+          paymentAddress: this.$store.get().paymentAddress,
+          paymentPublicKey: this.$store.get().paymentPublicKey,
+          toAddress: runeArgs.toAddress,
+          signPsbt: this.signPsbt.bind(this),
+          network
+        })
+      default:
+        throw new Error('Unsupported protocol')
+    }
   }
 }

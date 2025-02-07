@@ -1,7 +1,7 @@
 {
   "name": "@omnisat/lasereyes-core",
   "private": false,
-  "version": "0.0.59",
+  "version": "0.0.60-rc.1",
   "type": "module",
   "main": "./dist/index.umd.cjs",
   "module": "./dist/index.js",
@@ -31,6 +31,7 @@
     "@bitcoinerlab/secp256k1": "^1.1.1",
     "@cmdcode/crypto-utils": "^2.4.6",
     "@cmdcode/tapscript": "^1.4.6",
+    "@magiceden-oss/runestone-lib": "^1.0.2",
     "@nanostores/persistent": "^0.10.2",
     "@orangecrypto/orange-connect": "^1.2.2",
     "axios": "^1.7.7",

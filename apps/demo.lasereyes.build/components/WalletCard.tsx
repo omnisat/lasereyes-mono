@@ -21,6 +21,7 @@ import {
   OP_NET,
   ProviderType,
   SPARROW,
+  SendArgs,
 } from '@omnisat/lasereyes'
 import {
   Card,
@@ -42,6 +43,13 @@ import { ImNewTab } from 'react-icons/im'
 import { cn } from '@/lib/utils'
 import { useUtxos } from '@/hooks/useUtxos'
 import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 const WalletCard = ({
   wallet,
@@ -60,10 +68,10 @@ const WalletCard = ({
   setSignedPsbt: (
     psbt:
       | {
-          signedPsbtHex: string
-          signedPsbtBase64: string
-          txId?: string
-        }
+        signedPsbtHex: string
+        signedPsbtBase64: string
+        txId?: string
+      }
       | undefined
   ) => void
 }) => {
@@ -94,8 +102,10 @@ const WalletCard = ({
     signMessage,
     signPsbt,
     inscribe,
+    send,
     pushPsbt,
     switchNetwork,
+    getMetaBalances
   } = useLaserEyes()
 
   const [hasError, setHasError] = useState(false)
@@ -109,6 +119,19 @@ const WalletCard = ({
   const [inscriptionText, setInscriptionText] = useState<string>(
     'Inscribed 100% clientside with Laser Eyes'
   )
+
+  const [runes, setRunes] = useState<{
+    balance: string;
+    symbol: string;
+    name: string;
+  }[] | undefined>()
+  const [selectedRune, setSelectedRune] = useState<{
+    balance: string;
+    symbol: string;
+    name: string;
+  } | undefined>(undefined);
+  const [runeToAddress, setRuneToAddress] = useState<string>('')
+  const [runeAmount, setRuneAmount] = useState<string>('')
 
   const hasWallet = {
     unisat: hasUnisat,
@@ -144,12 +167,12 @@ const WalletCard = ({
         paymentAddress,
         paymentPublicKey,
         network as
-          | typeof MAINNET
-          | typeof TESTNET
-          | typeof TESTNET4
-          | typeof SIGNET
-          | typeof FRACTAL_MAINNET
-          | typeof FRACTAL_TESTNET
+        | typeof MAINNET
+        | typeof TESTNET
+        | typeof TESTNET4
+        | typeof SIGNET
+        | typeof FRACTAL_MAINNET
+        | typeof FRACTAL_TESTNET
       )
         .then((psbt) => {
           if (psbt && psbt.toHex() !== unsigned) {
@@ -182,7 +205,14 @@ const WalletCard = ({
     setUnsigned(undefined)
   }, [network])
 
-  const send = async () => {
+  useEffect(() => {
+    if (address) {
+      getMetaBalances("runes").then(setRunes)
+      setRuneToAddress(address)
+    }
+  }, [address])
+
+  const sendBtc = async () => {
     try {
       if (balance! < 1500) {
         throw new Error('Insufficient funds')
@@ -405,6 +435,42 @@ const WalletCard = ({
     }
   }, [inscribe, inscriptionText, network])
 
+
+  const sendRune = async () => {
+    try {
+      if (!selectedRune) throw new Error('No rune selected')
+      if (!address) throw new Error('No address available')
+      if (!runeToAddress) throw new Error('No destination address provided')
+      if (!runeAmount) throw new Error('No amount specified')
+
+      const txid = await send("runes", {
+        fromAddress: address,
+        toAddress: runeToAddress,
+        amount: Number(runeAmount),
+        runeId: selectedRune.name,
+      } as SendArgs)
+
+      toast.success(
+        <span className={'flex flex-col gap-1 items-center justify-center'}>
+          <span className={'font-black'}>View on mempool.space</span>
+          <a
+            target={'_blank'}
+            href={`${getMempoolSpaceUrl(
+              network as typeof MAINNET | typeof TESTNET
+            )}/tx/${txid}`}
+            className={'underline text-blue-600 text-xs'}
+          >
+            {txid}
+          </a>
+        </span>
+      )
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message)
+      }
+    }
+  }
+
   return (
     <Card
       className={
@@ -500,7 +566,7 @@ const WalletCard = ({
               className={'w-full bg-[#232225]'}
               disabled={isMissingWallet || !isConnected}
               variant={!isConnected ? 'secondary' : 'default'}
-              onClick={() => (!isConnected ? null : send())}
+              onClick={() => (!isConnected ? null : sendBtc())}
             >
               send BTC
             </Button>
@@ -589,6 +655,88 @@ const WalletCard = ({
             >
               inscribe
             </Button>
+
+            <div className={'border-b border-2 border-[#232225] w-full my-2'} />
+            <div className="flex flex-col w-full gap-2">
+
+              <Select
+                onValueChange={(value) => {
+                  const rune = runes?.find((r) => r.symbol === value);
+                  setSelectedRune(rune);
+                }}
+                disabled={
+                  isMissingWallet ||
+                  !isConnected
+                }
+              >
+                <SelectTrigger
+                  disabled={
+                    isMissingWallet ||
+                    !isConnected
+                  }
+                  className={cn(
+                    'w-full bg-[#232225] border-none disabled:text-[#737275] text-center',
+                    ''
+                  )}
+                >
+                  <SelectValue placeholder="Select a Rune" />
+                  <div className="grow" />
+                  <Badge variant={'success'} className={'text-gray-900'}>
+                    beta
+                  </Badge>
+                </SelectTrigger>
+                <SelectContent>
+                  {runes?.map((rune, index) => (
+                    <SelectItem key={index} value={rune.symbol}>
+                      {rune.name} ({rune.balance})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Input
+                disabled={
+                  isMissingWallet ||
+                  !isConnected ||
+                  !selectedRune
+                }
+                className={cn(
+                  'w-full bg-[#232225] border-none disabled:text-[#737275] text-center',
+                  ''
+                )}
+                placeholder="To Address"
+                value={runeToAddress}
+                onChange={(e) => setRuneToAddress(e.target.value)}
+              />
+              <Input
+                disabled={
+                  isMissingWallet ||
+                  !isConnected ||
+                  !selectedRune ||
+                  !runeToAddress
+                }
+                type="number"
+                className={cn(
+                  'w-full bg-[#232225] border-none disabled:text-[#737275] text-center',
+                  ''
+                )}
+                placeholder="Amount"
+                value={runeAmount}
+                onChange={(e) => setRuneAmount(e.target.value)}
+              />
+              <Button
+                disabled={
+                  isMissingWallet ||
+                  !isConnected ||
+                  !selectedRune ||
+                  !runeToAddress ||
+                  !runeAmount
+                }
+                className={'w-full bg-[#232225] disabled:text-[#737275]'}
+                onClick={sendRune}
+              >
+                Send Rune
+              </Button>
+            </div>
           </div>
         </div>
       </CardContent>

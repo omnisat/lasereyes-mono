@@ -265,10 +265,10 @@ export default class MagicEdenProvider extends WalletProvider {
     broadcast?: boolean | undefined
   ): Promise<
     | {
-        signedPsbtHex: string | undefined
-        signedPsbtBase64: string | undefined
-        txId?: string | undefined
-      }
+      signedPsbtHex: string | undefined
+      signedPsbtBase64: string | undefined
+      txId?: string | undefined
+    }
     | undefined
   > {
     console.log('signPsbt', psbtBase64, _finalize, broadcast)
@@ -369,19 +369,19 @@ export default class MagicEdenProvider extends WalletProvider {
 
     if (_finalize || broadcast) {
       signedPsbt.finalizeAllInputs()
-      const signedTx = signedPsbt.extractTransaction()
-      signedPsbtHex = signedTx.toHex()
-      if (broadcast) {
-        txId = await this.pushPsbt(signedPsbtHex)
-        return {
-          signedPsbtHex,
-          signedPsbtBase64,
-          txId,
-        }
-      }
+      // const signedTx = signedPsbt.extractTransaction()
+      // signedPsbtHex = signedTx.toHex()
+      // if (broadcast) {
+      //   txId = await this.pushPsbt(signedPsbtHex)
+      //   return {
+      //     signedPsbtHex,
+      //     signedPsbtBase64,
+      //     txId,
+      //   }
+      // }
 
       return {
-        signedPsbtHex,
+        signedPsbtHex: signedPsbt.toHex(),
         signedPsbtBase64,
         txId,
       }
