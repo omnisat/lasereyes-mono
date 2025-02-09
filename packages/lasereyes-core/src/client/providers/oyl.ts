@@ -147,10 +147,10 @@ export default class OylProvider extends WalletProvider {
     broadcast?: boolean | undefined
   ): Promise<
     | {
-        signedPsbtHex: string | undefined
-        signedPsbtBase64: string | undefined
-        txId?: string | undefined
-      }
+      signedPsbtHex: string | undefined
+      signedPsbtBase64: string | undefined
+      txId?: string | undefined
+    }
     | undefined
   > {
     const { psbt, txid } = await this.library.signPsbt({
@@ -186,7 +186,7 @@ export default class OylProvider extends WalletProvider {
   }
 
   async requestAccounts(): Promise<string[]> {
-    return await this.library.requestAccounts()
+    return [this.$store.get().address, this.$store.get().paymentAddress]
   }
 
   async switchNetwork(): Promise<void> {
