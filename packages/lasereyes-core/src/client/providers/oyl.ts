@@ -171,7 +171,11 @@ export default class OylProvider extends WalletProvider {
   }
 
   async getPublicKey() {
-    return await this.library?.getPublicKey()
+    const { nativeSegwit, taproot } = await this.library.getAddresses()
+    if (!nativeSegwit || !taproot) throw new Error('No accounts found')
+    this.$store.setKey('publicKey', taproot.publicKey)
+    this.$store.setKey('paymentPublicKey', nativeSegwit.publicKey)
+    return taproot.publicKey
   }
   async getBalance() {
     const { total } = await this.library.getBalance()
