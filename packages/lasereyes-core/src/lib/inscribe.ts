@@ -180,7 +180,6 @@ export const getCommitPsbt = async ({
     let counter = 0
     for await (const utxo of filteredUtxos) {
       const paymentAddressType = getAddressType(paymentAddress, network)
-      console.log({ paymentAddressType })
       psbt.addInput({
         hash: utxo.txid,
         index: utxo.vout,
