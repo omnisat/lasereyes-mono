@@ -9,14 +9,18 @@ import {
   LeatherRequestSignResponse,
   SignPsbtRequestParams,
 } from '../../types'
-import { getBTCBalance } from '../../lib/helpers'
+import { getBTCBalance, isMainnetNetwork } from '../../lib/helpers'
 import { LEATHER, P2TR, P2WPKH } from '../../constants/wallets'
 import { listenKeys, MapStore } from 'nanostores'
 import { persistentMap } from '@nanostores/persistent'
 import { LaserEyesStoreType } from '../types'
 import { SIGNET, TESTNET, TESTNET4 } from '../../constants'
 import { RpcErrorCode } from 'sats-connect'
-import { keysToPersist, PersistedKey } from '../utils'
+import {
+  handleStateChangePersistence,
+  keysToPersist,
+  PersistedKey,
+} from '../utils'
 
 const LEATHER_WALLET_PERSISTENCE_KEY = 'LEATHER_CONNECTED_WALLET_STATE'
 
@@ -46,8 +50,15 @@ export default class LeatherProvider extends WalletProvider {
   restorePersistedValues() {
     const vals = this.$valueStore.get()
     for (const key of keysToPersist) {
+      if (key === 'balance') {
+        this.$store.setKey(key, BigInt(vals[key]))
+      }
       this.$store.setKey(key, vals[key])
     }
+    this.$store.setKey(
+      'accounts',
+      [vals.address, vals.paymentAddress].filter(Boolean)
+    )
   }
 
   watchStateChange(
@@ -55,16 +66,12 @@ export default class LeatherProvider extends WalletProvider {
     _: LaserEyesStoreType | undefined,
     changedKey: keyof LaserEyesStoreType | undefined
   ) {
-    if (changedKey && newState.provider === LEATHER) {
-      if (changedKey === 'balance') {
-        this.$valueStore.setKey('balance', newState.balance?.toString() ?? '')
-      } else if ((keysToPersist as readonly string[]).includes(changedKey)) {
-        this.$valueStore.setKey(
-          changedKey as PersistedKey,
-          newState[changedKey]?.toString() ?? ''
-        )
-      }
-    }
+    handleStateChangePersistence(
+      LEATHER,
+      newState,
+      changedKey,
+      this.$valueStore
+    )
   }
 
   initialize() {
@@ -107,6 +114,20 @@ export default class LeatherProvider extends WalletProvider {
   }
 
   async connect(_: ProviderType): Promise<void> {
+    const { address, paymentAddress } = this.$valueStore!.get()
+
+    if (address) {
+      if (address.startsWith('tb1') && isMainnetNetwork(this.network)) {
+        this.disconnect()
+      } else {
+        this.restorePersistedValues()
+        getBTCBalance(paymentAddress, this.network).then((totalBalance) => {
+          this.$store.setKey('balance', totalBalance)
+        })
+        return
+      }
+    }
+    
     if (!this.library) throw new Error("Leather isn't installed")
     const getAddressesResponse: LeatherRPCResponse =
       await this.library.request('getAddresses')
@@ -144,8 +165,6 @@ export default class LeatherProvider extends WalletProvider {
     this.$store.setKey('paymentAddress', segwitAddress.address)
     this.$store.setKey('publicKey', taprootAddress.publicKey)
     this.$store.setKey('paymentPublicKey', segwitAddress.publicKey)
-    this.$store.setKey('provider', LEATHER)
-    this.$store.setKey('connected', true)
   }
 
   async getNetwork() {

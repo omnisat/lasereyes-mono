@@ -105,8 +105,6 @@ export default class UnisatProvider extends WalletProvider {
     this.$store.setKey('paymentAddress', unisatAccounts[0])
     this.$store.setKey('publicKey', unisatPubKey)
     this.$store.setKey('paymentPublicKey', unisatPubKey)
-    this.$store.setKey('provider', UNISAT)
-    this.$store.setKey('connected', true)
   }
 
   async getNetwork() {

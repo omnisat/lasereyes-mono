@@ -8,7 +8,11 @@ import {
   getBTCBalance,
   isMainnetNetwork,
 } from '../../lib/helpers'
-import { keysToPersist, PersistedKey } from '../utils'
+import {
+  handleStateChangePersistence,
+  keysToPersist,
+  PersistedKey,
+} from '../utils'
 import { persistentMap } from '@nanostores/persistent'
 import { LaserEyesStoreType, SparrowWalletProvider } from '../types'
 import { DefaultSparrowWalletProvider } from '../helpers/sparrow'
@@ -82,23 +86,26 @@ export default class SparrowProvider extends WalletProvider {
     _: LaserEyesStoreType | undefined,
     changedKey: keyof LaserEyesStoreType | undefined
   ) {
-    if (changedKey && newState.provider === SPARROW) {
-      if (changedKey === 'balance') {
-        this.$valueStore.setKey('balance', newState.balance?.toString() ?? '')
-      } else if ((keysToPersist as readonly string[]).includes(changedKey)) {
-        this.$valueStore.setKey(
-          changedKey as PersistedKey,
-          newState[changedKey]?.toString() ?? ''
-        )
-      }
-    }
+    handleStateChangePersistence(
+      SPARROW,
+      newState,
+      changedKey,
+      this.$valueStore
+    )
   }
 
   restorePersistedValues() {
     const vals = this.$valueStore.get()
     for (const key of keysToPersist) {
+      if (key === 'balance') {
+        this.$store.setKey(key, BigInt(vals[key]))
+      }
       this.$store.setKey(key, vals[key])
     }
+    this.$store.setKey(
+      'accounts',
+      [vals.address, vals.paymentAddress].filter(Boolean)
+    )
   }
 
   dispose() {
@@ -114,8 +121,6 @@ export default class SparrowProvider extends WalletProvider {
           this.disconnect()
         } else {
           this.restorePersistedValues()
-          this.$store.setKey('provider', SPARROW)
-          this.$store.setKey('connected', true)
           return
         }
       }
@@ -135,8 +140,8 @@ export default class SparrowProvider extends WalletProvider {
       this.$store.setKey('publicKey', publicKey)
       this.$store.setKey('paymentPublicKey', publicKey)
     } catch (error) {
-      this.disconnect()
-      console.error('Error during connect:', error)
+      console.error('Error during sparrow connect:', error)
+      throw error
     }
   }
 
