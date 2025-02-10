@@ -1,12 +1,8 @@
 import * as bitcoin from 'bitcoinjs-lib'
 import * as ecc2 from '@bitcoinerlab/secp256k1'
-import {
-  getBitcoinNetwork,
-} from './helpers'
+import { getBitcoinNetwork } from './helpers'
 import * as bip39 from 'bip39'
-import {
-  NetworkType,
-} from '../types'
+import { NetworkType } from '../types'
 import { BIP32Factory, BIP32Interface } from 'bip32'
 import { getTransactionMempoolSpace } from './mempool-space'
 import { P2PKH, P2SH_P2WPKH, P2SH, P2WPKH, P2WSH, P2TR } from '../constants'
@@ -21,7 +17,6 @@ export async function generatePrivateKey(network: NetworkType) {
   const root: BIP32Interface = bip32.fromSeed(seed, getBitcoinNetwork(network))
   return root?.derivePath("m/44'/0'/0'/0/0").privateKey
 }
-
 
 export const getAddressType = (
   address: string,
@@ -60,7 +55,6 @@ export function getPublicKeyHash(
   const decoded = bitcoin.address.toOutputScript(address, btcNetwork)
   return decoded
 }
-
 
 export function getRedeemScript(
   paymentPublicKey: string,

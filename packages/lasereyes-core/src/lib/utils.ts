@@ -9,7 +9,6 @@ export const isHex = (str: string): boolean => {
   return hexRegex.test(str)
 }
 
-
 export const encodeVarint = (bigIntValue: any) => {
   const bufferArray = []
   let num = bigIntValue

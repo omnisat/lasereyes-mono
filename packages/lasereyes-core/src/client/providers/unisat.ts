@@ -4,6 +4,7 @@ import { getNetworkForUnisat, getUnisatNetwork } from '../../constants/networks'
 import { NetworkType, ProviderType } from '../../types'
 import { UNISAT } from '../../constants/wallets'
 import { listenKeys } from 'nanostores'
+import { SignMessageOptions } from '../types'
 
 export default class UnisatProvider extends WalletProvider {
   public get library(): any | undefined {
@@ -125,8 +126,13 @@ export default class UnisatProvider extends WalletProvider {
     return txId
   }
 
-  async signMessage(message: string, _?: string | undefined): Promise<string> {
-    return await this.library?.signMessage(message)
+  override async signMessage(
+    message: string,
+    options?: SignMessageOptions
+  ): Promise<string> {
+    const protocol =
+      options?.protocol === 'bip322' ? 'bip322-simple' : options?.protocol
+    return await this.library?.signMessage(message, protocol)
   }
 
   async signPsbt(

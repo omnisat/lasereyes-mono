@@ -1,5 +1,5 @@
 import { encodeRunestone, RunestoneSpec } from '@magiceden-oss/runestone-lib'
-import { encodeVarint } from '../utils'
+import { encodeVarint } from './utils'
 
 export const createRuneMintScript = ({
   runeId,

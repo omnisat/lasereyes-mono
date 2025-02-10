@@ -10,7 +10,7 @@ import {
 import { OYL } from '../../constants/wallets'
 import { listenKeys, MapStore } from 'nanostores'
 import { persistentMap } from '@nanostores/persistent'
-import { LaserEyesStoreType } from '../types'
+import { LaserEyesStoreType, SignMessageOptions } from '../types'
 import {
   handleStateChangePersistence,
   keysToPersist,
@@ -150,11 +150,15 @@ export default class OylProvider extends WalletProvider {
     // @ts-ignore
     return psbt.txId
   }
-  async signMessage(message: string, toSignAddress?: string): Promise<string> {
-    const tempAddy = toSignAddress || this.$store.get().paymentAddress
+  async signMessage(
+    message: string,
+    options?: SignMessageOptions
+  ): Promise<string> {
+    const tempAddy = options?.toSignAddress || this.$store.get().paymentAddress
     const response = await this.library.signMessage({
       address: tempAddy,
       message,
+      protocol: options?.protocol,
     })
     return response.signature
   }

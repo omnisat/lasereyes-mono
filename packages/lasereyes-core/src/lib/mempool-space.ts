@@ -1,9 +1,7 @@
-import axios from "axios"
-import { MAINNET } from "../constants"
-import { NetworkType, MempoolTransactionResponse } from "../types"
-import { getMempoolSpaceUrl } from "./urls"
-
-
+import axios from 'axios'
+import { MAINNET } from '../constants'
+import { NetworkType, MempoolTransactionResponse } from '../types'
+import { getMempoolSpaceUrl } from './urls'
 
 export async function getTransactionMempoolSpace(
   txId: string,
@@ -31,7 +29,9 @@ export async function getRawTransactionMempoolSpace(
   }
 }
 
-export const getRecommendedFeesMempoolSpace = async (network: NetworkType): Promise<{
+export const getRecommendedFeesMempoolSpace = async (
+  network: NetworkType
+): Promise<{
   fastestFee: number
   halfHourFee: number
   hourFee: number

@@ -13,6 +13,7 @@ import {
   Protocol,
   ProviderType,
   RuneSendArgs,
+  SignMessageOptions,
 } from '@omnisat/lasereyes-core'
 
 export default function LaserEyesProvider({
@@ -50,7 +51,8 @@ export default function LaserEyesProvider({
   )
   const getMetaBalances = useCallback(
     async (protocol: Protocol) =>
-      await client?.getMetaBalances(protocol) ?? defaultMethods.getMetaBalances(),
+      (await client?.getMetaBalances(protocol)) ??
+      defaultMethods.getMetaBalances(),
     [client]
   )
   const getInscriptions = useCallback(
@@ -72,9 +74,22 @@ export default function LaserEyesProvider({
     [client]
   )
   const signMessage = useCallback(
-    async (message: string, toSignAddress?: string) =>
-      (await client?.signMessage(message, toSignAddress)) ??
-      defaultMethods.signMessage(),
+    async (
+      message: string,
+      toSignAddressOrOptions?: string | SignMessageOptions
+    ) => {
+      let options: SignMessageOptions = {}
+      if (typeof toSignAddressOrOptions === 'string') {
+        options = { toSignAddress: toSignAddressOrOptions }
+      } else if (toSignAddressOrOptions) {
+        options = toSignAddressOrOptions
+      }
+
+      return (
+        (await client?.signMessage(message, options)) ??
+        defaultMethods.signMessage()
+      )
+    },
     [client]
   )
   const requestAccounts = useCallback(
@@ -133,7 +148,7 @@ export default function LaserEyesProvider({
       signPsbt,
       switchNetwork,
       inscribe,
-      send
+      send,
     }
   }, [
     client,
@@ -141,11 +156,13 @@ export default function LaserEyesProvider({
     disconnect,
     getBalance,
     getInscriptions,
+    getMetaBalances,
     getNetwork,
     getPublicKey,
     inscribe,
     pushPsbt,
     requestAccounts,
+    send,
     sendBTC,
     signMessage,
     signPsbt,

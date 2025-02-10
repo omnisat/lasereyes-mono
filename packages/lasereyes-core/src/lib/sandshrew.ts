@@ -1,11 +1,20 @@
-import axios from "axios"
-import { OrdAddress, OrdAddressResponse, OrdOutputs, OrdRune, RuneBalance } from "../types/ord"
-import { EsploraTx, SingleRuneOutpoint } from "../types/sandshrew"
-import { getPublicKeyHash } from "./btc"
-import { MAINNET } from "../constants"
-export const SANDSHREW_URL: string = "https://mainnet.sandshrew.io/v1/lasereyes"
+import axios from 'axios'
+import {
+  OrdAddress,
+  OrdAddressResponse,
+  OrdOutputs,
+  OrdRune,
+  RuneBalance,
+} from '../types/ord'
+import { EsploraTx, SingleRuneOutpoint } from '../types/sandshrew'
+import { getPublicKeyHash } from './btc'
+import { MAINNET } from '../constants'
+export const SANDSHREW_URL: string = 'https://mainnet.sandshrew.io/v1/lasereyes'
 
-export const callSandshrewRPC = async (method: string, params: string | any) => {
+export const callSandshrewRPC = async (
+  method: string,
+  params: string | any
+) => {
   const data = JSON.stringify({
     jsonrpc: '2.0',
     id: method,
@@ -31,7 +40,9 @@ export const callSandshrewRPC = async (method: string, params: string | any) => 
 
 export const getOrdAddress = async (address: string) => {
   try {
-    const response = await callSandshrewRPC('ord_address', [address]) as OrdAddressResponse
+    const response = (await callSandshrewRPC('ord_address', [
+      address,
+    ])) as OrdAddressResponse
     return response.result as OrdAddress
   } catch (e) {
     throw e
@@ -67,34 +78,36 @@ export const getTxInfo = async (txId: string): Promise<EsploraTx> => {
 
 export const batchOrdOutput = async ({
   outpoints,
-  rune_name
+  rune_name,
 }: {
   outpoints: string[]
   rune_name: string
 }): Promise<OrdOutputs[]> => {
-  const MAX_OUTPOINTS_PER_CALL = 1000;
-  const ordOutputs: OrdOutputs[] = [];
+  const MAX_OUTPOINTS_PER_CALL = 1000
+  const ordOutputs: OrdOutputs[] = []
   for (let i = 0; i < outpoints.length; i += MAX_OUTPOINTS_PER_CALL) {
-    const batch = outpoints.slice(i, i + MAX_OUTPOINTS_PER_CALL);
+    const batch = outpoints.slice(i, i + MAX_OUTPOINTS_PER_CALL)
     const multiCall = batch.map((outpoint) => {
-      return ["ord_output", [outpoint]];
-    });
+      return ['ord_output', [outpoint]]
+    })
 
-    const { result } = await callSandshrewRPC("sandshrew_multicall", multiCall);
+    const { result } = await callSandshrewRPC('sandshrew_multicall', multiCall)
     for (let i = 0; i < result.length; i++) {
-      result[i].result["output"] = batch[i];
+      result[i].result['output'] = batch[i]
     }
 
-    const filteredResult = result.filter((output: OrdOutputs) => Object.keys(output.result.runes).includes(rune_name));
-    ordOutputs.push(...filteredResult);
+    const filteredResult = result.filter((output: OrdOutputs) =>
+      Object.keys(output.result.runes).includes(rune_name)
+    )
+    ordOutputs.push(...filteredResult)
   }
-  return ordOutputs;
+  return ordOutputs
 }
 
 export const getAddressRunesBalances = async (address: string) => {
   try {
     const response = await getOrdAddress(address)
-    const runesData = response.runes_balances;
+    const runesData = response.runes_balances
     if (!runesData) {
       throw new Error('No runes data found')
     }
@@ -103,11 +116,11 @@ export const getAddressRunesBalances = async (address: string) => {
       name: rune[0],
       balance: rune[1],
       symbol: rune[2],
-    })) as RuneBalance[];
+    })) as RuneBalance[]
   } catch (error) {
-    console.error("Error fetching ord address:", error);
+    console.error('Error fetching ord address:', error)
   }
-};
+}
 
 export const mapRuneBalances = async ({
   ordOutputs,
@@ -115,39 +128,41 @@ export const mapRuneBalances = async ({
   ordOutputs: OrdOutputs[]
 }): Promise<SingleRuneOutpoint[]> => {
   try {
-    const runeOutpoints: SingleRuneOutpoint[] = [];
+    const runeOutpoints: SingleRuneOutpoint[] = []
     for (let i = 0; i < ordOutputs.length; i++) {
-      const ordOutput = ordOutputs[i];
-      const { result } = ordOutput;
-      if (!result.output?.split(":")) {
+      const ordOutput = ordOutputs[i]
+      const { result } = ordOutput
+      if (!result.output?.split(':')) {
         throw new Error('No output found')
       }
 
-      const { output, address, runes } = result;
+      const { output, address, runes } = result
       const singleRuneOutpoint: SingleRuneOutpoint = {
         output,
         wallet_addr: address,
-        script: "",
+        script: '',
         balances: [],
         decimals: [],
         rune_ids: [],
         value: result.value,
-      };
+      }
 
-      const [txId, txIndex] = output.split(":");
-      console.log(txId, txIndex, output);
-      singleRuneOutpoint["script"] = Buffer.from(getPublicKeyHash(address, MAINNET)).toString("hex");
-      if (typeof runes === "object" && !Array.isArray(runes)) {
+      const [txId, txIndex] = output.split(':')
+      console.log(txId, txIndex, output)
+      singleRuneOutpoint['script'] = Buffer.from(
+        getPublicKeyHash(address, MAINNET)
+      ).toString('hex')
+      if (typeof runes === 'object' && !Array.isArray(runes)) {
         for (const rune in runes) {
-          singleRuneOutpoint.balances.push(runes[rune].amount);
-          singleRuneOutpoint.decimals.push(runes[rune].divisibility);
-          singleRuneOutpoint.rune_ids.push((await getRuneByName(rune)).id);
+          singleRuneOutpoint.balances.push(runes[rune].amount)
+          singleRuneOutpoint.decimals.push(runes[rune].divisibility)
+          singleRuneOutpoint.rune_ids.push((await getRuneByName(rune)).id)
         }
       }
 
-      runeOutpoints.push(singleRuneOutpoint);
+      runeOutpoints.push(singleRuneOutpoint)
     }
-    return runeOutpoints;
+    return runeOutpoints
   } catch (e) {
     throw e
   }

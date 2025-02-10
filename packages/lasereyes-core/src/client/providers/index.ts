@@ -1,6 +1,14 @@
 import { MapStore, WritableAtom } from 'nanostores'
 import { LaserEyesStoreType } from '../types'
-import { BTCSendArgs, Config, ContentType, NetworkType, Protocol, ProviderType, RuneSendArgs } from '../../types'
+import {
+  BTCSendArgs,
+  Config,
+  ContentType,
+  NetworkType,
+  Protocol,
+  ProviderType,
+  RuneSendArgs,
+} from '../../types'
 import { LaserEyesClient } from '..'
 import { inscribeContent } from '../../lib/inscribe'
 import { broadcastTx, getBTCBalance } from '../../lib/helpers'
@@ -38,7 +46,7 @@ export abstract class WalletProvider {
     this.initialize()
   }
 
-  disconnect(): void { }
+  disconnect(): void {}
 
   abstract initialize(): void
 
@@ -99,7 +107,10 @@ export abstract class WalletProvider {
 
   abstract sendBTC(to: string, amount: number): Promise<string>
 
-  abstract signMessage(message: string, toSignAddress?: string): Promise<string>
+  abstract signMessage(
+    message: string,
+    options?: { toSignAddress?: string }
+  ): Promise<string>
 
   abstract signPsbt(
     tx: string,
@@ -109,10 +120,10 @@ export abstract class WalletProvider {
     broadcast?: boolean
   ): Promise<
     | {
-      signedPsbtHex: string | undefined
-      signedPsbtBase64: string | undefined
-      txId?: string
-    }
+        signedPsbtHex: string | undefined
+        signedPsbtBase64: string | undefined
+        txId?: string
+      }
     | undefined
   >
 
@@ -151,7 +162,7 @@ export abstract class WalletProvider {
           throw new Error('Unsupported network')
         }
 
-        const runeArgs = sendArgs as RuneSendArgs;
+        const runeArgs = sendArgs as RuneSendArgs
         if (!runeArgs.runeId || !runeArgs.amount || !runeArgs.toAddress) {
           throw new Error('Missing required parameters')
         }
@@ -165,7 +176,7 @@ export abstract class WalletProvider {
           paymentPublicKey: this.$store.get().paymentPublicKey,
           toAddress: runeArgs.toAddress,
           signPsbt: this.signPsbt.bind(this),
-          network
+          network,
         })
       default:
         throw new Error('Unsupported protocol')
