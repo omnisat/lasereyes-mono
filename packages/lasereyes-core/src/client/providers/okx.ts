@@ -15,7 +15,7 @@ import {
 } from '../..'
 import { listenKeys, MapStore } from 'nanostores'
 import { persistentMap } from '@nanostores/persistent'
-import { keysToPersist, PersistedKey } from '../utils'
+import { handleStateChangePersistence, keysToPersist, PersistedKey } from '../utils'
 
 const OKX_WALLET_PERSISTENCE_KEY = 'OKX_CONNECTED_WALLET_STATE'
 
@@ -56,8 +56,15 @@ export default class OkxProvider extends WalletProvider {
   restorePersistedValues() {
     const vals = this.$valueStore.get()
     for (const key of keysToPersist) {
+      if (key === 'balance') {
+        this.$store.setKey(key, BigInt(vals[key]))
+      }
       this.$store.setKey(key, vals[key])
     }
+    this.$store.setKey(
+      'accounts',
+      [vals.address, vals.paymentAddress].filter(Boolean)
+    )
   }
 
   watchStateChange(
@@ -65,16 +72,7 @@ export default class OkxProvider extends WalletProvider {
     _: LaserEyesStoreType | undefined,
     changedKey: keyof LaserEyesStoreType | undefined
   ) {
-    if (changedKey && newState.provider === OKX) {
-      if (changedKey === 'balance') {
-        this.$valueStore.setKey('balance', newState.balance?.toString() ?? '')
-      } else if ((keysToPersist as readonly string[]).includes(changedKey)) {
-        this.$valueStore.setKey(
-          changedKey as PersistedKey,
-          newState[changedKey]?.toString() ?? ''
-        )
-      }
-    }
+    handleStateChangePersistence(OKX, newState, changedKey, this.$valueStore)
   }
 
   initialize(): void {
@@ -127,8 +125,6 @@ export default class OkxProvider extends WalletProvider {
       this.$store.setKey('publicKey', okxAccounts.publicKey)
       this.$store.setKey('paymentPublicKey', okxAccounts.publicKey)
       this.$store.setKey('accounts', [okxAccounts])
-      this.$store.setKey('provider', OKX)
-      this.$store.setKey('connected', true)
     } catch (e) {
       throw e
     }
