@@ -16,6 +16,7 @@ import {
 import { listenKeys, MapStore } from 'nanostores'
 import { persistentMap } from '@nanostores/persistent'
 import { handleStateChangePersistence, keysToPersist, PersistedKey } from '../utils'
+import { getBTCBalance, isMainnetNetwork } from '../../lib/helpers'
 
 const OKX_WALLET_PERSISTENCE_KEY = 'OKX_CONNECTED_WALLET_STATE'
 
@@ -116,6 +117,20 @@ export default class OkxProvider extends WalletProvider {
   }
 
   async connect(_: ProviderType): Promise<void> {
+    const { address, paymentAddress } = this.$valueStore!.get()
+
+    if (address) {
+      if (address.startsWith('tb1') && isMainnetNetwork(this.network)) {
+        this.disconnect()
+      } else {
+        this.restorePersistedValues()
+        getBTCBalance(paymentAddress, this.network).then((totalBalance) => {
+          this.$store.setKey('balance', totalBalance)
+        })
+        return
+      }
+    }
+    
     try {
       const okxAccounts = await this.library.connect()
       if (!okxAccounts) throw new Error('No accounts found')
