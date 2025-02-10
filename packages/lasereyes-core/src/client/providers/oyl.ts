@@ -1,12 +1,21 @@
 import * as bitcoin from 'bitcoinjs-lib'
 import { UNSUPPORTED_PROVIDER_METHOD_ERROR, WalletProvider } from '.'
 import { ProviderType, NetworkType } from '../../types'
-import { createSendBtcPsbt, isTestnetNetwork } from '../../lib/helpers'
+import {
+  createSendBtcPsbt,
+  getBTCBalance,
+  isMainnetNetwork,
+  isTestnetNetwork,
+} from '../../lib/helpers'
 import { OYL } from '../../constants/wallets'
 import { listenKeys, MapStore } from 'nanostores'
 import { persistentMap } from '@nanostores/persistent'
 import { LaserEyesStoreType } from '../types'
-import { keysToPersist, PersistedKey } from '../utils'
+import {
+  handleStateChangePersistence,
+  keysToPersist,
+  PersistedKey,
+} from '../utils'
 
 const OYL_WALLET_PERSISTENCE_KEY = 'OYL_CONNECTED_WALLET_STATE'
 
@@ -36,8 +45,15 @@ export default class OylProvider extends WalletProvider {
   restorePersistedValues() {
     const vals = this.$valueStore.get()
     for (const key of keysToPersist) {
+      if (key === 'balance') {
+        this.$store.setKey(key, BigInt(vals[key]))
+      }
       this.$store.setKey(key, vals[key])
     }
+    this.$store.setKey(
+      'accounts',
+      [vals.address, vals.paymentAddress].filter(Boolean)
+    )
   }
 
   watchStateChange(
@@ -45,16 +61,7 @@ export default class OylProvider extends WalletProvider {
     _: LaserEyesStoreType | undefined,
     changedKey: keyof LaserEyesStoreType | undefined
   ) {
-    if (changedKey && newState.provider === OYL) {
-      if (changedKey === 'balance') {
-        this.$valueStore.setKey('balance', newState.balance?.toString() ?? '')
-      } else if ((keysToPersist as readonly string[]).includes(changedKey)) {
-        this.$valueStore.setKey(
-          changedKey as PersistedKey,
-          newState[changedKey]?.toString() ?? ''
-        )
-      }
-    }
+    handleStateChangePersistence(OYL, newState, changedKey, this.$valueStore)
   }
 
   initialize() {
@@ -97,6 +104,20 @@ export default class OylProvider extends WalletProvider {
   }
 
   async connect(_: ProviderType): Promise<void> {
+    const { address, paymentAddress } = this.$valueStore!.get()
+
+    if (address) {
+      if (address.startsWith('tb1') && isMainnetNetwork(this.network)) {
+        this.disconnect()
+      } else {
+        this.restorePersistedValues()
+        getBTCBalance(paymentAddress, this.network).then((totalBalance) => {
+          this.$store.setKey('balance', totalBalance)
+        })
+        return
+      }
+    }
+
     if (!this.library) throw new Error("Oyl isn't installed")
     if (isTestnetNetwork(this.network)) {
       throw new Error(`${this.network} is not supported by Oyl`)
@@ -108,8 +129,6 @@ export default class OylProvider extends WalletProvider {
     this.$store.setKey('paymentAddress', nativeSegwit.address)
     this.$store.setKey('publicKey', taproot.publicKey)
     this.$store.setKey('paymentPublicKey', nativeSegwit.publicKey)
-    this.$store.setKey('provider', OYL)
-    this.$store.setKey('connected', true)
   }
 
   async getNetwork() {
@@ -171,7 +190,11 @@ export default class OylProvider extends WalletProvider {
   }
 
   async getPublicKey() {
-    return await this.library?.getPublicKey()
+    const { nativeSegwit, taproot } = await this.library.getAddresses()
+    if (!nativeSegwit || !taproot) throw new Error('No accounts found')
+    this.$store.setKey('publicKey', taproot.publicKey)
+    this.$store.setKey('paymentPublicKey', nativeSegwit.publicKey)
+    return taproot.publicKey
   }
   async getBalance() {
     const { total } = await this.library.getBalance()
@@ -186,7 +209,7 @@ export default class OylProvider extends WalletProvider {
   }
 
   async requestAccounts(): Promise<string[]> {
-    return await this.library.requestAccounts()
+    return [this.$store.get().address, this.$store.get().paymentAddress]
   }
 
   async switchNetwork(): Promise<void> {
