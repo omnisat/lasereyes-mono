@@ -105,6 +105,3 @@ export const createRuneSendScript = ({
   ])
   return script
 }
-
-
-

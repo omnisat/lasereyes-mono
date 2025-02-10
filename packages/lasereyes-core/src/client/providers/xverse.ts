@@ -18,6 +18,7 @@ import {
   SIGNET,
   FRACTAL_TESTNET,
   LaserEyesStoreType,
+  SignMessageOptions,
 } from '../..'
 import {
   findOrdinalsAddress,
@@ -28,7 +29,11 @@ import {
 } from '../../lib/helpers'
 import { MapStore, listenKeys } from 'nanostores'
 import { persistentMap } from '@nanostores/persistent'
-import { handleStateChangePersistence, keysToPersist, PersistedKey } from '../utils'
+import {
+  handleStateChangePersistence,
+  keysToPersist,
+  PersistedKey,
+} from '../utils'
 
 const XVERSE_WALLET_PERSISTENCE_KEY = 'XVERSE_CONNECTED_WALLET_STATE'
 export default class XVerseProvider extends WalletProvider {
@@ -211,13 +216,16 @@ export default class XVerseProvider extends WalletProvider {
 
   async signMessage(
     message: string,
-    toSignAddress?: string | undefined
+    { toSignAddress, protocol }: SignMessageOptions
   ): Promise<string> {
     const tempAddy = toSignAddress || this.$store.get().paymentAddress
     const response = await request('signMessage', {
       address: tempAddy,
       message,
-      protocol: MessageSigningProtocols.BIP322,
+      protocol:
+        protocol === 'ecdsa'
+          ? MessageSigningProtocols.ECDSA
+          : MessageSigningProtocols.BIP322,
     })
 
     if (response.status === 'success') {

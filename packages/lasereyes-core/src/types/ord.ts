@@ -1,5 +1,5 @@
 export interface OrdOutputs {
-  result: OrdOutput;
+  result: OrdOutput
 }
 
 export type OrdOutputRune = {
@@ -21,10 +21,10 @@ export interface OrdOutput {
 }
 
 export type RuneBalance = {
-  name: string;
-  balance: string;
-  symbol: string;
-};
+  name: string
+  balance: string
+  symbol: string
+}
 
 export type OrdAddressResponse = {
   jsonrpc: string

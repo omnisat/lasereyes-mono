@@ -1,5 +1,13 @@
 import { MapStore, WritableAtom, keepMount, listenKeys } from 'nanostores'
-import { BTCSendArgs, Config, ContentType, NetworkType, Protocol, ProviderType, RuneSendArgs } from '../types'
+import {
+  BTCSendArgs,
+  Config,
+  ContentType,
+  NetworkType,
+  Protocol,
+  ProviderType,
+  RuneSendArgs,
+} from '../types'
 import {
   LEATHER,
   MAGIC_EDEN,
@@ -18,7 +26,7 @@ import { WalletProvider } from './providers'
 import UnisatProvider from './providers/unisat'
 import { isBase64, isHex } from '../lib/utils'
 import * as bitcoin from 'bitcoinjs-lib'
-import { LaserEyesStoreType } from './types'
+import { LaserEyesStoreType, SignMessageOptions } from './types'
 import { triggerDOMShakeHack } from './utils'
 import XVerseProvider from './providers/xverse'
 import { WizzProvider } from './providers/wizz'
@@ -239,13 +247,13 @@ export class LaserEyesClient {
     }
   }
 
-  async signMessage(message: string, toSignAddress?: string) {
+  async signMessage(message: string, options?: SignMessageOptions) {
     if (!this.$store.get().provider) return
     if (this.$providerMap[this.$store.get().provider!]) {
       try {
         return await this.$providerMap[
           this.$store.get().provider!
-        ]?.signMessage(message, toSignAddress)
+        ]?.signMessage(message, options)
       } catch (error) {
         if (error instanceof Error) {
           if (error.message.toLowerCase().includes('not implemented')) {
@@ -406,7 +414,9 @@ export class LaserEyesClient {
         }
 
         const balances =
-          await this.$providerMap[this.$store.get().provider!]!.getMetaBalances(protocol)
+          await this.$providerMap[this.$store.get().provider!]!.getMetaBalances(
+            protocol
+          )
         // TODO: Decide if we want to store these balances
         // this.$store.setKey(`${protocol}Balances`, JSON.stringify(balances))
         return balances

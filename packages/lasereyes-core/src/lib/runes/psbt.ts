@@ -1,14 +1,19 @@
-
-import * as bitcoin from "bitcoinjs-lib"
-import { createRuneMintScript, createRuneSendScript } from "./scripts"
-import { getRecommendedFeesMempoolSpace } from "../mempool-space"
-import { MAINNET, P2SH, P2TR, } from "../../constants"
-import { getRuneOutpoints } from "./utils"
-import { broadcastTx, calculateValueOfUtxosGathered, estimateTxSize, getAddressUtxos, getBitcoinNetwork } from "../helpers"
-import { getRuneById } from "../sandshrew"
-import { NetworkType } from "../../types"
-import { getAddressType, getRedeemScript } from "../btc"
-import { toXOnly } from "bitcoinjs-lib/src/psbt/bip371"
+import * as bitcoin from 'bitcoinjs-lib'
+import { createRuneMintScript, createRuneSendScript } from './scripts'
+import { getRecommendedFeesMempoolSpace } from '../mempool-space'
+import { MAINNET, P2SH, P2TR } from '../../constants'
+import { getRuneOutpoints } from './utils'
+import {
+  broadcastTx,
+  calculateValueOfUtxosGathered,
+  estimateTxSize,
+  getAddressUtxos,
+  getBitcoinNetwork,
+} from '../helpers'
+import { getRuneById } from '../sandshrew'
+import { NetworkType } from '../../types'
+import { getAddressType, getRedeemScript } from '../btc'
+import { toXOnly } from 'bitcoinjs-lib/src/psbt/bip371'
 // import { getAddressType, getRedeemScript } from "../btc"
 // import { toXOnly } from 'bitcoinjs-lib/src/psbt/bip371'
 
@@ -39,10 +44,10 @@ export const sendRune = async ({
     network?: NetworkType
   ) => Promise<
     | {
-      signedPsbtHex: string | undefined
-      signedPsbtBase64: string | undefined
-      txId?: string
-    }
+        signedPsbtHex: string | undefined
+        signedPsbtBase64: string | undefined
+        txId?: string
+      }
     | undefined
   >
   network: NetworkType
@@ -56,7 +61,7 @@ export const sendRune = async ({
       toAddress,
       runeId,
       amount,
-      network
+      network,
     })
 
     if (!runeSendPsbt || !runeSendPsbt?.psbtHex) {
@@ -82,7 +87,6 @@ export const sendRune = async ({
   }
 }
 
-
 export const createRuneSendPsbt = async ({
   fromAddress,
   fromAddressPublicKey,
@@ -91,7 +95,7 @@ export const createRuneSendPsbt = async ({
   toAddress,
   runeId,
   amount,
-  network
+  network,
 }: {
   fromAddress: string
   fromAddressPublicKey: string
@@ -106,9 +110,12 @@ export const createRuneSendPsbt = async ({
   psbtHex: string
 }> => {
   try {
-    const { fastestFee: feeRate } = await getRecommendedFeesMempoolSpace(network)
+    const { fastestFee: feeRate } =
+      await getRecommendedFeesMempoolSpace(network)
     const utxos = await getAddressUtxos(fromPaymentAddress, network)
-    let sortedUtxos = utxos.sort((a: { value: number }, b: { value: number }) => b.value - a.value).filter((utxo: { value: number }) => utxo.value > 3000)
+    let sortedUtxos = utxos
+      .sort((a: { value: number }, b: { value: number }) => b.value - a.value)
+      .filter((utxo: { value: number }) => utxo.value > 3000)
     if (sortedUtxos.length === 0) {
       throw new Error('No utxos found')
     }
@@ -121,7 +128,7 @@ export const createRuneSendPsbt = async ({
     const amountGathered = calculateValueOfUtxosGathered(sortedUtxos)
 
     const minFee = estimateTxSize(outpoints.length, 2, 4)
-    const calculatedFee = minFee * feeRate < 250 ? 250 : minFee * (feeRate)
+    const calculatedFee = minFee * feeRate < 250 ? 250 : minFee * feeRate
     let finalFee = calculatedFee
 
     let counter = 0
@@ -146,7 +153,10 @@ export const createRuneSendPsbt = async ({
 
     const paymentAddressType = getAddressType(fromPaymentAddress, network)
     for (let i = 0; i < sortedUtxos.length; i++) {
-      const script = bitcoin.address.toOutputScript(fromPaymentAddress, getBitcoinNetwork(MAINNET))
+      const script = bitcoin.address.toOutputScript(
+        fromPaymentAddress,
+        getBitcoinNetwork(MAINNET)
+      )
       const utxo = sortedUtxos[i]
 
       if (paymentAddressType === P2TR) {
@@ -174,7 +184,7 @@ export const createRuneSendPsbt = async ({
         })
       }
 
-      if (paymentAddressType === "p2wpkh") {
+      if (paymentAddressType === 'p2wpkh') {
         psbt.addInput({
           hash: utxo.txid,
           index: utxo.vout,
@@ -198,8 +208,7 @@ export const createRuneSendPsbt = async ({
     psbt.addOutput(output)
 
     const inscriptionSats = 546
-    const changeAmount =
-      amountGathered - (finalFee + (inscriptionSats * 2))
+    const changeAmount = amountGathered - (finalFee + inscriptionSats * 2)
 
     psbt.addOutput({
       value: BigInt(inscriptionSats),
@@ -230,8 +239,9 @@ export const createRuneMintPsbt = async ({
   runeId: string
 }) => {
   try {
-    const network = "mainnet"
-    const { fastestFee: feeRate } = await getRecommendedFeesMempoolSpace(network)
+    const network = 'mainnet'
+    const { fastestFee: feeRate } =
+      await getRecommendedFeesMempoolSpace(network)
     const utxos = await getAddressUtxos(address, network)
 
     const minFee = 300
@@ -248,7 +258,10 @@ export const createRuneMintPsbt = async ({
     let psbt = new bitcoin.Psbt({ network: getBitcoinNetwork(network) })
 
     for (let i = 0; i < sortedUtxos.length; i++) {
-      const script = bitcoin.address.toOutputScript(address, getBitcoinNetwork(network))
+      const script = bitcoin.address.toOutputScript(
+        address,
+        getBitcoinNetwork(network)
+      )
       const utxo = sortedUtxos[i]
       psbt.addInput({
         hash: utxo.txid,
@@ -268,8 +281,7 @@ export const createRuneMintPsbt = async ({
     const output = { script: script, value: BigInt(0) }
     psbt.addOutput(output)
 
-    const changeAmount =
-      amountRetrieved - (finalFee + inscriptionSats)
+    const changeAmount = amountRetrieved - (finalFee + inscriptionSats)
 
     psbt.addOutput({
       value: BigInt(inscriptionSats),
