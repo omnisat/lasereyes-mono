@@ -1,12 +1,21 @@
 import * as bitcoin from 'bitcoinjs-lib'
 import { UNSUPPORTED_PROVIDER_METHOD_ERROR, WalletProvider } from '.'
 import { ProviderType, NetworkType } from '../../types'
-import { createSendBtcPsbt, isTestnetNetwork } from '../../lib/helpers'
+import {
+  createSendBtcPsbt,
+  getBTCBalance,
+  isMainnetNetwork,
+  isTestnetNetwork,
+} from '../../lib/helpers'
 import { OYL } from '../../constants/wallets'
 import { listenKeys, MapStore } from 'nanostores'
 import { persistentMap } from '@nanostores/persistent'
 import { LaserEyesStoreType } from '../types'
-import { handleStateChangePersistence, keysToPersist, PersistedKey } from '../utils'
+import {
+  handleStateChangePersistence,
+  keysToPersist,
+  PersistedKey,
+} from '../utils'
 
 const OYL_WALLET_PERSISTENCE_KEY = 'OYL_CONNECTED_WALLET_STATE'
 
@@ -52,12 +61,7 @@ export default class OylProvider extends WalletProvider {
     _: LaserEyesStoreType | undefined,
     changedKey: keyof LaserEyesStoreType | undefined
   ) {
-    handleStateChangePersistence(
-      OYL,
-      newState,
-      changedKey,
-      this.$valueStore
-    )
+    handleStateChangePersistence(OYL, newState, changedKey, this.$valueStore)
   }
 
   initialize() {
@@ -100,6 +104,20 @@ export default class OylProvider extends WalletProvider {
   }
 
   async connect(_: ProviderType): Promise<void> {
+    const { address, paymentAddress } = this.$valueStore!.get()
+
+    if (address) {
+      if (address.startsWith('tb1') && isMainnetNetwork(this.network)) {
+        this.disconnect()
+      } else {
+        this.restorePersistedValues()
+        getBTCBalance(paymentAddress, this.network).then((totalBalance) => {
+          this.$store.setKey('balance', totalBalance)
+        })
+        return
+      }
+    }
+
     if (!this.library) throw new Error("Oyl isn't installed")
     if (isTestnetNetwork(this.network)) {
       throw new Error(`${this.network} is not supported by Oyl`)
@@ -148,10 +166,10 @@ export default class OylProvider extends WalletProvider {
     broadcast?: boolean | undefined
   ): Promise<
     | {
-      signedPsbtHex: string | undefined
-      signedPsbtBase64: string | undefined
-      txId?: string | undefined
-    }
+        signedPsbtHex: string | undefined
+        signedPsbtBase64: string | undefined
+        txId?: string | undefined
+      }
     | undefined
   > {
     const { psbt, txid } = await this.library.signPsbt({
