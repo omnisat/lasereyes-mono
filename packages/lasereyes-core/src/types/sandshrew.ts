@@ -1,12 +1,12 @@
 export interface SingleRuneOutpoint {
-  output: string;
-  wallet_addr: string;
-  balances: number[];
-  decimals: number[];
-  rune_ids: string[];
-  script: string;
-  value: number;
-};
+  output: string
+  wallet_addr: string
+  balances: number[]
+  decimals: number[]
+  rune_ids: string[]
+  script: string
+  value: number
+}
 
 export interface EsploraTx {
   txid: string

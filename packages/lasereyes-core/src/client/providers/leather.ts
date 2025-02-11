@@ -13,7 +13,7 @@ import { getBTCBalance, isMainnetNetwork } from '../../lib/helpers'
 import { LEATHER, P2TR, P2WPKH } from '../../constants/wallets'
 import { listenKeys, MapStore } from 'nanostores'
 import { persistentMap } from '@nanostores/persistent'
-import { LaserEyesStoreType } from '../types'
+import { LaserEyesStoreType, SignMessageOptions } from '../types'
 import { SIGNET, TESTNET, TESTNET4 } from '../../constants'
 import { RpcErrorCode } from 'sats-connect'
 import {
@@ -127,7 +127,7 @@ export default class LeatherProvider extends WalletProvider {
         return
       }
     }
-    
+
     if (!this.library) throw new Error("Leather isn't installed")
     const getAddressesResponse: LeatherRPCResponse =
       await this.library.request('getAddresses')
@@ -190,7 +190,13 @@ export default class LeatherProvider extends WalletProvider {
       }
     }
   }
-  async signMessage(message: string, toSignAddress?: string): Promise<string> {
+  async signMessage(
+    message: string,
+    options?: SignMessageOptions
+  ): Promise<string> {
+    const toSignAddress = options?.toSignAddress
+    const protocol = options?.protocol
+    if (protocol === 'ecdsa') throw new Error("Leather doesn't support ECDSA message signing")
     const paymentType =
       toSignAddress === this.$store.get().address ? P2TR : P2WPKH
     if (

@@ -106,12 +106,12 @@ export type ContentType =
 
 export type Config = {
   network:
-  | typeof MAINNET
-  | typeof TESTNET
-  | typeof TESTNET4
-  | typeof SIGNET
-  | typeof FRACTAL_MAINNET
-  | typeof FRACTAL_TESTNET
+    | typeof MAINNET
+    | typeof TESTNET
+    | typeof TESTNET4
+    | typeof SIGNET
+    | typeof FRACTAL_MAINNET
+    | typeof FRACTAL_TESTNET
 }
 
 export type SendArgs = BTCSendArgs | RuneSendArgs
@@ -132,7 +132,6 @@ export interface RuneSendArgs {
   amount: number
   network: NetworkType
 }
-
 
 export interface OYLBalanceResponse {
   brc20s: {

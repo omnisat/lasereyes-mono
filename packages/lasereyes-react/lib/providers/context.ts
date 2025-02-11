@@ -10,8 +10,8 @@ import { MapStore, WritableAtom } from 'nanostores'
 
 const { $store, $network } = createStores()
 export const defaultMethods = {
-  connect: async () => { },
-  disconnect: () => { },
+  connect: async () => {},
+  disconnect: () => {},
   getBalance: async () => '',
   getMetaBalances: async () => [],
   getInscriptions: async () => [],
@@ -25,9 +25,9 @@ export const defaultMethods = {
     signedPsbtBase64: '',
     signedPsbtHex: '',
   }),
-  switchNetwork: async () => { },
+  switchNetwork: async () => {},
   inscribe: async () => '',
-  send: async () => ''
+  send: async () => '',
 }
 export const LaserEyesStoreContext = createContext<{
   $store: MapStore<LaserEyesStoreType>

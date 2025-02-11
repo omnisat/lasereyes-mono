@@ -49,7 +49,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from '@/components/ui/select'
 
 const WalletCard = ({
   wallet,
@@ -68,10 +68,10 @@ const WalletCard = ({
   setSignedPsbt: (
     psbt:
       | {
-        signedPsbtHex: string
-        signedPsbtBase64: string
-        txId?: string
-      }
+          signedPsbtHex: string
+          signedPsbtBase64: string
+          txId?: string
+        }
       | undefined
   ) => void
 }) => {
@@ -105,7 +105,7 @@ const WalletCard = ({
     send,
     pushPsbt,
     switchNetwork,
-    getMetaBalances
+    getMetaBalances,
   } = useLaserEyes()
 
   const [hasError, setHasError] = useState(false)
@@ -120,16 +120,22 @@ const WalletCard = ({
     'Inscribed 100% clientside with Laser Eyes'
   )
 
-  const [runes, setRunes] = useState<{
-    balance: string;
-    symbol: string;
-    name: string;
-  }[] | undefined>()
-  const [selectedRune, setSelectedRune] = useState<{
-    balance: string;
-    symbol: string;
-    name: string;
-  } | undefined>(undefined);
+  const [runes, setRunes] = useState<
+    | {
+        balance: string
+        symbol: string
+        name: string
+      }[]
+    | undefined
+  >()
+  const [selectedRune, setSelectedRune] = useState<
+    | {
+        balance: string
+        symbol: string
+        name: string
+      }
+    | undefined
+  >(undefined)
   const [runeToAddress, setRuneToAddress] = useState<string>('')
   const [runeAmount, setRuneAmount] = useState<string>('')
 
@@ -167,12 +173,12 @@ const WalletCard = ({
         paymentAddress,
         paymentPublicKey,
         network as
-        | typeof MAINNET
-        | typeof TESTNET
-        | typeof TESTNET4
-        | typeof SIGNET
-        | typeof FRACTAL_MAINNET
-        | typeof FRACTAL_TESTNET
+          | typeof MAINNET
+          | typeof TESTNET
+          | typeof TESTNET4
+          | typeof SIGNET
+          | typeof FRACTAL_MAINNET
+          | typeof FRACTAL_TESTNET
       )
         .then((psbt) => {
           if (psbt && psbt.toHex() !== unsigned) {
@@ -207,7 +213,7 @@ const WalletCard = ({
 
   useEffect(() => {
     if (address) {
-      getMetaBalances("runes").then(setRunes)
+      getMetaBalances('runes').then(setRunes)
       setRuneToAddress(address)
     }
   }, [address])
@@ -435,7 +441,6 @@ const WalletCard = ({
     }
   }, [inscribe, inscriptionText, network])
 
-
   const sendRune = async () => {
     try {
       if (!selectedRune) throw new Error('No rune selected')
@@ -443,7 +448,7 @@ const WalletCard = ({
       if (!runeToAddress) throw new Error('No destination address provided')
       if (!runeAmount) throw new Error('No amount specified')
 
-      const txid = await send("runes", {
+      const txid = await send('runes', {
         fromAddress: address,
         toAddress: runeToAddress,
         amount: Number(runeAmount),
@@ -658,22 +663,15 @@ const WalletCard = ({
 
             <div className={'border-b border-2 border-[#232225] w-full my-2'} />
             <div className="flex flex-col w-full gap-2">
-
               <Select
                 onValueChange={(value) => {
-                  const rune = runes?.find((r) => r.symbol === value);
-                  setSelectedRune(rune);
+                  const rune = runes?.find((r) => r.symbol === value)
+                  setSelectedRune(rune)
                 }}
-                disabled={
-                  isMissingWallet ||
-                  !isConnected
-                }
+                disabled={isMissingWallet || !isConnected}
               >
                 <SelectTrigger
-                  disabled={
-                    isMissingWallet ||
-                    !isConnected
-                  }
+                  disabled={isMissingWallet || !isConnected}
                   className={cn(
                     'w-full bg-[#232225] border-none disabled:text-[#737275] text-center',
                     ''
@@ -694,11 +692,7 @@ const WalletCard = ({
                 </SelectContent>
               </Select>
               <Input
-                disabled={
-                  isMissingWallet ||
-                  !isConnected ||
-                  !selectedRune
-                }
+                disabled={isMissingWallet || !isConnected || !selectedRune}
                 className={cn(
                   'w-full bg-[#232225] border-none disabled:text-[#737275] text-center',
                   ''

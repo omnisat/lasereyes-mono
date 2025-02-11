@@ -173,7 +173,6 @@ export async function createSendBtcPsbt(
   }
 }
 
-
 export function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
@@ -197,7 +196,6 @@ export async function broadcastTx(
   )
   return response.data
 }
-
 
 export const isTestnetNetwork = (network: NetworkType) => {
   return network === TESTNET || network === TESTNET4 || network === SIGNET

@@ -22,3 +22,8 @@ export interface SparrowWalletProvider {
   signMessage(message: string): Promise<string>
   signPsbt(psbtBase64: string): Promise<string>
 }
+
+export type SignMessageOptions = {
+  toSignAddress?: string
+  protocol?: 'bip322' | 'ecdsa'
+}

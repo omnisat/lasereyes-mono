@@ -17,6 +17,7 @@ import {
   MAINNET,
   NetworkType,
   ProviderType,
+  SignMessageOptions,
 } from '../..'
 import {
   findOrdinalsAddress,
@@ -226,10 +227,11 @@ export default class MagicEdenProvider extends WalletProvider {
 
   async signMessage(
     message: string,
-    toSignAddress?: string | undefined
+    options?: SignMessageOptions
   ): Promise<string> {
     try {
-      const tempAddy = toSignAddress || this.$store.get().paymentAddress
+      const tempAddy =
+        options?.toSignAddress || this.$store.get().paymentAddress
       let signedMessage: string = ''
 
       await signMessage({
@@ -240,7 +242,10 @@ export default class MagicEdenProvider extends WalletProvider {
           },
           address: tempAddy,
           message: message,
-          protocol: MessageSigningProtocols.BIP322,
+          protocol:
+            options?.protocol === 'ecdsa'
+              ? MessageSigningProtocols.ECDSA
+              : MessageSigningProtocols.BIP322,
         },
         onFinish: (response) => {
           signedMessage = response
@@ -265,10 +270,10 @@ export default class MagicEdenProvider extends WalletProvider {
     broadcast?: boolean | undefined
   ): Promise<
     | {
-      signedPsbtHex: string | undefined
-      signedPsbtBase64: string | undefined
-      txId?: string | undefined
-    }
+        signedPsbtHex: string | undefined
+        signedPsbtBase64: string | undefined
+        txId?: string | undefined
+      }
     | undefined
   > {
     console.log('signPsbt', psbtBase64, _finalize, broadcast)
