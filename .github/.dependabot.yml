@@ -1,0 +1,9 @@
+version: 2
+updates:
+  - package-ecosystem: "pnpm" # Adjust for your package manager
+    directory: "/" # Directory where `package.json` is located
+    schedule:
+      interval: "daily"
+    target-branch: "dev" # Change this from "main" to "dev"
+    commit-message:
+      prefix: "deps"
