@@ -19,6 +19,7 @@ import {
   FRACTAL_TESTNET,
   LaserEyesStoreType,
   SignMessageOptions,
+  ECDSA,
 } from '../..'
 import {
   findOrdinalsAddress,
@@ -223,7 +224,7 @@ export default class XVerseProvider extends WalletProvider {
       address: tempAddy,
       message,
       protocol:
-        protocol === 'ecdsa'
+        protocol === ECDSA
           ? MessageSigningProtocols.ECDSA
           : MessageSigningProtocols.BIP322,
     })

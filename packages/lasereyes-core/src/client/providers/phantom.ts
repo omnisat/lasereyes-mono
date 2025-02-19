@@ -1,6 +1,6 @@
 import * as bitcoin from 'bitcoinjs-lib'
 import { WalletProvider } from '.'
-import { MAINNET, PHANTOM, TESTNET } from '../../constants'
+import { ECDSA, MAINNET, PHANTOM, TESTNET } from '../../constants'
 import { ProviderType, NetworkType } from '../../types'
 import {
   createSendBtcPsbt,
@@ -124,7 +124,7 @@ export default class PhantomProvider extends WalletProvider {
     message: string,
     options?: SignMessageOptions
   ): Promise<string> {
-    if (options?.protocol === 'ecdsa') {
+    if (options?.protocol === ECDSA) {
       throw new Error('ECDSA signing is not supported by Phantom')
     }
     const utf8Bytes = new TextEncoder().encode(message)

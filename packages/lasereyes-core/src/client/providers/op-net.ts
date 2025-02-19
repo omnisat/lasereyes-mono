@@ -5,6 +5,7 @@ import { NetworkType, ProviderType } from '../../types'
 import { OP_NET } from '../../constants/wallets'
 import { listenKeys } from 'nanostores'
 import { SignMessageOptions } from '../types'
+import { BIP322, BIP322_SIMPLE } from '../../constants'
 
 export default class OpNetProvider extends WalletProvider {
   public get library(): any | undefined {
@@ -133,7 +134,7 @@ export default class OpNetProvider extends WalletProvider {
     options?: SignMessageOptions
   ): Promise<string> {
     const protocol =
-      options?.protocol === 'bip322' ? 'bip322-simple' : options?.protocol
+      options?.protocol === BIP322 ? BIP322_SIMPLE : options?.protocol
     return await this.library?.signMessage(message, protocol)
   }
 

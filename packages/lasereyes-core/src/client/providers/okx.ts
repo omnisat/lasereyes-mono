@@ -1,6 +1,8 @@
 import * as bitcoin from 'bitcoinjs-lib'
 import { WalletProvider } from '.'
 import {
+  BIP322_SIMPLE,
+  ECDSA,
   FRACTAL_MAINNET,
   FRACTAL_TESTNET,
   getNetworkForOkx,
@@ -206,7 +208,7 @@ export default class OkxProvider extends WalletProvider {
   ): Promise<string> {
     const library = this.library
     const protocol =
-      options?.protocol === 'bip322' ? 'bip322-simple' : options?.protocol
+      options?.protocol === ECDSA ? BIP322_SIMPLE : options?.protocol
     return await library?.signMessage(message, protocol)
   }
 

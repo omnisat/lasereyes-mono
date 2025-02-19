@@ -5,6 +5,7 @@ import { NetworkType, ProviderType } from '../../types'
 import { UNISAT } from '../../constants/wallets'
 import { listenKeys } from 'nanostores'
 import { SignMessageOptions } from '../types'
+import { BIP322, BIP322_SIMPLE } from '../../constants'
 
 export default class UnisatProvider extends WalletProvider {
   public get library(): any | undefined {
@@ -131,7 +132,7 @@ export default class UnisatProvider extends WalletProvider {
     options?: SignMessageOptions
   ): Promise<string> {
     const protocol =
-      options?.protocol === 'bip322' ? 'bip322-simple' : options?.protocol
+      options?.protocol === BIP322 ? BIP322_SIMPLE : options?.protocol
     return await this.library?.signMessage(message, protocol)
   }
 

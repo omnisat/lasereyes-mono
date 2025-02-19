@@ -11,6 +11,7 @@ import {
 } from 'sats-connect'
 import { WalletProvider } from '.'
 import {
+  ECDSA,
   getSatsConnectNetwork,
   LaserEyesStoreType,
   MAGIC_EDEN,
@@ -243,7 +244,7 @@ export default class MagicEdenProvider extends WalletProvider {
           address: tempAddy,
           message: message,
           protocol:
-            options?.protocol === 'ecdsa'
+            options?.protocol === ECDSA
               ? MessageSigningProtocols.ECDSA
               : MessageSigningProtocols.BIP322,
         },

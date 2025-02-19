@@ -8,6 +8,8 @@ import {
   getNetworkForWizz,
   WIZZ,
   SignMessageOptions,
+  BIP322,
+  BIP322_SIMPLE,
 } from '../..'
 import * as bitcoin from 'bitcoinjs-lib'
 import { listenKeys } from 'nanostores'
@@ -150,7 +152,7 @@ export class WizzProvider extends WalletProvider {
     options?: SignMessageOptions
   ): Promise<string> {
     const protocol =
-      options?.protocol === 'bip322' ? 'bip322-simple' : options?.protocol
+      options?.protocol === BIP322 ? BIP322_SIMPLE : options?.protocol
     return await this.library?.signMessage(message, protocol)
   }
 
