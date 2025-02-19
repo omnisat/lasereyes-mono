@@ -250,6 +250,12 @@ importers:
       '@cmdcode/tapscript':
         specifier: ^1.4.6
         version: 1.4.6
+      '@ledgerhq/wallet-api-client':
+        specifier: ^1.6.2
+        version: 1.6.2
+      '@ledgerhq/wallet-api-simulator':
+        specifier: ^1.2.3
+        version: 1.2.3
       '@magiceden-oss/runestone-lib':
         specifier: ^1.0.2
         version: 1.0.2
@@ -3276,6 +3282,79 @@ packages:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.0
+
+  /@ledgerhq/devices@8.4.4:
+    resolution: {integrity: sha512-sz/ryhe/R687RHtevIE9RlKaV8kkKykUV4k29e7GAVwzHX1gqG+O75cu1NCJUHLbp3eABV5FdvZejqRUlLis9A==}
+    dependencies:
+      '@ledgerhq/errors': 6.19.1
+      '@ledgerhq/logs': 6.12.0
+      rxjs: 7.8.1
+      semver: 7.6.3
+    dev: false
+
+  /@ledgerhq/errors@6.19.1:
+    resolution: {integrity: sha512-75yK7Nnit/Gp7gdrJAz0ipp31CCgncRp+evWt6QawQEtQKYEDfGo10QywgrrBBixeRxwnMy1DP6g2oCWRf1bjw==}
+    dev: false
+
+  /@ledgerhq/hw-transport@6.31.4:
+    resolution: {integrity: sha512-6c1ir/cXWJm5dCWdq55NPgCJ3UuKuuxRvf//Xs36Bq9BwkV2YaRQhZITAkads83l07NAdR16hkTWqqpwFMaI6A==}
+    dependencies:
+      '@ledgerhq/devices': 8.4.4
+      '@ledgerhq/errors': 6.19.1
+      '@ledgerhq/logs': 6.12.0
+      events: 3.3.0
+    dev: false
+
+  /@ledgerhq/logs@6.12.0:
+    resolution: {integrity: sha512-ExDoj1QV5eC6TEbMdLUMMk9cfvNKhhv5gXol4SmULRVCx/3iyCPhJ74nsb3S0Vb+/f+XujBEj3vQn5+cwS0fNA==}
+    dev: false
+
+  /@ledgerhq/wallet-api-client@1.6.2:
+    resolution: {integrity: sha512-+w1hzmQs0Hz5B+StW0ygFvi2TVWb4jgAKZNn6b6IasVHcuQM4GQsyal6YtwkZJbNIUZis7Bdv9V/K0PM+ZhxPw==}
+    dependencies:
+      '@ledgerhq/hw-transport': 6.31.4
+      '@ledgerhq/wallet-api-core': 1.15.0
+      bignumber.js: 9.1.2
+    dev: false
+
+  /@ledgerhq/wallet-api-core@1.15.0:
+    resolution: {integrity: sha512-GyNIOn8jTXJ+wT4d8C/sTje2/2QNca6/B+AJK+u7o3L3maNmL+5aDtiEhyHLqibGvFS33sasb79hdR9N+mQDKw==}
+    dependencies:
+      '@ledgerhq/errors': 6.19.1
+      bignumber.js: 9.1.2
+      uuid: 9.0.1
+      zod: 3.24.2
+    dev: false
+
+  /@ledgerhq/wallet-api-server@1.7.2(rxjs@7.8.1):
+    resolution: {integrity: sha512-U7VQ4ugsglx/z9wcYLB7OEPYlB600uRi3R8AgtqcBstCj4OyrAy0PDWYBiivKcSOv1D38OYH8fU8l4WRtQxRBw==}
+    peerDependencies:
+      react: ^17.x || ^18.x
+      rxjs: ^7.x
+    peerDependenciesMeta:
+      react:
+        optional: true
+    dependencies:
+      '@ledgerhq/wallet-api-core': 1.15.0
+      bignumber.js: 9.1.2
+      picomatch: 4.0.2
+      rxjs: 7.8.1
+    dev: false
+
+  /@ledgerhq/wallet-api-simulator@1.2.3:
+    resolution: {integrity: sha512-DM5oxKi3o+t8zzuz1B7aXlvUrGWU/InKlleWzXKxvvu3VkSl+dRljvm1iAcPEB2b4jYLK6/X/n1cgwY5uggpFQ==}
+    dependencies:
+      '@ledgerhq/hw-transport': 6.31.4
+      '@ledgerhq/wallet-api-client': 1.6.2
+      '@ledgerhq/wallet-api-core': 1.15.0
+      '@ledgerhq/wallet-api-server': 1.7.2(rxjs@7.8.1)
+      rxjs: 7.8.1
+      ws: 8.18.0
+    transitivePeerDependencies:
+      - bufferutil
+      - react
+      - utf-8-validate
+    dev: false
 
   /@leichtgewicht/ip-codec@2.0.5:
     resolution: {integrity: sha512-Vo+PSpZG2/fmgmiNzYK9qWRh8h/CHrwD0mo1h1DzL4yzHNSfWYujGTYsWGreD000gcgmZ7K4Ys6Tx9TxtsKdDw==}
@@ -6902,6 +6981,10 @@ packages:
 
   /big.js@5.2.2:
     resolution: {integrity: sha512-vyL2OymJxmarO8gxMr0mhChsO9QGwhynfuu4+MHTAW6czfq9humCB7rKpUjDd9YUiDPU4mzpyupFSvOClAwbmQ==}
+    dev: false
+
+  /bignumber.js@9.1.2:
+    resolution: {integrity: sha512-2/mKyZH9K85bzOEfhXDBFZTGd1CTs+5IHpeFQo9luiBG7hghdC851Pj2WAhb6E3R6b9tZj/XKhbg4fum+Kepug==}
     dev: false
 
   /binary-extensions@2.3.0:
@@ -12883,7 +12966,6 @@ packages:
   /picomatch@4.0.2:
     resolution: {integrity: sha512-M7BAV6Rlcy5u+m6oPhAPFgJTzAioX/6B0DxyvDlo9l8+T3nLKbrczg2WLUyzd45L8RqfUMyGPzekbMvX2Ldkwg==}
     engines: {node: '>=12'}
-    dev: true
 
   /pify@2.3.0:
     resolution: {integrity: sha512-udgsAY+fTnvv7kI7aaxbqwWNb0AHiB0qBO89PZKPkoTmGOgdbrHDKD+0B2X4uTfJ/FT1R09r9gTsjUjNJotuog==}
@@ -14573,6 +14655,12 @@ packages:
     dependencies:
       queue-microtask: 1.2.3
 
+  /rxjs@7.8.1:
+    resolution: {integrity: sha512-AA3TVj+0A2iuIoQkWEK/tqFjBq2j+6PO6Y0zJcvzLAFhEFIO3HL0vls9hWLncZbAAbK0mar7oZ4V079I/qPMxg==}
+    dependencies:
+      tslib: 2.8.0
+    dev: false
+
   /safe-array-concat@1.1.2:
     resolution: {integrity: sha512-vj6RsCsWBCf19jIeHEfkRMw8DPiBb+DMXklQ/1SGDHOMlHdPUkZXFQ2YdplS23zESTijAcurb1aSgJA3AgMu1Q==}
     engines: {node: '>=0.4'}
@@ -16088,6 +16176,11 @@ packages:
     hasBin: true
     dev: false
 
+  /uuid@9.0.1:
+    resolution: {integrity: sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==}
+    hasBin: true
+    dev: false
+
   /v8-to-istanbul@8.1.1:
     resolution: {integrity: sha512-FGtKtv3xIpR6BYhvgH8MI/y78oT7d8Au3ww4QIxymrCtZEh5b8gCw2siywE+puhEmuWKDtmfrvF5UlB298ut3w==}
     engines: {node: '>=10.12.0'}
@@ -16999,3 +17092,7 @@ packages:
   /yocto-queue@0.1.0:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
+
+  /zod@3.24.2:
+    resolution: {integrity: sha512-lY7CDW43ECgW9u1TcT3IoXHflywfVqDYze4waEz812jR/bZ8FHDsl7pFQoSZTz5N+2NqRXs8GBwnAwo3ZNxqhQ==}
+    dev: false
