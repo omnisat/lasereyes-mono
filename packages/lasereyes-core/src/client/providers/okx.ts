@@ -1,6 +1,8 @@
 import * as bitcoin from 'bitcoinjs-lib'
 import { WalletProvider } from '.'
 import {
+  BIP322_SIMPLE,
+  ECDSA,
   FRACTAL_MAINNET,
   FRACTAL_TESTNET,
   getNetworkForOkx,
@@ -10,12 +12,17 @@ import {
   OKX,
   ProviderType,
   SIGNET,
+  SignMessageOptions,
   TESTNET,
   TESTNET4,
 } from '../..'
 import { listenKeys, MapStore } from 'nanostores'
 import { persistentMap } from '@nanostores/persistent'
-import { handleStateChangePersistence, keysToPersist, PersistedKey } from '../utils'
+import {
+  handleStateChangePersistence,
+  keysToPersist,
+  PersistedKey,
+} from '../utils'
 import { getBTCBalance, isMainnetNetwork } from '../../lib/helpers'
 
 const OKX_WALLET_PERSISTENCE_KEY = 'OKX_CONNECTED_WALLET_STATE'
@@ -130,7 +137,7 @@ export default class OkxProvider extends WalletProvider {
         return
       }
     }
-    
+
     try {
       const okxAccounts = await this.library.connect()
       if (!okxAccounts) throw new Error('No accounts found')
@@ -195,9 +202,14 @@ export default class OkxProvider extends WalletProvider {
     return txId
   }
 
-  async signMessage(message: string, _?: string | undefined): Promise<string> {
+  async signMessage(
+    message: string,
+    options?: SignMessageOptions
+  ): Promise<string> {
     const library = this.library
-    return await library?.signMessage(message)
+    const protocol =
+      options?.protocol === ECDSA ? BIP322_SIMPLE : options?.protocol
+    return await library?.signMessage(message, protocol)
   }
 
   async signPsbt(

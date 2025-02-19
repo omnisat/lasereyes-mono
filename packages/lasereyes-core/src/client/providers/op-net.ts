@@ -4,6 +4,8 @@ import { getNetworkForUnisat, getUnisatNetwork } from '../../constants/networks'
 import { NetworkType, ProviderType } from '../../types'
 import { OP_NET } from '../../constants/wallets'
 import { listenKeys } from 'nanostores'
+import { SignMessageOptions } from '../types'
+import { BIP322, BIP322_SIMPLE } from '../../constants'
 
 export default class OpNetProvider extends WalletProvider {
   public get library(): any | undefined {
@@ -127,8 +129,13 @@ export default class OpNetProvider extends WalletProvider {
     return txId
   }
 
-  async signMessage(message: string, _?: string | undefined): Promise<string> {
-    return await this.library?.signMessage(message)
+  async signMessage(
+    message: string,
+    options?: SignMessageOptions
+  ): Promise<string> {
+    const protocol =
+      options?.protocol === BIP322 ? BIP322_SIMPLE : options?.protocol
+    return await this.library?.signMessage(message, protocol)
   }
 
   async signPsbt(

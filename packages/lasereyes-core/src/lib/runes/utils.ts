@@ -1,5 +1,10 @@
-import { SingleRuneOutpoint } from "../../types/sandshrew";
-import { batchOrdOutput, getOrdAddress, getRuneById, mapRuneBalances } from "../sandshrew";
+import { SingleRuneOutpoint } from '../../types/sandshrew'
+import {
+  batchOrdOutput,
+  getOrdAddress,
+  getRuneById,
+  mapRuneBalances,
+} from '../sandshrew'
 
 export const getRuneOutpoints = async ({
   address,
@@ -8,18 +13,18 @@ export const getRuneOutpoints = async ({
   address: string
   runeId: string
 }): Promise<SingleRuneOutpoint[]> => {
-  const addressOutpoints = await getOrdAddress(address);
-  const { entry } = await getRuneById(runeId);
-  const runeName = entry.spaced_rune;
+  const addressOutpoints = await getOrdAddress(address)
+  const { entry } = await getRuneById(runeId)
+  const runeName = entry.spaced_rune
 
   const ordOutputs = await batchOrdOutput({
     outpoints: addressOutpoints.outputs,
-    rune_name: runeName
+    rune_name: runeName,
   })
 
   const runeUtxosOutpoints = await mapRuneBalances({
     ordOutputs: ordOutputs,
   })
 
-  return runeUtxosOutpoints;
+  return runeUtxosOutpoints
 }

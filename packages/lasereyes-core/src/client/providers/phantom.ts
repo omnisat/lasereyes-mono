@@ -1,6 +1,6 @@
 import * as bitcoin from 'bitcoinjs-lib'
 import { WalletProvider } from '.'
-import { MAINNET, PHANTOM, TESTNET } from '../../constants'
+import { ECDSA, MAINNET, PHANTOM, TESTNET } from '../../constants'
 import { ProviderType, NetworkType } from '../../types'
 import {
   createSendBtcPsbt,
@@ -10,6 +10,7 @@ import {
 import { listenKeys } from 'nanostores'
 import { fromOutputScript } from 'bitcoinjs-lib/src/address'
 import { fromHexString } from '../utils'
+import { SignMessageOptions } from '../types'
 
 export default class PhantomProvider extends WalletProvider {
   public get library(): any | undefined {
@@ -121,11 +122,14 @@ export default class PhantomProvider extends WalletProvider {
 
   async signMessage(
     message: string,
-    toSignAddress?: string | undefined
+    options?: SignMessageOptions
   ): Promise<string> {
+    if (options?.protocol === ECDSA) {
+      throw new Error('ECDSA signing is not supported by Phantom')
+    }
     const utf8Bytes = new TextEncoder().encode(message)
     const uintArray = new Uint8Array(utf8Bytes)
-    const tempAddy = toSignAddress || this.$store.get().paymentAddress
+    const tempAddy = options?.toSignAddress || this.$store.get().paymentAddress
     const response = await this.library?.signMessage(tempAddy, uintArray)
     const binaryString = String.fromCharCode(...response.signature)
     return btoa(binaryString)

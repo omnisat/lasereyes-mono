@@ -22,6 +22,7 @@ import {
   LaserEyesStoreType,
   getOrangeNetwork,
   ORANGE,
+  SignMessageOptions,
 } from '../..'
 import {
   findOrdinalsAddress,
@@ -32,7 +33,11 @@ import {
 import { MapStore, listenKeys } from 'nanostores'
 import { persistentMap } from '@nanostores/persistent'
 
-import { handleStateChangePersistence, keysToPersist, PersistedKey } from '../utils'
+import {
+  handleStateChangePersistence,
+  keysToPersist,
+  PersistedKey,
+} from '../utils'
 
 const { signMessage: signMessageOrange, sendBtcTransaction: sendBtcTxOrange } =
   orange
@@ -80,12 +85,7 @@ export default class OrangeProvider extends WalletProvider {
     _: LaserEyesStoreType | undefined,
     changedKey: keyof LaserEyesStoreType | undefined
   ) {
-    handleStateChangePersistence(
-      ORANGE,
-      newState,
-      changedKey,
-      this.$valueStore
-    )
+    handleStateChangePersistence(ORANGE, newState, changedKey, this.$valueStore)
   }
 
   initialize(): void {
@@ -221,10 +221,10 @@ export default class OrangeProvider extends WalletProvider {
 
   async signMessage(
     message: string,
-    toSignAddress?: string | undefined
+    options?: SignMessageOptions
   ): Promise<string> {
     let signature = ''
-    const tempAddy = toSignAddress || this.$store.get().paymentAddress
+    const tempAddy = options?.toSignAddress || this.$store.get().paymentAddress
     const signMessageOptions = {
       payload: {
         network: {

@@ -1,4 +1,5 @@
 import { NetworkType, ProviderType } from '../types'
+import { BIP322, ECDSA } from '../constants/signing-protocol'
 
 export type LaserEyesStoreType = {
   provider: ProviderType | undefined
@@ -21,4 +22,9 @@ export interface SparrowWalletProvider {
   switchNetwork(network: NetworkType): Promise<void>
   signMessage(message: string): Promise<string>
   signPsbt(psbtBase64: string): Promise<string>
+}
+
+export type SignMessageOptions = {
+  toSignAddress?: string
+  protocol?: typeof BIP322 | typeof ECDSA
 }

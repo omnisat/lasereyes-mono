@@ -7,6 +7,9 @@ import {
   WIZZ_MAINNET,
   getNetworkForWizz,
   WIZZ,
+  SignMessageOptions,
+  BIP322,
+  BIP322_SIMPLE,
 } from '../..'
 import * as bitcoin from 'bitcoinjs-lib'
 import { listenKeys } from 'nanostores'
@@ -144,8 +147,13 @@ export class WizzProvider extends WalletProvider {
     }
   }
 
-  async signMessage(message: string): Promise<string> {
-    return await this.library?.signMessage(message)
+  async signMessage(
+    message: string,
+    options?: SignMessageOptions
+  ): Promise<string> {
+    const protocol =
+      options?.protocol === BIP322 ? BIP322_SIMPLE : options?.protocol
+    return await this.library?.signMessage(message, protocol)
   }
 
   async signPsbt(

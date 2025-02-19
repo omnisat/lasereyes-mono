@@ -167,7 +167,7 @@ export default class SparrowProvider extends WalletProvider {
     return txId
   }
 
-  async signMessage(message: string, _?: string | undefined): Promise<string> {
+  async signMessage(message: string): Promise<string> {
     return await this.library!.signMessage(message)
   }
 
