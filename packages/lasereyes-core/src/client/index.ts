@@ -247,7 +247,17 @@ export class LaserEyesClient {
     }
   }
 
-  async signMessage(message: string, options?: SignMessageOptions) {
+  async signMessage(
+    message: string,
+    toSignAddressOrOptions?: string | SignMessageOptions
+  ) {
+    let options: SignMessageOptions = {}
+    if (typeof toSignAddressOrOptions === 'string') {
+      options = { toSignAddress: toSignAddressOrOptions }
+    } else if (toSignAddressOrOptions) {
+      options = toSignAddressOrOptions
+    }
+
     if (!this.$store.get().provider) return
     if (this.$providerMap[this.$store.get().provider!]) {
       try {
