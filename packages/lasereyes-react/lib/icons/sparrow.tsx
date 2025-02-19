@@ -14,6 +14,7 @@ const SparrowLogo: React.FC<SparrowLogoProps> = ({
     height={size}
     viewBox="0 0 200 200"
     fill="none"
+    className={className}
     {...props}
   >
     <g>
