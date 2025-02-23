@@ -1,13 +1,24 @@
 import * as bitcoin from 'bitcoinjs-lib'
 import { WalletProvider } from '.'
 import { getNetworkForUnisat, getUnisatNetwork } from '../../constants/networks'
-import { NetworkType, ProviderType } from '../../types'
+import { Config, NetworkType, ProviderType } from '../../types'
 import { OP_NET } from '../../constants/wallets'
-import { listenKeys } from 'nanostores'
-import { SignMessageOptions } from '../types'
+import { listenKeys, MapStore, WritableAtom } from 'nanostores'
+import { LaserEyesStoreType, SignMessageOptions } from '../types'
 import { BIP322, BIP322_SIMPLE } from '../../constants'
+import { LaserEyesClient } from '..'
 
 export default class OpNetProvider extends WalletProvider {
+  constructor(stores: {
+    $store: MapStore<LaserEyesStoreType>
+    $network: WritableAtom<NetworkType>
+  },
+    parent: LaserEyesClient,
+    config?: Config
+  ) {
+    super(stores, parent, config)
+  }
+
   public get library(): any | undefined {
     return (window as any)?.opnet
   }
@@ -146,10 +157,10 @@ export default class OpNetProvider extends WalletProvider {
     broadcast?: boolean | undefined
   ): Promise<
     | {
-        signedPsbtHex: string | undefined
-        signedPsbtBase64: string | undefined
-        txId?: string | undefined
-      }
+      signedPsbtHex: string | undefined
+      signedPsbtBase64: string | undefined
+      txId?: string | undefined
+    }
     | undefined
   > {
     const signedPsbt = await this.library?.signPsbt(psbtHex, {

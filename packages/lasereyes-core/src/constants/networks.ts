@@ -1,137 +1,106 @@
 import { BitcoinNetworkType } from '@orangecrypto/orange-connect'
-export const XVERSE_NETWORK: 'Mainnet' | 'Testnet' = 'Mainnet'
+import { BaseNetwork, CmdruidNetwork, FractalNetwork, LeatherNetwork, OkxNetwork, OrangeNetwork, UnisatNetwork, WizzNetwork, XverseNetwork } from '../types/network'
 
-export const UNISAT_MAINNET = 'BITCOIN_MAINNET'
-export const UNISAT_TESTNET = 'BITCOIN_TESTNET'
-export const UNISAT_TESTNET4 = 'BITCOIN_TESTNET4'
-export const UNISAT_SIGNET = 'BITCOIN_SIGNET'
-export const UNISAT_FRACTAL_MAINNET = 'FRACTAL_BITCOIN_MAINNET'
-export const UNISAT_FRACTAL_TESTNET = 'FRACTAL_BITCOIN_TESTNET'
-
-export const OP_WALLET_MAINNET = 'livenet'
-export const OP_WALLET_TESTNET = 'testnet'
-
-export const XVERSE_MAINNET = 'Mainnet'
-export const XVERSE_TESTNET = 'Testnet'
-export const XVERSE_SIGNET = 'Signet'
-
-export const OKX_MAINNET = 'livenet'
-export const OKX_TESTNET = 'testnet'
-
-export const WIZZ_MAINNET = 'livenet'
-export const WIZZ_TESTNET = 'testnet'
-export const WIZZ_TESTNET4 = 'testnet4'
-export const WIZZ_SIGNET = 'signet'
-
-export const ORANGE_MAINNET = 'Mainnet'
-export const ORANGE_TESTNET = 'Testnet'
-
-export const LEATHER_MAINNET = 'mainnet'
-export const LEATHER_TESTNET = 'testnet'
-
-export const CMDRUID_MAINNET = 'main'
-export const CMDRUID_TESTNET = 'testnet'
-export const CMDRUID_SIGNET = 'signet'
-
-export const MAINNET = 'mainnet'
-export const SIGNET = 'signet'
-export const TESTNET = 'testnet'
-export const TESTNET4 = 'testnet4'
-export const FRACTAL_MAINNET = 'fractal mainnet'
-export const FRACTAL_TESTNET = 'fractal testnet'
-export const REGTEST = 'regtest'
+export const MAINNET = BaseNetwork.MAINNET
+export const SIGNET = BaseNetwork.SIGNET
+export const TESTNET = BaseNetwork.TESTNET
+export const TESTNET4 = BaseNetwork.TESTNET4
+export const FRACTAL_MAINNET = BaseNetwork.FRACTAL_MAINNET
+export const FRACTAL_TESTNET = BaseNetwork.FRACTAL_TESTNET
+export const REGTEST = BaseNetwork.REGTEST
 
 export const getSatsConnectNetwork = (network: string) => {
-  if (network === MAINNET) return XVERSE_MAINNET
-  if (network === TESTNET) return XVERSE_TESTNET
-  if (network === TESTNET4) return XVERSE_TESTNET
-  if (network === SIGNET) return XVERSE_SIGNET
-  if (network === FRACTAL_MAINNET) return XVERSE_MAINNET
-  if (network === FRACTAL_TESTNET) return XVERSE_MAINNET
-  return XVERSE_MAINNET
+  if (network === BaseNetwork.MAINNET) return XverseNetwork.MAINNET
+  if (network === BaseNetwork.TESTNET) return XverseNetwork.TESTNET
+  if (network === BaseNetwork.TESTNET4) return XverseNetwork.TESTNET
+  if (network === BaseNetwork.SIGNET) return XverseNetwork.SIGNET
+  if (network === BaseNetwork.FRACTAL_MAINNET) return XverseNetwork.MAINNET
+  if (network === BaseNetwork.FRACTAL_TESTNET) return XverseNetwork.MAINNET
+  return XverseNetwork.MAINNET
 }
 
 export const getLeatherNetwork = (network: string) => {
-  if (network === MAINNET) return LEATHER_MAINNET
-  if (network === TESTNET) return LEATHER_TESTNET
-  return LEATHER_MAINNET
+  if (network === BaseNetwork.MAINNET) return LeatherNetwork.MAINNET
+  if (network === BaseNetwork.TESTNET) return LeatherNetwork.TESTNET
+  return LeatherNetwork.MAINNET
 }
 
 export const getUnisatNetwork = (network: string) => {
-  if (network === MAINNET) return UNISAT_MAINNET
-  if (network === TESTNET) return UNISAT_TESTNET
-  if (network === TESTNET4) return UNISAT_TESTNET4
-  if (network === SIGNET) return UNISAT_SIGNET
-  if (network === FRACTAL_MAINNET) return UNISAT_FRACTAL_MAINNET
-  if (network === FRACTAL_TESTNET) return UNISAT_FRACTAL_TESTNET
-  return UNISAT_MAINNET
+  if (network === BaseNetwork.MAINNET) return UnisatNetwork.MAINNET
+  if (network === BaseNetwork.TESTNET) return UnisatNetwork.TESTNET
+  if (network === BaseNetwork.TESTNET4) return UnisatNetwork.TESTNET4
+  if (network === BaseNetwork.SIGNET) return UnisatNetwork.SIGNET
+  if (network === BaseNetwork.FRACTAL_MAINNET) return UnisatNetwork.FRACTAL_MAINNET
+  if (network === BaseNetwork.FRACTAL_TESTNET) return UnisatNetwork.FRACTAL_TESTNET
+  return UnisatNetwork.MAINNET
 }
 
 export const getWizzNetwork = (network: string) => {
-  if (network === MAINNET) return WIZZ_MAINNET
-  if (network === TESTNET) return WIZZ_TESTNET
-  if (network === TESTNET4) return WIZZ_TESTNET4
-  if (network === SIGNET) return WIZZ_SIGNET
-  if (network === FRACTAL_TESTNET) return WIZZ_TESTNET
-  if (network === FRACTAL_MAINNET) return WIZZ_MAINNET
-  return WIZZ_MAINNET
+  if (network === BaseNetwork.MAINNET) return WizzNetwork.MAINNET
+  if (network === BaseNetwork.TESTNET) return WizzNetwork.TESTNET
+  if (network === BaseNetwork.TESTNET4) return WizzNetwork.TESTNET4
+  if (network === BaseNetwork.SIGNET) return WizzNetwork.SIGNET
+  if (network === BaseNetwork.FRACTAL_TESTNET) return WizzNetwork.TESTNET
+  if (network === BaseNetwork.FRACTAL_MAINNET) return WizzNetwork.MAINNET
+  return WizzNetwork.MAINNET
 }
 
 export const getOrangeNetwork = (network: string): BitcoinNetworkType => {
-  if (network === MAINNET) return ORANGE_MAINNET as BitcoinNetworkType
-  if (network === TESTNET) return ORANGE_TESTNET as BitcoinNetworkType
-  if (network === TESTNET4) return ORANGE_TESTNET as BitcoinNetworkType
-  if (network === SIGNET) return ORANGE_TESTNET as BitcoinNetworkType
-  if (network === FRACTAL_MAINNET) return ORANGE_MAINNET as BitcoinNetworkType
-  if (network === FRACTAL_TESTNET) return ORANGE_MAINNET as BitcoinNetworkType
-  return ORANGE_MAINNET as BitcoinNetworkType
+  if (network === BaseNetwork.MAINNET) return OrangeNetwork.MAINNET as unknown as BitcoinNetworkType
+  if (network === BaseNetwork.TESTNET) return OrangeNetwork.TESTNET as unknown as BitcoinNetworkType
+  if (network === BaseNetwork.TESTNET4) return OrangeNetwork.TESTNET as unknown as BitcoinNetworkType
+  if (network === BaseNetwork.SIGNET) return OrangeNetwork.TESTNET as unknown as BitcoinNetworkType
+  if (network === BaseNetwork.FRACTAL_MAINNET) return OrangeNetwork.MAINNET as unknown as BitcoinNetworkType
+  if (network === BaseNetwork.FRACTAL_TESTNET) return OrangeNetwork.MAINNET as unknown as BitcoinNetworkType
+  return OrangeNetwork.MAINNET as unknown as BitcoinNetworkType
 }
 
 export const getCmDruidNetwork = (network: string) => {
-  if (network === MAINNET) return CMDRUID_MAINNET
-  if (network === TESTNET4) return CMDRUID_TESTNET
-  if (network === TESTNET) return CMDRUID_TESTNET
-  if (network === SIGNET) return CMDRUID_SIGNET
-  if (network === FRACTAL_MAINNET) return CMDRUID_MAINNET
-  if (network === FRACTAL_TESTNET) return CMDRUID_MAINNET
-  return CMDRUID_MAINNET
+  if (network === BaseNetwork.MAINNET) return CmdruidNetwork.MAINNET
+  if (network === BaseNetwork.TESTNET4) return CmdruidNetwork.TESTNET
+  if (network === BaseNetwork.TESTNET) return CmdruidNetwork.TESTNET
+  if (network === BaseNetwork.SIGNET) return CmdruidNetwork.SIGNET
+  if (network === BaseNetwork.MAINNET) return CmdruidNetwork.MAINNET
+  if (network === BaseNetwork.TESTNET) return CmdruidNetwork.MAINNET
+  return CmdruidNetwork.MAINNET
 }
 
+
 export const getNetworkForUnisat = (network: string) => {
-  if (network === UNISAT_MAINNET) return MAINNET
-  if (network === UNISAT_TESTNET) return TESTNET
-  if (network === UNISAT_TESTNET4) return TESTNET4
-  if (network === UNISAT_SIGNET) return SIGNET
-  if (network === UNISAT_FRACTAL_MAINNET) return FRACTAL_MAINNET
-  if (network === UNISAT_FRACTAL_TESTNET) return FRACTAL_TESTNET
-  return MAINNET
+  if (network === UnisatNetwork.MAINNET) return BaseNetwork.MAINNET
+  if (network === UnisatNetwork.TESTNET) return BaseNetwork.TESTNET
+  if (network === UnisatNetwork.TESTNET4) return BaseNetwork.TESTNET4
+  if (network === UnisatNetwork.SIGNET) return BaseNetwork.SIGNET
+  if (network === UnisatNetwork.FRACTAL_MAINNET) return BaseNetwork.FRACTAL_MAINNET
+  if (network === UnisatNetwork.FRACTAL_TESTNET) return BaseNetwork.TESTNET
+  return BaseNetwork.MAINNET
 }
 
 export const getNetworkForXverse = (network: string) => {
-  if (network === XVERSE_MAINNET) return MAINNET
-  if (network === XVERSE_TESTNET) return TESTNET
-  return MAINNET
+  if (network === XverseNetwork.MAINNET) return BaseNetwork.MAINNET
+  if (network === XverseNetwork.TESTNET) return BaseNetwork.TESTNET
+  return BaseNetwork.MAINNET
 }
 
 export const getNetworkForLeather = (network: string) => {
-  if (network === LEATHER_MAINNET) return MAINNET
-  if (network === LEATHER_TESTNET) return TESTNET
-  return MAINNET
+  if (network === LeatherNetwork.MAINNET) return BaseNetwork.MAINNET
+  if (network === LeatherNetwork.TESTNET) return BaseNetwork.TESTNET
+  return BaseNetwork.MAINNET
 }
 
 export const getNetworkForOkx = (network: string) => {
-  if (network === OKX_MAINNET) return MAINNET
-  if (network === OKX_TESTNET) return TESTNET
-  return MAINNET
+  if (network === OkxNetwork.MAINNET) return BaseNetwork.MAINNET
+  if (network === OkxNetwork.TESTNET) return BaseNetwork.TESTNET
+  return BaseNetwork.MAINNET
 }
 
 export const getNetworkForWizz = (network: string) => {
-  if (network === WIZZ_MAINNET) return MAINNET
-  if (network === WIZZ_TESTNET) return TESTNET
-  if (network === WIZZ_TESTNET4) return TESTNET4
-  if (network === WIZZ_SIGNET) return SIGNET
-  if (network === FRACTAL_TESTNET) return TESTNET
-  if (network === FRACTAL_MAINNET) return MAINNET
-
-  return MAINNET
+  if (network === WizzNetwork.MAINNET) return BaseNetwork.MAINNET
+  if (network === WizzNetwork.TESTNET) return BaseNetwork.TESTNET
+  if (network === WizzNetwork.TESTNET4) return BaseNetwork.TESTNET4
+  if (network === WizzNetwork.SIGNET) return BaseNetwork.SIGNET
+  if (network === FractalNetwork.TESTNET) return BaseNetwork.TESTNET
+  if (network === FractalNetwork.MAINNET) return BaseNetwork.MAINNET
+  return BaseNetwork.MAINNET
 }
+

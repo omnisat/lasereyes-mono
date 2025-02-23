@@ -2,10 +2,11 @@ import * as bitcoin from 'bitcoinjs-lib'
 import { WalletProvider } from '.'
 import {
   BIP322_SIMPLE,
+  Config,
   ECDSA,
   FRACTAL_MAINNET,
   FRACTAL_TESTNET,
-  getNetworkForOkx,
+  LaserEyesClient,
   LaserEyesStoreType,
   MAINNET,
   NetworkType,
@@ -16,7 +17,7 @@ import {
   TESTNET,
   TESTNET4,
 } from '../..'
-import { listenKeys, MapStore } from 'nanostores'
+import { listenKeys, MapStore, WritableAtom } from 'nanostores'
 import { persistentMap } from '@nanostores/persistent'
 import {
   handleStateChangePersistence,
@@ -24,10 +25,21 @@ import {
   PersistedKey,
 } from '../utils'
 import { getBTCBalance, isMainnetNetwork } from '../../lib/helpers'
+import { getNetworkForOkx } from '../../constants/networks'
 
 const OKX_WALLET_PERSISTENCE_KEY = 'OKX_CONNECTED_WALLET_STATE'
 
 export default class OkxProvider extends WalletProvider {
+  constructor(stores: {
+    $store: MapStore<LaserEyesStoreType>
+    $network: WritableAtom<NetworkType>
+  },
+    parent: LaserEyesClient,
+    config?: Config
+  ) {
+    super(stores, parent, config)
+  }
+
   public get library(): any | undefined {
     let foundOkx
     if (
@@ -220,10 +232,10 @@ export default class OkxProvider extends WalletProvider {
     broadcast?: boolean | undefined
   ): Promise<
     | {
-        signedPsbtHex: string | undefined
-        signedPsbtBase64: string | undefined
-        txId?: string | undefined
-      }
+      signedPsbtHex: string | undefined
+      signedPsbtBase64: string | undefined
+      txId?: string | undefined
+    }
     | undefined
   > {
     const library = this.library

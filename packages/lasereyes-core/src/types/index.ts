@@ -51,14 +51,15 @@ import {
   TEXT_MARKDOWN,
 } from '../constants/content'
 import { BTC, RUNES } from '../constants/protocols'
+import { BaseNetwork } from './network'
 
 export type NetworkType =
-  | typeof MAINNET
-  | typeof TESTNET
-  | typeof TESTNET4
-  | typeof SIGNET
-  | typeof FRACTAL_MAINNET
-  | typeof FRACTAL_TESTNET
+  | typeof BaseNetwork.MAINNET
+  | typeof BaseNetwork.TESTNET
+  | typeof BaseNetwork.TESTNET4
+  | typeof BaseNetwork.SIGNET
+  | typeof BaseNetwork.FRACTAL_MAINNET
+  | typeof BaseNetwork.FRACTAL_TESTNET
 
 export type ProviderType =
   | typeof UNISAT
@@ -106,13 +107,26 @@ export type ContentType =
 
 export type Config = {
   network:
-    | typeof MAINNET
-    | typeof TESTNET
-    | typeof TESTNET4
-    | typeof SIGNET
-    | typeof FRACTAL_MAINNET
-    | typeof FRACTAL_TESTNET
-}
+  | typeof MAINNET
+  | typeof TESTNET
+  | typeof TESTNET4
+  | typeof SIGNET
+  | typeof FRACTAL_MAINNET
+  | typeof FRACTAL_TESTNET;
+  dataSources?: {
+    mempool?: {
+      url: string;
+    };
+    sandshrew?: {
+      url?: string;
+      apiKey?: string;
+    };
+    esplora?: string;
+    maestro?: {
+      apiKey?: string;
+    };
+  };
+};
 
 export type SendArgs = BTCSendArgs | RuneSendArgs
 

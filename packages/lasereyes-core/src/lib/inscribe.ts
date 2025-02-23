@@ -9,7 +9,8 @@ import {
   getAddressUtxos,
   getBitcoinNetwork,
 } from './helpers'
-import { getCmDruidNetwork, MAINNET, P2SH, P2TR } from '../constants'
+import { getCmDruidNetwork } from '../constants/networks'
+import { MAINNET, P2SH, P2TR } from '../constants'
 import { ContentType, MempoolUtxo, NetworkType } from '../types'
 import { toXOnly } from 'bitcoinjs-lib/src/psbt/bip371'
 import { TEXT_PLAIN } from '../constants/content'
@@ -51,10 +52,10 @@ export const inscribeContent = async ({
     network?: NetworkType
   ) => Promise<
     | {
-        signedPsbtHex: string | undefined
-        signedPsbtBase64: string | undefined
-        txId?: string
-      }
+      signedPsbtHex: string | undefined
+      signedPsbtBase64: string | undefined
+      txId?: string
+    }
     | undefined
   >
   network: NetworkType
@@ -68,9 +69,9 @@ export const inscribeContent = async ({
     const ixs = inscriptions
       ? inscriptions
       : Array(quantity).fill({
-          content: contentBase64,
-          mimeType,
-        })
+        content: contentBase64,
+        mimeType,
+      })
 
     const commitTx = await getCommitPsbt({
       inscriptions: ixs,
@@ -126,9 +127,9 @@ export const getCommitPsbt = async ({
   isDry?: boolean
 }): Promise<
   | {
-      psbtHex: string
-      psbtBase64: string
-    }
+    psbtHex: string
+    psbtBase64: string
+  }
   | undefined
 > => {
   try {
