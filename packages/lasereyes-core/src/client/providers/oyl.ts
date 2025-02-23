@@ -1,6 +1,6 @@
 import * as bitcoin from 'bitcoinjs-lib'
 import { UNSUPPORTED_PROVIDER_METHOD_ERROR, WalletProvider } from '.'
-import { ProviderType, NetworkType } from '../../types'
+import { ProviderType, NetworkType, Config } from '../../types'
 import {
   createSendBtcPsbt,
   getBTCBalance,
@@ -8,7 +8,7 @@ import {
   isTestnetNetwork,
 } from '../../lib/helpers'
 import { OYL } from '../../constants/wallets'
-import { listenKeys, MapStore } from 'nanostores'
+import { listenKeys, MapStore, WritableAtom } from 'nanostores'
 import { persistentMap } from '@nanostores/persistent'
 import { LaserEyesStoreType, SignMessageOptions } from '../types'
 import {
@@ -16,10 +16,21 @@ import {
   keysToPersist,
   PersistedKey,
 } from '../utils'
+import { LaserEyesClient } from '..'
 
 const OYL_WALLET_PERSISTENCE_KEY = 'OYL_CONNECTED_WALLET_STATE'
 
 export default class OylProvider extends WalletProvider {
+  constructor(stores: {
+    $store: MapStore<LaserEyesStoreType>
+    $network: WritableAtom<NetworkType>
+  },
+    parent: LaserEyesClient,
+    config?: Config
+  ) {
+    super(stores, parent, config)
+  }
+
   public get library(): any | undefined {
     return (window as any).oyl
   }
@@ -170,10 +181,10 @@ export default class OylProvider extends WalletProvider {
     broadcast?: boolean | undefined
   ): Promise<
     | {
-        signedPsbtHex: string | undefined
-        signedPsbtBase64: string | undefined
-        txId?: string | undefined
-      }
+      signedPsbtHex: string | undefined
+      signedPsbtBase64: string | undefined
+      txId?: string | undefined
+    }
     | undefined
   > {
     const { psbt, txid } = await this.library.signPsbt({

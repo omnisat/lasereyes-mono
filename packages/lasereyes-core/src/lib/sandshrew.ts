@@ -9,7 +9,7 @@ import {
 import { EsploraTx, SingleRuneOutpoint } from '../types/sandshrew'
 import { getPublicKeyHash } from './btc'
 import { MAINNET } from '../constants'
-export const SANDSHREW_URL: string = 'https://mainnet.sandshrew.io/v1/lasereyes'
+import { SANDSHREW_URL } from './urls'
 
 export const callSandshrewRPC = async (
   method: string,

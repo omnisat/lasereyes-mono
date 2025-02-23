@@ -23,6 +23,7 @@ import {
 import { BTC, RUNES } from '../../constants/protocols'
 import { sendRune } from '../../lib/runes/psbt'
 import { getAddressRunesBalances } from '../../lib/sandshrew'
+import { DataSourceManager } from '../../lib/data-sources/manager'
 
 export const UNSUPPORTED_PROVIDER_METHOD_ERROR = new Error(
   "The connected wallet doesn't support this method..."
@@ -31,6 +32,8 @@ export const WALLET_NOT_INSTALLED_ERROR = new Error('Wallet is not installed')
 export abstract class WalletProvider {
   readonly $store: MapStore<LaserEyesStoreType>
   readonly $network: WritableAtom<NetworkType>
+
+  protected dataSourceManager: DataSourceManager;
 
   constructor(
     stores: {
@@ -43,10 +46,17 @@ export abstract class WalletProvider {
     this.$store = stores.$store
     this.$network = stores.$network
 
+    try {
+      this.dataSourceManager = DataSourceManager.getInstance()
+    } catch {
+      DataSourceManager.init(config!)
+      this.dataSourceManager = DataSourceManager.getInstance()
+    }
+
     this.initialize()
   }
 
-  disconnect(): void {}
+  disconnect(): void { }
 
   abstract initialize(): void
 
@@ -120,10 +130,10 @@ export abstract class WalletProvider {
     broadcast?: boolean
   ): Promise<
     | {
-        signedPsbtHex: string | undefined
-        signedPsbtBase64: string | undefined
-        txId?: string
-      }
+      signedPsbtHex: string | undefined
+      signedPsbtBase64: string | undefined
+      txId?: string
+    }
     | undefined
   >
 

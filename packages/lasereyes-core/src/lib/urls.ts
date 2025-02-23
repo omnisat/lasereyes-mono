@@ -7,6 +7,12 @@ import {
 } from '../constants/networks'
 import { NetworkType } from '../types'
 
+
+export const SANDSHREW_URL: string = 'https://mainnet.sandshrew.io/v1/'
+export const SANDSHREW_LASEREYES_KEY: string = "lasereyes"
+
+export const MAESTRO_API_KEY: string = "lasereyes"
+
 export const MEMPOOL_SPACE_URL = 'https://mempool.space'
 export const MEMPOOL_SPACE_TESTNET_URL = 'https://mempool.space/testnet'
 export const MEMPOOL_SPACE_TESTNET4_URL = 'https://mempool.space/testnet4'
@@ -28,3 +34,9 @@ export const getMempoolSpaceUrl = (network: NetworkType) =>
           : network === FRACTAL_TESTNET
             ? MEMPOOL_SPACE_FRACTAL_TESTNET_URL
             : MEMPOOL_SPACE_URL
+
+export const getMaestroUrl = (network: NetworkType) =>
+  network === TESTNET4
+    ? 'https://xbt-testnet.gomaestro-api.org/v0'
+    : "https://xbt-mainnet.gomaestro-api.org/v0"
+

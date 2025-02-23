@@ -5,13 +5,13 @@ import {
   getAddress,
   request,
   MessageSigningProtocols,
+  BitcoinNetworkType,
 } from 'sats-connect'
 import { WalletProvider } from '.'
 import {
   ProviderType,
   NetworkType,
   XVERSE,
-  getSatsConnectNetwork,
   MAINNET,
   TESTNET,
   TESTNET4,
@@ -20,6 +20,8 @@ import {
   LaserEyesStoreType,
   SignMessageOptions,
   ECDSA,
+  LaserEyesClient,
+  Config,
 } from '../..'
 import {
   findOrdinalsAddress,
@@ -28,16 +30,28 @@ import {
   getBitcoinNetwork,
   isMainnetNetwork,
 } from '../../lib/helpers'
-import { MapStore, listenKeys } from 'nanostores'
+import { getSatsConnectNetwork } from '../../constants/networks'
+import { MapStore, WritableAtom, listenKeys } from 'nanostores'
 import { persistentMap } from '@nanostores/persistent'
 import {
   handleStateChangePersistence,
   keysToPersist,
   PersistedKey,
 } from '../utils'
+import { BaseNetwork } from '../../types/network'
 
 const XVERSE_WALLET_PERSISTENCE_KEY = 'XVERSE_CONNECTED_WALLET_STATE'
 export default class XVerseProvider extends WalletProvider {
+  constructor(stores: {
+    $store: MapStore<LaserEyesStoreType>
+    $network: WritableAtom<NetworkType>
+  },
+    parent: LaserEyesClient,
+    config?: Config
+  ) {
+    super(stores, parent, config)
+  }
+
   public get library(): any | undefined {
     return (window as any)?.BitcoinProvider
   }
@@ -137,13 +151,13 @@ export default class XVerseProvider extends WalletProvider {
         }
       }
 
-      let xverseNetwork = getSatsConnectNetwork(this.network || MAINNET)
+      let xverseNetwork = getSatsConnectNetwork(this.network || BaseNetwork.MAINNET)
       const getAddressOptions = {
         payload: {
           purposes: ['ordinals', 'payment'],
           message: 'Connecting with lasereyes',
           network: {
-            type: xverseNetwork,
+            type: xverseNetwork as unknown as BitcoinNetworkType,
           },
         },
         onFinish: (response: any) => {
@@ -248,10 +262,10 @@ export default class XVerseProvider extends WalletProvider {
     broadcast?: boolean | undefined
   ): Promise<
     | {
-        signedPsbtHex: string | undefined
-        signedPsbtBase64: string | undefined
-        txId?: string | undefined
-      }
+      signedPsbtHex: string | undefined
+      signedPsbtBase64: string | undefined
+      txId?: string | undefined
+    }
     | undefined
   > {
     try {

@@ -8,10 +8,11 @@ import {
   LeatherAddress,
   LeatherRequestSignResponse,
   SignPsbtRequestParams,
+  Config,
 } from '../../types'
 import { getBTCBalance, isMainnetNetwork } from '../../lib/helpers'
 import { LEATHER, P2TR, P2WPKH } from '../../constants/wallets'
-import { listenKeys, MapStore } from 'nanostores'
+import { listenKeys, MapStore, WritableAtom } from 'nanostores'
 import { persistentMap } from '@nanostores/persistent'
 import { LaserEyesStoreType, SignMessageOptions } from '../types'
 import { ECDSA, SIGNET, TESTNET, TESTNET4 } from '../../constants'
@@ -21,10 +22,21 @@ import {
   keysToPersist,
   PersistedKey,
 } from '../utils'
+import { LaserEyesClient } from '..'
 
 const LEATHER_WALLET_PERSISTENCE_KEY = 'LEATHER_CONNECTED_WALLET_STATE'
 
 export default class LeatherProvider extends WalletProvider {
+  constructor(stores: {
+    $store: MapStore<LaserEyesStoreType>
+    $network: WritableAtom<NetworkType>
+  },
+    parent: LaserEyesClient,
+    config?: Config
+  ) {
+    super(stores, parent, config)
+  }
+
   public get library(): any | undefined {
     return (window as any).LeatherProvider
   }
@@ -220,10 +232,10 @@ export default class LeatherProvider extends WalletProvider {
     broadcast?: boolean | undefined
   ): Promise<
     | {
-        signedPsbtHex: string | undefined
-        signedPsbtBase64: string | undefined
-        txId?: string | undefined
-      }
+      signedPsbtHex: string | undefined
+      signedPsbtBase64: string | undefined
+      txId?: string | undefined
+    }
     | undefined
   > {
     const requestParams: SignPsbtRequestParams = {
