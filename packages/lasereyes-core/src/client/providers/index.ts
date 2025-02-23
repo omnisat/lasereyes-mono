@@ -22,7 +22,6 @@ import {
 } from '../../constants'
 import { BTC, RUNES } from '../../constants/protocols'
 import { sendRune } from '../../lib/runes/psbt'
-import { getAddressRunesBalances } from '../../lib/sandshrew'
 import { DataSourceManager } from '../../lib/data-sources/manager'
 
 export const UNSUPPORTED_PROVIDER_METHOD_ERROR = new Error(
@@ -104,7 +103,17 @@ export abstract class WalletProvider {
           throw new Error('Unsupported network')
         }
 
-        return await getAddressRunesBalances(this.$store.get().address)
+        const ds = this.dataSourceManager.getSource("sandshrew")
+
+        if (!ds) {
+          throw new Error('Data source not found')
+        }
+
+        if (!ds.getAddressRunesBalances) {
+          throw new Error('Method not found on data source')
+        }
+
+        return await ds.getAddressRunesBalances(this.$store.get().address)
       default:
         throw new Error('Unsupported protocol')
     }

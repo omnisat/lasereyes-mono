@@ -15,10 +15,8 @@ export class SandshrewDataSource implements DataSource {
     this.setNetwork(network, baseUrl);
   }
 
-  public setNetwork(network: string, baseUrl?: string) {
-    this.apiUrl = baseUrl
-      ? `${baseUrl}/${network === 'mainnet' ? '' : network}`
-      : `https://mainnet.sandshrew.io/v1/lasereyes`;
+  public setNetwork(_network: string, _baseUrl?: string) {
+    this.apiUrl = `https://mainnet.sandshrew.io/v1/lasereyes`;
   }
 
   private async call(method: string, params: any) {
