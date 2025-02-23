@@ -30,7 +30,7 @@ export async function getRawTransactionMempoolSpace(
 }
 
 export const getRecommendedFeesMempoolSpace = async (
-  network: NetworkType
+  network: NetworkType = MAINNET
 ): Promise<{
   fastestFee: number
   halfHourFee: number
