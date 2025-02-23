@@ -16,41 +16,35 @@ export class MempoolSpaceDataSource implements DataSource {
       : getMempoolSpaceUrl(network);
   }
 
-  async getTransaction(txId: string) {
+  private async call(method: 'get' | 'post', endpoint: string, body?: any) {
     try {
-      const res = await axios.get(`${this.apiUrl}/tx/${txId}`);
-      return res.data;
+      const url = `${this.apiUrl}${endpoint}`;
+      const options = {
+        headers: {
+          'Content-Type': method === 'post' ? 'text/plain' : 'application/json'
+        }
+      };
+
+      const response = method === 'get'
+        ? await axios.get(url, options)
+        : await axios.post(url, body, options);
+
+      return response.data;
     } catch (error) {
-      console.error(`MempoolSpaceDataSource.getTransaction error:`, error);
+      console.error(`MempoolSpaceDataSource.call error:`, error);
       throw error;
     }
+  }
+
+  async getTransaction(txId: string) {
+    return this.call('get', `/tx/${txId}`);
   }
 
   async getRecommendedFees() {
-    try {
-      const res = await axios.get(`${this.apiUrl}/v1/fees/recommended`);
-      return res.data;
-    } catch (error) {
-      console.error(`MempoolSpaceDataSource.getRecommendedFees error:`, error);
-      throw error;
-    }
+    return this.call('get', `/v1/fees/recommended`);
   }
 
   async broadcastTransaction(txHex: string) {
-    try {
-      const response = await axios.post(
-        `${this.apiUrl}/api/tx`,
-        txHex,
-        {
-          headers: {
-            'Content-Type': 'text/plain',
-          },
-        }
-      )
-      return response.data
-    } catch (error) {
-      console.error(`MempoolSpaceDataSource.getTransaction error:`, error);
-      throw error
-    }
+    return this.call('post', `/api/tx`, txHex);
   }
 }
