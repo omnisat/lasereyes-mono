@@ -11,7 +11,7 @@ import {
 } from '../../types'
 import { LaserEyesClient } from '..'
 import { inscribeContent } from '../../lib/inscribe'
-import { broadcastTx, getBTCBalance } from '../../lib/helpers'
+import { broadcastTx, } from '../../lib/helpers'
 import * as bitcoin from 'bitcoinjs-lib'
 import {
   FRACTAL_TESTNET,
@@ -20,9 +20,10 @@ import {
   TESTNET,
   TESTNET4,
 } from '../../constants'
-import { BTC, RUNES } from '../../constants/protocols'
+import { BRC20, BTC, RUNES } from '../../constants/protocols'
 import { sendRune } from '../../lib/runes/psbt'
 import { DataSourceManager } from '../../lib/data-sources/manager'
+import { DataSource } from '../../types/data-source'
 
 export const UNSUPPORTED_PROVIDER_METHOD_ERROR = new Error(
   "The connected wallet doesn't support this method..."
@@ -89,8 +90,17 @@ export abstract class WalletProvider {
   }
 
   async getBalance(): Promise<string | number | bigint> {
-    const { paymentAddress } = this.$store.get()
-    return await getBTCBalance(paymentAddress, this.$network.get())
+    const ds = this.dataSourceManager.getSource("maestro")
+
+    if (!ds) {
+      throw new Error('Data source not found')
+    }
+
+    if (!ds.getBalance) {
+      throw new Error('Method not found on data source')
+    }
+
+    return await ds.getBalance(this.$store.get().paymentAddress)
   }
 
   async getMetaBalances(protocol: Protocol): Promise<any> {
@@ -104,7 +114,6 @@ export abstract class WalletProvider {
         }
 
         const ds = this.dataSourceManager.getSource("sandshrew")
-
         if (!ds) {
           throw new Error('Data source not found')
         }
@@ -114,6 +123,17 @@ export abstract class WalletProvider {
         }
 
         return await ds.getAddressRunesBalances(this.$store.get().address)
+      case BRC20:
+        const dsm = this.dataSourceManager.getSource("maestro")
+        if (!dsm) {
+          throw new Error('Data source not found')
+        }
+
+        if (!dsm.getBrc20ByAddress) {
+          throw new Error('Method not found on data source')
+        }
+
+        return await dsm.getBrc20ByAddress(this.$store.get().address)
       default:
         throw new Error('Unsupported protocol')
     }
@@ -158,7 +178,8 @@ export abstract class WalletProvider {
 
   async inscribe(
     contentBase64: string,
-    mimeType: ContentType
+    mimeType: ContentType,
+    dataSource?: DataSource
   ): Promise<string | string[]> {
     return await inscribeContent({
       contentBase64,
@@ -167,6 +188,7 @@ export abstract class WalletProvider {
       paymentAddress: this.$store.get().paymentAddress,
       paymentPublicKey: this.$store.get().paymentPublicKey,
       signPsbt: this.signPsbt.bind(this),
+      dataSource: dataSource || this.dataSourceManager.getSource("maestro") as DataSource,
       network: this.$network.get(),
     })
   }

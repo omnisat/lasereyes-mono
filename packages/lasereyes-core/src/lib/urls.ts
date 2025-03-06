@@ -11,8 +11,11 @@ import { NetworkType } from '../types'
 export const SANDSHREW_URL: string = 'https://mainnet.sandshrew.io/v1/'
 
 export const SANDSHREW_LASEREYES_KEY: string = "lasereyes"
-export const MAESTRO_API_KEY_MAINNET: string = "M7yRe3UAAyLkOA2HfCFqCNSXPTi6nqWX"
-export const MAESTRO_API_KEY_TESTNET4: string = "M7yRe3UAAyLkOA2HfCFqCNSXPTi6nqWX"
+export const MAESTRO_API_KEY_MAINNET: string = "VIOi9IApvUkDFWBQ7I9oHsfUMWOIfDeO"
+export const MAESTRO_API_KEY_TESTNET4: string = "bVG4GSXShooC9f67hq5YQWAJfZyRPrEN"
+
+export const MAESTRO_API_URL_MAINNET: string = "https://xbt-mainnet.gomaestro-api.org/v0"
+export const MAESTRO_API_URL_TESTNET4: string = "https://xbt-testnet.gomaestro-api.org/v0"
 
 export const MEMPOOL_SPACE_URL = 'https://mempool.space'
 export const MEMPOOL_SPACE_TESTNET_URL = 'https://mempool.space/testnet'
@@ -38,6 +41,6 @@ export const getMempoolSpaceUrl = (network: NetworkType) =>
 
 export const getMaestroUrl = (network: NetworkType) =>
   network === TESTNET4
-    ? 'https://xbt-testnet.gomaestro-api.org/v0'
-    : "https://xbt-mainnet.gomaestro-api.org/v0"
+    ? MAESTRO_API_URL_TESTNET4
+    : MAESTRO_API_URL_MAINNET
 

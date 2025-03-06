@@ -4,9 +4,7 @@ import { Address, Signer, Tap, Tx } from '@cmdcode/tapscript'
 import * as bitcoin from 'bitcoinjs-lib'
 import * as ecc2 from '@bitcoinerlab/secp256k1'
 import {
-  broadcastTx,
   calculateValueOfUtxosGathered,
-  getAddressUtxos,
   getBitcoinNetwork,
 } from './helpers'
 import { getCmDruidNetwork } from '../constants/networks'
@@ -16,12 +14,10 @@ import { toXOnly } from 'bitcoinjs-lib/src/psbt/bip371'
 import { TEXT_PLAIN } from '../constants/content'
 import {
   generatePrivateKey,
-  waitForTransaction,
-  getOutputValueByVOutIndex,
   getAddressType,
   getRedeemScript,
 } from './btc'
-import { getRecommendedFeesMempoolSpace } from './mempool-space'
+import { DataSource } from '../types/data-source'
 
 bitcoin.initEccLib(ecc2)
 
@@ -34,6 +30,7 @@ export const inscribeContent = async ({
   paymentAddress,
   paymentPublicKey,
   signPsbt,
+  dataSource,
   network = MAINNET,
 }: {
   contentBase64?: string
@@ -58,12 +55,22 @@ export const inscribeContent = async ({
     }
     | undefined
   >
+  dataSource: DataSource
   network: NetworkType
 }) => {
   try {
     if (!contentBase64 && !inscriptions) {
       throw new Error('contentBase64 or inscriptions is required')
     }
+
+    if (!dataSource) {
+      throw new Error("missing data source")
+    }
+
+    if (!dataSource.broadcastTransaction) {
+      throw new Error("missing broadcastTransaction")
+    }
+
     const privKeyBuff = await generatePrivateKey(network)
     const privKey = Buffer.from(privKeyBuff!).toString('hex')
     const ixs = inscriptions
@@ -78,6 +85,7 @@ export const inscribeContent = async ({
       paymentAddress,
       paymentPublicKey,
       privKey,
+      dataSource,
       network,
     })
 
@@ -98,13 +106,14 @@ export const inscribeContent = async ({
     if (!response) throw new Error('sign psbt failed')
     const psbt = bitcoin.Psbt.fromHex(response?.signedPsbtHex || '')
     const extracted = psbt.extractTransaction()
-    const commitTxId = await broadcastTx(extracted.toHex(), network)
+    const commitTxId = await dataSource.broadcastTransaction(extracted.toHex())
     if (!commitTxId) throw new Error('commit tx failed')
     return await executeRevealTransaction({
       inscriptions: ixs,
       ordinalAddress,
       privKey,
       commitTxId,
+      dataSource,
       network,
     })
   } catch (e) {
@@ -117,12 +126,14 @@ export const getCommitPsbt = async ({
   paymentAddress,
   paymentPublicKey,
   privKey,
+  dataSource,
   network,
 }: {
   inscriptions: { content: string; mimeType: ContentType }[]
   paymentAddress: string
   paymentPublicKey?: string
   privKey: string
+  dataSource: DataSource
   network: NetworkType
   isDry?: boolean
 }): Promise<
@@ -141,7 +152,19 @@ export const getCommitPsbt = async ({
     if (contentSize > 390000)
       throw new Error('Content size is too large, must be less than 390kb')
 
-    const { fastestFee } = await getRecommendedFeesMempoolSpace(network)
+    if (!dataSource) {
+      throw new Error("missing data source")
+    }
+
+    if (!dataSource.getRecommendedFees) {
+      throw new Error("missing getRecommendedFees")
+    }
+
+    if (!dataSource.getAddressUtxos) {
+      throw new Error("missing getAddressUtxos")
+    }
+
+    const { fastestFee } = await dataSource.getRecommendedFees()
     const pubKey = ecc.keys.get_pubkey(String(privKey), true)
     const psbt = new bitcoin.Psbt({
       network: getBitcoinNetwork(network),
@@ -158,7 +181,7 @@ export const getCommitPsbt = async ({
     const revealSatsNeeded =
       Math.floor((contentSize * fastestFee) / 3) + 1000 + 546 * quantity
     const inscribeFees = Math.floor(commitSatsNeeded + revealSatsNeeded)
-    const utxosGathered: MempoolUtxo[] = await getAddressUtxos(
+    const utxosGathered: MempoolUtxo[] = await dataSource.getAddressUtxos(
       paymentAddress,
       network
     )
@@ -236,6 +259,7 @@ export const executeRevealTransaction = async ({
   ordinalAddress,
   commitTxId,
   privKey,
+  dataSource,
   network,
   isDry,
 }: {
@@ -243,6 +267,7 @@ export const executeRevealTransaction = async ({
   ordinalAddress: string
   commitTxId: string
   privKey: string
+  dataSource: DataSource
   network: NetworkType
   isDry?: boolean
 }): Promise<string> => {
@@ -253,12 +278,30 @@ export const executeRevealTransaction = async ({
     const tapleaf = Tap.encodeScript(script)
     const [tpubkey, cblock] = Tap.getPubKey(pubKey, { target: tapleaf })
 
-    const txResult = await waitForTransaction(String(commitTxId), network)
+    if (!dataSource) {
+      throw new Error("missing data source")
+    }
+
+
+    if (!dataSource.waitForTransaction) {
+      throw new Error("missing waitForTransaction")
+    }
+
+
+    if (!dataSource.getOutputValueByVOutIndex) {
+      throw new Error("missing waitForTransaction")
+    }
+
+    if (!dataSource.broadcastTransaction) {
+      throw new Error('missing broadcastTransaction')
+    }
+
+    const txResult = await dataSource.waitForTransaction(String(commitTxId), network)
     if (!txResult) {
       throw new Error('ERROR WAITING FOR COMMIT TX')
     }
 
-    const commitTxOutputValue = await getOutputValueByVOutIndex(
+    const commitTxOutputValue = await dataSource.getOutputValueByVOutIndex(
       commitTxId,
       0,
       network
@@ -292,7 +335,7 @@ export const executeRevealTransaction = async ({
       return Tx.util.getTxid(txData)
     }
 
-    return await broadcastTx(Tx.encode(txData).hex, network)
+    return await dataSource.broadcastTransaction(Tx.encode(txData).hex)
   } catch (e: any) {
     throw e
   }

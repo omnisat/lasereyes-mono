@@ -1,7 +1,7 @@
 import { Config } from "../../types";
 import { DataSource } from "../../types/data-source";
 import { BaseNetwork } from "../../types/network";
-import { getMempoolSpaceUrl, MAESTRO_API_KEY, SANDSHREW_LASEREYES_KEY, SANDSHREW_URL } from "../urls";
+import { getMempoolSpaceUrl, MAESTRO_API_KEY_MAINNET, SANDSHREW_LASEREYES_KEY, SANDSHREW_URL } from "../urls";
 import { MaestroDataSource } from "./sources/maestro-ds";
 import { MempoolSpaceDataSource } from "./sources/mempool-space-ds";
 import { SandshrewDataSource } from "./sources/sandshrew-ds";
@@ -18,6 +18,10 @@ export class DataSourceManager {
       network
     ));
 
+
+
+    const url = config.dataSources?.sandshrew?.url || SANDSHREW_URL;
+    console.log(url)
     this.dataSources.set('sandshrew', new SandshrewDataSource(
       config.dataSources?.sandshrew?.url || SANDSHREW_URL,
       config.dataSources?.sandshrew?.apiKey || SANDSHREW_LASEREYES_KEY,
@@ -25,7 +29,7 @@ export class DataSourceManager {
     ));
 
     this.dataSources.set('maestro', new MaestroDataSource(
-      config.dataSources?.maestro?.apiKey || MAESTRO_API_KEY,
+      config.dataSources?.maestro?.apiKey || MAESTRO_API_KEY_MAINNET,
       network,
     ));
   }

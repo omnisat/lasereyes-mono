@@ -9,7 +9,7 @@ import {
 import { EsploraTx, SingleRuneOutpoint } from '../types/sandshrew'
 import { getPublicKeyHash } from './btc'
 import { MAINNET } from '../constants'
-import { SANDSHREW_URL } from './urls'
+import { SANDSHREW_LASEREYES_KEY, SANDSHREW_URL } from './urls'
 
 export const callSandshrewRPC = async (
   method: string,
@@ -27,7 +27,7 @@ export const callSandshrewRPC = async (
   }
 
   return await axios
-    .post(SANDSHREW_URL, data, {
+    .post(`${SANDSHREW_URL}/${SANDSHREW_LASEREYES_KEY}`, data, {
       headers: {
         'content-type': 'application/json',
       },

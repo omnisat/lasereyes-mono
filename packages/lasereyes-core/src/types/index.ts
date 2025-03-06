@@ -50,7 +50,7 @@ import {
   VIDEO_WEBM,
   TEXT_MARKDOWN,
 } from '../constants/content'
-import { BTC, RUNES } from '../constants/protocols'
+import { BTC, RUNES, BRC20 } from '../constants/protocols'
 import { BaseNetwork } from './network'
 
 export type NetworkType =
@@ -130,7 +130,7 @@ export type Config = {
 
 export type SendArgs = BTCSendArgs | RuneSendArgs
 
-export type Protocol = typeof BTC | typeof RUNES
+export type Protocol = typeof BTC | typeof RUNES | typeof BRC20
 
 export interface BTCSendArgs {
   fromAddress: string

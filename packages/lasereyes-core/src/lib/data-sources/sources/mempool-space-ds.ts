@@ -1,7 +1,7 @@
 import axios from "axios";
 import { DataSource } from "../../../types/data-source";
 import { getMempoolSpaceUrl } from "../../urls";
-import { NetworkType } from "../../../types";
+import { MempoolUtxo, NetworkType } from "../../../types";
 
 export class MempoolSpaceDataSource implements DataSource {
   private apiUrl: string = "";
@@ -34,6 +34,12 @@ export class MempoolSpaceDataSource implements DataSource {
       console.error(`MempoolSpaceDataSource.call error:`, error);
       throw error;
     }
+  }
+
+  async getAddressUtxos(address: string, network: NetworkType) {
+    return (await axios
+      .get(`${getMempoolSpaceUrl(network)}/api/address/${address}/utxo`)
+      .then((response) => response.data)) as Array<MempoolUtxo>
   }
 
   async getTransaction(txId: string) {

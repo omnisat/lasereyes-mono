@@ -5,18 +5,19 @@ import { MAINNET } from "../../../constants";
 import { OrdOutputs } from "../../../types/ord";
 import { EsploraTx, SingleRuneOutpoint } from "../../../types/sandshrew";
 import { getPublicKeyHash } from "../../btc";
+import { SANDSHREW_LASEREYES_KEY, SANDSHREW_URL } from "../../urls";
 
 export class SandshrewDataSource implements DataSource {
-  private apiUrl: string = '';
-  private apiKey: string;
+  private apiUrl: string = `${SANDSHREW_URL}/${SANDSHREW_LASEREYES_KEY}`;
+  private apiKey: string = SANDSHREW_LASEREYES_KEY;
 
   constructor(baseUrl: string, apiKey: string, network: string) {
-    this.apiKey = apiKey;
     this.setNetwork(network, baseUrl);
+    this.apiKey = apiKey
   }
 
   public setNetwork(_network: string, _baseUrl?: string) {
-    this.apiUrl = `https://mainnet.sandshrew.io/v1/lasereyes`;
+    this.apiUrl = `${this.apiUrl}/${this.apiKey || SANDSHREW_LASEREYES_KEY}`;
   }
 
   private async call(method: string, params: any) {
@@ -29,7 +30,6 @@ export class SandshrewDataSource implements DataSource {
       }, {
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.apiKey}`
         }
       });
       return response.data;
