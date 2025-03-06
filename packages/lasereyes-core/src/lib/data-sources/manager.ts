@@ -18,10 +18,6 @@ export class DataSourceManager {
       network
     ));
 
-
-
-    const url = config.dataSources?.sandshrew?.url || SANDSHREW_URL;
-    console.log(url)
     this.dataSources.set('sandshrew', new SandshrewDataSource(
       config.dataSources?.sandshrew?.url || SANDSHREW_URL,
       config.dataSources?.sandshrew?.apiKey || SANDSHREW_LASEREYES_KEY,
@@ -57,6 +53,24 @@ export class DataSourceManager {
     return this.dataSources.get(source);
   }
 
+  public async getAddressBrc20Balances(address: string): Promise<any> {
+    const dataSource = this.findAvailableSource('getAddressBrc20Balances');
+    if (!dataSource || !dataSource.getAddressBrc20Balances) {
+      throw new Error('Method getAddressBrc20Balances not available on any data source');
+    }
+
+    return await dataSource.getAddressBrc20Balances(address);
+  }
+
+  public async getAddressInscriptions(address: string, offset?: number, limit?: number): Promise<any> {
+    const dataSource = this.findAvailableSource('getAddressInscriptions');
+
+    if (!dataSource || !dataSource.getAddressInscriptions) {
+      throw new Error('Method getAddressInscriptions not available on any data source');
+    }
+    return await dataSource.getAddressInscriptions(address, offset, limit);
+  }
+
   public async withFallback<T>(
     primarySource: string,
     method: (ds: DataSource) => Promise<T>
@@ -72,5 +86,14 @@ export class DataSourceManager {
       }
     }
     throw new Error('All data sources failed');
+  }
+
+  private findAvailableSource(method: keyof DataSource): DataSource | undefined {
+    for (const source of this.dataSources.values()) {
+      if (typeof source[method] === 'function') {
+        return source;
+      }
+    }
+    return undefined;
   }
 }

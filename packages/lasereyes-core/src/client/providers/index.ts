@@ -124,24 +124,22 @@ export abstract class WalletProvider {
 
         return await ds.getAddressRunesBalances(this.$store.get().address)
       case BRC20:
-        const dsm = this.dataSourceManager.getSource("maestro")
-        if (!dsm) {
-          throw new Error('Data source not found')
-        }
-
-        if (!dsm.getBrc20ByAddress) {
+        if (!this.dataSourceManager.getAddressBrc20Balances) {
           throw new Error('Method not found on data source')
         }
 
-        return await dsm.getBrc20ByAddress(this.$store.get().address)
+        return await this.dataSourceManager.getAddressBrc20Balances(this.$store.get().address)
       default:
         throw new Error('Unsupported protocol')
     }
   }
 
   async getInscriptions(offset?: number, limit?: number): Promise<any[]> {
-    console.log('getInscriptions not implemented', offset, limit)
-    throw UNSUPPORTED_PROVIDER_METHOD_ERROR
+    if (!this.dataSourceManager.getAddressInscriptions) {
+      throw new Error('Method not found on data source')
+    }
+
+    return await this.dataSourceManager.getAddressInscriptions(this.$store.get().address, offset, limit)
   }
 
   abstract sendBTC(to: string, amount: number): Promise<string>

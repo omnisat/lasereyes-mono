@@ -2,7 +2,7 @@ import axios from "axios";
 import { NetworkType } from "../../../types"
 import { DataSource } from "../../../types/data-source"
 import { getMaestroUrl } from "../../urls";
-import { MaestroBrc20ByAddressResponse, MaestroGetAddressBalanceResponse } from "../../../types/maestro";
+import { MaestroBrc20ByAddressResponse, MaestroGetAddressBalanceResponse, MaestroGetAddressInscriptions } from "../../../types/maestro";
 
 export class MaestroDataSource implements DataSource {
   private apiUrl: string = "";
@@ -40,13 +40,22 @@ export class MaestroDataSource implements DataSource {
     }
   }
 
-  async getBalance(address: string): Promise<string> {
+  async getAddressBtcBalance(address: string): Promise<string> {
     const balanceResp = await this.call('get', `/addresses/${address}/balance`) as MaestroGetAddressBalanceResponse
     return balanceResp.data
   }
 
-  async getBrc20ByAddress(address: string): Promise<any> {
+  async getAddressBrc20Balances(address: string): Promise<MaestroBrc20ByAddressResponse> {
     return await this.call('get', `/addresses/${address}/brc20`) as MaestroBrc20ByAddressResponse
+  }
+
+  async getAddressInscriptions(address: string, offset?: number, limit?: number): Promise<MaestroGetAddressInscriptions> {
+    const queryParams = new URLSearchParams();
+    if (offset !== undefined) queryParams.append('offset', offset.toString());
+    if (limit !== undefined) queryParams.append('limit', limit.toString());
+
+    const url = `/addresses/${address}/inscriptions${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    return await this.call('get', url) as MaestroGetAddressInscriptions;
   }
 
   async getTransactionInfo(txHash: string): Promise<any> {
