@@ -2,6 +2,7 @@ import axios from "axios";
 import { DataSource } from "../../../types/data-source";
 import { getMempoolSpaceUrl } from "../../urls";
 import { MempoolUtxo, NetworkType } from "../../../types";
+import { MempoolSpaceFeeRatesResponse, MempoolSpaceGetTransactionResponse } from "../../../types/mempool-space";
 
 export class MempoolSpaceDataSource implements DataSource {
   private apiUrl: string = "";
@@ -36,21 +37,19 @@ export class MempoolSpaceDataSource implements DataSource {
     }
   }
 
-  async getAddressUtxos(address: string, network: NetworkType) {
-    return (await axios
-      .get(`${getMempoolSpaceUrl(network)}/api/address/${address}/utxo`)
-      .then((response) => response.data)) as Array<MempoolUtxo>
+  async getAddressUtxos(address: string): Promise<Array<MempoolUtxo>> {
+    return this.call('get', `/api/address/${address}/utxo`);
   }
 
-  async getTransaction(txId: string) {
-    return this.call('get', `/tx/${txId}`);
+  async getTransaction(txId: string): Promise<MempoolSpaceGetTransactionResponse> {
+    return await this.call('get', `/tx/${txId}`);
   }
 
-  async getRecommendedFees() {
-    return this.call('get', `/v1/fees/recommended`);
+  async getRecommendedFees(): Promise<MempoolSpaceFeeRatesResponse> {
+    return await this.call('get', `/v1/fees/recommended`);
   }
 
-  async broadcastTransaction(txHex: string) {
-    return this.call('post', `/api/tx`, txHex);
+  async broadcastTransaction(txHex: string): Promise<string> {
+    return await this.call('post', `/api/tx`, txHex);
   }
 }

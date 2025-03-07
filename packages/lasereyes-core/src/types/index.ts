@@ -147,6 +147,14 @@ export interface RuneSendArgs {
   network: NetworkType
 }
 
+export interface Brc20SendArgs {
+  ticker: string
+  fromAddress: string
+  toAddress: string
+  amount: number
+  network: NetworkType
+}
+
 export interface OYLBalanceResponse {
   brc20s: {
     total: number

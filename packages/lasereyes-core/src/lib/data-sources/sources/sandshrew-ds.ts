@@ -1,9 +1,8 @@
 import axios from "axios";
 import { DataSource } from "../../../types/data-source";
-import { RuneBalance } from "@magiceden-oss/runestone-lib";
 import { MAINNET } from "../../../constants";
-import { OrdOutputs } from "../../../types/ord";
-import { EsploraTx, SingleRuneOutpoint } from "../../../types/sandshrew";
+import { OrdAddress, OrdOutputs, RuneBalance } from "../../../types/ord";
+import { EsploraTx, SandshrewGetRuneByIdOrNameResponse, SandshrewResponse, SingleRuneOutpoint } from "../../../types/sandshrew";
 import { getPublicKeyHash } from "../../btc";
 import { SANDSHREW_LASEREYES_KEY, SANDSHREW_URL } from "../../urls";
 
@@ -43,24 +42,28 @@ export class SandshrewDataSource implements DataSource {
     return this.call('esplora_tx', [txId]);
   }
 
-  async getRuneById(runeId: string) {
-    return this.call('ord_rune', [runeId]);
+  async getRuneById(runeId: string): Promise<SandshrewGetRuneByIdOrNameResponse> {
+    const response = await this.call('ord_rune', [runeId]);
+    return response.result as SandshrewGetRuneByIdOrNameResponse;
   }
 
-  async getRuneByName(runeName: string) {
-    return this.call('ord_rune', [runeName]);
+  async getRuneByName(runeName: string): Promise<SandshrewGetRuneByIdOrNameResponse> {
+    const response = await this.call('ord_rune', [runeName]) as SandshrewResponse
+    return response.result as SandshrewGetRuneByIdOrNameResponse;
   }
 
-  async broadcastTransaction(rawTx: string) {
-    return this.call('broadcast_tx', [rawTx]);
+  async broadcastTransaction(rawTx: string): Promise<string> {
+    return await this.call('broadcast_tx', [rawTx]) as string
   }
 
-  async getOrdAddress(address: string) {
-    return this.call('ord_address', [address]);
+  async getOrdAddress(address: string): Promise<OrdAddress> {
+    const response = await this.call('ord_address', [address]) as SandshrewResponse
+    return response.result as OrdAddress;
   }
 
   async getTxInfo(txId: string): Promise<EsploraTx> {
-    return this.call('esplora_tx', [txId]);
+    const response = await this.call('esplora_tx', [txId]) as SandshrewResponse
+    return response.result as EsploraTx;
   }
 
   async batchOrdOutput({ outpoints, rune_name }: { outpoints: string[], rune_name: string }): Promise<OrdOutputs[]> {
@@ -72,7 +75,7 @@ export class SandshrewDataSource implements DataSource {
         return ['ord_output', [outpoint]];
       });
 
-      const { result } = await this.call('sandshrew_multicall', multiCall);
+      const { result } = await this.call('sandshrew_multicall', multiCall) as SandshrewResponse;
 
       for (let i = 0; i < result.length; i++) {
         result[i].result['output'] = batch[i];
@@ -89,7 +92,7 @@ export class SandshrewDataSource implements DataSource {
   async getAddressRunesBalances(address: string) {
     try {
       const response = await this.getOrdAddress(address);
-      const runesData = response.result.runes_balances;
+      const runesData = response.runes_balances;
       if (!runesData) {
         throw new Error('No runes data found');
       }
@@ -111,7 +114,7 @@ export class SandshrewDataSource implements DataSource {
     const runeName = entry.spaced_rune;
 
     const ordOutputs = await this.batchOrdOutput({
-      outpoints: addressOutpoints.result.outputs,
+      outpoints: addressOutpoints.outputs,
       rune_name: runeName,
     });
 

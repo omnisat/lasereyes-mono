@@ -6,6 +6,8 @@ import { MaestroDataSource } from "./sources/maestro-ds";
 import { MempoolSpaceDataSource } from "./sources/mempool-space-ds";
 import { SandshrewDataSource } from "./sources/sandshrew-ds";
 
+const ERROR_METHOD_NOT_AVAILABLE = 'Method not available on any data source';
+
 export class DataSourceManager {
   private static instance: DataSourceManager;
   private dataSources: Map<string, DataSource> = new Map();
@@ -40,6 +42,7 @@ export class DataSourceManager {
     if (!DataSourceManager.instance) {
       throw new Error('DataSourceManager has not been initialized');
     }
+
     return DataSourceManager.instance;
   }
 
@@ -53,10 +56,19 @@ export class DataSourceManager {
     return this.dataSources.get(source);
   }
 
+  public async getAddressBtcBalance(address: string): Promise<string> {
+    const dataSource = this.findAvailableSource('getAddressBtcBalance');
+    if (!dataSource || !dataSource.getAddressBtcBalance) {
+      throw new Error(ERROR_METHOD_NOT_AVAILABLE);
+    }
+
+    return await dataSource.getAddressBtcBalance(address);
+  }
+
   public async getAddressBrc20Balances(address: string): Promise<any> {
     const dataSource = this.findAvailableSource('getAddressBrc20Balances');
     if (!dataSource || !dataSource.getAddressBrc20Balances) {
-      throw new Error('Method getAddressBrc20Balances not available on any data source');
+      throw new Error(ERROR_METHOD_NOT_AVAILABLE);
     }
 
     return await dataSource.getAddressBrc20Balances(address);
@@ -64,11 +76,20 @@ export class DataSourceManager {
 
   public async getAddressInscriptions(address: string, offset?: number, limit?: number): Promise<any> {
     const dataSource = this.findAvailableSource('getAddressInscriptions');
-
     if (!dataSource || !dataSource.getAddressInscriptions) {
-      throw new Error('Method getAddressInscriptions not available on any data source');
+      throw new Error(ERROR_METHOD_NOT_AVAILABLE);
     }
+
     return await dataSource.getAddressInscriptions(address, offset, limit);
+  }
+
+  public async getAddressRunesBalances(address: string): Promise<any> {
+    const dataSource = this.findAvailableSource('getAddressRunesBalances');
+    if (!dataSource || !dataSource.getAddressRunesBalances) {
+      throw new Error(ERROR_METHOD_NOT_AVAILABLE);
+    }
+
+    return await dataSource.getAddressRunesBalances(address);
   }
 
   public async withFallback<T>(

@@ -2,7 +2,7 @@ import axios from "axios";
 import { NetworkType } from "../../../types"
 import { DataSource } from "../../../types/data-source"
 import { getMaestroUrl } from "../../urls";
-import { MaestroBrc20ByAddressResponse, MaestroGetAddressBalanceResponse, MaestroGetAddressInscriptions } from "../../../types/maestro";
+import { MaestroBrc20ByAddressResponse, MaestroGetAddressBalanceResponse, MaestroGetAddressInscriptions, MaestroGetBrc20InfoResponse, MaestroGetRuneInfoResponse, MaestroGetTransactionInfoResponse } from "../../../types/maestro";
 
 export class MaestroDataSource implements DataSource {
   private apiUrl: string = "";
@@ -19,7 +19,6 @@ export class MaestroDataSource implements DataSource {
 
   private async call(method: 'get' | 'post', endpoint: string, body?: any) {
     const url = `${this.apiUrl}${endpoint}`;
-
     try {
       const options = {
         headers: {
@@ -58,8 +57,24 @@ export class MaestroDataSource implements DataSource {
     return await this.call('get', url) as MaestroGetAddressInscriptions;
   }
 
-  async getTransactionInfo(txHash: string): Promise<any> {
-    return this.call('get', `/transactions/${txHash}`);
+  async getBrc20ByTicker(ticker: string): Promise<MaestroGetBrc20InfoResponse> {
+    return this.call('get', `/assets/brc20/${ticker}`);
+  }
+
+  async getRuneById(runeId: string): Promise<MaestroGetRuneInfoResponse> {
+    return this.call('get', `/assets/runes/${runeId}`);
+  }
+
+  async getRuneByName(runeName: string): Promise<MaestroGetRuneInfoResponse> {
+    return this.call('get', `/assets/runes/${runeName}`);
+  }
+
+  async getTransactionInfo(txHash: string): Promise<MaestroGetTransactionInfoResponse> {
+    return this.call('get', `/rpc/transaction/${txHash}`);
+  }
+
+  async broadcastTransaction(txHex: string): Promise<string> {
+    return await this.call('post', `/arpc/transaction/submit`, txHex);
   }
 
   async getRawTransaction(txHash: string): Promise<any> {
@@ -74,11 +89,4 @@ export class MaestroDataSource implements DataSource {
     return this.call('get', `/inscriptions/${address}`);
   }
 
-  async getRuneById(runeId: string): Promise<any> {
-    return this.call('get', `/runes/${runeId}`);
-  }
-
-  async getRuneByName(runeName: string): Promise<any> {
-    return this.call('get', `/runes/${runeName}`);
-  }
 }

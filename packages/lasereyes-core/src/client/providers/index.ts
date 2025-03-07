@@ -1,6 +1,7 @@
 import { MapStore, WritableAtom } from 'nanostores'
 import { LaserEyesStoreType } from '../types'
 import {
+  Brc20SendArgs,
   BTCSendArgs,
   Config,
   ContentType,
@@ -24,6 +25,7 @@ import { BRC20, BTC, RUNES } from '../../constants/protocols'
 import { sendRune } from '../../lib/runes/psbt'
 import { DataSourceManager } from '../../lib/data-sources/manager'
 import { DataSource } from '../../types/data-source'
+import { sendBrc20 } from '../../lib/brc-20/psbt'
 
 export const UNSUPPORTED_PROVIDER_METHOD_ERROR = new Error(
   "The connected wallet doesn't support this method..."
@@ -90,17 +92,11 @@ export abstract class WalletProvider {
   }
 
   async getBalance(): Promise<string | number | bigint> {
-    const ds = this.dataSourceManager.getSource("maestro")
-
-    if (!ds) {
-      throw new Error('Data source not found')
-    }
-
-    if (!ds.getBalance) {
+    if (!this.dataSourceManager.getAddressBtcBalance) {
       throw new Error('Method not found on data source')
     }
 
-    return await ds.getBalance(this.$store.get().paymentAddress)
+    return await this.dataSourceManager.getAddressBtcBalance(this.$store.get().paymentAddress)
   }
 
   async getMetaBalances(protocol: Protocol): Promise<any> {
@@ -113,16 +109,11 @@ export abstract class WalletProvider {
           throw new Error('Unsupported network')
         }
 
-        const ds = this.dataSourceManager.getSource("sandshrew")
-        if (!ds) {
-          throw new Error('Data source not found')
-        }
-
-        if (!ds.getAddressRunesBalances) {
+        if (!this.dataSourceManager.getAddressRunesBalances) {
           throw new Error('Method not found on data source')
         }
 
-        return await ds.getAddressRunesBalances(this.$store.get().address)
+        return await this.dataSourceManager.getAddressRunesBalances(this.$store.get().address)
       case BRC20:
         if (!this.dataSourceManager.getAddressBrc20Balances) {
           throw new Error('Method not found on data source')
@@ -191,13 +182,12 @@ export abstract class WalletProvider {
     })
   }
 
-  async send(protocol: Protocol, sendArgs: BTCSendArgs | RuneSendArgs) {
+  async send(protocol: Protocol, sendArgs: BTCSendArgs | RuneSendArgs | Brc20SendArgs) {
     switch (protocol) {
       case BTC:
         return await this.sendBTC(sendArgs.toAddress, sendArgs.amount)
       case RUNES:
-        const network = this.$network.get()
-        if (network !== MAINNET) {
+        if (this.$network.get() !== MAINNET) {
           throw new Error('Unsupported network')
         }
 
@@ -215,7 +205,27 @@ export abstract class WalletProvider {
           paymentPublicKey: this.$store.get().paymentPublicKey,
           toAddress: runeArgs.toAddress,
           signPsbt: this.signPsbt.bind(this),
-          network,
+          network: this.$network.get(),
+        })
+      case BRC20:
+        if (this.$network.get() !== MAINNET) {
+          throw new Error('Unsupported network')
+        }
+
+        const brcArgs = sendArgs as Brc20SendArgs
+        if (!brcArgs.ticker || !brcArgs.amount || !brcArgs.toAddress) {
+          throw new Error('Missing required parameters')
+        }
+
+        return await sendBrc20({
+          ticker: brcArgs.ticker,
+          amount: brcArgs.amount,
+          ordinalAddress: this.$store.get().address,
+          paymentAddress: this.$store.get().paymentAddress,
+          paymentPublicKey: this.$store.get().paymentPublicKey,
+          signPsbt: this.signPsbt.bind(this),
+          dataSource: dataSource || this.dataSourceManager.getSource("maestro") as DataSource,
+          network: this.$network.get(),
         })
       default:
         throw new Error('Unsupported protocol')
