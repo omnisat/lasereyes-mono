@@ -37,10 +37,12 @@
     "@nanostores/persistent": "^0.10.2",
     "@orangecrypto/orange-connect": "^1.2.2",
     "axios": "^1.7.7",
+    "bignumber.js": "^9.1.2",
     "bip32": "5.0.0-rc.0",
     "bip39": "^3.1.0",
     "bitcoinjs-lib": "^7.0.0-rc.0",
     "buffer": "^6.0.3",
+    "ledger-bitcoin": "^0.2.3",
     "nanostores": "^0.11.3",
     "sats-connect": "^2.8.0"
   },
