@@ -55,10 +55,16 @@ If you find Laser Eyes useful or use it for work, please consider [sponsoring La
       <img alt="UTXO Management" src="./.github/assets/utxo.svg" width="auto" height="100">
     </picture>
   </a>
-  <a href="https://ordinalsbot.com/">
+    <a href="https://www.oyl.io/">
     <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="./.github/assets/ordinals-bot.svg">
-      <img alt="Ordinals Bot" src="./.github/assets/ordinals-bot.svg" width="auto" height="60">
+      <source media="(prefers-color-scheme: dark)" srcset="./.github/assets/oyl-light.svg">
+      <img alt="OYL" src="./.github/assets/oyl-light.svg" width="auto" height="80">
+    </picture>
+  </a>
+  <a href="https://www.gomaestro.org/">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="./.github/assets/maestro-light.svg">
+      <img alt="Maestro" src="./.github/assets/maestro-light.svg" width="auto" height="80">
     </picture>
   </a>
 </p>
@@ -85,22 +91,10 @@ If you find Laser Eyes useful or use it for work, please consider [sponsoring La
       <img alt="Seize CTRL" src="./.github/assets/ctrl.svg" width="auto" height="50">
     </picture>
   </a>
-  <a href="https://satsventures.com/">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="./.github/assets/sats-ventures.svg">
-      <img alt="Seize CTRL" src="./.github/assets/sats-ventures.svg" width="auto" height="50">
-    </picture>
-  </a>
   <a href="https://leather.io/">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="./.github/assets/leather.svg">
       <img alt="Leather" src="./.github/assets/leather.svg" width="auto" height="50">
-    </picture>
-  </a>
-  <a href="https://www.orangecrypto.com/">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="./.github/assets/orangewallet.svg">
-      <img alt="Orange Wallet" src="./.github/assets/orangewallet.svg" width="auto" height="50">
     </picture>
   </a>
 </p>
