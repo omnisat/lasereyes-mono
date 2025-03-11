@@ -1,7 +1,11 @@
+import { MAESTRO } from "../../constants/data-sources";
 import { Config } from "../../types";
 import { DataSource } from "../../types/data-source";
+import { Inscription } from "../../types/lasereyes";
+import { MaestroAddressInscription, MaestroGetAddressInscriptions } from "../../types/maestro";
 import { BaseNetwork } from "../../types/network";
 import { getMempoolSpaceUrl, MAESTRO_API_KEY_MAINNET, SANDSHREW_LASEREYES_KEY, SANDSHREW_URL } from "../urls";
+import { normalizeInscription } from "./normalizations";
 import { MaestroDataSource } from "./sources/maestro-ds";
 import { MempoolSpaceDataSource } from "./sources/mempool-space-ds";
 import { SandshrewDataSource } from "./sources/sandshrew-ds";
@@ -74,13 +78,45 @@ export class DataSourceManager {
     return await dataSource.getAddressBrc20Balances(address);
   }
 
-  public async getAddressInscriptions(address: string, offset?: number, limit?: number): Promise<any> {
+  /**
+   * Get inscriptions for an address
+   * @param address The address to query
+   * @param offset Optional pagination offset
+   * @param limit Optional pagination limit
+   * @returns Array of normalized inscription objects
+   */
+  public async getAddressInscriptions(
+    address: string,
+    offset?: number,
+    limit?: number
+  ): Promise<Inscription[]> {
     const dataSource = this.findAvailableSource('getAddressInscriptions');
     if (!dataSource || !dataSource.getAddressInscriptions) {
       throw new Error(ERROR_METHOD_NOT_AVAILABLE);
     }
 
-    return await dataSource.getAddressInscriptions(address, offset, limit);
+    const inscriptionsResult = await dataSource.getAddressInscriptions(address, offset, limit);
+    const sourceName = dataSource.getName();
+
+    // Handle different data structures from different sources
+    if (sourceName === MAESTRO && inscriptionsResult.data) {
+      return inscriptionsResult.data.map((insc: MaestroAddressInscription) =>
+        normalizeInscription(insc, sourceName)
+      );
+    } else if (inscriptionsResult.inscriptions) {
+      // Some sources return { inscriptions: [...inscriptions] }
+      return inscriptionsResult.inscriptions.map((insc: any) =>
+        normalizeInscription(insc, sourceName)
+      );
+    } else if (Array.isArray(inscriptionsResult)) {
+      // Some sources return [...inscriptions] directly
+      return inscriptionsResult.map((insc: any) =>
+        normalizeInscription(insc, sourceName)
+      );
+    }
+
+    console.warn('Unable to normalize inscriptions from data source', sourceName);
+    return [];
   }
 
   public async getAddressRunesBalances(address: string): Promise<any> {
