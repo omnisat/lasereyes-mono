@@ -3,7 +3,6 @@ import { MAINNET, P2TR } from '../../constants'
 import { getBrc20SendJsonStr } from './utils'
 import { NetworkType } from '../../types'
 import { inscribeContent } from '../inscribe'
-import { DataSource } from '../../types/data-source'
 import { broadcastTx, getBitcoinNetwork } from '../helpers'
 import { getAddressType } from '../btc'
 import { toXOnly } from 'bitcoinjs-lib/src/psbt/bip371'
@@ -18,7 +17,7 @@ export const sendBrc20 = async ({
   paymentPublicKey,
   toAddress,
   signPsbt,
-  dataSource,
+  dataSourceManager,
   network = MAINNET,
 }: {
   ticker: string
@@ -43,15 +42,15 @@ export const sendBrc20 = async ({
     }
     | undefined
   >
-  dataSource?: DataSource
+  dataSourceManager?: DataSourceManager
   network: NetworkType
 }) => {
   try {
-    let ds: DataSource | undefined
-    if (!dataSource) {
+    let ds: DataSourceManager | undefined
+    if (!dataSourceManager) {
       ds = DataSourceManager.getInstance()
     } else {
-      ds = dataSource as DataSource
+      ds = dataSourceManager as DataSourceManager
     }
 
     if (!ds) {
@@ -76,7 +75,7 @@ export const sendBrc20 = async ({
       paymentAddress,
       paymentPublicKey,
       signPsbt,
-      dataSource: dataSource!,
+      dataSourceManager: dataSourceManager!,
       network,
     })
 

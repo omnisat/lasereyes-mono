@@ -11,6 +11,10 @@ export class MempoolSpaceDataSource implements DataSource {
     this.setNetwork(network, baseUrl);
   }
 
+  public getName() {
+    return "mempool-space";
+  }
+
   public setNetwork(network: NetworkType, baseUrl?: string) {
     this.apiUrl = baseUrl
       ? `${baseUrl}/${network === 'mainnet' ? '' : network}`

@@ -1,6 +1,7 @@
 import { MempoolUtxo, NetworkType } from ".";
 
 export interface DataSource {
+  getName(): string;
   getAddressInscriptions?(address: string, offset?: number, limit?: number): Promise<any>;
   getAddressBtcBalance?(address: string): Promise<string>;
   getAddressBrc20Balances?(address: string): Promise<any>;

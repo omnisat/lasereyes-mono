@@ -13,6 +13,10 @@ export class MaestroDataSource implements DataSource {
     this.setNetwork(network);
   }
 
+  public getName() {
+    return "maestro";
+  }
+
   public setNetwork(network: NetworkType) {
     this.apiUrl = getMaestroUrl(network);
   }

@@ -12,27 +12,27 @@ export class DataSourceManager {
   private static instance: DataSourceManager;
   private dataSources: Map<string, DataSource> = new Map();
 
-  private constructor(config: Config) {
-    const network = config.network || BaseNetwork.MAINNET;
+  private constructor(config?: Config) {
+    const network = config?.network || BaseNetwork.MAINNET;
 
     this.dataSources.set('mempool', new MempoolSpaceDataSource(
-      config.dataSources?.mempool?.url || getMempoolSpaceUrl(network),
+      config?.dataSources?.mempool?.url || getMempoolSpaceUrl(network),
       network
     ));
 
     this.dataSources.set('sandshrew', new SandshrewDataSource(
-      config.dataSources?.sandshrew?.url || SANDSHREW_URL,
-      config.dataSources?.sandshrew?.apiKey || SANDSHREW_LASEREYES_KEY,
+      config?.dataSources?.sandshrew?.url || SANDSHREW_URL,
+      config?.dataSources?.sandshrew?.apiKey || SANDSHREW_LASEREYES_KEY,
       network
     ));
 
     this.dataSources.set('maestro', new MaestroDataSource(
-      config.dataSources?.maestro?.apiKey || MAESTRO_API_KEY_MAINNET,
+      config?.dataSources?.maestro?.apiKey || MAESTRO_API_KEY_MAINNET,
       network,
     ));
   }
 
-  public static init(config: Config) {
+  public static init(config?: Config) {
     if (!DataSourceManager.instance) {
       DataSourceManager.instance = new DataSourceManager(config);
     }
@@ -90,6 +90,14 @@ export class DataSourceManager {
     }
 
     return await dataSource.getAddressRunesBalances(address);
+  }
+
+  public async broadcastTransaction(rawTx: string): Promise<string> {
+    const dataSource = this.findAvailableSource('broadcastTransaction');
+    if (!dataSource || !dataSource.broadcastTransaction) {
+      throw new Error(ERROR_METHOD_NOT_AVAILABLE);
+    }
+    return await dataSource.broadcastTransaction(rawTx);
   }
 
   public async withFallback<T>(

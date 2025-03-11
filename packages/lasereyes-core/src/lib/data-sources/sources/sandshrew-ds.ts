@@ -15,6 +15,12 @@ export class SandshrewDataSource implements DataSource {
     this.apiKey = apiKey
   }
 
+  public getName() {
+    return "sandshrew";
+  }
+
+
+
   public setNetwork(_network: string, _baseUrl?: string) {
     this.apiUrl = `${this.apiUrl}/${this.apiKey || SANDSHREW_LASEREYES_KEY}`;
   }
@@ -89,7 +95,7 @@ export class SandshrewDataSource implements DataSource {
     return ordOutputs;
   }
 
-  async getAddressRunesBalances(address: string) {
+  async getAddressRunesBalances(address: string): Promise<RuneBalance[]> {
     try {
       const response = await this.getOrdAddress(address);
       const runesData = response.runes_balances;

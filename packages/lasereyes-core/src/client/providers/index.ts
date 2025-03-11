@@ -26,6 +26,7 @@ import { sendRune } from '../../lib/runes/psbt'
 import { DataSourceManager } from '../../lib/data-sources/manager'
 import { DataSource } from '../../types/data-source'
 import { sendBrc20 } from '../../lib/brc-20/psbt'
+// import { sendBrc20 } from '../../lib/brc-20/psbt'
 
 export const UNSUPPORTED_PROVIDER_METHOD_ERROR = new Error(
   "The connected wallet doesn't support this method..."
@@ -168,7 +169,7 @@ export abstract class WalletProvider {
   async inscribe(
     contentBase64: string,
     mimeType: ContentType,
-    dataSource?: DataSource
+    dataSourceManager?: DataSourceManager
   ): Promise<string | string[]> {
     return await inscribeContent({
       contentBase64,
@@ -177,7 +178,7 @@ export abstract class WalletProvider {
       paymentAddress: this.$store.get().paymentAddress,
       paymentPublicKey: this.$store.get().paymentPublicKey,
       signPsbt: this.signPsbt.bind(this),
-      dataSource: dataSource || this.dataSourceManager.getSource("maestro") as DataSource,
+      dataSourceManager: dataSourceManager || this.dataSourceManager,
       network: this.$network.get(),
     })
   }
@@ -221,10 +222,12 @@ export abstract class WalletProvider {
           ticker: brcArgs.ticker,
           amount: brcArgs.amount,
           ordinalAddress: this.$store.get().address,
+          ordinalPublicKey: this.$store.get().publicKey,
           paymentAddress: this.$store.get().paymentAddress,
           paymentPublicKey: this.$store.get().paymentPublicKey,
           signPsbt: this.signPsbt.bind(this),
-          dataSource: dataSource || this.dataSourceManager.getSource("maestro") as DataSource,
+          toAddress: brcArgs.toAddress,
+          dataSourceManager: this.dataSourceManager,
           network: this.$network.get(),
         })
       default:
