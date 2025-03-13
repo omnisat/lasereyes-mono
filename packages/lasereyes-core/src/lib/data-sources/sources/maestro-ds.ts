@@ -3,6 +3,7 @@ import { NetworkType } from "../../../types"
 import { DataSource } from "../../../types/data-source"
 import { getMaestroUrl } from "../../urls";
 import { MaestroBrc20ByAddressResponse, MaestroGetAddressBalanceResponse, MaestroGetAddressInscriptions, MaestroGetBrc20InfoResponse, MaestroGetRuneInfoResponse, MaestroGetTransactionInfoResponse } from "../../../types/maestro";
+import { MAESTRO } from "../../../constants/data-sources";
 
 export class MaestroDataSource implements DataSource {
   private apiUrl: string = "";
@@ -14,7 +15,7 @@ export class MaestroDataSource implements DataSource {
   }
 
   public getName() {
-    return "maestro";
+    return MAESTRO;
   }
 
   public setNetwork(network: NetworkType) {

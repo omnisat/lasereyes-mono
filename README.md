@@ -81,6 +81,7 @@ If you find Laser Eyes useful or use it for work, please consider [sponsoring La
 <p style="display: flex; justify-content: center; align-items: center; gap: 40px; flex-wrap: wrap;">
   <a href="https://www.seizectrl.io/">
     <picture>
+
       <source media="(prefers-color-scheme: dark)" srcset="./.github/assets/ctrl.svg">
       <img alt="Seize CTRL" src="./.github/assets/ctrl.svg" width="auto" height="50">
     </picture>

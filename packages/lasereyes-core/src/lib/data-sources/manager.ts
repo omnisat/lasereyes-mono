@@ -1,8 +1,8 @@
 import { MAESTRO } from "../../constants/data-sources";
-import { Config } from "../../types";
+import { Config, MempoolUtxo } from "../../types";
 import { DataSource } from "../../types/data-source";
 import { Inscription } from "../../types/lasereyes";
-import { MaestroAddressInscription, MaestroGetAddressInscriptions } from "../../types/maestro";
+import { MaestroAddressInscription } from "../../types/maestro";
 import { BaseNetwork } from "../../types/network";
 import { getMempoolSpaceUrl, MAESTRO_API_KEY_MAINNET, SANDSHREW_LASEREYES_KEY, SANDSHREW_URL } from "../urls";
 import { normalizeInscription } from "./normalizations";
@@ -78,13 +78,6 @@ export class DataSourceManager {
     return await dataSource.getAddressBrc20Balances(address);
   }
 
-  /**
-   * Get inscriptions for an address
-   * @param address The address to query
-   * @param offset Optional pagination offset
-   * @param limit Optional pagination limit
-   * @returns Array of normalized inscription objects
-   */
   public async getAddressInscriptions(
     address: string,
     offset?: number,
@@ -98,18 +91,15 @@ export class DataSourceManager {
     const inscriptionsResult = await dataSource.getAddressInscriptions(address, offset, limit);
     const sourceName = dataSource.getName();
 
-    // Handle different data structures from different sources
     if (sourceName === MAESTRO && inscriptionsResult.data) {
       return inscriptionsResult.data.map((insc: MaestroAddressInscription) =>
         normalizeInscription(insc, sourceName)
       );
     } else if (inscriptionsResult.inscriptions) {
-      // Some sources return { inscriptions: [...inscriptions] }
       return inscriptionsResult.inscriptions.map((insc: any) =>
         normalizeInscription(insc, sourceName)
       );
     } else if (Array.isArray(inscriptionsResult)) {
-      // Some sources return [...inscriptions] directly
       return inscriptionsResult.map((insc: any) =>
         normalizeInscription(insc, sourceName)
       );
@@ -117,6 +107,42 @@ export class DataSourceManager {
 
     console.warn('Unable to normalize inscriptions from data source', sourceName);
     return [];
+  }
+
+  public async getRecommendedFees(): Promise<any> {
+    const dataSource = this.findAvailableSource('getRecommendedFees');
+    if (!dataSource || !dataSource.getRecommendedFees) {
+      throw new Error(ERROR_METHOD_NOT_AVAILABLE);
+    }
+
+
+    console.log('getting recommended fees')
+    return await dataSource.getRecommendedFees();
+  }
+
+  public async getAddressUtxos(address: string): Promise<MempoolUtxo[]> {
+    const dataSource = this.findAvailableSource('getAddressUtxos');
+    if (!dataSource || !dataSource.getAddressUtxos) {
+      throw new Error(ERROR_METHOD_NOT_AVAILABLE);
+    }
+    return await dataSource.getAddressUtxos(address);
+  }
+
+  public async getOutputValueByVOutIndex(txId: string, vOut: number): Promise<number | null> {
+    const dataSource = this.findAvailableSource('getOutputValueByVOutIndex');
+    if (!dataSource || !dataSource.getOutputValueByVOutIndex) {
+      throw new Error(ERROR_METHOD_NOT_AVAILABLE);
+    }
+    return await dataSource.getOutputValueByVOutIndex(txId, vOut);
+  }
+
+  public async waitForTransaction(txId: string): Promise<boolean> {
+    const dataSource = this.findAvailableSource('waitForTransaction');
+    if (!dataSource || !dataSource.waitForTransaction) {
+      throw new Error(ERROR_METHOD_NOT_AVAILABLE);
+    }
+
+    return !!await dataSource.waitForTransaction(txId);
   }
 
   public async getAddressRunesBalances(address: string): Promise<any> {

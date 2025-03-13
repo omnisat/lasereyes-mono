@@ -24,9 +24,7 @@ import {
 import { BRC20, BTC, RUNES } from '../../constants/protocols'
 import { sendRune } from '../../lib/runes/psbt'
 import { DataSourceManager } from '../../lib/data-sources/manager'
-import { DataSource } from '../../types/data-source'
 import { sendBrc20 } from '../../lib/brc-20/psbt'
-// import { sendBrc20 } from '../../lib/brc-20/psbt'
 
 export const UNSUPPORTED_PROVIDER_METHOD_ERROR = new Error(
   "The connected wallet doesn't support this method..."

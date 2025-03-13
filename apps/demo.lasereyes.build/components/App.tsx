@@ -27,17 +27,17 @@ import Link from 'next/link'
 import { Input } from '@/components/ui/input'
 import { getPackageVersion } from '@/lib/github'
 import { Badge, badgeVariants } from '@/components/ui/badge'
-import { FaBroadcastTower, FaExternalLinkAlt } from 'react-icons/fa'
+import { FaBroadcastTower, FaExternalLinkAlt, FaPushed } from 'react-icons/fa'
 import { RxReload, RxSwitch } from 'react-icons/rx'
 import { ClickToCopyNpmInstallPill } from '@/components/ClickToCopyNpmInstallPill'
-import { ImCheckmark, ImNewTab, ImSwitch } from 'react-icons/im'
+import { ImCheckmark, ImNewTab, ImPushpin, ImSwitch } from 'react-icons/im'
 import { toast } from 'sonner'
 import { useUtxos } from '@/hooks/useUtxos'
 import WalletConnectButton from './WalletConnectButton'
 import { Button } from './ui/button'
 import { getMempoolSpaceUrl } from '@/lib/urls'
 import axios from 'axios'
-import { LucideSignature, NetworkIcon, Pencil, Recycle, SendIcon, Signal, Signature, TowerControlIcon } from 'lucide-react'
+import { Pencil, Recycle, SendHorizonal, SendIcon, Signal, Signature, TowerControlIcon, Upload } from 'lucide-react'
 import { FaSignature } from 'react-icons/fa6'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
 
@@ -777,7 +777,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
             >
               <div className={'flex flex-col items-center'}>
                 <span className={clsx('font-black text-orange-500')}>
-                  unsigned PSBT
+                  unsigned Psbt
                 </span>
                 <span
                   className={clsx(
@@ -809,7 +809,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
             >
               <div className={'flex flex-col items-center'}>
                 <span className={clsx('font-black text-orange-500')}>
-                  signed PSBT
+                  signed Psbt
                 </span>
                 <span
                   className={clsx(
@@ -861,7 +861,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
               size={'lg'}
             >
               <SendIcon size={14} />
-              send BTC
+              send Btc
             </Button>
             <Button
               className={'w-full gap-2 bg-[#232225]'}
@@ -933,12 +933,13 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
             </span>
 
             <Button
-              className={'w-full bg-[#232225] disabled:text-[#737275]'}
+              className={'w-full gap-2 bg-[#232225] disabled:text-[#737275]'}
               disabled={!provider || !unsigned || !signed}
               variant={!provider ? 'secondary' : 'default'}
               onClick={() => (!provider ? null : push())}
             >
-              push PSBT
+              <Upload size={16} />
+              push Psbt
             </Button>
           </div>
           <div className={'border-b border-2 border-[#232225]  my-2'} />

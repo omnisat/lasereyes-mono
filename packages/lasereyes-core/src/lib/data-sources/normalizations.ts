@@ -1,5 +1,4 @@
 import { Inscription } from "../../types/lasereyes";
-import { MaestroAddressInscription } from "../../types/maestro";
 
 /**
  * Helper function to extract a string value from an object using multiple possible keys

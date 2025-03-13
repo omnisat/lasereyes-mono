@@ -114,7 +114,6 @@ export const inscribeContent = async ({
       privKey,
       commitTxId,
       dataSourceManager,
-      network,
     })
   } catch (e) {
     throw e
@@ -164,6 +163,7 @@ export const getCommitPsbt = async ({
       throw new Error("missing getAddressUtxos")
     }
 
+
     const { fastestFee } = await dataSourceManager.getRecommendedFees()
     const pubKey = ecc.keys.get_pubkey(String(privKey), true)
     const psbt = new bitcoin.Psbt({
@@ -182,8 +182,7 @@ export const getCommitPsbt = async ({
       Math.floor((contentSize * fastestFee) / 3) + 1000 + 546 * quantity
     const inscribeFees = Math.floor(commitSatsNeeded + revealSatsNeeded)
     const utxosGathered: MempoolUtxo[] = await dataSourceManager.getAddressUtxos(
-      paymentAddress,
-      network
+      paymentAddress
     )
     const filteredUtxos = utxosGathered
       .filter((utxo: MempoolUtxo) => utxo.value > 3000)
@@ -260,7 +259,6 @@ export const executeRevealTransaction = async ({
   commitTxId,
   privKey,
   dataSourceManager,
-  network,
   isDry,
 }: {
   inscriptions: { content: string; mimeType: ContentType }[]
@@ -268,7 +266,6 @@ export const executeRevealTransaction = async ({
   commitTxId: string
   privKey: string
   dataSourceManager: DataSourceManager
-  network: NetworkType
   isDry?: boolean
 }): Promise<string> => {
   try {
@@ -296,7 +293,7 @@ export const executeRevealTransaction = async ({
       throw new Error('missing broadcastTransaction')
     }
 
-    const txResult = await dataSourceManager.waitForTransaction(String(commitTxId), network)
+    const txResult = await dataSourceManager.waitForTransaction(String(commitTxId))
     if (!txResult) {
       throw new Error('ERROR WAITING FOR COMMIT TX')
     }
@@ -304,7 +301,6 @@ export const executeRevealTransaction = async ({
     const commitTxOutputValue = await dataSourceManager.getOutputValueByVOutIndex(
       commitTxId,
       0,
-      network
     )
     if (commitTxOutputValue === 0 || !commitTxOutputValue) {
       throw new Error('ERROR GETTING FIRST INPUT VALUE')

@@ -2,11 +2,12 @@ import axios from "axios";
 import { DataSource } from "../../../types/data-source";
 import { MAINNET } from "../../../constants";
 import { OrdAddress, OrdOutputs, OrdRuneBalance } from "../../../types/ord";
-import { SandshrewGetRuneByIdOrNameResponse, SandshrewResponse, SingleRuneOutpoint } from "../../../types/sandshrew";
+import { SandshrewGetRuneByIdOrNameResponse, SingleRuneOutpoint } from "../../../types/sandshrew";
 import { EsploraTx } from "../../../types/esplora";
 import { getPublicKeyHash } from "../../btc";
 import { SANDSHREW_LASEREYES_KEY, SANDSHREW_URL } from "../../urls";
 import { RpcResponse } from "../../../types/rpc";
+import { SANDSHREW } from "../../../constants/data-sources";
 
 export class SandshrewDataSource implements DataSource {
   private apiUrl: string = `${SANDSHREW_URL}/${SANDSHREW_LASEREYES_KEY}`;
@@ -18,10 +19,8 @@ export class SandshrewDataSource implements DataSource {
   }
 
   public getName() {
-    return "sandshrew";
+    return SANDSHREW;
   }
-
-
 
   public setNetwork(_network: string, _baseUrl?: string) {
     this.apiUrl = `${this.apiUrl}/${this.apiKey || SANDSHREW_LASEREYES_KEY}`;
@@ -84,7 +83,7 @@ export class SandshrewDataSource implements DataSource {
         return ['ord_output', [outpoint]];
       });
 
-      const { result } = await this.call('sandshrew_multicall', multiCall) as SandshrewResponse;
+      const { result } = await this.call('sandshrew_multicall', multiCall) as RpcResponse;
 
       for (let i = 0; i < result.length; i++) {
         result[i].result['output'] = batch[i];

@@ -1,5 +1,5 @@
 import * as bitcoin from 'bitcoinjs-lib'
-import { UNSUPPORTED_PROVIDER_METHOD_ERROR, WalletProvider } from '.'
+import { WalletProvider } from '.'
 import { ProviderType, NetworkType, Config } from '../../types'
 import {
   createSendBtcPsbt,
@@ -143,7 +143,7 @@ export default class OylProvider extends WalletProvider {
   }
 
   async getNetwork() {
-    return this.network
+    return await this.library.getNetwork()
   }
 
   async sendBTC(to: string, amount: number): Promise<string> {
@@ -227,7 +227,7 @@ export default class OylProvider extends WalletProvider {
     return [this.$store.get().address, this.$store.get().paymentAddress]
   }
 
-  async switchNetwork(): Promise<void> {
-    throw UNSUPPORTED_PROVIDER_METHOD_ERROR
+  async switchNetwork(network: NetworkType): Promise<void> {
+    return await this.library.switchNetwork(network)
   }
 }
