@@ -173,20 +173,19 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
   const [brc20s, setBrc20s] = useState<any>()
 
   const [selectedBrc20, setSelectedBrc20] = useState<any>()
-
   const [inscriptions, setInscriptions] = useState<any>()
-
-  console.log({ inscriptions })
-  console.log(JSON.stringify(inscriptions))
-  console.log({ runes })
-  console.log({ brc20s })
-
 
   useEffect(() => {
     setSignature('')
     setUnsignedPsbt(undefined)
     setSignedPsbt(undefined)
   }, [address])
+
+  useEffect(() => {
+    console.log({ inscriptions })
+    console.log({ runes })
+    console.log({ brc20s })
+  }, [inscriptions, runes, brc20s])
 
 
   const { utxos } = useUtxos()

@@ -54,7 +54,7 @@ function extractNumberValue(obj: any, keys: string[], defaultValue: number): num
  * @param source The name of the data source (for logging)
  * @returns Normalized inscription object
  */
-export function normalizeInscription(insc: any, source: string, network: NetworkType): Inscription {
+export function normalizeInscription(insc: any, source: string = "unknown", network: NetworkType): Inscription {
   if (!insc) {
     console.warn(`Invalid inscription data from source: ${source}`);
     return {
@@ -68,7 +68,8 @@ export function normalizeInscription(insc: any, source: string, network: Network
       location: "",
       preview: "",
       genesisTransaction: "",
-      height: 0
+      height: 0,
+      outputValue: 0
     };
   }
 
@@ -103,6 +104,7 @@ export function normalizeInscription(insc: any, source: string, network: Network
     }
   }
 
+  const outputValue = extractNumberValue(insc, ['output_value', 'value', 'outputValue'], 0);
   const height = extractNumberValue(insc, ['height', 'block_height'], 0);
 
   let genesisTransaction = extractStringValue(insc, [
@@ -140,10 +142,11 @@ export function normalizeInscription(insc: any, source: string, network: Network
     id,
     inscriptionId: id,
     number,
+    outputValue,
     contentType,
-    content: `${getUnisatContentUrl(network)}/${id}`,
     output,
     location: `${txid}:${vout}:${offset}`,
+    content: `${getUnisatContentUrl(network)}/${id}`,
     preview: `${getUnisatPreviewUrl(network)}/${id}`,
     genesisTransaction,
     height,

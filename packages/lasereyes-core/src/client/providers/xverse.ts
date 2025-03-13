@@ -39,6 +39,8 @@ import {
   PersistedKey,
 } from '../utils'
 import { BaseNetwork } from '../../types/network'
+import { normalizeInscription } from '../../lib/data-sources/normalizations'
+import { Inscription } from '../../types/lasereyes'
 
 const XVERSE_WALLET_PERSISTENCE_KEY = 'XVERSE_CONNECTED_WALLET_STATE'
 export default class XVerseProvider extends WalletProvider {
@@ -358,7 +360,7 @@ export default class XVerseProvider extends WalletProvider {
     }
   }
 
-  async getInscriptions(offset?: number, limit?: number): Promise<XVerseInscription[]> {
+  async getInscriptions(offset?: number, limit?: number): Promise<Inscription[]> {
     const offsetValue = offset || 0
     const limitValue = limit || 10
     const response = await request('ord_getInscriptions', {
@@ -366,10 +368,14 @@ export default class XVerseProvider extends WalletProvider {
       limit: limitValue,
     })
 
-    console.log(JSON.stringify(response))
 
     if (response.status === 'success') {
-      return response.result.inscriptions as unknown as XVerseInscription[]
+
+      const inscriptions = response.result.inscriptions.map((insc) => {
+        return normalizeInscription(insc, undefined, this.network)
+      })
+
+      return inscriptions as Inscription[]
     } else {
       console.error(response.error)
       throw new Error('Error getting inscriptions')
@@ -377,16 +383,16 @@ export default class XVerseProvider extends WalletProvider {
   }
 }
 
-type XVerseInscription = {
-  inscriptionId: string
-  inscriptionNumber: string
-  collectionName: string
-  contentType: string
-  contentLength: string
-  address: string
-  output: string
-  offset: number
-  postage: number
-  genesisTransaction: string
-  timestamp: number
-}
+// type XVerseInscription = {
+//   inscriptionId: string
+//   inscriptionNumber: string
+//   collectionName: string
+//   contentType: string
+//   contentLength: string
+//   address: string
+//   output: string
+//   offset: number
+//   postage: number
+//   genesisTransaction: string
+//   timestamp: number
+// }

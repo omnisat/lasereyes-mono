@@ -10,6 +10,7 @@ export type Inscription = {
   genesisTransaction: string;
   height: number;
   preview: string;
+  outputValue: number;
   offset?: number;
 }
 
