@@ -2,7 +2,7 @@ import axios from "axios";
 import { NetworkType } from "../../../types"
 import { DataSource } from "../../../types/data-source"
 import { getMaestroUrl } from "../../urls";
-import { MaestroBrc20ByAddressResponse, MaestroGetAddressBalanceResponse, MaestroGetAddressInscriptions, MaestroGetBrc20InfoResponse, MaestroGetRuneInfoResponse, MaestroGetTransactionInfoResponse } from "../../../types/maestro";
+import { MaestroAddressInscription, MaestroBrc20ByAddressResponse, MaestroGetAddressBalanceResponse, MaestroGetAddressInscriptions, MaestroGetBrc20InfoResponse, MaestroGetInscriptionInfoResponse, MaestroGetRuneInfoResponse, MaestroGetTransactionInfoResponse } from "../../../types/maestro";
 import { MAESTRO } from "../../../constants/data-sources";
 
 export class MaestroDataSource implements DataSource {
@@ -59,7 +59,16 @@ export class MaestroDataSource implements DataSource {
     if (limit !== undefined) queryParams.append('limit', limit.toString());
 
     const url = `/addresses/${address}/inscriptions${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
-    return await this.call('get', url) as MaestroGetAddressInscriptions;
+    const response = await this.call('get', url) as MaestroGetAddressInscriptions;
+    const responseWithAddress = {
+      ...response, data: response.data.map((insc: MaestroAddressInscription) => ({ ...insc, address }))
+    }
+
+    return responseWithAddress;
+  }
+
+  async getInscriptionInfo(inscriptionId: string): Promise<MaestroGetInscriptionInfoResponse> {
+    return await this.call('get', `/assets/inscriptions/${inscriptionId}`);
   }
 
   async getBrc20ByTicker(ticker: string): Promise<MaestroGetBrc20InfoResponse> {

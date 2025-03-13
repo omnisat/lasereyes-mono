@@ -87,26 +87,58 @@ export class DataSourceManager {
     if (!dataSource || !dataSource.getAddressInscriptions) {
       throw new Error(ERROR_METHOD_NOT_AVAILABLE);
     }
+    if (!dataSource.getInscriptionInfo) {
+      throw new Error(ERROR_METHOD_NOT_AVAILABLE)
+    }
+
+
+    const network = BaseNetwork.MAINNET;
 
     const inscriptionsResult = await dataSource.getAddressInscriptions(address, offset, limit);
     const sourceName = dataSource.getName();
 
     if (sourceName === MAESTRO && inscriptionsResult.data) {
-      return inscriptionsResult.data.map((insc: MaestroAddressInscription) =>
-        normalizeInscription(insc, sourceName)
+      const inscriptionsWithDetails = await Promise.all(
+        inscriptionsResult.data.map(async (inscription: MaestroAddressInscription) => {
+          try {
+            if (!dataSource.getInscriptionInfo) {
+              throw new Error(ERROR_METHOD_NOT_AVAILABLE)
+            }
+            const detailedInscription = await dataSource.getInscriptionInfo(inscription.inscription_id);
+            return {
+              ...inscription,
+              ...detailedInscription.data
+            };
+          } catch (error) {
+            console.error(`Failed to fetch details for inscription ${inscription.inscription_id}:`, error);
+            return inscription;
+          }
+        })
+      );
+
+      return inscriptionsWithDetails.map((insc) =>
+        normalizeInscription(insc, sourceName, network)
       );
     } else if (inscriptionsResult.inscriptions) {
       return inscriptionsResult.inscriptions.map((insc: any) =>
-        normalizeInscription(insc, sourceName)
+        normalizeInscription(insc, sourceName, network)
       );
     } else if (Array.isArray(inscriptionsResult)) {
       return inscriptionsResult.map((insc: any) =>
-        normalizeInscription(insc, sourceName)
+        normalizeInscription(insc, sourceName, network)
       );
     }
 
     console.warn('Unable to normalize inscriptions from data source', sourceName);
     return [];
+  }
+
+  public async getInscriptionInfo(inscriptionId: string): Promise<any> {
+    const dataSource = this.findAvailableSource('getInscriptionInfo');
+    if (!dataSource || !dataSource.getInscriptionInfo) {
+      throw new Error(ERROR_METHOD_NOT_AVAILABLE);
+    }
+    return await dataSource.getInscriptionInfo(inscriptionId);
   }
 
   public async getRecommendedFees(): Promise<any> {

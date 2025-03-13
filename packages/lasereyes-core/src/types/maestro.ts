@@ -72,8 +72,6 @@ export type MaestroGetInscriptionInfoResponse = {
   }
 }
 
-
-
 export type MaestroGetBrc20InfoResponse = {
   data: {
     ticker: string

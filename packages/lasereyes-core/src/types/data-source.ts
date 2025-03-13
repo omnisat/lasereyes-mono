@@ -1,4 +1,5 @@
 import { MempoolUtxo, NetworkType } from ".";
+import { MaestroGetInscriptionInfoResponse } from "./maestro";
 
 export interface DataSource {
   getName(): string;
@@ -6,6 +7,7 @@ export interface DataSource {
   getAddressBtcBalance?(address: string): Promise<string>;
   getAddressBrc20Balances?(address: string): Promise<any>;
   getAddressRunesBalances?(address: string): Promise<any>;
+  getInscriptionInfo?(inscriptionId: string): Promise<MaestroGetInscriptionInfoResponse>;
   getTransaction?(txId: string): Promise<any>;
   getRawTransaction?(txId: string): Promise<any>;
   getRecommendedFees?(): Promise<any>;

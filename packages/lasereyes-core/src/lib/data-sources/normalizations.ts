@@ -1,4 +1,6 @@
 import { Inscription } from "../../types/lasereyes";
+import { NetworkType } from "../../types";
+import { getUnisatContentUrl, getUnisatPreviewUrl } from "../urls";
 
 /**
  * Helper function to extract a string value from an object using multiple possible keys
@@ -52,15 +54,19 @@ function extractNumberValue(obj: any, keys: string[], defaultValue: number): num
  * @param source The name of the data source (for logging)
  * @returns Normalized inscription object
  */
-export function normalizeInscription(insc: any, source: string): Inscription {
+export function normalizeInscription(insc: any, source: string, network: NetworkType): Inscription {
   if (!insc) {
     console.warn(`Invalid inscription data from source: ${source}`);
     return {
       id: "",
+      inscriptionId: "",
+      content: "",
       number: 0,
       address: "",
       contentType: "unknown",
       output: "",
+      location: "",
+      preview: "",
       genesisTransaction: "",
       height: 0
     };
@@ -86,11 +92,12 @@ export function normalizeInscription(insc: any, source: string): Inscription {
     'content_type', 'contentType', 'mime', 'mimeType'
   ], "unknown");
 
-  // Construct output
+
+  const txid = extractStringValue(insc, ['utxo_txid', 'txid', 'transaction_id'], "");
+  const vout = extractNumberValue(insc, ['vout', 'utxo_vout'], 0);
+
   let output = extractStringValue(insc, ['output'], "");
   if (!output) {
-    const txid = extractStringValue(insc, ['tx_id', 'txid', 'transaction_id'], "");
-    const vout = extractNumberValue(insc, ['vout', 'output_index'], 0);
     if (txid) {
       output = `${txid}:${vout}`;
     }
@@ -98,13 +105,11 @@ export function normalizeInscription(insc: any, source: string): Inscription {
 
   const height = extractNumberValue(insc, ['height', 'block_height'], 0);
 
-  // Extract genesis transaction
   let genesisTransaction = extractStringValue(insc, [
     'genesis_tx_id', 'genesisTx', 'genesis_txid', 'genesisTransaction'
   ], insc.inscription_id?.split("i")?.[0] || insc.txid || "");
 
-  // Extract offset
-  const offset = insc.offset !== undefined ? insc.offset : undefined;
+  const offset = insc.utxo_sat_offset !== undefined ? insc.utxo_sat_offset : undefined;
 
   if (!id) {
     console.warn(`Invalid inscription data from source: ${source}`);
@@ -131,11 +136,15 @@ export function normalizeInscription(insc: any, source: string): Inscription {
   }
 
   return {
-    id,
-    number,
     address,
-    output,
+    id,
+    inscriptionId: id,
+    number,
     contentType,
+    content: `${getUnisatContentUrl(network)}/${id}`,
+    output,
+    location: `${txid}:${vout}:${offset}`,
+    preview: `${getUnisatPreviewUrl(network)}/${id}`,
     genesisTransaction,
     height,
     offset

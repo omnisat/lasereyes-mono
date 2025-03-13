@@ -115,6 +115,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
     send,
     paymentPublicKey,
     getBalance,
+    getInscriptions,
     pushPsbt,
     publicKey,
     signPsbt,
@@ -172,6 +173,13 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
   const [brc20s, setBrc20s] = useState<any>()
 
   const [selectedBrc20, setSelectedBrc20] = useState<any>()
+
+  const [inscriptions, setInscriptions] = useState<any>()
+
+  console.log({ inscriptions })
+  console.log(JSON.stringify(inscriptions))
+  console.log({ runes })
+  console.log({ brc20s })
 
 
   useEffect(() => {
@@ -245,6 +253,13 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
       getMetaBalances('brc20').then(setBrc20s)
     }
   }, [address])
+
+  useEffect(() => {
+    if (address) {
+      getInscriptions().then(setInscriptions)
+    }
+  }, [address])
+
 
 
   const hasWallet = {
@@ -1079,7 +1094,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
               <div className="text-gray-500 text-sm">brc-20</div>
               <Select
                 onValueChange={(value) => {
-                  const brc20 = brc20s?.find((r) => r.symbol === value)
+                  const brc20 = brc20s?.find((r: any) => r.symbol === value)
                   setSelectedBrc20(brc20)
                 }}
                 disabled={!provider}

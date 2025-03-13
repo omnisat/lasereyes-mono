@@ -358,7 +358,7 @@ export default class XVerseProvider extends WalletProvider {
     }
   }
 
-  async getInscriptions(offset?: number, limit?: number): Promise<any[]> {
+  async getInscriptions(offset?: number, limit?: number): Promise<XVerseInscription[]> {
     const offsetValue = offset || 0
     const limitValue = limit || 10
     const response = await request('ord_getInscriptions', {
@@ -366,12 +366,27 @@ export default class XVerseProvider extends WalletProvider {
       limit: limitValue,
     })
 
+    console.log(JSON.stringify(response))
+
     if (response.status === 'success') {
-      console.log(response.result)
-      return response.result.inscriptions
+      return response.result.inscriptions as unknown as XVerseInscription[]
     } else {
       console.error(response.error)
       throw new Error('Error getting inscriptions')
     }
   }
+}
+
+type XVerseInscription = {
+  inscriptionId: string
+  inscriptionNumber: string
+  collectionName: string
+  contentType: string
+  contentLength: string
+  address: string
+  output: string
+  offset: number
+  postage: number
+  genesisTransaction: string
+  timestamp: number
 }
