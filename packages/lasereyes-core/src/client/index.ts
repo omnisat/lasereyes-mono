@@ -38,12 +38,15 @@ import MagicEdenProvider from './providers/magic-eden'
 import PhantomProvider from './providers/phantom'
 import OpNetProvider from './providers/op-net'
 import SparrowProvider from './providers/sparrow'
+import { DataSourceManager } from '../lib/data-sources/manager'
 
 export class LaserEyesClient {
   readonly $store: MapStore<LaserEyesStoreType>
   readonly $network: WritableAtom<NetworkType>
   readonly $providerMap: Partial<Record<ProviderType, WalletProvider>>
   private disposed = false
+
+  protected dataSourceManager: DataSourceManager;
 
   dispose() {
     this.disposed = true
@@ -72,6 +75,14 @@ export class LaserEyesClient {
       [UNISAT]: new UnisatProvider(stores, this, config),
       [XVERSE]: new XVerseProvider(stores, this, config),
       [WIZZ]: new WizzProvider(stores, this, config),
+    }
+
+
+    try {
+      this.dataSourceManager = DataSourceManager.getInstance()
+    } catch {
+      DataSourceManager.init(config!)
+      this.dataSourceManager = DataSourceManager.getInstance()
     }
   }
 
@@ -342,7 +353,8 @@ export class LaserEyesClient {
       try {
         return await this.$providerMap[this.$store.get().provider!]?.inscribe(
           content,
-          mimeType
+          mimeType,
+
         )
       } catch (error) {
         if (error instanceof Error) {
@@ -458,4 +470,23 @@ export class LaserEyesClient {
       }
     }
   }
+
+  async sendInscriptions(inscriptionIds: string[], toAddress: string) {
+    if (!this.$store.get().provider) return
+    if (this.$providerMap[this.$store.get().provider!]) {
+      try {
+        return await this.$providerMap[
+          this.$store.get().provider!
+        ]?.sendInscriptions(inscriptionIds, toAddress)
+      } catch (error) {
+        if (error instanceof Error) {
+          if (error.message.toLowerCase().includes('not implemented')) {
+            throw new Error("The connected wallet doesn't support this method")
+          }
+        }
+        throw error
+      }
+    }
+  }
+
 }

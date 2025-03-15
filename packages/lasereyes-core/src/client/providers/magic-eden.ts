@@ -11,8 +11,9 @@ import {
 } from 'sats-connect'
 import { WalletProvider } from '.'
 import {
+  Config,
   ECDSA,
-  getSatsConnectNetwork,
+  LaserEyesClient,
   LaserEyesStoreType,
   MAGIC_EDEN,
   MAINNET,
@@ -28,7 +29,8 @@ import {
   isMainnetNetwork,
   isTestnetNetwork,
 } from '../../lib/helpers'
-import { listenKeys, MapStore } from 'nanostores'
+import { getSatsConnectNetwork } from '../../constants/networks'
+import { listenKeys, MapStore, WritableAtom } from 'nanostores'
 import { persistentMap } from '@nanostores/persistent'
 import { fromOutputScript } from 'bitcoinjs-lib/src/address'
 import {
@@ -40,6 +42,16 @@ import {
 const MAGIC_EDEN_WALLET_PERSISTENCE_KEY = 'MAGIC_EDEN_CONNECTED_WALLET_STATE'
 
 export default class MagicEdenProvider extends WalletProvider {
+  constructor(stores: {
+    $store: MapStore<LaserEyesStoreType>
+    $network: WritableAtom<NetworkType>
+  },
+    parent: LaserEyesClient,
+    config?: Config
+  ) {
+    super(stores, parent, config)
+  }
+
   public get library(): any | undefined {
     return (window as any)?.magicEden?.bitcoin
   }
@@ -157,7 +169,7 @@ export default class MagicEdenProvider extends WalletProvider {
           purposes: ['ordinals', 'payment'],
           message: 'Connecting with lasereyes',
           network: {
-            type: magicEdenNetwork,
+            type: magicEdenNetwork as unknown as BitcoinNetworkType,
           },
         },
         onFinish: (response: any) => {
@@ -201,7 +213,7 @@ export default class MagicEdenProvider extends WalletProvider {
       getProvider: async () => this.library,
       payload: {
         network: {
-          type: getSatsConnectNetwork(this.network) as BitcoinNetworkType,
+          type: getSatsConnectNetwork(this.network) as unknown as BitcoinNetworkType,
         },
         recipients: [
           {
@@ -271,10 +283,10 @@ export default class MagicEdenProvider extends WalletProvider {
     broadcast?: boolean | undefined
   ): Promise<
     | {
-        signedPsbtHex: string | undefined
-        signedPsbtBase64: string | undefined
-        txId?: string | undefined
-      }
+      signedPsbtHex: string | undefined
+      signedPsbtBase64: string | undefined
+      txId?: string | undefined
+    }
     | undefined
   > {
     console.log('signPsbt', psbtBase64, _finalize, broadcast)

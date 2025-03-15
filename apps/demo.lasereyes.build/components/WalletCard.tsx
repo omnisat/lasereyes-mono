@@ -68,10 +68,10 @@ const WalletCard = ({
   setSignedPsbt: (
     psbt:
       | {
-          signedPsbtHex: string
-          signedPsbtBase64: string
-          txId?: string
-        }
+        signedPsbtHex: string
+        signedPsbtBase64: string
+        txId?: string
+      }
       | undefined
   ) => void
 }) => {
@@ -122,22 +122,24 @@ const WalletCard = ({
 
   const [runes, setRunes] = useState<
     | {
-        balance: string
-        symbol: string
-        name: string
-      }[]
+      balance: string
+      symbol: string
+      name: string
+    }[]
     | undefined
   >()
   const [selectedRune, setSelectedRune] = useState<
     | {
-        balance: string
-        symbol: string
-        name: string
-      }
+      balance: string
+      symbol: string
+      name: string
+    }
     | undefined
   >(undefined)
   const [runeToAddress, setRuneToAddress] = useState<string>('')
   const [runeAmount, setRuneAmount] = useState<string>('')
+
+  const [brc20s, setBrc20s] = useState<any>()
 
   const hasWallet = {
     unisat: hasUnisat,
@@ -173,12 +175,12 @@ const WalletCard = ({
         paymentAddress,
         paymentPublicKey,
         network as
-          | typeof MAINNET
-          | typeof TESTNET
-          | typeof TESTNET4
-          | typeof SIGNET
-          | typeof FRACTAL_MAINNET
-          | typeof FRACTAL_TESTNET
+        | typeof MAINNET
+        | typeof TESTNET
+        | typeof TESTNET4
+        | typeof SIGNET
+        | typeof FRACTAL_MAINNET
+        | typeof FRACTAL_TESTNET
       )
         .then((psbt) => {
           if (psbt && psbt.toHex() !== unsigned) {
@@ -215,6 +217,13 @@ const WalletCard = ({
     if (address) {
       getMetaBalances('runes').then(setRunes)
       setRuneToAddress(address)
+    }
+  }, [address])
+
+
+  useEffect(() => {
+    if (address) {
+      getMetaBalances('brc20').then(setBrc20s)
     }
   }, [address])
 
@@ -475,6 +484,7 @@ const WalletCard = ({
       }
     }
   }
+
 
   return (
     <Card

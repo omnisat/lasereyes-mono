@@ -1,18 +1,29 @@
 import * as bitcoin from 'bitcoinjs-lib'
 import { WalletProvider } from '.'
 import { ECDSA, MAINNET, PHANTOM, TESTNET } from '../../constants'
-import { ProviderType, NetworkType } from '../../types'
+import { ProviderType, NetworkType, Config } from '../../types'
 import {
   createSendBtcPsbt,
   getBitcoinNetwork,
   isTestnetNetwork,
 } from '../../lib/helpers'
-import { listenKeys } from 'nanostores'
+import { listenKeys, MapStore, WritableAtom } from 'nanostores'
 import { fromOutputScript } from 'bitcoinjs-lib/src/address'
 import { fromHexString } from '../utils'
-import { SignMessageOptions } from '../types'
+import { LaserEyesStoreType, SignMessageOptions } from '../types'
+import { LaserEyesClient } from '..'
 
 export default class PhantomProvider extends WalletProvider {
+  constructor(stores: {
+    $store: MapStore<LaserEyesStoreType>
+    $network: WritableAtom<NetworkType>
+  },
+    parent: LaserEyesClient,
+    config?: Config
+  ) {
+    super(stores, parent, config)
+  }
+
   public get library(): any | undefined {
     return (window as any)?.phantom?.bitcoin
   }
@@ -143,10 +154,10 @@ export default class PhantomProvider extends WalletProvider {
     broadcast?: boolean | undefined
   ): Promise<
     | {
-        signedPsbtHex: string | undefined
-        signedPsbtBase64: string | undefined
-        txId?: string | undefined
-      }
+      signedPsbtHex: string | undefined
+      signedPsbtBase64: string | undefined
+      txId?: string | undefined
+    }
     | undefined
   > {
     const { address, paymentAddress } = this.$store.get()

@@ -1,36 +1,29 @@
 import * as bitcoin from 'bitcoinjs-lib'
-import { createRuneMintScript, createRuneSendScript } from './scripts'
 import { getRecommendedFeesMempoolSpace } from '../mempool-space'
 import { MAINNET, P2SH, P2TR } from '../../constants'
-import { getRuneOutpoints } from './utils'
 import {
   broadcastTx,
   calculateValueOfUtxosGathered,
   estimateTxSize,
-  getAddressUtxos,
   getBitcoinNetwork,
 } from '../helpers'
-import { getRuneById } from '../sandshrew'
 import { NetworkType } from '../../types'
 import { getAddressType, getRedeemScript } from '../btc'
 import { toXOnly } from 'bitcoinjs-lib/src/psbt/bip371'
-import { BaseNetwork } from '../../types/network'
-// import { getAddressType, getRedeemScript } from "../btc"
-// import { toXOnly } from 'bitcoinjs-lib/src/psbt/bip371'
+import { DataSourceManager } from '../data-sources/manager'
 
-export const sendRune = async ({
-  runeId,
-  amount,
+export const sendInscriptions = async ({
+  inscriptionIds,
   ordinalAddress,
   ordinalPublicKey,
   paymentAddress,
   paymentPublicKey,
   toAddress,
   signPsbt,
+  dataSourceManager,
   network = MAINNET,
 }: {
-  runeId: string
-  amount: number
+  inscriptionIds: string[]
   ordinalAddress: string
   ordinalPublicKey: string
   paymentAddress: string
@@ -51,30 +44,31 @@ export const sendRune = async ({
     }
     | undefined
   >
+  dataSourceManager: DataSourceManager
   network: NetworkType
 }): Promise<string> => {
   try {
-    const runeSendPsbt = await createRuneSendPsbt({
+    const inscriptionsSendPsbt = await createInscriptionsSendPsbt({
+      inscriptionIds,
       fromAddress: ordinalAddress,
       fromAddressPublicKey: ordinalPublicKey,
       fromPaymentAddress: paymentAddress,
       fromPaymentPublicKey: paymentPublicKey,
+      dataSourceManager,
       toAddress,
-      runeId,
-      amount,
       network,
     })
 
-    if (!runeSendPsbt || !runeSendPsbt?.psbtHex) {
+    if (!inscriptionsSendPsbt || !inscriptionsSendPsbt?.psbtHex) {
       throw new Error("couldn't get commit tx")
     }
 
-    const runeSendTxHex = String(runeSendPsbt?.psbtHex)
-    const runeSendTxBase64 = String(runeSendPsbt?.psbtBase64)
+    const inscriptionsSendTxHex = String(inscriptionsSendPsbt?.psbtHex)
+    const inscriptonsSendTxBase64 = String(inscriptionsSendPsbt?.psbtBase64)
     const response = await signPsbt(
       '',
-      runeSendTxHex,
-      runeSendTxBase64,
+      inscriptionsSendTxHex,
+      inscriptonsSendTxBase64,
       true,
       false,
       network
@@ -88,14 +82,14 @@ export const sendRune = async ({
   }
 }
 
-export const createRuneSendPsbt = async ({
+export const createInscriptionsSendPsbt = async ({
   fromAddress,
   fromAddressPublicKey,
   fromPaymentAddress,
   fromPaymentPublicKey,
   toAddress,
-  runeId,
-  amount,
+  inscriptionIds,
+  dataSourceManager,
   network,
 }: {
   fromAddress: string
@@ -103,8 +97,8 @@ export const createRuneSendPsbt = async ({
   fromPaymentAddress: string
   fromPaymentPublicKey: string
   toAddress: string
-  runeId: string
-  amount: number
+  inscriptionIds: string[]
+  dataSourceManager: DataSourceManager
   network: NetworkType
 }): Promise<{
   psbtBase64: string
@@ -113,7 +107,7 @@ export const createRuneSendPsbt = async ({
   try {
     const { fastestFee: feeRate } =
       await getRecommendedFeesMempoolSpace(network)
-    const utxos = await getAddressUtxos(fromPaymentAddress, network)
+    const utxos = await dataSourceManager.getAddressUtxos(fromPaymentAddress)
     let sortedUtxos = utxos
       .sort((a: { value: number }, b: { value: number }) => b.value - a.value)
       .filter((utxo: { value: number }) => utxo.value > 3000)
@@ -121,35 +115,46 @@ export const createRuneSendPsbt = async ({
       throw new Error('No utxos found')
     }
 
+    const sandshrew = dataSourceManager.getSource('sandshrew')
+
+    if (!sandshrew || !sandshrew.batchOrdInscriptionInfo) {
+      throw new Error('Sandshrew data source not found')
+    }
+
+    const inscriptions = await sandshrew?.batchOrdInscriptionInfo(inscriptionIds)
+
+    console.log(inscriptions)
+
     let psbt = new bitcoin.Psbt({ network: getBitcoinNetwork(network) })
-
-    let runeTotalSatoshis = 0
-    const rune = await getRuneById(runeId)
-    const outpoints = await getRuneOutpoints({ runeId, address: fromAddress })
     const amountGathered = calculateValueOfUtxosGathered(sortedUtxos)
-
-    const minFee = estimateTxSize(outpoints.length, 2, 4)
+    const minFee = estimateTxSize(inscriptions.length, 2, 4)
     const calculatedFee = minFee * feeRate < 250 ? 250 : minFee * feeRate
     let finalFee = calculatedFee
 
     let counter = 0
-    for await (const runeOutput of outpoints) {
-      const { output, value, script } = runeOutput
-      const txSplit = output.split(':')
-      const txHash = txSplit[0]
-      const txIndex = txSplit[1]
+    for await (const runeOutput of inscriptions) {
+      const { value, satpoint } = runeOutput
+      const [txHash, vout] = satpoint.split(':')
+      if (!value || !txHash || !vout) {
+        throw new Error('Invalid satpoint or value')
+      }
+
+      const script = bitcoin.address.toOutputScript(fromAddress, getBitcoinNetwork(MAINNET))
       psbt.addInput({
         hash: txHash,
-        index: parseInt(txIndex),
+        index: parseInt(vout),
         witnessUtxo: {
           value: BigInt(value),
-          script: Buffer.from(script, 'hex'),
+          script
         },
         tapInternalKey: toXOnly(Buffer.from(fromAddressPublicKey, 'hex')),
       })
 
+      psbt.addOutput({
+        value: BigInt(value),
+        address: toAddress,
+      })
       counter++
-      runeTotalSatoshis += value
     }
 
     const paymentAddressType = getAddressType(fromPaymentAddress, network)
@@ -197,29 +202,7 @@ export const createRuneSendPsbt = async ({
       }
     }
 
-    const script = createRuneSendScript({
-      runeId: rune.id,
-      amount,
-      divisibility: rune.entry.divisibility,
-      sendOutputIndex: 2,
-      pointer: 1,
-    })
-
-    const output = { script: script, value: BigInt(0) }
-    psbt.addOutput(output)
-
-    const inscriptionSats = 546
-    const changeAmount = amountGathered - (finalFee + inscriptionSats * 2)
-
-    psbt.addOutput({
-      value: BigInt(inscriptionSats),
-      address: fromAddress,
-    })
-
-    psbt.addOutput({
-      value: BigInt(inscriptionSats),
-      address: toAddress,
-    })
+    const changeAmount = amountGathered - (finalFee)
 
     psbt.addOutput({
       address: fromAddress,
@@ -232,71 +215,3 @@ export const createRuneSendPsbt = async ({
   }
 }
 
-export const createRuneMintPsbt = async ({
-  address,
-  runeId,
-}: {
-  address: string
-  runeId: string
-}) => {
-  try {
-    const network: NetworkType = BaseNetwork.MAINNET
-    const { fastestFee: feeRate } =
-      await getRecommendedFeesMempoolSpace(network)
-    const utxos = await getAddressUtxos(address, network)
-
-    const minFee = 300
-    const inscriptionSats = 546
-    const calculatedFee = minFee * feeRate < 250 ? 250 : minFee * feeRate
-    let finalFee = calculatedFee
-
-    const sortedUtxos = utxos.sort(
-      (a: { value: number }, b: { value: number }) => b.value - a.value
-    )
-
-    const amountRetrieved = calculateValueOfUtxosGathered(sortedUtxos)
-
-    let psbt = new bitcoin.Psbt({ network: getBitcoinNetwork(network) })
-
-    for (let i = 0; i < sortedUtxos.length; i++) {
-      const script = bitcoin.address.toOutputScript(
-        address,
-        getBitcoinNetwork(network)
-      )
-      const utxo = sortedUtxos[i]
-      psbt.addInput({
-        hash: utxo.txid,
-        index: utxo.vout,
-        witnessUtxo: {
-          value: BigInt(utxo.value),
-          script,
-        },
-      })
-    }
-
-    const script = createRuneMintScript({
-      runeId: runeId,
-      pointer: 1,
-    })
-
-    const output = { script: script, value: BigInt(0) }
-    psbt.addOutput(output)
-
-    const changeAmount = amountRetrieved - (finalFee + inscriptionSats)
-
-    psbt.addOutput({
-      value: BigInt(inscriptionSats),
-      address: address,
-    })
-
-    psbt.addOutput({
-      address: address,
-      value: BigInt(changeAmount),
-    })
-
-    return { psbt: psbt.toBase64() }
-  } catch (error) {
-    console.log(error)
-    throw error
-  }
-}

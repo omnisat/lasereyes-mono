@@ -1,93 +1,120 @@
-![lasereyes_logo](https://github.com/omnisat/lasereyes-mono/blob/main/.github/assets/lasereyes.png?raw=true)
+# LaserEyes Core Documentation
 
-# lasereyes-core
+## Overview
 
-`@omnisat/lasereyes-core` is the framework-agnostic core library of the lasereyes suite, designed to provide the core logic for Bitcoin wallet integration into dApps. It abstracts wallet-specific interactions and offers a unified interface, enabling developers to interact with various Bitcoin wallets seamlessly.
+`@omnisat/lasereyes-core` is a framework-agnostic library designed to provide Bitcoin wallet integration for dApps. It abstracts wallet-specific interactions and offers a unified interface, enabling developers to interact with various Bitcoin wallets seamlessly.
 
-This package is not tied to any specific framework and can be used in any TypeScript or JavaScript environment.\
+This package is not tied to any specific framework and can be used in any TypeScript or JavaScript environment.
+
+## Installation
+
+```bash
+# NPM
+npm install @omnisat/lasereyes-core
+
+# Yarn
+yarn add @omnisat/lasereyes-core
+
+# PNPM
+pnpm install @omnisat/lasereyes-core
+
+# Bun
+bun install @omnisat/lasereyes-core
+```
 
 ## Key Concepts
 
 ### Client
 
-The `Client` in `@omnisat/lasereyes-core` manages wallet connections, facilitates communication with different Bitcoin wallets, and handles user authentication and transactions. It serves as the entry point for initializing and interacting with wallet providers.
-
-Example of initializing the LaserEyesClient on a web page:
-
-We'll create a LaserEyesClient instance and connect it to the XVERSE wallet when a button is clicked.
-
-```typescript
-// src/index.ts
-import { LaserEyesClient, createStores, XVERSE } from '@omnisat/lasereyes-core'
-
-const client = new LaserEyesClient(createStores())
-
-const button = document.getElementById('click-me')
-
-button?.addEventListener('click', () => {
-  client.connect(XVERSE).then(() => {
-    console.log('Wallet address:')
-  })
-})
-```
+The `LaserEyesClient` is the main entry point for the library. It manages wallet connections, handles user authentication, and facilitates interactions with Bitcoin wallets. 
 
 ### Provider
 
-Each wallet supported by `@omnisat/lasereyes-core` is implemented through a `WalletProvider` class. The `WalletProvider` is responsible for interacting with the underlying wallet's API, such as sending transactions, signing messages, and querying balances.
+Each supported Bitcoin wallet is implemented through a `WalletProvider` class. These providers handle the communication between your application and the specific wallet's API.
 
-Providers are modular, making it easy to add support for additional wallets. Current supported wallets include:
+## Supported Wallets
+
+LaserEyes Core supports the following Bitcoin wallets:
 
 - **Leather**
 - **Magic Eden**
 - **OKX**
-- OP_NET
+- **OP_NET**
 - **Orange**
 - **Oyl**
 - **Phantom**
-- Sparrow (coming soon)
+- **Sparrow**
 - **UniSat**
 - **Wizz**
 - **Xverse**
 
-## Installation
+## Supported Networks
 
-To install `@omnisat/lasereyes-core`, choose one of the following package managers and run the command below:
+LaserEyes Core supports multiple Bitcoin networks:
 
-```bash
-npm install @omnisat/lasereyes-core
+- **mainnet**
+- **testnet3**
+- **testnet4**
+- **fractal**
+- **fractal testnet**
+- **signet**
+
+## Quick Start
+
+### Initializing the Client
+
+```typescript
+import { LaserEyesClient, createStores, createConfig, XVERSE } from '@omnisat/lasereyes-core';
+
+// Create stores for state management
+const stores = createStores();
+
+// Optional: Create configuration with network setting
+const config = createConfig({ network: 'mainnet' });
+
+// Initialize the client
+const client = new LaserEyesClient(stores, config);
+client.initialize();
+
+// Connect to a wallet (e.g., Xverse)
+client.connect(XVERSE).then(() => {
+  console.log('Connected to Xverse wallet');
+});
 ```
 
-```bash
-yarn add @omnisat/lasereyes-core
+### Basic Usage
+
+```typescript
+// Connect to a wallet
+await client.connect(XVERSE);
+
+// Request wallet accounts
+const accounts = await client.requestAccounts();
+console.log('Accounts:', accounts);
+
+// Get wallet balance
+const balance = await client.getBalance();
+console.log('Balance:', balance.toString());
+
+// Send Bitcoin
+const txId = await client.sendBTC('recipient-address', 10000); // 10,000 satoshis
+console.log('Transaction ID:', txId);
+
+// Sign a message
+const signature = await client.signMessage('Hello, LaserEyes!');
+console.log('Signature:', signature);
+
+// Disconnect
+client.disconnect();
 ```
 
-```bash
-pnpm install @omnisat/lasereyes-core
-```
-
-```bash
-bun install @omnisat/lasereyes-core
-```
-
-## Features
-
-- **Unified Wallet Interface**: Interact with multiple Bitcoin wallets through a single interface.
-- **Modular Providers**: Easily extend the library by adding new wallet providers.
-- **Network Support**: Supports multiple Bitcoin networks such as **mainnet**, **testnet3**, **testnet4**, **fractal**, **fractal testnet**, **signet**.
-
-## Documentation
+## API Reference
 
 ### LaserEyesClient
 
-The `LaserEyesClient` class is a core component for managing interactions with multiple Bitcoin wallet providers in a unified way. It utilizes the `nanostores` library for reactive state management and supports various wallet providers such as Leather, Unisat, and XVerse, among others.
+#### Constructor
 
-This client handles connection management, account requests, network switching, and common wallet-related actions like sending BTC and signing messages. Additionally, it allows interaction with Partially Signed Bitcoin Transactions (PSBTs).
-
----
-
-## Constructor
-
-```ts
+```typescript
 constructor(
   stores: {
     readonly $store: MapStore<LaserEyesStoreType>
@@ -97,401 +124,361 @@ constructor(
 )
 ```
 
-- **Parameters:**
+#### Properties
 
-  - `stores`: An object containing the following:
-    - `$store`: A `MapStore<LaserEyesStoreType>` that stores the application state.
-    - `$network`: A `WritableAtom<NetworkType>` that tracks the current network type.
-  - `config`: An optional `Config` object for initial configuration, such as the network setting.
+- `$store`: A MapStore that tracks the application state
+- `$network`: A WritableAtom that tracks the current network type
 
-- **Initialization:**
-  - The constructor initializes the wallet provider map and subscribes to network and initialization-related changes.
-  - It triggers a check for default wallet setup and network configuration if provided in the `config`.
+#### Methods
 
----
+##### `initialize()`
 
-## Methods
+Initializes the client and checks for wallet providers.
 
-### `connect(defaultWallet: ProviderType)`
-
-Connects to the specified wallet provider and updates the store accordingly.
-
-```ts
-async connect(defaultWallet: ProviderType): Promise<void>
+```typescript
+client.initialize();
 ```
 
-- **Parameters:**
+##### `connect(defaultWallet: ProviderType)`
 
-  - `defaultWallet`: The wallet provider to connect to.
+Connects to the specified wallet provider.
 
-- **Error Handling:** Throws an error if the wallet provider is unsupported or the connection fails.
-
-### `disconnect()`
-
-Disconnects the currently connected wallet provider and resets the store values related to the connection.
-
-```ts
-disconnect(): void
+```typescript
+await client.connect(XVERSE);
 ```
 
-### `requestAccounts()`
+##### `disconnect()`
+
+Disconnects from the currently connected wallet provider.
+
+```typescript
+client.disconnect();
+```
+
+##### `requestAccounts()`
 
 Requests accounts from the connected wallet provider.
 
-```ts
-async requestAccounts(): Promise<string[]>
+```typescript
+const accounts = await client.requestAccounts();
 ```
 
-- **Returns:** A promise resolving to an array of account addresses.
+##### `getNetwork()`
 
-### `switchNetwork(network: NetworkType)`
+Gets the current network for the connected wallet provider.
+
+```typescript
+const network = await client.getNetwork();
+```
+
+##### `switchNetwork(network: NetworkType)`
 
 Switches the network for the connected wallet provider.
 
-```ts
-switchNetwork(network: NetworkType): void
+```typescript
+await client.switchNetwork('testnet');
 ```
 
-- **Parameters:**
-  - `network`: The new network to switch to.
+##### `getBalance()`
 
-### `sendBTC(to: string, amount: number)`
+Gets the balance of the connected wallet.
 
-Sends Bitcoin to the specified address using the connected wallet provider.
-
-```ts
-async sendBTC(to: string, amount: number): Promise<string>
+```typescript
+const balance = await client.getBalance();
 ```
 
-- **Parameters:**
+##### `sendBTC(to: string, amount: number)`
 
-  - `to`: The recipient's Bitcoin address.
-  - `amount`: The amount of Bitcoin to send (in satoshis).
+Sends Bitcoin to the specified address.
 
-- **Error Handling:** Throws errors if no wallet is connected or the provider does not support the operation.
-
-### `signMessage(message: string, toSignAddress?: string)`
-
-Signs a message using the connected wallet provider.
-
-```ts
-async signMessage(message: string, toSignAddress?: string): Promise<string>
+```typescript
+const txId = await client.sendBTC('recipientAddress', 10000); // 10,000 satoshis
 ```
 
-- **Parameters:**
-  - `message`: The message to sign.
-  - `toSignAddress`: Optional. The address to sign the message with.
+##### `signMessage(message: string, toSignAddressOrOptions?: string | SignMessageOptions)`
 
-### `signPsbt(tx: string, finalize = false, broadcast = false)`
+Signs a message with the connected wallet.
+
+```typescript
+const signature = await client.signMessage('Hello, LaserEyes!');
+```
+
+##### `signPsbt(tx: string, finalize?: boolean, broadcast?: boolean)`
 
 Signs a Partially Signed Bitcoin Transaction (PSBT).
 
-```ts
-async signPsbt(tx: string, finalize?: boolean, broadcast?: boolean): Promise<string>
+```typescript
+const result = await client.signPsbt(psbtHex, true, false);
 ```
 
-- **Parameters:**
-  - `tx`: The PSBT in base64 or hex format.
-  - `finalize`: Whether to finalize the PSBT.
-  - `broadcast`: Whether to broadcast the PSBT after signing.
+##### `pushPsbt(tx: string)`
 
-### `pushPsbt(tx: string)`
-
-Pushes a PSBT to the network using the connected wallet provider.
-
-```ts
-async pushPsbt(tx: string): Promise<void>
-```
-
-- **Parameters:**
-  - `tx`: The PSBT in base64 or hex format.
-
-### `inscribe(content: string, mimeType: ContentType)`
-
-```ts
-async inscribe(content: string, mimeType: ContentType): Promise<string | string[]>
-```
-
-Inscribe content onto the blockchain.
-
-**Parameters:**
-
-- `content` (string): The content to be inscribed, encoded in Base64.
-- `mimeType` (ContentType): The MIME type of the content.
-
-**Returns:**
-
-- `Promise<string | string[]>`: A promise that resolves to the transaction ID(s) of the inscribed content.
-
-### `getPublicKey()`
-
-Retrieves the public key of the connected wallet provider.
-
-```ts
-async getPublicKey(): Promise<string>
-```
-
-### `getBalance()`
-
-Fetches the balance of the connected wallet.
-
-```ts
-async getBalance(): Promise<bigint>
-```
-
-### `getInscriptions()`
-
-Fetches any inscriptions (NFTs) associated with the connected wallet.
-
-```ts
-async getInscriptions(): Promise<any[]>
-```
-
-### `dispose()`
-
-Disposes of all wallet providers by calling their respective `dispose()` methods.
-
-```ts
-dispose(): void
-```
-
----
-
-## Private Methods
-
-### `handleIsInitializingChanged(value: boolean)`
-
-Handles the change in the `isInitializing` state, automatically connecting the default wallet if one is set in local storage.
-
-### `watchNetworkChange()`
-
-Resets the wallet balance when a network change is detected.
-
-### `checkInitializationComplete()`
-
-Checks if the initialization process is complete by ensuring all providers are loaded.
-
----
-
-## Provider Map
-
-The `$providerMap` is a record of supported wallet providers that includes instances of `WalletProvider`-extended classes such as:
-
-- `LeatherProvider`
-- `UnisatProvider`
-- `XVerseProvider`
-- `MagicEdenProvider`
-- `PhantomProvider`
-- ...and others.
-
----
-
-## Example Usage
-
-```ts
-import { LaserEyesClient, createStores, XVERSE } from '@omnisat/lasereyes-core'
-
-const client = new LaserEyesClient(createStores())
-
-// Connect to Unisat wallet
-await client.connect(XVERSE)
-
-// Send 1000 satoshis to a recipient
-await client.sendBTC('recipient-address', 1000)
-
-// Sign a message
-const signature = await client.signMessage('Hello, Laser Eyes!')
-```
-
-## Usage
-
-### Importing the Library
+Pushes a PSBT to the network.
 
 ```typescript
-import { LaserEyesClient, createStores, createConfig } from 'lasereyes-core'
+const txId = await client.pushPsbt(psbtHex);
 ```
 
-### Initializing the Client
+##### `getPublicKey()`
 
-First, create the necessary stores and configuration:
+Gets the public key from the connected wallet.
 
 ```typescript
-const stores = createStores()
-const config = createConfig({ network: 'mainnet' }) // or 'testnet', 'signet', etc.
+const publicKey = await client.getPublicKey();
 ```
 
-Then, initialize the `LaserEyesClient`:
+##### `getInscriptions(offset?: number, limit?: number)`
+
+Gets inscriptions (NFTs) associated with the connected wallet.
 
 ```typescript
-const client = new LaserEyesClient(stores, config)
+const inscriptions = await client.getInscriptions();
 ```
 
-### Connecting to a Wallet
+##### `inscribe(content: string, mimeType: ContentType)`
 
-Connect to a wallet provider (e.g., 'unisat'):
+Inscribes content onto the blockchain.
 
 ```typescript
-await client.connect('unisat') // Replace 'unisat' with your desired wallet provider
+import { TEXT_PLAIN } from '@omnisat/lasereyes-core';
+
+const contentBase64 = Buffer.from('Hello, LaserEyes!').toString('base64');
+const txId = await client.inscribe(contentBase64, TEXT_PLAIN);
 ```
 
-### Requesting Accounts
+##### `send(protocol: Protocol, sendArgs: BTCSendArgs | RuneSendArgs)`
 
-Request the accounts from the connected wallet:
+Sends assets using the specified protocol.
 
 ```typescript
-const accounts = await client.requestAccounts()
-console.log(accounts)
+import { BTC } from '@omnisat/lasereyes-core';
+
+const txId = await client.send(BTC, {
+  fromAddress: 'senderAddress',
+  toAddress: 'recipientAddress',
+  amount: 10000,
+  network: 'mainnet'
+});
 ```
 
-### Sending BTC
+##### `dispose()`
 
-Send BTC to a recipient address:
+Disposes of all wallet providers.
 
 ```typescript
-await client.sendBTC('recipientAddress', amount)
+client.dispose();
 ```
 
-### Signing a Message
+### Constants
 
-Sign a message with the connected wallet:
-
-```typescript
-const signedMessage = await client.signMessage('message to sign')
-console.log(signedMessage)
-```
-
-### Signing a PSBT
-
-Sign a Partially Signed Bitcoin Transaction (PSBT):
-
-```typescript
-const signedPsbt = await client.signPsbt('psbtHex')
-console.log(signedPsbt)
-```
-
-### Getting the Public Key
-
-Retrieve the public key from the connected wallet:
-
-```typescript
-const publicKey = await client.getPublicKey()
-console.log(publicKey)
-```
-
-### Getting the Balance
-
-Get the balance of the connected wallet:
-
-```typescript
-const balance = await client.getBalance()
-console.log(balance)
-```
-
-### Getting Inscriptions
-
-Retrieve inscriptions from the connected wallet:
-
-```typescript
-const inscriptions = await client.getInscriptions()
-console.log(inscriptions)
-```
-
-### Disconnecting
-
-Disconnect from the wallet:
-
-```typescript
-client.disconnect()
-```
-
-### Inscribing Content
-
-To inscribe content using the `inscribe` method, follow these steps:
-
-1. **Initialize the Client**: Ensure you have initialized the `LaserEyesClient` with the necessary stores and configuration.
-2. **Connect to a Wallet**: Connect to a wallet provider.
-3. **Inscribe Content**: Use the `inscribe` method to inscribe content.
-
-#### Example
+#### Wallet Providers
 
 ```typescript
 import {
-  LaserEyesClient,
-  createStores,
-  createConfig,
-} from '@omnisat/lasereyes-core'
-import { TEXT_PLAIN } from '@omnisat/lasereyes-core'
-
-const stores = createStores()
-const config = createConfig({ network: 'mainnet' })
-const client = new LaserEyesClient(stores, config)
-
-client.connect('unisat').then(async () => {
-  const contentBase64 = Buffer.from('Hello, LaserEyes!').toString('base64')
-  const mimeType = TEXT_PLAIN
-  try {
-    const txId = await client.inscribe(contentBase64, mimeType)
-    console.log('Inscription txId:', txId)
-  } catch (error) {
-    console.error('Error inscribing content:', error)
-  }
-})
+  LEATHER,
+  MAGIC_EDEN,
+  OKX,
+  OP_NET,
+  ORANGE,
+  OYL,
+  PHANTOM,
+  SPARROW,
+  UNISAT,
+  WIZZ,
+  XVERSE
+} from '@omnisat/lasereyes-core';
 ```
 
-## Network Configuration
-
-The network configuration can be set to different Bitcoin networks such as 'mainnet', 'testnet', 'signet', etc. These are exported as consts from the `@omnisat/lasereyes-core` package.
-
-## Extending the Library
-
-### Adding a New Wallet Provider
-
-To add a new wallet provider, extend the `WalletProvider` abstract class and implement the required methods.:
+#### Networks
 
 ```typescript
-export abstract class WalletProvider {
-  // Constructor and properties
+import {
+  MAINNET,
+  TESTNET,
+  TESTNET4,
+  SIGNET,
+  FRACTAL_MAINNET,
+  FRACTAL_TESTNET
+} from '@omnisat/lasereyes-core';
+```
 
-  abstract initialize(): void
-  abstract dispose(): void
-  abstract connect(defaultWallet: ProviderType): Promise<void>
-  abstract requestAccounts(): Promise<string[]>
-  abstract getNetwork(): Promise<NetworkType | undefined>
-  abstract getPublicKey(): Promise<string | undefined>
-  abstract getBalance(): Promise<bigint | string | number>
-  abstract getInscriptions(): Promise<any[]>
-  abstract sendBTC(to: string, amount: number): Promise<string>
-  abstract signMessage(message: string, toSignAddress?: string): Promise<string>
-  abstract signPsbt(
-    tx: string,
-    psbtHex: string,
-    psbtBase64: string,
-    finalize?: boolean,
-    broadcast?: boolean
-  ): Promise<
-    | {
-        signedPsbtHex: string | undefined
-        signedPsbtBase64: string | undefined
-        txId?: string
-      }
-    | undefined
-  >
-  abstract pushPsbt(tx: string): Promise<string | undefined>
+#### Content Types
+
+```typescript
+import {
+  TEXT_HTML,
+  TEXT_PLAIN,
+  APPLICATION_JSON,
+  IMAGE_JPEG,
+  IMAGE_PNG
+  // ... many more available
+} from '@omnisat/lasereyes-core';
+```
+
+#### Protocols
+
+```typescript
+import {
+  BTC,
+  BRC20,
+  RUNES,
+  ALKANES
+} from '@omnisat/lasereyes-core';
+```
+
+## Error Handling
+
+LaserEyes Core throws appropriate errors when operations fail. Always wrap your wallet interactions in try-catch blocks:
+
+```typescript
+try {
+  await client.connect(XVERSE);
+  const balance = await client.getBalance();
+  console.log('Balance:', balance.toString());
+} catch (error) {
+  console.error('Wallet error:', error);
 }
 ```
 
----
+## Advanced Usage
 
-This documentation provides an overview of the `LaserEyesClient` class, its constructor, and the main methods it offers for interacting with various Bitcoin wallet providers.
+### Working with PSBTs
+
+```typescript
+// Sign a PSBT
+const { signedPsbtHex, signedPsbtBase64, txId } = await client.signPsbt(
+  psbtHex,   // PSBT in hex format
+  true,      // finalize
+  true       // broadcast
+);
+
+// If not broadcasting immediately, push the PSBT later
+if (!txId) {
+  const broadcastTxId = await client.pushPsbt(signedPsbtHex);
+  console.log('Broadcast transaction ID:', broadcastTxId);
+}
+```
+
+### Working with Inscriptions
+
+```typescript
+// Create an inscription
+const content = Buffer.from('Hello, Ordinals!').toString('base64');
+const txId = await client.inscribe(content, TEXT_PLAIN);
+console.log('Inscription transaction ID:', txId);
+
+// Get all inscriptions for the connected wallet
+const inscriptions = await client.getInscriptions();
+console.log('Inscriptions:', inscriptions);
+```
+
+### Working with Runes
+
+```typescript
+import { RUNES } from '@omnisat/lasereyes-core';
+
+// Send runes
+const txId = await client.send(RUNES, {
+  runeId: '123456:78',
+  fromAddress: 'senderAddress',
+  toAddress: 'recipientAddress',
+  amount: 100,
+  network: 'mainnet'
+});
+
+// Get rune balances
+const runeBalances = await client.getMetaBalances(RUNES);
+```
+
+## Best Practices
+
+1. **Initialize once**: Create a single instance of `LaserEyesClient` and reuse it.
+2. **Handle errors**: Wrap all wallet interactions in try-catch blocks.
+3. **Clean up**: Call `dispose()` when you're done with the client to free resources.
+4. **Network awareness**: Check the current network before performing transactions.
+5. **User confirmation**: Always get user confirmation before signing transactions.
+
+## Troubleshooting
+
+### Wallet Not Connecting
+
+- Check if the wallet extension is installed
+- Verify the wallet is unlocked
+- Check the console for specific error messages
+
+### Transaction Failures
+
+- Confirm sufficient balance
+- Check network configuration
+- Verify recipient address format
+
+### Signing Issues
+
+- Ensure the wallet has the appropriate permissions
+- Check if the message format is correct
+
+## Examples
+
+### Basic Wallet Connection
+
+```typescript
+import { LaserEyesClient, createStores, UNISAT } from '@omnisat/lasereyes-core';
+
+const client = new LaserEyesClient(createStores());
+client.initialize();
+
+document.getElementById('connect-button').addEventListener('click', async () => {
+  try {
+    await client.connect(UNISAT);
+    const address = client.$store.get().address;
+    document.getElementById('address-display').textContent = address;
+  } catch (error) {
+    console.error('Connection error:', error);
+  }
+});
+```
+
+### Sending Bitcoin
+
+```typescript
+document.getElementById('send-button').addEventListener('click', async () => {
+  const recipient = document.getElementById('recipient').value;
+  const amountSats = parseInt(document.getElementById('amount').value);
+  
+  try {
+    const txId = await client.sendBTC(recipient, amountSats);
+    document.getElementById('tx-display').textContent = `Transaction sent: ${txId}`;
+  } catch (error) {
+    console.error('Send error:', error);
+  }
+});
+```
+
+### Creating an Inscription
+
+```typescript
+document.getElementById('inscribe-button').addEventListener('click', async () => {
+  const text = document.getElementById('inscription-text').value;
+  const contentBase64 = Buffer.from(text).toString('base64');
+  
+  try {
+    const txId = await client.inscribe(contentBase64, TEXT_PLAIN);
+    document.getElementById('inscription-display').textContent = `Inscription created: ${txId}`;
+  } catch (error) {
+    console.error('Inscription error:', error);
+  }
+});
+```
 
 ## Contributing
 
-If you'd like to contribute to `@omnisat/lasereyes`, feel free to submit pull requests or open issues on the GitHub repository.
+Contributions to LaserEyes Core are welcome! Please follow these steps:
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Submit a pull request
 
 ## License
 
-`@omnisat/lasereyes-core` is MIT licensed
-
-## Conclusion
-
-LaserEyes Core provides a robust and flexible interface for interacting with various Bitcoin wallet providers. By following the above documentation, you can easily integrate LaserEyes Core into your project and extend its functionality as needed.
+LaserEyes Core is MIT licensed.

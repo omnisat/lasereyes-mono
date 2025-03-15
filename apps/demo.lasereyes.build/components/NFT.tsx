@@ -1,14 +1,10 @@
-/* eslint-disable */
 import React, { ReactNode, useEffect, useRef, useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { usePathname } from 'next/navigation'
-import Link from 'next/link'
-import { Button } from '@/components/ui/button'
-import { ImNewTab } from 'react-icons/im'
 import { cn } from '@/lib/utils'
 import { ContentType } from '@omnisat/lasereyes'
 
-const Inscription = ({
+const InscriptionComponent = ({
   contentUrl,
   contentType,
   size,
@@ -24,6 +20,9 @@ const Inscription = ({
   const pathname = usePathname()
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [svgContent, setSvgContent] = useState<string | null>(null)
+  const [textContent, setTextContent] = useState<string | null>(null)
+  const [jsonContent, setJsonContent] = useState<any | null>(null)
+  const [jsContent, setJsContent] = useState<string | null>(null)
 
   const getMimeType = (contentType: ContentType) =>
     contentType.split(';')[0].trim().toLowerCase()
@@ -42,18 +41,44 @@ const Inscription = ({
   const isHtmlContentType = (contentType: ContentType) =>
     getMimeType(contentType) === 'text/html'
 
+  const isTextContentType = (contentType: ContentType) =>
+    getMimeType(contentType) === 'text/plain'
+
+  const isJsonContentType = (contentType: ContentType) =>
+    getMimeType(contentType) === 'application/json'
+
+  const isJavaScriptContentType = (contentType: ContentType) =>
+    getMimeType(contentType) === 'text/javascript'
+
   useEffect(() => {
-    if (isSvgContentType(contentType)) {
-      fetch(contentUrl)
-        .then((response) => response.text())
-        .then((svg) => {
-          setSvgContent(svg)
-        })
-        .catch((error) => {
-          console.error('Error fetching SVG content:', error)
-        })
+    const fetchContent = async () => {
+      try {
+        const response = await fetch(contentUrl);
+        const content = await response.text();
+
+        if (isSvgContentType(contentType)) {
+          setSvgContent(content);
+        } else if (isTextContentType(contentType)) {
+          setTextContent(content);
+        } else if (isJsonContentType(contentType)) {
+          try {
+            setJsonContent(JSON.parse(content));
+          } catch (error) {
+            console.error('Error parsing JSON:', error);
+            setJsonContent({ error: 'Invalid JSON format', raw: content });
+          }
+        } else if (isJavaScriptContentType(contentType)) {
+          setJsContent(content);
+        }
+      } catch (error) {
+        console.error(`Error fetching content (${contentType}):`, error);
+      }
+    };
+
+    if (contentUrl) {
+      fetchContent();
     }
-  }, [contentUrl])
+  }, [contentUrl, contentType]);
 
   useEffect(() => {
     if (contentUrl && contentType && isImageContentType(contentType)) {
@@ -116,85 +141,180 @@ const Inscription = ({
         }
       }
     }
-  }, [contentUrl, size])
+  }, [contentUrl, size, contentType])
 
-  let content
+  const renderContent = () => {
+    const mimeType = getMimeType(contentType);
 
-  if (contentUrl && contentType && isHtmlContentType(contentType)) {
-    content = (
-      <iframe
-        src={contentUrl}
-        width={size}
-        height={size}
-        style={{ border: 'none', borderRadius: '0.5rem' }}
-        sandbox="allow-scripts allow-same-origin"
-      />
-    )
-  } else if (contentUrl && contentType && isGifContentType(contentType)) {
-    content = (
-      <img
-        src={contentUrl}
-        alt={'inscription'}
-        style={{
-          margin: 'auto',
-          display: 'block',
-          width: '120%',
-          height: 'auto',
-        }}
-      />
-    )
-  } else if (contentUrl && contentType && isSvgContentType(contentType)) {
-    content = svgContent ? (
-      <DynamicSvgDisplay
-        svgContent={svgContent}
-        baseUrl={new URL(contentUrl).origin} // Pass base URL
-        size={size}
-      />
-    ) : (
-      <div>Loading...</div>
-    )
-  } else if (contentUrl && contentType && isImageContentType(contentType)) {
-    content = (
-      <canvas
-        ref={canvasRef}
-        id="canvas"
-        style={{
-          // imageRendering: "pixelated",
-          margin: '10px auto',
-          // display: "none",
-          width: '100%',
-          height: '100%',
-        }}
-      />
-    )
-  } else {
-    // Handle other content types or provide a fallback
-    content = (
+    if (isHtmlContentType(contentType)) {
+      return (
+        <iframe
+          src={contentUrl}
+          width={size}
+          height={size}
+          style={{ border: 'none', borderRadius: '0.5rem' }}
+          sandbox="allow-scripts allow-same-origin"
+        />
+      );
+    }
+
+    if (isGifContentType(contentType)) {
+      return (
+        <img
+          src={contentUrl}
+          alt="GIF inscription"
+          style={{
+            margin: 'auto',
+            display: 'block',
+            width: '100%',
+            height: 'auto',
+          }}
+        />
+      );
+    }
+
+    if (isSvgContentType(contentType)) {
+      return svgContent ? (
+        <DynamicSvgDisplay
+          svgContent={svgContent}
+          baseUrl={new URL(contentUrl).origin}
+          size={size}
+        />
+      ) : (
+        <div className="flex items-center justify-center h-full">Loading SVG...</div>
+      );
+    }
+
+    if (isImageContentType(contentType)) {
+      return (
+        <canvas
+          ref={canvasRef}
+          id="canvas"
+          style={{
+            border: '1px solid #ddd',
+            margin: '0 auto',
+            width: '100%',
+            height: '100%',
+          }}
+        />
+      );
+    }
+
+    if (isTextContentType(contentType)) {
+      return (
+        <div
+          style={{
+            width: '100%',
+            height: size,
+            padding: '1rem',
+            overflowY: 'auto',
+            backgroundColor: '#0e1a15',
+            color: '#fff',
+            fontFamily: 'monospace',
+            whiteSpace: 'pre-wrap',
+            wordBreak: 'break-word',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '16px'
+          }}
+        >
+          <pre style={{ margin: 0, width: '100%' }}>
+            {textContent || 'Loading text content...'}
+          </pre>
+        </div>
+      );
+    }
+
+    if (isJsonContentType(contentType)) {
+      return (
+        <div
+          style={{
+            width: '100%',
+            height: size,
+            padding: '1rem',
+            overflowY: 'auto',
+            backgroundColor: '#0e1a15',
+            color: '#fff',
+            fontFamily: 'monospace',
+            whiteSpace: 'pre-wrap',
+            wordBreak: 'break-word',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '14px'
+          }}
+        >
+          <pre style={{ margin: 0, width: '100%' }}>
+            {jsonContent ? JSON.stringify(jsonContent, null, 2) : 'Loading JSON content...'}
+          </pre>
+        </div>
+      );
+    }
+
+    if (isJavaScriptContentType(contentType)) {
+      return (
+        <div
+          style={{
+            width: '100%',
+            height: size,
+            padding: '1rem',
+            overflowY: 'auto',
+            backgroundColor: '#0e1a15',
+            color: '#E9D16C', // JavaScript syntax highlighting color
+            fontFamily: 'monospace',
+            whiteSpace: 'pre-wrap',
+            wordBreak: 'break-word',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '14px'
+          }}
+        >
+          <pre style={{ margin: 0, width: '100%' }}>
+            {jsContent || 'Loading JavaScript content...'}
+          </pre>
+        </div>
+      );
+    }
+
+    // Fallback for unsupported content types - Display a more user-friendly message with mime type
+    return (
       <div
         style={{
-          width: size - 20,
+          width: '100%',
           height: size,
-          display: 'block',
+          display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           backgroundColor: '#0e1a15',
           color: '#fff',
+          padding: '1rem',
+          textAlign: 'center',
+          fontFamily: 'sans-serif'
         }}
       >
-        Unsupported content type
+        <div>
+          <div style={{ fontSize: '16px', marginBottom: '8px' }}>
+            {mimeType}
+          </div>
+          <div style={{ fontSize: '14px', color: '#999' }}>
+            Preview not available
+          </div>
+        </div>
       </div>
-    )
+    );
   }
 
   return (
     <Card
       className={cn(
-        `border h-full self-end w-full grow flex flex-col items-center hover:grow max-w-full mx-auto p-1  rounded justify-between`,
+        `h-full border-gray-500 shadow-xl self-end w-full grow flex flex-col items-center hover:grow max-w-full mx-auto rounded justify-between`,
         className
       )}
     >
-      <CardHeader className="p-0 cursor-pointer transition-transform overflow-hidden justify-end hover:scale-105">
-        {content}
+      <CardHeader className="p-0 cursor-pointer transition-transform overflow-hidden justify-end hover:scale-105 w-full">
+        {renderContent()}
       </CardHeader>
       <CardContent
         className={`p-0 w-full ${pathname === '/' ? 'mt-0' : 'mt-4'}`}
@@ -272,4 +392,4 @@ const DynamicSvgDisplay = ({
   )
 }
 
-export default Inscription
+export default InscriptionComponent

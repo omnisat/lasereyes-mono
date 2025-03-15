@@ -20,9 +20,10 @@ import {
   SIGNET,
   FRACTAL_TESTNET,
   LaserEyesStoreType,
-  getOrangeNetwork,
   ORANGE,
   SignMessageOptions,
+  Config,
+  LaserEyesClient,
 } from '../..'
 import {
   findOrdinalsAddress,
@@ -30,7 +31,8 @@ import {
   getBTCBalance,
   getBitcoinNetwork,
 } from '../../lib/helpers'
-import { MapStore, listenKeys } from 'nanostores'
+import { getOrangeNetwork } from '../../constants/networks'
+import { MapStore, WritableAtom, listenKeys } from 'nanostores'
 import { persistentMap } from '@nanostores/persistent'
 
 import {
@@ -44,6 +46,16 @@ const { signMessage: signMessageOrange, sendBtcTransaction: sendBtcTxOrange } =
 
 const ORANGE_WALLET_PERSISTENCE_KEY = 'ORANGE_CONNECTED_WALLET_STATE'
 export default class OrangeProvider extends WalletProvider {
+  constructor(stores: {
+    $store: MapStore<LaserEyesStoreType>
+    $network: WritableAtom<NetworkType>
+  },
+    parent: LaserEyesClient,
+    config?: Config
+  ) {
+    super(stores, parent, config)
+  }
+
   public get library(): any | undefined {
     return (window as any)?.OrangeWalletProviders?.OrangeBitcoinProvider
   }
@@ -253,10 +265,10 @@ export default class OrangeProvider extends WalletProvider {
     broadcast?: boolean | undefined
   ): Promise<
     | {
-        signedPsbtHex: string | undefined
-        signedPsbtBase64: string | undefined
-        txId?: string | undefined
-      }
+      signedPsbtHex: string | undefined
+      signedPsbtBase64: string | undefined
+      txId?: string | undefined
+    }
     | undefined
   > {
     try {

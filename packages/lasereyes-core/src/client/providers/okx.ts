@@ -2,10 +2,12 @@ import * as bitcoin from 'bitcoinjs-lib'
 import { WalletProvider } from '.'
 import {
   BIP322_SIMPLE,
+  Config,
   ECDSA,
   FRACTAL_MAINNET,
   FRACTAL_TESTNET,
-  getNetworkForOkx,
+  Inscription,
+  LaserEyesClient,
   LaserEyesStoreType,
   MAINNET,
   NetworkType,
@@ -16,7 +18,7 @@ import {
   TESTNET,
   TESTNET4,
 } from '../..'
-import { listenKeys, MapStore } from 'nanostores'
+import { listenKeys, MapStore, WritableAtom } from 'nanostores'
 import { persistentMap } from '@nanostores/persistent'
 import {
   handleStateChangePersistence,
@@ -24,10 +26,23 @@ import {
   PersistedKey,
 } from '../utils'
 import { getBTCBalance, isMainnetNetwork } from '../../lib/helpers'
+import { getNetworkForOkx } from '../../constants/networks'
+import { normalizeInscription } from '../../lib/data-sources/normalizations'
+import { UnisatInscription } from './unisat'
 
 const OKX_WALLET_PERSISTENCE_KEY = 'OKX_CONNECTED_WALLET_STATE'
 
 export default class OkxProvider extends WalletProvider {
+  constructor(stores: {
+    $store: MapStore<LaserEyesStoreType>
+    $network: WritableAtom<NetworkType>
+  },
+    parent: LaserEyesClient,
+    config?: Config
+  ) {
+    super(stores, parent, config)
+  }
+
   public get library(): any | undefined {
     let foundOkx
     if (
@@ -190,9 +205,15 @@ export default class OkxProvider extends WalletProvider {
     return await library?.getPublicKey()
   }
 
-  async getInscriptions(offset: number, limit: number): Promise<any[]> {
-    const library = this.library
-    return await library.getInscriptions(offset, limit)
+  async getInscriptions(offset?: number, limit?: number): Promise<Inscription[]> {
+    const offsetValue = offset || 0
+    const limitValue = limit || 10
+    const response = await this.library.getInscriptions(offsetValue, limitValue)
+    const inscriptions = response.list.map((insc: UnisatInscription) => {
+      return normalizeInscription(insc, undefined, this.network)
+    })
+
+    return inscriptions
   }
 
   async sendBTC(to: string, amount: number): Promise<string> {
@@ -220,10 +241,10 @@ export default class OkxProvider extends WalletProvider {
     broadcast?: boolean | undefined
   ): Promise<
     | {
-        signedPsbtHex: string | undefined
-        signedPsbtBase64: string | undefined
-        txId?: string | undefined
-      }
+      signedPsbtHex: string | undefined
+      signedPsbtBase64: string | undefined
+      txId?: string | undefined
+    }
     | undefined
   > {
     const library = this.library

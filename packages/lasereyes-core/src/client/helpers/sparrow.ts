@@ -63,7 +63,7 @@ export class DefaultSparrowWalletProvider implements SparrowWalletProvider {
 
   // TODO: Implement network switching between mainnet and testnet
   async getNetwork(): Promise<NetworkType> {
-    return 'mainnet'
+    return 'mainnet' as NetworkType
   }
 
   async switchNetwork(_: NetworkType): Promise<void> {

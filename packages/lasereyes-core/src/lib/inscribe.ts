@@ -4,23 +4,20 @@ import { Address, Signer, Tap, Tx } from '@cmdcode/tapscript'
 import * as bitcoin from 'bitcoinjs-lib'
 import * as ecc2 from '@bitcoinerlab/secp256k1'
 import {
-  broadcastTx,
   calculateValueOfUtxosGathered,
-  getAddressUtxos,
   getBitcoinNetwork,
 } from './helpers'
-import { getCmDruidNetwork, MAINNET, P2SH, P2TR } from '../constants'
+import { getCmDruidNetwork } from '../constants/networks'
+import { MAINNET, P2SH, P2TR } from '../constants'
 import { ContentType, MempoolUtxo, NetworkType } from '../types'
 import { toXOnly } from 'bitcoinjs-lib/src/psbt/bip371'
 import { TEXT_PLAIN } from '../constants/content'
 import {
   generatePrivateKey,
-  waitForTransaction,
-  getOutputValueByVOutIndex,
   getAddressType,
   getRedeemScript,
 } from './btc'
-import { getRecommendedFeesMempoolSpace } from './mempool-space'
+import { DataSourceManager } from './data-sources/manager'
 
 bitcoin.initEccLib(ecc2)
 
@@ -33,6 +30,7 @@ export const inscribeContent = async ({
   paymentAddress,
   paymentPublicKey,
   signPsbt,
+  dataSourceManager,
   network = MAINNET,
 }: {
   contentBase64?: string
@@ -51,32 +49,43 @@ export const inscribeContent = async ({
     network?: NetworkType
   ) => Promise<
     | {
-        signedPsbtHex: string | undefined
-        signedPsbtBase64: string | undefined
-        txId?: string
-      }
+      signedPsbtHex: string | undefined
+      signedPsbtBase64: string | undefined
+      txId?: string
+    }
     | undefined
   >
+  dataSourceManager: DataSourceManager
   network: NetworkType
 }) => {
   try {
     if (!contentBase64 && !inscriptions) {
       throw new Error('contentBase64 or inscriptions is required')
     }
+
+    if (!dataSourceManager) {
+      throw new Error("missing data source")
+    }
+
+    if (!dataSourceManager.broadcastTransaction) {
+      throw new Error("missing broadcastTransaction")
+    }
+
     const privKeyBuff = await generatePrivateKey(network)
     const privKey = Buffer.from(privKeyBuff!).toString('hex')
     const ixs = inscriptions
       ? inscriptions
       : Array(quantity).fill({
-          content: contentBase64,
-          mimeType,
-        })
+        content: contentBase64,
+        mimeType,
+      })
 
     const commitTx = await getCommitPsbt({
       inscriptions: ixs,
       paymentAddress,
       paymentPublicKey,
       privKey,
+      dataSourceManager,
       network,
     })
 
@@ -97,14 +106,14 @@ export const inscribeContent = async ({
     if (!response) throw new Error('sign psbt failed')
     const psbt = bitcoin.Psbt.fromHex(response?.signedPsbtHex || '')
     const extracted = psbt.extractTransaction()
-    const commitTxId = await broadcastTx(extracted.toHex(), network)
+    const commitTxId = await dataSourceManager.broadcastTransaction(extracted.toHex())
     if (!commitTxId) throw new Error('commit tx failed')
     return await executeRevealTransaction({
       inscriptions: ixs,
       ordinalAddress,
       privKey,
       commitTxId,
-      network,
+      dataSourceManager,
     })
   } catch (e) {
     throw e
@@ -116,19 +125,21 @@ export const getCommitPsbt = async ({
   paymentAddress,
   paymentPublicKey,
   privKey,
+  dataSourceManager,
   network,
 }: {
   inscriptions: { content: string; mimeType: ContentType }[]
   paymentAddress: string
   paymentPublicKey?: string
   privKey: string
+  dataSourceManager: DataSourceManager
   network: NetworkType
   isDry?: boolean
 }): Promise<
   | {
-      psbtHex: string
-      psbtBase64: string
-    }
+    psbtHex: string
+    psbtBase64: string
+  }
   | undefined
 > => {
   try {
@@ -140,7 +151,20 @@ export const getCommitPsbt = async ({
     if (contentSize > 390000)
       throw new Error('Content size is too large, must be less than 390kb')
 
-    const { fastestFee } = await getRecommendedFeesMempoolSpace(network)
+    if (!dataSourceManager) {
+      throw new Error("missing data source")
+    }
+
+    if (!dataSourceManager.getRecommendedFees) {
+      throw new Error("missing getRecommendedFees")
+    }
+
+    if (!dataSourceManager.getAddressUtxos) {
+      throw new Error("missing getAddressUtxos")
+    }
+
+
+    const { fastestFee } = await dataSourceManager.getRecommendedFees()
     const pubKey = ecc.keys.get_pubkey(String(privKey), true)
     const psbt = new bitcoin.Psbt({
       network: getBitcoinNetwork(network),
@@ -157,9 +181,8 @@ export const getCommitPsbt = async ({
     const revealSatsNeeded =
       Math.floor((contentSize * fastestFee) / 3) + 1000 + 546 * quantity
     const inscribeFees = Math.floor(commitSatsNeeded + revealSatsNeeded)
-    const utxosGathered: MempoolUtxo[] = await getAddressUtxos(
-      paymentAddress,
-      network
+    const utxosGathered: MempoolUtxo[] = await dataSourceManager.getAddressUtxos(
+      paymentAddress
     )
     const filteredUtxos = utxosGathered
       .filter((utxo: MempoolUtxo) => utxo.value > 3000)
@@ -235,14 +258,14 @@ export const executeRevealTransaction = async ({
   ordinalAddress,
   commitTxId,
   privKey,
-  network,
+  dataSourceManager,
   isDry,
 }: {
   inscriptions: { content: string; mimeType: ContentType }[]
   ordinalAddress: string
   commitTxId: string
   privKey: string
-  network: NetworkType
+  dataSourceManager: DataSourceManager
   isDry?: boolean
 }): Promise<string> => {
   try {
@@ -252,15 +275,30 @@ export const executeRevealTransaction = async ({
     const tapleaf = Tap.encodeScript(script)
     const [tpubkey, cblock] = Tap.getPubKey(pubKey, { target: tapleaf })
 
-    const txResult = await waitForTransaction(String(commitTxId), network)
+    if (!dataSourceManager) {
+      throw new Error("missing data source")
+    }
+
+    if (!dataSourceManager.waitForTransaction) {
+      throw new Error("missing waitForTransaction")
+    }
+
+    if (!dataSourceManager.getOutputValueByVOutIndex) {
+      throw new Error("missing waitForTransaction")
+    }
+
+    if (!dataSourceManager.broadcastTransaction) {
+      throw new Error('missing broadcastTransaction')
+    }
+
+    const txResult = await dataSourceManager.waitForTransaction(String(commitTxId))
     if (!txResult) {
       throw new Error('ERROR WAITING FOR COMMIT TX')
     }
 
-    const commitTxOutputValue = await getOutputValueByVOutIndex(
+    const commitTxOutputValue = await dataSourceManager.getOutputValueByVOutIndex(
       commitTxId,
       0,
-      network
     )
     if (commitTxOutputValue === 0 || !commitTxOutputValue) {
       throw new Error('ERROR GETTING FIRST INPUT VALUE')
@@ -291,7 +329,7 @@ export const executeRevealTransaction = async ({
       return Tx.util.getTxid(txData)
     }
 
-    return await broadcastTx(Tx.encode(txData).hex, network)
+    return await dataSourceManager.broadcastTransaction(Tx.encode(txData).hex)
   } catch (e: any) {
     throw e
   }
@@ -304,7 +342,6 @@ export const createInscriptionScript = (
   const ec = new TextEncoder()
   const marker = ec.encode('ord')
   const INSCRIPTION_SIZE = 546
-
   const createContentChunks = (
     contentBase64: string,
     mimeType: ContentType
@@ -336,7 +373,6 @@ export const createInscriptionScript = (
       script.push(Buffer.from([0x02]))
       script.push(pointerBuffer)
     }
-
     script.push(...contentChunks.map((chunk) => chunk), 'OP_ENDIF')
   })
 

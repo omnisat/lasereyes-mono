@@ -1,6 +1,7 @@
 import { MapStore, WritableAtom } from 'nanostores'
 import { LaserEyesStoreType } from '../types'
 import {
+  Brc20SendArgs,
   BTCSendArgs,
   Config,
   ContentType,
@@ -11,7 +12,7 @@ import {
 } from '../../types'
 import { LaserEyesClient } from '..'
 import { inscribeContent } from '../../lib/inscribe'
-import { broadcastTx, getBTCBalance } from '../../lib/helpers'
+import { broadcastTx, } from '../../lib/helpers'
 import * as bitcoin from 'bitcoinjs-lib'
 import {
   FRACTAL_TESTNET,
@@ -20,9 +21,12 @@ import {
   TESTNET,
   TESTNET4,
 } from '../../constants'
-import { BTC, RUNES } from '../../constants/protocols'
+import { BRC20, BTC, RUNES } from '../../constants/protocols'
 import { sendRune } from '../../lib/runes/psbt'
-import { getAddressRunesBalances } from '../../lib/sandshrew'
+import { DataSourceManager } from '../../lib/data-sources/manager'
+import { sendBrc20 } from '../../lib/brc-20/psbt'
+import { Inscription } from '../../types/lasereyes'
+import { sendInscriptions } from '../../lib/inscriptions/psbt'
 
 export const UNSUPPORTED_PROVIDER_METHOD_ERROR = new Error(
   "The connected wallet doesn't support this method..."
@@ -31,6 +35,8 @@ export const WALLET_NOT_INSTALLED_ERROR = new Error('Wallet is not installed')
 export abstract class WalletProvider {
   readonly $store: MapStore<LaserEyesStoreType>
   readonly $network: WritableAtom<NetworkType>
+
+  protected dataSourceManager: DataSourceManager;
 
   constructor(
     stores: {
@@ -43,10 +49,17 @@ export abstract class WalletProvider {
     this.$store = stores.$store
     this.$network = stores.$network
 
+    try {
+      this.dataSourceManager = DataSourceManager.getInstance()
+    } catch {
+      DataSourceManager.init(config!)
+      this.dataSourceManager = DataSourceManager.getInstance()
+    }
+
     this.initialize()
   }
 
-  disconnect(): void {}
+  disconnect(): void { }
 
   abstract initialize(): void
 
@@ -80,8 +93,11 @@ export abstract class WalletProvider {
   }
 
   async getBalance(): Promise<string | number | bigint> {
-    const { paymentAddress } = this.$store.get()
-    return await getBTCBalance(paymentAddress, this.$network.get())
+    if (!this.dataSourceManager.getAddressBtcBalance) {
+      throw new Error('Method not found on data source')
+    }
+
+    return await this.dataSourceManager.getAddressBtcBalance(this.$store.get().paymentAddress)
   }
 
   async getMetaBalances(protocol: Protocol): Promise<any> {
@@ -94,15 +110,28 @@ export abstract class WalletProvider {
           throw new Error('Unsupported network')
         }
 
-        return await getAddressRunesBalances(this.$store.get().address)
+        if (!this.dataSourceManager.getAddressRunesBalances) {
+          throw new Error('Method not found on data source')
+        }
+
+        return await this.dataSourceManager.getAddressRunesBalances(this.$store.get().address)
+      case BRC20:
+        if (!this.dataSourceManager.getAddressBrc20Balances) {
+          throw new Error('Method not found on data source')
+        }
+
+        return await this.dataSourceManager.getAddressBrc20Balances(this.$store.get().address)
       default:
         throw new Error('Unsupported protocol')
     }
   }
 
-  async getInscriptions(offset?: number, limit?: number): Promise<any[]> {
-    console.log('getInscriptions not implemented', offset, limit)
-    throw UNSUPPORTED_PROVIDER_METHOD_ERROR
+  async getInscriptions(offset?: number, limit?: number): Promise<Inscription[]> {
+    if (!this.dataSourceManager.getAddressInscriptions) {
+      throw new Error('Method not found on data source')
+    }
+
+    return await this.dataSourceManager.getAddressInscriptions(this.$store.get().address, offset, limit)
   }
 
   abstract sendBTC(to: string, amount: number): Promise<string>
@@ -120,10 +149,10 @@ export abstract class WalletProvider {
     broadcast?: boolean
   ): Promise<
     | {
-        signedPsbtHex: string | undefined
-        signedPsbtBase64: string | undefined
-        txId?: string
-      }
+      signedPsbtHex: string | undefined
+      signedPsbtBase64: string | undefined
+      txId?: string
+    }
     | undefined
   >
 
@@ -139,7 +168,8 @@ export abstract class WalletProvider {
 
   async inscribe(
     contentBase64: string,
-    mimeType: ContentType
+    mimeType: ContentType,
+    dataSourceManager?: DataSourceManager
   ): Promise<string | string[]> {
     return await inscribeContent({
       contentBase64,
@@ -148,17 +178,17 @@ export abstract class WalletProvider {
       paymentAddress: this.$store.get().paymentAddress,
       paymentPublicKey: this.$store.get().paymentPublicKey,
       signPsbt: this.signPsbt.bind(this),
+      dataSourceManager: dataSourceManager || this.dataSourceManager,
       network: this.$network.get(),
     })
   }
 
-  async send(protocol: Protocol, sendArgs: BTCSendArgs | RuneSendArgs) {
+  async send(protocol: Protocol, sendArgs: BTCSendArgs | RuneSendArgs | Brc20SendArgs) {
     switch (protocol) {
       case BTC:
         return await this.sendBTC(sendArgs.toAddress, sendArgs.amount)
       case RUNES:
-        const network = this.$network.get()
-        if (network !== MAINNET) {
+        if (this.$network.get() !== MAINNET) {
           throw new Error('Unsupported network')
         }
 
@@ -176,10 +206,54 @@ export abstract class WalletProvider {
           paymentPublicKey: this.$store.get().paymentPublicKey,
           toAddress: runeArgs.toAddress,
           signPsbt: this.signPsbt.bind(this),
-          network,
+          network: this.$network.get(),
+        })
+      case BRC20:
+        if (this.$network.get() !== MAINNET) {
+          throw new Error('Unsupported network')
+        }
+
+        const brcArgs = sendArgs as Brc20SendArgs
+        if (!brcArgs.ticker || !brcArgs.amount || !brcArgs.toAddress) {
+          throw new Error('Missing required parameters')
+        }
+
+        return await sendBrc20({
+          ticker: brcArgs.ticker,
+          amount: brcArgs.amount,
+          ordinalAddress: this.$store.get().address,
+          ordinalPublicKey: this.$store.get().publicKey,
+          paymentAddress: this.$store.get().paymentAddress,
+          paymentPublicKey: this.$store.get().paymentPublicKey,
+          signPsbt: this.signPsbt.bind(this),
+          toAddress: brcArgs.toAddress,
+          dataSourceManager: this.dataSourceManager,
+          network: this.$network.get(),
         })
       default:
         throw new Error('Unsupported protocol')
     }
+  }
+
+  async sendInscriptions(inscriptionIds: string[], toAddress: string): Promise<string> {
+    const inscriptions = await this.getInscriptions()
+    const inscriptionsToSend = inscriptions.filter(inscription =>
+      inscriptionIds.includes(inscription.id)
+    )
+    if (inscriptionsToSend.length !== inscriptionIds.length) {
+      throw new Error('Missing inscriptions')
+    }
+
+    return await sendInscriptions({
+      inscriptionIds,
+      ordinalAddress: this.$store.get().address,
+      ordinalPublicKey: this.$store.get().publicKey,
+      paymentAddress: this.$store.get().paymentAddress,
+      paymentPublicKey: this.$store.get().paymentPublicKey,
+      toAddress,
+      signPsbt: this.signPsbt.bind(this),
+      dataSourceManager: this.dataSourceManager,
+      network: this.$network.get(),
+    })
   }
 }
