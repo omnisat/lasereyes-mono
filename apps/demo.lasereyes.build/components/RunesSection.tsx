@@ -11,7 +11,7 @@ const RunesSection = () => {
   const { provider, address, send, network, getMetaBalances } = useLaserEyes()
   const [runes, setRunes] = useState<OrdRuneBalance[]>([])
 
-  const [selectedRune, setSelectedRune] = useState<OrdRuneBalance>(undefined)
+  const [selectedRune, setSelectedRune] = useState<OrdRuneBalance>()
   const [runeToAddress, setRuneToAddress] = useState(address || '')
   const [runeAmount, setRuneAmount] = useState('')
 
