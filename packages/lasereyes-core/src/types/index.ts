@@ -352,4 +352,6 @@ export * from './lasereyes'
 export * from './esplora'
 export * from './mempool-space'
 export * from './sandshrew'
+export * from "./maestro"
+export * from './data-source'
 
