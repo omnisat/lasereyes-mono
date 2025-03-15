@@ -58,7 +58,7 @@ const RunesSection = () => {
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="text-gray-500 text-sm text-orange-400">runes</div>
+      <div className="text-gray-500 text-md text-orange-400">runes</div>
       <Select
         onValueChange={(value) => {
           const rune = runes?.find((r) => r.symbol === value)

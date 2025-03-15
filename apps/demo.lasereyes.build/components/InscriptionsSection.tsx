@@ -97,7 +97,7 @@ const InscriptionsSection = () => {
 
   return (
     <div className={"flex flex-col gap-2"}>
-      <div className="text-gray-500 text-sm text-orange-400">inscriptions</div>
+      <div className="text-gray-500 text-md text-orange-400">inscriptions</div>
       <div className="flex flex-col gap-2 items-center justify-center">
         <div className="flex flex-wrap gap-1">
           {inscriptions?.slice(0, 4).map((insc) => (
