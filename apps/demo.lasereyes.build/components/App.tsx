@@ -77,6 +77,16 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
     colors[Math.floor(Math.random() * 5)]
   )
 
+  const [hasError, setHasError] = useState(false)
+  const hasRun = useRef(false)
+
+  const [finalize, setFinalize] = useState<boolean>(false)
+  const [broadcast, setBroadcast] = useState<boolean>(false)
+  const [unsigned, setUnsigned] = useState<string | undefined>()
+  const [signed, setSigned] = useState<string | undefined>()
+
+  const { utxos } = useUtxos()
+
   const {
     address,
     provider,
@@ -103,14 +113,6 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
     hasOrange,
     hasOpNet,
   } = useLaserEyes()
-
-  const [hasError, setHasError] = useState(false)
-  const hasRun = useRef(false)
-
-  const [finalize, setFinalize] = useState<boolean>(false)
-  const [broadcast, setBroadcast] = useState<boolean>(false)
-  const [unsigned, setUnsigned] = useState<string | undefined>()
-  const [signed, setSigned] = useState<string | undefined>()
 
   const switchN = () => {
     try {
@@ -151,7 +153,6 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
     setSignedPsbt(undefined)
   }, [address])
 
-  const { utxos } = useUtxos()
 
   useEffect(() => {
     if (

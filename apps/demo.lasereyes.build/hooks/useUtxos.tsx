@@ -21,10 +21,12 @@ const UtxoContext = createContext<UtxoContextType | undefined>(undefined)
 export const UtxoProvider: React.FC<{
   children: React.ReactNode
 }> = ({ children }) => {
+
   const { paymentAddress, network } = useLaserEyes((x) => ({
     paymentAddress: x.paymentAddress,
     network: x.network,
   }))
+
   const mempoolUrl = `${getMempoolSpaceUrl(network)}/api/address/${paymentAddress}/utxo`
   const [utxos, setUtxos] = useState<IMempoolUtxo[]>([])
 
@@ -35,7 +37,7 @@ export const UtxoProvider: React.FC<{
         throw new Error('Failed to fetch UTXOs')
       }
       return response.json()
-    } catch (e) {}
+    } catch (e) { }
   }, [])
 
   const { data: utxosData, error } = useSWR<IMempoolUtxo[]>(
