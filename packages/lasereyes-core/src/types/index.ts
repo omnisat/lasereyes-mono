@@ -128,7 +128,7 @@ export type Config = {
   };
 };
 
-export type SendArgs = BTCSendArgs | RuneSendArgs
+export type SendArgs = BTCSendArgs | RuneSendArgs | Brc20SendArgs
 
 export type Protocol = typeof BTC | typeof RUNES | typeof BRC20
 
@@ -138,6 +138,8 @@ export interface BTCSendArgs {
   amount: number
   network: NetworkType
 }
+
+export * from './lasereyes'
 
 export interface RuneSendArgs {
   runeId: string

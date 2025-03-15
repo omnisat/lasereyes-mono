@@ -6,6 +6,7 @@ import {
   ECDSA,
   FRACTAL_MAINNET,
   FRACTAL_TESTNET,
+  Inscription,
   LaserEyesClient,
   LaserEyesStoreType,
   MAINNET,
@@ -26,6 +27,8 @@ import {
 } from '../utils'
 import { getBTCBalance, isMainnetNetwork } from '../../lib/helpers'
 import { getNetworkForOkx } from '../../constants/networks'
+import { normalizeInscription } from '../../lib/data-sources/normalizations'
+import { UnisatInscription } from './unisat'
 
 const OKX_WALLET_PERSISTENCE_KEY = 'OKX_CONNECTED_WALLET_STATE'
 
@@ -202,9 +205,15 @@ export default class OkxProvider extends WalletProvider {
     return await library?.getPublicKey()
   }
 
-  async getInscriptions(offset: number, limit: number): Promise<any[]> {
-    const library = this.library
-    return await library.getInscriptions(offset, limit)
+  async getInscriptions(offset?: number, limit?: number): Promise<Inscription[]> {
+    const offsetValue = offset || 0
+    const limitValue = limit || 10
+    const response = await this.library.getInscriptions(offsetValue, limitValue)
+    const inscriptions = response.list.map((insc: UnisatInscription) => {
+      return normalizeInscription(insc, undefined, this.network)
+    })
+
+    return inscriptions
   }
 
   async sendBTC(to: string, amount: number): Promise<string> {

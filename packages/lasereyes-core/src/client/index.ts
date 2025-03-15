@@ -470,4 +470,23 @@ export class LaserEyesClient {
       }
     }
   }
+
+  async sendInscriptions(inscriptionIds: string[], toAddress: string) {
+    if (!this.$store.get().provider) return
+    if (this.$providerMap[this.$store.get().provider!]) {
+      try {
+        return await this.$providerMap[
+          this.$store.get().provider!
+        ]?.sendInscriptions(inscriptionIds, toAddress)
+      } catch (error) {
+        if (error instanceof Error) {
+          if (error.message.toLowerCase().includes('not implemented')) {
+            throw new Error("The connected wallet doesn't support this method")
+          }
+        }
+        throw error
+      }
+    }
+  }
+
 }

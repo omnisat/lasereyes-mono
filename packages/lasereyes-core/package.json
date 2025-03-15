@@ -40,6 +40,7 @@
     "bitcoinjs-lib": "^7.0.0-rc.0",
     "buffer": "^6.0.3",
     "nanostores": "^0.11.3",
+    "ordapi": "^0.0.7",
     "sats-connect": "^2.8.0"
   },
   "publishConfig": {

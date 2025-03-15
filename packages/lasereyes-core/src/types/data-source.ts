@@ -1,3 +1,4 @@
+import { InscriptionInfo } from "ordapi";
 import { MempoolUtxo, NetworkType } from ".";
 import { MaestroGetInscriptionInfoResponse } from "./maestro";
 
@@ -8,6 +9,7 @@ export interface DataSource {
   getAddressBrc20Balances?(address: string): Promise<any>;
   getAddressRunesBalances?(address: string): Promise<any>;
   getInscriptionInfo?(inscriptionId: string): Promise<MaestroGetInscriptionInfoResponse>;
+  batchOrdInscriptionInfo?(inscriptionIds: string[]): Promise<InscriptionInfo[]>;
   getTransaction?(txId: string): Promise<any>;
   getRawTransaction?(txId: string): Promise<any>;
   getRecommendedFees?(): Promise<any>;

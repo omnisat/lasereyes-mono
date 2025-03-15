@@ -1,4 +1,4 @@
-import { Inscription } from "../../types/lasereyes";
+import { Brc20Balance, Inscription } from "../../types/lasereyes";
 import { NetworkType } from "../../types";
 import { getUnisatContentUrl, getUnisatPreviewUrl } from "../urls";
 
@@ -50,8 +50,8 @@ function extractNumberValue(obj: any, keys: string[], defaultValue: number): num
 /**
  * Normalizes an inscription object from any data source
  * @param insc The inscription data from the data source
- * @param address The address that owns the inscription
  * @param source The name of the data source (for logging)
+ * @param network The network type
  * @returns Normalized inscription object
  */
 export function normalizeInscription(insc: any, source: string = "unknown", network: NetworkType): Inscription {
@@ -94,8 +94,8 @@ export function normalizeInscription(insc: any, source: string = "unknown", netw
   ], "unknown");
 
 
-  const txid = extractStringValue(insc, ['utxo_txid', 'txid', 'transaction_id'], "");
-  const vout = extractNumberValue(insc, ['vout', 'utxo_vout'], 0);
+  let txid = extractStringValue(insc, ['utxo_txid', 'txid', 'transaction_id'], "");
+  let vout = extractNumberValue(insc, ['vout', 'utxo_vout'], 0);
 
   let output = extractStringValue(insc, ['output'], "");
   if (!output) {
@@ -104,14 +104,22 @@ export function normalizeInscription(insc: any, source: string = "unknown", netw
     }
   }
 
-  const outputValue = extractNumberValue(insc, ['output_value', 'value', 'outputValue'], 0);
+  if (output) {
+    if (!txid || !vout) {
+      console.warn(`Invalid inscription location from source: ${source}`);
+      txid = output.split(":")[0];
+      vout = parseInt(output.split(":")[1]);
+    }
+  }
+
+  const outputValue = extractNumberValue(insc, ['output_value', 'value', 'outputValue', 'postage', 'satoshis'], 0);
   const height = extractNumberValue(insc, ['height', 'block_height'], 0);
 
   let genesisTransaction = extractStringValue(insc, [
     'genesis_tx_id', 'genesisTx', 'genesis_txid', 'genesisTransaction'
   ], insc.inscription_id?.split("i")?.[0] || insc.txid || "");
 
-  const offset = insc.utxo_sat_offset !== undefined ? insc.utxo_sat_offset : undefined;
+  const offset = insc.utxo_sat_offset !== undefined ? insc.utxo_sat_offset : 0;
 
   if (!id) {
     console.warn(`Invalid inscription data from source: ${source}`);
@@ -154,241 +162,113 @@ export function normalizeInscription(insc: any, source: string = "unknown", netw
   };
 }
 
+/**
+ * Normalizes BRC20 balances from various API formats into a consistent structure
+ * @param data - The input data which could be in various formats
+ * @param source - The source of the data (for logging purposes)
+ * @returns An array of normalized BRC20 balances
+ */
+export function normalizeBrc20Balances(data: any, source: string = "unknown"): Brc20Balance[] {
+  const normalized: Brc20Balance[] = [];
 
-// /**
-//  * Normalizes a BTC balance response from any data source
-//  * @param balance The balance data from the data source
-//  * @param source The name of the data source (for logging)
-//  * @returns Normalized balance object
-//  */
-// export function normalizeBalance(balance: any, source: string): NormalizedBalance {
-//   if (typeof balance === 'string') {
-//     // Simple string balance
-//     return {
-//       confirmed: balance,
-//       unconfirmed: "0",
-//       total: balance
-//     };
-//   } else if (typeof balance === 'number') {
-//     // Number balance
-//     const balanceStr = balance.toString();
-//     return {
-//       confirmed: balanceStr,
-//       unconfirmed: "0",
-//       total: balanceStr
-//     };
-//   } else if (typeof balance === 'object') {
-//     // Object with balance properties
-//     const confirmed = extractStringValue(balance, [
-//       'confirmed', 'confirmedBalance', 'confirmed_balance'
-//     ], "0");
-//
-//     const unconfirmed = extractStringValue(balance, [
-//       'unconfirmed', 'unconfirmedBalance', 'unconfirmed_balance'
-//     ], "0");
-//
-//     // If we have the 'total' already, use it, otherwise compute it
-//     const total = extractStringValue(balance, [
-//       'total', 'totalBalance', 'total_balance'
-//     ], String(BigInt(confirmed || "0") + BigInt(unconfirmed || "0")));
-//
-//     return { confirmed, unconfirmed, total };
-//   }
-//
-//   // Default for unknown formats
-//   console.warn(`Unknown balance format from source: ${source}`, balance);
-//   return {
-//     confirmed: "0",
-//     unconfirmed: "0",
-//     total: "0"
-//   };
-// }
-//
-// /**
-//  * Normalizes a BRC-20 token balance from any data source
-//  * @param token The token data from the data source
-//  * @param source The name of the data source (for logging)
-//  * @returns Normalized BRC-20 balance object
-//  */
-// export function normalizeBrc20Balance(token: any, source: string): NormalizedBrc20Balance {
-//   if (!token) {
-//     console.warn(`Invalid token data from source: ${source}`);
-//     return {
-//       ticker: "",
-//       availableBalance: "0",
-//       transferableBalance: "0",
-//       overallBalance: "0",
-//       decimals: 0
-//     };
-//   }
-//
-//   const ticker = extractStringValue(token, ['ticker', 'name', 'tick'], "");
-//
-//   const availableBalance = extractStringValue(token, [
-//     'available_balance', 'availableBalance', 'available', 'avail'
-//   ], "0");
-//
-//   const transferableBalance = extractStringValue(token, [
-//     'transferable_balance', 'transferableBalance', 'transferable', 'transfer'
-//   ], "0");
-//
-//   // Extract or calculate overall balance
-//   let overallBalance = extractStringValue(token, [
-//     'overall_balance', 'overallBalance', 'overall', 'balance', 'total'
-//   ], "");
-//
-//   // If not found, calculate from available and transferable
-//   if (!overallBalance) {
-//     try {
-//       overallBalance = String(BigInt(availableBalance || "0") + BigInt(transferableBalance || "0"));
-//     } catch (e) {
-//       overallBalance = "0";
-//     }
-//   }
-//
-//   // Extract decimals with fallback to 0
-//   const decimals = extractNumberValue(token, ['decimals', 'decimal'], 0);
-//
-//   return {
-//     ticker,
-//     availableBalance,
-//     transferableBalance,
-//     overallBalance,
-//     decimals
-//   };
-// }
-//
-//
-// /**
-//  * Normalizes a Rune balance from any data source
-//  * @param rune The rune data from the data source
-//  * @param source The name of the data source (for logging)
-//  * @returns Normalized rune balance object
-//  */
-// export function normalizeRuneBalance(rune: any, source: string): NormalizedRuneBalance {
-//   if (!rune) {
-//     console.warn(`Invalid rune data from source: ${source}`);
-//     return {
-//       name: "",
-//       id: "",
-//       balance: "0",
-//       symbol: undefined,
-//       decimals: 0
-//     };
-//   }
-//
-//   // Extract rune name
-//   const name = extractStringValue(rune, [
-//     'name', 'rune_name', 'runeName'
-//   ], "");
-//
-//   // Extract rune ID
-//   const id = extractStringValue(rune, [
-//     'id', 'rune_id', 'runeId'
-//   ], "");
-//
-//   // Extract balance
-//   const balance = extractStringValue(rune, [
-//     'balance', 'amount', 'value'
-//   ], "0");
-//
-//   // Extract symbol if available
-//   const symbol = extractStringValue(rune, [
-//     'symbol', 'tick'
-//   ], undefined);
-//
-//   // Extract decimals
-//   const decimals = extractNumberValue(rune, [
-//     'decimals', 'decimal', 'divisibility'
-//   ], 0);
-//
-//   return {
-//     name,
-//     id,
-//     balance,
-//     symbol,
-//     decimals
-//   };
-// }
-//
-// /**
-//  * Normalizes a transaction from any data source
-//  * @param tx The transaction data from the data source
-//  * @param source The name of the data source (for logging)
-//  * @returns Normalized transaction object
-//  */
-// export function normalizeTransaction(tx: any, source: string): NormalizedTransaction {
-//   if (!tx) {
-//     console.warn(`Invalid transaction data from source: ${source}`);
-//     return {
-//       txid: "",
-//       status: {
-//         confirmed: false
-//       },
-//       fee: 0,
-//       size: 0,
-//       inputs: [],
-//       outputs: []
-//     };
-//   }
-//
-//   // Extract txid
-//   const txid = extractStringValue(tx, [
-//     'txid', 'tx_id', 'hash', 'id'
-//   ], "");
-//
-//   // Extract confirmation status
-//   const confirmed = tx.status?.confirmed || tx.confirmed || false;
-//
-//   // Extract block height if confirmed
-//   const blockHeight = confirmed ?
-//     extractNumberValue(tx, ['height', 'block_height', 'blockHeight'],
-//       extractNumberValue(tx.status || {}, ['block_height', 'height'], undefined)) :
-//     undefined;
-//
-//   // Extract block time if confirmed
-//   const blockTime = confirmed ?
-//     extractNumberValue(tx, ['time', 'timestamp', 'block_time', 'blockTime'],
-//       extractNumberValue(tx.status || {}, ['block_time', 'time'], undefined)) :
-//     undefined;
-//
-//   // Extract fee
-//   const fee = extractNumberValue(tx, ['fee'], 0);
-//
-//   // Extract size
-//   const size = extractNumberValue(tx, ['size', 'vsize', 'weight'], 0);
-//
-//   // Extract inputs
-//   const inputs = Array.isArray(tx.vin || tx.inputs) ?
-//     (tx.vin || tx.inputs).map((input: any) => ({
-//       txid: extractStringValue(input, ['txid', 'tx_id', 'prev_hash'], ""),
-//       vout: extractNumberValue(input, ['vout', 'output_index', 'prev_index'], 0),
-//       address: extractStringValue(input, ['address', 'addr', 'prevout.address'], undefined),
-//       value: extractNumberValue(input, ['value', 'amount', 'prevout.value'], 0)
-//     })) : [];
-//
-//   // Extract outputs
-//   const outputs = Array.isArray(tx.vout || tx.outputs) ?
-//     (tx.vout || tx.outputs).map((output: any) => ({
-//       address: extractStringValue(output, [
-//         'address', 'addr', 'scriptpubkey_address'
-//       ], undefined),
-//       value: extractNumberValue(output, ['value', 'amount'], 0),
-//       scriptPubKey: extractStringValue(output, [
-//         'scriptPubKey.hex', 'scriptpubkey', 'script_pubkey'
-//       ], "")
-//     })) : [];
-//
-//   return {
-//     txid,
-//     status: {
-//       confirmed,
-//       blockHeight,
-//       blockTime
-//     },
-//     fee,
-//     size,
-//     inputs,
-//     outputs
-//   };
-// }
+  // Handle case when data is null or undefined
+  if (!data) {
+    console.warn(`Invalid BRC20 balance data from source: ${source}`);
+    return normalized;
+  }
+
+  // Handle Maestro-style response format
+  if (data.data && typeof data.data === 'object') {
+    // Maestro format: { data: { ticker1: { total: "100", available: "50" }, ticker2: {...} } }
+    Object.entries(data.data).forEach(([ticker, balanceData]: [string, any]) => {
+
+      const overall = extractStringValue(balanceData, ['overall', 'overallBalance', 'total', 'totalBalance'], "0");
+      const transferable = extractStringValue(balanceData, ['transferable', 'transferableBalance'], "na");
+      const available = extractStringValue(balanceData, ['available', 'availableBalance'], "0")
+
+      if (!overall || !available) {
+        console.warn(`Invalid BRC20 balance data from source: ${source}`);
+        return; // Skip this item
+      }
+
+      const balance: Brc20Balance = {
+        ticker,
+        overall: overall,
+        transferable: transferable ?? "na",
+        available
+      };
+
+      normalized.push(balance);
+    });
+
+    return normalized;
+  }
+
+  // Handle array-style format
+  if (Array.isArray(data)) {
+    // Format: [{ ticker: "text", overallBalance: "text", ... }, ...]
+    data.forEach((item) => {
+      const ticker = extractStringValue(item, ['ticker', 'tick', 'token'], '');
+
+      if (!ticker) {
+        console.warn(`Missing ticker in BRC20 balance from source: ${source}`);
+        return; // Skip this item
+      }
+
+      const overall = extractStringValue(item, ['overall', 'overallBalance', 'total', 'totalBalance'], "0");
+      const transferable = extractStringValue(item, ['transferable', 'transferableBalance'], "0");
+      const available = extractStringValue(item, ['available', 'availableBalance'], "0")
+
+      if (!overall || !available) {
+        console.warn(`Invalid BRC20 balance data from source: ${source}`);
+        return; // Skip this item
+      }
+
+      const balance: Brc20Balance = {
+        ticker,
+        overall: overall,
+        transferable: transferable ?? "na",
+        available
+      };
+
+      normalized.push(balance);
+    });
+
+    return normalized;
+  }
+
+  // Handle single balance object format
+  if (typeof data === 'object' && !Array.isArray(data)) {
+    const ticker = extractStringValue(data, ['ticker', 'tick', 'token'], '');
+
+    if (!ticker) {
+      console.warn(`Missing ticker in BRC20 balance from source: ${source}`);
+      return normalized;
+    }
+
+
+    const overall = extractStringValue(data, ['overall', 'overallBalance', 'total', 'totalBalance'], "0");
+    const transferable = extractStringValue(data, ['transferable', 'transferableBalance'], "0");
+    const available = extractStringValue(data, ['available', 'availableBalance'], "0")
+
+    if (!overall || !available) {
+      console.warn(`Invalid BRC20 balance data from source: ${source}`);
+      throw new Error(`Invalid BRC20 balance data from source: ${source}`);
+    }
+
+    const balance: Brc20Balance = {
+      ticker,
+      overall: overall,
+      transferable: transferable ?? "na",
+      available
+    };
+
+
+    normalized.push(balance);
+
+    return normalized;
+  }
+
+  console.warn(`Unrecognized BRC20 balance format from source: ${source}`);
+  return normalized;
+}

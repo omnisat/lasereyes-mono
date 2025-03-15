@@ -25,6 +25,8 @@ import { BRC20, BTC, RUNES } from '../../constants/protocols'
 import { sendRune } from '../../lib/runes/psbt'
 import { DataSourceManager } from '../../lib/data-sources/manager'
 import { sendBrc20 } from '../../lib/brc-20/psbt'
+import { Inscription } from '../../types/lasereyes'
+import { sendInscriptions } from '../../lib/inscriptions/psbt'
 
 export const UNSUPPORTED_PROVIDER_METHOD_ERROR = new Error(
   "The connected wallet doesn't support this method..."
@@ -124,7 +126,7 @@ export abstract class WalletProvider {
     }
   }
 
-  async getInscriptions(offset?: number, limit?: number): Promise<any[]> {
+  async getInscriptions(offset?: number, limit?: number): Promise<Inscription[]> {
     if (!this.dataSourceManager.getAddressInscriptions) {
       throw new Error('Method not found on data source')
     }
@@ -231,5 +233,27 @@ export abstract class WalletProvider {
       default:
         throw new Error('Unsupported protocol')
     }
+  }
+
+  async sendInscriptions(inscriptionIds: string[], toAddress: string): Promise<string> {
+    const inscriptions = await this.getInscriptions()
+    const inscriptionsToSend = inscriptions.filter(inscription =>
+      inscriptionIds.includes(inscription.id)
+    )
+    if (inscriptionsToSend.length !== inscriptionIds.length) {
+      throw new Error('Missing inscriptions')
+    }
+
+    return await sendInscriptions({
+      inscriptionIds,
+      ordinalAddress: this.$store.get().address,
+      ordinalPublicKey: this.$store.get().publicKey,
+      paymentAddress: this.$store.get().paymentAddress,
+      paymentPublicKey: this.$store.get().paymentPublicKey,
+      toAddress,
+      signPsbt: this.signPsbt.bind(this),
+      dataSourceManager: this.dataSourceManager,
+      network: this.$network.get(),
+    })
   }
 }

@@ -14,3 +14,10 @@ export type Inscription = {
   offset?: number;
 }
 
+
+export type Brc20Balance = {
+  ticker: string;
+  overall: string;
+  transferable: string;
+  available: string;
+};

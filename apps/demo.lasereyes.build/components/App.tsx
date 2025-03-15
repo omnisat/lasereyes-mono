@@ -17,7 +17,6 @@ import {
   MAGIC_EDEN,
   XVERSE,
   UNISAT,
-  SendArgs,
 } from '@omnisat/lasereyes'
 import { createPsbt, satoshisToBTC } from '@/lib/btc'
 import { cn, truncateString } from '@/lib/utils'
@@ -27,19 +26,22 @@ import Link from 'next/link'
 import { Input } from '@/components/ui/input'
 import { getPackageVersion } from '@/lib/github'
 import { Badge, badgeVariants } from '@/components/ui/badge'
-import { FaBroadcastTower, FaExternalLinkAlt, FaPushed } from 'react-icons/fa'
-import { RxReload, RxSwitch } from 'react-icons/rx'
+import { FaBroadcastTower, FaExternalLinkAlt } from 'react-icons/fa'
+import { RxReload } from 'react-icons/rx'
 import { ClickToCopyNpmInstallPill } from '@/components/ClickToCopyNpmInstallPill'
-import { ImCheckmark, ImNewTab, ImPushpin, ImSwitch } from 'react-icons/im'
+import { ImCheckmark, ImNewTab } from 'react-icons/im'
 import { toast } from 'sonner'
 import { useUtxos } from '@/hooks/useUtxos'
 import WalletConnectButton from './WalletConnectButton'
 import { Button } from './ui/button'
 import { getMempoolSpaceUrl } from '@/lib/urls'
 import axios from 'axios'
-import { Pencil, Recycle, SendHorizonal, SendIcon, Signal, Signature, TowerControlIcon, Upload } from 'lucide-react'
+import { Pencil, Recycle, SendIcon, Upload } from 'lucide-react'
 import { FaSignature } from 'react-icons/fa6'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
+import InscriptionsSection from './InscriptionsSection'
+import RunesSection from './RunesSection'
+import BRC20Section from './Brc20Section'
+
 
 const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
   const [pkgVersion, setPkgVersion] = useState<string | undefined>()
@@ -109,13 +111,10 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
   const {
     address,
     provider,
-    inscribe,
     network,
     paymentAddress,
-    send,
     paymentPublicKey,
     getBalance,
-    getInscriptions,
     pushPsbt,
     publicKey,
     signPsbt,
@@ -134,7 +133,6 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
     hasSparrow,
     hasOrange,
     hasOpNet,
-    getMetaBalances,
   } = useLaserEyes()
 
   const [hasError, setHasError] = useState(false)
@@ -145,48 +143,11 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
   const [unsigned, setUnsigned] = useState<string | undefined>()
   const [signed, setSigned] = useState<string | undefined>()
 
-  const [inscriptionText, setInscriptionText] = useState<string>(
-    'Inscribed 100% clientside with Laser Eyes'
-  )
-
-  const [runes, setRunes] = useState<
-    | {
-      balance: string
-      symbol: string
-      name: string
-    }[]
-    | undefined
-  >()
-  const [selectedRune, setSelectedRune] = useState<
-    | {
-      balance: string
-      symbol: string
-      name: string
-    }
-    | undefined
-  >(undefined)
-
-
-  const [runeToAddress, setRuneToAddress] = useState<string>('')
-  const [runeAmount, setRuneAmount] = useState<string>('')
-
-  const [brc20s, setBrc20s] = useState<any>()
-
-  const [selectedBrc20, setSelectedBrc20] = useState<any>()
-  const [inscriptions, setInscriptions] = useState<any>()
-
   useEffect(() => {
     setSignature('')
     setUnsignedPsbt(undefined)
     setSignedPsbt(undefined)
   }, [address])
-
-  useEffect(() => {
-    console.log({ inscriptions })
-    console.log({ runes })
-    console.log({ brc20s })
-  }, [inscriptions, runes, brc20s])
-
 
   const { utxos } = useUtxos()
 
@@ -239,27 +200,8 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
     setUnsigned(undefined)
   }, [network])
 
-  useEffect(() => {
-    if (address) {
-      getMetaBalances('runes').then(setRunes)
-      setRuneToAddress(address)
-    }
-  }, [address])
-
-
-  useEffect(() => {
-    if (address) {
-      getMetaBalances('brc20').then(setBrc20s)
-    }
-  }, [address])
-
-  useEffect(() => {
-    if (address) {
-      getInscriptions().then(setInscriptions)
-    }
-  }, [address])
-
-
+  // Removed effects for fetching runes, brc20s, and inscriptions
+  // as they are now handled in their respective components
 
   const hasWallet = {
     unisat: hasUnisat,
@@ -425,7 +367,6 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
         toast.error(error.message)
       }
     }
-
   }
 
   const push = async () => {
@@ -450,83 +391,20 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
       )
     } catch (error) {
       setSignedPsbt(undefined)
-      // @ts-ignore
-      if (error?.message!) {
-        // @ts-ignore
-        toast.error(error.message!)
-      }
-    }
-  }
-
-
-  const inscribeWithWallet = useCallback(async () => {
-    try {
-      const inscriptionTxId = await inscribe(
-        Buffer.from(inscriptionText).toString('base64'),
-        'text/plain'
-      )
-      toast.success(
-        <span className={'flex flex-col gap-1 items-center justify-center'}>
-          <span className={'font-black'}>View on mempool.space</span>
-          <a
-            target={'_blank'}
-            href={`${getMempoolSpaceUrl(network as typeof MAINNET | typeof TESTNET)}/tx/${inscriptionTxId}`}
-            className={'underline text-blue-600 text-xs'}
-          >
-            {inscriptionTxId}
-          </a>
-        </span>
-      )
-    } catch (error) {
-      if (error instanceof Error) {
-        toast.error(error.message)
-      }
-    }
-  }, [inscribe, inscriptionText, network])
-
-
-  const sendRune = async () => {
-    try {
-      if (!selectedRune) throw new Error('No rune selected')
-      if (!address) throw new Error('No address available')
-      if (!runeToAddress) throw new Error('No destination address provided')
-      if (!runeAmount) throw new Error('No amount specified')
-
-      const txid = await send('runes', {
-        fromAddress: address,
-        toAddress: runeToAddress,
-        amount: Number(runeAmount),
-        runeId: selectedRune.name,
-      } as SendArgs)
-
-      toast.success(
-        <span className={'flex flex-col gap-1 items-center justify-center'}>
-          <span className={'font-black'}>View on mempool.space</span>
-          <a
-            target={'_blank'}
-            href={`${getMempoolSpaceUrl(
-              network as typeof MAINNET | typeof TESTNET
-            )}/tx/${txid}`}
-            className={'underline text-blue-600 text-xs'}
-          >
-            {txid}
-          </a>
-        </span>
-      )
-    } catch (error) {
       if (error instanceof Error) {
         toast.error(error.message)
       }
     }
   }
 
-
+  // Render the updated UI with our modular components
   return (
     <div
       className={
         'flex flex-col gap-4 w-full mt-12 mb-24 max-w-[1200px] px-12 font-windows'
       }
     >
+      {/* Header section with logo and links */}
       <div className={'w-full flex gap-2 flex-row justify-center items-center'}>
         <Image
           src={
@@ -573,6 +451,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
         </Link>
       </div>
 
+      {/* Wallet connection section */}
       <div className={'flex items-center justify-center flex-col gap-4'}>
         <div className="text-gray-500 text-xl">supported wallets:</div>
         <div className={'flex flex-wrap justify-center gap-3'}>
@@ -583,7 +462,10 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
           )}
         </div>
       </div>
+
+      {/* Main container */}
       <div className={'border border-[#3c393f] w-full text-xl grow '}>
+        {/* Network selector */}
         <div className={'flex flex-row items-center gap-4 '}>
           <div className={'grow'} />
           <div
@@ -595,54 +477,35 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
             {network}
           </div>
         </div>
-        <div
-          className={'flex flex-col gap-2 text-center items-center break-all'}
-        >
-          <div
-            className={
-              'flex flex-row items-center gap-4 justify-center space-around'
-            }
-          >
+
+        {/* Wallet information */}
+        <div className={'flex flex-col gap-2 text-center items-center break-all'}>
+          {/* Provider info */}
+          <div className={'flex flex-row items-center gap-4 justify-center space-around'}>
             <div className={'flex flex-col items-center'}>
-              <span className={clsx('font-black text-orange-500')}>
-                Provider
-              </span>
-              <span
-                className={clsx(
-                  'text-lg flex flex-row gap-2 items-center justify-center',
-                  provider?.length > 0 ? 'text-white' : 'text-gray-500'
-                )}
-              >
+              <span className={clsx('font-black text-orange-500')}>Provider</span>
+              <span className={clsx('text-lg flex flex-row gap-2 items-center justify-center',
+                provider?.length > 0 ? 'text-white' : 'text-gray-500')}>
                 {provider && <WalletIcon walletName={provider} size={24} />}{' '}
                 {provider?.length > 0 ? provider : '--'}
               </span>
             </div>
           </div>
-          <div
-            className={
-              'flex flex-row items-center gap-6 justify-center space-around'
-            }
-          >
+
+          {/* Address section */}
+          <div className={'flex flex-row items-center gap-6 justify-center space-around'}>
             <div className={'flex flex-row gap-2'}>
               <div className={'flex flex-col items-center'}>
-                <span
-                  className={clsx('font-black text-orange-500 justify-center')}
-                >
+                <span className={clsx('font-black text-orange-500 justify-center')}>
                   address (taproot)
                 </span>
-                <span
-                  className={clsx(
-                    'text-lg flex flex-row gap-2 items-center justify-center',
-                    address?.length > 0 ? 'text-white' : 'text-gray-500'
-                  )}
-                >
+                <span className={clsx('text-lg flex flex-row gap-2 items-center justify-center',
+                  address?.length > 0 ? 'text-white' : 'text-gray-500')}>
                   {address?.length > 0 && (
                     <span className={'flex flex-row gap-4'}>
-                      <Link
-                        href={`https://mempool.space/address/${address}`}
+                      <Link href={`https://mempool.space/address/${address}`}
                         target={'_blank'}
-                        className={'flex flex-row items-center gap-1'}
-                      >
+                        className={'flex flex-row items-center gap-1'}>
                         <FaExternalLinkAlt className="h-3 w-3 text-gray-500" />
                       </Link>
                       <ClickToCopy value={address as string} />
@@ -653,32 +516,23 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
               </div>
             </div>
 
-            <div
-              className={
-                'flex flex-row items-center gap-4 justify-center space-around'
-              }
-            >
+            {/* Payment address section */}
+            <div className={'flex flex-row items-center gap-4 justify-center space-around'}>
               <div className={'flex flex-col items-center'}>
                 <span className={clsx('font-black text-orange-500')}>
                   payment address
                 </span>
-                <span
-                  className={clsx(
-                    'text-lg flex flex-row gap-2 items-center justify-center',
-                    paymentAddress?.length > 0 ? 'text-white' : 'text-gray-500'
-                  )}
-                >
+                <span className={clsx('text-lg flex flex-row gap-2 items-center justify-center',
+                  paymentAddress?.length > 0 ? 'text-white' : 'text-gray-500')}>
                   {paymentAddress?.length > 0
                     ? truncateString(paymentAddress, 24)
                     : '--'}
                   {paymentAddress?.length > 0 && (
                     <span className={'flex flex-row gap-4'}>
                       <ClickToCopy value={paymentAddress as string} />
-                      <Link
-                        href={`https://mempool.space/address/${paymentAddress}`}
+                      <Link href={`https://mempool.space/address/${paymentAddress}`}
                         target={'_blank'}
-                        className={'flex flex-row items-center gap-1'}
-                      >
+                        className={'flex flex-row items-center gap-1'}>
                         <FaExternalLinkAlt className="h-3 w-3 text-gray-500" />
                       </Link>
                     </span>
@@ -688,22 +542,15 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
             </div>
           </div>
 
+          {/* Public keys section */}
           <div className={'flex flex-row gap-6'}>
-            <div
-              className={
-                'flex flex-row items-center gap-4 justify-center space-around'
-              }
-            >
+            <div className={'flex flex-row items-center gap-4 justify-center space-around'}>
               <div className={'flex flex-col items-center'}>
                 <span className={clsx('font-black text-orange-500')}>
                   public key
                 </span>
-                <span
-                  className={clsx(
-                    'text-lg flex flex-row gap-2 items-center justify-center',
-                    publicKey?.length > 0 ? 'text-white' : 'text-gray-500'
-                  )}
-                >
+                <span className={clsx('text-lg flex flex-row gap-2 items-center justify-center',
+                  publicKey?.length > 0 ? 'text-white' : 'text-gray-500')}>
                   {publicKey?.length > 0 && (
                     <ClickToCopy value={publicKey as string} />
                   )}
@@ -711,23 +558,13 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
                 </span>
               </div>
             </div>
-            <div
-              className={
-                'flex flex-row items-center gap-4 justify-center space-around'
-              }
-            >
+            <div className={'flex flex-row items-center gap-4 justify-center space-around'}>
               <div className={'flex flex-col items-center'}>
                 <span className={clsx('font-black text-orange-500')}>
                   payment public key
                 </span>
-                <span
-                  className={clsx(
-                    'text-lg flex flex-row gap-2 items-center justify-center',
-                    paymentPublicKey?.length > 0
-                      ? 'text-white'
-                      : 'text-gray-500'
-                  )}
-                >
+                <span className={clsx('text-lg flex flex-row gap-2 items-center justify-center',
+                  paymentPublicKey?.length > 0 ? 'text-white' : 'text-gray-500')}>
                   {paymentPublicKey?.length > 0
                     ? truncateString(paymentPublicKey, 24)
                     : '--'}
@@ -739,21 +576,14 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
             </div>
           </div>
 
-          <div
-            className={
-              'flex flex-row items-center gap-4 justify-center space-around'
-            }
-          >
+          {/* Balance */}
+          <div className={'flex flex-row items-center gap-4 justify-center space-around'}>
             <div className={'flex flex-col items-center'}>
               <span className={clsx('font-black text-orange-500')}>
                 balance
               </span>
-              <span
-                className={clsx(
-                  'text-lg flex flex-row gap-2 items-center justify-center',
-                  publicKey?.length > 0 ? 'text-white' : 'text-gray-500'
-                )}
-              >
+              <span className={clsx('text-lg flex flex-row gap-2 items-center justify-center',
+                publicKey?.length > 0 ? 'text-white' : 'text-gray-500')}>
                 {balance !== undefined ? total : '--'} BTC{' '}
                 <RxReload
                   className={'cursor-pointer text-gray-600'}
@@ -763,42 +593,29 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
             </div>
           </div>
 
+          {/* Signature */}
           <div className={'flex flex-col items-center'}>
             <span className={clsx('font-black text-orange-500')}>
               signature
             </span>{' '}
-            <span
-              className={clsx(
-                'text-md flex flex-row gap-2 items-center justify-center',
-                signature?.length > 0 ? 'text-white' : 'text-gray-500'
-              )}
-            >
+            <span className={clsx('text-md flex flex-row gap-2 items-center justify-center',
+              signature?.length > 0 ? 'text-white' : 'text-gray-500')}>
               {signature?.length > 0 ? truncateString(signature, 24) : '--'}{' '}
               {signature?.length > 0 && (
                 <ClickToCopy value={signature as string} />
               )}
             </span>
           </div>
-          <div
-            className={
-              'flex flex-row items-center gap-6 justify-center space-around'
-            }
-          >
-            <div
-              className={
-                'flex flex-row items-center gap-4 justify-center space-around'
-              }
-            >
+
+          {/* PSBT section */}
+          <div className={'flex flex-row items-center gap-6 justify-center space-around'}>
+            <div className={'flex flex-row items-center gap-4 justify-center space-around'}>
               <div className={'flex flex-col items-center'}>
                 <span className={clsx('font-black text-orange-500')}>
                   unsigned Psbt
                 </span>
-                <span
-                  className={clsx(
-                    'text-lg flex flex-row gap-2 items-center justify-center',
-                    unsignedPsbt ? 'text-white' : 'text-gray-500'
-                  )}
-                >
+                <span className={clsx('text-lg flex flex-row gap-2 items-center justify-center',
+                  unsignedPsbt ? 'text-white' : 'text-gray-500')}>
                   {unsignedPsbt && (
                     <ClickToCopy value={unsignedPsbt as string} />
                   )}
@@ -816,22 +633,14 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
               </div>
             </div>
 
-            <div
-              className={
-                'flex flex-row items-center gap-4 justify-center space-around'
-              }
-            >
+            <div className={'flex flex-row items-center gap-4 justify-center space-around'}>
               <div className={'flex flex-col items-center'}>
                 <span className={clsx('font-black text-orange-500')}>
                   signed Psbt
                 </span>
-                <span
-                  className={clsx(
-                    'text-lg flex flex-row gap-2 items-center justify-center',
-                    // @ts-ignore
-                    signedPsbt?.signedPsbtHex ? 'text-white' : 'text-gray-500'
-                  )}
-                >
+                <span className={clsx('text-lg flex flex-row gap-2 items-center justify-center',
+                  // @ts-ignore
+                  signedPsbt?.signedPsbtHex ? 'text-white' : 'text-gray-500')}>
                   {truncateString(
                     // @ts-ignore
                     signedPsbt?.signedPsbtHex ? signedPsbt.signedPsbtHex : '--',
@@ -849,9 +658,9 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
 
           <br />
 
+          {/* Bitcoin section */}
           <div className="text-gray-500 text-sm">bitcoin</div>
           <div className={"flex flex-row text-xl gap-2"}>
-
             <Button
               className={'w-full gap-2 bg-[#232225]'}
               disabled={!provider}
@@ -871,7 +680,6 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
               disabled={!provider}
               variant={!provider ? 'secondary' : 'default'}
               onClick={() => (!provider ? null : sendBtc())}
-
               size={'lg'}
             >
               <SendIcon size={14} />
@@ -893,12 +701,9 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
             </Button>
           </div>
 
+          {/* PSBT Buttons */}
           <div className={"flex flex-col gap-2"}>
-            <span
-              className={
-                'w-full flex flex-row px-2 py-1 items-center justify-center gap-2'
-              }
-            >
+            <span className={'w-full flex flex-row px-2 py-1 items-center justify-center gap-2'}>
               <Button
                 className={'w-full gap-2 bg-[#232225] disabled:text-[#737275]'}
                 disabled={!provider || !unsigned}
@@ -956,207 +761,20 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
               push Psbt
             </Button>
           </div>
-          <div className={'border-b border-2 border-[#232225]  my-2'} />
+
+          <div className={'border-b border-2 border-[#232225] my-2'} />
+
+          {/* Inscriptions Component */}
+          <InscriptionsSection />
+
           <div className="flex md:flex-row flex-col gap-8">
-            <div className={"flex flex-col gap-2"}>
-              <div className="text-gray-500 text-sm">inscriptions</div>
-              <div className="flex flex-col gap-2 items-center justify-center">
-                <Input
-                  className={cn(
-                    'w-full h-full bg-[#232225] disabled:text-[#737275] min-w-[200px] border border-gray-500 text-center',
-                    ''
-                  )}
-                  placeholder={'Inscribe some text...'}
-                  value={inscriptionText}
-                  disabled={!provider}
-                  onChange={(e) => setInscriptionText(e.target.value)}
-                />
-                <Button
-                  className={'w-full bg-[#232225] disabled:text-[#737275]'}
-                  disabled={!provider}
-                  variant={!provider ? 'secondary' : 'default'}
-                  onClick={() => (!provider ? null : inscribeWithWallet())}
-                >
-                  inscribe
-                </Button>
-                <div className={'border-b border-2 border-gray-500  my-1'} />
-                <Select
-                  onValueChange={(value) => {
-                    const rune = runes?.find((r) => r.symbol === value)
-                    setSelectedRune(rune)
-                  }}
-                  disabled={!provider}
-                >
-                  <SelectTrigger
-
-                    disabled={!provider}
-                    className={cn(
-                      'w-full bg-[#232225] border-none flex flex-row gap-4 items-center disabled:text-[#737275] text-sm text-center',
-                      'min-w-[200px]'
-                    )}
-                  >
-                    <SelectValue placeholder="Select an inscription" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {runes?.map((rune, index) => (
-                      <SelectItem key={index} value={rune.symbol}>
-                        {rune.name} ({rune.balance})
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-
-                <Button
-                  disabled={
-                    !provider ||
-                    !selectedRune ||
-                    !runeToAddress ||
-                    !runeAmount
-                  }
-                  className={'w-full bg-[#232225] disabled:text-[#737275]'}
-                  onClick={sendRune}
-                >
-                  Send Inscription
-                </Button>
-              </div>
-            </div>
-
+            {/* Runes Component */}
+            <RunesSection />
             <div className={'border-b border-2 border-[#232225] my-2'} />
-            <div className="flex flex-col gap-2">
-              <div className="text-gray-500 text-sm">runes</div>
-              <Select
-                onValueChange={(value) => {
-                  const rune = runes?.find((r) => r.symbol === value)
-                  setSelectedRune(rune)
-                }}
-                disabled={!provider}
-              >
-                <SelectTrigger
-
-                  disabled={!provider}
-                  className={cn(
-                    'w-full bg-[#232225] border-none flex flex-row gap-4 items-center disabled:text-[#737275] text-sm text-center',
-                    'min-w-[200px]'
-                  )}
-                >
-                  <SelectValue placeholder="Select a Rune" />
-                </SelectTrigger>
-                <SelectContent>
-                  {runes?.map((rune, index) => (
-                    <SelectItem key={index} value={rune.symbol}>
-                      {rune.name} ({rune.balance})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Input
-                disabled={!provider}
-                className={cn(
-                  'w-full bg-[#232225] border-none disabled:text-[#737275] text-center',
-                  ''
-                )}
-                placeholder="To Address"
-                value={runeToAddress}
-                onChange={(e) => setRuneToAddress(e.target.value)}
-              />
-              <Input
-                disabled={
-                  !provider ||
-                  !selectedRune ||
-                  !runeToAddress
-                }
-                type="number"
-                className={cn(
-                  'w-full bg-[#232225] border-none disabled:text-[#737275] text-center',
-                  ''
-                )}
-                placeholder="Amount"
-                value={runeAmount}
-                onChange={(e) => setRuneAmount(e.target.value)}
-              />
-              <Button
-                disabled={
-                  !provider ||
-                  !selectedRune ||
-                  !runeToAddress ||
-                  !runeAmount
-                }
-                className={'w-full bg-[#232225] disabled:text-[#737275]'}
-                onClick={sendRune}
-              >
-                Send Rune
-              </Button>
-            </div>
-
-            <div className={'border-b border-2 border-[#232225] my-2'} />
-            <div className="flex flex-col gap-2">
-              <div className="text-gray-500 text-sm">brc-20</div>
-              <Select
-                onValueChange={(value) => {
-                  const brc20 = brc20s?.find((r: any) => r.symbol === value)
-                  setSelectedBrc20(brc20)
-                }}
-                disabled={!provider}
-              >
-                <SelectTrigger
-
-                  disabled={!provider}
-                  className={cn(
-                    'w-full bg-[#232225] border-none flex flex-row gap-4 items-center disabled:text-[#737275] text-sm text-center',
-                    'min-w-[200px]'
-                  )}
-                >
-                  <SelectValue placeholder="Select a Brc-20" />
-                </SelectTrigger>
-                <SelectContent>
-                  {runes?.map((rune, index) => (
-                    <SelectItem key={index} value={rune.symbol}>
-                      {rune.name} ({rune.balance})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Input
-                disabled={!provider}
-                className={cn(
-                  'w-full bg-[#232225] border-none disabled:text-[#737275] text-center',
-                  ''
-                )}
-                placeholder="To Address"
-                value={runeToAddress}
-                onChange={(e) => setRuneToAddress(e.target.value)}
-              />
-              <Input
-                disabled={
-                  !provider ||
-                  !selectedRune ||
-                  !runeToAddress
-                }
-                type="number"
-                className={cn(
-                  'w-full bg-[#232225] border-none disabled:text-[#737275] text-center',
-                  ''
-                )}
-                placeholder="Amount"
-                value={runeAmount}
-                onChange={(e) => setRuneAmount(e.target.value)}
-              />
-              <Button
-                disabled={
-                  !provider ||
-                  !selectedRune ||
-                  !runeToAddress ||
-                  !runeAmount
-                }
-                className={'w-full bg-[#232225] disabled:text-[#737275]'}
-                onClick={sendRune}
-              >
-                Send Rune
-              </Button>
-            </div>
+            {/* BRC20 Component */}
+            <BRC20Section />
           </div>
         </div>
-
 
         <div className={'flex flex-row items-center gap-4 '}>
           <LaserEyesLogo
@@ -1169,7 +787,6 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
           <div className={'grow'} />
         </div>
       </div>
-
     </div>
   )
 }

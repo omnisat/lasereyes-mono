@@ -1,7 +1,8 @@
 import axios from "axios";
 import { DataSource } from "../../../types/data-source";
 import { MAINNET } from "../../../constants";
-import { OrdAddress, OrdOutputs, OrdRuneBalance } from "../../../types/ord";
+import { OrdOutputs, OrdRuneBalance } from "../../../types/ord";
+import { AddressInfo, InscriptionInfo } from 'ordapi';
 import { SandshrewGetRuneByIdOrNameResponse, SingleRuneOutpoint } from "../../../types/sandshrew";
 import { EsploraTx } from "../../../types/esplora";
 import { getPublicKeyHash } from "../../btc";
@@ -64,9 +65,9 @@ export class SandshrewDataSource implements DataSource {
     return await this.call('broadcast_tx', [rawTx]) as string
   }
 
-  async getOrdAddress(address: string): Promise<OrdAddress> {
+  async getOrdAddress(address: string): Promise<AddressInfo> {
     const response = await this.call('ord_address', [address]) as RpcResponse
-    return response.result as OrdAddress;
+    return response.result as AddressInfo;
   }
 
   async getTxInfo(txId: string): Promise<EsploraTx> {
@@ -97,6 +98,22 @@ export class SandshrewDataSource implements DataSource {
     return ordOutputs;
   }
 
+  async batchOrdInscriptionInfo(inscriptionIds: string[]): Promise<InscriptionInfo[]> {
+    const MAX_INSCRIPTIONS_PER_CALL = 1000;
+    const inscriptionInfos: InscriptionInfo[] = [];
+    for (let i = 0; i < inscriptionIds.length; i += MAX_INSCRIPTIONS_PER_CALL) {
+      const batch = inscriptionIds.slice(i, i + MAX_INSCRIPTIONS_PER_CALL);
+      const multiCall = batch.map((inscriptionId) => {
+        return ['ord_inscription', [inscriptionId]];
+      });
+      const { result } = await this.call('sandshrew_multicall', multiCall) as RpcResponse;
+      for (let i = 0; i < result.length; i++) {
+        inscriptionInfos.push(result[i].result as InscriptionInfo);
+      }
+    }
+    return inscriptionInfos;
+  }
+
   async getAddressRunesBalances(address: string): Promise<OrdRuneBalance[]> {
     try {
       const response = await this.getOrdAddress(address);
@@ -114,6 +131,11 @@ export class SandshrewDataSource implements DataSource {
       console.error('Error fetching ord address:', error);
       throw error;
     }
+  }
+
+  async getInscriptionInfo(inscriptionId: string): Promise<any> {
+    const response = await this.call('ord_inscription', [inscriptionId]) as RpcResponse
+    return response.result as InscriptionInfo
   }
 
   async getRuneOutpoints({ address, runeId }: { address: string, runeId: string }): Promise<SingleRuneOutpoint[]> {

@@ -16,6 +16,8 @@ import * as bitcoin from 'bitcoinjs-lib'
 import { listenKeys, MapStore, WritableAtom } from 'nanostores'
 import { getNetworkForWizz } from '../../constants/networks'
 import { WizzNetwork } from '../../types/network'
+import { normalizeInscription } from '../../lib/data-sources/normalizations'
+import { UnisatInscription } from './unisat'
 
 export class WizzProvider extends WalletProvider {
   constructor(stores: {
@@ -148,7 +150,12 @@ export class WizzProvider extends WalletProvider {
   async getInscriptions(offset?: number, limit?: number): Promise<any[]> {
     const offsetValue = offset || 0
     const limitValue = limit || 10
-    return await this.library.getInscriptions(offsetValue, limitValue)
+    const response = await this.library.getInscriptions(offsetValue, limitValue)
+    const inscriptions = response.list.map((insc: UnisatInscription) => {
+      return normalizeInscription(insc, undefined, this.network as NetworkType)
+    })
+
+    return inscriptions
   }
 
   async sendBTC(to: string, amount: number): Promise<string> {

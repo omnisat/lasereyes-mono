@@ -127,6 +127,14 @@ export default function LaserEyesProvider({
     [client]
   )
 
+  const sendInscriptions = useCallback(
+    async (inscriptionIds: string[], toAddress: string) =>
+      (await client?.sendInscriptions.call(client, inscriptionIds, toAddress)) ??
+      defaultMethods.sendInscriptions(),
+    [client]
+  )
+
+
   // TODO: Move method definitions into useMemo here
   const methods = useMemo(() => {
     if (!client) {
@@ -149,6 +157,7 @@ export default function LaserEyesProvider({
       switchNetwork,
       inscribe,
       send,
+      sendInscriptions
     }
   }, [
     client,
@@ -164,6 +173,7 @@ export default function LaserEyesProvider({
     requestAccounts,
     send,
     sendBTC,
+    sendInscriptions,
     signMessage,
     signPsbt,
     switchNetwork,

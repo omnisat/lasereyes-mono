@@ -4,8 +4,9 @@ import { DataSource } from "../../types/data-source";
 import { Inscription } from "../../types/lasereyes";
 import { MaestroAddressInscription } from "../../types/maestro";
 import { BaseNetwork } from "../../types/network";
+import { OrdRuneBalance } from "../../types/ord";
 import { getMempoolSpaceUrl, MAESTRO_API_KEY_MAINNET, SANDSHREW_LASEREYES_KEY, SANDSHREW_URL } from "../urls";
-import { normalizeInscription } from "./normalizations";
+import { normalizeBrc20Balances, normalizeInscription } from "./normalizations";
 import { MaestroDataSource } from "./sources/maestro-ds";
 import { MempoolSpaceDataSource } from "./sources/mempool-space-ds";
 import { SandshrewDataSource } from "./sources/sandshrew-ds";
@@ -75,7 +76,8 @@ export class DataSourceManager {
       throw new Error(ERROR_METHOD_NOT_AVAILABLE);
     }
 
-    return await dataSource.getAddressBrc20Balances(address);
+    const brc20Raw = await dataSource.getAddressBrc20Balances(address);
+    return normalizeBrc20Balances(brc20Raw);
   }
 
   public async getAddressInscriptions(
@@ -177,7 +179,7 @@ export class DataSourceManager {
     return !!await dataSource.waitForTransaction(txId);
   }
 
-  public async getAddressRunesBalances(address: string): Promise<any> {
+  public async getAddressRunesBalances(address: string): Promise<OrdRuneBalance[]> {
     const dataSource = this.findAvailableSource('getAddressRunesBalances');
     if (!dataSource || !dataSource.getAddressRunesBalances) {
       throw new Error(ERROR_METHOD_NOT_AVAILABLE);

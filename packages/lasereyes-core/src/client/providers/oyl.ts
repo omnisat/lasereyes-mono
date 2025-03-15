@@ -5,7 +5,6 @@ import {
   createSendBtcPsbt,
   getBTCBalance,
   isMainnetNetwork,
-  isTestnetNetwork,
 } from '../../lib/helpers'
 import { OYL } from '../../constants/wallets'
 import { listenKeys, MapStore, WritableAtom } from 'nanostores'
@@ -130,9 +129,6 @@ export default class OylProvider extends WalletProvider {
     }
 
     if (!this.library) throw new Error("Oyl isn't installed")
-    if (isTestnetNetwork(this.network)) {
-      throw new Error(`${this.network} is not supported by Oyl`)
-    }
 
     const { nativeSegwit, taproot } = await this.library.getAddresses()
     if (!nativeSegwit || !taproot) throw new Error('No accounts found')
@@ -211,16 +207,11 @@ export default class OylProvider extends WalletProvider {
     this.$store.setKey('paymentPublicKey', nativeSegwit.publicKey)
     return taproot.publicKey
   }
+
   async getBalance() {
     const { total } = await this.library.getBalance()
     this.$store.setKey('balance', total)
     return total
-  }
-
-  async getInscriptions(offset?: number, limit?: number): Promise<any[]> {
-    const offsetValue = offset || 0
-    const limitValue = limit || 10
-    return await this.library.getInscriptions(offsetValue, limitValue)
   }
 
   async requestAccounts(): Promise<string[]> {

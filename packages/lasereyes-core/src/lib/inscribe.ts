@@ -279,11 +279,9 @@ export const executeRevealTransaction = async ({
       throw new Error("missing data source")
     }
 
-
     if (!dataSourceManager.waitForTransaction) {
       throw new Error("missing waitForTransaction")
     }
-
 
     if (!dataSourceManager.getOutputValueByVOutIndex) {
       throw new Error("missing waitForTransaction")
@@ -344,7 +342,6 @@ export const createInscriptionScript = (
   const ec = new TextEncoder()
   const marker = ec.encode('ord')
   const INSCRIPTION_SIZE = 546
-
   const createContentChunks = (
     contentBase64: string,
     mimeType: ContentType
@@ -376,7 +373,6 @@ export const createInscriptionScript = (
       script.push(Buffer.from([0x02]))
       script.push(pointerBuffer)
     }
-
     script.push(...contentChunks.map((chunk) => chunk), 'OP_ENDIF')
   })
 

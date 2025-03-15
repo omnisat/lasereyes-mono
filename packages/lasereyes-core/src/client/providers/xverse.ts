@@ -375,6 +375,8 @@ export default class XVerseProvider extends WalletProvider {
         return normalizeInscription(insc, undefined, this.network)
       })
 
+      console.log(inscriptions)
+
       return inscriptions as Inscription[]
     } else {
       console.error(response.error)

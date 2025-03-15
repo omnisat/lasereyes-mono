@@ -1,0 +1,23 @@
+{
+  "include": ["src/**/*"],
+  "compilerOptions": {
+    /* Base Options: */
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "target": "es2022",
+    "verbatimModuleSyntax": true,
+    "allowJs": true,
+    "resolveJsonModule": true,
+    "moduleDetection": "force",
+    /* Strictness */
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "declaration": true,
+    "outDir": "dist",
+    /* If NOT transpiling with TypeScript: */
+    "moduleResolution": "Bundler",
+    "module": "ESNext",
+    "lib": ["DOM", "ES2018", "DOM.Iterable"],
+    "jsx": "react-jsx"
+  }
+}

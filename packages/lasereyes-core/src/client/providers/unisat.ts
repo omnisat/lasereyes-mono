@@ -7,6 +7,8 @@ import { listenKeys, MapStore, WritableAtom } from 'nanostores'
 import { LaserEyesStoreType, SignMessageOptions } from '../types'
 import { BIP322, BIP322_SIMPLE } from '../../constants'
 import { LaserEyesClient } from '..'
+import { Inscription } from '../../types/lasereyes'
+import { normalizeInscription } from '../../lib/data-sources/normalizations'
 
 export default class UnisatProvider extends WalletProvider {
   constructor(stores: {
@@ -191,10 +193,15 @@ export default class UnisatProvider extends WalletProvider {
     return bal.total
   }
 
-  async getInscriptions(offset?: number, limit?: number): Promise<any[]> {
+  async getInscriptions(offset?: number, limit?: number): Promise<Inscription[]> {
     const offsetValue = offset || 0
     const limitValue = limit || 10
-    return await this.library.getInscriptions(offsetValue, limitValue)
+    const response = await this.library.getInscriptions(offsetValue, limitValue)
+    const inscriptions = response.list.map((insc: UnisatInscription) => {
+      return normalizeInscription(insc, undefined, this.network)
+    })
+
+    return inscriptions
   }
 
   async requestAccounts(): Promise<string[]> {
@@ -206,4 +213,25 @@ export default class UnisatProvider extends WalletProvider {
     await this.library?.switchChain(wantedNetwork)
     this.$network.set(network)
   }
+}
+
+export type UnisatInscription = {
+  inscriptionId: string
+  inscriptionNumber: number
+  address: string
+  outputValue: number
+  preview: string
+  content: string
+  contentLength: number
+  contentType: string
+  contentBody: string
+  timestamp: number
+  genesisTransaction: string
+  location: string
+  output: string
+  offset: number
+  utxoHeight: number
+  utxoConfirmation: number
+  parents: Array<any>
+  children: Array<any>
 }
