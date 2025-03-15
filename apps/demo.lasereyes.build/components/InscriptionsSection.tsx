@@ -7,7 +7,7 @@ import { getMempoolSpaceUrl } from '@/lib/urls'
 import { MAINNET, TESTNET, useLaserEyes, Inscription } from '@omnisat/lasereyes'
 
 const InscriptionsSection = () => {
-  const { provider, inscribe, network, getInscriptions, sendInscriptions } = useLaserEyes()
+  const { provider, inscribe, address, network, getInscriptions, sendInscriptions } = useLaserEyes()
   const [inscriptions, setInscriptions] = useState<Inscription[]>([])
   const [inscriptionText, setInscriptionText] = useState('Inscribed 100% clientside with Laser Eyes')
   const [selectedInscriptionIds, setSelectedInscriptionIds] = useState<string[]>([])
@@ -22,6 +22,12 @@ const InscriptionsSection = () => {
       })
     }
   }, [provider, getInscriptions])
+
+  useEffect(() => {
+    if (!address) {
+      setInscriptions([])
+    }
+  }, [address, provider, network])
 
   const inscribeWithWallet = async () => {
     try {
