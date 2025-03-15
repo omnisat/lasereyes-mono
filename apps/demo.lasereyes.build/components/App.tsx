@@ -43,6 +43,24 @@ import RunesSection from './RunesSection'
 import BRC20Section from './Brc20Section'
 
 
+
+type colorsType =
+  | 'orange'
+  | 'pink'
+  | 'blue'
+  | 'darkBlue'
+  | 'yellow'
+  | 'green'
+  | 'purple'
+  | 'red'
+const colors = [
+  'orange',
+  'pink',
+  'blue',
+  'darkBlue',
+  'yellow',
+] as colorsType[]
+
 const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
   const [pkgVersion, setPkgVersion] = useState<string | undefined>()
   const [signature, setSignature] = useState<string>('')
@@ -55,58 +73,9 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
     }
     | undefined
   >()
-  type colorsType =
-    | 'orange'
-    | 'pink'
-    | 'blue'
-    | 'darkBlue'
-    | 'yellow'
-    | 'green'
-    | 'purple'
-    | 'red'
-  const colors = [
-    'orange',
-    'pink',
-    'blue',
-    'darkBlue',
-    'yellow',
-  ] as colorsType[]
   const [selectedColor, setSelectedColor] = useState<colorsType>(
     colors[Math.floor(Math.random() * 5)]
   )
-
-  const switchN = () => {
-    try {
-      if (network === MAINNET) {
-        switchNetwork(TESTNET4)
-        setNetwork(TESTNET4)
-      } else if (network === TESTNET4) {
-        switchNetwork(TESTNET)
-        setNetwork(TESTNET)
-      } else if (network === TESTNET) {
-        switchNetwork(SIGNET)
-        setNetwork(SIGNET)
-      } else if (network === SIGNET) {
-        switchNetwork(FRACTAL_MAINNET)
-        setNetwork(FRACTAL_MAINNET)
-      } else if (network === FRACTAL_MAINNET) {
-        switchNetwork(FRACTAL_TESTNET)
-        setNetwork(FRACTAL_TESTNET)
-      } else {
-        switchNetwork(MAINNET)
-        setNetwork(MAINNET)
-      }
-    } catch (e: any) {
-      toast.error(e.message)
-    }
-  }
-
-  useEffect(() => {
-    getPackageVersion().then((version) => {
-      setPkgVersion(version)
-    })
-  }, [])
-
 
   const {
     address,
@@ -142,6 +111,39 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
   const [broadcast, setBroadcast] = useState<boolean>(false)
   const [unsigned, setUnsigned] = useState<string | undefined>()
   const [signed, setSigned] = useState<string | undefined>()
+
+  const switchN = () => {
+    try {
+      if (network === MAINNET) {
+        switchNetwork(TESTNET4)
+        setNetwork(TESTNET4)
+      } else if (network === TESTNET4) {
+        switchNetwork(TESTNET)
+        setNetwork(TESTNET)
+      } else if (network === TESTNET) {
+        switchNetwork(SIGNET)
+        setNetwork(SIGNET)
+      } else if (network === SIGNET) {
+        switchNetwork(FRACTAL_MAINNET)
+        setNetwork(FRACTAL_MAINNET)
+      } else if (network === FRACTAL_MAINNET) {
+        switchNetwork(FRACTAL_TESTNET)
+        setNetwork(FRACTAL_TESTNET)
+      } else {
+        switchNetwork(MAINNET)
+        setNetwork(MAINNET)
+      }
+    } catch (e: any) {
+      toast.error(e.message)
+    }
+  }
+
+  useEffect(() => {
+    getPackageVersion().then((version) => {
+      setPkgVersion(version)
+    })
+  }, [])
+
 
   useEffect(() => {
     setSignature('')
@@ -453,7 +455,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
 
       {/* Wallet connection section */}
       <div className={'flex items-center justify-center flex-col gap-4'}>
-        <div className="text-gray-500 text-xl">supported wallets:</div>
+        <div className="text-orange-400 text-xl">supported wallets:</div>
         <div className={'flex flex-wrap justify-center gap-3'}>
           {Object.values(SUPPORTED_WALLETS).sort((a, b) => Number(hasWallet[b.name]) - Number(hasWallet[a.name])).map(
             (walletInfo: { name: ProviderType; url: string }) => (

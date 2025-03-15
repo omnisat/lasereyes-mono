@@ -184,22 +184,27 @@ export default class LeatherProvider extends WalletProvider {
   }
 
   async sendBTC(to: string, amount: number): Promise<string> {
-    const response = await this.library?.request('sendTransfer', {
-      recipients: [
-        {
-          address: to,
-          amount: amount,
-        },
-      ],
-    })
-    if (response?.result?.txid) {
-      return response.result.txid
-    } else {
-      if (response.error.code === RpcErrorCode.USER_REJECTION) {
-        throw new Error('User rejected the request')
+    try {
+      const response = await this.library?.request('sendTransfer', {
+        recipients: [
+          {
+            address: to,
+            amount: String(amount),
+          },
+        ],
+      })
+      if (response?.result?.txid) {
+        return response.result.txid
       } else {
-        throw new Error('Error sending BTC: ' + response.error.message)
+        if (response.error.code === RpcErrorCode.USER_REJECTION) {
+          throw new Error('User rejected the request')
+        } else {
+          throw new Error('Error sending BTC: ' + response.error.message)
+        }
       }
+    } catch (e: any) {
+      console.log(e)
+      throw new Error("error sending BTC")
     }
   }
   async signMessage(
