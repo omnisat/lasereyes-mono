@@ -50,15 +50,16 @@ import {
   VIDEO_WEBM,
   TEXT_MARKDOWN,
 } from '../constants/content'
-import { BTC, RUNES } from '../constants/protocols'
+import { BTC, RUNES, BRC20 } from '../constants/protocols'
+import { BaseNetwork } from './network'
 
 export type NetworkType =
-  | typeof MAINNET
-  | typeof TESTNET
-  | typeof TESTNET4
-  | typeof SIGNET
-  | typeof FRACTAL_MAINNET
-  | typeof FRACTAL_TESTNET
+  | typeof BaseNetwork.MAINNET
+  | typeof BaseNetwork.TESTNET
+  | typeof BaseNetwork.TESTNET4
+  | typeof BaseNetwork.SIGNET
+  | typeof BaseNetwork.FRACTAL_MAINNET
+  | typeof BaseNetwork.FRACTAL_TESTNET
 
 export type ProviderType =
   | typeof UNISAT
@@ -106,17 +107,30 @@ export type ContentType =
 
 export type Config = {
   network:
-    | typeof MAINNET
-    | typeof TESTNET
-    | typeof TESTNET4
-    | typeof SIGNET
-    | typeof FRACTAL_MAINNET
-    | typeof FRACTAL_TESTNET
-}
+  | typeof MAINNET
+  | typeof TESTNET
+  | typeof TESTNET4
+  | typeof SIGNET
+  | typeof FRACTAL_MAINNET
+  | typeof FRACTAL_TESTNET;
+  dataSources?: {
+    mempool?: {
+      url: string;
+    };
+    sandshrew?: {
+      url?: string;
+      apiKey?: string;
+    };
+    esplora?: string;
+    maestro?: {
+      apiKey?: string;
+    };
+  };
+};
 
-export type SendArgs = BTCSendArgs | RuneSendArgs
+export type SendArgs = BTCSendArgs | RuneSendArgs | Brc20SendArgs
 
-export type Protocol = typeof BTC | typeof RUNES
+export type Protocol = typeof BTC | typeof RUNES | typeof BRC20
 
 export interface BTCSendArgs {
   fromAddress: string
@@ -125,8 +139,18 @@ export interface BTCSendArgs {
   network: NetworkType
 }
 
+export * from './lasereyes'
+
 export interface RuneSendArgs {
   runeId: string
+  fromAddress: string
+  toAddress: string
+  amount: number
+  network: NetworkType
+}
+
+export interface Brc20SendArgs {
+  ticker: string
   fromAddress: string
   toAddress: string
   amount: number
@@ -322,3 +346,13 @@ export interface MempoolTransactionResponse {
     block_time: number
   }
 }
+
+export * from './network'
+export * from './lasereyes'
+export * from './esplora'
+export * from './mempool-space'
+export * from './sandshrew'
+export * from "./maestro"
+export * from "./ord";
+export * from './data-source'
+

@@ -1,14 +1,13 @@
 import * as bitcoin from 'bitcoinjs-lib'
-import { UNSUPPORTED_PROVIDER_METHOD_ERROR, WalletProvider } from '.'
-import { ProviderType, NetworkType } from '../../types'
+import { WalletProvider } from '.'
+import { ProviderType, NetworkType, Config } from '../../types'
 import {
   createSendBtcPsbt,
   getBTCBalance,
   isMainnetNetwork,
-  isTestnetNetwork,
 } from '../../lib/helpers'
 import { OYL } from '../../constants/wallets'
-import { listenKeys, MapStore } from 'nanostores'
+import { listenKeys, MapStore, WritableAtom } from 'nanostores'
 import { persistentMap } from '@nanostores/persistent'
 import { LaserEyesStoreType, SignMessageOptions } from '../types'
 import {
@@ -16,10 +15,21 @@ import {
   keysToPersist,
   PersistedKey,
 } from '../utils'
+import { LaserEyesClient } from '..'
 
 const OYL_WALLET_PERSISTENCE_KEY = 'OYL_CONNECTED_WALLET_STATE'
 
 export default class OylProvider extends WalletProvider {
+  constructor(stores: {
+    $store: MapStore<LaserEyesStoreType>
+    $network: WritableAtom<NetworkType>
+  },
+    parent: LaserEyesClient,
+    config?: Config
+  ) {
+    super(stores, parent, config)
+  }
+
   public get library(): any | undefined {
     return (window as any).oyl
   }
@@ -119,9 +129,6 @@ export default class OylProvider extends WalletProvider {
     }
 
     if (!this.library) throw new Error("Oyl isn't installed")
-    if (isTestnetNetwork(this.network)) {
-      throw new Error(`${this.network} is not supported by Oyl`)
-    }
 
     const { nativeSegwit, taproot } = await this.library.getAddresses()
     if (!nativeSegwit || !taproot) throw new Error('No accounts found')
@@ -132,7 +139,7 @@ export default class OylProvider extends WalletProvider {
   }
 
   async getNetwork() {
-    return this.network
+    return await this.library.getNetwork()
   }
 
   async sendBTC(to: string, amount: number): Promise<string> {
@@ -170,10 +177,10 @@ export default class OylProvider extends WalletProvider {
     broadcast?: boolean | undefined
   ): Promise<
     | {
-        signedPsbtHex: string | undefined
-        signedPsbtBase64: string | undefined
-        txId?: string | undefined
-      }
+      signedPsbtHex: string | undefined
+      signedPsbtBase64: string | undefined
+      txId?: string | undefined
+    }
     | undefined
   > {
     const { psbt, txid } = await this.library.signPsbt({
@@ -200,23 +207,18 @@ export default class OylProvider extends WalletProvider {
     this.$store.setKey('paymentPublicKey', nativeSegwit.publicKey)
     return taproot.publicKey
   }
+
   async getBalance() {
     const { total } = await this.library.getBalance()
     this.$store.setKey('balance', total)
     return total
   }
 
-  async getInscriptions(offset?: number, limit?: number): Promise<any[]> {
-    const offsetValue = offset || 0
-    const limitValue = limit || 10
-    return await this.library.getInscriptions(offsetValue, limitValue)
-  }
-
   async requestAccounts(): Promise<string[]> {
     return [this.$store.get().address, this.$store.get().paymentAddress]
   }
 
-  async switchNetwork(): Promise<void> {
-    throw UNSUPPORTED_PROVIDER_METHOD_ERROR
+  async switchNetwork(network: NetworkType): Promise<void> {
+    return await this.library.switchNetwork(network)
   }
 }

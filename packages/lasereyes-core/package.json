@@ -1,7 +1,7 @@
 {
   "name": "@omnisat/lasereyes-core",
   "private": false,
-  "version": "0.0.62",
+  "version": "0.0.63-rc.1",
   "type": "module",
   "main": "./dist/index.umd.cjs",
   "module": "./dist/index.js",
@@ -40,6 +40,7 @@
     "bitcoinjs-lib": "^7.0.0-rc.0",
     "buffer": "^6.0.3",
     "nanostores": "^0.11.3",
+    "ordapi": "^0.0.7",
     "sats-connect": "^2.8.0"
   },
   "publishConfig": {

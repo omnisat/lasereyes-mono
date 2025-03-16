@@ -14,6 +14,7 @@ import { getRuneById } from '../sandshrew'
 import { NetworkType } from '../../types'
 import { getAddressType, getRedeemScript } from '../btc'
 import { toXOnly } from 'bitcoinjs-lib/src/psbt/bip371'
+import { BaseNetwork } from '../../types/network'
 // import { getAddressType, getRedeemScript } from "../btc"
 // import { toXOnly } from 'bitcoinjs-lib/src/psbt/bip371'
 
@@ -44,10 +45,10 @@ export const sendRune = async ({
     network?: NetworkType
   ) => Promise<
     | {
-        signedPsbtHex: string | undefined
-        signedPsbtBase64: string | undefined
-        txId?: string
-      }
+      signedPsbtHex: string | undefined
+      signedPsbtBase64: string | undefined
+      txId?: string
+    }
     | undefined
   >
   network: NetworkType
@@ -239,7 +240,7 @@ export const createRuneMintPsbt = async ({
   runeId: string
 }) => {
   try {
-    const network = 'mainnet'
+    const network: NetworkType = BaseNetwork.MAINNET
     const { fastestFee: feeRate } =
       await getRecommendedFeesMempoolSpace(network)
     const utxos = await getAddressUtxos(address, network)

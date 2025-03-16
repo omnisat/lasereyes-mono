@@ -1,13 +1,26 @@
 import * as bitcoin from 'bitcoinjs-lib'
 import { WalletProvider } from '.'
 import { getNetworkForUnisat, getUnisatNetwork } from '../../constants/networks'
-import { NetworkType, ProviderType } from '../../types'
+import { Config, NetworkType, ProviderType } from '../../types'
 import { UNISAT } from '../../constants/wallets'
-import { listenKeys } from 'nanostores'
-import { SignMessageOptions } from '../types'
+import { listenKeys, MapStore, WritableAtom } from 'nanostores'
+import { LaserEyesStoreType, SignMessageOptions } from '../types'
 import { BIP322, BIP322_SIMPLE } from '../../constants'
+import { LaserEyesClient } from '..'
+import { Inscription } from '../../types/lasereyes'
+import { normalizeInscription } from '../../lib/data-sources/normalizations'
 
 export default class UnisatProvider extends WalletProvider {
+  constructor(stores: {
+    $store: MapStore<LaserEyesStoreType>
+    $network: WritableAtom<NetworkType>
+  },
+    parent: LaserEyesClient,
+    config?: Config
+  ) {
+    super(stores, parent, config)
+  }
+
   public get library(): any | undefined {
     return (window as any).unisat
   }
@@ -144,10 +157,10 @@ export default class UnisatProvider extends WalletProvider {
     broadcast?: boolean | undefined
   ): Promise<
     | {
-        signedPsbtHex: string | undefined
-        signedPsbtBase64: string | undefined
-        txId?: string | undefined
-      }
+      signedPsbtHex: string | undefined
+      signedPsbtBase64: string | undefined
+      txId?: string | undefined
+    }
     | undefined
   > {
     const signedPsbt = await this.library?.signPsbt(psbtHex, {
@@ -180,10 +193,15 @@ export default class UnisatProvider extends WalletProvider {
     return bal.total
   }
 
-  async getInscriptions(offset?: number, limit?: number): Promise<any[]> {
+  async getInscriptions(offset?: number, limit?: number): Promise<Inscription[]> {
     const offsetValue = offset || 0
     const limitValue = limit || 10
-    return await this.library.getInscriptions(offsetValue, limitValue)
+    const response = await this.library.getInscriptions(offsetValue, limitValue)
+    const inscriptions = response.list.map((insc: UnisatInscription) => {
+      return normalizeInscription(insc, undefined, this.network)
+    })
+
+    return inscriptions
   }
 
   async requestAccounts(): Promise<string[]> {
@@ -195,4 +213,25 @@ export default class UnisatProvider extends WalletProvider {
     await this.library?.switchChain(wantedNetwork)
     this.$network.set(network)
   }
+}
+
+export type UnisatInscription = {
+  inscriptionId: string
+  inscriptionNumber: number
+  address: string
+  outputValue: number
+  preview: string
+  content: string
+  contentLength: number
+  contentType: string
+  contentBody: string
+  timestamp: number
+  genesisTransaction: string
+  location: string
+  output: string
+  offset: number
+  utxoHeight: number
+  utxoConfirmation: number
+  parents: Array<any>
+  children: Array<any>
 }

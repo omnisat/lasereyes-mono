@@ -1,15 +1,16 @@
 import axios from 'axios'
 import {
   OrdAddress,
-  OrdAddressResponse,
+  OrdResponse,
   OrdOutputs,
   OrdRune,
-  RuneBalance,
+  OrdRuneBalance,
 } from '../types/ord'
-import { EsploraTx, SingleRuneOutpoint } from '../types/sandshrew'
+import { SandshrewResponse, SingleRuneOutpoint } from '../types/sandshrew'
+import { EsploraTx } from "../types/esplora"
 import { getPublicKeyHash } from './btc'
 import { MAINNET } from '../constants'
-export const SANDSHREW_URL: string = 'https://mainnet.sandshrew.io/v1/lasereyes'
+import { SANDSHREW_LASEREYES_KEY, SANDSHREW_URL } from './urls'
 
 export const callSandshrewRPC = async (
   method: string,
@@ -27,7 +28,7 @@ export const callSandshrewRPC = async (
   }
 
   return await axios
-    .post(SANDSHREW_URL, data, {
+    .post(`${SANDSHREW_URL}/${SANDSHREW_LASEREYES_KEY}`, data, {
       headers: {
         'content-type': 'application/json',
       },
@@ -38,30 +39,30 @@ export const callSandshrewRPC = async (
     })
 }
 
-export const getOrdAddress = async (address: string) => {
+export const getOrdAddress = async (address: string): Promise<OrdAddress> => {
   try {
     const response = (await callSandshrewRPC('ord_address', [
       address,
-    ])) as OrdAddressResponse
+    ])) as OrdResponse
     return response.result as OrdAddress
   } catch (e) {
     throw e
   }
 }
 
-export const getRuneById = async (rune_id: string) => {
+export const getRuneById = async (rune_id: string): Promise<OrdRune> => {
   try {
-    const response = await callSandshrewRPC('ord_rune', [rune_id])
+    const response = (await callSandshrewRPC('ord_rune', [rune_id])) as OrdResponse
     return response.result as OrdRune
   } catch (e) {
     throw e
   }
 }
 
-export const getRuneByName = async (rune_name: string) => {
+export const getRuneByName = async (rune_name: string): Promise<OrdRune> => {
   try {
-    const response = await callSandshrewRPC('ord_rune', [rune_name])
-    return response
+    const response = (await callSandshrewRPC('ord_rune', [rune_name])) as OrdResponse
+    return response.result as OrdRune
   } catch (e) {
     throw e
   }
@@ -69,7 +70,8 @@ export const getRuneByName = async (rune_name: string) => {
 
 export const getTxInfo = async (txId: string): Promise<EsploraTx> => {
   try {
-    return await callSandshrewRPC('esplora_tx', [txId])
+    const response = (await callSandshrewRPC('esplora_tx', [txId])) as SandshrewResponse
+    return response.result as EsploraTx
   } catch (e) {
     console.error(e)
     throw e
@@ -104,7 +106,7 @@ export const batchOrdOutput = async ({
   return ordOutputs
 }
 
-export const getAddressRunesBalances = async (address: string) => {
+export const getAddressRunesBalances = async (address: string): Promise<OrdRuneBalance[]> => {
   try {
     const response = await getOrdAddress(address)
     const runesData = response.runes_balances
@@ -116,9 +118,10 @@ export const getAddressRunesBalances = async (address: string) => {
       name: rune[0],
       balance: rune[1],
       symbol: rune[2],
-    })) as RuneBalance[]
+    })) as OrdRuneBalance[]
   } catch (error) {
     console.error('Error fetching ord address:', error)
+    throw error
   }
 }
 

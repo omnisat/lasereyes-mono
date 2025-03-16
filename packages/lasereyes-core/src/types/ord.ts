@@ -20,16 +20,16 @@ export interface OrdOutput {
   output?: string
 }
 
-export type RuneBalance = {
+export type OrdRuneBalance = {
   name: string
   balance: string
   symbol: string
 }
 
-export type OrdAddressResponse = {
+export type OrdResponse = {
   jsonrpc: string
   id: number
-  result: OrdAddress
+  result: any
 }
 
 export type OrdAddress = {

@@ -5,13 +5,13 @@ import {
   getAddress,
   request,
   MessageSigningProtocols,
+  BitcoinNetworkType,
 } from 'sats-connect'
 import { WalletProvider } from '.'
 import {
   ProviderType,
   NetworkType,
   XVERSE,
-  getSatsConnectNetwork,
   MAINNET,
   TESTNET,
   TESTNET4,
@@ -20,6 +20,8 @@ import {
   LaserEyesStoreType,
   SignMessageOptions,
   ECDSA,
+  LaserEyesClient,
+  Config,
 } from '../..'
 import {
   findOrdinalsAddress,
@@ -28,16 +30,30 @@ import {
   getBitcoinNetwork,
   isMainnetNetwork,
 } from '../../lib/helpers'
-import { MapStore, listenKeys } from 'nanostores'
+import { getSatsConnectNetwork } from '../../constants/networks'
+import { MapStore, WritableAtom, listenKeys } from 'nanostores'
 import { persistentMap } from '@nanostores/persistent'
 import {
   handleStateChangePersistence,
   keysToPersist,
   PersistedKey,
 } from '../utils'
+import { BaseNetwork } from '../../types/network'
+import { normalizeInscription } from '../../lib/data-sources/normalizations'
+import { Inscription } from '../../types/lasereyes'
 
 const XVERSE_WALLET_PERSISTENCE_KEY = 'XVERSE_CONNECTED_WALLET_STATE'
 export default class XVerseProvider extends WalletProvider {
+  constructor(stores: {
+    $store: MapStore<LaserEyesStoreType>
+    $network: WritableAtom<NetworkType>
+  },
+    parent: LaserEyesClient,
+    config?: Config
+  ) {
+    super(stores, parent, config)
+  }
+
   public get library(): any | undefined {
     return (window as any)?.BitcoinProvider
   }
@@ -137,13 +153,13 @@ export default class XVerseProvider extends WalletProvider {
         }
       }
 
-      let xverseNetwork = getSatsConnectNetwork(this.network || MAINNET)
+      let xverseNetwork = getSatsConnectNetwork(this.network || BaseNetwork.MAINNET)
       const getAddressOptions = {
         payload: {
           purposes: ['ordinals', 'payment'],
           message: 'Connecting with lasereyes',
           network: {
-            type: xverseNetwork,
+            type: xverseNetwork as unknown as BitcoinNetworkType,
           },
         },
         onFinish: (response: any) => {
@@ -248,10 +264,10 @@ export default class XVerseProvider extends WalletProvider {
     broadcast?: boolean | undefined
   ): Promise<
     | {
-        signedPsbtHex: string | undefined
-        signedPsbtBase64: string | undefined
-        txId?: string | undefined
-      }
+      signedPsbtHex: string | undefined
+      signedPsbtBase64: string | undefined
+      txId?: string | undefined
+    }
     | undefined
   > {
     try {
@@ -344,7 +360,7 @@ export default class XVerseProvider extends WalletProvider {
     }
   }
 
-  async getInscriptions(offset?: number, limit?: number): Promise<any[]> {
+  async getInscriptions(offset?: number, limit?: number): Promise<Inscription[]> {
     const offsetValue = offset || 0
     const limitValue = limit || 10
     const response = await request('ord_getInscriptions', {
@@ -352,12 +368,33 @@ export default class XVerseProvider extends WalletProvider {
       limit: limitValue,
     })
 
+
     if (response.status === 'success') {
-      console.log(response.result)
-      return response.result.inscriptions
+
+      const inscriptions = response.result.inscriptions.map((insc) => {
+        return normalizeInscription(insc, undefined, this.network)
+      })
+
+      console.log(inscriptions)
+
+      return inscriptions as Inscription[]
     } else {
       console.error(response.error)
       throw new Error('Error getting inscriptions')
     }
   }
 }
+
+// type XVerseInscription = {
+//   inscriptionId: string
+//   inscriptionNumber: string
+//   collectionName: string
+//   contentType: string
+//   contentLength: string
+//   address: string
+//   output: string
+//   offset: number
+//   postage: number
+//   genesisTransaction: string
+//   timestamp: number
+// }

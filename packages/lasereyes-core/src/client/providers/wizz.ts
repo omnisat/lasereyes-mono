@@ -4,17 +4,32 @@ import {
   WizzBalanceResponse,
   FRACTAL_TESTNET,
   FRACTAL_MAINNET,
-  WIZZ_MAINNET,
-  getNetworkForWizz,
   WIZZ,
   SignMessageOptions,
   BIP322,
   BIP322_SIMPLE,
+  LaserEyesClient,
+  Config,
+  LaserEyesStoreType,
 } from '../..'
 import * as bitcoin from 'bitcoinjs-lib'
-import { listenKeys } from 'nanostores'
+import { listenKeys, MapStore, WritableAtom } from 'nanostores'
+import { getNetworkForWizz } from '../../constants/networks'
+import { WizzNetwork } from '../../types/network'
+import { normalizeInscription } from '../../lib/data-sources/normalizations'
+import { UnisatInscription } from './unisat'
 
 export class WizzProvider extends WalletProvider {
+  constructor(stores: {
+    $store: MapStore<LaserEyesStoreType>
+    $network: WritableAtom<NetworkType>
+  },
+    parent: LaserEyesClient,
+    config?: Config
+  ) {
+    super(stores, parent, config)
+  }
+
   public get library(): any | undefined {
     return (window as any).wizz
   }
@@ -115,7 +130,7 @@ export class WizzProvider extends WalletProvider {
 
   async switchNetwork(_network: NetworkType): Promise<void> {
     if (_network === FRACTAL_TESTNET || _network === FRACTAL_MAINNET) {
-      return await this.library.switchNetwork(WIZZ_MAINNET)
+      return await this.library.switchNetwork(WizzNetwork.MAINNET)
     }
 
     const wantedNetwork = getNetworkForWizz(_network)
@@ -135,7 +150,12 @@ export class WizzProvider extends WalletProvider {
   async getInscriptions(offset?: number, limit?: number): Promise<any[]> {
     const offsetValue = offset || 0
     const limitValue = limit || 10
-    return await this.library.getInscriptions(offsetValue, limitValue)
+    const response = await this.library.getInscriptions(offsetValue, limitValue)
+    const inscriptions = response.list.map((insc: UnisatInscription) => {
+      return normalizeInscription(insc, undefined, this.network as NetworkType)
+    })
+
+    return inscriptions
   }
 
   async sendBTC(to: string, amount: number): Promise<string> {
@@ -164,10 +184,10 @@ export class WizzProvider extends WalletProvider {
     broadcast?: boolean | undefined
   ): Promise<
     | {
-        signedPsbtHex: string | undefined
-        signedPsbtBase64: string | undefined
-        txId?: string | undefined
-      }
+      signedPsbtHex: string | undefined
+      signedPsbtBase64: string | undefined
+      txId?: string | undefined
+    }
     | undefined
   > {
     const signedPsbt = await this.library?.signPsbt(psbtHex, {
