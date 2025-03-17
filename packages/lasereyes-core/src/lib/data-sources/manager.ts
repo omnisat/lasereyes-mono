@@ -57,6 +57,10 @@ export class DataSourceManager {
     }
   }
 
+  public registerDataSource(source: string, dataSource: DataSource) {
+    this.dataSources.set(source, dataSource);
+  }
+
   public getSource(source: string): DataSource | undefined {
     return this.dataSources.get(source);
   }
