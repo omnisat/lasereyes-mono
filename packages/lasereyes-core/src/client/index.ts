@@ -46,7 +46,7 @@ export class LaserEyesClient {
   readonly $providerMap: Partial<Record<ProviderType, WalletProvider>>
   private disposed = false
 
-  protected dataSourceManager: DataSourceManager;
+  readonly dataSourceManager: DataSourceManager;
 
   dispose() {
     this.disposed = true

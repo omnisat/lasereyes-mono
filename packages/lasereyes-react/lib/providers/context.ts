@@ -29,6 +29,7 @@ export const defaultMethods = {
   inscribe: async () => '',
   send: async () => '',
   sendInscriptions: async () => "",
+  getUtxos: async () => [],
 }
 export const LaserEyesStoreContext = createContext<{
   $store: MapStore<LaserEyesStoreType>
@@ -52,6 +53,7 @@ export const LaserEyesStoreContext = createContext<{
     | 'getMetaBalances'
     | 'disconnect'
     | 'connect'
+    | 'getUtxos'
   >
 }>({
   $store,
