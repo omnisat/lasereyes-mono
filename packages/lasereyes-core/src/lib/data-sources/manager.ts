@@ -16,10 +16,10 @@ const ERROR_METHOD_NOT_AVAILABLE = 'Method not available on any data source';
 export class DataSourceManager {
   private static instance: DataSourceManager;
   private dataSources: Map<string, DataSource> = new Map();
-
+  private network: string;
   private constructor(config?: Config) {
     const network = config?.network || BaseNetwork.MAINNET;
-
+    this.network = network;
     this.dataSources.set('mempool', new MempoolSpaceDataSource(
       config?.dataSources?.mempool?.url || getMempoolSpaceUrl(network),
       network
@@ -53,6 +53,7 @@ export class DataSourceManager {
   }
 
   public updateNetwork(newNetwork: string) {
+    this.network = newNetwork;
     for (const ds of this.dataSources.values()) {
       ds.setNetwork?.(newNetwork);
     }
@@ -60,6 +61,7 @@ export class DataSourceManager {
 
   public registerDataSource(source: string, dataSource: DataSource) {
     this.dataSources.set(source, dataSource);
+    this.dataSources.get(source)?.setNetwork?.(this.network);
   }
 
   public getSource(source: string): DataSource | undefined {
