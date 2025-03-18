@@ -5,7 +5,7 @@ import { Inscription } from "../../types/lasereyes";
 import { MaestroAddressInscription } from "../../types/maestro";
 import { BaseNetwork } from "../../types/network";
 import { OrdRuneBalance } from "../../types/ord";
-import { getMempoolSpaceUrl, MAESTRO_API_KEY_MAINNET, SANDSHREW_LASEREYES_KEY, SANDSHREW_URL } from "../urls";
+import { getMempoolSpaceUrl, MAESTRO_API_KEY_MAINNET, MAESTRO_API_KEY_TESTNET4, SANDSHREW_LASEREYES_KEY, SANDSHREW_URL } from "../urls";
 import { normalizeBrc20Balances, normalizeInscription } from "./normalizations";
 import { MaestroDataSource } from "./sources/maestro-ds";
 import { MempoolSpaceDataSource } from "./sources/mempool-space-ds";
@@ -34,6 +34,7 @@ export class DataSourceManager {
     this.dataSources.set('maestro', new MaestroDataSource(
       config?.dataSources?.maestro?.apiKey || MAESTRO_API_KEY_MAINNET,
       network,
+      config?.dataSources?.maestro?.testnetApiKey || MAESTRO_API_KEY_TESTNET4
     ));
   }
 

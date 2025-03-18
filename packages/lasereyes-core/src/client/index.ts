@@ -203,6 +203,7 @@ export class LaserEyesClient {
   async switchNetwork(network: NetworkType): Promise<void> {
     try {
       if (this.$store.get().provider) {
+        this.dataSourceManager.updateNetwork(network)
         await this.$providerMap[this.$store.get().provider!]?.switchNetwork(
           network
         )
@@ -211,6 +212,7 @@ export class LaserEyesClient {
       if (error instanceof Error) {
         if (error.message.toLowerCase().includes('not implemented')) {
           this.disconnect()
+          this.dataSourceManager.updateNetwork(this.$network.get())
           throw new Error(
             "The connected wallet doesn't support programmatic network changes.."
           )

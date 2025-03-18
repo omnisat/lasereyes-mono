@@ -124,6 +124,7 @@ export type Config = {
     esplora?: string;
     maestro?: {
       apiKey?: string;
+      testnetApiKey?: string;
     };
   };
 };
