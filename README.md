@@ -91,8 +91,8 @@ If you find Laser Eyes useful or use it for work, please consider [sponsoring La
 <p style="display: flex; justify-content: center; align-items: center; gap: 40px; flex-wrap: wrap;">
   <a href="https://www.seizectrl.io/" rel="nofollow">
     <picture>
-      <source media="(prefers-color-scheme: dark)" srcset=".github/assets/ctrl-dark.svg">
-      <img alt="Seize CTRL" src=".github/assets/ctrl-light.svg" width="auto" height="50">
+      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/omnisat/lasereyes-mono/dev/.github/assets/ctrl-light.svg">
+      <img alt="Seize CTRL" src="https://raw.githubusercontent.com/omnisat/lasereyes-mono/dev/.github/assets/ctrl-dark.svg" width="auto" height="50">
     </picture>
   </a>
   <a href="https://leather.io/" rel="nofollow">
