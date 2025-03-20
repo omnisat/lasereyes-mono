@@ -47,67 +47,83 @@ If you find Laser Eyes useful or use it for work, please consider [sponsoring La
 
 <h2 style="text-align: center;">Ecosystem Partnerships</h2>
 <p style="display: flex; justify-content: center; align-items: center; gap: 60px; flex-wrap: wrap;">
-  <a href="https://www.utxo.management/">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="./.github/assets/utxo-light.svg">
-      <source media="(prefers-color-scheme: light)" srcset="./.github/assets/utxo-dark.svg">
-      <img alt="UTXO Management" src="./.github/assets/utxo-dark.svg" width="auto" height="100">
-    </picture>
+  <a href="https://www.utxo.management/" rel="nofollow">
+    <themed-picture data-catalyst-inline="true" data-catalyst>
+      <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="./.github/assets/utxo-light.svg">
+        <source media="(prefers-color-scheme: light)" srcset="./.github/assets/utxo-dark.svg">
+        <img alt="UTXO Management" src="./.github/assets/utxo-dark.svg" width="auto" height="100" style="visibility:visible;max-width:100%;">
+      </picture>
+    </themed-picture>
   </a>
-  <a href="https://www.oyl.io/">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="./.github/assets/oyl-light.svg">
-      <source media="(prefers-color-scheme: light)" srcset="./.github/assets/oyl-dark.svg">
-      <img alt="OYL" src="./.github/assets/oyl-dark.svg" width="auto" height="80">
-    </picture>
+  <a href="https://www.oyl.io/" rel="nofollow">
+    <themed-picture data-catalyst-inline="true" data-catalyst>
+      <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="./.github/assets/oyl-light.svg">
+        <source media="(prefers-color-scheme: light)" srcset="./.github/assets/oyl-dark.svg">
+        <img alt="OYL" src="./.github/assets/oyl-dark.svg" width="auto" height="80" style="visibility:visible;max-width:100%;">
+      </picture>
+    </themed-picture>
   </a>
-  <a href="https://www.gomaestro.org/">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="./.github/assets/maestro-light.svg">
-      <source media="(prefers-color-scheme: light)" srcset="./.github/assets/maestro-dark.svg">
-      <img alt="Maestro" src="./.github/assets/maestro-dark.svg" width="auto" height="80">
-    </picture>
+  <a href="https://www.gomaestro.org/" rel="nofollow">
+    <themed-picture data-catalyst-inline="true" data-catalyst>
+      <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="./.github/assets/maestro-light.svg">
+        <source media="(prefers-color-scheme: light)" srcset="./.github/assets/maestro-dark.svg">
+        <img alt="Maestro" src="./.github/assets/maestro-dark.svg" width="auto" height="80" style="visibility:visible;max-width:100%;">
+      </picture>
+    </themed-picture>
   </a>
-  <a href="https://www.trio.xyz">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="./.github/assets/trio-light.svg">
-      <source media="(prefers-color-scheme: light)" srcset="./.github/assets/trio-dark.svg">
-      <img alt="Trio" src="./.github/assets/trio-dark.svg" width="auto" height="80">
-    </picture>
+  <a href="https://www.trio.xyz" rel="nofollow">
+    <themed-picture data-catalyst-inline="true" data-catalyst>
+      <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="./.github/assets/trio-light.svg">
+        <source media="(prefers-color-scheme: light)" srcset="./.github/assets/trio-dark.svg">
+        <img alt="Trio" src="./.github/assets/trio-dark.svg" width="auto" height="80" style="visibility:visible;max-width:100%;">
+      </picture>
+    </themed-picture>
   </a>
 </p>
 <p style="display: flex; justify-content: center; align-items: center; gap: 60px; flex-wrap: wrap;">
-  <a href="https://l1f.io/">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="./.github/assets/l1f-light.svg">
-      <source media="(prefers-color-scheme: light)" srcset="./.github/assets/l1f_dark.svg">
-      <img alt="L1F" src="./.github/assets/l1f_dark.svg" width="auto" height="60">
-    </picture>
+  <a href="https://l1f.io/" rel="nofollow">
+    <themed-picture data-catalyst-inline="true" data-catalyst>
+      <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="./.github/assets/l1f-light.svg">
+        <source media="(prefers-color-scheme: light)" srcset="./.github/assets/l1f_dark.svg">
+        <img alt="L1F" src="./.github/assets/l1f_dark.svg" width="auto" height="60" style="visibility:visible;max-width:100%;">
+      </picture>
+    </themed-picture>
   </a>
-  <a href="https://x.com/BLIFEProtocol">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="./.github/assets/blife-light.svg">
-      <source media="(prefers-color-scheme: light)" srcset="./.github/assets/blife-dark.svg">
-      <img alt="BLIFE" src="./.github/assets/blife-dark.svg" width="auto" height="120">
-    </picture>
+  <a href="https://x.com/BLIFEProtocol" rel="nofollow">
+    <themed-picture data-catalyst-inline="true" data-catalyst>
+      <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="./.github/assets/blife-light.svg">
+        <source media="(prefers-color-scheme: light)" srcset="./.github/assets/blife-dark.svg">
+        <img alt="BLIFE" src="./.github/assets/blife-dark.svg" width="auto" height="120" style="visibility:visible;max-width:100%;">
+      </picture>
+    </themed-picture>
   </a>
 </p>
 
 <h2 style="text-align: center;">Start-Up Sponsors</h2>
 <p style="display: flex; justify-content: center; align-items: center; gap: 40px; flex-wrap: wrap;">
-  <a href="https://www.seizectrl.io/">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="./.github/assets/ctrl.svg">
-      <source media="(prefers-color-scheme: light)" srcset="./.github/assets/ctrl-dark.svg">
-      <img alt="Seize CTRL" src="./.github/assets/ctrl-dark.svg" width="auto" height="50">
-    </picture>
+  <a href="https://www.seizectrl.io/" rel="nofollow">
+    <themed-picture data-catalyst-inline="true" data-catalyst>
+      <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="./.github/assets/ctrl.svg">
+        <source media="(prefers-color-scheme: light)" srcset="./.github/assets/ctrl-dark.svg">
+        <img alt="Seize CTRL" src="./.github/assets/ctrl-dark.svg" width="auto" height="50" style="visibility:visible;max-width:100%;">
+      </picture>
+    </themed-picture>
   </a>
-  <a href="https://leather.io/">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="./.github/assets/leather-light.svg">
-      <source media="(prefers-color-scheme: light)" srcset="./.github/assets/leather-dark.svg">
-      <img alt="Leather" src="./.github/assets/leather-dark.svg" width="auto" height="50">
-    </picture>
+  <a href="https://leather.io/" rel="nofollow">
+    <themed-picture data-catalyst-inline="true" data-catalyst>
+      <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="./.github/assets/leather-light.svg">
+        <source media="(prefers-color-scheme: light)" srcset="./.github/assets/leather-dark.svg">
+        <img alt="Leather" src="./.github/assets/leather-dark.svg" width="auto" height="50" style="visibility:visible;max-width:100%;">
+      </picture>
+    </themed-picture>
   </a>
 </p>
 <br>
