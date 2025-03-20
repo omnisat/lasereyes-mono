@@ -13,14 +13,25 @@ export default defineConfig({
     }),
   ] as UserConfig['plugins'],
   build: {
+    cssCodeSplit: true,
     lib: {
       entry: resolve(__dirname, './index.ts'),
       name: 'lasereyes',
       fileName: 'index',
+      formats: ['es'],
     },
     rollupOptions: {
       external: ['react', 'react-dom', 'react/jsx-runtime'],
+      input: {
+        index: resolve(__dirname, './index.ts'),
+        ui: resolve(__dirname, './ui.ts'),
+        "ui/style": resolve(__dirname, './node_modules/@omnisat/lasereyes-ui/dist/style.css'),
+      },
       output: {
+        dir: resolve(__dirname, './dist'),
+        entryFileNames: '[name].js',
+        assetFileNames: '[name].[ext]',
+        format: 'es',
         globals: {
           react: 'React',
           'react-dom': 'ReactDOM',

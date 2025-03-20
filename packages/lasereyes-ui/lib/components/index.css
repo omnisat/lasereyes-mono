@@ -1,0 +1,60 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --lem-background: 0 0% 100%;
+    --lem-foreground: 0 0% 3.9%;
+    --lem-card: 0 0% 100%;
+    --lem-card-foreground: 0 0% 3.9%;
+    --lem-popover: 0 0% 100%;
+    --lem-popover-foreground: 0 0% 3.9%;
+    --lem-primary: 23 85% 56%;
+    --lem-primary-foreground: 0 0% 98%;
+    --lem-secondary: 0 0% 96.1%;
+    --lem-secondary-foreground: 0 0% 9%;
+    --lem-muted: 0 0% 96.1%;
+    --lem-muted-foreground: 0 0% 45.1%;
+    --lem-accent: 0 0% 96.1%;
+    --lem-accent-foreground: 0 0% 9%;
+    --lem-destructive: 0 84.2% 60.2%;
+    --lem-destructive-foreground: 0 0% 98%;
+    --lem-border: 0 0% 89.8%;
+    --lem-input: 0 0% 89.8%;
+    --lem-ring: 0 0% 3.9%;
+    --lem-radius: 1rem;
+    --lem-chart-1: 12 76% 61%;
+    --lem-chart-2: 173 58% 39%;
+    --lem-chart-3: 197 37% 24%;
+    --lem-chart-4: 43 74% 66%;
+    --lem-chart-5: 27 87% 67%;
+  }
+
+  .dark, .lem-dark {
+    --lem-background: 0 0% 3.9%;
+    --lem-foreground: 0 0% 98%;
+    --lem-card: 0 0% 3.9%;
+    --lem-card-foreground: 0 0% 98%;
+    --lem-popover: 0 0% 3.9%;
+    --lem-popover-foreground: 0 0% 98%;
+    --lem-primary: 36 81% 67%;
+    --lem-primary-foreground: 0 0% 9%;
+    --lem-secondary: 0 0% 14.9%;
+    --lem-secondary-foreground: 0 0% 98%;
+    --lem-muted: 0 0% 14.9%;
+    --lem-muted-foreground: 0 0% 63.9%;
+    --lem-accent: 0 0% 14.9%;
+    --lem-accent-foreground: 0 0% 98%;
+    --lem-destructive: 0 62.8% 30.6%;
+    --lem-destructive-foreground: 0 0% 98%;
+    --lem-border: 0 0% 14.9%;
+    --lem-input: 0 0% 14.9%;
+    --lem-ring: 0 0% 83.1%;
+    --lem-chart-1: 220 70% 50%;
+    --lem-chart-2: 160 60% 45%;
+    --lem-chart-3: 30 80% 55%;
+    --lem-chart-4: 280 65% 60%;
+    --lem-chart-5: 340 75% 55%;
+  }
+}

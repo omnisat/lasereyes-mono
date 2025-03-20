@@ -10,7 +10,7 @@ export function useLaserEyes<T>(selector: (x: LaserEyesContextType) => T): T
 export function useLaserEyes<T>(
   selector?: (x: LaserEyesContextType) => T
 ): T | LaserEyesContextType {
-  const { $network, $store, methods } = useContext(LaserEyesStoreContext)
+  const { $network, $store, methods, client } = useContext(LaserEyesStoreContext)
 
   const $computedStore = useMemo(() => {
     const computedStore = batched([$store, $network], (store, network) => {
@@ -21,6 +21,7 @@ export function useLaserEyes<T>(
         paymentPublicKey: store.paymentPublicKey,
         library: {},
         network,
+        client: client,
         accounts: store.accounts,
         balance: Number(store.balance),
         connected: store.connected,
@@ -54,7 +55,7 @@ export function useLaserEyes<T>(
     })
 
     return computedStore
-  }, [$network, $store, selector, methods])
+  }, [$network, $store, selector, methods, client])
 
   return useStore($computedStore)
 }
