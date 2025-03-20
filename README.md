@@ -43,46 +43,67 @@ Contributions to Laser Eyes are greatly appreciated! If you're interested in con
 
 ## Sponsors
 
-If you find Laser Eyes useful or use it for work, please consider [sponsoring Laser Eyes](https://github.com/sponsors/omnisat). Thank youthi
+If you find Laser Eyes useful or use it for work, please consider [sponsoring Laser Eyes](https://github.com/sponsors/omnisat). Thank you 🙏
 
-## Ecosystem Partnerships
+<h2 style="text-align: center;">Ecosystem Partnerships</h2>
+<p style="display: flex; justify-content: center; align-items: center; gap: 60px; flex-wrap: wrap;">
+  <a href="https://www.utxo.management/" rel="nofollow">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="./.github/assets/utxo-light.svg">
+      <img alt="UTXO Management" src="./.github/assets/utxo-dark.svg" width="auto" height="100">
+    </picture>
+  </a>
+  <a href="https://www.oyl.io/" rel="nofollow">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="./.github/assets/oyl-light.svg">
+      <img alt="OYL" src="./.github/assets/oyl-dark.svg" width="auto" height="80">
+    </picture>
+  </a>
+  <a href="https://www.gomaestro.org/" rel="nofollow">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="./.github/assets/maestro-light.svg">
+      <img alt="Maestro" src="./.github/assets/maestro-dark.svg" width="auto" height="80">
+    </picture>
+  </a>
+  <a href="https://www.trio.xyz" rel="nofollow">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="./.github/assets/trio-light.svg">
+      <img alt="Trio" src="./.github/assets/trio-dark.svg" width="auto" height="80">
+    </picture>
+  </a>
+</p>
+<p style="display: flex; justify-content: center; align-items: center; gap: 60px; flex-wrap: wrap;">
+  <a href="https://l1f.io/" rel="nofollow">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="./.github/assets/l1f-light.svg">
+      <img alt="L1F" src="./.github/assets/l1f_dark.svg" width="auto" height="60">
+    </picture>
+  </a>
+  <a href="https://x.com/BLIFEProtocol" rel="nofollow">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="./.github/assets/blife-light.svg">
+      <img alt="BLIFE" src="./.github/assets/blife-dark.svg" width="auto" height="120">
+    </picture>
+  </a>
+</p>
 
-<div align="center">
+<h2 style="text-align: center;">Start-Up Sponsors</h2>
+<p style="display: flex; justify-content: center; align-items: center; gap: 40px; flex-wrap: wrap;">
+  <a href="https://www.seizectrl.io/" rel="nofollow">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="./.github/assets/ctrl-light.svg">
+      <img alt="Seize CTRL" src="./.github/assets/ctrl-dark.svg" width="auto" height="50">
+    </picture>
+  </a>
+  <a href="https://leather.io/" rel="nofollow">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="./.github/assets/leather-light.svg">
+      <img alt="Leather" src="./.github/assets/leather-dark.svg" width="auto" height="50">
+    </picture>
+  </a>
+</p>
+<br>
 
-![UTXO Management](.github/assets/utxo-dark.svg#gh-light-mode-only)
-![UTXO Management](.github/assets/utxo-light.svg#gh-dark-mode-only)
-
-![OYL](.github/assets/oyl-dark.svg#gh-light-mode-only)
-![OYL](.github/assets/oyl-light.svg#gh-dark-mode-only)
-
-![Maestro](.github/assets/maestro-dark.svg#gh-light-mode-only)
-![Maestro](.github/assets/maestro-light.svg#gh-dark-mode-only)
-
-![Trio](.github/assets/trio-dark.svg#gh-light-mode-only)
-![Trio](.github/assets/trio-light.svg#gh-dark-mode-only)
-
-![L1F](.github/assets/l1f_dark.svg#gh-light-mode-only)
-![L1F](.github/assets/l1f.svg#gh-dark-mode-only)
-
-![BLIFE](.github/assets/blife-dark.svg#gh-light-mode-only)
-![BLIFE](.github/assets/blife-light.svg#gh-dark-mode-only)
-
-</div>
-
-## Start-Up Sponsors
-
-<div align="center">
-
-![Seize CTRL](.github/assets/ctrl-dark.svg#gh-light-mode-only)
-![Seize CTRL](.github/assets/ctrl.svg#gh-dark-mode-only)
-
-![Leather](.github/assets/leather-dark.svg#gh-light-mode-only)
-![Leather](.github/assets/leather-light.svg#gh-dark-mode-only)
-
-</div>
-
-<div align="center">
-  <h3>
-    <a href="https://github.com/sponsors/omnisat">Become A Sponsor</a>
-  </h3>
-</div>
+<h4 style="text-align: center; font-size: 1.5em; margin-top: 20px; margin-bottom: 20px;">
+  <a href="https://github.com/sponsors/omnisat">Become A Sponsor</a>
+</h4>
