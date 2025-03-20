@@ -43,29 +43,29 @@ Contributions to Laser Eyes are greatly appreciated! If you're interested in con
 
 ## Sponsors
 
-If you find Laser Eyes useful or use it for work, please consider [sponsoring Laser Eyes](https://github.com/sponsors/omnisat). Thank you 🙏
+If you find Laser Eyes useful or use it for work, please consider [sponsoring Laser Eyes](https://github.com/sponsors/omnisat). Thank youthi
 
 ## Ecosystem Partnerships
 
 <div align="center">
 
-[![UTXO Management](/.github/assets/utxo-dark.svg#gh-light-mode-only)](https://www.utxo.management/)
-[![UTXO Management](/.github/assets/utxo-light.svg#gh-dark-mode-only)](https://www.utxo.management/)
+![UTXO Management](.github/assets/utxo-dark.svg#gh-light-mode-only)
+![UTXO Management](.github/assets/utxo-light.svg#gh-dark-mode-only)
 
-[![OYL](/.github/assets/oyl-dark.svg#gh-light-mode-only)](https://www.oyl.io/)
-[![OYL](/.github/assets/oyl-light.svg#gh-dark-mode-only)](https://www.oyl.io/)
+![OYL](.github/assets/oyl-dark.svg#gh-light-mode-only)
+![OYL](.github/assets/oyl-light.svg#gh-dark-mode-only)
 
-[![Maestro](/.github/assets/maestro-dark.svg#gh-light-mode-only)](https://www.gomaestro.org/)
-[![Maestro](/.github/assets/maestro-light.svg#gh-dark-mode-only)](https://www.gomaestro.org/)
+![Maestro](.github/assets/maestro-dark.svg#gh-light-mode-only)
+![Maestro](.github/assets/maestro-light.svg#gh-dark-mode-only)
 
-[![Trio](/.github/assets/trio-dark.svg#gh-light-mode-only)](https://www.trio.xyz)
-[![Trio](/.github/assets/trio-light.svg#gh-dark-mode-only)](https://www.trio.xyz)
+![Trio](.github/assets/trio-dark.svg#gh-light-mode-only)
+![Trio](.github/assets/trio-light.svg#gh-dark-mode-only)
 
-[![L1F](/.github/assets/l1f_dark.svg#gh-light-mode-only)](https://l1f.io/)
-[![L1F](/.github/assets/l1f.svg#gh-dark-mode-only)](https://l1f.io/)
+![L1F](.github/assets/l1f_dark.svg#gh-light-mode-only)
+![L1F](.github/assets/l1f.svg#gh-dark-mode-only)
 
-[![BLIFE](/.github/assets/blife-dark.svg#gh-light-mode-only)](https://x.com/BLIFEProtocol)
-[![BLIFE](/.github/assets/blife-light.svg#gh-dark-mode-only)](https://x.com/BLIFEProtocol)
+![BLIFE](.github/assets/blife-dark.svg#gh-light-mode-only)
+![BLIFE](.github/assets/blife-light.svg#gh-dark-mode-only)
 
 </div>
 
@@ -73,14 +73,16 @@ If you find Laser Eyes useful or use it for work, please consider [sponsoring La
 
 <div align="center">
 
-[![Seize CTRL](/.github/assets/ctrl-dark.svg#gh-light-mode-only)](https://www.seizectrl.io/)
-[![Seize CTRL](/.github/assets/ctrl.svg#gh-dark-mode-only)](https://www.seizectrl.io/)
+![Seize CTRL](.github/assets/ctrl-dark.svg#gh-light-mode-only)
+![Seize CTRL](.github/assets/ctrl.svg#gh-dark-mode-only)
 
-[![Leather](/.github/assets/leather-dark.svg#gh-light-mode-only)](https://leather.io/)
-[![Leather](/.github/assets/leather-light.svg#gh-dark-mode-only)](https://leather.io/)
+![Leather](.github/assets/leather-dark.svg#gh-light-mode-only)
+![Leather](.github/assets/leather-light.svg#gh-dark-mode-only)
 
 </div>
 
-<h4 style="text-align: center; font-size: 1.5em; margin-top: 20px; margin-bottom: 20px;">
-  <a href="https://github.com/sponsors/omnisat">Become A Sponsor</a>
-</h4>
+<div align="center">
+  <h3>
+    <a href="https://github.com/sponsors/omnisat">Become A Sponsor</a>
+  </h3>
+</div>
