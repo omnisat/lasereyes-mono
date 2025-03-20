@@ -27,9 +27,6 @@ Don't trust verify [Try Out The Demo Here](https://demo.lasereyes.build)
 - Phantom
 - Xverse
 
-## Why Laser Eyes?
-
-![herding cats](https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbW92cmM4MDExcGE1NmJtZjhka2N3M25wNm4zeDR5cWQ4YzFnNzZiNiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/7MIULHLEeZyKs/giphy.gif)
 
 ## Community
 
