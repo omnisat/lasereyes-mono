@@ -18,6 +18,7 @@ import {
   XVERSE,
   UNISAT,
 } from '@omnisat/lasereyes'
+import { ConnectWalletButton } from '@omnisat/lasereyes/ui'
 import { createPsbt, satoshisToBTC } from '@/lib/btc'
 import { cn, truncateString } from '@/lib/utils'
 import ClickToCopy from '@/components/ClickToCopy'
@@ -41,6 +42,8 @@ import { FaSignature } from 'react-icons/fa6'
 import InscriptionsSection from './InscriptionsSection'
 import RunesSection from './RunesSection'
 import BRC20Section from './Brc20Section'
+
+import '@omnisat/lasereyes/ui/style.css'
 
 
 
@@ -464,6 +467,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
             )
           )}
         </div>
+        <ConnectWalletButton />
       </div>
 
       {/* Main container */}
@@ -662,7 +666,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
           <br />
 
           {/* Bitcoin section */}
-          <div className="text-gray-500 text-md text-orange-400">bitcoin</div>
+          <div className="text-md text-orange-400">bitcoin</div>
           <div className={"flex flex-row text-xl gap-2"}>
             <Button
               className={'w-full gap-2 bg-[#232225]'}
