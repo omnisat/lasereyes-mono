@@ -12,6 +12,7 @@ import { Copy, Check, ExternalLink, Send, Pencil, Upload, FileText } from "lucid
 import { cn } from "@/lib/utils"
 import { LaserEyesLogo, WalletIcon } from "@omnisat/lasereyes-react"
 import type { colorsType } from "@omnisat/lasereyes-react"
+import Link from "next/link"
 
 export function WalletConnectCard() {
   const {
@@ -317,25 +318,9 @@ export function WalletConnectCard() {
                 ))}
               </div>
               {error && <p className="text-red-500 text-sm">{error}</p>}
-              <p className="text-sm text-muted-foreground">
-                Don't have a wallet? Install{" "}
-                <a
-                  href="https://unisat.io/download"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-primary hover:underline inline-flex items-center gap-1"
-                >
-                  UniSat <ExternalLink className="h-3 w-3" />
-                </a>{" "}
-                or{" "}
-                <a
-                  href="https://www.xverse.app/download"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-primary hover:underline inline-flex items-center gap-1"
-                >
-                  Xverse <ExternalLink className="h-3 w-3" />
-                </a>
+              <p className="text-sm text-muted-foreground text-center">
+                Don't have a wallet? <br/>
+                <Link href="/docs/installation" className="text-primary hover:underline inline-flex items-center gap-1">Click here to see some options</Link>
               </p>
             </div>
           ) : (

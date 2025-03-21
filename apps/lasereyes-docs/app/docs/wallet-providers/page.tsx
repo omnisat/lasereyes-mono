@@ -1,178 +1,166 @@
 "use client"
 
+import * as React from "react"
 import { CodeBlock } from "@/components/code-block"
 import Link from "next/link"
 import { Heading } from "@/components/heading"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { ArrowRight, Wallet, Shield, Code2, Zap, Globe, Plug } from "lucide-react"
+import { cn } from "@/lib/utils"
+import { WalletIcon } from "@omnisat/lasereyes-react"
+import { UNISAT, XVERSE, OYL, LEATHER, MAGIC_EDEN, OKX, PHANTOM, WIZZ, ORANGE, type ProviderType } from "@omnisat/lasereyes-core"
 
-export default function WalletProvidersPage() {
+interface FeatureCardProps {
+  icon: React.ElementType
+  title: string
+  description: string
+  className?: string
+}
+
+interface WalletCardProps {
+  name: string
+  constant: string
+  description: string
+  website: string
+  className?: string
+}
+
+function FeatureCard({ icon: Icon, title, description, className }: FeatureCardProps) {
   return (
-    <>
-      <Heading level={1} className="text-3xl font-bold mb-6">
-        Wallet Providers
-      </Heading>
-      <p className="text-lg mb-4">
-        LaserEyes supports multiple Bitcoin wallet providers through a unified interface. This page documents the
-        supported wallet providers and how to work with them.
-      </p>
+    <Card className={cn(
+      "group relative overflow-hidden transition-all duration-300 hover:border-orange-500/30 hover:shadow-lg hover:shadow-orange-500/5",
+      className
+    )}>
+      <div className="absolute right-0 top-0 h-20 w-20 translate-x-6 -translate-y-6 rounded-full bg-orange-500/10 blur-2xl filter group-hover:bg-orange-500/20" />
+      <CardContent className="p-6">
+        <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-orange-500/10 text-orange-500">
+          <Icon className="h-6 w-6" />
+        </div>
+        <h3 className="mb-2 text-xl font-semibold">{title}</h3>
+        <p className="text-muted-foreground">{description}</p>
+      </CardContent>
+    </Card>
+  )
+}
 
-      <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
-        Supported Wallet Providers
-      </Heading>
-      <p className="mb-6">LaserEyes provides built-in support for the following Bitcoin wallet providers:</p>
-      <div className="overflow-x-auto mb-6">
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="bg-muted">
-              <th className="border p-2 text-left">Provider</th>
-              <th className="border p-2 text-left">Constant</th>
-              <th className="border p-2 text-left">Description</th>
-              <th className="border p-2 text-left">Website</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td className="border p-2">UniSat</td>
-              <td className="border p-2">
-                <code>UNISAT</code>
-              </td>
-              <td className="border p-2">Popular Bitcoin and Ordinals wallet</td>
-              <td className="border p-2">
-                <a href="https://unisat.io" target="_blank" rel="noreferrer" className="text-primary hover:underline">
-                  unisat.io
-                </a>
-              </td>
-            </tr>
-            <tr>
-              <td className="border p-2">Xverse</td>
-              <td className="border p-2">
-                <code>XVERSE</code>
-              </td>
-              <td className="border p-2">Stacks and Bitcoin wallet with Ordinals support</td>
-              <td className="border p-2">
-                <a href="https://xverse.app" target="_blank" rel="noreferrer" className="text-primary hover:underline">
-                  xverse.app
-                </a>
-              </td>
-            </tr>
-            <tr>
-              <td className="border p-2">OYL</td>
-              <td className="border p-2">
-                <code>OYL</code>
-              </td>
-              <td className="border p-2">Bitcoin wallet focused on Ordinals</td>
-              <td className="border p-2">
-                <a href="https://oyl.app" target="_blank" rel="noreferrer" className="text-primary hover:underline">
-                  oyl.app
-                </a>
-              </td>
-            </tr>
-            <tr>
-              <td className="border p-2">Leather</td>
-              <td className="border p-2">
-                <code>LEATHER</code>
-              </td>
-              <td className="border p-2">Stacks and Bitcoin wallet</td>
-              <td className="border p-2">
-                <a href="https://leather.io" target="_blank" rel="noreferrer" className="text-primary hover:underline">
-                  leather.io
-                </a>
-              </td>
-            </tr>
-            <tr>
-              <td className="border p-2">Magic Eden</td>
-              <td className="border p-2">
-                <code>MAGIC_EDEN</code>
-              </td>
-              <td className="border p-2">Multi-chain NFT marketplace wallet</td>
-              <td className="border p-2">
-                <a
-                  href="https://magiceden.io"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-primary hover:underline"
-                >
-                  magiceden.io
-                </a>
-              </td>
-            </tr>
-            <tr>
-              <td className="border p-2">OKX</td>
-              <td className="border p-2">
-                <code>OKX</code>
-              </td>
-              <td className="border p-2">Multi-chain wallet from OKX exchange</td>
-              <td className="border p-2">
-                <a
-                  href="https://okx.com/web3"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-primary hover:underline"
-                >
-                  okx.com/web3
-                </a>
-              </td>
-            </tr>
-            <tr>
-              <td className="border p-2">Phantom</td>
-              <td className="border p-2">
-                <code>PHANTOM</code>
-              </td>
-              <td className="border p-2">Multi-chain wallet with Bitcoin support</td>
-              <td className="border p-2">
-                <a href="https://phantom.app" target="_blank" rel="noreferrer" className="text-primary hover:underline">
-                  phantom.app
-                </a>
-              </td>
-            </tr>
-            <tr>
-              <td className="border p-2">Wizz</td>
-              <td className="border p-2">
-                <code>WIZZ</code>
-              </td>
-              <td className="border p-2">Bitcoin and Ordinals wallet</td>
-              <td className="border p-2">
-                <a href="https://wizz.wallet" target="_blank" rel="noreferrer" className="text-primary hover:underline">
-                  wizz.wallet
-                </a>
-              </td>
-            </tr>
-            <tr>
-              <td className="border p-2">Orange</td>
-              <td className="border p-2">
-                <code>ORANGE</code>
-              </td>
-              <td className="border p-2">Bitcoin wallet with Ordinals support</td>
-              <td className="border p-2">
-                <a href="https://orange.xyz" target="_blank" rel="noreferrer" className="text-primary hover:underline">
-                  orange.xyz
-                </a>
-              </td>
-            </tr>
-            <tr>
-              <td className="border p-2">OP_NET</td>
-              <td className="border p-2">
-                <code>OP_NET</code>
-              </td>
-              <td className="border p-2">Bitcoin wallet focused on OP_NET</td>
-              <td className="border p-2">
-                <a href="https://op.net" target="_blank" rel="noreferrer" className="text-primary hover:underline">
-                  op.net
-                </a>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+function WalletCard({ name, constant, description, website, className }: WalletCardProps) {
+  // Map wallet names to their provider constants
+  const walletProviders: Record<string, ProviderType> = {
+    UniSat: UNISAT as ProviderType,
+    Xverse: XVERSE as ProviderType,
+    OYL: OYL as ProviderType,
+    Leather: LEATHER as ProviderType,
+    "Magic Eden": MAGIC_EDEN as ProviderType,
+    OKX: OKX as ProviderType,
+    Phantom: PHANTOM as ProviderType,
+    Wizz: WIZZ as ProviderType,
+    Orange: ORANGE as ProviderType,
+  }
 
-      <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
-        Using Wallet Providers
-      </Heading>
-      <p className="mb-6">
-        To use a wallet provider, you need to import the provider constant from <code>@omnisat/lasereyes-core</code>:
-      </p>
-      <CodeBlock
-        language="typescript"
-        code={`import { 
+  const provider = walletProviders[name]
+
+  return (
+    <Card className={cn(
+      "group relative overflow-hidden transition-all duration-300 hover:border-orange-500/30 hover:shadow-lg hover:shadow-orange-500/5",
+      className
+    )}>
+      <div className="absolute right-0 top-0 h-20 w-20 translate-x-6 -translate-y-6 rounded-full bg-orange-500/10 blur-2xl filter group-hover:bg-orange-500/20" />
+      <CardContent className="p-6">
+        <div className="flex items-center gap-4 mb-4">
+          <div className="transition-transform duration-300 group-hover:scale-110">
+            <WalletIcon walletName={provider} size={42} />
+          </div>
+          <div className="flex-1">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xl font-semibold">{name}</h3>
+              <a href={website} target="_blank" rel="noreferrer" className="text-orange-500 hover:text-orange-600">
+                <Globe className="h-5 w-5" />
+              </a>
+            </div>
+            <code className="mt-1 block rounded bg-muted px-2 py-1 text-sm">{constant}</code>
+          </div>
+        </div>
+        <p className="text-muted-foreground">{description}</p>
+      </CardContent>
+    </Card>
+  )
+}
+
+function WalletProvidersContent() {
+  return (
+    <div className="space-y-10">
+     <section className="space-y-6" id="supported-wallets">
+        <h2 className="text-3xl font-bold">Supported Wallets</h2>
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <WalletCard
+            name="UniSat"
+            constant="UNISAT"
+            description="Popular Bitcoin and Ordinals wallet"
+            website="https://unisat.io"
+          />
+          <WalletCard
+            name="Xverse"
+            constant="XVERSE"
+            description="Stacks and Bitcoin wallet with Ordinals support"
+            website="https://xverse.app"
+          />
+          <WalletCard
+            name="OYL"
+            constant="OYL"
+            description="Bitcoin wallet focused on Ordinals"
+            website="https://oyl.app"
+          />
+          <WalletCard
+            name="Magic Eden"
+            constant="MAGIC_EDEN"
+            description="Multi-chain NFT marketplace wallet"
+            website="https://magiceden.io"
+          />
+          <WalletCard
+            name="OKX"
+            constant="OKX"
+            description="Multi-chain wallet from OKX exchange"
+            website="https://okx.com/web3"
+          />
+          <WalletCard
+            name="Leather"
+            constant="LEATHER"
+            description="Stacks and Bitcoin wallet"
+            website="https://leather.io"
+          />
+          <WalletCard
+            name="Phantom"
+            constant="PHANTOM"
+            description="Multi-chain wallet with Bitcoin support"
+            website="https://phantom.app"
+          />
+          <WalletCard
+            name="Wizz"
+            constant="WIZZ"
+            description="Bitcoin and Ordinals wallet"
+            website="https://wizz.wallet"
+          />
+          <WalletCard
+            name="Orange"
+            constant="ORANGE"
+            description="Bitcoin wallet with Ordinals support"
+            website="https://orange.xyz"
+          />
+        </div>
+      </section>
+
+      <section className="space-y-6" id="usage">
+        <h2 className="text-3xl font-bold">Usage</h2>
+        <Card className="overflow-hidden border-2 border-dashed">
+          <CardHeader className="border-b bg-muted/50 px-6">
+            <h3 className="font-mono text-sm font-medium">Basic Example</h3>
+          </CardHeader>
+          <CardContent className="p-6">
+            <CodeBlock
+              language="typescript"
+              code={`import { 
   UNISAT, 
   XVERSE, 
   OYL, 
@@ -181,8 +169,7 @@ export default function WalletProvidersPage() {
   OKX, 
   PHANTOM, 
   WIZZ, 
-  ORANGE, 
-  OP_NET 
+  ORANGE 
 } from '@omnisat/lasereyes-core'
 
 // Connect to UniSat wallet
@@ -193,49 +180,23 @@ await client.connect(XVERSE)
 
 // Connect to OYL wallet
 await client.connect(OYL)`}
-        fileName="using-providers.ts"
-        copyButton={true}
-      />
+              fileName="using-providers.ts"
+              copyButton={true}
+            />
+          </CardContent>
+        </Card>
+      </section>
 
-      <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
-        Wallet Adapters
-      </Heading>
-      <p className="mb-6">
-        LaserEyes uses wallet adapters to provide a consistent interface for interacting with different wallet
-        providers. Each adapter implements the same interface but handles the specific requirements of its respective
-        wallet.
-      </p>
-      <CodeBlock
-        language="typescript"
-        code={`// Wallet adapter interface
-interface WalletAdapter {
-  connect(): Promise<{ address: string; publicKey: string }>
-  disconnect(): Promise<void>
-  getAddress(): Promise<string>
-  getPublicKey(): Promise<string>
-  getBalance(): Promise<string>
-  signMessage(message: string, address?: string): Promise<string>
-  signPsbt(psbtHex: string, options?: SignPsbtOptions): Promise<string>
-  pushPsbt(psbtHex: string): Promise<string>
-  // Additional methods for specific wallet capabilities
-}`}
-        fileName="wallet-adapter.ts"
-        copyButton={true}
-      />
-
-      <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
-        Provider Detection
-      </Heading>
-      <p className="mb-6">You can check if a wallet provider is available in the browser:</p>
-      <CodeBlock
-        language="typescript"
-        code={`import { isWalletAvailable } from '@omnisat/lasereyes-core'
+      <section className="space-y-6" id="provider-detection">
+        <h2 className="text-3xl font-bold">Provider Detection</h2>
+        <Card className="overflow-hidden">
+          <CardContent className="p-6">
+            <CodeBlock
+              language="typescript"
+              code={`import { isWalletAvailable } from '@omnisat/lasereyes-core'
 
 // Check if UniSat wallet is available
 const isUnisatAvailable = isWalletAvailable(UNISAT)
-
-// Check if Xverse wallet is available
-const isXverseAvailable = isWalletAvailable(XVERSE)
 
 // Get all available wallet providers
 const availableProviders = [
@@ -247,193 +208,72 @@ const availableProviders = [
   OKX,
   PHANTOM,
   WIZZ,
-  ORANGE,
-  OP_NET
+  ORANGE
 ].filter(provider => isWalletAvailable(provider))`}
-        fileName="provider-detection.ts"
-        copyButton={true}
-      />
+              fileName="provider-detection.ts"
+              copyButton={true}
+            />
+          </CardContent>
+        </Card>
+      </section>
 
-      <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
-        Provider Capabilities
-      </Heading>
-      <p className="mb-6">Different wallet providers have different capabilities:</p>
-      <div className="overflow-x-auto mb-6">
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="bg-muted">
-              <th className="border p-2 text-left">Feature</th>
-              <th className="border p-2 text-center">UniSat</th>
-              <th className="border p-2 text-center">Xverse</th>
-              <th className="border p-2 text-center">OYL</th>
-              <th className="border p-2 text-center">Others</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td className="border p-2">Basic Bitcoin Operations</td>
-              <td className="border p-2 text-center">✅</td>
-              <td className="border p-2 text-center">✅</td>
-              <td className="border p-2 text-center">✅</td>
-              <td className="border p-2 text-center">✅</td>
-            </tr>
-            <tr>
-              <td className="border p-2">Ordinals & Inscriptions</td>
-              <td className="border p-2 text-center">✅</td>
-              <td className="border p-2 text-center">✅</td>
-              <td className="border p-2 text-center">✅</td>
-              <td className="border p-2 text-center">Varies</td>
-            </tr>
-            <tr>
-              <td className="border p-2">BRC-20 Tokens</td>
-              <td className="border p-2 text-center">✅</td>
-              <td className="border p-2 text-center">✅</td>
-              <td className="border p-2 text-center">✅</td>
-              <td className="border p-2 text-center">Varies</td>
-            </tr>
-            <tr>
-              <td className="border p-2">Runes</td>
-              <td className="border p-2 text-center">✅</td>
-              <td className="border p-2 text-center">❌</td>
-              <td className="border p-2 text-center">❌</td>
-              <td className="border p-2 text-center">Varies</td>
-            </tr>
-            <tr>
-              <td className="border p-2">Testnet Support</td>
-              <td className="border p-2 text-center">✅</td>
-              <td className="border p-2 text-center">✅</td>
-              <td className="border p-2 text-center">✅</td>
-              <td className="border p-2 text-center">Varies</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
 
-      <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
-        Custom Wallet Adapters
-      </Heading>
-      <p className="mb-6">You can implement custom wallet adapters for wallets not supported by LaserEyes:</p>
-      <CodeBlock
-        language="typescript"
-        code={`import { WalletAdapter, registerWalletAdapter } from '@omnisat/lasereyes-core'
-
-// Define a custom wallet provider constant
-export const CUSTOM_WALLET = 'custom-wallet'
-
-// Implement the WalletAdapter interface
-class CustomWalletAdapter implements WalletAdapter {
-  constructor() {
-    // Initialize your wallet adapter
-  }
-
-  // Implement required methods
-  async connect(): Promise<{ address: string; publicKey: string }> {
-    // Implement connection logic
-    const address = await window.customWallet.getAddress()
-    const publicKey = await window.customWallet.getPublicKey()
-    return { address, publicKey }
-  }
-
-  async disconnect(): Promise<void> {
-    // Implement disconnection logic
-    await window.customWallet.disconnect()
-  }
-
-  // Implement other required methods...
+      <section className="space-y-6" id="next-steps">
+        <h2 className="text-3xl font-bold">Next Steps</h2>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Link href="/docs/laser-eyes-client" className="block">
+            <Card className="h-full transition-all hover:border-orange-500/30 hover:shadow-lg hover:shadow-orange-500/5">
+              <CardContent className="flex h-full flex-col justify-between p-6">
+                <div>
+                  <h3 className="mb-2 text-lg font-semibold">LaserEyes Client</h3>
+                  <p className="text-sm text-muted-foreground">Learn how to use the core client with wallet providers</p>
+                </div>
+                <ArrowRight className="mt-4 h-5 w-5 text-orange-500" />
+              </CardContent>
+            </Card>
+          </Link>
+          <Link href="/docs/wallet-connection" className="block">
+            <Card className="h-full transition-all hover:border-orange-500/30 hover:shadow-lg hover:shadow-orange-500/5">
+              <CardContent className="flex h-full flex-col justify-between p-6">
+                <div>
+                  <h3 className="mb-2 text-lg font-semibold">Wallet Connection</h3>
+                  <p className="text-sm text-muted-foreground">Explore wallet connection examples and best practices</p>
+                </div>
+                <ArrowRight className="mt-4 h-5 w-5 text-orange-500" />
+              </CardContent>
+            </Card>
+          </Link>
+        </div>
+      </section>
+    </div>
+  )
 }
 
-// Register your custom wallet adapter
-registerWalletAdapter(CUSTOM_WALLET, () => new CustomWalletAdapter())
+export default function WalletProvidersPage() {
+  return (
+    <div className="space-y-8">
+      <div className="relative overflow-hidden rounded-lg border bg-gradient-to-br from-orange-500/10 via-background to-background p-8">
+        <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-orange-500/20 rounded-full blur-3xl -z-10 translate-x-1/2 -translate-y-1/2" />
+        <Badge variant="secondary" className="mb-4">Core API</Badge>
+        <Heading level={1} className="mb-4 bg-gradient-to-br from-orange-500 to-yellow-500 bg-clip-text text-transparent">
+          Wallet Providers
+        </Heading>
+        <p className="text-xl mb-6 max-w-2xl text-muted-foreground">
+          LaserEyes supports multiple Bitcoin wallet providers through a unified interface, making it simple to integrate with any supported wallet.
+        </p>
+        <div className="flex gap-4 items-center">
+          <Link href="#supported-wallets">
+            <Button size="lg" className="group">
+              View Supported Wallets
+              <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </Button>
+          </Link>
+          <Badge variant="secondary" className="h-7 px-3">9 Wallets</Badge>
+        </div>
+      </div>
 
-// Now you can use your custom wallet provider
-await client.connect(CUSTOM_WALLET)`}
-        fileName="custom-adapter.ts"
-        copyButton={true}
-      />
-
-      <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
-        Error Handling
-      </Heading>
-      <p className="mb-6">When working with wallet providers, you should handle various error scenarios:</p>
-      <CodeBlock
-        language="typescript"
-        code={`try {
-  await client.connect(UNISAT)
-} catch (error) {
-  if (error.code === 'WALLET_NOT_FOUND') {
-    console.error('UniSat wallet extension not found')
-    // Prompt user to install the wallet
-    window.open('https://unisat.io/download', '_blank')
-  } else if (error.code === 'USER_REJECTED') {
-    console.error('User rejected the connection request')
-    // Handle user rejection gracefully
-  } else if (error.code === 'NETWORK_MISMATCH') {
-    console.error('Wallet is on a different network')
-    // Prompt user to switch networks
-  } else {
-    console.error('Connection failed:', error.message)
-  }
-}`}
-        fileName="error-handling.ts"
-        copyButton={true}
-      />
-
-      <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
-        Best Practices
-      </Heading>
-      <p className="mb-6">Here are some best practices for working with wallet providers:</p>
-      <ul className="list-disc pl-6 mb-6 space-y-2">
-        <li>
-          <strong>Check availability</strong> before attempting to connect to a wallet provider
-        </li>
-        <li>
-          <strong>Provide fallback options</strong> if the user's preferred wallet is not available
-        </li>
-        <li>
-          <strong>Handle connection errors</strong> gracefully and provide helpful error messages
-        </li>
-        <li>
-          <strong>Remember the user's preferred wallet</strong> for a better user experience
-        </li>
-        <li>
-          <strong>Test with multiple wallets</strong> to ensure compatibility
-        </li>
-        <li>
-          <strong>Stay updated</strong> with wallet provider changes and updates
-        </li>
-      </ul>
-
-      <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
-        Next Steps
-      </Heading>
-      <p className="mb-6">Now that you understand wallet providers, you can explore related topics:</p>
-      <ul className="list-disc pl-6 mb-6 space-y-2">
-        <li>
-          <Link href="/docs/laser-eyes-client" className="text-primary hover:underline">
-            LaserEyesClient
-          </Link>{" "}
-          - Learn more about the central client
-        </li>
-        <li>
-          <Link href="/docs/wallet-connection" className="text-primary hover:underline">
-            Wallet Connection
-          </Link>{" "}
-          - Explore wallet connection examples
-        </li>
-        <li>
-          <Link href="/docs/transaction-types" className="text-primary hover:underline">
-            Transaction Types
-          </Link>{" "}
-          - Learn about different transaction types
-        </li>
-        <li>
-          <Link href="/docs/security" className="text-primary hover:underline">
-            Security Considerations
-          </Link>{" "}
-          - Understand security best practices
-        </li>
-      </ul>
-    </>
+      <WalletProvidersContent />
+    </div>
   )
 }
 

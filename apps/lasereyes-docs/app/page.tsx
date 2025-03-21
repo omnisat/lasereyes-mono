@@ -66,23 +66,23 @@ export default function Home() {
               <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">Supported By</h2>
             </div>
             <div className="mx-auto flex flex-flow flex-wrap  gap-8 items-center justify-center py-8 md:py-12 max-w-4xl">
-              <Link href="/" target="_blank" rel="noreferrer" className="flex items-center justify-center">
+              <Link href="https://www.gomaestro.org/" target="_blank" rel="noreferrer" className="flex items-center justify-center">
                 <img src="/maestro-light.svg" alt="Magic Eden" className="h-8 md:h-10 hidden dark:block" />
                 <img src="/maestro-dark.svg" alt="Magic Eden" className="h-8 md:h-10 dark:hidden" />
               </Link>
-              <Link href="/" target="_blank" rel="noreferrer" className="flex items-center justify-center">
+              <Link href="https://oyl.io/" target="_blank" rel="noreferrer" className="flex items-center justify-center">
                 <img src="/oyl-light.svg" alt="oyl" className="h-8 md:h-10 hidden dark:block" />
                 <img src="/oyl-dark.svg" alt="oyl" className="h-8 md:h-10 dark:hidden" />
               </Link>
-              <Link href="/" target="_blank" rel="noreferrer" className="flex items-center justify-center">
+              <Link href="https://www.trio.xyz/" target="_blank" rel="noreferrer" className="flex items-center justify-center">
                 <img src="/trio-light.svg" alt="trio" className="h-8 md:h-10 hidden dark:block" />
                 <img src="/trio-dark.svg" alt="trio" className="h-8 md:h-10 dark:hidden" />
               </Link>
-              <Link href="/" target="_blank" rel="noreferrer" className="flex items-center justify-center">
+              <Link href="https://layer1.foundation/" target="_blank" rel="noreferrer" className="flex items-center justify-center">
                 <img src="/l1f-light.svg" alt="level 1 foundation" className="h-8 md:h-10 hidden dark:block" />
                 <img src="/l1f-dark.svg" alt="level 1 foundation" className="h-8 md:h-10 dark:hidden" />
               </Link>
-              <Link href="/" target="_blank" rel="noreferrer" className="flex items-center justify-center">
+              <Link href="https://www.seizectrl.io/" target="_blank" rel="noreferrer" className="flex items-center justify-center">
                 <img src="/ctrl-light.svg" alt="seize ctrl" className="h-10 md:h-16 hidden dark:block" />
                 <img src="/ctrl-dark.svg" alt="seize ctrl" className="h-10 md:h-16 dark:hidden" />
               </Link>
@@ -90,7 +90,7 @@ export default function Home() {
                 <img src="/utxo-light.svg" alt="UTXO" className="h-10 md:h-16 hidden dark:block" />
                 <img src="/utxo-dark.svg" alt="UTXO" className="h-10 md:h-16 dark:hidden" />
               </Link>
-              <Link href="/" target="_blank" rel="noreferrer" className="flex items-center justify-center">
+              <Link href="https://www.blifeprotocol.com/" target="_blank" rel="noreferrer" className="flex items-center justify-center">
                 <img src="/blife-light.svg" alt="BLife Protocol" className="h-24 md:h-24 hidden dark:block" />
                 <img src="/blife-dark.svg" alt="BLife Protocol" className="h-24 md:h-24 dark:hidden" />
               </Link>
