@@ -1,6 +1,7 @@
 "use client"
 
 import { ClientPageWrapper } from "@/components/client-page-wrapper"
+import { CodeBlock } from "@/components/code-block"
 import { Heading } from "@/components/heading"
 
 export default function BasicSetupPage() {
@@ -32,15 +33,17 @@ function BasicSetupContent() {
       <h2 className="text-2xl font-bold mt-8 mb-4">Installation</h2>
       <p>First, install the LaserEyes packages:</p>
 
-      <pre className="bg-muted p-4 rounded-md overflow-x-auto">
-        <code>{`npm install @omnisat/lasereyes-core @omnisat/lasereyes-react`}</code>
-      </pre>
-
+      <CodeBlock
+                  language="bash"
+                  code={`npm install @omnisat/lasereyes-core @omnisat/lasereyes-react`}
+                  copyButton={true}
+                />
       <h2 className="text-2xl font-bold mt-8 mb-4">Provider Setup</h2>
       <p>Wrap your application with the LaserEyes provider:</p>
 
-      <pre className="bg-muted p-4 rounded-md overflow-x-auto">
-        <code>{`import { LaserEyesProvider } from '@omnisat/lasereyes-react'
+      <CodeBlock
+                  language="typescript"
+                  code={`import { LaserEyesProvider } from '@omnisat/lasereyes-react'
 import { MAINNET } from '@omnisat/lasereyes-core'
 
 function App() {
@@ -54,9 +57,9 @@ function App() {
       <YourApp />
     </LaserEyesProvider>
   )
-}`}</code>
-      </pre>
-
+}`}
+                  copyButton={true}
+                />
       <h2 className="text-2xl font-bold mt-8 mb-4">Configuration Options</h2>
       <p>The LaserEyes provider accepts several configuration options:</p>
 
@@ -108,9 +111,9 @@ function App() {
       <p>
         Access LaserEyes functionality in your components using the <code>useLaserEyes</code> hook:
       </p>
-
-      <pre className="bg-muted p-4 rounded-md overflow-x-auto">
-        <code>{`import { useLaserEyes } from '@omnisat/lasereyes-react'
+                <CodeBlock
+                  language="typescript"
+                  code={`import { useLaserEyes } from '@omnisat/lasereyes-react'
 
 function WalletStatus() {
   const { 
@@ -137,9 +140,9 @@ function WalletStatus() {
   return (
     <button onClick={connect}>Connect Wallet</button>
   )
-}`}</code>
-      </pre>
-
+}`}
+                  copyButton={true}
+                />
       <h2 className="text-2xl font-bold mt-8 mb-4">Next Steps</h2>
       <p>Now that you have the basic setup complete, you can:</p>
       <ul className="list-disc pl-6 space-y-2">

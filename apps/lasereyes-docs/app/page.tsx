@@ -71,32 +71,32 @@ export default function Home() {
                 <img src="/maestro-dark.svg" alt="Magic Eden" className="h-8 md:h-10 dark:hidden" />
               </Link>
               <Link href="/" target="_blank" rel="noreferrer" className="flex items-center justify-center">
-                <img src="/oyl-light.svg" alt="Draper Associates" className="h-8 md:h-10 hidden dark:block" />
-                <img src="/oyl-dark.svg" alt="Draper Associates" className="h-8 md:h-10 dark:hidden" />
+                <img src="/oyl-light.svg" alt="oyl" className="h-8 md:h-10 hidden dark:block" />
+                <img src="/oyl-dark.svg" alt="oyl" className="h-8 md:h-10 dark:hidden" />
               </Link>
               <Link href="/" target="_blank" rel="noreferrer" className="flex items-center justify-center">
-                <img src="/trio-light.svg" alt="Draper Associates" className="h-8 md:h-10 hidden dark:block" />
-                <img src="/trio-dark.svg" alt="Draper Associates" className="h-8 md:h-10 dark:hidden" />
+                <img src="/trio-light.svg" alt="trio" className="h-8 md:h-10 hidden dark:block" />
+                <img src="/trio-dark.svg" alt="trio" className="h-8 md:h-10 dark:hidden" />
               </Link>
               <Link href="/" target="_blank" rel="noreferrer" className="flex items-center justify-center">
-                <img src="/l1f-light.svg" alt="Draper Associates" className="h-8 md:h-10 hidden dark:block" />
-                <img src="/l1f-dark.svg" alt="Draper Associates" className="h-8 md:h-10 dark:hidden" />
+                <img src="/l1f-light.svg" alt="level 1 foundation" className="h-8 md:h-10 hidden dark:block" />
+                <img src="/l1f-dark.svg" alt="level 1 foundation" className="h-8 md:h-10 dark:hidden" />
               </Link>
               <Link href="/" target="_blank" rel="noreferrer" className="flex items-center justify-center">
-                <img src="/ctrl-light.svg" alt="Draper Associates" className="h-10 md:h-16 hidden dark:block" />
-                <img src="/ctrl-dark.svg" alt="Draper Associates" className="h-10 md:h-16 dark:hidden" />
+                <img src="/ctrl-light.svg" alt="seize ctrl" className="h-10 md:h-16 hidden dark:block" />
+                <img src="/ctrl-dark.svg" alt="seize ctrl" className="h-10 md:h-16 dark:hidden" />
               </Link>
               <Link href="/" target="_blank" rel="noreferrer" className="flex items-center justify-center">
                 <img src="/utxo-light.svg" alt="UTXO" className="h-10 md:h-16 hidden dark:block" />
                 <img src="/utxo-dark.svg" alt="UTXO" className="h-10 md:h-16 dark:hidden" />
               </Link>
               <Link href="/" target="_blank" rel="noreferrer" className="flex items-center justify-center">
-                <img src="/blife-light.svg" alt="Bitcoin Frontier Fund" className="h-24 md:h-24 hidden dark:block" />
-                <img src="/blife-dark.svg" alt="Bitcoin Frontier Fund" className="h-24 md:h-24 dark:hidden" />
+                <img src="/blife-light.svg" alt="BLife Protocol" className="h-24 md:h-24 hidden dark:block" />
+                <img src="/blife-dark.svg" alt="BLife Protocol" className="h-24 md:h-24 dark:hidden" />
               </Link>
               <Link href="https://leather.io" target="_blank" rel="noreferrer" className="flex items-center justify-center">
-                <img src="/leather-light.svg" alt="WalletConnect" className="h-8 md:h-10 hidden dark:block" />
-                <img src="/leather-dark.svg" alt="WalletConnect" className="h-8 md:h-10 dark:hidden" />
+                <img src="/leather-light.svg" alt="Leather" className="h-8 md:h-10 hidden dark:block" />
+                <img src="/leather-dark.svg" alt="Leather" className="h-8 md:h-10 dark:hidden" />
               </Link>
             </div>
           </div>
@@ -109,6 +109,9 @@ export default function Home() {
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
+                <div className="inline-block rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary mb-2">
+                  Quick Start Guide
+                </div>
                 <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">Quick Start</h2>
                 <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
                   Get up and running with LaserEyes in minutes
@@ -126,53 +129,46 @@ export default function Home() {
                 <h3 className="text-xl font-bold mt-8">Basic Setup</h3>
                 <CodeBlock
                   language="typescript"
-                  code={`import { LaserEyesProvider } from '@omnisat/lasereyes-react'
-import { useLaserEyes } from '@omnisat/lasereyes-react'
-import { MAINNET, OYL } from '@omnisat/lasereyes-core'
+                  code={`import {
+  LaserEyesProvider,
+  useLaserEyes,
+  MAINNET,
+  OYL,
+} from "@omnisat/lasereyes";
 
 function App() {
-return (
-  <LaserEyesProvider
-    config={{ network: MAINNET }}
-  >
-    <WalletConnect />
-  </LaserEyesProvider>
-)
+  return (
+    <LaserEyesProvider config={{ network: MAINNET }}>
+      <WalletConnect />
+    </LaserEyesProvider>
+  );
 }
 
 function WalletConnect() {
-const { 
-  connect, 
-  disconnect, 
-  connected, 
-  address 
-} = useLaserEyes()
+  const { connect, disconnect, connected, address } = useLaserEyes();
 
-const connectWallet = async () => {
-  try {
-    await connect(OYL)
-  } catch (error) {
-    console.error(error)
-  }
+  const connectWallet = async () => {
+    try {
+      await connect(OYL);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  return (
+    <div>
+      {connected ? (
+        <div>
+          <p>Connected: {address}</p>
+          <button onClick={disconnect}>Disconnect</button>
+        </div>
+      ) : (
+        <button onClick={connectWallet}>Connect Wallet</button>
+      )}
+    </div>
+  );
 }
-
-return (
-  <div>
-    {connected ? (
-      <div>
-        <p>Connected: {address}</p>
-        <button onClick={disconnect}>
-          Disconnect
-        </button>
-      </div>
-    ) : (
-      <button onClick={connectWallet}>
-        Connect Wallet
-      </button>
-    )}
-  </div>
-)
-}`}
+`}
                   fileName="wallet-connect.tsx"
                   copyButton={true}
                 />
@@ -323,6 +319,9 @@ return (
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
+                <div className="inline-block rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary mb-2">
+                  Data Providers
+                </div>
                 <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">Data Source Manager</h2>
                 <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
                   LaserEyes integrates with leading Bitcoin data providers
@@ -365,6 +364,9 @@ return (
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
+                <div className="inline-block rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary mb-2">
+                  Wallet Integration
+                </div>
                 <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">Supported Wallets</h2>
                 <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
                   Connect with all major Bitcoin wallets
@@ -393,6 +395,9 @@ return (
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
+                <div className="inline-block rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary mb-2">
+                  Multi-Framework
+                </div>
                 <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">Framework Support</h2>
                 <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
                   Use LaserEyes with your favorite frameworks

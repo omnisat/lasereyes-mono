@@ -1,6 +1,7 @@
 "use client"
 
 import { ClientPageWrapper } from "@/components/client-page-wrapper"
+import { CodeBlock } from "@/components/code-block"
 import { Heading } from "@/components/heading"
 
 export default function DocsPage() {
@@ -46,13 +47,16 @@ function DocsPageContent() {
       </ul>
 
       <h2 className="text-2xl font-bold mt-8 mb-4">Installation</h2>
-      <pre className="bg-muted p-4 rounded-md overflow-x-auto">
-        <code>npm install @omnisat/lasereyes-core @omnisat/lasereyes-react</code>
-      </pre>
+                <CodeBlock
+                  language="bash"
+                  code={`npm install @omnisat/lasereyes-core @omnisat/lasereyes-react`}
+                  copyButton={true}
+                />
 
       <h2 className="text-2xl font-bold mt-8 mb-4">Basic Usage</h2>
-      <pre className="bg-muted p-4 rounded-md overflow-x-auto">
-        <code>{`import { LaserEyesProvider } from '@omnisat/lasereyes-react'
+                <CodeBlock
+                  language="bash"
+                  code={`import { LaserEyesProvider } from '@omnisat/lasereyes-react'
 import { useLaserEyes } from '@omnisat/lasereyes-react'
 import { MAINNET, UNISAT } from '@omnisat/lasereyes-core'
 
@@ -86,8 +90,9 @@ function WalletConnect() {
       )}
     </div>
   )
-}`}</code>
-      </pre>
+}`}
+                  copyButton={true}
+                />
     </div>
   )
 }
