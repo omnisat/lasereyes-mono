@@ -1,410 +1,350 @@
 "use client"
 
+import * as React from "react"
+import { ClientPageWrapper } from "@/components/client-page-wrapper"
 import { CodeBlock } from "@/components/code-block"
-import { WarningBox } from "@/components/warning-box"
-import Link from "next/link"
 import { Heading } from "@/components/heading"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Network, Globe, Zap, Shield, ArrowRight, Blocks, Laptop, Server, Wifi } from "lucide-react"
+import { cn } from "@/lib/utils"
+import Link from "next/link"
+
+interface FeatureCardProps {
+  icon: React.ElementType
+  title: string
+  description: string
+  className?: string
+}
 
 export default function NetworkSupportPage() {
   return (
-    <>
-      <Heading level={1} className="text-3xl font-bold mb-6">
-        Network Support
-      </Heading>
-      <p className="text-lg mb-4">
-        LaserEyes supports multiple Bitcoin networks, allowing you to develop and test your applications in different
-        environments. This page explains the supported networks and how to configure LaserEyes to use them.
-      </p>
+    <div className="space-y-8">
+      <div className="relative overflow-hidden rounded-lg border bg-gradient-to-br from-orange-500/10 via-background to-background p-8">
+        {/* Enhanced background effects */}
+        <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-orange-500/20 rounded-full blur-[120px] -z-10 translate-x-1/2 -translate-y-1/2 animate-pulse" />
+        <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-yellow-500/10 rounded-full blur-[100px] -z-10 -translate-x-1/2 translate-y-1/2 animate-pulse" />
+        <div className="absolute top-1/2 left-1/2 w-[200px] h-[200px] bg-orange-800/10 rounded-full blur-[80px] -z-10 -translate-x-1/2 -translate-y-1/2" />
+        
+        <div className="flex items-center gap-3 mb-4">
+          <Badge variant="secondary" className="bg-orange-900/10 text-orange-400 hover:bg-orange-900/20">Multi-Network</Badge>
+          <Badge variant="secondary" className="bg-yellow-900/10 text-yellow-400 hover:bg-yellow-900/20">Testnet Ready</Badge>
+          <Badge variant="secondary" className="bg-orange-900/10 text-orange-400 hover:bg-orange-900/20">Mainnet Secure</Badge>
+        </div>
 
-      <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
-        Bitcoin Networks Overview
-      </Heading>
-      <p className="mb-6">
-        Bitcoin has several networks that serve different purposes. Each network has its own blockchain, rules, and
-        characteristics:
-      </p>
+        <div className="flex items-center gap-6 mb-6">
+          <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-gradient-to-br from-orange-900/20 to-yellow-900/20 backdrop-blur-sm ring-1 ring-orange-900/20">
+            <Network className="h-7 w-7 text-orange-400" />
+          </div>
+          <div>
+            <Heading level={1} className="bg-gradient-to-r from-orange-400 via-orange-500 to-yellow-400 bg-clip-text text-transparent">
+              Network Support
+            </Heading>
+            <p className="text-sm text-muted-foreground">Seamless Bitcoin Network Integration</p>
+          </div>
+        </div>
 
-      <div className="grid gap-6 md:grid-cols-2 mb-8">
-        <div className="bg-card rounded-lg border p-6">
-          <Heading level={3} className="text-xl font-bold mb-2">
-            Mainnet
-          </Heading>
-          <p className="text-muted-foreground">
-            The primary Bitcoin network where real BTC transactions occur. This is the production environment for
-            Bitcoin applications.
-          </p>
+        <p className="text-xl mb-8 max-w-2xl text-muted-foreground">
+          Build with confidence across Bitcoin networks. Full support for mainnet and testnet with automatic network detection and switching.
+        </p>
+
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+          <Card className="border-orange-900/20 bg-orange-900/5 backdrop-blur-xl">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-900/10">
+                  <Globe className="h-5 w-5 text-orange-400" />
+                </div>
+                <div>
+                  <div className="text-sm font-medium">Mainnet</div>
+                  <div className="text-xs text-muted-foreground">Production ready</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="border-orange-900/20 bg-orange-900/5 backdrop-blur-xl">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-900/10">
+                  <Laptop className="h-5 w-5 text-orange-400" />
+                </div>
+                <div>
+                  <div className="text-sm font-medium">Testnet</div>
+                  <div className="text-xs text-muted-foreground">Development</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="border-orange-900/20 bg-orange-900/5 backdrop-blur-xl">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-900/10">
+                  <Server className="h-5 w-5 text-orange-400" />
+                </div>
+                <div>
+                  <div className="text-sm font-medium">Regtest</div>
+                  <div className="text-xs text-muted-foreground">Local testing</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="border-orange-900/20 bg-orange-900/5 backdrop-blur-xl">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-900/10">
+                  <Wifi className="h-5 w-5 text-orange-400" />
+                </div>
+                <div>
+                  <div className="text-sm font-medium">Auto-Switch</div>
+                  <div className="text-xs text-muted-foreground">Smart detection</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
-        <div className="bg-card rounded-lg border p-6">
-          <Heading level={3} className="text-xl font-bold mb-2">
-            Testnet
-          </Heading>
-          <p className="text-muted-foreground">
-            A testing environment that mimics Mainnet but uses worthless test coins. Ideal for development and testing
-            without risking real funds.
-          </p>
-        </div>
-        <div className="bg-card rounded-lg border p-6">
-          <Heading level={3} className="text-xl font-bold mb-2">
-            Signet
-          </Heading>
-          <p className="text-muted-foreground">
-            A more controlled test network where blocks are signed by a central authority. Provides a more stable
-            testing environment than Testnet.
-          </p>
-        </div>
-        <div className="bg-card rounded-lg border p-6">
-          <Heading level={3} className="text-xl font-bold mb-2">
-            Regtest
-          </Heading>
-          <p className="text-muted-foreground">
-            A local testing environment where developers can create blocks on demand. Perfect for isolated testing and
-            development.
-          </p>
+
+        <div className="flex gap-4 items-center">
+          <Link href="#implementation">
+            <Button size="lg" className="bg-gradient-to-r from-orange-600 to-yellow-600 hover:from-orange-500 hover:to-yellow-500 group">
+              Configure Networks
+              <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </Button>
+          </Link>
+          <Link href="#examples">
+            <Button variant="outline" size="lg" className="group">
+              <Blocks className="mr-2 h-4 w-4" />
+              View Examples
+            </Button>
+          </Link>
         </div>
       </div>
 
-      <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
-        Supported Networks in LaserEyes
-      </Heading>
-      <p className="mb-6">LaserEyes provides built-in support for the following Bitcoin networks:</p>
-
-      <CodeBlock
-        language="typescript"
-        code={`import { 
-  MAINNET,  // Bitcoin Mainnet
-  TESTNET,  // Bitcoin Testnet
-  SIGNET,   // Bitcoin Signet
-  TESTNET4  // Bitcoin Testnet4 (experimental)
-} from '@omnisat/lasereyes-core'`}
-        fileName="networks.ts"
-        copyButton={true}
-      />
-
-      <p className="mt-4 mb-6">
-        Each network constant contains the necessary configuration for that network, including:
-      </p>
-      <ul className="list-disc pl-6 mb-6 space-y-2">
-        <li>Network name and identifier</li>
-        <li>Default API endpoints for data providers</li>
-        <li>Network-specific parameters</li>
-        <li>Address format and validation rules</li>
-      </ul>
-
-      <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
-        Network Configuration
-      </Heading>
-      <p className="mb-6">
-        To specify which network your application should use, provide the network constant in the LaserEyes
-        configuration:
-      </p>
-
-      <Heading level={3} className="text-xl font-bold mt-6 mb-2">
-        React Setup
-      </Heading>
-      <CodeBlock
-        language="tsx"
-        code={`import { LaserEyesProvider } from '@omnisat/lasereyes-react'
-import { TESTNET } from '@omnisat/lasereyes-core'
-
-function App() {
-  return (
-    <LaserEyesProvider
-      config={{ 
-        network: TESTNET,  // Use Bitcoin Testnet
-        // Other configuration options...
-      }}
-    >
-      <YourApp />
-    </LaserEyesProvider>
+      <ClientPageWrapper>
+        <NetworkSupportContent />
+      </ClientPageWrapper>
+    </div>
   )
-}`}
-        fileName="testnet-config.tsx"
-        copyButton={true}
-      />
-
-      <Heading level={3} className="text-xl font-bold mt-6 mb-2">
-        Core Setup
-      </Heading>
-      <CodeBlock
-        language="typescript"
-        code={`import { 
-  LaserEyesClient, 
-  createStores, 
-  createConfig,
-  SIGNET
-} from '@omnisat/lasereyes-core'
-
-// Create stores and config with Signet network
-const stores = createStores()
-const config = createConfig({ 
-  network: SIGNET,  // Use Bitcoin Signet
-  // Other configuration options...
-})
-
-// Initialize the client
-const client = new LaserEyesClient(stores, config)
-client.initialize()`}
-        fileName="signet-config.ts"
-        copyButton={true}
-      />
-
-      <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
-        Network-Specific Considerations
-      </Heading>
-
-      <Heading level={3} className="text-xl font-bold mt-6 mb-2">
-        Mainnet
-      </Heading>
-      <ul className="list-disc pl-6 mb-6 space-y-2">
-        <li>Uses real BTC with actual value</li>
-        <li>Transactions require real fees</li>
-        <li>All major wallet providers support Mainnet</li>
-        <li>Production-ready data providers are required</li>
-      </ul>
-
-      <Heading level={3} className="text-xl font-bold mt-6 mb-2">
-        Testnet
-      </Heading>
-      <ul className="list-disc pl-6 mb-6 space-y-2">
-        <li>Uses worthless test coins (tBTC)</li>
-        <li>Coins can be obtained from testnet faucets</li>
-        <li>Most wallet providers support Testnet, but may require configuration</li>
-        <li>Block times and network conditions can be unpredictable</li>
-      </ul>
-
-      <Heading level={3} className="text-xl font-bold mt-6 mb-2">
-        Signet
-      </Heading>
-      <ul className="list-disc pl-6 mb-6 space-y-2">
-        <li>More stable and predictable than Testnet</li>
-        <li>Limited wallet support compared to Testnet</li>
-        <li>Requires specific data providers that support Signet</li>
-        <li>Useful for testing features that require consistent block times</li>
-      </ul>
-
-      <Heading level={3} className="text-xl font-bold mt-6 mb-2">
-        Testnet4
-      </Heading>
-      <ul className="list-disc pl-6 mb-6 space-y-2">
-        <li>Experimental testnet with potential future changes</li>
-        <li>Limited wallet and data provider support</li>
-        <li>Useful for testing upcoming Bitcoin features</li>
-        <li>May have different rules than other networks</li>
-      </ul>
-
-      <WarningBox title="Wallet Provider Support" className="mt-6 mb-6">
-        Not all wallet providers support all networks. Check the wallet provider's documentation to ensure it supports
-        the network you intend to use. Most wallets support Mainnet and Testnet, but support for Signet and Testnet4 may
-        be limited.
-      </WarningBox>
-
-      <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
-        Obtaining Test Coins
-      </Heading>
-      <p className="mb-6">
-        For development and testing on non-Mainnet networks, you'll need test coins. These can be obtained from various
-        faucets:
-      </p>
-
-      <div className="bg-card rounded-lg border p-6 mb-6">
-        <Heading level={3} className="text-xl font-bold mb-2">
-          Testnet Faucets
-        </Heading>
-        <ul className="list-disc pl-6 space-y-2">
-          <li>
-            <a
-              href="https://coinfaucet.eu/en/btc-testnet/"
-              target="_blank"
-              rel="noreferrer"
-              className="text-primary hover:underline"
-            >
-              coinfaucet.eu
-            </a>
-          </li>
-          <li>
-            <a
-              href="https://testnet-faucet.mempool.co/"
-              target="_blank"
-              rel="noreferrer"
-              className="text-primary hover:underline"
-            >
-              testnet-faucet.mempool.co
-            </a>
-          </li>
-          <li>
-            <a
-              href="https://bitcoinfaucet.uo1.net/"
-              target="_blank"
-              rel="noreferrer"
-              className="text-primary hover:underline"
-            >
-              bitcoinfaucet.uo1.net
-            </a>
-          </li>
-        </ul>
-      </div>
-
-      <div className="bg-card rounded-lg border p-6 mb-6">
-        <Heading level={3} className="text-xl font-bold mb-2">
-          Signet Faucets
-        </Heading>
-        <ul className="list-disc pl-6 space-y-2">
-          <li>
-            <a href="https://signet.bc-2.jp/" target="_blank" rel="noreferrer" className="text-primary hover:underline">
-              signet.bc-2.jp
-            </a>
-          </li>
-          <li>
-            <a
-              href="https://signetfaucet.com/"
-              target="_blank"
-              rel="noreferrer"
-              className="text-primary hover:underline"
-            >
-              signetfaucet.com
-            </a>
-          </li>
-        </ul>
-      </div>
-
-      <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
-        Switching Networks
-      </Heading>
-      <p className="mb-6">
-        LaserEyes does not support switching networks at runtime. The network is specified during initialization and
-        remains fixed for the lifetime of the client. If you need to switch networks, you must reinitialize the client
-        with a new configuration.
-      </p>
-
-      <CodeBlock
-        language="typescript"
-        code={`// Create a new client with a different network
-function createClientForNetwork(network) {
-  const stores = createStores()
-  const config = createConfig({ network })
-  const client = new LaserEyesClient(stores, config)
-  client.initialize()
-  return client
 }
 
-// Usage
-const mainnetClient = createClientForNetwork(MAINNET)
-const testnetClient = createClientForNetwork(TESTNET)`}
-        fileName="switch-networks.ts"
-        copyButton={true}
-      />
+function FeatureCard({ icon: Icon, title, description, className }: FeatureCardProps) {
+  return (
+    <Card className={cn(
+      "group relative overflow-hidden transition-all duration-300 hover:border-orange-500/30 hover:shadow-lg hover:shadow-orange-500/5",
+      className
+    )}>
+      <div className="absolute right-0 top-0 h-20 w-20 translate-x-6 -translate-y-6 rounded-full bg-orange-500/10 blur-2xl filter group-hover:bg-orange-500/20" />
+      <CardContent className="p-6">
+        <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-orange-500/20 to-yellow-500/20 text-orange-400 ring-1 ring-orange-500/20">
+          <Icon className="h-6 w-6" />
+        </div>
+        <h3 className="mb-2 text-xl font-semibold">{title}</h3>
+        <p className="text-muted-foreground">{description}</p>
+      </CardContent>
+    </Card>
+  )
+}
 
-      <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
-        DataSource Providers and Networks
-      </Heading>
-      <p className="mb-6">
-        Different data providers may have varying levels of support for different networks. When configuring LaserEyes,
-        ensure that your chosen data providers support the network you're using.
-      </p>
+function NetworkSupportContent() {
+  return (
+    <div className="space-y-10">
+      <section className="space-y-6">
+        <h2 className="text-3xl font-bold">Features</h2>
+        <div className="grid gap-6 sm:grid-cols-2">
+          <FeatureCard
+            icon={Globe}
+            title="Multi-Network Support"
+            description="Full support for Bitcoin mainnet, testnet, and regtest networks with seamless switching."
+          />
+          <FeatureCard
+            icon={Shield}
+            title="Network Safety"
+            description="Built-in safeguards to prevent accidental mainnet transactions during testing."
+          />
+          <FeatureCard
+            icon={Zap}
+            title="Auto Detection"
+            description="Automatic network detection from connected wallets and data providers."
+          />
+          <FeatureCard
+            icon={Server}
+            title="Custom Networks"
+            description="Support for custom network configurations and local development environments."
+          />
+        </div>
+      </section>
 
-      <div className="overflow-x-auto mb-6">
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="bg-muted">
-              <th className="border p-2 text-left">Data Provider</th>
-              <th className="border p-2 text-center">Mainnet</th>
-              <th className="border p-2 text-center">Testnet</th>
-              <th className="border p-2 text-center">Signet</th>
-              <th className="border p-2 text-center">Testnet4</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td className="border p-2">Maestro</td>
-              <td className="border p-2 text-center">✅</td>
-              <td className="border p-2 text-center">✅</td>
-              <td className="border p-2 text-center">❌</td>
-              <td className="border p-2 text-center">❌</td>
-            </tr>
-            <tr>
-              <td className="border p-2">Sandshrew</td>
-              <td className="border p-2 text-center">✅</td>
-              <td className="border p-2 text-center">✅</td>
-              <td className="border p-2 text-center">❌</td>
-              <td className="border p-2 text-center">❌</td>
-            </tr>
-            <tr>
-              <td className="border p-2">Mempool.space</td>
-              <td className="border p-2 text-center">✅</td>
-              <td className="border p-2 text-center">✅</td>
-              <td className="border p-2 text-center">✅</td>
-              <td className="border p-2 text-center">❌</td>
-            </tr>
-            <tr>
-              <td className="border p-2">Esplora</td>
-              <td className="border p-2 text-center">✅</td>
-              <td className="border p-2 text-center">✅</td>
-              <td className="border p-2 text-center">✅</td>
-              <td className="border p-2 text-center">❌</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <section id="implementation" className="space-y-6">
+        <h2 className="text-3xl font-bold">Network Configuration</h2>
+        <Card className="overflow-hidden border-2 border-dashed border-orange-900/20">
+          <CardHeader className="border-b bg-muted/50 px-6">
+            <h2 className="font-mono text-sm font-medium">Basic Setup</h2>
+          </CardHeader>
+          <CardContent className="p-6">
+            <CodeBlock
+              language="typescript"
+              code={`import { LaserEyesClient, createConfig, MAINNET, TESTNET } from '@omnisat/lasereyes-core'
 
-      <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
-        Testing Recommendations
-      </Heading>
-      <p className="mb-6">Here are some recommendations for testing your application on different networks:</p>
+// Mainnet configuration
+const mainnetConfig = createConfig({
+  network: MAINNET,
+  dataSources: {
+    mempool: { priority: 1 },
+    maestro: { priority: 2 }
+  }
+})
 
-      <ul className="list-disc pl-6 mb-6 space-y-2">
-        <li>
-          <strong>Development</strong>: Use Testnet or Signet during development to avoid using real BTC.
-        </li>
-        <li>
-          <strong>Integration Testing</strong>: Use Testnet for integration testing with real wallet providers.
-        </li>
-        <li>
-          <strong>Unit Testing</strong>: Consider using mocks or a local Regtest environment for unit tests.
-        </li>
-        <li>
-          <strong>Production</strong>: Always thoroughly test on Testnet before deploying to Mainnet.
-        </li>
-        <li>
-          <strong>CI/CD</strong>: Set up automated tests on Testnet in your continuous integration pipeline.
-        </li>
-      </ul>
+// Testnet configuration
+const testnetConfig = createConfig({
+  network: TESTNET,
+  dataSources: {
+    mempool: {
+      url: 'https://mempool.space/testnet/api',
+      priority: 1
+    }
+  }
+})`}
+              copyButton={true}
+            />
+          </CardContent>
+        </Card>
+      </section>
 
-      <WarningBox title="Testing on Mainnet" className="mt-6 mb-6">
-        When testing on Mainnet, always use small amounts of BTC to minimize risk. Never use production API keys or
-        sensitive wallets in development environments.
-      </WarningBox>
+      <section className="space-y-6">
+        <h2 className="text-3xl font-bold">Network Detection</h2>
+        <Card className="overflow-hidden">
+          <CardHeader className="border-b bg-muted/50 px-6">
+            <h2 className="font-mono text-sm font-medium">Auto Detection</h2>
+          </CardHeader>
+          <CardContent className="p-6">
+            <CodeBlock
+              language="typescript"
+              code={`import { useLaserEyes } from '@omnisat/lasereyes-react'
 
-      <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
-        Next Steps
-      </Heading>
-      <p className="mb-6">Now that you understand the network support in LaserEyes, you can explore related topics:</p>
-      <ul className="list-disc pl-6 mb-6 space-y-2">
-        <li>
-          <Link href="/docs/datasource-system" className="text-primary hover:underline">
-            DataSource System
-          </Link>{" "}
-          - Learn how LaserEyes interacts with Bitcoin data providers
-        </li>
-        <li>
-          <Link href="/docs/wallet-providers" className="text-primary hover:underline">
-            Wallet Providers
-          </Link>{" "}
-          - Explore the supported wallet providers and their capabilities
-        </li>
-        <li>
-          <Link href="/docs/transaction-types" className="text-primary hover:underline">
-            Transaction Types
-          </Link>{" "}
-          - Learn about the different types of transactions supported by LaserEyes
-        </li>
-        <li>
-          <Link href="/docs/testing" className="text-primary hover:underline">
-            Testing
-          </Link>{" "}
-          - Best practices for testing your LaserEyes integration
-        </li>
-      </ul>
-    </>
+function NetworkStatus() {
+  const { network, switchNetwork } = useLaserEyes()
+  
+  return (
+    <div>
+      <div>Current Network: {network}</div>
+      <button onClick={() => switchNetwork(TESTNET)}>
+        Switch to Testnet
+      </button>
+    </div>
+  )
+}`}
+              copyButton={true}
+            />
+          </CardContent>
+        </Card>
+      </section>
+
+      <section id="examples" className="space-y-6">
+        <h2 className="text-3xl font-bold">Advanced Examples</h2>
+        <div className="grid gap-6">
+          <Card className="overflow-hidden">
+            <CardHeader className="border-b bg-muted/50 px-6">
+              <h2 className="font-mono text-sm font-medium">Custom Network Configuration</h2>
+            </CardHeader>
+            <CardContent className="p-6">
+              <CodeBlock
+                language="typescript"
+                code={`import { NetworkType, createConfig } from '@omnisat/lasereyes-core'
+
+// Define custom network
+const CUSTOM_NETWORK: NetworkType = {
+  name: 'custom',
+  networkId: 'bitcoin-custom',
+  bech32: 'bc',
+  pubKeyHash: 0x00,
+  scriptHash: 0x05
+}
+
+// Create configuration
+const config = createConfig({
+  network: CUSTOM_NETWORK,
+  dataSources: {
+    custom: {
+      url: 'https://your-bitcoin-node.com',
+      priority: 1
+    }
+  }
+})`}
+                copyButton={true}
+              />
+            </CardContent>
+          </Card>
+
+          <Card className="overflow-hidden">
+            <CardHeader className="border-b bg-muted/50 px-6">
+              <h2 className="font-mono text-sm font-medium">Network Event Handling</h2>
+            </CardHeader>
+            <CardContent className="p-6">
+              <CodeBlock
+                language="typescript"
+                code={`import { useLaserEyes } from '@omnisat/lasereyes-react'
+import { useEffect } from 'react'
+
+function NetworkMonitor() {
+  const { network, client } = useLaserEyes()
+
+  useEffect(() => {
+    const unsubscribe = client.on('networkChange', (newNetwork) => {
+      console.log('Network changed:', newNetwork)
+      // Update your app's state accordingly
+    })
+
+    return () => unsubscribe()
+  }, [client])
+
+  return <div>Current Network: {network}</div>
+}`}
+                copyButton={true}
+              />
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
+      <section className="space-y-6">
+        <Card className="overflow-hidden border-orange-900/20">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-900/10">
+                <Shield className="h-5 w-5 text-orange-400" />
+              </div>
+              <h2 className="text-2xl font-bold">Best Practices</h2>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <h3 className="font-semibold mb-2">Network Validation</h3>
+                <p className="text-sm text-muted-foreground">
+                  Always validate network compatibility before executing transactions to prevent errors.
+                </p>
+              </div>
+              <div>
+                <h3 className="font-semibold mb-2">Environment Separation</h3>
+                <p className="text-sm text-muted-foreground">
+                  Use different configurations for development, staging, and production environments.
+                </p>
+              </div>
+              <div>
+                <h3 className="font-semibold mb-2">Error Handling</h3>
+                <p className="text-sm text-muted-foreground">
+                  Implement proper error handling for network-related operations and switches.
+                </p>
+              </div>
+              <div>
+                <h3 className="font-semibold mb-2">Testing Strategy</h3>
+                <p className="text-sm text-muted-foreground">
+                  Test your application thoroughly on testnet before deploying to mainnet.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </section>
+    </div>
   )
 }
 

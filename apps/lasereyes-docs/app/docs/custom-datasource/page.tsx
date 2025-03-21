@@ -1,473 +1,394 @@
 "use client"
 
+import * as React from "react"
+import { ClientPageWrapper } from "@/components/client-page-wrapper"
 import { CodeBlock } from "@/components/code-block"
-import Link from "next/link"
 import { Heading } from "@/components/heading"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Code2, Puzzle, Workflow, Layers, Settings, ArrowRight, Wrench, Boxes, Cpu, GitFork } from "lucide-react"
+import { cn } from "@/lib/utils"
+import Link from "next/link"
+
+interface FeatureCardProps {
+  icon: React.ElementType
+  title: string
+  description: string
+  className?: string
+}
 
 export default function CustomDataSourcePage() {
   return (
-    <>
-      <Heading level={1} className="text-3xl font-bold mb-6">
-        Custom DataSource Implementation
-      </Heading>
-      <p className="text-lg mb-4">
-        LaserEyes allows you to implement custom data sources to integrate with other Bitcoin data providers or to add
-        specialized functionality. This page explains how to create and register your own data source.
-      </p>
+    <div className="space-y-8">
+      <div className="relative overflow-hidden rounded-lg border bg-gradient-to-br from-violet-600/20 via-background to-background p-8">
+        {/* Enhanced background effects */}
+        <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-violet-600/20 rounded-full blur-[120px] -z-10 translate-x-1/2 -translate-y-1/2 animate-pulse" />
+        <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-indigo-500/10 rounded-full blur-[100px] -z-10 -translate-x-1/2 translate-y-1/2 animate-pulse" />
+        <div className="absolute top-1/2 left-1/2 w-[200px] h-[200px] bg-violet-400/10 rounded-full blur-[80px] -z-10 -translate-x-1/2 -translate-y-1/2" />
+        
+        <div className="flex items-center gap-3 mb-4">
+          <Badge variant="secondary" className="bg-violet-500/10 text-violet-500 hover:bg-violet-500/20">Advanced</Badge>
+          <Badge variant="secondary" className="bg-indigo-500/10 text-indigo-500 hover:bg-indigo-500/20">Extensible</Badge>
+          <Badge variant="secondary" className="bg-violet-500/10 text-violet-500 hover:bg-violet-500/20">Customizable</Badge>
+        </div>
 
-      <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
-        Overview
-      </Heading>
-      <p className="mb-6">You might want to implement a custom data source for several reasons:</p>
-      <ul className="list-disc pl-6 mb-6 space-y-2">
-        <li>Integrating with a Bitcoin data provider not supported by LaserEyes</li>
-        <li>Connecting to your own Bitcoin node or indexer</li>
-        <li>Adding specialized functionality for your application</li>
-        <li>Implementing custom caching or data transformation logic</li>
-      </ul>
+        <div className="flex items-center gap-6 mb-6">
+          <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-gradient-to-br from-violet-500/20 to-indigo-500/20 backdrop-blur-sm ring-1 ring-violet-500/20">
+            <Puzzle className="h-7 w-7 text-violet-500" />
+          </div>
+          <div>
+            <Heading level={1} className="bg-gradient-to-r from-violet-600 via-violet-500 to-indigo-500 bg-clip-text text-transparent">
+              Custom DataSource
+            </Heading>
+            <p className="text-sm text-muted-foreground">Build Your Own Bitcoin Data Provider</p>
+          </div>
+        </div>
 
-      <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
-        The DataSource Interface
-      </Heading>
-      <p className="mb-6">
-        To implement a custom data source, you need to create a class that implements the <code>DataSource</code>{" "}
-        interface:
-      </p>
-      <CodeBlock
-        language="typescript"
-        code={`import { 
-  DataSource, 
-  NetworkType, 
-  UTXO, 
-  Transaction, 
-  Inscription 
-} from '@omnisat/lasereyes-core'
+        <p className="text-xl mb-8 max-w-2xl text-muted-foreground">
+          Create custom data sources to integrate any Bitcoin data provider with LaserEyes. Perfect for specialized use cases and custom infrastructure.
+        </p>
 
-// Implement the DataSource interface
-class CustomDataSource implements DataSource {
-  constructor(private apiKey: string, private network: NetworkType) {
-    // Initialize your data source
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+          <Card className="border-violet-500/20 bg-violet-500/5 backdrop-blur-xl">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-violet-500/10">
+                  <Workflow className="h-5 w-5 text-violet-500" />
+                </div>
+                <div>
+                  <div className="text-sm font-medium">Flexible</div>
+                  <div className="text-xs text-muted-foreground">Any data source</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="border-violet-500/20 bg-violet-500/5 backdrop-blur-xl">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-violet-500/10">
+                  <Layers className="h-5 w-5 text-violet-500" />
+                </div>
+                <div>
+                  <div className="text-sm font-medium">Composable</div>
+                  <div className="text-xs text-muted-foreground">Mix & match</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="border-violet-500/20 bg-violet-500/5 backdrop-blur-xl">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-violet-500/10">
+                  <Code2 className="h-5 w-5 text-violet-500" />
+                </div>
+                <div>
+                  <div className="text-sm font-medium">Type-Safe</div>
+                  <div className="text-xs text-muted-foreground">Full TypeScript</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="border-violet-500/20 bg-violet-500/5 backdrop-blur-xl">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-violet-500/10">
+                  <Settings className="h-5 w-5 text-violet-500" />
+                </div>
+                <div>
+                  <div className="text-sm font-medium">Configurable</div>
+                  <div className="text-xs text-muted-foreground">Full control</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="flex gap-4 items-center">
+          <Link href="#implementation">
+            <Button size="lg" className="bg-gradient-to-r from-violet-600 to-indigo-500 hover:from-violet-500 hover:to-indigo-400 group">
+              Start Building
+              <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </Button>
+          </Link>
+          <Link href="#examples">
+            <Button variant="outline" size="lg" className="group">
+              <Code2 className="mr-2 h-4 w-4" />
+              View Examples
+            </Button>
+          </Link>
+        </div>
+      </div>
+
+      <ClientPageWrapper>
+        <CustomDataSourceContent />
+      </ClientPageWrapper>
+    </div>
+  )
+}
+
+function FeatureCard({ icon: Icon, title, description, className }: FeatureCardProps) {
+  return (
+    <Card className={cn(
+      "group relative overflow-hidden transition-all duration-300 hover:border-violet-500/30 hover:shadow-lg hover:shadow-violet-500/5",
+      className
+    )}>
+      <div className="absolute right-0 top-0 h-20 w-20 translate-x-6 -translate-y-6 rounded-full bg-violet-500/10 blur-2xl filter group-hover:bg-violet-500/20" />
+      <CardContent className="p-6">
+        <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-violet-500/20 to-indigo-500/20 text-violet-500 ring-1 ring-violet-500/20">
+          <Icon className="h-6 w-6" />
+        </div>
+        <h3 className="mb-2 text-xl font-semibold">{title}</h3>
+        <p className="text-muted-foreground">{description}</p>
+      </CardContent>
+    </Card>
+  )
+}
+
+function CustomDataSourceContent() {
+  return (
+    <div className="space-y-10">
+      <section className="space-y-6">
+        <h2 className="text-3xl font-bold">Features</h2>
+        <div className="grid gap-6 sm:grid-cols-2">
+          <FeatureCard
+            icon={Wrench}
+            title="Custom Implementation"
+            description="Build data sources tailored to your specific needs, from custom APIs to specialized blockchain indexers."
+          />
+          <FeatureCard
+            icon={Boxes}
+            title="Modular Design"
+            description="Mix and match different data sources, with automatic fallback support and priority handling."
+          />
+          <FeatureCard
+            icon={Cpu}
+            title="Performance Control"
+            description="Optimize performance with custom caching strategies, request batching, and error handling."
+          />
+          <FeatureCard
+            icon={GitFork}
+            title="Extensible Interface"
+            description="Implement only the methods you need, with TypeScript ensuring type safety throughout."
+          />
+        </div>
+      </section>
+
+      <section id="implementation" className="space-y-6">
+        <h2 className="text-3xl font-bold">Implementation Guide</h2>
+        <Card className="overflow-hidden border-2 border-dashed border-violet-500/20">
+          <CardHeader className="border-b bg-muted/50 px-6">
+            <h2 className="font-mono text-sm font-medium">Custom Data Source</h2>
+          </CardHeader>
+          <CardContent className="p-6">
+            <CodeBlock
+              language="typescript"
+              code={`import { DataSource, DataSourceConfig } from '@omnisat/lasereyes-core'
+
+interface CustomConfig extends DataSourceConfig {
+  apiKey?: string
+  baseUrl: string
+}
+
+export class CustomDataSource implements DataSource {
+  private config: CustomConfig
+
+  constructor(config: CustomConfig) {
+    this.config = config
   }
 
-  // Required methods
   async getBalance(address: string): Promise<string> {
-    // Implement balance fetching logic
-    const response = await fetch(\`https://your-api.com/balance/\${address}?apiKey=\${this.apiKey}\`)
+    const response = await fetch(\`\${this.config.baseUrl}/balance/\${address}\`)
     const data = await response.json()
     return data.balance
   }
 
-  async getUtxos(address: string): Promise<UTXO[]> {
-    // Implement UTXO fetching logic
-    const response = await fetch(\`https://your-api.com/utxos/\${address}?apiKey=\${this.apiKey}\`)
-    const data = await response.json()
-    return data.utxos.map(utxo => ({
-      txid: utxo.txid,
-      vout: utxo.vout,
-      value: utxo.value,
-      status: utxo.status
-    }))
+  async getTransaction(txid: string): Promise<any> {
+    const response = await fetch(\`\${this.config.baseUrl}/tx/\${txid}\`)
+    return response.json()
   }
 
-  async getTransaction(txid: string): Promise<Transaction> {
-    // Implement transaction fetching logic
-    const response = await fetch(\`https://your-api.com/tx/\${txid}?apiKey=\${this.apiKey}\`)
-    const data = await response.json()
-    return {
-      txid: data.txid,
-      version: data.version,
-      locktime: data.locktime,
-      vin: data.vin,
-      vout: data.vout,
-      // ... other transaction properties
-    }
-  }
-
-  async broadcastTransaction(txHex: string): Promise<string> {
-    // Implement transaction broadcasting logic
-    const response = await fetch('https://your-api.com/broadcast', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': \`Bearer \${this.apiKey}\`
-      },
-      body: JSON.stringify({ txHex })
-    })
-    const data = await response.json()
-    return data.txid
-  }
-
-  // Optional methods for Ordinals and inscriptions
-  async getInscriptions(address: string): Promise<Inscription[]> {
-    // Implement if your data source supports inscriptions
-    return []
-  }
-
-  // ... implement other methods as needed
+  // Implement other methods as needed...
 }`}
-        fileName="custom-datasource.ts"
-        copyButton={true}
-      />
+              copyButton={true}
+            />
+          </CardContent>
+        </Card>
+      </section>
 
-      <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
-        Required Methods
-      </Heading>
-      <p className="mb-6">At a minimum, your custom data source should implement these core methods:</p>
-      <div className="overflow-x-auto mb-6">
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="bg-muted">
-              <th className="border p-2 text-left">Method</th>
-              <th className="border p-2 text-left">Description</th>
-              <th className="border p-2 text-left">Return Type</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td className="border p-2">
-                <code>getBalance</code>
-              </td>
-              <td className="border p-2">Get the balance of an address in satoshis</td>
-              <td className="border p-2">
-                <code>Promise&lt;string&gt;</code>
-              </td>
-            </tr>
-            <tr>
-              <td className="border p-2">
-                <code>getUtxos</code>
-              </td>
-              <td className="border p-2">Get the UTXOs for an address</td>
-              <td className="border p-2">
-                <code>Promise&lt;UTXO[]&gt;</code>
-              </td>
-            </tr>
-            <tr>
-              <td className="border p-2">
-                <code>getTransaction</code>
-              </td>
-              <td className="border p-2">Get transaction details by TXID</td>
-              <td className="border p-2">
-                <code>Promise&lt;Transaction&gt;</code>
-              </td>
-            </tr>
-            <tr>
-              <td className="border p-2">
-                <code>broadcastTransaction</code>
-              </td>
-              <td className="border p-2">Broadcast a signed transaction</td>
-              <td className="border p-2">
-                <code>Promise&lt;string&gt;</code>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
-        Optional Methods
-      </Heading>
-      <p className="mb-6">Depending on your data source's capabilities, you can implement additional methods:</p>
-      <div className="overflow-x-auto mb-6">
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="bg-muted">
-              <th className="border p-2 text-left">Method</th>
-              <th className="border p-2 text-left">Description</th>
-              <th className="border p-2 text-left">Return Type</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td className="border p-2">
-                <code>getInscriptions</code>
-              </td>
-              <td className="border p-2">Get inscriptions for an address</td>
-              <td className="border p-2">
-                <code>Promise&lt;Inscription[]&gt;</code>
-              </td>
-            </tr>
-            <tr>
-              <td className="border p-2">
-                <code>getInscriptionContent</code>
-              </td>
-              <td className="border p-2">Get the content of an inscription</td>
-              <td className="border p-2">
-                <code>Promise&lt;string&gt;</code>
-              </td>
-            </tr>
-            <tr>
-              <td className="border p-2">
-                <code>getInscriptionById</code>
-              </td>
-              <td className="border p-2">Get inscription details by ID</td>
-              <td className="border p-2">
-                <code>Promise&lt;Inscription&gt;</code>
-              </td>
-            </tr>
-            <tr>
-              <td className="border p-2">
-                <code>getMetaBalances</code>
-              </td>
-              <td className="border p-2">Get token balances (BRC-20, Runes)</td>
-              <td className="border p-2">
-                <code>Promise&lt;any[]&gt;</code>
-              </td>
-            </tr>
-            <tr>
-              <td className="border p-2">
-                <code>estimateFee</code>
-              </td>
-              <td className="border p-2">Estimate transaction fee rate</td>
-              <td className="border p-2">
-                <code>Promise&lt;number&gt;</code>
-              </td>
-            </tr>
-            <tr>
-              <td className="border p-2">
-                <code>getBlockHeight</code>
-              </td>
-              <td className="border p-2">Get current block height</td>
-              <td className="border p-2">
-                <code>Promise&lt;number&gt;</code>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
-        Registering Your Custom Data Source
-      </Heading>
-      <p className="mb-6">
-        Once you've implemented your custom data source, you need to register it with the DataSourceManager:
-      </p>
-      <CodeBlock
-        language="typescript"
-        code={`import { LaserEyesClient, createStores, createConfig, MAINNET } from '@omnisat/lasereyes-core'
+      <section className="space-y-6">
+        <h2 className="text-3xl font-bold">Configuration</h2>
+        <Card className="overflow-hidden">
+          <CardHeader className="border-b bg-muted/50 px-6">
+            <h2 className="font-mono text-sm font-medium">Setup</h2>
+          </CardHeader>
+          <CardContent className="p-6">
+            <CodeBlock
+              language="typescript"
+              code={`import { LaserEyesClient, createConfig } from '@omnisat/lasereyes-core'
 import { CustomDataSource } from './custom-datasource'
 
-// Create config
-const config = createConfig({ 
-  network: MAINNET,
-  // Configure built-in data sources as needed
+const config = createConfig({
+  dataSources: {
+    custom: new CustomDataSource({
+      baseUrl: 'https://your-api.com',
+      apiKey: 'your-api-key',
+      priority: 1
+    }),
+    mempool: {  // Fallback source
+      priority: 2
+    }
+  }
 })
 
-// Create stores and client
-const stores = createStores()
-const client = new LaserEyesClient(stores, config)
+const client = new LaserEyesClient(config)`}
+              copyButton={true}
+            />
+          </CardContent>
+        </Card>
+      </section>
 
-// Initialize the client
-client.initialize()
+      <section id="examples" className="space-y-6">
+        <h2 className="text-3xl font-bold">Advanced Examples</h2>
+        <div className="grid gap-6">
+          <Card className="overflow-hidden">
+            <CardHeader className="border-b bg-muted/50 px-6">
+              <h2 className="font-mono text-sm font-medium">Caching Implementation</h2>
+            </CardHeader>
+            <CardContent className="p-6">
+              <CodeBlock
+                language="typescript"
+                code={`export class CachedDataSource implements DataSource {
+  private cache: Map<string, { data: any, timestamp: number }>
+  private ttl: number // Time to live in ms
 
-// Get the DataSource Manager
-const dataSourceManager = client.getDataSourceManager()
-
-// Register your custom data source
-const customDataSource = new CustomDataSource('your-api-key', MAINNET)
-dataSourceManager.registerDataSource('custom', customDataSource)
-
-// Now you can use your custom data source through the DataSource Manager
-// The manager will automatically include it in provider selection`}
-        fileName="register-custom-datasource.ts"
-        copyButton={true}
-      />
-
-      <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
-        Using Your Custom Data Source
-      </Heading>
-      <p className="mb-6">After registering your custom data source, you can use it like any other data source:</p>
-      <CodeBlock
-        language="typescript"
-        code={`// Use your custom data source specifically
-const balance = await dataSourceManager.getBalance('bc1q...', { provider: 'custom' })
-const utxos = await dataSourceManager.getUtxos('bc1q...', { provider: 'custom' })
-
-// Or let the DataSourceManager choose the best provider
-// (which may include your custom data source)
-const balance = await dataSourceManager.getBalance('bc1q...')
-const utxos = await dataSourceManager.getUtxos('bc1q...')`}
-        fileName="using-custom-datasource.ts"
-        copyButton={true}
-      />
-
-      <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
-        Example: Bitcoin Core RPC Data Source
-      </Heading>
-      <p className="mb-6">Here's an example of a custom data source that connects to a Bitcoin Core node via RPC:</p>
-      <CodeBlock
-        language="typescript"
-        code={`import { DataSource, NetworkType, UTXO, Transaction } from '@omnisat/lasereyes-core'
-
-class BitcoinCoreDataSource implements DataSource {
-  private rpcUrl: string
-  private auth: string
-
-  constructor(
-    private network: NetworkType,
-    options: {
-      host?: string
-      port?: number
-      username: string
-      password: string
-      protocol?: 'http' | 'https'
-    }
-  ) {
-    const { host = 'localhost', port = 8332, username, password, protocol = 'http' } = options
-    this.rpcUrl = \`\${protocol}://\${host}:\${port}\`
-    this.auth = \`Basic \${Buffer.from(\`\${username}:\${password}\`).toString('base64')}\`
+  constructor(config: CustomConfig) {
+    this.cache = new Map()
+    this.ttl = config.cacheTTL || 60000 // 1 minute default
   }
 
-  private async rpcCall(method: string, params: any[] = []): Promise<any> {
-    const response = await fetch(this.rpcUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': this.auth
-      },
-      body: JSON.stringify({
-        jsonrpc: '1.0',
-        id: 'lasereyes',
-        method,
-        params
-      })
-    })
-
-    const data = await response.json()
-    if (data.error) {
-      throw new Error(\`RPC Error: \${data.error.message}\`)
+  private getCached<T>(key: string): T | null {
+    const cached = this.cache.get(key)
+    if (!cached) return null
+    
+    if (Date.now() - cached.timestamp > this.ttl) {
+      this.cache.delete(key)
+      return null
     }
+    
+    return cached.data as T
+  }
 
-    return data.result
+  private setCache(key: string, data: any): void {
+    this.cache.set(key, {
+      data,
+      timestamp: Date.now()
+    })
   }
 
   async getBalance(address: string): Promise<string> {
-    // First, get the UTXOs for the address
-    const utxos = await this.getUtxos(address)
-    
-    // Sum the values of all UTXOs
-    const balance = utxos.reduce((sum, utxo) => sum + BigInt(utxo.value), BigInt(0))
-    
-    return balance.toString()
-  }
+    const cacheKey = \`balance:\${address}\`
+    const cached = this.getCached<string>(cacheKey)
+    if (cached) return cached
 
-  async getUtxos(address: string): Promise<UTXO[]> {
-    // Bitcoin Core doesn't have a direct method to get UTXOs by address
-    // We need to use scantxoutset to find UTXOs for an address
-    const result = await this.rpcCall('scantxoutset', ['start', [\`addr(\${address})\`]])
-    
-    return result.unspents.map((utxo: any) => ({
-      txid: utxo.txid,
-      vout: utxo.vout,
-      value: utxo.amount.toString(),
-      status: { confirmed: true }
-    }))
+    const balance = await super.getBalance(address)
+    this.setCache(cacheKey, balance)
+    return balance
   }
-
-  async getTransaction(txid: string): Promise<Transaction> {
-    // Get raw transaction
-    const txHex = await this.rpcCall('getrawtransaction', [txid])
-    
-    // Decode raw transaction
-    const tx = await this.rpcCall('decoderawtransaction', [txHex])
-    
-    return {
-      txid: tx.txid,
-      version: tx.version,
-      locktime: tx.locktime,
-      vin: tx.vin,
-      vout: tx.vout,
-      size: tx.size,
-      weight: tx.weight,
-      fee: '0', // Bitcoin Core doesn't provide fee in decoded tx
-      status: { confirmed: true }
-    }
-  }
-
-  async broadcastTransaction(txHex: string): Promise<string> {
-    return await this.rpcCall('sendrawtransaction', [txHex])
-  }
-
-  async estimateFee(targetBlocks: number = 6): Promise<number> {
-    // estimatesmartfee returns BTC/kB, convert to sat/vB
-    const result = await this.rpcCall('estimatesmartfee', [targetBlocks])
-    
-    if (result.errors || !result.feerate) {
-      throw new Error('Fee estimation failed')
-    }
-    
-    // Convert BTC/kB to sat/vB
-    return Math.round(result.feerate * 100000)
-  }
-
-  async getBlockHeight(): Promise<number> {
-    return await this.rpcCall('getblockcount')
-  }
-
-  // Other methods would return empty results or throw "Not implemented"
-  // since Bitcoin Core doesn't support Ordinals or tokens natively
 }`}
-        fileName="bitcoin-core-datasource.ts"
-        copyButton={true}
-      />
+                copyButton={true}
+              />
+            </CardContent>
+          </Card>
 
-      <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
-        Best Practices
-      </Heading>
-      <p className="mb-6">Here are some best practices for implementing custom data sources:</p>
-      <ul className="list-disc pl-6 mb-6 space-y-2">
-        <li>
-          <strong>Implement error handling</strong> for API calls and provide meaningful error messages
-        </li>
-        <li>
-          <strong>Add logging</strong> to help with debugging
-        </li>
-        <li>
-          <strong>Implement caching</strong> for frequently accessed data
-        </li>
-        <li>
-          <strong>Handle rate limits</strong> with retry logic and backoff strategies
-        </li>
-        <li>
-          <strong>Normalize data</strong> to match the expected formats
-        </li>
-        <li>
-          <strong>Document capabilities</strong> so users know what your data source supports
-        </li>
-      </ul>
+          <Card className="overflow-hidden">
+            <CardHeader className="border-b bg-muted/50 px-6">
+              <h2 className="font-mono text-sm font-medium">Batch Processing</h2>
+            </CardHeader>
+            <CardContent className="p-6">
+              <CodeBlock
+                language="typescript"
+                code={`export class BatchDataSource implements DataSource {
+  private batchSize: number
+  private batchDelay: number
+  private queue: Map<string, Promise<any>>
 
-      <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
-        Next Steps
-      </Heading>
-      <p className="mb-6">
-        Now that you understand how to implement custom data sources, you can explore related topics:
-      </p>
-      <ul className="list-disc pl-6 mb-6 space-y-2">
-        <li>
-          <Link href="/docs/maestro" className="text-primary hover:underline">
-            Maestro Integration
-          </Link>{" "}
-          - Learn about the built-in Maestro data provider
-        </li>
-        <li>
-          <Link href="/docs/sandshrew" className="text-primary hover:underline">
-            Sandshrew Integration
-          </Link>{" "}
-          - Explore the Sandshrew data provider
-        </li>
-        <li>
-          <Link href="/docs/mempool-space" className="text-primary hover:underline">
-            Mempool.space Integration
-          </Link>{" "}
-          - Learn about the Mempool.space data provider
-        </li>
-        <li>
-          <Link href="/docs/performance" className="text-primary hover:underline">
-            Performance Optimization
-          </Link>{" "}
-          - Learn how to optimize performance with data providers
-        </li>
-      </ul>
-    </>
+  constructor(config: CustomConfig) {
+    this.batchSize = config.batchSize || 10
+    this.batchDelay = config.batchDelay || 100
+    this.queue = new Map()
+  }
+
+  private async processBatch(addresses: string[]): Promise<Record<string, string>> {
+    const response = await fetch(this.config.baseUrl + '/batch', {
+      method: 'POST',
+      body: JSON.stringify({ addresses })
+    })
+    return response.json()
+  }
+
+  async getBalance(address: string): Promise<string> {
+    if (this.queue.has(address)) {
+      return this.queue.get(address)!
+    }
+
+    const promise = new Promise<string>(async (resolve) => {
+      await new Promise(r => setTimeout(r, this.batchDelay))
+      const batch = Array.from(this.queue.keys()).slice(0, this.batchSize)
+      const results = await this.processBatch(batch)
+      resolve(results[address])
+    })
+
+    this.queue.set(address, promise)
+    return promise
+  }
+}`}
+                copyButton={true}
+              />
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
+      <section className="space-y-6">
+        <Card className="overflow-hidden border-violet-500/20">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-violet-500/10">
+                <Wrench className="h-5 w-5 text-violet-500" />
+              </div>
+              <h2 className="text-2xl font-bold">Best Practices</h2>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <h3 className="font-semibold mb-2">Error Handling</h3>
+                <p className="text-sm text-muted-foreground">
+                  Implement proper error handling and normalize errors to match the LaserEyes error format.
+                </p>
+              </div>
+              <div>
+                <h3 className="font-semibold mb-2">Rate Limiting</h3>
+                <p className="text-sm text-muted-foreground">
+                  Add rate limiting and request queuing to prevent API abuse and handle throttling gracefully.
+                </p>
+              </div>
+              <div>
+                <h3 className="font-semibold mb-2">Data Normalization</h3>
+                <p className="text-sm text-muted-foreground">
+                  Normalize response data to match the expected format of other data sources for consistency.
+                </p>
+              </div>
+              <div>
+                <h3 className="font-semibold mb-2">Performance</h3>
+                <p className="text-sm text-muted-foreground">
+                  Implement caching and batch processing where appropriate to optimize performance.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </section>
+    </div>
   )
 }
 

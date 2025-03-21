@@ -1,613 +1,337 @@
 "use client"
 
+import * as React from "react"
+import { ClientPageWrapper } from "@/components/client-page-wrapper"
 import { CodeBlock } from "@/components/code-block"
-import { WarningBox } from "@/components/warning-box"
-import Link from "next/link"
 import { Heading } from "@/components/heading"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { ArrowRight, AlertTriangle, ShieldAlert, Network, Wifi, Wallet, Bug, RefreshCw, AlertCircle } from "lucide-react"
+import { cn } from "@/lib/utils"
+import Link from "next/link"
+
+interface FeatureCardProps {
+  icon: React.ElementType
+  title: string
+  description: string
+  className?: string
+  badges?: string[]
+}
 
 export default function ErrorHandlingPage() {
   return (
-    <>
-      <Heading level={1} className="text-3xl font-bold mb-6">
-        Error Handling
-      </Heading>
-      <p className="text-lg mb-4">
-        Proper error handling is essential when working with Bitcoin wallets and blockchain data. This page explains how
-        to handle errors in LaserEyes and provides best practices for creating a robust user experience.
-      </p>
+    <div className="space-y-8">
+      <div className="relative overflow-hidden rounded-lg border bg-gradient-to-br from-orange-500/10 via-background to-background p-8">
+        {/* Enhanced background effects */}
+        <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-orange-500/20 rounded-full blur-[120px] -z-10 translate-x-1/2 -translate-y-1/2 animate-pulse" />
+        <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-yellow-500/10 rounded-full blur-[100px] -z-10 -translate-x-1/2 translate-y-1/2 animate-pulse" />
+        <div className="absolute top-1/2 left-1/2 w-[200px] h-[200px] bg-orange-800/10 rounded-full blur-[80px] -z-10 -translate-x-1/2 -translate-y-1/2" />
+        
+        <div className="flex items-center gap-3 mb-4">
+          <Badge variant="secondary" className="bg-orange-900/10 text-orange-400 hover:bg-orange-900/20">Error Types</Badge>
+          <Badge variant="secondary" className="bg-yellow-900/10 text-yellow-400 hover:bg-yellow-900/20">Recovery</Badge>
+          <Badge variant="secondary" className="bg-orange-900/10 text-orange-400 hover:bg-orange-900/20">Best Practices</Badge>
+        </div>
 
-      <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
-        Common Error Types
-      </Heading>
-      <p className="mb-6">LaserEyes can throw various types of errors, which can be categorized as follows:</p>
-      <div className="overflow-x-auto mb-6">
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="bg-muted">
-              <th className="border p-2 text-left">Error Category</th>
-              <th className="border p-2 text-left">Error Codes</th>
-              <th className="border p-2 text-left">Description</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td className="border p-2">Wallet Connection Errors</td>
-              <td className="border p-2">
-                <code>WALLET_NOT_FOUND</code>
-                <br />
-                <code>USER_REJECTED</code>
-                <br />
-                <code>NETWORK_MISMATCH</code>
-              </td>
-              <td className="border p-2">Errors related to connecting to a wallet</td>
-            </tr>
-            <tr>
-              <td className="border p-2">Transaction Errors</td>
-              <td className="border p-2">
-                <code>INSUFFICIENT_FUNDS</code>
-                <br />
-                <code>INVALID_ADDRESS</code>
-                <br />
-                <code>TRANSACTION_FAILED</code>
-              </td>
-              <td className="border p-2">Errors related to creating or sending transactions</td>
-            </tr>
-            <tr>
-              <td className="border p-2">Data Provider Errors</td>
-              <td className="border p-2">
-                <code>PROVIDER_ERROR</code>
-                <br />
-                <code>RATE_LIMIT_EXCEEDED</code>
-                <br />
-                <code>NETWORK_ERROR</code>
-              </td>
-              <td className="border p-2">Errors related to fetching data from providers</td>
-            </tr>
-            <tr>
-              <td className="border p-2">Validation Errors</td>
-              <td className="border p-2">
-                <code>INVALID_PARAMETER</code>
-                <br />
-                <code>INVALID_FORMAT</code>
-              </td>
-              <td className="border p-2">Errors related to invalid input parameters</td>
-            </tr>
-          </tbody>
-        </table>
+        <div className="flex items-center gap-6 mb-6">
+          <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-gradient-to-br from-orange-900/20 to-yellow-900/20 backdrop-blur-sm ring-1 ring-orange-900/20">
+            <AlertTriangle className="h-7 w-7 text-orange-400" />
+          </div>
+          <div>
+            <Heading level={1} className="bg-gradient-to-r from-orange-400 via-orange-500 to-yellow-400 bg-clip-text text-transparent">
+              Error Handling
+            </Heading>
+            <p className="text-sm text-muted-foreground">Comprehensive Error Management Guide</p>
+          </div>
+        </div>
+
+        <p className="text-xl mb-8 max-w-2xl text-muted-foreground">
+          Learn how to handle errors gracefully in your Bitcoin applications with LaserEyes' robust error handling system.
+        </p>
+
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 mb-8">
+          <Card className="border-orange-900/20 bg-orange-900/5 backdrop-blur-xl">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-900/10">
+                  <ShieldAlert className="h-5 w-5 text-orange-400" />
+                </div>
+                <div>
+                  <div className="text-sm font-medium">Error Types</div>
+                  <div className="text-xs text-muted-foreground">Categorized errors</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="border-orange-900/20 bg-orange-900/5 backdrop-blur-xl">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-900/10">
+                  <RefreshCw className="h-5 w-5 text-orange-400" />
+                </div>
+                <div>
+                  <div className="text-sm font-medium">Recovery</div>
+                  <div className="text-xs text-muted-foreground">Error recovery patterns</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="border-orange-900/20 bg-orange-900/5 backdrop-blur-xl">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-900/10">
+                  <Bug className="h-5 w-5 text-orange-400" />
+                </div>
+                <div>
+                  <div className="text-sm font-medium">Debugging</div>
+                  <div className="text-xs text-muted-foreground">Debug strategies</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="flex gap-4 items-center">
+          <Link href="#implementation">
+            <Button size="lg" className="bg-gradient-to-r from-orange-600 to-yellow-600 hover:from-orange-500 hover:to-yellow-500 group">
+              View Examples
+              <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </Button>
+          </Link>
+          <Link href="#best-practices">
+            <Button variant="outline" size="lg" className="group">
+              <AlertCircle className="mr-2 h-4 w-4" />
+              Best Practices
+            </Button>
+          </Link>
+        </div>
       </div>
 
-      <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
-        Basic Error Handling
-      </Heading>
-      <p className="mb-6">
-        The simplest way to handle errors is to use try-catch blocks around LaserEyes method calls:
-      </p>
-      <CodeBlock
-        language="typescript"
-        code={`import { useLaserEyes } from '@omnisat/lasereyes-react'
-import { useState } from 'react'
-
-function WalletConnect() {
-  const { connect } = useLaserEyes()
-  const [error, setError] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
-
-  const handleConnect = async () => {
-    setError(null)
-    setLoading(true)
-    
-    try {
-      await connect('UNISAT')
-      // Connection successful
-    } catch (err) {
-      // Handle the error
-      setError(err.message || 'Failed to connect wallet')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  return (
-    <div>
-      <button onClick={handleConnect} disabled={loading}>
-        {loading ? 'Connecting...' : 'Connect Wallet'}
-      </button>
-      
-      {error && (
-        <div className="text-red-500 mt-2">
-          Error: {error}
-        </div>
-      )}
+      <ClientPageWrapper>
+        <ErrorHandlingContent />
+      </ClientPageWrapper>
     </div>
   )
-}`}
-        fileName="basic-error-handling.tsx"
-        copyButton={true}
-      />
+}
 
-      <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
-        Error Code Handling
-      </Heading>
-      <p className="mb-6">For more specific error handling, you can check the error code:</p>
-      <CodeBlock
-        language="typescript"
-        code={`import { useLaserEyes } from '@omnisat/lasereyes-react'
-import { useState } from 'react'
+function FeatureCard({ icon: Icon, title, description, className, badges }: FeatureCardProps) {
+  return (
+    <Card className={cn(
+      "group relative overflow-hidden transition-all duration-300 hover:border-orange-500/30 hover:shadow-lg hover:shadow-orange-500/5",
+      className
+    )}>
+      <div className="absolute right-0 top-0 h-20 w-20 translate-x-6 -translate-y-6 rounded-full bg-orange-500/10 blur-2xl filter group-hover:bg-orange-500/20" />
+      <CardContent className="p-6">
+        <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-orange-500/20 to-yellow-500/20 text-orange-400 ring-1 ring-orange-500/20">
+          <Icon className="h-6 w-6" />
+        </div>
+        <h3 className="mb-2 text-xl font-semibold">{title}</h3>
+        <p className="text-muted-foreground mb-4">{description}</p>
+        {badges && (
+          <div className="flex gap-2 flex-wrap">
+            {badges.map((badge) => (
+              <Badge key={badge} variant="secondary" className="bg-orange-900/10 text-orange-400">
+                {badge}
+              </Badge>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  )
+}
+
+function ErrorHandlingContent() {
+  return (
+    <div className="space-y-10">
+      <section className="space-y-6">
+        <h2 className="text-3xl font-bold">Error Categories</h2>
+        <div className="grid gap-6 sm:grid-cols-2">
+          <FeatureCard
+            icon={Network}
+            title="Network Errors"
+            description="Handle connection issues, timeouts, and network-related failures gracefully."
+            badges={["Timeout", "Connection Lost", "Rate Limit"]}
+          />
+          <FeatureCard
+            icon={Wallet}
+            title="Wallet Errors"
+            description="Manage wallet connection, signing, and permission-related errors."
+            badges={["Not Connected", "Rejected", "Insufficient Funds"]}
+          />
+          <FeatureCard
+            icon={Bug}
+            title="Transaction Errors"
+            description="Handle transaction validation, broadcasting, and confirmation errors."
+            badges={["Invalid Input", "Broadcast Failed", "Unconfirmed"]}
+          />
+          <FeatureCard
+            icon={Wifi}
+            title="API Errors"
+            description="Handle API response errors, rate limiting, and data validation issues."
+            badges={["Invalid Response", "Rate Limited", "Validation"]}
+          />
+        </div>
+      </section>
+
+      <section id="implementation" className="space-y-6">
+        <h2 className="text-3xl font-bold">Implementation Examples</h2>
+        <Card className="overflow-hidden border-2 border-dashed border-orange-900/20">
+          <CardHeader className="border-b bg-muted/50 px-6">
+            <h2 className="font-mono text-sm font-medium">Basic Error Handling</h2>
+          </CardHeader>
+          <CardContent className="p-6">
+            <CodeBlock
+              language="typescript"
+              code={`import { useLaserEyes, WalletError, NetworkError } from '@omnisat/lasereyes-react'
 
 function WalletConnect() {
   const { connect } = useLaserEyes()
-  const [error, setError] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
 
   const handleConnect = async () => {
-    setError(null)
-    setLoading(true)
-    
     try {
-      await connect('UNISAT')
-      // Connection successful
-    } catch (err) {
-      // Handle specific error types
-      if (err.code === 'WALLET_NOT_FOUND') {
-        setError('UniSat wallet extension not found. Please install it first.')
-      } else if (err.code === 'USER_REJECTED') {
-        setError('Connection rejected by user.')
-      } else if (err.code === 'NETWORK_MISMATCH') {
-        setError('Wallet is on a different network. Please switch to the correct network.')
+      await connect()
+    } catch (error) {
+      if (error instanceof WalletError) {
+        // Handle wallet-specific errors
+        console.error('Wallet error:', error.message)
+      } else if (error instanceof NetworkError) {
+        // Handle network-related errors
+        console.error('Network error:', error.message)
       } else {
-        setError(err.message || 'Failed to connect wallet')
+        // Handle unknown errors
+        console.error('Unknown error:', error)
       }
-    } finally {
-      setLoading(false)
     }
   }
-
-  return (
-    <div>
-      <button onClick={handleConnect} disabled={loading}>
-        {loading ? 'Connecting...' : 'Connect Wallet'}
-      </button>
-      
-      {error && (
-        <div className="text-red-500 mt-2">
-          Error: {error}
-        </div>
-      )}
-    </div>
-  )
 }`}
-        fileName="error-code-handling.tsx"
-        copyButton={true}
-      />
+              copyButton={true}
+            />
+          </CardContent>
+        </Card>
 
-      <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
-        Transaction Error Handling
-      </Heading>
-      <p className="mb-6">When sending transactions, it's important to handle various error scenarios:</p>
-      <CodeBlock
-        language="typescript"
-        code={`import { useLaserEyes } from '@omnisat/lasereyes-react'
-import { useState } from 'react'
+        <Card className="overflow-hidden border-2 border-dashed border-orange-900/20">
+          <CardHeader className="border-b bg-muted/50 px-6">
+            <h2 className="font-mono text-sm font-medium">Advanced Error Recovery</h2>
+          </CardHeader>
+          <CardContent className="p-6">
+            <CodeBlock
+              language="typescript"
+              code={`import { useLaserEyes, useErrorHandler } from '@omnisat/lasereyes-react'
 
-function SendBTC() {
-  const { sendBTC } = useLaserEyes()
-  const [recipient, setRecipient] = useState('')
-  const [amount, setAmount] = useState('')
-  const [error, setError] = useState<string | null>(null)
-  const [txid, setTxid] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
+function TransactionComponent() {
+  const { sendBitcoin } = useLaserEyes()
+  const errorHandler = useErrorHandler({
+    onWalletError: async (error) => {
+      // Attempt to reconnect wallet
+      await reconnectWallet()
+    },
+    onNetworkError: async (error) => {
+      // Retry with exponential backoff
+      await retryWithBackoff(async () => {
+        // Original transaction logic
+      })
+    },
+    onTransactionError: async (error) => {
+      if (error.code === 'INSUFFICIENT_FUNDS') {
+        // Show insufficient funds UI
+      } else if (error.code === 'BROADCAST_FAILED') {
+        // Attempt to rebroadcast
+        await rebroadcastTransaction(error.txHex)
+      }
+    }
+  })
 
   const handleSend = async () => {
-    if (!recipient || !amount) {
-      setError('Please enter recipient address and amount')
-      return
-    }
-    
-    setError(null)
-    setTxid(null)
-    setLoading(true)
-    
     try {
-      // Convert amount to satoshis
-      const satoshis = Math.floor(parseFloat(amount) * 100000000)
-      
-      // Send transaction
-      const result = await sendBTC(recipient, satoshis)
-      setTxid(result)
-    } catch (err) {
-      // Handle specific error types
-      if (err.code === 'INSUFFICIENT_FUNDS') {
-        setError('Insufficient funds for this transaction.')
-      } else if (err.code === 'INVALID_ADDRESS') {
-        setError('Invalid Bitcoin address. Please check and try again.')
-      } else if (err.code === 'USER_REJECTED') {
-        setError('Transaction rejected by user.')
-      } else if (err.code === 'TRANSACTION_FAILED') {
-        setError(\`Transaction failed: \${err.message}\`)
-      } else {
-        setError(err.message || 'Transaction failed')
-      }
-    } finally {
-      setLoading(false)
+      await sendBitcoin({
+        address: 'bc1q...',
+        amount: 0.001
+      })
+    } catch (error) {
+      await errorHandler.handle(error)
     }
   }
-
-  return (
-    <div>
-      {/* Form inputs */}
-      <div>
-        <label>Recipient:</label>
-        <input 
-          type="text" 
-          value={recipient} 
-          onChange={(e) => setRecipient(e.target.value)} 
-        />
-      </div>
-      <div>
-        <label>Amount (BTC):</label>
-        <input 
-          type="number" 
-          value={amount} 
-          onChange={(e) => setAmount(e.target.value)} 
-          step="0.00000001" 
-        />
-      </div>
-      
-      <button onClick={handleSend} disabled={loading}>
-        {loading ? 'Sending...' : 'Send BTC'}
-      </button>
-      
-      {error && (
-        <div className="text-red-500 mt-2">
-          Error: {error}
-        </div>
-      )}
-      
-      {txid && (
-        <div className="text-green-500 mt-2">
-          Transaction sent! TXID: {txid}
-        </div>
-      )}
-    </div>
-  )
 }`}
-        fileName="transaction-error-handling.tsx"
-        copyButton={true}
-      />
+              copyButton={true}
+            />
+          </CardContent>
+        </Card>
 
-      <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
-        Data Provider Error Handling
-      </Heading>
-      <p className="mb-6">When fetching data from providers, you should handle network errors and rate limits:</p>
-      <CodeBlock
-        language="typescript"
-        code={`import { useLaserEyes } from '@omnisat/lasereyes-react'
-import { useState, useEffect } from 'react'
+        <Card className="overflow-hidden border-2 border-dashed border-orange-900/20">
+          <CardHeader className="border-b bg-muted/50 px-6">
+            <h2 className="font-mono text-sm font-medium">Custom Error Boundaries</h2>
+          </CardHeader>
+          <CardContent className="p-6">
+            <CodeBlock
+              language="typescript"
+              code={`import { LaserEyesErrorBoundary } from '@omnisat/lasereyes-react'
 
-function InscriptionsList() {
-  const { connected, getInscriptions } = useLaserEyes()
-  const [inscriptions, setInscriptions] = useState([])
-  const [error, setError] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
-
-  useEffect(() => {
-    if (connected) {
-      fetchInscriptions()
-    }
-  }, [connected])
-
-  const fetchInscriptions = async () => {
-    setError(null)
-    setLoading(true)
-    
-    try {
-      const result = await getInscriptions()
-      setInscriptions(result || [])
-    } catch (err) {
-      // Handle specific error types
-      if (err.code === 'PROVIDER_ERROR') {
-        setError('Data provider error. Please try again later.')
-      } else if (err.code === 'RATE_LIMIT_EXCEEDED') {
-        setError('Rate limit exceeded. Please try again in a few minutes.')
-      } else if (err.code === 'NETWORK_ERROR') {
-        setError('Network error. Please check your connection and try again.')
-      } else {
-        setError(err.message || 'Failed to fetch inscriptions')
-      }
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  return (
-    <div>
-      <h2>Your Inscriptions</h2>
-      
-      <button onClick={fetchInscriptions} disabled={loading || !connected}>
-        {loading ? 'Loading...' : 'Refresh Inscriptions'}
-      </button>
-      
-      {error && (
-        <div className="text-red-500 mt-2">
-          Error: {error}
-        </div>
-      )}
-      
-      {!error && inscriptions.length === 0 && !loading && (
-        <div className="mt-2">No inscriptions found</div>
-      )}
-      
-      {inscriptions.length > 0 && (
-        <div className="grid grid-cols-3 gap-4 mt-4">
-          {inscriptions.map((inscription) => (
-            <div key={inscription.id} className="border rounded p-2">
-              {/* Inscription display */}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  )
-}`}
-        fileName="data-provider-error-handling.tsx"
-        copyButton={true}
-      />
-
-      <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
-        Creating a Custom Error Handler
-      </Heading>
-      <p className="mb-6">For more complex applications, you might want to create a custom error handler:</p>
-      <CodeBlock
-        language="typescript"
-        code={`// Define error handler function
-function handleLaserEyesError(error: any, context: string = 'operation'): string {
-  // Check for specific error codes
-  if (error.code === 'WALLET_NOT_FOUND') {
-    return 'Wallet extension not found. Please install it first.'
-  } else if (error.code === 'USER_REJECTED') {
-    return 'Action rejected by user.'
-  } else if (error.code === 'INSUFFICIENT_FUNDS') {
-    return 'Insufficient funds for this transaction.'
-  } else if (error.code === 'INVALID_ADDRESS') {
-    return 'Invalid Bitcoin address. Please check and try again.'
-  } else if (error.code === 'PROVIDER_ERROR') {
-    return 'Data provider error. Please try again later.'
-  } else if (error.code === 'RATE_LIMIT_EXCEEDED') {
-    return 'Rate limit exceeded. Please try again in a few minutes.'
-  } else if (error.code === 'NETWORK_ERROR') {
-    return 'Network error. Please check your connection and try again.'
-  }
-  
-  // For unknown errors, include the context
-  return \`Failed to \${context}: \${error.message || 'Unknown error'}\`
-}
-
-// Usage in components
-function WalletComponent() {
-  const { connect, sendBTC } = useLaserEyes()
-  const [error, setError] = useState<string | null>(null)
-  
-  const handleConnect = async () => {
-    try {
-      await connect('UNISAT')
-    } catch (err) {
-      setError(handleLaserEyesError(err, 'connect wallet'))
-    }
-  }
-  
-  const handleSend = async (recipient: string, amount: string) => {
-    try {
-      const satoshis = Math.floor(parseFloat(amount) * 100000000)
-      await sendBTC(recipient, satoshis)
-    } catch (err) {
-      setError(handleLaserEyesError(err, 'send transaction'))
-    }
-  }
-  
-  // Component JSX
-}`}
-        fileName="custom-error-handler.tsx"
-        copyButton={true}
-      />
-
-      <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
-        Error Handling with React Context
-      </Heading>
-      <p className="mb-6">For larger applications, you might want to create a global error handling context:</p>
-      <CodeBlock
-        language="typescript"
-        code={`// ErrorContext.tsx
-import React, { createContext, useContext, useState, ReactNode } from 'react'
-
-type ErrorContextType = {
-  error: string | null
-  setError: (error: string | null) => void
-  clearError: () => void
-  handleLaserEyesError: (error: any, context?: string) => void
-}
-
-const ErrorContext = createContext<ErrorContextType | undefined>(undefined)
-
-export function ErrorProvider({ children }: { children: ReactNode }) {
-  const [error, setError] = useState<string | null>(null)
-  
-  const clearError = () => setError(null)
-  
-  const handleLaserEyesError = (error: any, context: string = 'operation') => {
-    // Similar to the previous error handler function
-    let errorMessage = 'Unknown error'
-    
-    if (error.code === 'WALLET_NOT_FOUND') {
-      errorMessage = 'Wallet extension not found. Please install it first.'
-    } else if (error.code === 'USER_REJECTED') {
-      errorMessage = 'Action rejected by user.'
-    } else if (error.code === 'INSUFFICIENT_FUNDS') {
-      errorMessage = 'Insufficient funds for this transaction.'
-    } else if (error.code === 'INVALID_ADDRESS') {
-      errorMessage = 'Invalid Bitcoin address. Please check and try again.'
-    } else if (error.code === 'PROVIDER_ERROR') {
-      errorMessage = 'Data provider error. Please try again later.'
-    } else if (error.code === 'RATE_LIMIT_EXCEEDED') {
-      errorMessage = 'Rate limit exceeded. Please try again in a few minutes.'
-    } else if (error.code === 'NETWORK_ERROR') {
-      errorMessage = 'Network error. Please check your connection and try again.'
-    } else {
-      errorMessage = \`Failed to \${context}: \${error.message || 'Unknown error'}\`
-    }
-    
-    setError(errorMessage)
-    return errorMessage
-  }
-  
-  return (
-    <ErrorContext.Provider value={{ error, setError, clearError, handleLaserEyesError }}>
-      {children}
-    </ErrorContext.Provider>
-  )
-}
-
-export function useError() {
-  const context = useContext(ErrorContext)
-  if (context === undefined) {
-    throw new Error('useError must be used within an ErrorProvider')
-  }
-  return context
-}
-
-// Usage in App
 function App() {
   return (
-    <LaserEyesProvider config={{ network: MAINNET }}>
-      <ErrorProvider>
-        <YourApp />
-      </ErrorProvider>
-    </LaserEyesProvider>
+    <LaserEyesErrorBoundary
+      fallback={({ error, reset }) => (
+        <div className="error-container">
+          <h2>Something went wrong!</h2>
+          <pre>{error.message}</pre>
+          <button onClick={reset}>Try again</button>
+        </div>
+      )}
+      onError={(error) => {
+        // Log error to monitoring service
+        logError(error)
+      }}
+    >
+      <YourApp />
+    </LaserEyesErrorBoundary>
   )
-}
+}`}
+              copyButton={true}
+            />
+          </CardContent>
+        </Card>
+      </section>
 
-// Usage in components
-function WalletComponent() {
-  const { connect } = useLaserEyes()
-  const { error, clearError, handleLaserEyesError } = useError()
-  
-  const handleConnect = async () => {
-    clearError()
-    try {
-      await connect('UNISAT')
-    } catch (err) {
-      handleLaserEyesError(err, 'connect wallet')
-    }
-  }
-  
-  return (
-    <div>
-      <button onClick={handleConnect}>Connect Wallet</button>
-      {error && <div className="text-red-500">{error}</div>}
+      <section id="best-practices" className="space-y-6">
+        <Card className="overflow-hidden border-orange-900/20">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-900/10">
+                <AlertCircle className="h-5 w-5 text-orange-400" />
+              </div>
+              <h2 className="text-2xl font-bold">Best Practices</h2>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <h3 className="font-semibold mb-2">Error Classification</h3>
+                <p className="text-sm text-muted-foreground">
+                  Always categorize errors properly to provide appropriate user feedback and recovery strategies.
+                </p>
+              </div>
+              <div>
+                <h3 className="font-semibold mb-2">Graceful Degradation</h3>
+                <p className="text-sm text-muted-foreground">
+                  Implement fallback mechanisms and graceful degradation for critical functionality.
+                </p>
+              </div>
+              <div>
+                <h3 className="font-semibold mb-2">Error Boundaries</h3>
+                <p className="text-sm text-muted-foreground">
+                  Use error boundaries to prevent entire app crashes and provide meaningful recovery options.
+                </p>
+              </div>
+              <div>
+                <h3 className="font-semibold mb-2">Error Logging</h3>
+                <p className="text-sm text-muted-foreground">
+                  Implement comprehensive error logging for debugging and monitoring in production.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </section>
     </div>
-  )
-}`}
-        fileName="error-context.tsx"
-        copyButton={true}
-      />
-
-      <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
-        Error Recovery Strategies
-      </Heading>
-      <p className="mb-6">In addition to handling errors, you should implement recovery strategies:</p>
-      <ul className="list-disc pl-6 mb-6 space-y-2">
-        <li>
-          <strong>Retry Logic</strong>: For transient errors like network issues, implement retry logic with exponential
-          backoff
-        </li>
-        <li>
-          <strong>Fallback Providers</strong>: If one data provider fails, try another
-        </li>
-        <li>
-          <strong>Graceful Degradation</strong>: If advanced features aren't available, fall back to basic functionality
-        </li>
-        <li>
-          <strong>Clear User Guidance</strong>: Provide clear instructions to users on how to resolve issues
-        </li>
-      </ul>
-
-      <CodeBlock
-        language="typescript"
-        code={`// Retry logic example
-async function fetchWithRetry<T>(
-  fetchFn: () => Promise<T>,
-  maxRetries: number = 3,
-  initialDelay: number = 1000
-): Promise<T> {
-  let retries = 0
-  let delay = initialDelay
-  
-  while (true) {
-    try {
-      return await fetchFn()
-    } catch (error) {
-      // Don't retry if it's not a retryable error
-      if (
-        error.code === 'USER_REJECTED' ||
-        error.code === 'INVALID_ADDRESS' ||
-        error.code === 'INSUFFICIENT_FUNDS'
-      ) {
-        throw error
-      }
-      
-      // If we've reached max retries, throw the error
-      if (retries >= maxRetries) {
-        throw error
-      }
-      
-      // Wait before retrying
-      await new Promise(resolve => setTimeout(resolve, delay))
-      
-      // Increase the delay for next retry (exponential backoff)
-      delay *= 2
-      retries++
-    }
-  }
-}`}
-        fileName="retry-logic.ts"
-        copyButton={true}
-      />
-
-      <WarningBox title="Error Handling in Production" className="mt-6 mb-6">
-        In production applications, it's important to implement comprehensive error handling and monitoring. Consider
-        using error tracking services like Sentry or LogRocket to capture and analyze errors in your application.
-      </WarningBox>
-
-      <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
-        Next Steps
-      </Heading>
-      <p className="mb-6">Now that you understand error handling in LaserEyes, you can explore related topics:</p>
-      <ul className="list-disc pl-6 mb-6 space-y-2">
-        <li>
-          <Link href="/docs/security" className="text-primary hover:underline">
-            Security Considerations
-          </Link>{" "}
-          - Learn about security best practices
-        </li>
-        <li>
-          <Link href="/docs/performance" className="text-primary hover:underline">
-            Performance Optimization
-          </Link>{" "}
-          - Optimize your application's performance
-        </li>
-        <li>
-          <Link href="/docs/testing" className="text-primary hover:underline">
-            Testing
-          </Link>{" "}
-          - Learn how to test your LaserEyes integration
-        </li>
-        <li>
-          <Link href="/docs/common-issues" className="text-primary hover:underline">
-            Common Issues
-          </Link>{" "}
-          - Troubleshoot common problems
-        </li>
-      </ul>
-    </>
   )
 }
 
