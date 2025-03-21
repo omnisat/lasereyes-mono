@@ -109,6 +109,9 @@ export default function Home() {
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
+                <div className="inline-block rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary mb-2">
+                  Quick Start Guide
+                </div>
                 <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">Quick Start</h2>
                 <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
                   Get up and running with LaserEyes in minutes
@@ -316,6 +319,9 @@ function WalletConnect() {
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
+                <div className="inline-block rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary mb-2">
+                  Data Providers
+                </div>
                 <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">Data Source Manager</h2>
                 <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
                   LaserEyes integrates with leading Bitcoin data providers
@@ -358,6 +364,9 @@ function WalletConnect() {
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
+                <div className="inline-block rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary mb-2">
+                  Wallet Integration
+                </div>
                 <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">Supported Wallets</h2>
                 <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
                   Connect with all major Bitcoin wallets
@@ -386,6 +395,9 @@ function WalletConnect() {
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
+                <div className="inline-block rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary mb-2">
+                  Multi-Framework
+                </div>
                 <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">Framework Support</h2>
                 <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
                   Use LaserEyes with your favorite frameworks
