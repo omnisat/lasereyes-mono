@@ -11,7 +11,28 @@ permissions:
   pull-requests: write
 
 jobs:
+  check-changesets:
+    runs-on: ubuntu-latest
+    outputs:
+      has_changesets: ${{ steps.check.outputs.has_changesets }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Check for changesets
+        id: check
+        run: |
+          if [ -n "$(ls -A .changeset/*.md 2>/dev/null)" ]; then
+            echo "has_changesets=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_changesets=false" >> $GITHUB_OUTPUT
+          fi
+
   release:
+    needs: check-changesets
+    if: needs.check-changesets.outputs.has_changesets == 'true'
     runs-on: ubuntu-latest
     environment: prod
     steps:
