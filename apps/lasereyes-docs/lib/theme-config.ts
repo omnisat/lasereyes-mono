@@ -91,7 +91,14 @@ export const themeConfig = {
           title: "Wallets",
           href: "/docs/wallets",
         },
-
+        {
+          title: "Network Support",
+          href: "/docs/network-support",
+        },
+        {
+          title: "Transaction Types",
+          href: "/docs/transaction-types",
+        },
         {
           title: "Wallet Providers",
           href: "/docs/wallet-providers",
@@ -102,7 +109,6 @@ export const themeConfig = {
         },
       ],
     },
-
     {
       title: "DataSource Deep Dive",
       items: [
@@ -112,16 +118,7 @@ export const themeConfig = {
         },
         {
           title: "Data Source Manager",
-          href: "/docs/data-source-manager",
-        },
-
-        {
-          title: "Network Support",
-          href: "/docs/network-support",
-        },
-        {
-          title: "Transaction Types",
-          href: "/docs/transaction-types",
+          href: "/docs/datasource-manager",
         },
         {
           title: "Maestro",

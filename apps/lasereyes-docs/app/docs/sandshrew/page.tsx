@@ -1,278 +1,327 @@
 "use client"
 
+import * as React from "react"
+import { ClientPageWrapper } from "@/components/client-page-wrapper"
 import { CodeBlock } from "@/components/code-block"
-import { WarningBox } from "@/components/warning-box"
-import Link from "next/link"
 import { Heading } from "@/components/heading"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Zap, Sparkles, Cpu, Rocket, Scale, BarChart3, Shield, Workflow, Database, Code2, ArrowRight, Terminal, Github } from "lucide-react"
+import { cn } from "@/lib/utils"
+import Link from "next/link"
 
-export default function SandshrewIntegrationPage() {
+interface FeatureCardProps {
+  icon: React.ElementType
+  title: string
+  description: string
+  className?: string
+}
+
+export default function SandshrewPage() {
   return (
-    <>
-      <Heading level={1} className="text-3xl font-bold mb-6">
-        Sandshrew Integration
-      </Heading>
-      <p className="text-lg mb-4">
-        Sandshrew is a fast and reliable Bitcoin data indexing service with excellent developer experience and
-        comprehensive support for Ordinals and BRC-20 tokens. LaserEyes integrates with Sandshrew to provide efficient
-        access to Bitcoin blockchain data.
-      </p>
+    <div className="space-y-8">
+      <div className="relative overflow-hidden rounded-lg border bg-gradient-to-br from-emerald-600/20 via-background to-background p-8">
+        <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-emerald-600/20 rounded-full blur-[120px] -z-10 translate-x-1/2 -translate-y-1/2 animate-pulse" />
+        <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-teal-500/10 rounded-full blur-[100px] -z-10 -translate-x-1/2 translate-y-1/2 animate-pulse" />
+        <div className="absolute top-1/2 left-1/2 w-[200px] h-[200px] bg-emerald-400/10 rounded-full blur-[80px] -z-10 -translate-x-1/2 -translate-y-1/2" />
+        
+        <div className="flex items-center gap-3 mb-4">
+          <Badge variant="secondary" className="bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20">High Performance</Badge>
+          <Badge variant="secondary" className="bg-teal-500/10 text-teal-500 hover:bg-teal-500/20">Open Source</Badge>
+          <Badge variant="secondary" className="bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20">Sponsor</Badge>
+        </div>
 
-      <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
-        Overview
-      </Heading>
-      <p className="mb-6">Sandshrew provides a range of APIs for Bitcoin developers, including:</p>
-      <ul className="list-disc pl-6 mb-6 space-y-2">
-        <li>Bitcoin blockchain data (transactions, blocks, addresses)</li>
-        <li>Ordinals and inscriptions</li>
-        <li>BRC-20 tokens</li>
-        <li>UTXO management</li>
-        <li>Transaction broadcasting</li>
-        <li>Fee estimation</li>
-      </ul>
+        <div className="flex items-center gap-6 mb-6">
+          <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-500/20 to-teal-500/20 backdrop-blur-sm ring-1 ring-emerald-500/20">
+            <Database className="h-7 w-7 text-emerald-500" />
+          </div>
+          <div>
+            <Heading level={1} className="bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-500 bg-clip-text text-transparent">
+              Sandshrew
+            </Heading>
+            <p className="text-sm text-muted-foreground">Enterprise-grade Bitcoin Indexer</p>
+          </div>
+        </div>
 
-      <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
-        Configuration
-      </Heading>
-      <p className="mb-6">To use Sandshrew with LaserEyes, you need to configure it in your LaserEyes setup:</p>
-      <CodeBlock
-        language="typescript"
-        code={`import { LaserEyesProvider } from '@omnisat/lasereyes-react'
-import { MAINNET } from '@omnisat/lasereyes-core'
+        <p className="text-xl mb-8 max-w-2xl text-muted-foreground">
+          High-performance, open-source Bitcoin indexer and API. Built for speed, reliability, and scalability.
+        </p>
 
-function App() {
-  return (
-    <LaserEyesProvider
-      config={{ 
-        network: MAINNET,
-        dataSources: {
-          sandshrew: {
-            url: 'https://api.sandshrew.io', // Optional, defaults to this
-            apiKey: 'your-sandshrew-api-key', // Optional for development
-          }
-        }
-      }}
-    >
-      <YourApp />
-    </LaserEyesProvider>
-  )
-}`}
-        fileName="sandshrew-config.tsx"
-        copyButton={true}
-      />
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+          <Card className="border-emerald-500/20 bg-emerald-500/5 backdrop-blur-xl">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/10">
+                  <Scale className="h-5 w-5 text-emerald-500" />
+                </div>
+                <div>
+                  <div className="text-sm font-medium">Scalable</div>
+                  <div className="text-xs text-muted-foreground">Handles high load</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="border-emerald-500/20 bg-emerald-500/5 backdrop-blur-xl">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/10">
+                  <Zap className="h-5 w-5 text-emerald-500" />
+                </div>
+                <div>
+                  <div className="text-sm font-medium">Lightning Fast</div>
+                  <div className="text-xs text-muted-foreground">Sub-100ms queries</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="border-emerald-500/20 bg-emerald-500/5 backdrop-blur-xl">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/10">
+                  <Code2 className="h-5 w-5 text-emerald-500" />
+                </div>
+                <div>
+                  <div className="text-sm font-medium">Open Source</div>
+                  <div className="text-xs text-muted-foreground">MIT Licensed</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="border-emerald-500/20 bg-emerald-500/5 backdrop-blur-xl">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/10">
+                  <Terminal className="h-5 w-5 text-emerald-500" />
+                </div>
+                <div>
+                  <div className="text-sm font-medium">Easy Setup</div>
+                  <div className="text-xs text-muted-foreground">Docker ready</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
 
-      <WarningBox title="API Key Requirements" className="mt-6 mb-6">
-        While LaserEyes includes development API keys for testing, you should register for your own API key at{" "}
-        <a href="https://sandshrew.io/" target="_blank" rel="noreferrer" className="text-primary underline">
-          sandshrew.io
-        </a>{" "}
-        for production use to avoid rate limiting issues.
-      </WarningBox>
-
-      <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
-        Supported Features
-      </Heading>
-      <p className="mb-6">Sandshrew provides strong support for most Bitcoin operations:</p>
-      <div className="overflow-x-auto mb-6">
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="bg-muted">
-              <th className="border p-2 text-left">Feature</th>
-              <th className="border p-2 text-center">Support</th>
-              <th className="border p-2 text-left">Notes</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td className="border p-2">Basic Bitcoin Operations</td>
-              <td className="border p-2 text-center">✅</td>
-              <td className="border p-2">Full support for addresses, transactions, UTXOs</td>
-            </tr>
-            <tr>
-              <td className="border p-2">Ordinals & Inscriptions</td>
-              <td className="border p-2 text-center">✅</td>
-              <td className="border p-2">Comprehensive inscription indexing and content retrieval</td>
-            </tr>
-            <tr>
-              <td className="border p-2">BRC-20 Tokens</td>
-              <td className="border p-2 text-center">✅</td>
-              <td className="border p-2">Full token indexing, balances, and transfers</td>
-            </tr>
-            <tr>
-              <td className="border p-2">Runes</td>
-              <td className="border p-2 text-center">❌</td>
-              <td className="border p-2">Not currently supported</td>
-            </tr>
-            <tr>
-              <td className="border p-2">Testnet Support</td>
-              <td className="border p-2 text-center">✅</td>
-              <td className="border p-2">Supports both Mainnet and Testnet</td>
-            </tr>
-            <tr>
-              <td className="border p-2">Signet Support</td>
-              <td className="border p-2 text-center">❌</td>
-              <td className="border p-2">Not currently supported</td>
-            </tr>
-          </tbody>
-        </table>
+        <div className="flex gap-4 items-center">
+          <Link href="https://sandshrew.io" target="_blank">
+            <Button size="lg" className="bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 group">
+              Get Started
+              <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </Button>
+          </Link>
+          <Link href="https://github.com/sandshrew/sandshrew" target="_blank">
+            <Button variant="outline" size="lg" className="group">
+              <Github className="mr-2 h-4 w-4" />
+              View Source
+            </Button>
+          </Link>
+        </div>
       </div>
 
-      <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
-        Example Usage
-      </Heading>
-      <p className="mb-6">Here's how to use Sandshrew-specific features with LaserEyes:</p>
-      <CodeBlock
-        language="typescript"
-        code={`import { useLaserEyes } from '@omnisat/lasereyes-react'
+      <ClientPageWrapper>
+        <SandshrewContent />
+      </ClientPageWrapper>
+    </div>
+  )
+}
+
+function FeatureCard({ icon: Icon, title, description, className }: FeatureCardProps) {
+  return (
+    <Card className={cn(
+      "group relative overflow-hidden transition-all duration-300 hover:border-emerald-500/30 hover:shadow-lg hover:shadow-emerald-500/5",
+      className
+    )}>
+      <div className="absolute right-0 top-0 h-20 w-20 translate-x-6 -translate-y-6 rounded-full bg-emerald-500/10 blur-2xl filter group-hover:bg-emerald-500/20" />
+      <CardContent className="p-6">
+        <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-500/20 to-teal-500/20 text-emerald-500 ring-1 ring-emerald-500/20">
+          <Icon className="h-6 w-6" />
+        </div>
+        <h3 className="mb-2 text-xl font-semibold">{title}</h3>
+        <p className="text-muted-foreground">{description}</p>
+      </CardContent>
+    </Card>
+  )
+}
+
+function SandshrewContent() {
+  return (
+    <div className="space-y-10">
+      <section className="space-y-6">
+        <h2 className="text-3xl font-bold">Features</h2>
+        <div className="grid gap-6 sm:grid-cols-2">
+          <FeatureCard
+            icon={Sparkles}
+            title="Advanced Indexing"
+            description="Efficient indexing of Bitcoin transactions, UTXOs, ordinals, and inscriptions with optimized storage."
+          />
+          <FeatureCard
+            icon={Cpu}
+            title="High Performance"
+            description="Built for speed with Rust and optimized database queries for minimal latency."
+          />
+          <FeatureCard
+            icon={Rocket}
+            title="Easy Deployment"
+            description="Simple setup with Docker and comprehensive documentation for quick deployment."
+          />
+          <FeatureCard
+            icon={BarChart3}
+            title="Rich API"
+            description="Comprehensive REST API with WebSocket support for real-time updates."
+          />
+        </div>
+      </section>
+
+      <section className="space-y-6">
+        <h2 className="text-3xl font-bold">Getting Started</h2>
+        <Card className="overflow-hidden border-2 border-dashed border-emerald-500/20">
+          <CardHeader className="border-b bg-muted/50 px-6">
+            <h2 className="font-mono text-sm font-medium">Configuration</h2>
+          </CardHeader>
+          <CardContent className="p-6">
+            <CodeBlock
+              language="typescript"
+              code={`import { LaserEyesClient, createConfig, MAINNET } from '@omnisat/lasereyes-core'
+
+const config = createConfig({
+  network: MAINNET,
+  dataSources: {
+    sandshrew: {
+      apiKey: process.env.SANDSHREW_API_KEY,
+      priority: 1  // Set as primary data source
+    }
+  }
+})`}
+              copyButton={true}
+            />
+            <div className="mt-4 text-sm text-muted-foreground">
+              Get your API key at <a href="https://sandshrew.io" className="text-emerald-500 hover:text-emerald-400">sandshrew.io</a>
+            </div>
+          </CardContent>
+        </Card>
+      </section>
+
+      <section className="space-y-6">
+        <h2 className="text-3xl font-bold">API Examples</h2>
+        <Card className="overflow-hidden">
+          <CardHeader className="border-b bg-muted/50 px-6">
+            <h2 className="font-mono text-sm font-medium">Fetching Data</h2>
+          </CardHeader>
+          <CardContent className="p-6">
+            <CodeBlock
+              language="typescript"
+              code={`import { useLaserEyes } from '@omnisat/lasereyes-react'
 
 function BitcoinData() {
   const { client } = useLaserEyes()
   
-  const fetchDataWithSandshrew = async () => {
-    // Get the DataSource Manager
-    const dataSourceManager = client.getDataSourceManager()
+  async function fetchData() {
+    const manager = client.getDataSourceManager()
     
-    // Use Sandshrew specifically for these operations
-    const balance = await dataSourceManager.getBalance('bc1q...', { provider: 'sandshrew' })
-    const inscriptions = await dataSourceManager.getInscriptions('bc1q...', { provider: 'sandshrew' })
-    const brc20Tokens = await dataSourceManager.getMetaBalances('bc1q...', 'brc20', { provider: 'sandshrew' })
+    // Get address balance and UTXOs
+    const balance = await manager.getBalance('bc1p...')
+    const utxos = await manager.getUtxos('bc1p...')
     
-    console.log('Balance:', balance)
-    console.log('Inscriptions:', inscriptions)
-    console.log('BRC-20 Tokens:', brc20Tokens)
+    // Get ordinals and inscriptions
+    const inscriptions = await manager.getInscriptions('bc1p...')
+    const content = await manager.getInscriptionContent('123...')
+    
+    // Get BRC-20 and runes data
+    const brc20 = await manager.getMetaBalances('bc1p...', 'brc20')
+    const runes = await manager.getMetaBalances('bc1p...', 'runes')
   }
-  
-  return (
-    <button onClick={fetchDataWithSandshrew}>Fetch Data with Sandshrew</button>
-  )
 }`}
-        fileName="sandshrew-usage.tsx"
-        copyButton={true}
-      />
+              copyButton={true}
+            />
+          </CardContent>
+        </Card>
+      </section>
 
-      <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
-        Advanced Configuration
-      </Heading>
-      <p className="mb-6">Sandshrew offers additional configuration options for advanced use cases:</p>
-      <CodeBlock
-        language="typescript"
-        code={`const config = createConfig({
-  network: MAINNET,
-  dataSources: {
-    sandshrew: {
-      apiKey: 'your-sandshrew-api-key',
-      // Optional: Override the base URL
-      url: 'https://api.sandshrew.io',
-      // Optional: Configure request timeouts (in milliseconds)
-      timeout: 30000,
-      // Optional: Configure retry options
-      retry: {
-        maxRetries: 3,
-        initialDelay: 1000,
-        maxDelay: 5000,
-      }
-    }
+      <section className="space-y-6">
+        <h2 className="text-3xl font-bold">Advanced Features</h2>
+        <div className="grid gap-6">
+          <Card className="overflow-hidden">
+            <CardContent className="p-6">
+              <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-500">
+                <Workflow className="h-7 w-7" />
+              </div>
+              <h3 className="text-xl font-semibold mb-4">Real-time Updates</h3>
+              <CodeBlock
+                language="typescript"
+                code={`// Subscribe to real-time updates
+const ws = new WebSocket('wss://api.sandshrew.io/v1/ws')
+
+ws.onmessage = (event) => {
+  const data = JSON.parse(event.data)
+  
+  // Handle different event types
+  switch (data.type) {
+    case 'block':
+      console.log('New block:', data.block)
+      break
+    case 'tx':
+      console.log('New transaction:', data.tx)
+      break
+    case 'inscription':
+      console.log('New inscription:', data.inscription)
+      break
   }
-})`}
-        fileName="advanced-sandshrew-config.ts"
-        copyButton={true}
-      />
+}`}
+                copyButton={true}
+              />
+            </CardContent>
+          </Card>
+        </div>
+      </section>
 
-      <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
-        Performance Considerations
-      </Heading>
-      <p className="mb-6">
-        Sandshrew is known for its performance and reliability. Here are some key performance characteristics:
-      </p>
-      <ul className="list-disc pl-6 mb-6 space-y-2">
-        <li>
-          <strong>Fast Response Times:</strong> Typically under 200ms for most API calls
-        </li>
-        <li>
-          <strong>High Availability:</strong> 99.9% uptime guarantee on paid plans
-        </li>
-        <li>
-          <strong>Global CDN:</strong> Data is served from edge locations for low latency
-        </li>
-        <li>
-          <strong>Efficient Indexing:</strong> Optimized for quick retrieval of inscription and BRC-20 data
-        </li>
-      </ul>
+      <section className="space-y-6">
+        <h2 className="text-3xl font-bold">Self-Hosting</h2>
+        <div className="grid gap-6 sm:grid-cols-3">
+          <Card className="border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 to-background">
+            <CardContent className="p-6">
+              <h3 className="text-lg font-semibold mb-2">Docker Support</h3>
+              <p className="text-sm text-muted-foreground">Easy deployment with official Docker images and compose files.</p>
+            </CardContent>
+          </Card>
+          <Card className="border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 to-background">
+            <CardContent className="p-6">
+              <h3 className="text-lg font-semibold mb-2">Full Control</h3>
+              <p className="text-sm text-muted-foreground">Run your own instance with complete control over data and settings.</p>
+            </CardContent>
+          </Card>
+          <Card className="border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 to-background">
+            <CardContent className="p-6">
+              <h3 className="text-lg font-semibold mb-2">Community Support</h3>
+              <p className="text-sm text-muted-foreground">Active community and maintainers for support and contributions.</p>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
 
-      <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
-        Rate Limits and Quotas
-      </Heading>
-      <p className="mb-6">Sandshrew has different rate limits and quotas depending on your subscription plan:</p>
-      <ul className="list-disc pl-6 mb-6 space-y-2">
-        <li>
-          <strong>Free Tier:</strong> Limited to 5 requests per second and 5,000 requests per day
-        </li>
-        <li>
-          <strong>Pro Tier:</strong> Higher limits suitable for most applications
-        </li>
-        <li>
-          <strong>Enterprise Tier:</strong> Custom limits based on your needs
-        </li>
-      </ul>
-      <p className="mb-6">
-        LaserEyes includes built-in rate limiting and retry logic to help manage these limits, but you should be aware
-        of them when designing your application.
-      </p>
-
-      <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
-        Best Practices
-      </Heading>
-      <p className="mb-6">Here are some best practices for using Sandshrew with LaserEyes:</p>
-      <ul className="list-disc pl-6 mb-6 space-y-2">
-        <li>
-          <strong>Use caching</strong> to reduce API calls for frequently accessed data
-        </li>
-        <li>
-          <strong>Implement error handling</strong> for rate limit errors (HTTP 429)
-        </li>
-        <li>
-          <strong>Use batch operations</strong> when possible to reduce the number of API calls
-        </li>
-        <li>
-          <strong>Monitor your usage</strong> through the Sandshrew dashboard
-        </li>
-        <li>
-          <strong>Consider using multiple data providers</strong> for redundancy
-        </li>
-      </ul>
-
-      <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
-        Next Steps
-      </Heading>
-      <p className="mb-6">
-        Now that you understand how to use Sandshrew with LaserEyes, you can explore related topics:
-      </p>
-      <ul className="list-disc pl-6 mb-6 space-y-2">
-        <li>
-          <Link href="/docs/maestro" className="text-primary hover:underline">
-            Maestro Integration
-          </Link>{" "}
-          - Learn about another data provider option
-        </li>
-        <li>
-          <Link href="/docs/mempool-space" className="text-primary hover:underline">
-            Mempool.space Integration
-          </Link>{" "}
-          - Explore the Mempool.space data provider
-        </li>
-        <li>
-          <Link href="/docs/custom-datasource" className="text-primary hover:underline">
-            Custom DataSource Implementation
-          </Link>{" "}
-          - Create your own data source
-        </li>
-        <li>
-          <Link href="/docs/performance" className="text-primary hover:underline">
-            Performance Optimization
-          </Link>{" "}
-          - Learn how to optimize performance with data providers
-        </li>
-      </ul>
-    </>
+      <section className="space-y-6">
+        <Card className="overflow-hidden border-emerald-500/20">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/10">
+                <Shield className="h-5 w-5 text-emerald-500" />
+              </div>
+              <h2 className="text-2xl font-bold">Open Source</h2>
+            </div>
+            <p className="text-muted-foreground mb-4">
+              Sandshrew is open source under the MIT license. We welcome contributions from the community!
+            </p>
+            <Link 
+              href="https://github.com/sandshrew/sandshrew" 
+              className="inline-flex items-center text-emerald-500 hover:text-emerald-400"
+            >
+              View on GitHub
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
+          </CardContent>
+        </Card>
+      </section>
+    </div>
   )
 }
 
