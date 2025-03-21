@@ -63,15 +63,7 @@ export function CodeBlock({
     return (
       <div className={cn("relative rounded-md overflow-hidden border border-border", className)}>
         <div className="flex w-full">
-          {showLineNumbers && (
-            <div className="bg-[hsl(var(--code-line-numbers-bg))] text-gray-400 py-4 select-none text-right flex-shrink-0">
-              {lines.map((_, i) => (
-                <div key={i} className="text-xs px-3 leading-[1.5rem] h-[1.5rem]">
-                  {i + 1}
-                </div>
-              ))}
-            </div>
-          )}
+
           <pre className={cn("p-4 overflow-x-auto flex-1 m-0 bg-[hsl(var(--code-bg))]")}>
             <code className={`language-${lang} leading-[1.5rem] text-[13px] md:text-sm`}>{codeString}</code>
           </pre>
