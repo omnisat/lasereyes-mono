@@ -1,32 +1,66 @@
 "use client"
 
+import * as React from "react"
 import { CodeBlock } from "@/components/code-block"
 import { WarningBox } from "@/components/warning-box"
 import Link from "next/link"
 import { Heading } from "@/components/heading"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { ArrowRight, Settings, Network, Database, Layers, Bot, Sparkles } from "lucide-react"
+import { cn } from "@/lib/utils"
+import { ClientPageWrapper } from "@/components/client-page-wrapper"
+import type { LucideIcon } from "lucide-react"
 
-export default function LaserEyesProviderPage() {
+interface FeatureCardProps {
+  icon: LucideIcon
+  title: string
+  description: string
+  className?: string
+}
+
+function FeatureCard({ icon: Icon, title, description, className }: FeatureCardProps) {
   return (
-    <>
-      <Heading level={1} className="text-3xl font-bold mb-6">
-        LaserEyesProvider
-      </Heading>
-      <p className="text-lg mb-4">
-        The <code>LaserEyesProvider</code> is a React context provider that initializes the LaserEyes client and makes
-        it available to all child components. This page explains how to set up and configure the provider in your React
-        application.
-      </p>
+    <Card className={cn(
+      "group relative overflow-hidden transition-all duration-300 hover:border-orange-500/30 hover:shadow-lg hover:shadow-orange-500/5",
+      className
+    )}>
+      <div className="absolute right-0 top-0 h-20 w-20 translate-x-6 -translate-y-6 rounded-full bg-orange-500/10 blur-2xl filter group-hover:bg-orange-500/20" />
+      <CardContent className="p-6">
+        <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-orange-500/10 text-orange-500">
+          <Icon className="h-6 w-6" />
+        </div>
+        <h3 className="mb-2 text-xl font-semibold">{title}</h3>
+        <p className="text-muted-foreground">{description}</p>
+      </CardContent>
+    </Card>
+  )
+}
 
-      <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
-        Basic Usage
-      </Heading>
-      <p className="mb-6">
-        To use LaserEyes in your React application, you need to wrap your components with the{" "}
-        <code>LaserEyesProvider</code>:
-      </p>
-      <CodeBlock
-        language="tsx"
-        code={`import { LaserEyesProvider } from '@omnisat/lasereyes-react'
+function LaserEyesProviderContent() {
+  return (
+    <div className="space-y-10">
+      <section className="space-y-6">
+        <Card className="overflow-hidden">
+          <CardContent className="p-6">
+            <p className="text-lg leading-relaxed">
+              The <code>LaserEyesProvider</code> is a React context provider that initializes the LaserEyes client and makes it available throughout your application. It serves as the bridge between your React components and the core LaserEyes functionality.
+            </p>
+          </CardContent>
+        </Card>
+      </section>
+
+      <section className="space-y-6">
+        <h2 className="text-3xl font-bold">Basic Usage</h2>
+        <Card className="overflow-hidden">
+          <CardHeader className="border-b bg-muted/50 px-6">
+            <h2 className="font-mono text-sm font-medium">Basic Setup</h2>
+          </CardHeader>
+          <CardContent className="p-6">
+            <CodeBlock
+              language="tsx"
+              code={`import { LaserEyesProvider } from '@omnisat/lasereyes-react'
 import { MAINNET } from '@omnisat/lasereyes-core'
 
 function App() {
@@ -40,272 +74,149 @@ function App() {
     </LaserEyesProvider>
   )
 }`}
-        fileName="app.tsx"
-        copyButton={true}
-      />
+              copyButton={true}
+            />
+          </CardContent>
+        </Card>
+      </section>
 
-      <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
-        Configuration Options
-      </Heading>
-      <p className="mb-6">
-        The <code>LaserEyesProvider</code> accepts a configuration object that allows you to customize its behavior:
-      </p>
-
-      <Heading level={3} className="text-xl font-bold mt-6 mb-2">
-        Network Configuration
-      </Heading>
-      <p className="mb-4">You can specify which Bitcoin network to use:</p>
-      <CodeBlock
-        language="tsx"
-        code={`import { LaserEyesProvider } from '@omnisat/lasereyes-react'
-import { MAINNET, TESTNET } from '@omnisat/lasereyes-core'
-
-// Use Mainnet
-function MainnetApp() {
-  return (
-    <LaserEyesProvider config={{ network: MAINNET }}>
-      <YourApp />
-    </LaserEyesProvider>
-  )
-}
+      <section className="space-y-6">
+        <h2 className="text-3xl font-bold">Configuration Options</h2>
+        <div className="grid gap-6">
+          <Card className="overflow-hidden">
+            <CardHeader className="border-b bg-muted/50 px-6">
+              <div className="flex items-center gap-2">
+                <Network className="h-4 w-4" />
+                <h3 className="font-medium">Network Configuration</h3>
+              </div>
+            </CardHeader>
+            <CardContent className="p-6">
+              <CodeBlock
+                language="tsx"
+                code={`// Use Mainnet
+<LaserEyesProvider config={{ network: MAINNET }}>
+  <MainnetApp />
+</LaserEyesProvider>
 
 // Use Testnet
-function TestnetApp() {
-  return (
-    <LaserEyesProvider config={{ network: TESTNET }}>
-      <YourApp />
-    </LaserEyesProvider>
-  )
-}`}
-        fileName="network-config.tsx"
-        copyButton={true}
-      />
+<LaserEyesProvider config={{ network: TESTNET }}>
+  <TestnetApp />
+</LaserEyesProvider>`}
+                copyButton={true}
+              />
+            </CardContent>
+          </Card>
 
-      <Heading level={3} className="text-xl font-bold mt-6 mb-2">
-        DataSource Configuration
-      </Heading>
-      <p className="mb-4">You can configure the data sources used by LaserEyes:</p>
-      <CodeBlock
-        language="tsx"
-        code={`import { LaserEyesProvider } from '@omnisat/lasereyes-react'
-import { MAINNET } from '@omnisat/lasereyes-core'
+          <Card className="overflow-hidden">
+            <CardHeader className="border-b bg-muted/50 px-6">
+              <div className="flex items-center gap-2">
+                <Database className="h-4 w-4" />
+                <h3 className="font-medium">DataSource Configuration</h3>
+              </div>
+            </CardHeader>
+            <CardContent className="p-6">
+              <CodeBlock
+                language="tsx"
+                code={`<LaserEyesProvider
+  config={{ 
+    network: MAINNET,
+    dataSources: {
+      maestro: {
+        apiKey: 'your-maestro-api-key',
+      },
+      sandshrew: {
+        url: 'https://api.sandshrew.io',
+        apiKey: 'your-sandshrew-api-key',
+      },
+      mempool: {
+        url: 'https://mempool.space/api',
+      },
+      esplora: 'https://blockstream.info/api',
+    }
+  }}
+>
+  <YourApp />
+</LaserEyesProvider>`}
+                copyButton={true}
+              />
+              <WarningBox title="Development API Keys" className="mt-4">
+                While development API keys are included for testing, register your own API keys for production use to avoid rate limiting.
+              </WarningBox>
+            </CardContent>
+          </Card>
 
-function App() {
-  return (
-    <LaserEyesProvider
-      config={{ 
-        network: MAINNET,
-        dataSources: {
-          // Maestro configuration
-          maestro: {
-            apiKey: 'your-maestro-api-key', // Optional for development
-          },
-          // Sandshrew configuration
-          sandshrew: {
-            url: 'https://api.sandshrew.io', // Optional, defaults to this
-            apiKey: 'your-sandshrew-api-key', // Optional for development
-          },
-          // Mempool.space configuration
-          mempool: {
-            url: 'https://mempool.space/api', // Optional, defaults to this
-          },
-          // Esplora configuration (URL string)
-          esplora: 'https://blockstream.info/api',
-        }
-      }}
-    >
-      <YourApp />
-    </LaserEyesProvider>
-  )
-}`}
-        fileName="datasource-config.tsx"
-        copyButton={true}
-      />
+          
+        </div>
+      </section>
 
-      <WarningBox title="Development API Keys" className="mt-6 mb-6">
-        LaserEyes includes development API keys for testing, but these are rate-limited. For production applications,
-        you should register for your own API keys with data providers like Maestro and Sandshrew to avoid rate limiting
-        issues.
-      </WarningBox>
-
-      <Heading level={3} className="text-xl font-bold mt-6 mb-2">
-        Wallet Options
-      </Heading>
-      <p className="mb-4">You can configure wallet-related options:</p>
-      <CodeBlock
-        language="tsx"
-        code={`import { LaserEyesProvider } from '@omnisat/lasereyes-react'
-import { MAINNET, UNISAT } from '@omnisat/lasereyes-core'
-
-function App() {
-  return (
-    <LaserEyesProvider
-      config={{ 
-        network: MAINNET,
-        walletOptions: {
-          autoConnect: true, // Attempt to reconnect to the last used wallet on load
-          defaultProvider: UNISAT, // Default wallet provider to use
-          timeout: 30000, // Timeout for wallet operations in milliseconds
-        }
-      }}
-    >
-      <YourApp />
-    </LaserEyesProvider>
-  )
-}`}
-        fileName="wallet-options.tsx"
-        copyButton={true}
-      />
-
-      <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
-        Advanced Configuration
-      </Heading>
-      <p className="mb-6">For more advanced use cases, you can provide a complete configuration object:</p>
-      <CodeBlock
-        language="tsx"
-        code={`import { LaserEyesProvider } from '@omnisat/lasereyes-react'
-import { MAINNET } from '@omnisat/lasereyes-core'
-
-function App() {
-  return (
-    <LaserEyesProvider
-      config={{ 
-        network: MAINNET,
-        dataSources: {
-          maestro: {
-            apiKey: 'your-maestro-api-key',
-          },
-          sandshrew: {
-            apiKey: 'your-sandshrew-api-key',
-          },
-        },
-        walletOptions: {
-          autoConnect: true,
-          timeout: 30000,
-        },
-        debug: process.env.NODE_ENV === 'development', // Enable debug logging in development
-        cacheOptions: {
-          ttl: 60000, // Cache time-to-live in milliseconds
-          maxSize: 100, // Maximum number of items to cache
-        }
-      }}
-    >
-      <YourApp />
-    </LaserEyesProvider>
-  )
-}`}
-        fileName="advanced-config.tsx"
-        copyButton={true}
-      />
-
-      <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
-        Multiple Providers
-      </Heading>
-      <p className="mb-6">
-        In some cases, you might need to use multiple LaserEyes providers in your application, for example, to support
-        different networks in different parts of your app:
-      </p>
-      <CodeBlock
-        language="tsx"
-        code={`import { LaserEyesProvider } from '@omnisat/lasereyes-react'
-import { MAINNET, TESTNET } from '@omnisat/lasereyes-core'
-
-function App() {
-  return (
-    <div>
-      <h1>LaserEyes Multi-Network Demo</h1>
-      
-      <div>
-        <h2>Mainnet Section</h2>
-        <LaserEyesProvider config={{ network: MAINNET }}>
-          <MainnetComponent />
-        </LaserEyesProvider>
-      </div>
-      
-      <div>
-        <h2>Testnet Section</h2>
-        <LaserEyesProvider config={{ network: TESTNET }}>
-          <TestnetComponent />
-        </LaserEyesProvider>
-      </div>
+      <section className="space-y-6">
+        <Card className="overflow-hidden">
+          <CardContent className="p-6">
+            <h2 className="text-2xl font-bold mb-4">Next Steps</h2>
+            <div className="grid gap-4">
+              {[
+                {
+                  href: "/docs/use-laser-eyes",
+                  title: "useLaserEyes Hook",
+                  description: "Learn how to interact with LaserEyes in your components",
+                  icon: Bot
+                },
+                {
+                  href: "/docs/wallet-providers",
+                  title: "Wallet Providers",
+                  description: "Explore the supported wallet providers",
+                  icon: Layers
+                },
+                {
+                  href: "/docs/datasource-system",
+                  title: "DataSource System",
+                  description: "Understand how LaserEyes interacts with Bitcoin data providers",
+                  icon: Database
+                }
+              ].map((item) => (
+                <Link key={item.href} href={item.href}>
+                  <Card className="group relative overflow-hidden transition-all duration-300 hover:border-orange-500/30 hover:shadow-lg hover:shadow-orange-500/5">
+                    <CardContent className="flex items-center justify-between p-4">
+                      <div className="flex items-center gap-4">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-500/10 text-orange-500">
+                          <item.icon className="h-5 w-5" />
+                        </div>
+                        <div>
+                          <h3 className="font-semibold group-hover:text-orange-500 transition-colors">{item.title}</h3>
+                          <p className="text-sm text-muted-foreground">{item.description}</p>
+                        </div>
+                      </div>
+                      <ArrowRight className="h-5 w-5 text-muted-foreground/50 transition-transform group-hover:translate-x-1 group-hover:text-orange-500" />
+                    </CardContent>
+                  </Card>
+                </Link>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </section>
     </div>
   )
 }
 
-// Components for different networks
-function MainnetComponent() {
-  // Uses the Mainnet provider
-  return <div>Mainnet Component</div>
-}
+export default function LaserEyesProviderPage() {
+  return (
+    <div className="space-y-8">
+      <div className="relative overflow-hidden rounded-lg border bg-gradient-to-br from-orange-500/10 via-background to-background p-8">
+        <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-orange-500/20 rounded-full blur-3xl -z-10 translate-x-1/2 -translate-y-1/2" />
+        <Badge variant="secondary" className="mb-4">React Integration</Badge>
+        <Heading level={1} className="mb-4 bg-gradient-to-br from-orange-500 to-yellow-500 bg-clip-text text-transparent">
+          LaserEyesProvider
+        </Heading>
+        <p className="text-xl max-w-2xl text-muted-foreground">
+          The essential React context provider that powers LaserEyes integration in your application.
+        </p>
+      </div>
 
-function TestnetComponent() {
-  // Uses the Testnet provider
-  return <div>Testnet Component</div>
-}`}
-        fileName="multiple-providers.tsx"
-        copyButton={true}
-      />
-      <p className="mt-4 mb-6">
-        Note that each provider creates its own isolated context, so components can only access the provider that wraps
-        them.
-      </p>
-
-      <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
-        Provider Lifecycle
-      </Heading>
-      <p className="mb-6">
-        The <code>LaserEyesProvider</code> manages the lifecycle of the LaserEyes client:
-      </p>
-      <ul className="list-disc pl-6 mb-6 space-y-2">
-        <li>
-          <strong>Initialization</strong>: When the provider mounts, it creates and initializes the LaserEyes client
-          with the provided configuration.
-        </li>
-        <li>
-          <strong>Auto-connection</strong>: If <code>autoConnect</code> is enabled, it attempts to reconnect to the last
-          used wallet.
-        </li>
-        <li>
-          <strong>State management</strong>: It manages the state of the wallet connection, balances, and other data.
-        </li>
-        <li>
-          <strong>Cleanup</strong>: When the provider unmounts, it cleans up resources and disconnects from the wallet.
-        </li>
-      </ul>
-
-      <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
-        Next Steps
-      </Heading>
-      <p className="mb-6">
-        Now that you understand how to set up the <code>LaserEyesProvider</code>, you can explore related topics:
-      </p>
-      <ul className="list-disc pl-6 mb-6 space-y-2">
-        <li>
-          <Link href="/docs/use-laser-eyes" className="text-primary hover:underline">
-            useLaserEyes Hook
-          </Link>{" "}
-          - Learn how to interact with LaserEyes in your components
-        </li>
-        <li>
-          <Link href="/docs/ui-components" className="text-primary hover:underline">
-            UI Components
-          </Link>{" "}
-          - Explore the ready-to-use UI components provided by LaserEyes
-        </li>
-        <li>
-          <Link href="/docs/wallet-providers" className="text-primary hover:underline">
-            Wallet Providers
-          </Link>{" "}
-          - Learn about the supported wallet providers
-        </li>
-        <li>
-          <Link href="/docs/datasource-system" className="text-primary hover:underline">
-            DataSource System
-          </Link>{" "}
-          - Understand how LaserEyes interacts with Bitcoin data providers
-        </li>
-      </ul>
-    </>
+      <ClientPageWrapper>
+        <LaserEyesProviderContent />
+      </ClientPageWrapper>
+    </div>
   )
 }
 

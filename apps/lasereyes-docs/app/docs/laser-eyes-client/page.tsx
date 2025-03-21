@@ -1,30 +1,54 @@
 "use client"
 
+import * as React from "react"
 import { CodeBlock } from "@/components/code-block"
 import Link from "next/link"
 import { Heading } from "@/components/heading"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { ArrowRight, Wallet, Database, Code2, Shield, Settings2, Zap } from "lucide-react"
+import { cn } from "@/lib/utils"
 
-export default function LaserEyesClientPage() {
+interface FeatureCardProps {
+  icon: React.ElementType
+  title: string
+  description: string
+  className?: string
+}
+
+function FeatureCard({ icon: Icon, title, description, className }: FeatureCardProps) {
   return (
-    <>
-      <Heading level={1} className="text-3xl font-bold mb-6">
-        LaserEyesClient
-      </Heading>
-      <p className="text-lg mb-4">
-        The <code>LaserEyesClient</code> is the central component of the LaserEyes core API. It orchestrates wallet
-        connections, transactions, and data retrieval, providing a unified interface for interacting with Bitcoin
-        wallets and blockchain data.
-      </p>
+    <Card className={cn(
+      "group relative overflow-hidden transition-all duration-300 hover:border-orange-500/30 hover:shadow-lg hover:shadow-orange-500/5",
+      className
+    )}>
+      <div className="absolute right-0 top-0 h-20 w-20 translate-x-6 -translate-y-6 rounded-full bg-orange-500/10 blur-2xl filter group-hover:bg-orange-500/20" />
+      <CardContent className="p-6">
+        <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-orange-500/10 text-orange-500">
+          <Icon className="h-6 w-6" />
+        </div>
+        <h3 className="mb-2 text-xl font-semibold">{title}</h3>
+        <p className="text-muted-foreground">{description}</p>
+      </CardContent>
+    </Card>
+  )
+}
 
-      <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
-        Initialization
-      </Heading>
-      <p className="mb-6">
-        To use the <code>LaserEyesClient</code>, you need to create and initialize it with stores and configuration:
-      </p>
-      <CodeBlock
-        language="typescript"
-        code={`import { 
+function LaserEyesClientContent() {
+  return (
+    <div className="space-y-10">
+
+      <section className="space-y-6" id="initialization">
+        <h2 className="text-3xl font-bold">Initialization</h2>
+        <Card className="overflow-hidden border-2 border-dashed">
+          <CardHeader className="border-b bg-muted/50 px-6">
+            <h3 className="font-mono text-sm font-medium">Client Setup</h3>
+          </CardHeader>
+          <CardContent className="p-6">
+            <CodeBlock
+              language="typescript"
+              code={`import { 
   LaserEyesClient, 
   createStores, 
   createConfig, 
@@ -51,26 +75,27 @@ client.initialize()
 
 // Now you can use the client
 console.log('Client initialized')`}
-        fileName="client-initialization.ts"
-        copyButton={true}
-      />
+              fileName="client-initialization.ts"
+              copyButton={true}
+            />
+          </CardContent>
+        </Card>
+      </section>
 
-      <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
-        Key Methods
-      </Heading>
-      <p className="mb-6">
-        The <code>LaserEyesClient</code> provides methods for wallet connection, transactions, and data retrieval:
-      </p>
+      <section className="space-y-6" id="wallet-operations">
+        <h2 className="text-3xl font-bold">Wallet Operations</h2>
+        <div className="grid gap-6 sm:grid-cols-2">
+          <Card className="overflow-hidden">
+            <CardHeader className="border-b bg-muted/50 px-6">
+              <h3 className="font-mono text-sm font-medium">Connection Management</h3>
+            </CardHeader>
+            <CardContent className="p-6">
+              <CodeBlock
+                language="typescript"
+                code={`// Connect to a wallet
+await client.connect(UNISAT)
 
-      <Heading level={3} className="text-xl font-bold mt-6 mb-2">
-        Wallet Connection
-      </Heading>
-      <CodeBlock
-        language="typescript"
-        code={`// Connect to a wallet
-await client.connect(UNISAT) // Connect to UniSat wallet
-
-// Check if connected
+// Check connection status
 const isConnected = client.isConnected()
 
 // Get connected address
@@ -79,44 +104,47 @@ const address = client.getAddress()
 // Disconnect
 await client.disconnect()
 
-// Switch to a different wallet provider
+// Switch wallet provider
 await client.switchProvider(XVERSE)`}
-        fileName="wallet-connection.ts"
-        copyButton={true}
-      />
+                fileName="wallet-connection.ts"
+                copyButton={true}
+              />
+            </CardContent>
+          </Card>
 
-      <Heading level={3} className="text-xl font-bold mt-6 mb-2">
-        Transactions
-      </Heading>
-      <CodeBlock
-        language="typescript"
-        code={`// Send BTC
-const txid = await client.sendBTC('bc1q...', 10000) // 10000 satoshis
+          <Card className="overflow-hidden">
+            <CardHeader className="border-b bg-muted/50 px-6">
+              <h3 className="font-mono text-sm font-medium">Transaction Operations</h3>
+            </CardHeader>
+            <CardContent className="p-6">
+              <CodeBlock
+                language="typescript"
+                code={`// Send BTC
+const txid = await client.sendBTC('bc1q...', 10000)
 
 // Sign a message
-const signature = await client.signMessage('Hello, Bitcoin!')
+const signature = await client.signMessage('Hello')
 
 // Sign a PSBT
-const signedPsbtHex = await client.signPsbt(psbtHex)
-
-// Broadcast a signed PSBT
-const txid = await client.pushPsbt(signedPsbtHex)
+const signedPsbt = await client.signPsbt(psbtHex)
 
 // Create an inscription
-const txid = await client.inscribe(contentBase64, 'text/plain')
+const txid = await client.inscribe(content, 'text/plain')`}
+                fileName="transactions.ts"
+                copyButton={true}
+              />
+            </CardContent>
+          </Card>
+        </div>
+      </section>
 
-// Send inscriptions
-const txid = await client.sendInscriptions(['inscription1', 'inscription2'], 'bc1q...')`}
-        fileName="transactions.ts"
-        copyButton={true}
-      />
-
-      <Heading level={3} className="text-xl font-bold mt-6 mb-2">
-        Data Retrieval
-      </Heading>
-      <CodeBlock
-        language="typescript"
-        code={`// Get balance
+      <section className="space-y-6" id="data-retrieval">
+        <h2 className="text-3xl font-bold">Data Retrieval</h2>
+        <Card className="overflow-hidden">
+          <CardContent className="p-6">
+            <CodeBlock
+              language="typescript"
+              code={`// Get balance
 const balance = await client.getBalance()
 
 // Get UTXOs
@@ -133,45 +161,20 @@ const runes = await client.getMetaBalances('runes')
 
 // Estimate fee
 const feeRate = await client.estimateFee(1) // For next block`}
-        fileName="data-retrieval.ts"
-        copyButton={true}
-      />
+              fileName="data-retrieval.ts"
+              copyButton={true}
+            />
+          </CardContent>
+        </Card>
+      </section>
 
-      <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
-        Advanced Usage
-      </Heading>
-      <p className="mb-6">For more advanced use cases, you can access the underlying components of the client:</p>
-      <CodeBlock
-        language="typescript"
-        code={`// Get the DataSource Manager
-const dataSourceManager = client.getDataSourceManager()
-
-// Get the current wallet adapter
-const walletAdapter = client.getWalletAdapter()
-
-// Access stores directly
-const storeState = client.getStores().$store.get()
-
-// Listen for store changes
-client.getStores().$store.subscribe((state) => {
-  console.log('Store updated:', state)
-})
-
-// Dispose the client when done
-client.dispose()`}
-        fileName="advanced-usage.ts"
-        copyButton={true}
-      />
-
-      <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
-        Error Handling
-      </Heading>
-      <p className="mb-6">
-        The <code>LaserEyesClient</code> methods can throw errors that you should handle:
-      </p>
-      <CodeBlock
-        language="typescript"
-        code={`try {
+      <section className="space-y-6" id="error-handling">
+        <h2 className="text-3xl font-bold">Error Handling</h2>
+        <Card className="overflow-hidden">
+          <CardContent className="p-6">
+            <CodeBlock
+              language="typescript"
+              code={`try {
   await client.connect(UNISAT)
 } catch (error) {
   if (error.code === 'WALLET_NOT_FOUND') {
@@ -195,19 +198,20 @@ try {
     console.error('Transaction failed:', error.message)
   }
 }`}
-        fileName="error-handling.ts"
-        copyButton={true}
-      />
+              fileName="error-handling.ts"
+              copyButton={true}
+            />
+          </CardContent>
+        </Card>
+      </section>
 
-      <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
-        Configuration Options
-      </Heading>
-      <p className="mb-6">
-        The <code>LaserEyesClient</code> can be configured with various options:
-      </p>
-      <CodeBlock
-        language="typescript"
-        code={`const config = createConfig({
+      <section className="space-y-6" id="configuration">
+        <h2 className="text-3xl font-bold">Configuration</h2>
+        <Card className="overflow-hidden">
+          <CardContent className="p-6">
+            <CodeBlock
+              language="typescript"
+              code={`const config = createConfig({
   // Required: Bitcoin network
   network: MAINNET, // or TESTNET, SIGNET, etc.
   
@@ -241,120 +245,69 @@ try {
     maxSize: 100, // Maximum number of items to cache
   },
 })`}
-        fileName="configuration.ts"
-        copyButton={true}
-      />
+              fileName="configuration.ts"
+              copyButton={true}
+            />
+          </CardContent>
+        </Card>
+      </section>
 
-      <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
-        TypeScript Support
-      </Heading>
-      <p className="mb-6">
-        The <code>LaserEyesClient</code> provides comprehensive TypeScript types:
-      </p>
-      <CodeBlock
-        language="typescript"
-        code={`import { 
-  LaserEyesClient, 
-  createStores, 
-  createConfig, 
-  MAINNET,
-  type Config,
-  type Stores,
-  type UTXO,
-  type Inscription,
-  type Transaction,
-} from '@omnisat/lasereyes-core'
+      <section className="space-y-6" id="next-steps">
+        <h2 className="text-3xl font-bold">Next Steps</h2>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Link href="/docs/data-source-manager" className="block">
+            <Card className="h-full transition-all hover:border-orange-500/30 hover:shadow-lg hover:shadow-orange-500/5">
+              <CardContent className="flex h-full flex-col justify-between p-6">
+                <div>
+                  <h3 className="mb-2 text-lg font-semibold">Data Source Manager</h3>
+                  <p className="text-sm text-muted-foreground">Learn how to interact with Bitcoin data providers</p>
+                </div>
+                <ArrowRight className="mt-4 h-5 w-5 text-orange-500" />
+              </CardContent>
+            </Card>
+          </Link>
+          <Link href="/docs/wallet-providers" className="block">
+            <Card className="h-full transition-all hover:border-orange-500/30 hover:shadow-lg hover:shadow-orange-500/5">
+              <CardContent className="flex h-full flex-col justify-between p-6">
+                <div>
+                  <h3 className="mb-2 text-lg font-semibold">Wallet Providers</h3>
+                  <p className="text-sm text-muted-foreground">Explore the supported wallet providers</p>
+                </div>
+                <ArrowRight className="mt-4 h-5 w-5 text-orange-500" />
+              </CardContent>
+            </Card>
+          </Link>
+        </div>
+      </section>
+    </div>
+  )
+}
 
-// Type-safe configuration
-const config: Config = createConfig({ 
-  network: MAINNET 
-})
+export default function LaserEyesClientPage() {
+  return (
+    <div className="space-y-8">
+      <div className="relative overflow-hidden rounded-lg border bg-gradient-to-br from-orange-500/10 via-background to-background p-8">
+        <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-orange-500/20 rounded-full blur-3xl -z-10 translate-x-1/2 -translate-y-1/2" />
+        <Badge variant="secondary" className="mb-4">Core API</Badge>
+        <Heading level={1} className="mb-4 bg-gradient-to-br from-orange-500 to-yellow-500 bg-clip-text text-transparent">
+          LaserEyesClient
+        </Heading>
+        <p className="text-xl mb-6 max-w-2xl text-muted-foreground">
+          The central component of the LaserEyes core API, orchestrating wallet connections, transactions, and data retrieval through a unified interface.
+        </p>
+        <div className="flex gap-4 items-center">
+          <Link href="#initialization">
+            <Button size="lg" className="group">
+              Get Started
+              <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </Button>
+          </Link>
+          <Badge variant="secondary" className="h-7 px-3">v1.0.0</Badge>
+        </div>
+      </div>
 
-// Type-safe stores
-const stores: Stores = createStores()
-
-// Type-safe client
-const client: LaserEyesClient = new LaserEyesClient(stores, config)
-
-// Type-safe method calls
-async function example() {
-  const balance: string = await client.getBalance()
-  const utxos: UTXO[] = await client.getUtxos()
-  const inscriptions: Inscription[] = await client.getInscriptions()
-  
-  // Type-safe error handling
-  try {
-    const txid: string = await client.sendBTC('bc1q...', 10000)
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      console.error(error.message)
-    }
-  }
-}`}
-        fileName="typescript-support.ts"
-        copyButton={true}
-      />
-
-      <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
-        Related Components
-      </Heading>
-      <p className="mb-6">
-        The <code>LaserEyesClient</code> works with several other components in the LaserEyes core API:
-      </p>
-      <ul className="list-disc pl-6 mb-6 space-y-2">
-        <li>
-          <Link href="/docs/data-source-manager" className="text-primary hover:underline">
-            DataSourceManager
-          </Link>{" "}
-          - Manages interactions with Bitcoin data providers
-        </li>
-        <li>
-          <Link href="/docs/wallet-providers" className="text-primary hover:underline">
-            Wallet Providers
-          </Link>{" "}
-          - Constants and adapters for different wallet providers
-        </li>
-        <li>
-          <strong>Stores</strong> - State management for the client
-        </li>
-        <li>
-          <strong>Config</strong> - Configuration options for the client
-        </li>
-      </ul>
-
-      <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
-        Next Steps
-      </Heading>
-      <p className="mb-6">
-        Now that you understand the <code>LaserEyesClient</code>, you can explore related topics:
-      </p>
-      <ul className="list-disc pl-6 mb-6 space-y-2">
-        <li>
-          <Link href="/docs/data-source-manager" className="text-primary hover:underline">
-            DataSourceManager
-          </Link>{" "}
-          - Learn how to interact with Bitcoin data providers
-        </li>
-        <li>
-          <Link href="/docs/wallet-providers" className="text-primary hover:underline">
-            Wallet Providers
-          </Link>{" "}
-          - Explore the supported wallet providers
-        </li>
-        <li>
-          <Link href="/docs/transaction-types" className="text-primary hover:underline">
-            Transaction Types
-          </Link>{" "}
-          - Learn about the different types of transactions
-        </li>
-        <li>
-          <Link href="/docs/custom-datasource" className="text-primary hover:underline">
-            Custom DataSource Implementation
-          </Link>{" "}
-          - Create your own data source
-        </li>
-      </ul>
-    </>
+      <LaserEyesClientContent />
+    </div>
   )
 }
 

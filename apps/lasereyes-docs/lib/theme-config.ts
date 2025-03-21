@@ -25,59 +25,29 @@ export const themeConfig = {
           title: "Installation",
           href: "/docs/installation",
         },
-        {
-          title: "Create LaserEyes",
-          href: "/docs/create-lasereyes",
-        },
+
         {
           title: "Basic Setup",
           href: "/docs/basic-setup",
         },
         {
-          title: "Hello World Example",
+          title: "Hello World",
           href: "/docs/hello-world",
         },
+
         {
-          title: "Architecture",
-          href: "/docs/architecture",
+          title: "Create LaserEyes",
+          href: "/docs/create-lasereyes",
+          highlight: true
         },
       ],
     },
-    {
-      title: "Examples & Recipes",
-      highlight: true,
+        {
+      title: "React",
       items: [
+
         {
-          title: "Examples",
-          href: "/docs/examples",
-        },
-        {
-          title: "Wallet Integration",
-          href: "/docs/examples/wallet-integration",
-        },
-        {
-          title: "Transaction Tracking",
-          href: "/docs/examples/transaction-tracking",
-        },
-        {
-          title: "Recipes",
-          href: "/docs/recipes",
-        },
-        {
-          title: "Bitcoin Donation Page",
-          href: "/docs/recipes/bitcoin-donation-page",
-        },
-        {
-          title: "Transaction History",
-          href: "/docs/recipes/transaction-history",
-        },
-      ],
-    },
-    {
-      title: "Core Concepts",
-      items: [
-        {
-          title: "LaserEyes Provider",
+          title: "LaserEyesProvider",
           href: "/docs/laser-eyes-provider",
         },
         {
@@ -85,8 +55,30 @@ export const themeConfig = {
           href: "/docs/use-laser-eyes",
         },
         {
-          title: "UI Components",
-          href: "/docs/ui-components",
+          title: "Wallet Icons",
+          href: "/docs/wallet-icons",
+        },
+      ],
+    },
+    {
+      title: "Core Concepts",
+      items: [
+        {
+          title: "Architecture",
+          href: "/docs/architecture",
+        },
+        {
+          title: "LaserEyes Client",
+          href: "/docs/laser-eyes-client",
+        },
+        {
+          title: "Wallets",
+          href: "/docs/wallets",
+        },
+
+        {
+          title: "Wallet Providers",
+          href: "/docs/wallet-providers",
         },
         {
           title: "Core API Reference",
@@ -94,15 +86,7 @@ export const themeConfig = {
         },
       ],
     },
-    {
-      title: "React Integration",
-      items: [
-        {
-          title: "LaserEyes Client",
-          href: "/docs/laser-eyes-client",
-        },
-      ],
-    },
+
     {
       title: "DataSource Deep Dive",
       items: [
@@ -114,10 +98,7 @@ export const themeConfig = {
           title: "Data Source Manager",
           href: "/docs/data-source-manager",
         },
-        {
-          title: "Wallet Providers",
-          href: "/docs/wallet-providers",
-        },
+
         {
           title: "Network Support",
           href: "/docs/network-support",
