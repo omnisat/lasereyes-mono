@@ -17,6 +17,10 @@ const DynamicLasereyesProvider = dynamic(
   () => import('@omnisat/lasereyes').then((mod) => mod.LaserEyesProvider),
   { ssr: false }
 )
+const DynamicLasereyesUiProvider = dynamic(
+  () => import('@omnisat/lasereyes/ui').then((mod) => mod.LaserEyesModalProvider),
+  { ssr: false }
+)
 
 export default function Home() {
   const [network, setNetwork] = useState<
@@ -60,9 +64,11 @@ export default function Home() {
         network: network,
       }}
     >
-      <UtxoProvider>
-        <App setNetwork={switchNet} />
-      </UtxoProvider>
+      <DynamicLasereyesUiProvider>
+        <UtxoProvider>
+          <App setNetwork={switchNet} />
+        </UtxoProvider>
+      </DynamicLasereyesUiProvider>
     </DynamicLasereyesProvider>
   )
 }

@@ -27,9 +27,6 @@ Don't trust verify [Try Out The Demo Here](https://demo.lasereyes.build)
 - Phantom
 - Xverse
 
-## Why Laser Eyes?
-
-![herding cats](https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbW92cmM4MDExcGE1NmJtZjhka2N3M25wNm4zeDR5cWQ4YzFnNzZiNiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/7MIULHLEeZyKs/giphy.gif)
 
 ## Community
 
@@ -45,57 +42,60 @@ Contributions to Laser Eyes are greatly appreciated! If you're interested in con
 
 If you find Laser Eyes useful or use it for work, please consider [sponsoring Laser Eyes](https://github.com/sponsors/omnisat). Thank you 🙏
 
-<br/>
-
 <h2 style="text-align: center;">Ecosystem Partnerships</h2>
 <p style="display: flex; justify-content: center; align-items: center; gap: 60px; flex-wrap: wrap;">
-  <a href="https://www.utxo.management/">
+  <a href="https://www.utxo.management/" rel="nofollow">
     <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="./.github/assets/utxo.svg">
-      <img alt="UTXO Management" src="./.github/assets/utxo.svg" width="auto" height="100">
+      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/omnisat/lasereyes-mono/dev/.github/assets/utxo-light.svg">
+      <img alt="UTXO Management" src="https://raw.githubusercontent.com/omnisat/lasereyes-mono/dev/.github/assets/utxo-dark.svg" width="auto" height="100">
     </picture>
   </a>
-    <a href="https://www.oyl.io/">
+  <a href="https://www.oyl.io/" rel="nofollow">
     <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="./.github/assets/oyl-light.svg">
-      <img alt="OYL" src="./.github/assets/oyl-light.svg" width="auto" height="80">
+      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/omnisat/lasereyes-mono/dev/.github/assets/oyl-light.svg">
+      <img alt="OYL" src="https://raw.githubusercontent.com/omnisat/lasereyes-mono/dev/.github/assets/oyl-dark.svg" width="auto" height="80">
     </picture>
   </a>
-  <a href="https://www.gomaestro.org/">
+  <a href="https://www.gomaestro.org/" rel="nofollow">
     <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="./.github/assets/maestro-light.svg">
-      <img alt="Maestro" src="./.github/assets/maestro-light.svg" width="auto" height="80">
+      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/omnisat/lasereyes-mono/dev/.github/assets/maestro-light.svg">
+      <img alt="Maestro" src="https://raw.githubusercontent.com/omnisat/lasereyes-mono/dev/.github/assets/maestro-dark.svg" width="auto" height="80">
+    </picture>
+  </a>
+  <a href="https://www.trio.xyz" rel="nofollow">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/omnisat/lasereyes-mono/dev/.github/assets/trio-light.svg">
+      <img alt="Trio" src="https://raw.githubusercontent.com/omnisat/lasereyes-mono/dev/.github/assets/trio-dark.svg" width="auto" height="80">
     </picture>
   </a>
 </p>
 <p style="display: flex; justify-content: center; align-items: center; gap: 60px; flex-wrap: wrap;">
-  <a href="https://l1f.io/">
+  <a href="https://l1f.io/" rel="nofollow">
     <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="./.github/assets/l1f.svg">
-      <img alt="L1F" src="./.github/assets/l1f.svg" width="auto" height="60">
+      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/omnisat/lasereyes-mono/dev/.github/assets/l1f-light.svg">
+      <img alt="L1F" src="https://raw.githubusercontent.com/omnisat/lasereyes-mono/dev/.github/assets/l1f_dark.svg" width="auto" height="60">
     </picture>
   </a>
-  <a href="https://x.com/BLIFEProtocol">
+  <a href="https://x.com/BLIFEProtocol" rel="nofollow">
     <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="./.github/assets/blife.svg">
-      <img alt="L1F" src="./.github/assets/blife.svg" width="auto" height="120">
+      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/omnisat/lasereyes-mono/dev/.github/assets/blife-light.svg">
+      <img alt="BLIFE" src="https://raw.githubusercontent.com/omnisat/lasereyes-mono/dev/.github/assets/blife-dark.svg" width="auto" height="120">
     </picture>
   </a>
 </p>
 
 <h2 style="text-align: center;">Start-Up Sponsors</h2>
 <p style="display: flex; justify-content: center; align-items: center; gap: 40px; flex-wrap: wrap;">
-  <a href="https://www.seizectrl.io/">
+  <a href="https://www.seizectrl.io/" rel="nofollow">
     <picture>
-
-      <source media="(prefers-color-scheme: dark)" srcset="./.github/assets/ctrl.svg">
-      <img alt="Seize CTRL" src="./.github/assets/ctrl.svg" width="auto" height="50">
+      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/omnisat/lasereyes-mono/dev/.github/assets/ctrl-light.svg">
+      <img alt="Seize CTRL" src="https://raw.githubusercontent.com/omnisat/lasereyes-mono/dev/.github/assets/ctrl-dark.svg" width="auto" height="50">
     </picture>
   </a>
-  <a href="https://leather.io/">
+  <a href="https://leather.io/" rel="nofollow">
     <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="./.github/assets/leather.svg">
-      <img alt="Leather" src="./.github/assets/leather.svg" width="auto" height="50">
+      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/omnisat/lasereyes-mono/dev/.github/assets/leather-light.svg">
+      <img alt="Leather" src="https://raw.githubusercontent.com/omnisat/lasereyes-mono/dev/.github/assets/leather-dark.svg" width="auto" height="50">
     </picture>
   </a>
 </p>

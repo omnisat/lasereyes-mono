@@ -134,6 +134,12 @@ export default function LaserEyesProvider({
     [client]
   )
 
+  const getUtxos = useCallback(
+    async (address: string) =>
+      (await client?.dataSourceManager.getAddressUtxos(address)) ??
+      defaultMethods.getUtxos(),
+    [client]
+  )
 
   // TODO: Move method definitions into useMemo here
   const methods = useMemo(() => {
@@ -157,7 +163,8 @@ export default function LaserEyesProvider({
       switchNetwork,
       inscribe,
       send,
-      sendInscriptions
+      sendInscriptions,
+      getUtxos
     }
   }, [
     client,
@@ -177,6 +184,7 @@ export default function LaserEyesProvider({
     signMessage,
     signPsbt,
     switchNetwork,
+    getUtxos
   ])
 
   return (

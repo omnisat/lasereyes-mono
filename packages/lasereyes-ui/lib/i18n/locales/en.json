@@ -1,0 +1,19 @@
+{
+  "common": {
+    "modal": {
+      "loading": "Loading",
+      "connect": "Connect",
+      "error_occurred": "An error occurred",
+      "connect_wallet": "Connect Your Wallet",
+      "connect_your_x_wallet": "Connect Your {{wallet}} Wallet",
+      "connect_wallet_short": "Connect Wallet",
+      "connecting_wallet": "Check your wallet for further actions...",
+      "choose_wallet": "Choose Wallet",
+      "connect_wallet_description": "Select what wallet you want to connect to below and click \"Connect\" to proceed",
+      "installed_wallets_description": "We found these wallets already installed on your browser",
+      "installed_wallets": "Installed",
+      "other_wallets": "Others",
+      "other_wallets_description": "Here are some other great wallets that we support. Click on any of them to learn more"
+    }
+  }
+}

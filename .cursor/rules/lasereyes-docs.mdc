@@ -1,0 +1,55 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+## Files
+[page.tsx](mdc:apps/lasereyes-docs/app/page.tsx) [page.tsx](mdc:apps/lasereyes-docs/app/docs/page.tsx) 
+
+## Adding New Content
+
+### Adding a New Documentation Page
+
+1. Create a new file in the appropriate directory under `./apps/lasereyes-docs/app/docs/`
+2. Add the page to the navigation in `./apps/lasereyes-docs/lib/theme-config.ts`
+3. Use the `DocPageLayout` component for consistent styling
+4. Add `DocNavigation` at the bottom with prev/next links
+
+
+### Adding a New Example or Recipe
+
+1. Create a new file in `./apps/lasereyes-docs/app/docs/examples/` or `./apps/lasereyes-docs/app/docs/recipes/`
+2. Add the page to the navigation in `./apps/lasereyes-docs/lib/theme-config.ts` under the "Examples & Recipes" section
+3. Use code examples with the `CodeBlock` component
+4. Include step-by-step instructions and explanations
+
+
+## Future Improvements
+
+Potential areas for enhancement:
+
+1. Add search functionality
+2. Improve mobile navigation experience
+3. Add versioning for documentation
+4. Add interactive demos
+5. Implement API reference generation from TypeScript types
+6. Add more comprehensive examples and recipes
+
+
+## Troubleshooting
+
+If you encounter deployment issues:
+
+1. Check for client components using hooks without Suspense boundaries
+2. Ensure no local fonts are being used
+3. Verify that all pages with dynamic content have proper error boundaries
+4. Check for browser-specific APIs that might cause issues during static generation
+
+
+## Monorepo Integration
+
+Since this project is now part of a monorepo:
+
+1. Make sure to run commands from the root of the monorepo or use the appropriate workspace commands
+2. Update import paths if sharing components or utilities between apps in the monorepo
+3. Ensure the monorepo's build and deployment scripts correctly handle the documentation app
