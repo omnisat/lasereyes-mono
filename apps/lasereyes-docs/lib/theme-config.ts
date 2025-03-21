@@ -38,11 +38,27 @@ export const themeConfig = {
         {
           title: "Create LaserEyes",
           href: "/docs/create-lasereyes",
-          highlight: true
         },
       ],
     },
+         {
+      title: "Ordinals",
+      items: [
+
         {
+          title: "Inscriptions",
+          href: "/docs/inscriptions",
+        },
+        {
+          title: "Runes",
+          href: "/docs/runes",
+        },
+        {
+          title: "BRC-20",
+          href: "/docs/brc-20",
+        },
+      ],
+    },       {
       title: "React",
       items: [
 

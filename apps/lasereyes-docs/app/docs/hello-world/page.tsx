@@ -10,6 +10,21 @@ import { Badge } from "@/components/ui/badge"
 import { Wallet, Code2, ArrowRight, Send, Coins, FileCode } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { useState } from 'react'
+import { LaserEyesProvider } from '@omnisat/lasereyes-react'
+import { useLaserEyes } from '@omnisat/lasereyes-react'
+import { 
+  MAINNET, 
+  UNISAT, 
+  XVERSE,
+  OYL,
+  LEATHER,
+  MAGIC_EDEN,
+  OKX,
+  PHANTOM,
+  WIZZ,
+  ORANGE
+} from '@omnisat/lasereyes-core'
 
 interface StepCardProps {
   step: number
@@ -123,7 +138,147 @@ export default function App() {
   )
 }
 
-// ... rest of the code ...`}
+// Wallet Demo Component
+function WalletDemo() {
+  const { 
+    connect, 
+    disconnect, 
+    connected, 
+    address, 
+    balance, 
+    sendBTC 
+  } = useLaserEyes()
+
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [recipient, setRecipient] = useState('')
+  const [amount, setAmount] = useState('')
+  const [txId, setTxId] = useState('')
+
+  // Connect wallet function
+  const connectWallet = async (provider) => {
+    setError('')
+    setLoading(true)
+    try {
+      await connect(provider)
+    } catch (error) {
+      setError(error.message || 'Failed to connect wallet')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Format balance from satoshis to BTC
+  const formatBalance = () => {
+    if (!balance) return '0'
+    return (Number(balance) / 100000000).toFixed(8)
+  }
+
+  // Send BTC function
+  const handleSendBTC = async () => {
+    if (!recipient || !amount) {
+      setError('Please enter recipient address and amount')
+      return
+    }
+    
+    setError('')
+    setTxId('')
+    setLoading(true)
+    
+    try {
+      // Convert amount to satoshis
+      const satoshis = Math.floor(parseFloat(amount) * 100000000)
+      const result = await sendBTC(recipient, satoshis)
+      setTxId(result)
+      setRecipient('')
+      setAmount('')
+    } catch (error) {
+      setError(error.message || 'Transaction failed')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  if (!connected) {
+    return (
+      <div className="space-y-4">
+        <div className="grid grid-cols-2 gap-4">
+          <button
+            onClick={() => connectWallet(UNISAT)}
+            disabled={loading}
+            className="px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600 disabled:opacity-50"
+          >
+            Connect UniSat
+          </button>
+          <button
+            onClick={() => connectWallet(XVERSE)}
+            disabled={loading}
+            className="px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600 disabled:opacity-50"
+          >
+            Connect Xverse
+          </button>
+        </div>
+        {error && <p className="text-red-500">{error}</p>}
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-6 w-full max-w-md">
+      <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded">
+        <h2 className="text-lg font-semibold mb-2">Wallet Info</h2>
+        <p className="mb-2">Address: {address}</p>
+        <p className="mb-4">Balance: {formatBalance()} BTC</p>
+        <button
+          onClick={disconnect}
+          className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+        >
+          Disconnect
+        </button>
+      </div>
+
+      <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded">
+        <h2 className="text-lg font-semibold mb-4">Send BTC</h2>
+        <div className="space-y-4">
+          <div>
+            <label className="block mb-1">Recipient Address</label>
+            <input
+              type="text"
+              value={recipient}
+              onChange={(e) => setRecipient(e.target.value)}
+              className="w-full p-2 border rounded dark:bg-gray-700"
+              placeholder="Enter Bitcoin address"
+            />
+          </div>
+          <div>
+            <label className="block mb-1">Amount (BTC)</label>
+            <input
+              type="number"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              className="w-full p-2 border rounded dark:bg-gray-700"
+              placeholder="0.00000000"
+              step="0.00000001"
+            />
+          </div>
+          <button
+            onClick={handleSendBTC}
+            disabled={loading}
+            className="w-full px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600 disabled:opacity-50"
+          >
+            Send
+          </button>
+          {error && <p className="text-red-500">{error}</p>}
+          {txId && (
+            <p className="text-green-500">
+              Transaction sent! TXID: {txId}
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}`}
               copyButton={true}
             />
           </CardContent>
@@ -249,8 +404,7 @@ const handleSendBTC = async () => {
           </CardHeader>
           <CardContent className="p-6">
             <p className="mb-6 text-muted-foreground">
-              LaserEyes also supports working with Bitcoin Ordinals and inscriptions. Here's a simple example of how to list
-              inscriptions:
+              LaserEyes also supports working with Bitcoin Ordinals and inscriptions. Here's a complete example showing how to list inscriptions and create new ones:
             </p>
             <CodeBlock
               language="tsx"
@@ -258,10 +412,170 @@ const handleSendBTC = async () => {
 import { useLaserEyes } from '@omnisat/lasereyes-react'
 
 function InscriptionsList() {
-  // ... inscription list code ...
+  const { 
+    getInscriptions, 
+    inscribe, 
+    connected, 
+    address 
+  } = useLaserEyes()
+
+  const [inscriptions, setInscriptions] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [content, setContent] = useState('')
+  const [inscribing, setInscribing] = useState(false)
+  const [txId, setTxId] = useState('')
+
+  // Load inscriptions
+  useEffect(() => {
+    if (connected) {
+      loadInscriptions()
+    }
+  }, [connected, address])
+
+  const loadInscriptions = async () => {
+    setLoading(true)
+    setError('')
+    try {
+      const result = await getInscriptions()
+      setInscriptions(result)
+    } catch (error) {
+      setError(error.message || 'Failed to load inscriptions')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Create new inscription
+  const handleInscribe = async () => {
+    if (!content) {
+      setError('Please enter content to inscribe')
+      return
+    }
+
+    setInscribing(true)
+    setError('')
+    setTxId('')
+
+    try {
+      const result = await inscribe(content, 'text/plain')
+      setTxId(result)
+      setContent('')
+      // Reload inscriptions after successful inscription
+      await loadInscriptions()
+    } catch (error) {
+      setError(error.message || 'Failed to create inscription')
+    } finally {
+      setInscribing(false)
+    }
+  }
+
+  if (!connected) {
+    return <p>Please connect your wallet first</p>
+  }
+
+  return (
+    <div className="space-y-8 w-full max-w-md">
+      {/* Create New Inscription */}
+      <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded">
+        <h2 className="text-lg font-semibold mb-4">Create Inscription</h2>
+        <div className="space-y-4">
+          <div>
+            <label className="block mb-1">Content</label>
+            <textarea
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              className="w-full p-2 border rounded dark:bg-gray-700"
+              placeholder="Enter text to inscribe"
+              rows={4}
+            />
+          </div>
+          <button
+            onClick={handleInscribe}
+            disabled={inscribing || !content}
+            className="w-full px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600 disabled:opacity-50"
+          >
+            {inscribing ? 'Creating Inscription...' : 'Create Inscription'}
+          </button>
+          {error && <p className="text-red-500">{error}</p>}
+          {txId && (
+            <p className="text-green-500">
+              Inscription created! TXID: {txId}
+            </p>
+          )}
+        </div>
+      </div>
+
+      {/* List Inscriptions */}
+      <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold">Your Inscriptions</h2>
+          <button
+            onClick={loadInscriptions}
+            disabled={loading}
+            className="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-700 rounded hover:bg-gray-300 dark:hover:bg-gray-600"
+          >
+            Refresh
+          </button>
+        </div>
+        
+        {loading ? (
+          <p>Loading inscriptions...</p>
+        ) : inscriptions.length > 0 ? (
+          <div className="space-y-4">
+            {inscriptions.map((inscription: any) => (
+              <div
+                key={inscription.id}
+                className="border dark:border-gray-700 rounded p-3"
+              >
+                <p className="text-sm mb-1">
+                  ID: {inscription.id}
+                </p>
+                <p className="text-sm mb-1">
+                  Number: {inscription.number}
+                </p>
+                <p className="text-sm">
+                  Content Type: {inscription.contentType}
+                </p>
+                {inscription.contentType.startsWith('text/') && (
+                  <p className="mt-2 p-2 bg-gray-200 dark:bg-gray-700 rounded text-sm">
+                    {inscription.content}
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p>No inscriptions found</p>
+        )}
+      </div>
+    </div>
+  )
 }`}
               copyButton={true}
             />
+          </CardContent>
+        </Card>
+
+        <WarningBox title="Inscription Fees" className="mt-6">
+          <p>
+            Creating inscriptions requires paying Bitcoin network fees. Make sure you have enough BTC in your wallet to cover both the inscription and the network fees. The exact fee will depend on network conditions and inscription size.
+          </p>
+        </WarningBox>
+
+        <Card className="overflow-hidden mt-6">
+          <CardHeader className="border-b bg-muted/50 px-6">
+            <h3 className="font-mono text-sm font-medium">Key Features</h3>
+          </CardHeader>
+          <CardContent className="p-6">
+            <ul className="list-disc pl-6 space-y-2">
+              <li>List all inscriptions owned by the connected wallet</li>
+              <li>Create new text inscriptions</li>
+              <li>Display inscription details including ID, number, and content</li>
+              <li>Handle loading states and errors</li>
+              <li>Automatic refresh after creating new inscriptions</li>
+              <li>Support for viewing text-based inscription content</li>
+            </ul>
           </CardContent>
         </Card>
       </section>
