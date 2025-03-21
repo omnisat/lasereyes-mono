@@ -9,7 +9,7 @@ export const themeConfig = {
     },
     {
       title: "GitHub",
-      href: "https://github.com/omnisat/lasereyes",
+      href: "https://github.com/omnisat/lasereyes-mono",
       external: true,
     },
   ],

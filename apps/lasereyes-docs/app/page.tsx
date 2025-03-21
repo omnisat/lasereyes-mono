@@ -58,8 +58,53 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Sponsors Section */}
+      <section className="w-full py-12 md:py-24 border-b bg-muted">
+        <div className="max-w-7xl mx-auto">
+          <div className="container px-4 md:px-6">
+            <div className="flex flex-col items-center justify-center space-y-4 text-center">
+              <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">Supported By</h2>
+            </div>
+            <div className="mx-auto flex flex-flow flex-wrap  gap-8 items-center justify-center py-8 md:py-12 max-w-4xl">
+              <Link href="/" target="_blank" rel="noreferrer" className="flex items-center justify-center">
+                <img src="/maestro-light.svg" alt="Magic Eden" className="h-8 md:h-10 hidden dark:block" />
+                <img src="/maestro-dark.svg" alt="Magic Eden" className="h-8 md:h-10 dark:hidden" />
+              </Link>
+              <Link href="/" target="_blank" rel="noreferrer" className="flex items-center justify-center">
+                <img src="/oyl-light.svg" alt="Draper Associates" className="h-8 md:h-10 hidden dark:block" />
+                <img src="/oyl-dark.svg" alt="Draper Associates" className="h-8 md:h-10 dark:hidden" />
+              </Link>
+              <Link href="/" target="_blank" rel="noreferrer" className="flex items-center justify-center">
+                <img src="/trio-light.svg" alt="Draper Associates" className="h-8 md:h-10 hidden dark:block" />
+                <img src="/trio-dark.svg" alt="Draper Associates" className="h-8 md:h-10 dark:hidden" />
+              </Link>
+              <Link href="/" target="_blank" rel="noreferrer" className="flex items-center justify-center">
+                <img src="/l1f-light.svg" alt="Draper Associates" className="h-8 md:h-10 hidden dark:block" />
+                <img src="/l1f-dark.svg" alt="Draper Associates" className="h-8 md:h-10 dark:hidden" />
+              </Link>
+              <Link href="/" target="_blank" rel="noreferrer" className="flex items-center justify-center">
+                <img src="/ctrl-light.svg" alt="Draper Associates" className="h-10 md:h-16 hidden dark:block" />
+                <img src="/ctrl-dark.svg" alt="Draper Associates" className="h-10 md:h-16 dark:hidden" />
+              </Link>
+              <Link href="/" target="_blank" rel="noreferrer" className="flex items-center justify-center">
+                <img src="/utxo-light.svg" alt="UTXO" className="h-10 md:h-16 hidden dark:block" />
+                <img src="/utxo-dark.svg" alt="UTXO" className="h-10 md:h-16 dark:hidden" />
+              </Link>
+              <Link href="/" target="_blank" rel="noreferrer" className="flex items-center justify-center">
+                <img src="/blife-light.svg" alt="Bitcoin Frontier Fund" className="h-24 md:h-24 hidden dark:block" />
+                <img src="/blife-dark.svg" alt="Bitcoin Frontier Fund" className="h-24 md:h-24 dark:hidden" />
+              </Link>
+              <Link href="https://leather.io" target="_blank" rel="noreferrer" className="flex items-center justify-center">
+                <img src="/leather-light.svg" alt="WalletConnect" className="h-8 md:h-10 hidden dark:block" />
+                <img src="/leather-dark.svg" alt="WalletConnect" className="h-8 md:h-10 dark:hidden" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Quick Start Section */}
-      <section className="w-full py-12 md:py-24 lg:py-32 bg-muted">
+      <section className="w-full py-12 md:py-24 lg:py-32 bg-background">
         <div className="max-w-7xl mx-auto">
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
@@ -83,7 +128,7 @@ export default function Home() {
                   language="typescript"
                   code={`import { LaserEyesProvider } from '@omnisat/lasereyes-react'
 import { useLaserEyes } from '@omnisat/lasereyes-react'
-import { MAINNET, UNISAT } from '@omnisat/lasereyes-core'
+import { MAINNET, OYL } from '@omnisat/lasereyes-core'
 
 function App() {
 return (
@@ -105,7 +150,7 @@ const {
 
 const connectWallet = async () => {
   try {
-    await connect(UNISAT)
+    await connect(OYL)
   } catch (error) {
     console.error(error)
   }
@@ -132,6 +177,80 @@ return (
                   copyButton={true}
                 />
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Create LaserEyes Section */}
+      <section className="w-full py-12 md:py-24 lg:py-32 bg-muted">
+        <div className="max-w-7xl mx-auto">
+          <div className="container px-4 md:px-6">
+            <div className="flex flex-col items-center justify-center space-y-4 text-center">
+              <div className="space-y-2">
+                <div className="inline-block rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary mb-2">
+                  Scaffold Your Project
+                </div>
+                <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">Create LaserEyes App</h2>
+                <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                  Get started with a fully configured Bitcoin dApp in seconds
+                </p>
+              </div>
+            </div>
+            <div className="mx-auto grid max-w-5xl items-center gap-6 py-12">
+              <div className="space-y-8">
+                <div className="space-y-4">
+                  <h3 className="text-xl font-bold">Create a New Project</h3>
+                  <CodeBlock
+                    language="bash"
+                    code={`npx create-lasereyes`}
+                    copyButton={true}
+                  />
+                </div>
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  <div className="group relative overflow-hidden rounded-xl border border-border/50 bg-card p-6 transition-all duration-300 hover:border-primary/20 hover:shadow-md hover:shadow-primary/5">
+                    <div className="absolute right-0 top-0 h-20 w-20 translate-x-6 -translate-y-6 rounded-full bg-primary/10 blur-2xl filter group-hover:bg-primary/20 group-hover:blur-3xl" />
+                    <h4 className="mb-2 text-lg font-semibold">Modern Stack</h4>
+                    <p className="text-sm text-muted-foreground">Next.js 14+, React 18, TypeScript, and Tailwind CSS pre-configured</p>
+                  </div>
+                  <div className="group relative overflow-hidden rounded-xl border border-border/50 bg-card p-6 transition-all duration-300 hover:border-primary/20 hover:shadow-md hover:shadow-primary/5">
+                    <div className="absolute right-0 top-0 h-20 w-20 translate-x-6 -translate-y-6 rounded-full bg-primary/10 blur-2xl filter group-hover:bg-primary/20 group-hover:blur-3xl" />
+                    <h4 className="mb-2 text-lg font-semibold">Wallet Integration</h4>
+                    <p className="text-sm text-muted-foreground">Pre-built wallet connection modal and components ready to use</p>
+                  </div>
+                  <div className="group relative overflow-hidden rounded-xl border border-border/50 bg-card p-6 transition-all duration-300 hover:border-primary/20 hover:shadow-md hover:shadow-primary/5">
+                    <div className="absolute right-0 top-0 h-20 w-20 translate-x-6 -translate-y-6 rounded-full bg-primary/10 blur-2xl filter group-hover:bg-primary/20 group-hover:blur-3xl" />
+                    <h4 className="mb-2 text-lg font-semibold">Best Practices</h4>
+                    <p className="text-sm text-muted-foreground">Security, performance, and accessibility best practices included</p>
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <h3 className="text-xl font-bold">Project Structure</h3>
+                  <CodeBlock
+                    language="bash"
+                    code={`my-lasereyes-app/
+├── src/
+│   ├── app/
+│   │   ├── layout.tsx    # Root layout with providers
+│   │   └── page.tsx      # Home page
+│   ├── components/
+│   │   ├── ui/          # Reusable UI components
+│   │   └── wallet/      # Wallet integration components
+│   └── lib/
+│       └── utils.ts     # Utility functions
+└── package.json`}
+                    copyButton={true}
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="flex justify-center">
+              <Button asChild variant="outline" size="lg" className="group">
+                <Link href="/docs/create-lasereyes">
+                  Learn more about create-lasereyes
+                  <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                </Link>
+              </Button>
             </div>
           </div>
         </div>
@@ -367,7 +486,7 @@ return (
                   <Link href="/docs/installation">Get Started</Link>
                 </Button>
                 <Button variant="outline" size="lg" asChild>
-                  <Link href="https://github.com/omnisat/lasereyes" target="_blank" rel="noreferrer">
+                  <Link href="https://github.com/omnisat/lasereyes-mono" target="_blank" rel="noreferrer">
                     View on GitHub
                   </Link>
                 </Button>
@@ -393,7 +512,7 @@ return (
               </div>
               <div className="flex items-center gap-4 mt-4 md:mt-0">
                 <Link
-                  href="https://github.com/omnisat/lasereyes"
+                  href="https://github.com/omnisat/lasereyes-mono"
                   target="_blank"
                   rel="noreferrer"
                   className="text-sm text-muted-foreground hover:text-foreground"

@@ -467,7 +467,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
             )
           )}
         </div>
-        <ConnectWalletButton />
+        {/* <ConnectWalletButton /> */}
       </div>
 
       {/* Main container */}
