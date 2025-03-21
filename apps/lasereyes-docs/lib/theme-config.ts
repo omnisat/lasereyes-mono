@@ -26,6 +26,10 @@ export const themeConfig = {
           href: "/docs/installation",
         },
         {
+          title: "Create LaserEyes",
+          href: "/docs/create-lasereyes",
+        },
+        {
           title: "Basic Setup",
           href: "/docs/basic-setup",
         },
