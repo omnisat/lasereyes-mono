@@ -1,0 +1,156 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Project Rules for `@omnisat/lasereyes-core`
+
+This document outlines the guidelines and standards for contributing to the `@omnisat/lasereyes-core` package. Following these rules will ensure consistency, maintainability, and quality throughout the project.
+
+## 🌟 Overview
+
+`@omnisat/lasereyes-core` is a framework-agnostic library designed to provide Bitcoin wallet integration for dApps. It abstracts wallet-specific interactions and offers a unified interface for working with various Bitcoin wallets.
+
+## 📋 General Code Guidelines
+
+1. **TypeScript Required**: All code must be written in TypeScript with proper type definitions.
+2. **Clean Code**: Follow clean code principles - meaningful variable names, clear functions, and appropriate comments.
+3. **No `any` Types**: Avoid using `any` type. Use proper typing or `unknown` when necessary.
+4. **ESLint**: All code must pass ESLint checks using the project's configuration.
+5. **Documentation**: All public methods, classes, and interfaces must be documented with TSDoc comments.
+6. **Error Handling**: Implement proper error handling and provide meaningful error messages.
+
+## 🏗️ Project Structure
+
+1. **Module Organization**:
+   - `/src/client`: Contains the client-facing API
+   - `/src/lib`: Shared utilities and helpers
+   - `/src/constants`: Project constants
+   - `/src/types`: TypeScript type definitions
+
+2. **Exports**:
+   - Export only what's necessary in `index.ts`
+   - Internal utilities should not be exposed
+
+## 📐 Architecture Guidelines
+
+1. **Provider Pattern**:
+   - Each wallet provider must implement the `WalletProvider` interface
+   - Providers must handle their specific wallet interactions
+   - All providers should be registered in `LaserEyesClient`
+
+2. **Client Implementation**:
+   - The `LaserEyesClient` should maintain a unified interface
+   - Wallet-specific logic should be abstracted away in providers
+   - Client methods should proxy to the appropriate provider methods
+
+3. **Error Management**:
+   - Use consistent error types across providers
+   - Normalize errors from different wallet implementations
+
+## 🔄 State Management
+
+1. **Store Usage**:
+   - Use nanostores for state management
+   - Keep state atomized and focused
+   - Avoid storing sensitive information in state
+
+2. **Events**:
+   - Handle wallet connection events appropriately
+   - Propagate events through the client interface
+
+## 🧪 Testing Standards
+
+1. **Unit Tests**:
+   - All core functionality must have unit tests
+   - Mock external wallet dependencies for testing
+   - Test edge cases and error handling
+
+2. **Integration Tests**:
+   - Test integration with mock wallet providers
+   - Ensure proper state management and event propagation
+
+## 🛠️ Development Workflow
+
+1. **Branching Strategy**:
+   - Feature branches should be created from `main`
+   - Use meaningful branch names: `feature/wallet-integration`, `fix/error-handling`, etc.
+
+2. **Commits**:
+   - Write clear, descriptive commit messages
+   - Reference issues in commit messages when applicable
+
+3. **Pull Requests**:
+   - PRs should include a clear description of changes
+   - All PRs must pass CI checks before merging
+   - PRs should be reviewed by at least one team member
+
+## 📦 Package Management
+
+1. **Dependencies**:
+   - Keep dependencies minimal and up-to-date
+   - Avoid adding dependencies for simple utilities
+   - Consider bundle size impact when adding dependencies
+
+2. **Versioning**:
+   - Follow semantic versioning
+   - Document breaking changes in CHANGELOG.md
+
+## 🌍 Wallet Support Guidelines
+
+1. **Adding New Wallets**:
+   - Create a new provider class that extends `WalletProvider`
+   - Implement all required methods
+   - Add wallet constants to the constants file
+   - Register the provider in `LaserEyesClient`
+   - Add tests for the new provider
+
+2. **Wallet Features**:
+   - Support basic operations (connect, disconnect, sign)
+   - Implement advanced features when available (inscriptions, runes)
+   - Handle wallet-specific error scenarios
+
+## 🌐 Network Support
+
+1. **Multiple Networks**:
+   - Support mainnet, testnet, and other networks
+   - Properly handle network switching
+   - Maintain network state in the client
+
+## 📊 Data Sources
+
+1. **Data Source Architecture**:
+   - Follow the Data Source Manager pattern for accessing external APIs
+   - All data sources must implement the `DataSource` interface
+   - Use the manager to handle fallbacks between different data sources
+
+2. **Adding New Data Sources**:
+   - Create a new data source class that implements the `DataSource` interface
+   - Implement required methods based on the capabilities of the API
+   - Register the data source in the `DataSourceManager`
+   - Add appropriate normalization functions for the data returned
+
+3. **Data Normalization**:
+   - Always normalize responses from different data sources into standard formats
+   - Use helper functions in the normalization module
+   - Handle edge cases where data may be missing or in unexpected formats
+
+4. **Error Handling**:
+   - Implement proper error handling for API failures
+   - Use fallback mechanisms when primary data sources are unavailable
+   - Log meaningful error messages when data source operations fail
+
+## 📃 Documentation Requirements
+
+1. **API Documentation**:
+   - Document all public methods, interfaces, and types
+   - Include examples in comments for complex methods
+
+2. **README**:
+   - Keep the README up-to-date with new features
+   - Document supported wallets and networks
+   - Include basic usage examples
+
+---
+
+These rules are intended to guide development and maintain quality. They may be updated as the project evolves.
