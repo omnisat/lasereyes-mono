@@ -24,7 +24,7 @@
   "devDependencies": {
     "@types/node": "^22.7.7",
     "typescript": "^5.5.3",
-    "vite": "^5.4.1",
+    "vite": "^5.4.12",
     "vite-plugin-dts": "^4.2.1"
   },
   "dependencies": {
@@ -34,7 +34,7 @@
     "@magiceden-oss/runestone-lib": "^1.0.2",
     "@nanostores/persistent": "^0.10.2",
     "@orangecrypto/orange-connect": "^1.2.2",
-    "axios": "^1.7.7",
+    "axios": "^1.8.2",
     "bip32": "5.0.0-rc.0",
     "bip39": "^3.1.0",
     "bitcoinjs-lib": "^7.0.0-rc.0",
