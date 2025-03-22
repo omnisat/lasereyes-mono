@@ -1,6 +1,6 @@
 {
   "name": "@omnisat/lasereyes-ui",
-  "version": "0.0.2-rc.2",
+  "version": "0.0.2",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -13,7 +13,7 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "test": "echo \"to be added\"",
     "preview": "vite preview",
-    "prepublishOnly": "yarn build"
+    "prepublishOnly": "pnpm build"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.1.0",

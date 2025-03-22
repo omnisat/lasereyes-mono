@@ -1,436 +1,311 @@
 "use client"
 
+import * as React from "react"
 import { CodeBlock } from "@/components/code-block"
-import { DocNavigation } from "@/components/doc-navigation"
-import { WarningBox } from "@/components/warning-box"
+import { Heading } from "@/components/heading"
+import { ClientPageWrapper } from "@/components/client-page-wrapper"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { 
+  Shield, 
+  Zap, 
+  Code2, 
+  RefreshCw, 
+  Database, 
+  LayoutGrid, 
+  Wallet,
+  Lock,
+  Cpu,
+  FileCode2,
+  Network,
+  Bug
+} from "lucide-react"
+import Link from "next/link"
+import type { LucideIcon } from "lucide-react"
+import { cn } from "@/lib/utils"
 
-export default function BestPracticesClientPage() {
-  return (
-    <div className="max-w-3xl mx-auto py-10 px-4">
-      <h1 className="text-4xl font-bold mb-6">Best Practices</h1>
-      <p className="text-lg mb-8">
-        This guide outlines recommended practices for building robust Bitcoin applications with LaserEyes. Following
-        these guidelines will help you create more reliable, secure, and user-friendly applications.
-      </p>
-
-      <div className="space-y-12">
-        <section id="architecture">
-          <h2 className="text-2xl font-bold mb-4">Architecture Best Practices</h2>
-
-          <div className="space-y-6">
-            <div>
-              <h3 className="text-xl font-semibold mb-2">Separation of Concerns</h3>
-              <p className="mb-3">Structure your application with clear separation between:</p>
-              <ul className="list-disc pl-6 space-y-2">
-                <li>UI components</li>
-                <li>Wallet connection logic</li>
-                <li>Transaction building</li>
-                <li>Data fetching and caching</li>
-              </ul>
-
-              <p className="mt-3">This makes your code more maintainable and easier to test.</p>
-            </div>
-
-            <div>
-              <h3 className="text-xl font-semibold mb-2">State Management</h3>
-              <p className="mb-3">For complex applications:</p>
-              <ul className="list-disc pl-6 space-y-2">
-                <li>Use a state management solution like Redux, Zustand, or Jotai</li>
-                <li>Create dedicated slices for wallet state, transaction history, and user preferences</li>
-                <li>Implement selectors for derived state</li>
-              </ul>
-
-              <CodeBlock
-                language="typescript"
-                code={`
-// Example with Zustand
-import create from 'zustand'
-import { useLaserEyes } from '@omnisat/lasereyes-react'
-
-const useWalletStore = create((set) => ({
-  balance: 0,
-  transactions: [],
-  isLoading: false,
-  updateBalance: (balance) => set({ balance }),
-  addTransaction: (tx) => set((state) => ({ 
-    transactions: [tx, ...state.transactions] 
-  })),
-  setLoading: (isLoading) => set({ isLoading }),
-}))
-
-// In your component
-function WalletDashboard() {
-  const { address, getBalance } = useLaserEyes()
-  const { balance, updateBalance, setLoading } = useWalletStore()
-  
-  useEffect(() => {
-    if (address) {
-      setLoading(true)
-      getBalance(address).then(balance => {
-        updateBalance(balance)
-        setLoading(false)
-      })
-    }
-  }, [address])
-  
-  // ...
+interface PracticeCardProps {
+  icon: LucideIcon
+  title: string
+  description: string
+  code?: string
+  className?: string
 }
-              `}
-              />
-            </div>
-          </div>
-        </section>
 
-        <section id="performance">
-          <h2 className="text-2xl font-bold mb-4">Performance Optimization</h2>
-
-          <div className="space-y-6">
-            <div>
-              <h3 className="text-xl font-semibold mb-2">Efficient Data Fetching</h3>
-              <p className="mb-3">Optimize your data fetching strategy:</p>
-              <ul className="list-disc pl-6 space-y-2">
-                <li>Implement caching for frequently accessed data</li>
-                <li>Use pagination for large datasets</li>
-                <li>Batch related requests when possible</li>
-                <li>Consider using server-side rendering for initial data</li>
-              </ul>
-
-              <CodeBlock
-                language="typescript"
-                code={`
-// Example using React Query for caching
-import { useQuery } from 'react-query'
-import { useLaserEyes } from '@omnisat/lasereyes-react'
-
-function UTXOList() {
-  const { address, getUTXOs } = useLaserEyes()
-  
-  const { data: utxos, isLoading, error } = useQuery(
-    ['utxos', address],
-    () => getUTXOs(address),
-    {
-      enabled: !!address,
-      staleTime: 60000, // 1 minute
-      cacheTime: 300000, // 5 minutes
-    }
-  )
-  
-  // ...
-}
-              `}
-              />
-            </div>
-
-            <div>
-              <h3 className="text-xl font-semibold mb-2">Lazy Loading</h3>
-              <p className="mb-3">Implement lazy loading for:</p>
-              <ul className="list-disc pl-6 space-y-2">
-                <li>Heavy components that aren't immediately visible</li>
-                <li>Features that aren't used by all users</li>
-                <li>Large libraries and dependencies</li>
-              </ul>
-
-              <CodeBlock
-                language="typescript"
-                code={`
-// Lazy load transaction history component
-import { lazy, Suspense } from 'react'
-
-const TransactionHistory = lazy(() => import('./TransactionHistory'))
-
-function WalletDashboard() {
-  const [showHistory, setShowHistory] = useState(false)
-  
+function PracticeCard({ icon: Icon, title, description, code, className }: PracticeCardProps) {
   return (
-    <div>
-      <button onClick={() => setShowHistory(true)}>
-        Show Transaction History
-      </button>
-      
-      {showHistory && (
-        <Suspense fallback={<div>Loading history...</div>}>
-          <TransactionHistory />
-        </Suspense>
-      )}
-    </div>
-  )
-}
-              `}
-              />
-            </div>
-          </div>
-        </section>
-
-        <section id="error-handling">
-          <h2 className="text-2xl font-bold mb-4">Error Handling</h2>
-
-          <div className="space-y-6">
-            <div>
-              <h3 className="text-xl font-semibold mb-2">Graceful Degradation</h3>
-              <p className="mb-3">Design your application to handle failures gracefully:</p>
-              <ul className="list-disc pl-6 space-y-2">
-                <li>Implement fallback UI for failed components</li>
-                <li>Provide clear error messages to users</li>
-                <li>Offer retry options when appropriate</li>
-                <li>Cache last known good state</li>
-              </ul>
-
-              <CodeBlock
-                language="typescript"
-                code={`
-// Error boundary example
-import { ErrorBoundary } from 'react-error-boundary'
-
-function ErrorFallback({ error, resetErrorBoundary }) {
-  return (
-    <div role="alert" className="p-4 border border-red-500 rounded">
-      <p className="font-bold">Something went wrong:</p>
-      <p className="text-sm">{error.message}</p>
-      <button 
-        onClick={resetErrorBoundary}
-        className="mt-2 px-4 py-2 bg-red-500 text-white rounded"
-      >
-        Try again
-      </button>
-    </div>
+    <Card className={cn(
+      "group relative overflow-hidden transition-all duration-300 hover:border-blue-500/30 hover:shadow-lg hover:shadow-blue-500/5",
+      className
+    )}>
+      <div className="absolute right-0 top-0 h-20 w-20 translate-x-6 -translate-y-6 rounded-full bg-blue-500/10 blur-2xl filter group-hover:bg-blue-500/20" />
+      <CardContent className="p-6">
+        <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-blue-500/10 text-blue-500">
+          <Icon className="h-6 w-6" />
+        </div>
+        <h3 className="mb-2 text-xl font-semibold">{title}</h3>
+        <p className="mb-4 text-muted-foreground">{description}</p>
+        {code && (
+          <CodeBlock
+            language="typescript"
+            code={code}
+            copyButton={true}
+          />
+        )}
+      </CardContent>
+    </Card>
   )
 }
 
-function App() {
+function BestPracticesContent() {
   return (
-    <ErrorBoundary
-      FallbackComponent={ErrorFallback}
-      onReset={() => {
-        // Reset application state here
+    <div className="space-y-10">
+      <section className="space-y-6">
+        <h2 className="text-3xl font-bold">Wallet Integration</h2>
+        <div className="grid gap-6 sm:grid-cols-2">
+          <PracticeCard
+            icon={Wallet}
+            title="Proper Provider Setup"
+            description="Always wrap your app with LaserEyesProvider at the root level and configure network settings appropriately."
+            code={`// _app.tsx or layout.tsx
+export default function RootLayout({ children }) {
+  return (
+    <LaserEyesProvider
+      config={{
+        network: MAINNET,
+        enforceNetwork: true,
+        autoConnect: true
       }}
     >
-      <WalletDashboard />
-    </ErrorBoundary>
-  )
-}
-              `}
-              />
-            </div>
-
-            <div>
-              <h3 className="text-xl font-semibold mb-2">Comprehensive Error Tracking</h3>
-              <p className="mb-3">Implement robust error tracking:</p>
-              <ul className="list-disc pl-6 space-y-2">
-                <li>Log errors with contextual information</li>
-                <li>Use error monitoring services (Sentry, LogRocket, etc.)</li>
-                <li>Track error rates and patterns</li>
-                <li>Set up alerts for critical errors</li>
-              </ul>
-
-              <WarningBox title="Privacy Considerations">
-                Be careful not to log sensitive user information. Never log private keys, seed phrases, or personal
-                data.
-              </WarningBox>
-            </div>
-          </div>
-        </section>
-
-        <section id="user-experience">
-          <h2 className="text-2xl font-bold mb-4">User Experience</h2>
-
-          <div className="space-y-6">
-            <div>
-              <h3 className="text-xl font-semibold mb-2">Progressive Disclosure</h3>
-              <p className="mb-3">Implement progressive disclosure of complex features:</p>
-              <ul className="list-disc pl-6 space-y-2">
-                <li>Start with simple, essential features</li>
-                <li>Gradually introduce advanced options</li>
-                <li>Provide contextual help and tooltips</li>
-                <li>Use wizards for complex workflows</li>
-              </ul>
-            </div>
-
-            <div>
-              <h3 className="text-xl font-semibold mb-2">Feedback and Loading States</h3>
-              <p className="mb-3">Always provide clear feedback:</p>
-              <ul className="list-disc pl-6 space-y-2">
-                <li>Show loading indicators for asynchronous operations</li>
-                <li>Provide progress updates for multi-step processes</li>
-                <li>Confirm successful actions</li>
-                <li>Explain errors in user-friendly language</li>
-              </ul>
-
-              <CodeBlock
-                language="typescript"
-                code={`
-function SendBitcoin() {
-  const { sendTransaction } = useLaserEyes()
-  const [status, setStatus] = useState('idle') // idle, loading, success, error
-  const [error, setError] = useState(null)
-  
-  const handleSend = async (amount, recipient) => {
-    try {
-      setStatus('loading')
-      setError(null)
-      
-      // Show progress for long operations
-      const txid = await sendTransaction({
-        amount,
-        recipient,
-        onProgress: (step, total) => {
-          console.log(\`Step \${step} of \${total}\`)
-        }
-      })
-      
-      setStatus('success')
-      return txid
-    } catch (err) {
-      setStatus('error')
-      setError(err.message || 'Failed to send transaction')
-    }
-  }
-  
-  return (
-    <div>
-      {/* Form components */}
-      
-      {status === 'loading' && <LoadingSpinner />}
-      {status === 'success' && <SuccessMessage />}
-      {status === 'error' && <ErrorMessage message={error} />}
-    </div>
-  )
-}
-              `}
-              />
-            </div>
-          </div>
-        </section>
-
-        <section id="security">
-          <h2 className="text-2xl font-bold mb-4">Security Best Practices</h2>
-
-          <div className="space-y-6">
-            <div>
-              <h3 className="text-xl font-semibold mb-2">Input Validation</h3>
-              <p className="mb-3">Always validate user inputs:</p>
-              <ul className="list-disc pl-6 space-y-2">
-                <li>Validate Bitcoin addresses before sending</li>
-                <li>Check amount ranges and decimal precision</li>
-                <li>Sanitize inputs to prevent XSS attacks</li>
-                <li>Implement rate limiting for sensitive operations</li>
-              </ul>
-
-              <CodeBlock
-                language="typescript"
-                code={`
-// Address validation example
-import { validateAddress } from '@omnisat/lasereyes'
-
-function SendForm() {
-  const [address, setAddress] = useState('')
-  const [isValid, setIsValid] = useState(false)
-  const [error, setError] = useState('')
-  
-  const handleAddressChange = (e) => {
-    const newAddress = e.target.value
-    setAddress(newAddress)
-    
-    try {
-      // Validate the address format and network
-      const validation = validateAddress(newAddress, 'mainnet')
-      setIsValid(validation.isValid)
-      setError(validation.isValid ? '' : validation.error)
-    } catch (err) {
-      setIsValid(false)
-      setError('Invalid address format')
-    }
-  }
-  
-  // ...
-}
-              `}
-              />
-            </div>
-
-            <div>
-              <h3 className="text-xl font-semibold mb-2">Transaction Confirmation</h3>
-              <p className="mb-3">Always confirm critical actions:</p>
-              <ul className="list-disc pl-6 space-y-2">
-                <li>Show transaction details before sending</li>
-                <li>Display fee estimates clearly</li>
-                <li>Require explicit confirmation for large amounts</li>
-                <li>Provide clear warnings for irreversible actions</li>
-              </ul>
-
-              <WarningBox title="Transaction Security">
-                Always show the full recipient address and amount before sending. Never truncate addresses in
-                confirmation screens.
-              </WarningBox>
-            </div>
-          </div>
-        </section>
-
-        <section id="testing">
-          <h2 className="text-2xl font-bold mb-4">Testing Strategy</h2>
-
-          <div className="space-y-4">
-            <p>Implement a comprehensive testing strategy:</p>
-
-            <ul className="list-disc pl-6 space-y-2">
-              <li>
-                <strong>Unit tests:</strong> Test individual functions and components
-              </li>
-              <li>
-                <strong>Integration tests:</strong> Test interactions between components
-              </li>
-              <li>
-                <strong>E2E tests:</strong> Test complete user flows
-              </li>
-              <li>
-                <strong>Testnet validation:</strong> Test with real wallets on testnet before mainnet
-              </li>
-              <li>
-                <strong>Mock services:</strong> Create mock implementations of LaserEyes services for testing
-              </li>
-            </ul>
-
-            <CodeBlock
-              language="typescript"
-              code={`
-// Mock LaserEyes provider for testing
-import { LaserEyesProvider } from '@omnisat/lasereyes-react'
-
-const mockLaserEyesClient = {
-  connect: jest.fn().mockResolvedValue(true),
-  getAddress: jest.fn().mockResolvedValue('tb1q...'),
-  getBalance: jest.fn().mockResolvedValue(100000),
-  sendTransaction: jest.fn().mockResolvedValue('txid123'),
-  // ...other methods
-}
-
-function TestWrapper({ children }) {
-  return (
-    <LaserEyesProvider client={mockLaserEyesClient}>
       {children}
     </LaserEyesProvider>
   )
+}`}
+          />
+          <PracticeCard
+            icon={Lock}
+            title="Connection Management"
+            description="Handle wallet connections gracefully with proper error handling and user feedback."
+            code={`const { connect, disconnect } = useLaserEyes()
+
+try {
+  await connect(UNISAT)
+  showSuccessToast('Wallet connected!')
+} catch (error) {
+  showErrorToast(error.message)
+  // Log error for debugging
+  console.error('Connection failed:', error)
+}`}
+          />
+        </div>
+      </section>
+
+      <section className="space-y-6">
+        <h2 className="text-3xl font-bold">State Management</h2>
+        <div className="grid gap-6 sm:grid-cols-2">
+          <PracticeCard
+            icon={RefreshCw}
+            title="State Updates"
+            description="Keep wallet state fresh by implementing proper update strategies and handling state changes."
+            code={`// Subscribe to state changes
+useEffect(() => {
+  const unsubscribe = subscribeToWalletEvents(
+    (event) => {
+      if (event.type === 'networkChanged') {
+        refreshBalance()
+      }
+    }
+  )
+  return () => unsubscribe()
+}, [])`}
+          />
+          <PracticeCard
+            icon={Database}
+            title="Data Persistence"
+            description="Implement proper caching and persistence strategies for better performance and UX."
+            code={`// Cache frequently accessed data
+const { getCachedBalance, refreshBalance } = useLaserEyes()
+
+// Use cached data first
+const cached = getCachedBalance()
+if (cached) {
+  setBalance(cached)
 }
 
-// In your test
-test('displays wallet balance', async () => {
-  render(
-    <TestWrapper>
-      <WalletBalance />
-    </TestWrapper>
+// Then fetch fresh data
+const fresh = await refreshBalance()
+setBalance(fresh)`}
+          />
+        </div>
+      </section>
+
+      <section className="space-y-6">
+        <h2 className="text-3xl font-bold">Performance</h2>
+        <div className="grid gap-6 sm:grid-cols-2">
+          <PracticeCard
+            icon={Cpu}
+            title="Optimization"
+            description="Optimize your application's performance with proper data fetching and rendering strategies."
+            code={`// Use React.memo for expensive components
+const WalletInfo = React.memo(({ address }) => (
+  <div>
+    <AddressDisplay address={address} />
+    <BalanceDisplay address={address} />
+  </div>
+))
+
+// Implement proper loading states
+const { data, isLoading } = useInscriptions()
+if (isLoading) return <LoadingSpinner />`}
+          />
+          <PracticeCard
+            icon={Zap}
+            title="Efficient Updates"
+            description="Implement efficient update patterns to minimize unnecessary re-renders and API calls."
+            code={`// Use callbacks for event handlers
+const handleTransfer = useCallback(async () => {
+  setLoading(true)
+  try {
+    await transfer(...)
+    await refreshBalance()
+  } finally {
+    setLoading(false)
+  }
+}, [transfer, refreshBalance])`}
+          />
+        </div>
+      </section>
+
+      <section className="space-y-6">
+        <h2 className="text-3xl font-bold">Security</h2>
+        <div className="grid gap-6 sm:grid-cols-2">
+          <PracticeCard
+            icon={Shield}
+            title="Transaction Safety"
+            description="Implement proper transaction validation and confirmation handling for secure operations."
+            code={`// Validate transactions before sending
+const { validateTransaction } = useLaserEyes()
+
+try {
+  await validateTransaction({
+    recipient,
+    amount,
+    feeRate
+  })
+  // Proceed with transaction
+} catch (error) {
+  // Handle validation error
+}`}
+          />
+          <PracticeCard
+            icon={Bug}
+            title="Error Handling"
+            description="Implement comprehensive error handling and recovery strategies."
+            code={`try {
+  await sendTransaction(...)
+} catch (error) {
+  if (error.code === 'INSUFFICIENT_FUNDS') {
+    notifyUser('Insufficient funds')
+  } else if (error.code === 'NETWORK_ERROR') {
+    await retryWithBackoff(sendTransaction)
+  } else {
+    reportError(error)
+  }
+}`}
+          />
+        </div>
+      </section>
+
+      <section className="space-y-6">
+        <h2 className="text-3xl font-bold">Code Organization</h2>
+        <div className="grid gap-6 sm:grid-cols-2">
+          <PracticeCard
+            icon={FileCode2}
+            title="Component Structure"
+            description="Organize your wallet-related components and hooks in a maintainable way."
+            code={`// src/features/wallet/hooks/useWalletConnection.ts
+export function useWalletConnection() {
+  const laser = useLaserEyes()
+  // Custom connection logic
+  return {
+    connect: async () => {...},
+    disconnect: async () => {...}
+  }
+}
+
+// src/features/wallet/components/WalletButton.tsx
+export function WalletButton() {
+  const { connect } = useWalletConnection()
+  // Button implementation
+}`}
+          />
+          <PracticeCard
+            icon={LayoutGrid}
+            title="Feature Organization"
+            description="Structure your Bitcoin features in a modular and scalable way."
+            code={`src/features/
+├── wallet/
+│   ├── components/
+│   ├── hooks/
+│   └── utils/
+├── inscriptions/
+│   ├── components/
+│   ├── hooks/
+│   └── utils/
+└── transactions/
+    ├── components/
+    ├── hooks/
+    └── utils/`}
+          />
+        </div>
+      </section>
+
+      <section className="space-y-6">
+        <Card className="overflow-hidden">
+          <CardContent className="p-6">
+            <h2 className="text-2xl font-bold mb-4">Next Steps</h2>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Link href="/docs/debugging" className="block">
+                <Card className="h-full transition-all hover:border-blue-500/30 hover:shadow-lg hover:shadow-blue-500/5">
+                  <CardContent className="p-6">
+                    <h3 className="text-lg font-semibold mb-2">Debugging Guide</h3>
+                    <p className="text-sm text-muted-foreground">Learn how to effectively debug LaserEyes applications</p>
+                  </CardContent>
+                </Card>
+              </Link>
+              <Link href="/docs/examples" className="block">
+                <Card className="h-full transition-all hover:border-blue-500/30 hover:shadow-lg hover:shadow-blue-500/5">
+                  <CardContent className="p-6">
+                    <h3 className="text-lg font-semibold mb-2">Examples</h3>
+                    <p className="text-sm text-muted-foreground">Explore real-world examples and patterns</p>
+                  </CardContent>
+                </Card>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+      </section>
+    </div>
   )
-  
-  expect(await screen.findByText('0.001 BTC')).toBeInTheDocument()
-})
-              `}
-            />
-          </div>
-        </section>
+}
+
+export default function BestPracticesClientPage() {
+  return (
+    <div className="space-y-8">
+      <div className="relative overflow-hidden rounded-lg border bg-gradient-to-br from-blue-500/10 via-background to-background p-8">
+        <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-blue-500/20 rounded-full blur-3xl -z-10 translate-x-1/2 -translate-y-1/2" />
+        <Badge variant="secondary" className="mb-4">Guidelines</Badge>
+        <Heading level={1} className="mb-4 bg-gradient-to-br from-blue-500 to-indigo-500 bg-clip-text text-transparent">
+          Best Practices
+        </Heading>
+        <p className="text-xl mb-6 max-w-2xl text-muted-foreground">
+          Learn how to build robust and maintainable Bitcoin applications with LaserEyes best practices and patterns.
+        </p>
       </div>
 
-      <DocNavigation
-        prev={{ title: "Common Issues", href: "/docs/common-issues" }}
-        next={{ title: "Development Setup", href: "/docs/development-setup" }}
-      />
+      <ClientPageWrapper>
+        <BestPracticesContent />
+      </ClientPageWrapper>
     </div>
   )
 }
