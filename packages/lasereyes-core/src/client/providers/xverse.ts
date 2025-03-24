@@ -1,11 +1,9 @@
 import * as bitcoin from 'bitcoinjs-lib'
 import {
-  GetAddressOptions,
   RpcErrorCode,
-  getAddress,
   request,
   MessageSigningProtocols,
-  BitcoinNetworkType,
+  AddressPurpose,
 } from 'sats-connect'
 import { WalletProvider } from '.'
 import {
@@ -30,7 +28,6 @@ import {
   getBitcoinNetwork,
   isMainnetNetwork,
 } from '../../lib/helpers'
-import { getSatsConnectNetwork } from '../../constants/networks'
 import { MapStore, WritableAtom, listenKeys } from 'nanostores'
 import { persistentMap } from '@nanostores/persistent'
 import {
@@ -38,16 +35,16 @@ import {
   keysToPersist,
   PersistedKey,
 } from '../utils'
-import { BaseNetwork } from '../../types/network'
 import { normalizeInscription } from '../../lib/data-sources/normalizations'
 import { Inscription } from '../../types/lasereyes'
 
 const XVERSE_WALLET_PERSISTENCE_KEY = 'XVERSE_CONNECTED_WALLET_STATE'
 export default class XVerseProvider extends WalletProvider {
-  constructor(stores: {
-    $store: MapStore<LaserEyesStoreType>
-    $network: WritableAtom<NetworkType>
-  },
+  constructor(
+    stores: {
+      $store: MapStore<LaserEyesStoreType>
+      $network: WritableAtom<NetworkType>
+    },
     parent: LaserEyesClient,
     config?: Config
   ) {
@@ -153,46 +150,48 @@ export default class XVerseProvider extends WalletProvider {
         }
       }
 
-      let xverseNetwork = getSatsConnectNetwork(this.network || BaseNetwork.MAINNET)
-      const getAddressOptions = {
-        payload: {
-          purposes: ['ordinals', 'payment'],
-          message: 'Connecting with lasereyes',
-          network: {
-            type: xverseNetwork as unknown as BitcoinNetworkType,
-          },
-        },
-        onFinish: (response: any) => {
-          const foundAddress = findOrdinalsAddress(response.addresses)
-          const foundPaymentAddress = findPaymentAddress(response.addresses)
-          if (!foundAddress || !foundPaymentAddress) {
-            throw new Error('Could not find the addresses')
-          }
-          if (foundAddress && foundPaymentAddress) {
-            this.$store.setKey('address', foundAddress.address)
-            this.$store.setKey('paymentAddress', foundPaymentAddress.address)
-            this.$store.setKey('accounts', [
-              foundAddress.address,
-              foundPaymentAddress.address,
-            ])
-          }
-          this.$store.setKey(
-            'publicKey',
-            String(response.addresses[0].publicKey)
-          )
-          this.$store.setKey(
-            'paymentPublicKey',
-            String(response.addresses[1].publicKey)
-          )
-        },
-        onCancel: () => {
+      const response = await request('getAccounts', {
+        purposes: [AddressPurpose.Ordinals, AddressPurpose.Payment],
+        message: 'Connecting with lasereyes',
+      })
+      if (response.status === 'success') {
+        const foundAddress = findOrdinalsAddress(response.result)
+        const foundPaymentAddress = findPaymentAddress(response.result)
+        if (!foundAddress || !foundPaymentAddress) {
+          throw new Error('Could not find the addresses')
+        }
+        this.$store.setKey('address', foundAddress.address)
+        this.$store.setKey('paymentAddress', foundPaymentAddress.address)
+        this.$store.setKey('accounts', [
+          foundAddress.address,
+          foundPaymentAddress.address,
+        ])
+        this.$store.setKey('publicKey', String(foundAddress.publicKey))
+        this.$store.setKey(
+          'paymentPublicKey',
+          String(foundPaymentAddress.publicKey)
+        )
+        if (
+          foundAddress.address.startsWith('m') ||
+          foundAddress.address.startsWith('n') ||
+          foundAddress.address.startsWith('t') ||
+          foundAddress.address.startsWith('2')
+        ) {
+          this.$network.set(TESTNET)
+        } else if (
+          foundAddress.address.startsWith('bc1') ||
+          foundPaymentAddress.address.startsWith('3') ||
+          foundPaymentAddress.address.startsWith('1')
+        ) {
+          this.$network.set(MAINNET)
+        }
+      } else {
+        if (response.error.code === RpcErrorCode.USER_REJECTION) {
           throw new Error(`User canceled lasereyes to ${XVERSE} wallet`)
-        },
-        onError: (_: any) => {
+        } else {
           throw new Error(`Can't lasereyes to ${XVERSE} wallet`)
-        },
+        }
       }
-      await getAddress(getAddressOptions as GetAddressOptions)
     } catch (e) {
       throw e
     }
@@ -264,10 +263,10 @@ export default class XVerseProvider extends WalletProvider {
     broadcast?: boolean | undefined
   ): Promise<
     | {
-      signedPsbtHex: string | undefined
-      signedPsbtBase64: string | undefined
-      txId?: string | undefined
-    }
+        signedPsbtHex: string | undefined
+        signedPsbtBase64: string | undefined
+        txId?: string | undefined
+      }
     | undefined
   > {
     try {
@@ -360,7 +359,10 @@ export default class XVerseProvider extends WalletProvider {
     }
   }
 
-  async getInscriptions(offset?: number, limit?: number): Promise<Inscription[]> {
+  async getInscriptions(
+    offset?: number,
+    limit?: number
+  ): Promise<Inscription[]> {
     const offsetValue = offset || 0
     const limitValue = limit || 10
     const response = await request('ord_getInscriptions', {
@@ -368,9 +370,7 @@ export default class XVerseProvider extends WalletProvider {
       limit: limitValue,
     })
 
-
     if (response.status === 'success') {
-
       const inscriptions = response.result.inscriptions.map((insc) => {
         return normalizeInscription(insc, undefined, this.network)
       })

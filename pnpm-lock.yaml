@@ -166,8 +166,8 @@ importers:
         specifier: ^2.1.3
         version: 2.3.0
       '@omnisat/lasereyes':
-        specifier: ^0.0.139
-        version: 0.0.139(@popperjs/core@2.11.8)(react-dom@18.3.1)(react@18.3.1)(typescript@5.6.3)(vite@5.4.11)
+        specifier: workspace:*
+        version: link:../../packages/lasereyes
       '@types/node':
         specifier: ^22.10.5
         version: 22.13.10
@@ -427,8 +427,8 @@ importers:
         specifier: ^0.0.7
         version: 0.0.7
       sats-connect:
-        specifier: ^2.8.0
-        version: 2.8.3(typescript@5.6.3)
+        specifier: ^3.3.0
+        version: 3.3.0(typescript@5.6.3)
     devDependencies:
       '@types/node':
         specifier: ^22.7.7
@@ -3852,17 +3852,6 @@ packages:
       nanostores: 0.11.3
     dev: false
 
-  /@nanostores/react@0.7.3(nanostores@0.11.3)(react@18.3.1):
-    resolution: {integrity: sha512-/XuLAMENRu/Q71biW4AZ4qmU070vkZgiQ28gaTSNRPm2SZF5zGAR81zPE1MaMB4SeOp6ZTst92NBaG75XSspNg==}
-    engines: {node: ^18.0.0 || >=20.0.0}
-    peerDependencies:
-      nanostores: ^0.9.0 || ^0.10.0 || ^0.11.0
-      react: '>=18.0.0'
-    dependencies:
-      nanostores: 0.11.3
-      react: 18.3.1
-    dev: false
-
   /@nanostores/react@0.7.3(nanostores@0.11.3)(react@19.0.0-rc.1):
     resolution: {integrity: sha512-/XuLAMENRu/Q71biW4AZ4qmU070vkZgiQ28gaTSNRPm2SZF5zGAR81zPE1MaMB4SeOp6ZTst92NBaG75XSspNg==}
     engines: {node: ^18.0.0 || >=20.0.0}
@@ -4007,64 +3996,6 @@ packages:
     resolution: {integrity: sha512-nn5ozdjYQpUCZlWGuxcJY/KpxkWQs4DcbMCmKojjyrYDEAGy4Ce19NN4v5MduafTwJlbKc99UA8YhSVqq9yPZA==}
     engines: {node: '>=12.4.0'}
     dev: true
-
-  /@omnisat/lasereyes-core@0.0.61(typescript@5.6.3):
-    resolution: {integrity: sha512-BAJk7PnAj/0pmpwOcR/4T8zdpYv2yil6rm+JbWLgl6GZPIQi2qZ2KRna5DowGn5qWIdnfsA2VVZTrpCExQyr+w==}
-    dependencies:
-      '@bitcoinerlab/secp256k1': 1.1.1
-      '@cmdcode/crypto-utils': 2.4.6
-      '@cmdcode/tapscript': 1.4.6
-      '@magiceden-oss/runestone-lib': 1.0.2
-      '@nanostores/persistent': 0.10.2(nanostores@0.11.3)
-      '@orangecrypto/orange-connect': 1.2.2
-      axios: 1.7.7
-      bip32: 5.0.0-rc.0(typescript@5.6.3)
-      bip39: 3.1.0
-      bitcoinjs-lib: 7.0.0-rc.0(typescript@5.6.3)
-      buffer: 6.0.3
-      nanostores: 0.11.3
-      sats-connect: 2.8.3(typescript@5.6.3)
-    transitivePeerDependencies:
-      - debug
-      - typescript
-    dev: false
-
-  /@omnisat/lasereyes-react@0.0.56(@popperjs/core@2.11.8)(react-dom@18.3.1)(react@18.3.1)(typescript@5.6.3)(vite@5.4.11):
-    resolution: {integrity: sha512-z4W3IAXUk0vhscuN0v4wrlrJDgdBMWyN1U0PDZLH5byfBSHwa92mv4KAnJL9Fjq0YNuT+crG2HZ/XDLrDTz1EQ==}
-    peerDependencies:
-      react: '>=17'
-      react-dom: '>=17'
-    dependencies:
-      '@nanostores/react': 0.7.3(nanostores@0.11.3)(react@18.3.1)
-      '@omnisat/lasereyes-core': 0.0.61(typescript@5.6.3)
-      bootstrap: 5.3.3(@popperjs/core@2.11.8)
-      nanostores: 0.11.3
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
-      vite-plugin-ssr: 0.4.142(vite@5.4.11)
-    transitivePeerDependencies:
-      - '@popperjs/core'
-      - debug
-      - react-streaming
-      - typescript
-      - vite
-    dev: false
-
-  /@omnisat/lasereyes@0.0.139(@popperjs/core@2.11.8)(react-dom@18.3.1)(react@18.3.1)(typescript@5.6.3)(vite@5.4.11):
-    resolution: {integrity: sha512-AkjK1AfTFJxKwc8F5kcRhQrn+kLu3E8o0IyIOxrNga1fJJjUMC4ri+LYZZp1rTtZ0uFQR64nQvSs9DhqCqs9Kg==}
-    dependencies:
-      '@omnisat/lasereyes-core': 0.0.61(typescript@5.6.3)
-      '@omnisat/lasereyes-react': 0.0.56(@popperjs/core@2.11.8)(react-dom@18.3.1)(react@18.3.1)(typescript@5.6.3)(vite@5.4.11)
-      bip39: 3.1.0
-    transitivePeerDependencies:
-      - '@popperjs/core'
-      - debug
-      - react
-      - react-dom
-      - react-streaming
-      - typescript
-      - vite
-    dev: false
 
   /@orangecrypto/orange-connect@1.2.2:
     resolution: {integrity: sha512-cv1TP+pan+Zx5yKuQHQsTIhABi2YlyTUZbzJgLbIB7fT1cA4plZiIS9GEJN7eD7wc60Fr/yumMV3zTIL5eSZ8w==}
@@ -5165,25 +5096,26 @@ packages:
       - '@types/node'
     dev: true
 
-  /@sats-connect/core@0.3.1:
-    resolution: {integrity: sha512-xMOEYUdEcJn8skWmlJLzcJXW7LK0z/8x2oUoly4yWnohZp9ynoZqTYlAe3QtVq72aUjVaX0kzbdB58GUKsixCg==}
+  /@sats-connect/core@0.5.8(typescript@5.6.3):
+    resolution: {integrity: sha512-jT+Hp7ERko2PWElprbDME0IPBx1abEQHHLf9+f+VDBi+NRKQsfAOWnLGY8geaEgRp51tnqPHZ7v9o8zDcnfyIQ==}
     dependencies:
-      axios: 1.7.4
+      axios: 1.7.7
       bitcoin-address-validation: 2.2.3
       buffer: 6.0.3
       jsontokens: 4.0.1
-      valibot: 0.33.2
+      valibot: 0.42.1(typescript@5.6.3)
     transitivePeerDependencies:
       - debug
+      - typescript
     dev: false
 
-  /@sats-connect/make-default-provider-config@0.0.9(@sats-connect/core@0.3.1)(typescript@5.6.3):
-    resolution: {integrity: sha512-7aNHrexYif5e4817YfMINgvUy1G8sKZJxwOSQ23kq4YTYze4wh+rsgJCl5oF1//sL3EXwheDVCn5NJe8tUH1rA==}
+  /@sats-connect/make-default-provider-config@0.0.10(@sats-connect/core@0.5.8)(typescript@5.6.3):
+    resolution: {integrity: sha512-BBot3Ofa2J7OwXprgYPD4C8dppX4nnPxj4FXWq1H7fDsvwJmW4sAnfmnAIzwmyWZJOR2uZqtTkXAA08sVkoN5g==}
     peerDependencies:
-      '@sats-connect/core': ^0.3.0
+      '@sats-connect/core': '*'
       typescript: ^5.0.0
     dependencies:
-      '@sats-connect/core': 0.3.1
+      '@sats-connect/core': 0.5.8(typescript@5.6.3)
       '@sats-connect/ui': 0.0.6
       bowser: 2.11.0
       typescript: 5.6.3
@@ -7386,16 +7318,6 @@ packages:
   /axe-core@4.10.2:
     resolution: {integrity: sha512-RE3mdQ7P3FRSe7eqCWoeQ/Z9QXrtniSjp1wUjt5nRC3WIpz5rSCve6o3fsZ2aCpJtrZjSZgjwXAoTO5k4tEI0w==}
     engines: {node: '>=4'}
-
-  /axios@1.7.4:
-    resolution: {integrity: sha512-DukmaFRnY6AzAALSH4J2M3k6PkaC+MfaAGdEERRWcC9q3/TWQwLpHR8ZRLKTdQ3aBDL64EdluRDjJqKw+BPZEw==}
-    dependencies:
-      follow-redirects: 1.15.9
-      form-data: 4.0.1
-      proxy-from-env: 1.1.0
-    transitivePeerDependencies:
-      - debug
-    dev: false
 
   /axios@1.7.7:
     resolution: {integrity: sha512-S4kL7XrjgBmvdGut0sN3yJxqYzrDOnivkBiN0OFs6hLiUam3UPvswUo0kqGyhqUZGEOytHyumEdXsAkgCOUf3Q==}
@@ -16400,11 +16322,11 @@ packages:
       webpack: 5.95.0
     dev: false
 
-  /sats-connect@2.8.3(typescript@5.6.3):
-    resolution: {integrity: sha512-9qQj4s/5Rj2OImygbs856AwWm7kAx6w19nUru43Dl4zDGv20uy3xHCBEUrKbBDcmE95bE5/SW+iAe89nU+irIw==}
+  /sats-connect@3.3.0(typescript@5.6.3):
+    resolution: {integrity: sha512-rzWhSVzCeYAGYs2+RrVtU/jGdnobx83JuVdjN3fGSOa3s/6FIKXtV84nRlH111sE7yaUcTcqWy8K7UQ7uIOUvQ==}
     dependencies:
-      '@sats-connect/core': 0.3.1
-      '@sats-connect/make-default-provider-config': 0.0.9(@sats-connect/core@0.3.1)(typescript@5.6.3)
+      '@sats-connect/core': 0.5.8(typescript@5.6.3)
+      '@sats-connect/make-default-provider-config': 0.0.10(@sats-connect/core@0.5.8)(typescript@5.6.3)
       '@sats-connect/ui': 0.0.7
     transitivePeerDependencies:
       - debug
@@ -17954,10 +17876,6 @@ packages:
       convert-source-map: 2.0.0
     dev: true
 
-  /valibot@0.33.2:
-    resolution: {integrity: sha512-ZpFWuI+bs5+PP66q4zVFn4e4t/s5jmMw5iPBZmGUoi8iQqXyU9YY/BLCAyk62Z/bNS8qdUNBEyx52952qdqW3w==}
-    dev: false
-
   /valibot@0.37.0(typescript@5.6.3):
     resolution: {integrity: sha512-FQz52I8RXgFgOHym3XHYSREbNtkgSjF9prvMFH1nBsRyfL6SfCzoT1GuSDTlbsuPubM7/6Kbw0ZMQb8A+V+VsQ==}
     peerDependencies:
@@ -17971,6 +17889,17 @@ packages:
 
   /valibot@0.38.0(typescript@5.6.3):
     resolution: {integrity: sha512-RCJa0fetnzp+h+KN9BdgYOgtsMAG9bfoJ9JSjIhFHobKWVWyzM3jjaeNTdpFK9tQtf3q1sguXeERJ/LcmdFE7w==}
+    peerDependencies:
+      typescript: '>=5'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+    dependencies:
+      typescript: 5.6.3
+    dev: false
+
+  /valibot@0.42.1(typescript@5.6.3):
+    resolution: {integrity: sha512-3keXV29Ar5b//Hqi4MbSdV7lfVp6zuYLZuA9V1PvQUsXqogr+u5lvLPLk3A4f74VUXDnf/JfWMN6sB+koJ/FFw==}
     peerDependencies:
       typescript: '>=5'
     peerDependenciesMeta:
@@ -18127,32 +18056,6 @@ packages:
       sirv: 2.0.4
       source-map-support: 0.5.21
       vite: 5.4.10(@types/node@22.8.4)
-    dev: false
-
-  /vite-plugin-ssr@0.4.142(vite@5.4.11):
-    resolution: {integrity: sha512-ZDgpocnTEUmhYxGgMah8ZNK1Sfy5CFVcdXu+Ll3zRtGIPyWT5vYvASs2BLYEneqantHpde2b31Khzb0hxmP62w==}
-    engines: {node: '>=16.0.0'}
-    hasBin: true
-    peerDependencies:
-      react-streaming: '>=0.3.5'
-      vite: '>=3.1.0'
-    peerDependenciesMeta:
-      react-streaming:
-        optional: true
-    dependencies:
-      '@brillout/import': 0.2.3
-      '@brillout/json-serializer': 0.5.13
-      '@brillout/picocolors': 1.0.15
-      '@brillout/require-shim': 0.1.2
-      '@brillout/vite-plugin-import-build': 0.2.22
-      acorn: 8.14.0
-      cac: 6.7.14
-      es-module-lexer: 1.5.4
-      esbuild: 0.17.19
-      fast-glob: 3.3.2
-      sirv: 2.0.4
-      source-map-support: 0.5.21
-      vite: 5.4.11(@types/node@22.13.10)
     dev: false
 
   /vite-plugin-wasm@3.4.1(vite@5.4.11):

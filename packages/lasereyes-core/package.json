@@ -41,7 +41,7 @@
     "buffer": "^6.0.3",
     "nanostores": "^0.11.3",
     "ordapi": "^0.0.7",
-    "sats-connect": "^2.8.0"
+    "sats-connect": "^3.3.0"
   },
   "publishConfig": {
     "access": "public"
