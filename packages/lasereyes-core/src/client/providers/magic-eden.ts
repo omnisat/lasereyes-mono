@@ -20,6 +20,8 @@ import {
   NetworkType,
   ProviderType,
   SignMessageOptions,
+  WalletProviderSignPsbtOptions,
+  SignPsbtResponse,
 } from '../..'
 import {
   findOrdinalsAddress,
@@ -42,10 +44,11 @@ import {
 const MAGIC_EDEN_WALLET_PERSISTENCE_KEY = 'MAGIC_EDEN_CONNECTED_WALLET_STATE'
 
 export default class MagicEdenProvider extends WalletProvider {
-  constructor(stores: {
-    $store: MapStore<LaserEyesStoreType>
-    $network: WritableAtom<NetworkType>
-  },
+  constructor(
+    stores: {
+      $store: MapStore<LaserEyesStoreType>
+      $network: WritableAtom<NetworkType>
+    },
     parent: LaserEyesClient,
     config?: Config
   ) {
@@ -213,7 +216,9 @@ export default class MagicEdenProvider extends WalletProvider {
       getProvider: async () => this.library,
       payload: {
         network: {
-          type: getSatsConnectNetwork(this.network) as unknown as BitcoinNetworkType,
+          type: getSatsConnectNetwork(
+            this.network
+          ) as unknown as BitcoinNetworkType,
         },
         recipients: [
           {
@@ -275,27 +280,21 @@ export default class MagicEdenProvider extends WalletProvider {
     }
   }
 
-  async signPsbt(
-    _: string,
-    __: string,
-    psbtBase64: string,
-    _finalize?: boolean | undefined,
-    broadcast?: boolean | undefined
-  ): Promise<
-    | {
-      signedPsbtHex: string | undefined
-      signedPsbtBase64: string | undefined
-      txId?: string | undefined
-    }
-    | undefined
-  > {
-    console.log('signPsbt', psbtBase64, _finalize, broadcast)
+  async signPsbt({
+    psbtBase64,
+    broadcast,
+    finalize,
+    inputsToSign: inputsToSignProp,
+  }: WalletProviderSignPsbtOptions): Promise<SignPsbtResponse> {
+    console.log('signPsbt', psbtBase64, finalize, broadcast)
     const { address, paymentAddress } = this.$store.get()
     const toSignPsbt = bitcoin.Psbt.fromBase64(String(psbtBase64), {
       network: getBitcoinNetwork(this.network),
     })
 
-    const inputs = toSignPsbt.data.inputs
+    const inputs = toSignPsbt.data.inputs.filter((_, i) =>
+      inputsToSignProp ? inputsToSignProp.includes(i) : true
+    )
     const inputsToSign = []
     type InputAddressData = {
       address: string
@@ -385,7 +384,7 @@ export default class MagicEdenProvider extends WalletProvider {
       throw new Error('signature failed')
     }
 
-    if (_finalize || broadcast) {
+    if (finalize || broadcast) {
       signedPsbt.finalizeAllInputs()
       // const signedTx = signedPsbt.extractTransaction()
       // signedPsbtHex = signedTx.toHex()

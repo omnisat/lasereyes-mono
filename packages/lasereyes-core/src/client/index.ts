@@ -26,7 +26,12 @@ import { WalletProvider } from './providers'
 import UnisatProvider from './providers/unisat'
 import { isBase64, isHex } from '../lib/utils'
 import * as bitcoin from 'bitcoinjs-lib'
-import { LaserEyesStoreType, SignMessageOptions } from './types'
+import {
+  LaserEyesSignPsbtOptions,
+  LaserEyesStoreType,
+  SignMessageOptions,
+  SignPsbtResponse,
+} from './types'
 import { triggerDOMShakeHack } from './utils'
 import XVerseProvider from './providers/xverse'
 import { WizzProvider } from './providers/wizz'
@@ -46,7 +51,7 @@ export class LaserEyesClient {
   readonly $providerMap: Partial<Record<ProviderType, WalletProvider>>
   private disposed = false
 
-  readonly dataSourceManager: DataSourceManager;
+  readonly dataSourceManager: DataSourceManager
 
   dispose() {
     this.disposed = true
@@ -76,7 +81,6 @@ export class LaserEyesClient {
       [XVERSE]: new XVerseProvider(stores, this, config),
       [WIZZ]: new WizzProvider(stores, this, config),
     }
-
 
     try {
       this.dataSourceManager = DataSourceManager.getInstance()
@@ -290,9 +294,31 @@ export class LaserEyesClient {
     }
   }
 
-  async signPsbt(tx: string, finalize = false, broadcast = false) {
-    let psbtHex, psbtBase64
+  async signPsbt(options: LaserEyesSignPsbtOptions): Promise<SignPsbtResponse>
+  async signPsbt(
+    tx: string,
+    finalize?: boolean,
+    broadcast?: boolean
+  ): Promise<SignPsbtResponse>
+  async signPsbt(
+    arg1: string | LaserEyesSignPsbtOptions,
+    arg2?: boolean,
+    arg3?: boolean
+  ) {
+    let tx, finalize, broadcast, inputsToSign
 
+    if (typeof arg1 === 'string') {
+      tx = arg1
+      finalize = arg2 ?? false
+      broadcast = arg3 ?? false
+    } else {
+      tx = arg1.tx
+      finalize = arg1.finalize ?? false
+      broadcast = arg1.broadcast ?? false
+      inputsToSign = arg1.inputsToSign ?? []
+    }
+
+    let psbtHex, psbtBase64
     if (!tx) throw new Error('No PSBT provided')
     if (isHex(tx)) {
       psbtBase64 = bitcoin.Psbt.fromHex(tx).toBase64()
@@ -311,7 +337,14 @@ export class LaserEyesClient {
       try {
         const signedPsbt = await this.$providerMap[
           this.$store.get().provider!
-        ]?.signPsbt(tx, psbtHex, psbtBase64, finalize, broadcast)
+        ]?.signPsbt({
+          psbtHex,
+          psbtBase64,
+          tx,
+          broadcast,
+          finalize,
+          inputsToSign,
+        })
         return signedPsbt
       } catch (error) {
         if (error instanceof Error) {
@@ -355,8 +388,7 @@ export class LaserEyesClient {
       try {
         return await this.$providerMap[this.$store.get().provider!]?.inscribe(
           content,
-          mimeType,
-
+          mimeType
         )
       } catch (error) {
         if (error instanceof Error) {
@@ -490,5 +522,4 @@ export class LaserEyesClient {
       }
     }
   }
-
 }

@@ -4,7 +4,7 @@ import { getNetworkForUnisat, getUnisatNetwork } from '../../constants/networks'
 import { Config, NetworkType, ProviderType } from '../../types'
 import { UNISAT } from '../../constants/wallets'
 import { listenKeys, MapStore, WritableAtom } from 'nanostores'
-import { LaserEyesStoreType, SignMessageOptions } from '../types'
+import { LaserEyesStoreType, SignMessageOptions, WalletProviderSignPsbtOptions } from '../types'
 import { BIP322, BIP322_SIMPLE } from '../../constants'
 import { LaserEyesClient } from '..'
 import { Inscription } from '../../types/lasereyes'
@@ -150,11 +150,7 @@ export default class UnisatProvider extends WalletProvider {
   }
 
   async signPsbt(
-    _: string,
-    psbtHex: string,
-    __: string,
-    finalize?: boolean | undefined,
-    broadcast?: boolean | undefined
+    { psbtHex, broadcast, finalize, inputsToSign }: WalletProviderSignPsbtOptions
   ): Promise<
     | {
       signedPsbtHex: string | undefined
@@ -163,8 +159,10 @@ export default class UnisatProvider extends WalletProvider {
     }
     | undefined
   > {
+    const address = this.$store.get().paymentAddress
     const signedPsbt = await this.library?.signPsbt(psbtHex, {
       autoFinalized: finalize,
+      toSignInputs: inputsToSign?.map((index) => ({ index, address })),
     })
 
     const psbtSignedPsbt = bitcoin.Psbt.fromHex(signedPsbt)

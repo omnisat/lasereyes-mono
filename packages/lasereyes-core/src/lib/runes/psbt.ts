@@ -15,6 +15,7 @@ import { NetworkType } from '../../types'
 import { getAddressType, getRedeemScript } from '../btc'
 import { toXOnly } from 'bitcoinjs-lib/src/psbt/bip371'
 import { BaseNetwork } from '../../types/network'
+import { WalletProviderSignPsbtOptions } from '../..'
 // import { getAddressType, getRedeemScript } from "../btc"
 // import { toXOnly } from 'bitcoinjs-lib/src/psbt/bip371'
 
@@ -36,14 +37,7 @@ export const sendRune = async ({
   paymentAddress: string
   paymentPublicKey: string
   toAddress: string
-  signPsbt: (
-    tx: string,
-    psbtHex: string,
-    psbtBase64: string,
-    finalize?: boolean,
-    broadcast?: boolean,
-    network?: NetworkType
-  ) => Promise<
+  signPsbt: (signPsbtOptions: WalletProviderSignPsbtOptions) => Promise<
     | {
       signedPsbtHex: string | undefined
       signedPsbtBase64: string | undefined
@@ -71,14 +65,14 @@ export const sendRune = async ({
 
     const runeSendTxHex = String(runeSendPsbt?.psbtHex)
     const runeSendTxBase64 = String(runeSendPsbt?.psbtBase64)
-    const response = await signPsbt(
-      '',
-      runeSendTxHex,
-      runeSendTxBase64,
-      true,
-      false,
-      network
-    )
+    const response = await signPsbt({
+      tx: runeSendTxHex,
+      psbtHex: runeSendTxHex,
+      psbtBase64: runeSendTxBase64,
+      finalize: true,
+      broadcast: false,
+      network,
+    })
     if (!response) throw new Error('sign psbt failed')
     const psbt = bitcoin.Psbt.fromHex(response?.signedPsbtHex || '')
     const extracted = psbt.extractTransaction()

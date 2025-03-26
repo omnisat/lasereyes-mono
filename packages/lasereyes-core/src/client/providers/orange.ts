@@ -24,6 +24,7 @@ import {
   SignMessageOptions,
   Config,
   LaserEyesClient,
+  WalletProviderSignPsbtOptions,
 } from '../..'
 import {
   findOrdinalsAddress,
@@ -258,11 +259,7 @@ export default class OrangeProvider extends WalletProvider {
   }
 
   async signPsbt(
-    _: string,
-    __: string,
-    psbtBase64: string,
-    _finalize?: boolean | undefined,
-    broadcast?: boolean | undefined
+    { psbtBase64, broadcast, finalize, inputsToSign: inputsToSignProp }: WalletProviderSignPsbtOptions
   ): Promise<
     | {
       signedPsbtHex: string | undefined
@@ -279,7 +276,7 @@ export default class OrangeProvider extends WalletProvider {
       const address = this.$store.get().address
       const paymentAddress = this.$store.get().paymentAddress
 
-      const inputs = toSignPsbt.data.inputs
+      const inputs = toSignPsbt.data.inputs.filter((_, i) => inputsToSignProp ? inputsToSignProp.includes(i) : true)
       let inputsToSign: Record<string, number[]> = {}
       const ordinalAddressData: Record<string, number[]> = {
         [address]: [] as number[],
@@ -342,7 +339,7 @@ export default class OrangeProvider extends WalletProvider {
         throw new Error('Error signing psbt')
       }
 
-      if (_finalize && !txId) {
+      if (finalize && !txId) {
         signedPsbt!.finalizeAllInputs()
         signedPsbtHex = signedPsbt.toHex()
         signedPsbtBase64 = signedPsbt.toBase64()

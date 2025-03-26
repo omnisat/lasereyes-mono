@@ -15,6 +15,7 @@ import {
   ProviderType,
   SIGNET,
   SignMessageOptions,
+  WalletProviderSignPsbtOptions,
   TESTNET,
   TESTNET4,
 } from '../..'
@@ -234,11 +235,7 @@ export default class OkxProvider extends WalletProvider {
   }
 
   async signPsbt(
-    _: string,
-    psbtHex: string,
-    __: string,
-    _finalize?: boolean | undefined,
-    broadcast?: boolean | undefined
+    { psbtHex, broadcast, finalize, inputsToSign }: WalletProviderSignPsbtOptions
   ): Promise<
     | {
       signedPsbtHex: string | undefined
@@ -248,13 +245,15 @@ export default class OkxProvider extends WalletProvider {
     | undefined
   > {
     const library = this.library
+    const address = this.$store.get().paymentAddress
     const signedPsbt = await library.signPsbt(psbtHex, {
-      autoFinalized: _finalize,
+      autoFinalized: finalize,
+      toSignInputs: inputsToSign?.map((index) => ({ index, address })),
     })
 
     const psbtSignedPsbt = bitcoin.Psbt.fromHex(signedPsbt)
 
-    if (_finalize && broadcast) {
+    if (finalize && broadcast) {
       const txId = await this.pushPsbt(signedPsbt)
       return {
         signedPsbtHex: psbtSignedPsbt.toHex(),
