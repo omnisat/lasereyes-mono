@@ -8,9 +8,11 @@ import { MAESTRO } from "../../../constants/data-sources";
 export class MaestroDataSource implements DataSource {
   private apiUrl: string = "";
   private apiKey: string;
+  private testnetApiKey?: string;
 
-  constructor(apiKey: string, network: NetworkType) {
+  constructor(apiKey: string, network: NetworkType, testnetApiKey?: string) {
     this.apiKey = apiKey;
+    this.testnetApiKey = testnetApiKey;
     this.setNetwork(network);
   }
 
@@ -20,6 +22,11 @@ export class MaestroDataSource implements DataSource {
 
   public setNetwork(network: NetworkType) {
     this.apiUrl = getMaestroUrl(network);
+    if (this.apiUrl.includes('testnet')) {
+      this.apiKey = this.testnetApiKey || this.apiKey;
+    } else {
+      this.apiKey = this.apiKey;
+    }
   }
 
   private async call(method: 'get' | 'post', endpoint: string, body?: any) {

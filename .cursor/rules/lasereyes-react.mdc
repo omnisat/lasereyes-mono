@@ -1,0 +1,166 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Project Rules for `@omnisat/lasereyes-react`
+
+This document outlines the guidelines and standards for contributing to the `@omnisat/lasereyes-react` package. Following these rules will ensure consistency, maintainability, and quality throughout the React-specific implementation.
+
+## 🌟 Overview
+
+`@omnisat/lasereyes-react` is a React-specific package built on top of `@omnisat/lasereyes-core`. It provides React hooks, context providers, and wallet icon components to make it easy to integrate Bitcoin wallet support into React applications.
+
+## 📋 General Code Guidelines
+
+1. **React + TypeScript**: All components must be written in TypeScript with proper type definitions.
+2. **Functional Components**: Use functional components with hooks, not class components.
+3. **ESLint & Prettier**: All code must pass ESLint checks and follow the project's Prettier configuration.
+4. **No `any` Types**: Avoid using `any` type. Use proper typing or `unknown` when necessary.
+5. **Documentation**: All components, hooks, and utilities must be properly documented with JSDoc comments.
+6. **Performance**: Consider React rendering optimization techniques where appropriate.
+
+## 🏗️ Project Structure
+
+1. **Module Organization**:
+   - `/lib/providers`: React context providers and hooks
+   - `/lib/icons`: Wallet icon components
+   - `/lib/utils`: React-specific utilities
+   
+2. **Exports**:
+   - Export only what's necessary in `index.ts`
+   - Keep internal utilities and components private
+
+## 📐 Architecture Guidelines
+
+1. **Context Provider Pattern**:
+   - Use React Context for state management
+   - Provide a clean provider interface with `LaserEyesProvider`
+   - Keep provider implementation details hidden from consumers
+
+2. **Hook Implementation**:
+   - Create custom hooks that encapsulate wallet functionality
+   - Follow React hooks naming convention (`use*`)
+   - Make hooks composition-friendly
+
+3. **Core Integration**:
+   - Maintain a clean separation between React components and core functionality
+   - Use the core API through properly typed interfaces
+   - Don't duplicate core logic in React components
+
+## 🎨 UI Component Guidelines
+
+1. **Icon Components**:
+   - All wallet icons should be implemented as React components
+   - Support size and color customization via props
+   - Implement proper accessibility attributes
+
+2. **Component Props**:
+   - Use proper TypeScript interfaces for component props
+   - Include default values for optional props
+   - Extend from standard HTML element props where appropriate
+
+3. **Styling**:
+   - Keep components unstyled or minimally styled by default
+   - Allow style customization via className props
+   - Avoid direct styling dependencies (like styled-components)
+
+## 🔄 State Management
+
+1. **Context Usage**:
+   - Use React Context to provide wallet state
+   - Memoize context values to prevent unnecessary re-renders
+   - Structure context to allow for partial state updates
+
+2. **NanoStores Integration**:
+   - Properly integrate with nanostores from the core package
+   - Use `useStore` hook from `@nanostores/react` for efficient state access
+   - Implement batched updates for performance
+
+## 🪝 Hook Guidelines
+
+1. **`useLaserEyes` Hook**:
+   - Make the main hook intuitive and easy to use
+   - Support TypeScript inference for hook return values
+   - Allow for selective state access to prevent unnecessary re-renders
+
+2. **Hook Responsibilities**:
+   - Each hook should have a single responsibility
+   - Hooks should compose well with other hooks
+   - Document hook dependencies and side effects
+
+## 🧪 Testing Standards
+
+1. **Component Tests**:
+   - Test all React components with React Testing Library
+   - Focus on testing component behavior, not implementation details
+   - Mock context providers for isolated component testing
+
+2. **Hook Tests**:
+   - Test custom hooks with renderHook
+   - Verify hook behavior with different inputs
+   - Test edge cases and error handling
+
+## 🛠️ Development Workflow
+
+1. **Component Development**:
+   - Develop components in isolation first
+   - Then integrate with actual wallet functionality
+   - Document component usage examples with code samples
+   - Test components in a real application environment
+
+## 📦 Package Management
+
+1. **Dependencies**:
+   - Keep React dependencies as peer dependencies
+   - Keep bundle size minimal
+   - Avoid unnecessary dependencies
+
+2. **Versioning**:
+   - Sync versions with the core package
+   - Document breaking changes in CHANGELOG.md
+
+## 🔒 Framework Compatibility
+
+1. **React Versions**:
+   - Support the last two major versions of React
+   - Test with different React versions
+   - Document minimum required React version
+
+2. **Next.js Support**:
+   - Ensure compatibility with Next.js (both Pages and App Router)
+   - Include `'use client'` directives where needed
+   - Test with both client and server components
+
+## 📃 Documentation Requirements
+
+1. **API Documentation**:
+   - Document all hooks, components, and context providers
+   - Include TypeScript types in documentation
+   - Provide usage examples for each hook and component
+
+2. **README**:
+   - Keep the README up-to-date with new features
+   - Include basic usage examples for the most common use cases
+   - Document component props and hook return values
+
+## 🖼️ Icon Component Guidelines
+
+1. **SVG Usage**:
+   - Use SVG for all wallet icons
+   - Optimize SVG code (remove unnecessary attributes)
+   - Support different color variants
+
+2. **Accessibility**:
+   - Include accessible names for all icon components
+   - Support aria attributes
+   - Ensure proper contrast for icon variants
+
+3. **Consistency**:
+   - Maintain consistent styling across all wallet icons
+   - Use a consistent API for all icon components
+   - Support the same set of props across all icons
+
+---
+
+These rules are intended to guide development and maintain quality. They may be updated as the project evolves.

@@ -58,7 +58,7 @@ const BRC20Section = () => {
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="text-gray-500 text-sm text-orange-400">brc-20</div>
+      <div className="text-gray-500 text-md text-orange-400">brc-20</div>
       <Select
         onValueChange={(value) => {
           const brc20 = brc20s?.find((r: Brc20Balance) => r.ticker === value)

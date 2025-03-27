@@ -13,7 +13,7 @@ import {
   OP_NET,
   SPARROW,
 } from '../constants/wallets'
-import { NetworkType, ProviderType } from '../types'
+import { NetworkType, ProviderType, Config } from '../types'
 import { LaserEyesStoreType } from './types'
 
 export function triggerDOMShakeHack(callback: VoidFunction) {
@@ -63,9 +63,9 @@ export function createStores(): {
   }
 }
 
-export function createConfig({ network }: { network: NetworkType }) {
+export function createConfig({ ...config }: Config) {
   return {
-    network,
+    ...config
   }
 }
 

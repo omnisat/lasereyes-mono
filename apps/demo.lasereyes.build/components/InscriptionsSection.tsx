@@ -7,7 +7,7 @@ import { getMempoolSpaceUrl } from '@/lib/urls'
 import { MAINNET, TESTNET, useLaserEyes, Inscription } from '@omnisat/lasereyes'
 
 const InscriptionsSection = () => {
-  const { provider, inscribe, network, getInscriptions, sendInscriptions } = useLaserEyes()
+  const { provider, inscribe, address, network, getInscriptions, sendInscriptions } = useLaserEyes()
   const [inscriptions, setInscriptions] = useState<Inscription[]>([])
   const [inscriptionText, setInscriptionText] = useState('Inscribed 100% clientside with Laser Eyes')
   const [selectedInscriptionIds, setSelectedInscriptionIds] = useState<string[]>([])
@@ -22,6 +22,12 @@ const InscriptionsSection = () => {
       })
     }
   }, [provider, getInscriptions])
+
+  useEffect(() => {
+    if (!address) {
+      setInscriptions([])
+    }
+  }, [address, provider, network])
 
   const inscribeWithWallet = async () => {
     try {
@@ -97,7 +103,7 @@ const InscriptionsSection = () => {
 
   return (
     <div className={"flex flex-col gap-2"}>
-      <div className="text-gray-500 text-sm text-orange-400">inscriptions</div>
+      <div className="text-gray-500 text-md text-orange-400">inscriptions</div>
       <div className="flex flex-col gap-2 items-center justify-center">
         <div className="flex flex-wrap gap-1">
           {inscriptions?.slice(0, 4).map((insc) => (

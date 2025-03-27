@@ -6,12 +6,11 @@ import React, {
   useState,
 } from 'react'
 import useSWR from 'swr'
-import { IMempoolUtxo } from '@/types/btc'
-import { getMempoolSpaceUrl } from '@/lib/urls'
-import { useLaserEyes, NetworkType } from '@omnisat/lasereyes'
+import { MempoolUtxo } from '@omnisat/lasereyes'
+import { useLaserEyes } from '@omnisat/lasereyes'
 
 type UtxoContextType = {
-  utxos: IMempoolUtxo[]
+  utxos: MempoolUtxo[]
   loading: boolean
   fetchUtxos: () => void
 }
@@ -21,25 +20,29 @@ const UtxoContext = createContext<UtxoContextType | undefined>(undefined)
 export const UtxoProvider: React.FC<{
   children: React.ReactNode
 }> = ({ children }) => {
-  const { paymentAddress, network } = useLaserEyes((x) => ({
+  const { paymentAddress, network, getUtxos } = useLaserEyes((x) => ({
     paymentAddress: x.paymentAddress,
     network: x.network,
+    getUtxos: x.getUtxos,
   }))
-  const mempoolUrl = `${getMempoolSpaceUrl(network)}/api/address/${paymentAddress}/utxo`
-  const [utxos, setUtxos] = useState<IMempoolUtxo[]>([])
 
-  const fetcher = useCallback(async (url: string) => {
-    try {
-      const response = await fetch(url)
-      if (!response.ok) {
-        throw new Error('Failed to fetch UTXOs')
+  const [utxos, setUtxos] = useState<MempoolUtxo[]>([])
+
+  const fetcher = useCallback(
+    async () => {
+      try {
+        const response = await getUtxos(paymentAddress)
+        return response
+      } catch (e) {
+        console.error('Error fetching UTXOs:', e)
+        return []
       }
-      return response.json()
-    } catch (e) {}
-  }, [])
+    },
+    [getUtxos, paymentAddress]
+  )
 
-  const { data: utxosData, error } = useSWR<IMempoolUtxo[]>(
-    paymentAddress && network && mempoolUrl,
+  const { data: utxosData, error } = useSWR<MempoolUtxo[]>(
+    paymentAddress && network,
     fetcher
   )
 
@@ -60,8 +63,8 @@ export const UtxoProvider: React.FC<{
   }, [error])
 
   const fetchUtxos = useCallback(() => {
-    fetcher(mempoolUrl)
-  }, [fetcher, mempoolUrl])
+    fetcher()
+  }, [fetcher])
 
   return (
     <UtxoContext.Provider

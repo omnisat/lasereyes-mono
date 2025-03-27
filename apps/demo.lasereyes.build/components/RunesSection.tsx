@@ -11,7 +11,7 @@ const RunesSection = () => {
   const { provider, address, send, network, getMetaBalances } = useLaserEyes()
   const [runes, setRunes] = useState<OrdRuneBalance[]>([])
 
-  const [selectedRune, setSelectedRune] = useState<OrdRuneBalance>(undefined)
+  const [selectedRune, setSelectedRune] = useState<OrdRuneBalance>()
   const [runeToAddress, setRuneToAddress] = useState(address || '')
   const [runeAmount, setRuneAmount] = useState('')
 
@@ -58,7 +58,7 @@ const RunesSection = () => {
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="text-gray-500 text-sm text-orange-400">runes</div>
+      <div className="text-gray-500 text-md text-orange-400">runes</div>
       <Select
         onValueChange={(value) => {
           const rune = runes?.find((r) => r.symbol === value)

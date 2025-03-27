@@ -18,6 +18,7 @@ import {
   XVERSE,
   UNISAT,
 } from '@omnisat/lasereyes'
+import { ConnectWalletButton } from '@omnisat/lasereyes/ui'
 import { createPsbt, satoshisToBTC } from '@/lib/btc'
 import { cn, truncateString } from '@/lib/utils'
 import ClickToCopy from '@/components/ClickToCopy'
@@ -42,6 +43,26 @@ import InscriptionsSection from './InscriptionsSection'
 import RunesSection from './RunesSection'
 import BRC20Section from './Brc20Section'
 
+import '@omnisat/lasereyes/ui/style.css'
+
+
+
+type colorsType =
+  | 'orange'
+  | 'pink'
+  | 'blue'
+  | 'darkBlue'
+  | 'yellow'
+  | 'green'
+  | 'purple'
+  | 'red'
+const colors = [
+  'orange',
+  'pink',
+  'blue',
+  'darkBlue',
+  'yellow',
+] as colorsType[]
 
 const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
   const [pkgVersion, setPkgVersion] = useState<string | undefined>()
@@ -55,25 +76,46 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
     }
     | undefined
   >()
-  type colorsType =
-    | 'orange'
-    | 'pink'
-    | 'blue'
-    | 'darkBlue'
-    | 'yellow'
-    | 'green'
-    | 'purple'
-    | 'red'
-  const colors = [
-    'orange',
-    'pink',
-    'blue',
-    'darkBlue',
-    'yellow',
-  ] as colorsType[]
   const [selectedColor, setSelectedColor] = useState<colorsType>(
     colors[Math.floor(Math.random() * 5)]
   )
+
+  const [hasError, setHasError] = useState(false)
+  const hasRun = useRef(false)
+
+  const [finalize, setFinalize] = useState<boolean>(false)
+  const [broadcast, setBroadcast] = useState<boolean>(false)
+  const [unsigned, setUnsigned] = useState<string | undefined>()
+  const [signed, setSigned] = useState<string | undefined>()
+
+  const { utxos } = useUtxos()
+
+  const {
+    address,
+    provider,
+    network,
+    paymentAddress,
+    paymentPublicKey,
+    getBalance,
+    pushPsbt,
+    publicKey,
+    signPsbt,
+    balance,
+    switchNetwork,
+    hasUnisat,
+    signMessage,
+    hasXverse,
+    sendBTC,
+    hasOyl,
+    hasMagicEden,
+    hasOkx,
+    hasLeather,
+    hasPhantom,
+    hasWizz,
+    hasSparrow,
+    hasOrange,
+    hasOpNet,
+  } = useLaserEyes()
 
   const switchN = () => {
     try {
@@ -108,48 +150,12 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
   }, [])
 
 
-  const {
-    address,
-    provider,
-    network,
-    paymentAddress,
-    paymentPublicKey,
-    getBalance,
-    pushPsbt,
-    publicKey,
-    signPsbt,
-    balance,
-    switchNetwork,
-    hasUnisat,
-    signMessage,
-    hasXverse,
-    sendBTC,
-    hasOyl,
-    hasMagicEden,
-    hasOkx,
-    hasLeather,
-    hasPhantom,
-    hasWizz,
-    hasSparrow,
-    hasOrange,
-    hasOpNet,
-  } = useLaserEyes()
-
-  const [hasError, setHasError] = useState(false)
-  const hasRun = useRef(false)
-
-  const [finalize, setFinalize] = useState<boolean>(false)
-  const [broadcast, setBroadcast] = useState<boolean>(false)
-  const [unsigned, setUnsigned] = useState<string | undefined>()
-  const [signed, setSigned] = useState<string | undefined>()
-
   useEffect(() => {
     setSignature('')
     setUnsignedPsbt(undefined)
     setSignedPsbt(undefined)
   }, [address])
 
-  const { utxos } = useUtxos()
 
   useEffect(() => {
     if (
@@ -419,7 +425,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
         <Link
           className={cn(
             badgeVariants({ variant: 'outline' }),
-            'self-end mb-1.5 text-orange-500 border-orange-500 hover:border-white hover:bg-white hover:text-black transition-all text-md'
+            'self-end mb-1.5 text-orange-400 border-orange-500 hover:border-white hover:bg-white hover:text-black transition-all text-md'
           )}
           href={'https://github.com/omnisat/lasereyes-mono'}
           target={'_blank'}
@@ -433,7 +439,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
           href={'https://www.lasereyes.build/docs/getting-started'}
           target={'_blank'}
           className={
-            'self-end font-windows text-white flex flex-row gap-2 items-center hover:text-orange-500 transition-all'
+            'self-end font-windows text-white flex flex-row gap-2 items-center hover:text-orange-400 transition-all'
           }
         >
           docs
@@ -443,7 +449,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
           href={'https://github.com/omnisat/lasereyes/tree/main/example'}
           target={'_blank'}
           className={
-            'self-end font-windows text-white flex flex-row gap-2 items-center hover:text-orange-500 transition-all'
+            'self-end font-windows text-white flex flex-row gap-2 items-center hover:text-orange-400 transition-all'
           }
         >
           view source
@@ -453,7 +459,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
 
       {/* Wallet connection section */}
       <div className={'flex items-center justify-center flex-col gap-4'}>
-        <div className="text-gray-500 text-xl">supported wallets:</div>
+        <div className="text-orange-400 text-xl">supported wallets:</div>
         <div className={'flex flex-wrap justify-center gap-3'}>
           {Object.values(SUPPORTED_WALLETS).sort((a, b) => Number(hasWallet[b.name]) - Number(hasWallet[a.name])).map(
             (walletInfo: { name: ProviderType; url: string }) => (
@@ -461,6 +467,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
             )
           )}
         </div>
+        {/* <ConnectWalletButton /> */}
       </div>
 
       {/* Main container */}
@@ -483,7 +490,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
           {/* Provider info */}
           <div className={'flex flex-row items-center gap-4 justify-center space-around'}>
             <div className={'flex flex-col items-center'}>
-              <span className={clsx('font-black text-orange-500')}>Provider</span>
+              <span className={clsx('font-black text-orange-400')}>Provider</span>
               <span className={clsx('text-lg flex flex-row gap-2 items-center justify-center',
                 provider?.length > 0 ? 'text-white' : 'text-gray-500')}>
                 {provider && <WalletIcon walletName={provider} size={24} />}{' '}
@@ -496,7 +503,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
           <div className={'flex flex-row items-center gap-6 justify-center space-around'}>
             <div className={'flex flex-row gap-2'}>
               <div className={'flex flex-col items-center'}>
-                <span className={clsx('font-black text-orange-500 justify-center')}>
+                <span className={clsx('font-black text-orange-400 justify-center')}>
                   address (taproot)
                 </span>
                 <span className={clsx('text-lg flex flex-row gap-2 items-center justify-center',
@@ -519,7 +526,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
             {/* Payment address section */}
             <div className={'flex flex-row items-center gap-4 justify-center space-around'}>
               <div className={'flex flex-col items-center'}>
-                <span className={clsx('font-black text-orange-500')}>
+                <span className={clsx('font-black text-orange-400')}>
                   payment address
                 </span>
                 <span className={clsx('text-lg flex flex-row gap-2 items-center justify-center',
@@ -546,7 +553,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
           <div className={'flex flex-row gap-6'}>
             <div className={'flex flex-row items-center gap-4 justify-center space-around'}>
               <div className={'flex flex-col items-center'}>
-                <span className={clsx('font-black text-orange-500')}>
+                <span className={clsx('font-black text-orange-400')}>
                   public key
                 </span>
                 <span className={clsx('text-lg flex flex-row gap-2 items-center justify-center',
@@ -560,7 +567,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
             </div>
             <div className={'flex flex-row items-center gap-4 justify-center space-around'}>
               <div className={'flex flex-col items-center'}>
-                <span className={clsx('font-black text-orange-500')}>
+                <span className={clsx('font-black text-orange-400')}>
                   payment public key
                 </span>
                 <span className={clsx('text-lg flex flex-row gap-2 items-center justify-center',
@@ -579,7 +586,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
           {/* Balance */}
           <div className={'flex flex-row items-center gap-4 justify-center space-around'}>
             <div className={'flex flex-col items-center'}>
-              <span className={clsx('font-black text-orange-500')}>
+              <span className={clsx('font-black text-orange-400')}>
                 balance
               </span>
               <span className={clsx('text-lg flex flex-row gap-2 items-center justify-center',
@@ -595,7 +602,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
 
           {/* Signature */}
           <div className={'flex flex-col items-center'}>
-            <span className={clsx('font-black text-orange-500')}>
+            <span className={clsx('font-black text-orange-400')}>
               signature
             </span>{' '}
             <span className={clsx('text-md flex flex-row gap-2 items-center justify-center',
@@ -611,7 +618,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
           <div className={'flex flex-row items-center gap-6 justify-center space-around'}>
             <div className={'flex flex-row items-center gap-4 justify-center space-around'}>
               <div className={'flex flex-col items-center'}>
-                <span className={clsx('font-black text-orange-500')}>
+                <span className={clsx('font-black text-orange-400')}>
                   unsigned Psbt
                 </span>
                 <span className={clsx('text-lg flex flex-row gap-2 items-center justify-center',
@@ -635,7 +642,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
 
             <div className={'flex flex-row items-center gap-4 justify-center space-around'}>
               <div className={'flex flex-col items-center'}>
-                <span className={clsx('font-black text-orange-500')}>
+                <span className={clsx('font-black text-orange-400')}>
                   signed Psbt
                 </span>
                 <span className={clsx('text-lg flex flex-row gap-2 items-center justify-center',
@@ -659,7 +666,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
           <br />
 
           {/* Bitcoin section */}
-          <div className="text-gray-500 text-sm">bitcoin</div>
+          <div className="text-md text-orange-400">bitcoin</div>
           <div className={"flex flex-row text-xl gap-2"}>
             <Button
               className={'w-full gap-2 bg-[#232225]'}
@@ -735,7 +742,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
                   "gap-2",
                   finalize || provider !== UNISAT ? 'text-white' : '',
                   'shrink disabled:text-gray-500 disabled ',
-                  broadcast ? 'text-orange-500' : 'bg-[#232225]'
+                  broadcast ? 'text-orange-400' : 'bg-[#232225]'
                 )}
                 size={'lg'}
                 disabled={

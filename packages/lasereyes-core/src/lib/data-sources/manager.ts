@@ -5,7 +5,7 @@ import { Inscription } from "../../types/lasereyes";
 import { MaestroAddressInscription } from "../../types/maestro";
 import { BaseNetwork } from "../../types/network";
 import { OrdRuneBalance } from "../../types/ord";
-import { getMempoolSpaceUrl, MAESTRO_API_KEY_MAINNET, SANDSHREW_LASEREYES_KEY, SANDSHREW_URL } from "../urls";
+import { getMempoolSpaceUrl, MAESTRO_API_KEY_MAINNET, MAESTRO_API_KEY_TESTNET4, SANDSHREW_LASEREYES_KEY, SANDSHREW_URL } from "../urls";
 import { normalizeBrc20Balances, normalizeInscription } from "./normalizations";
 import { MaestroDataSource } from "./sources/maestro-ds";
 import { MempoolSpaceDataSource } from "./sources/mempool-space-ds";
@@ -16,10 +16,10 @@ const ERROR_METHOD_NOT_AVAILABLE = 'Method not available on any data source';
 export class DataSourceManager {
   private static instance: DataSourceManager;
   private dataSources: Map<string, DataSource> = new Map();
-
+  private network: string;
   private constructor(config?: Config) {
     const network = config?.network || BaseNetwork.MAINNET;
-
+    this.network = network;
     this.dataSources.set('mempool', new MempoolSpaceDataSource(
       config?.dataSources?.mempool?.url || getMempoolSpaceUrl(network),
       network
@@ -34,6 +34,7 @@ export class DataSourceManager {
     this.dataSources.set('maestro', new MaestroDataSource(
       config?.dataSources?.maestro?.apiKey || MAESTRO_API_KEY_MAINNET,
       network,
+      config?.dataSources?.maestro?.testnetApiKey || MAESTRO_API_KEY_TESTNET4
     ));
   }
 
@@ -52,9 +53,15 @@ export class DataSourceManager {
   }
 
   public updateNetwork(newNetwork: string) {
+    this.network = newNetwork;
     for (const ds of this.dataSources.values()) {
       ds.setNetwork?.(newNetwork);
     }
+  }
+
+  public registerDataSource(source: string, dataSource: DataSource) {
+    this.dataSources.set(source, dataSource);
+    this.dataSources.get(source)?.setNetwork?.(this.network);
   }
 
   public getSource(source: string): DataSource | undefined {
