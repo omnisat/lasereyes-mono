@@ -7,6 +7,7 @@ import { listenKeys, MapStore, WritableAtom } from 'nanostores'
 import { LaserEyesStoreType, SignMessageOptions, WalletProviderSignPsbtOptions } from '../types'
 import { BIP322, BIP322_SIMPLE } from '../../constants'
 import { LaserEyesClient } from '..'
+import { omitUndefined } from '../../lib/utils'
 
 export default class OpNetProvider extends WalletProvider {
   constructor(stores: {
@@ -160,10 +161,10 @@ export default class OpNetProvider extends WalletProvider {
     | undefined
   > {
     const address = this.$store.get().paymentAddress
-    const signedPsbt = await this.library?.signPsbt(psbtHex, {
+    const signedPsbt = await this.library?.signPsbt(psbtHex, omitUndefined({
       autoFinalized: finalize,
       toSignInputs: inputsToSign?.map((index) => ({ index, address })),
-    })
+    }))
 
     const psbtSignedPsbt = bitcoin.Psbt.fromHex(signedPsbt)
 

@@ -172,8 +172,12 @@ export default class PhantomProvider extends WalletProvider {
       signingIndexes: [] as number[],
     }
 
-    let counter = 0
-    for await (let input of inputs) {
+    for (let counter of inputsToSignProp ?? inputs.keys()) {
+      const input = inputs[counter]
+      if (input.witnessUtxo === undefined || inputsToSignProp) {
+        paymentsAddressData.signingIndexes.push(Number(counter))
+        continue
+      }
       const { script } = input.witnessUtxo!
       const addressFromScript = fromOutputScript(
         script,
@@ -185,7 +189,6 @@ export default class PhantomProvider extends WalletProvider {
       } else if (addressFromScript === address) {
         ordinalAddressData.signingIndexes.push(Number(counter))
       }
-      counter++
     }
 
     if (ordinalAddressData.signingIndexes.length > 0) {

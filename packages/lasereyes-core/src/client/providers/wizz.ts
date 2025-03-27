@@ -19,6 +19,7 @@ import { getNetworkForWizz } from '../../constants/networks'
 import { WizzNetwork } from '../../types/network'
 import { normalizeInscription } from '../../lib/data-sources/normalizations'
 import { UnisatInscription } from './unisat'
+import { omitUndefined } from '../../lib/utils'
 
 export class WizzProvider extends WalletProvider {
   constructor(
@@ -192,11 +193,11 @@ export class WizzProvider extends WalletProvider {
     | undefined
   > {
     const address = this.$store.get().paymentAddress
-    const signedPsbt = await this.library?.signPsbt(psbtHex, {
+    const signedPsbt = await this.library?.signPsbt(psbtHex, omitUndefined({
       autoFinalized: finalize,
       broadcast: false,
       toSignInputs: inputsToSign?.map((index) => ({ index, address })),
-    })
+    }))
 
     const psbtSignedPsbt = bitcoin.Psbt.fromHex(signedPsbt)
 

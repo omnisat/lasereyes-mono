@@ -287,17 +287,7 @@ export default class LeatherProvider extends WalletProvider {
   }
 
   async getPublicKey() {
-    const { result } = (await this.library.request(
-      'getAddresses'
-    )) as LeatherRPCResponse
-    const addresses = (result as LeatherRequestAddressResponse).addresses
-    const taprootAddress = addresses.find(
-      (address: LeatherAddress) => address.type === P2TR
-    )
-    if (!taprootAddress?.publicKey) {
-      throw new Error('No accounts found')
-    }
-    return taprootAddress.publicKey
+    return this.$store.get().publicKey
   }
 
   async getBalance() {
@@ -310,6 +300,10 @@ export default class LeatherProvider extends WalletProvider {
   }
 
   async requestAccounts(): Promise<string[]> {
+    const { accounts: accountsFromStore } = this.$store.get()
+    if (accountsFromStore.length > 0) {
+      return accountsFromStore
+    }
     const { result } = (await this.library.request(
       'getAddresses'
     )) as LeatherRPCResponse

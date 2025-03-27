@@ -30,6 +30,7 @@ import { getBTCBalance, isMainnetNetwork } from '../../lib/helpers'
 import { getNetworkForOkx } from '../../constants/networks'
 import { normalizeInscription } from '../../lib/data-sources/normalizations'
 import { UnisatInscription } from './unisat'
+import { omitUndefined } from '../../lib/utils'
 
 const OKX_WALLET_PERSISTENCE_KEY = 'OKX_CONNECTED_WALLET_STATE'
 
@@ -246,10 +247,10 @@ export default class OkxProvider extends WalletProvider {
   > {
     const library = this.library
     const address = this.$store.get().paymentAddress
-    const signedPsbt = await library.signPsbt(psbtHex, {
+    const signedPsbt = await library.signPsbt(psbtHex, omitUndefined({
       autoFinalized: finalize,
       toSignInputs: inputsToSign?.map((index) => ({ index, address })),
-    })
+    }))
 
     const psbtSignedPsbt = bitcoin.Psbt.fromHex(signedPsbt)
 

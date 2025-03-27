@@ -4,17 +4,24 @@ import { getNetworkForUnisat, getUnisatNetwork } from '../../constants/networks'
 import { Config, NetworkType, ProviderType } from '../../types'
 import { UNISAT } from '../../constants/wallets'
 import { listenKeys, MapStore, WritableAtom } from 'nanostores'
-import { LaserEyesStoreType, SignMessageOptions, WalletProviderSignPsbtOptions } from '../types'
+import {
+  LaserEyesStoreType,
+  SignMessageOptions,
+  WalletProviderSignPsbtOptions,
+} from '../types'
 import { BIP322, BIP322_SIMPLE } from '../../constants'
 import { LaserEyesClient } from '..'
 import { Inscription } from '../../types/lasereyes'
 import { normalizeInscription } from '../../lib/data-sources/normalizations'
+import _ from 'lodash'
+import { omitUndefined } from '../../lib/utils'
 
 export default class UnisatProvider extends WalletProvider {
-  constructor(stores: {
-    $store: MapStore<LaserEyesStoreType>
-    $network: WritableAtom<NetworkType>
-  },
+  constructor(
+    stores: {
+      $store: MapStore<LaserEyesStoreType>
+      $network: WritableAtom<NetworkType>
+    },
     parent: LaserEyesClient,
     config?: Config
   ) {
@@ -149,21 +156,27 @@ export default class UnisatProvider extends WalletProvider {
     return await this.library?.signMessage(message, protocol)
   }
 
-  async signPsbt(
-    { psbtHex, broadcast, finalize, inputsToSign }: WalletProviderSignPsbtOptions
-  ): Promise<
+  async signPsbt({
+    psbtHex,
+    broadcast,
+    finalize,
+    inputsToSign,
+  }: WalletProviderSignPsbtOptions): Promise<
     | {
-      signedPsbtHex: string | undefined
-      signedPsbtBase64: string | undefined
-      txId?: string | undefined
-    }
+        signedPsbtHex: string | undefined
+        signedPsbtBase64: string | undefined
+        txId?: string | undefined
+      }
     | undefined
   > {
     const address = this.$store.get().paymentAddress
-    const signedPsbt = await this.library?.signPsbt(psbtHex, {
-      autoFinalized: finalize,
-      toSignInputs: inputsToSign?.map((index) => ({ index, address })),
-    })
+    const signedPsbt = await this.library?.signPsbt(
+      psbtHex,
+      omitUndefined({
+        autoFinalized: finalize,
+        toSignInputs: inputsToSign?.map((index) => ({ index, address })),
+      })
+    )
 
     const psbtSignedPsbt = bitcoin.Psbt.fromHex(signedPsbt)
 
@@ -191,7 +204,10 @@ export default class UnisatProvider extends WalletProvider {
     return bal.total
   }
 
-  async getInscriptions(offset?: number, limit?: number): Promise<Inscription[]> {
+  async getInscriptions(
+    offset?: number,
+    limit?: number
+  ): Promise<Inscription[]> {
     const offsetValue = offset || 0
     const limitValue = limit || 10
     const response = await this.library.getInscriptions(offsetValue, limitValue)
