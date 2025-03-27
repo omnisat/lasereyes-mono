@@ -100,7 +100,7 @@ const dataSourceManager = new DataSourceManager(config);`
         <CardTitle>Data Source Manager Playground</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid gap-6">
+        <div className="flex flex-col gap-6">
           <div className="flex flex-wrap gap-4">
             <div className="flex items-center space-x-2">
               <Switch
@@ -133,7 +133,7 @@ const dataSourceManager = new DataSourceManager(config);`
           </div>
 
           <Tabs defaultValue={methods[0].name} value={activeMethod} onValueChange={setActiveMethod}>
-            <TabsList className="grid grid-cols-2 md:grid-cols-4">
+            <TabsList className="grid grid-cols-1 md:grid-cols-4">
               {methods.map((method) => (
                 <TabsTrigger key={method.name} value={method.name}>
                   {method.name}
