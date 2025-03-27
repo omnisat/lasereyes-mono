@@ -1,5 +1,5 @@
 import { MapStore, WritableAtom } from 'nanostores'
-import { LaserEyesStoreType } from '../types'
+import { LaserEyesStoreType, WalletProviderSignPsbtOptions } from '../types'
 import {
   Brc20SendArgs,
   BTCSendArgs,
@@ -142,11 +142,7 @@ export abstract class WalletProvider {
   ): Promise<string>
 
   abstract signPsbt(
-    tx: string,
-    psbtHex: string,
-    psbtBase64: string,
-    finalize?: boolean,
-    broadcast?: boolean
+    signPsbtOptions: WalletProviderSignPsbtOptions
   ): Promise<
     | {
       signedPsbtHex: string | undefined

@@ -8,6 +8,7 @@ import {
   createConfig,
   createStores,
   LaserEyesClient,
+  LaserEyesSignPsbtOptions,
   MAINNET,
   NetworkType,
   Protocol,
@@ -103,10 +104,29 @@ export default function LaserEyesProvider({
       defaultMethods.sendBTC(),
     [client]
   )
-  const signPsbt = useCallback(
-    async (psbt: string, finalize?: boolean, broadcast?: boolean) =>
-      (await client?.signPsbt.call(client, psbt, finalize, broadcast)) ??
-      defaultMethods.signPsbt(),
+
+  const signPsbt = useCallback<LaserEyesClient['signPsbt']>(
+    async (
+      ...args:
+        | [LaserEyesSignPsbtOptions]
+        | [tx: string, finalize?: boolean, broadcast?: boolean]
+    ) => {
+      if (typeof args[0] === 'string') {
+        // Handle the `(tx: string, finalize: boolean, broadcast: boolean)` overload
+        const [tx, finalize, broadcast] = args
+        return (
+          (await client?.signPsbt?.(
+            tx,
+            finalize ?? false,
+            broadcast ?? false
+          )) ?? defaultMethods.signPsbt()
+        )
+      } else {
+        // Handle the `(options: LaserEyesSignPsbtOptions)` overload
+        const [options] = args
+        return (await client?.signPsbt?.(options)) ?? defaultMethods.signPsbt()
+      }
+    },
     [client]
   )
   const switchNetwork = useCallback(
@@ -129,8 +149,11 @@ export default function LaserEyesProvider({
 
   const sendInscriptions = useCallback(
     async (inscriptionIds: string[], toAddress: string) =>
-      (await client?.sendInscriptions.call(client, inscriptionIds, toAddress)) ??
-      defaultMethods.sendInscriptions(),
+      (await client?.sendInscriptions.call(
+        client,
+        inscriptionIds,
+        toAddress
+      )) ?? defaultMethods.sendInscriptions(),
     [client]
   )
 
@@ -164,7 +187,7 @@ export default function LaserEyesProvider({
       inscribe,
       send,
       sendInscriptions,
-      getUtxos
+      getUtxos,
     }
   }, [
     client,
@@ -184,7 +207,7 @@ export default function LaserEyesProvider({
     signMessage,
     signPsbt,
     switchNetwork,
-    getUtxos
+    getUtxos,
   ])
 
   return (

@@ -24,6 +24,7 @@ import {
   SignMessageOptions,
   Config,
   LaserEyesClient,
+  WalletProviderSignPsbtOptions,
 } from '../..'
 import {
   findOrdinalsAddress,
@@ -46,10 +47,11 @@ const { signMessage: signMessageOrange, sendBtcTransaction: sendBtcTxOrange } =
 
 const ORANGE_WALLET_PERSISTENCE_KEY = 'ORANGE_CONNECTED_WALLET_STATE'
 export default class OrangeProvider extends WalletProvider {
-  constructor(stores: {
-    $store: MapStore<LaserEyesStoreType>
-    $network: WritableAtom<NetworkType>
-  },
+  constructor(
+    stores: {
+      $store: MapStore<LaserEyesStoreType>
+      $network: WritableAtom<NetworkType>
+    },
     parent: LaserEyesClient,
     config?: Config
   ) {
@@ -257,18 +259,17 @@ export default class OrangeProvider extends WalletProvider {
     return signature
   }
 
-  async signPsbt(
-    _: string,
-    __: string,
-    psbtBase64: string,
-    _finalize?: boolean | undefined,
-    broadcast?: boolean | undefined
-  ): Promise<
+  async signPsbt({
+    psbtBase64,
+    broadcast,
+    finalize,
+    inputsToSign: inputsToSignProp,
+  }: WalletProviderSignPsbtOptions): Promise<
     | {
-      signedPsbtHex: string | undefined
-      signedPsbtBase64: string | undefined
-      txId?: string | undefined
-    }
+        signedPsbtHex: string | undefined
+        signedPsbtBase64: string | undefined
+        txId?: string | undefined
+      }
     | undefined
   > {
     try {
@@ -279,7 +280,9 @@ export default class OrangeProvider extends WalletProvider {
       const address = this.$store.get().address
       const paymentAddress = this.$store.get().paymentAddress
 
-      const inputs = toSignPsbt.data.inputs
+      const inputs = toSignPsbt.data.inputs.filter((_, i) =>
+        inputsToSignProp ? inputsToSignProp.includes(i) : true
+      )
       let inputsToSign: Record<string, number[]> = {}
       const ordinalAddressData: Record<string, number[]> = {
         [address]: [] as number[],
@@ -288,24 +291,22 @@ export default class OrangeProvider extends WalletProvider {
         [paymentAddress]: [] as number[],
       }
 
-      let counter = 0
-      for await (let input of inputs) {
-        if (input.witnessUtxo === undefined) {
+      for (let counter of inputsToSignProp ?? inputs.keys()) {
+        const input = inputs[counter]
+        if (input.witnessUtxo === undefined || inputsToSignProp) {
           paymentsAddressData[paymentAddress].push(Number(counter))
-        } else {
-          const { script } = input.witnessUtxo!
-          const addressFromScript = fromOutputScript(
-            script,
-            getBitcoinNetwork(this.network)
-          )
-          if (addressFromScript === paymentAddress) {
-            paymentsAddressData[paymentAddress].push(Number(counter))
-          } else if (addressFromScript === address) {
-            ordinalAddressData[address].push(Number(counter))
-          }
+          continue
         }
-
-        counter++
+        const { script } = input.witnessUtxo!
+        const addressFromScript = fromOutputScript(
+          script,
+          getBitcoinNetwork(this.network)
+        )
+        if (addressFromScript === paymentAddress) {
+          paymentsAddressData[paymentAddress].push(Number(counter))
+        } else if (addressFromScript === address) {
+          ordinalAddressData[address].push(Number(counter))
+        }
       }
 
       if (ordinalAddressData[address].length > 0) {
@@ -342,7 +343,7 @@ export default class OrangeProvider extends WalletProvider {
         throw new Error('Error signing psbt')
       }
 
-      if (_finalize && !txId) {
+      if (finalize && !txId) {
         signedPsbt!.finalizeAllInputs()
         signedPsbtHex = signedPsbt.toHex()
         signedPsbtBase64 = signedPsbt.toBase64()

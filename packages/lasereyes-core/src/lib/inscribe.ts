@@ -18,6 +18,7 @@ import {
   getRedeemScript,
 } from './btc'
 import { DataSourceManager } from './data-sources/manager'
+import { WalletProviderSignPsbtOptions } from '../client/types'
 
 bitcoin.initEccLib(ecc2)
 
@@ -41,12 +42,7 @@ export const inscribeContent = async ({
   paymentAddress: string
   paymentPublicKey?: string
   signPsbt: (
-    tx: string,
-    psbtHex: string,
-    psbtBase64: string,
-    finalize?: boolean,
-    broadcast?: boolean,
-    network?: NetworkType
+    signPsbtOptions: WalletProviderSignPsbtOptions
   ) => Promise<
     | {
       signedPsbtHex: string | undefined
@@ -95,14 +91,14 @@ export const inscribeContent = async ({
 
     const commitTxHex = String(commitTx?.psbtHex)
     const commitTxBase64 = String(commitTx?.psbtBase64)
-    const response = await signPsbt(
-      '',
-      commitTxHex,
-      commitTxBase64,
-      true,
-      false,
-      network
-    )
+    const response = await signPsbt({
+      tx: commitTxHex,
+      psbtHex: commitTxHex,
+      psbtBase64: commitTxBase64,
+      finalize: true,
+      broadcast: false,
+      network,
+    })
     if (!response) throw new Error('sign psbt failed')
     const psbt = bitcoin.Psbt.fromHex(response?.signedPsbtHex || '')
     const extracted = psbt.extractTransaction()

@@ -10,7 +10,7 @@ import {
 import { listenKeys, MapStore, WritableAtom } from 'nanostores'
 import { fromOutputScript } from 'bitcoinjs-lib/src/address'
 import { fromHexString } from '../utils'
-import { LaserEyesStoreType, SignMessageOptions } from '../types'
+import { LaserEyesStoreType, SignMessageOptions, WalletProviderSignPsbtOptions } from '../types'
 import { LaserEyesClient } from '..'
 
 export default class PhantomProvider extends WalletProvider {
@@ -116,7 +116,7 @@ export default class PhantomProvider extends WalletProvider {
   }
 
   async sendBTC(to: string, amount: number): Promise<string> {
-    const { psbtHex } = await createSendBtcPsbt(
+    const { psbtHex, psbtBase64 } = await createSendBtcPsbt(
       this.$store.get().address,
       this.$store.get().paymentAddress,
       to,
@@ -125,7 +125,7 @@ export default class PhantomProvider extends WalletProvider {
       this.network,
       7
     )
-    const psbt = await this.signPsbt('', psbtHex, '', true, true)
+    const psbt = await this.signPsbt({ psbtBase64, psbtHex, tx: psbtHex, broadcast: true, finalize: true })
     if (!psbt) throw new Error('Error sending BTC')
     // @ts-ignore
     return psbt.txId
@@ -147,11 +147,7 @@ export default class PhantomProvider extends WalletProvider {
   }
 
   async signPsbt(
-    _: string,
-    psbtHex: string,
-    __: string,
-    finalize?: boolean | undefined,
-    broadcast?: boolean | undefined
+    { psbtHex, broadcast, finalize, inputsToSign: inputsToSignProp }: WalletProviderSignPsbtOptions
   ): Promise<
     | {
       signedPsbtHex: string | undefined
@@ -165,7 +161,7 @@ export default class PhantomProvider extends WalletProvider {
       network: getBitcoinNetwork(this.network),
     })
 
-    const inputs = toSignPsbt.data.inputs
+    const inputs = toSignPsbt.data.inputs.filter((_, i) => inputsToSignProp ? inputsToSignProp.includes(i) : true)
     const inputsToSign = []
     const ordinalAddressData = {
       address: address,
@@ -176,8 +172,12 @@ export default class PhantomProvider extends WalletProvider {
       signingIndexes: [] as number[],
     }
 
-    let counter = 0
-    for await (let input of inputs) {
+    for (let counter of inputsToSignProp ?? inputs.keys()) {
+      const input = inputs[counter]
+      if (input.witnessUtxo === undefined || inputsToSignProp) {
+        paymentsAddressData.signingIndexes.push(Number(counter))
+        continue
+      }
       const { script } = input.witnessUtxo!
       const addressFromScript = fromOutputScript(
         script,
@@ -189,7 +189,6 @@ export default class PhantomProvider extends WalletProvider {
       } else if (addressFromScript === address) {
         ordinalAddressData.signingIndexes.push(Number(counter))
       }
-      counter++
     }
 
     if (ordinalAddressData.signingIndexes.length > 0) {

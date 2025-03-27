@@ -14,7 +14,11 @@ import { getBTCBalance, isMainnetNetwork } from '../../lib/helpers'
 import { LEATHER, P2TR, P2WPKH } from '../../constants/wallets'
 import { listenKeys, MapStore, WritableAtom } from 'nanostores'
 import { persistentMap } from '@nanostores/persistent'
-import { LaserEyesStoreType, SignMessageOptions } from '../types'
+import {
+  LaserEyesStoreType,
+  SignMessageOptions,
+  WalletProviderSignPsbtOptions,
+} from '../types'
 import { ECDSA, SIGNET, TESTNET, TESTNET4 } from '../../constants'
 import { RpcErrorCode } from 'sats-connect'
 import {
@@ -27,10 +31,11 @@ import { LaserEyesClient } from '..'
 const LEATHER_WALLET_PERSISTENCE_KEY = 'LEATHER_CONNECTED_WALLET_STATE'
 
 export default class LeatherProvider extends WalletProvider {
-  constructor(stores: {
-    $store: MapStore<LaserEyesStoreType>
-    $network: WritableAtom<NetworkType>
-  },
+  constructor(
+    stores: {
+      $store: MapStore<LaserEyesStoreType>
+      $network: WritableAtom<NetworkType>
+    },
     parent: LaserEyesClient,
     config?: Config
   ) {
@@ -204,7 +209,7 @@ export default class LeatherProvider extends WalletProvider {
       }
     } catch (e: any) {
       console.log(e)
-      throw new Error("error sending BTC")
+      throw new Error('error sending BTC')
     }
   }
   async signMessage(
@@ -229,24 +234,24 @@ export default class LeatherProvider extends WalletProvider {
     })
     return signed?.result?.signature
   }
-  async signPsbt(
-    _: string,
-    psbtHex: string,
-    __: string,
-    finalize?: boolean | undefined,
-    broadcast?: boolean | undefined
-  ): Promise<
+  async signPsbt({
+    psbtHex,
+    broadcast,
+    finalize,
+    inputsToSign,
+  }: WalletProviderSignPsbtOptions): Promise<
     | {
-      signedPsbtHex: string | undefined
-      signedPsbtBase64: string | undefined
-      txId?: string | undefined
-    }
+        signedPsbtHex: string | undefined
+        signedPsbtBase64: string | undefined
+        txId?: string | undefined
+      }
     | undefined
   > {
     const requestParams: SignPsbtRequestParams = {
       hex: psbtHex,
       broadcast: false,
       network: this.network,
+      signAtIndex: inputsToSign,
     }
 
     const response: LeatherRPCResponse = await this.library.request(
@@ -282,17 +287,7 @@ export default class LeatherProvider extends WalletProvider {
   }
 
   async getPublicKey() {
-    const { result } = (await this.library.request(
-      'getAddresses'
-    )) as LeatherRPCResponse
-    const addresses = (result as LeatherRequestAddressResponse).addresses
-    const taprootAddress = addresses.find(
-      (address: LeatherAddress) => address.type === P2TR
-    )
-    if (!taprootAddress?.publicKey) {
-      throw new Error('No accounts found')
-    }
-    return taprootAddress.publicKey
+    return this.$store.get().publicKey
   }
 
   async getBalance() {
@@ -305,6 +300,10 @@ export default class LeatherProvider extends WalletProvider {
   }
 
   async requestAccounts(): Promise<string[]> {
+    const { accounts: accountsFromStore } = this.$store.get()
+    if (accountsFromStore.length > 0) {
+      return accountsFromStore
+    }
     const { result } = (await this.library.request(
       'getAddresses'
     )) as LeatherRPCResponse

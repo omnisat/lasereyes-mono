@@ -14,7 +14,7 @@ import {
   PersistedKey,
 } from '../utils'
 import { persistentMap } from '@nanostores/persistent'
-import { LaserEyesStoreType, SparrowWalletProvider } from '../types'
+import { LaserEyesStoreType, WalletProviderSignPsbtOptions, SparrowWalletProvider } from '../types'
 import { DefaultSparrowWalletProvider } from '../helpers/sparrow'
 
 const SPARROW_WALLET_PERSISTENCE_KEY = 'SPARROW_CONNECTED_WALLET_STATE'
@@ -172,11 +172,7 @@ export default class SparrowProvider extends WalletProvider {
   }
 
   async signPsbt(
-    _: string,
-    __: string,
-    psbtBase64: string,
-    finalize?: boolean | undefined,
-    broadcast?: boolean | undefined
+    { psbtBase64, broadcast, finalize }: WalletProviderSignPsbtOptions
   ): Promise<
     | {
         signedPsbtHex: string | undefined

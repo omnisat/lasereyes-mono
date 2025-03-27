@@ -49,18 +49,7 @@ export type LaserEyesContextType = {
     message: string,
     toSignAddressOrOptions?: string | SignMessageOptions
   ) => Promise<string>
-  signPsbt: (
-    tx: string,
-    finalize?: boolean,
-    broadcast?: boolean
-  ) => Promise<
-    | {
-      signedPsbtHex: string | undefined
-      signedPsbtBase64: string | undefined
-      txId?: string
-    }
-    | undefined
-  >
+  signPsbt: LaserEyesClient['signPsbt']
   pushPsbt: (tx: string) => Promise<string | undefined>
   inscribe: (
     contentBase64: string,
