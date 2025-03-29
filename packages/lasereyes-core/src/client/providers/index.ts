@@ -68,7 +68,7 @@ export abstract class WalletProvider {
   abstract connect(defaultWallet: ProviderType): Promise<void>
 
   async requestAccounts(): Promise<string[]> {
-    return [this.$store.get().address, this.$store.get().paymentAddress]
+    return this.$store.get().accounts
   }
 
   async switchNetwork(_network: NetworkType): Promise<void> {
