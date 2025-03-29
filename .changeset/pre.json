@@ -12,5 +12,7 @@
     "@omnisat/lasereyes-ui": "0.0.2",
     "@repo/typescript-config": "0.0.0"
   },
-  "changesets": []
+  "changesets": [
+    "many-tips-worry"
+  ]
 }
