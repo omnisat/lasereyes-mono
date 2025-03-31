@@ -169,12 +169,11 @@ export default class UnisatProvider extends WalletProvider {
       }
     | undefined
   > {
-    const address = this.$store.get().paymentAddress
     const signedPsbt = await this.library?.signPsbt(
       psbtHex,
       omitUndefined({
         autoFinalized: finalize,
-        toSignInputs: inputsToSign?.map((index) => ({ index, address })),
+        toSignInputs: inputsToSign,
       })
     )
 

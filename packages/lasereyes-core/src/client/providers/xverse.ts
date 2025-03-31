@@ -4,6 +4,7 @@ import {
   request,
   MessageSigningProtocols,
   AddressPurpose,
+  BitcoinNetworkType,
 } from 'sats-connect'
 import { WalletProvider } from '.'
 import {
@@ -21,6 +22,8 @@ import {
   LaserEyesClient,
   Config,
   WalletProviderSignPsbtOptions,
+  getNetworkForXverse,
+  FRACTAL_MAINNET,
 } from '../..'
 import {
   findOrdinalsAddress,
@@ -40,6 +43,17 @@ import { normalizeInscription } from '../../lib/data-sources/normalizations'
 import { Inscription } from '../../types/lasereyes'
 
 const XVERSE_WALLET_PERSISTENCE_KEY = 'XVERSE_CONNECTED_WALLET_STATE'
+
+const getSatsConnectBitcoinNetwork = (network: NetworkType) => {
+  if (network === MAINNET) return BitcoinNetworkType.Mainnet
+  if (network === TESTNET) return BitcoinNetworkType.Testnet
+  if (network === SIGNET) return BitcoinNetworkType.Signet
+  if (network === FRACTAL_TESTNET) return BitcoinNetworkType.Testnet
+  if (network === FRACTAL_MAINNET) return BitcoinNetworkType.Mainnet
+  if (network === TESTNET4) return BitcoinNetworkType.Testnet4
+
+  return BitcoinNetworkType.Mainnet
+}
 export default class XVerseProvider extends WalletProvider {
   constructor(
     stores: {
@@ -151,13 +165,15 @@ export default class XVerseProvider extends WalletProvider {
         }
       }
 
-      const response = await request('getAccounts', {
-        purposes: [AddressPurpose.Ordinals, AddressPurpose.Payment],
+      const response = await request('wallet_connect', {
+        addresses: [AddressPurpose.Ordinals, AddressPurpose.Payment],
         message: 'Connecting with lasereyes',
       })
       if (response.status === 'success') {
-        const foundAddress = findOrdinalsAddress(response.result)
-        const foundPaymentAddress = findPaymentAddress(response.result)
+        const foundAddress = findOrdinalsAddress(response.result.addresses)
+        const foundPaymentAddress = findPaymentAddress(
+          response.result.addresses
+        )
         if (!foundAddress || !foundPaymentAddress) {
           throw new Error('Could not find the addresses')
         }
@@ -172,20 +188,8 @@ export default class XVerseProvider extends WalletProvider {
           'paymentPublicKey',
           String(foundPaymentAddress.publicKey)
         )
-        if (
-          foundAddress.address.startsWith('m') ||
-          foundAddress.address.startsWith('n') ||
-          foundAddress.address.startsWith('t') ||
-          foundAddress.address.startsWith('2')
-        ) {
-          this.$network.set(TESTNET)
-        } else if (
-          foundAddress.address.startsWith('bc1') ||
-          foundPaymentAddress.address.startsWith('3') ||
-          foundPaymentAddress.address.startsWith('1')
-        ) {
-          this.$network.set(MAINNET)
-        }
+        const network = response.result.network.bitcoin.name
+        this.$network.set(getNetworkForXverse(network))
       } else {
         if (response.error.code === RpcErrorCode.USER_REJECTION) {
           throw new Error(`User canceled lasereyes to ${XVERSE} wallet`)
@@ -199,16 +203,16 @@ export default class XVerseProvider extends WalletProvider {
   }
 
   async getNetwork(): Promise<NetworkType | undefined> {
-    const { address } = this.$store.get()
+    return this.network
+  }
 
-    if (
-      address.slice(0, 1) === 't' &&
-      [TESTNET, TESTNET4, SIGNET, FRACTAL_TESTNET].includes(this.network)
-    ) {
-      return this.network
+  async switchNetwork(_network: NetworkType): Promise<void> {
+    const response = await request('wallet_changeNetwork', {
+      name: getSatsConnectBitcoinNetwork(_network),
+    })
+    if (response.status === 'success') {
+      this.$network.set(_network)
     }
-
-    return MAINNET
   }
 
   async sendBTC(to: string, amount: number): Promise<string> {
@@ -274,44 +278,50 @@ export default class XVerseProvider extends WalletProvider {
         network: getBitcoinNetwork(this.network),
       })
 
-      const address = this.$store.get().address
-      const paymentAddress = this.$store.get().paymentAddress
-
-      const inputs = toSignPsbt.data.inputs.filter((_, i) =>
-        inputsToSignProp ? inputsToSignProp.includes(i) : true
-      )
+      const inputs = toSignPsbt.data.inputs
       let inputsToSign: Record<string, number[]> = {}
-      const ordinalAddressData: Record<string, number[]> = {
-        [address]: [] as number[],
-      }
-      const paymentsAddressData: Record<string, number[]> = {
-        [paymentAddress]: [] as number[],
-      }
 
-      for (let counter of inputsToSignProp ?? inputs.keys()) {
-        const input = inputs[counter]
-        if (input.witnessUtxo === undefined || inputsToSignProp) {
-          paymentsAddressData[paymentAddress].push(Number(counter))
-          continue
-        }
-        const { script } = input.witnessUtxo!
-        const addressFromScript = bitcoin.address.fromOutputScript(
-          script,
-          getBitcoinNetwork(this.network)
+      if (inputsToSignProp) {
+        inputsToSign = inputsToSignProp.reduce(
+          (acc: Record<string, number[]>, input) => ({
+            ...acc,
+            [input.address]: [...(acc[input.address] || []), input.index],
+          }),
+          {}
         )
-        if (addressFromScript === paymentAddress) {
-          paymentsAddressData[paymentAddress].push(Number(counter))
-        } else if (addressFromScript === address) {
-          ordinalAddressData[address].push(Number(counter))
+      } else {
+        const { address, paymentAddress } = this.$store.get()
+        const ordinalAddressData: Record<string, number[]> = {
+          [address]: [] as number[],
         }
-      }
+        const paymentsAddressData: Record<string, number[]> = {
+          [paymentAddress]: [] as number[],
+        }
+        for (let counter of inputs.keys()) {
+          const input = inputs[counter]
+          if (input.witnessUtxo === undefined) {
+            paymentsAddressData[paymentAddress].push(Number(counter))
+            continue
+          }
+          const { script } = input.witnessUtxo!
+          const addressFromScript = bitcoin.address.fromOutputScript(
+            script,
+            getBitcoinNetwork(this.network)
+          )
+          if (addressFromScript === paymentAddress) {
+            paymentsAddressData[paymentAddress].push(Number(counter))
+          } else if (addressFromScript === address) {
+            ordinalAddressData[address].push(Number(counter))
+          }
+        }
 
-      if (ordinalAddressData[address].length > 0) {
-        inputsToSign = { ...inputsToSign, ...ordinalAddressData }
-      }
+        if (ordinalAddressData[address].length > 0) {
+          inputsToSign = { ...inputsToSign, ...ordinalAddressData }
+        }
 
-      if (paymentsAddressData[paymentAddress].length > 0) {
-        inputsToSign = { ...inputsToSign, ...paymentsAddressData }
+        if (paymentsAddressData[paymentAddress].length > 0) {
+          inputsToSign = { ...inputsToSign, ...paymentsAddressData }
+        }
       }
 
       let txId, signedPsbtHex, signedPsbtBase64

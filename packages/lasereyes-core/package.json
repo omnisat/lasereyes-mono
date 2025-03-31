@@ -1,7 +1,7 @@
 {
   "name": "@omnisat/lasereyes-core",
   "private": false,
-  "version": "0.0.66-next.0",
+  "version": "0.0.66-next.1",
   "type": "module",
   "main": "./dist/index.umd.cjs",
   "module": "./dist/index.js",
@@ -43,7 +43,7 @@
     "lodash": "^4.17.21",
     "nanostores": "^0.11.3",
     "ordapi": "^0.0.7",
-    "sats-connect": "^2.8.0"
+    "sats-connect": "^3.3.0"
   },
   "publishConfig": {
     "access": "public"

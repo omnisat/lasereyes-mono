@@ -160,10 +160,9 @@ export default class OpNetProvider extends WalletProvider {
     }
     | undefined
   > {
-    const address = this.$store.get().paymentAddress
     const signedPsbt = await this.library?.signPsbt(psbtHex, omitUndefined({
       autoFinalized: finalize,
-      toSignInputs: inputsToSign?.map((index) => ({ index, address })),
+      toSignInputs: inputsToSign,
     }))
 
     const psbtSignedPsbt = bitcoin.Psbt.fromHex(signedPsbt)

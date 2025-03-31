@@ -1,5 +1,16 @@
 # @omnisat/lasereyes-core
 
+## 0.0.66-next.1
+
+### Patch Changes
+
+- d76e9f1: chore: update dependencies and refactor input handling in signPsbt method
+
+  - Upgrade `sats-connect` to version 3.3.0
+  - Modify `inputsToSign` to accept an array of objects for better structure
+  - Refactor various provider implementations to accommodate new input structure
+  - Adjust React peer dependencies to support versions >=17
+
 ## 0.0.66-next.0
 
 ### Patch Changes

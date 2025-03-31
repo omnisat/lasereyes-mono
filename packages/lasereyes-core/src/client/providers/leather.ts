@@ -197,6 +197,7 @@ export default class LeatherProvider extends WalletProvider {
             amount: String(amount),
           },
         ],
+        network: this.network,
       })
       if (response?.result?.txid) {
         return response.result.txid
@@ -251,7 +252,7 @@ export default class LeatherProvider extends WalletProvider {
       hex: psbtHex,
       broadcast: false,
       network: this.network,
-      signAtIndex: inputsToSign,
+      signAtIndex: inputsToSign?.map((input) => input.index),
     }
 
     const response: LeatherRPCResponse = await this.library.request(

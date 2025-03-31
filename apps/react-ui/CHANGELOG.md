@@ -1,5 +1,11 @@
 # react-ui
 
+## 0.1.2-next.1
+
+### Patch Changes
+
+- @omnisat/lasereyes@0.0.144-next.1
+
 ## 0.1.2-next.0
 
 ### Patch Changes
