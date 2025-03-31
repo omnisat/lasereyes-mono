@@ -323,7 +323,6 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
           tx: unsignedPsbt!,
           finalize,
           broadcast,
-          inputsToSign: [0]
         }
       )
 
