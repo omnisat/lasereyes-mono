@@ -33,7 +33,12 @@ export type LaserEyesSignPsbtOptions = {
   tx: string
   finalize?: boolean
   broadcast?: boolean
-  inputsToSign?: number[]
+  inputsToSign?: InputToSign[]
+}
+
+export type InputToSign = {
+  index: number
+  address: string
 }
 
 export type WalletProviderSignPsbtOptions = {
@@ -42,7 +47,7 @@ export type WalletProviderSignPsbtOptions = {
   psbtBase64: string
   finalize?: boolean
   broadcast?: boolean
-  inputsToSign?: number[]
+  inputsToSign?: InputToSign[]
   network?: NetworkType
 }
 

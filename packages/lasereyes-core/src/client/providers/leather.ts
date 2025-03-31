@@ -13,7 +13,7 @@ import {
 import { getBTCBalance, isMainnetNetwork } from '../../lib/helpers'
 import { LEATHER, P2TR, P2WPKH } from '../../constants/wallets'
 import { listenKeys, MapStore, WritableAtom } from 'nanostores'
-import { persistentMap } from '@nanostores/persistent'
+import { persistentAtom, persistentMap } from '@nanostores/persistent'
 import {
   LaserEyesStoreType,
   SignMessageOptions,
@@ -59,6 +59,14 @@ export default class LeatherProvider extends WalletProvider {
       paymentAddress: '',
       paymentPublicKey: '',
       balance: '',
+    }
+  )
+  $addressIndexStore = persistentAtom<Record<string, number>>(
+    'LEATHER_ADDRESS_INDEX',
+    {},
+    {
+      encode: JSON.stringify,
+      decode: JSON.parse,
     }
   )
 
@@ -128,6 +136,7 @@ export default class LeatherProvider extends WalletProvider {
 
   dispose() {
     this.observer?.disconnect()
+    this.$addressIndexStore.set({})
   }
 
   async connect(_: ProviderType): Promise<void> {
@@ -155,6 +164,12 @@ export default class LeatherProvider extends WalletProvider {
     const leatherAccountsParsed = addresses.map(
       (address: LeatherAddress) => address.address
     )
+    addresses.forEach((address: LeatherAddress, index: number) => {
+      this.$addressIndexStore.set({
+        ...this.$addressIndexStore.get(),
+        [address.address]: index,
+      })
+    })
     const taprootAddress = addresses.find(
       (address: LeatherAddress) => address.type === P2TR
     )
@@ -197,6 +212,7 @@ export default class LeatherProvider extends WalletProvider {
             amount: String(amount),
           },
         ],
+        network: this.network,
       })
       if (response?.result?.txid) {
         return response.result.txid
@@ -247,20 +263,47 @@ export default class LeatherProvider extends WalletProvider {
       }
     | undefined
   > {
-    const requestParams: SignPsbtRequestParams = {
-      hex: psbtHex,
-      broadcast: false,
-      network: this.network,
-      signAtIndex: inputsToSign,
+    let signedPsbtHex: string | undefined
+    const tempInputsToSign = inputsToSign?.reduce(
+      (acc: Record<string, number[]>, input) => ({
+        ...acc,
+        [input.address]: [...(acc[input.address] || []), input.index],
+      }),
+      {}
+    )
+
+    if (tempInputsToSign) {
+      for (const address in tempInputsToSign) {
+        const requestParams: SignPsbtRequestParams = {
+          hex: signedPsbtHex ?? psbtHex,
+          broadcast: false,
+          network: this.network,
+          signAtIndex: tempInputsToSign[address],
+          account: this.$addressIndexStore.get()[address] ?? 0,
+        }
+
+        const response: LeatherRPCResponse = await this.library.request(
+          'signPsbt',
+          requestParams
+        )
+        const leatherHexResult = response.result as LeatherRequestSignResponse
+        signedPsbtHex = leatherHexResult.hex
+      }
+    } else {
+      const requestParams: SignPsbtRequestParams = {
+        hex: psbtHex,
+        broadcast: false,
+        network: this.network,
+      }
+      const response: LeatherRPCResponse = await this.library.request(
+        'signPsbt',
+        requestParams
+      )
+      const leatherHexResult = response.result as LeatherRequestSignResponse
+      signedPsbtHex = leatherHexResult.hex
     }
 
-    const response: LeatherRPCResponse = await this.library.request(
-      'signPsbt',
-      requestParams
-    )
-    const leatherHexResult = response.result as LeatherRequestSignResponse
-    const signedTx = leatherHexResult.hex
-    const signed = bitcoin.Psbt.fromHex(String(signedTx))
+    const signed = bitcoin.Psbt.fromHex(String(signedPsbtHex))
 
     if (finalize && broadcast) {
       const finalized = signed.finalizeAllInputs()

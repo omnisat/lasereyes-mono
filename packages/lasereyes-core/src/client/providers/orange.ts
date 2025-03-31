@@ -277,44 +277,50 @@ export default class OrangeProvider extends WalletProvider {
         network: getBitcoinNetwork(this.network),
       })
 
-      const address = this.$store.get().address
-      const paymentAddress = this.$store.get().paymentAddress
-
-      const inputs = toSignPsbt.data.inputs.filter((_, i) =>
-        inputsToSignProp ? inputsToSignProp.includes(i) : true
-      )
+      const inputs = toSignPsbt.data.inputs
       let inputsToSign: Record<string, number[]> = {}
-      const ordinalAddressData: Record<string, number[]> = {
-        [address]: [] as number[],
-      }
-      const paymentsAddressData: Record<string, number[]> = {
-        [paymentAddress]: [] as number[],
-      }
 
-      for (let counter of inputsToSignProp ?? inputs.keys()) {
-        const input = inputs[counter]
-        if (input.witnessUtxo === undefined || inputsToSignProp) {
-          paymentsAddressData[paymentAddress].push(Number(counter))
-          continue
-        }
-        const { script } = input.witnessUtxo!
-        const addressFromScript = fromOutputScript(
-          script,
-          getBitcoinNetwork(this.network)
+      if (inputsToSignProp) {
+        inputsToSign = inputsToSignProp.reduce(
+          (acc: Record<string, number[]>, input) => ({
+            ...acc,
+            [input.address]: [...(acc[input.address] || []), input.index],
+          }),
+          {}
         )
-        if (addressFromScript === paymentAddress) {
-          paymentsAddressData[paymentAddress].push(Number(counter))
-        } else if (addressFromScript === address) {
-          ordinalAddressData[address].push(Number(counter))
+      } else {
+        const { address, paymentAddress } = this.$store.get()
+        const ordinalAddressData: Record<string, number[]> = {
+          [address]: [] as number[],
         }
-      }
+        const paymentsAddressData: Record<string, number[]> = {
+          [paymentAddress]: [] as number[],
+        }
+        for (let counter of inputs.keys()) {
+          const input = inputs[counter]
+          if (input.witnessUtxo === undefined) {
+            paymentsAddressData[paymentAddress].push(Number(counter))
+            continue
+          }
+          const { script } = input.witnessUtxo!
+          const addressFromScript = fromOutputScript(
+            script,
+            getBitcoinNetwork(this.network)
+          )
+          if (addressFromScript === paymentAddress) {
+            paymentsAddressData[paymentAddress].push(Number(counter))
+          } else if (addressFromScript === address) {
+            ordinalAddressData[address].push(Number(counter))
+          }
+        }
 
-      if (ordinalAddressData[address].length > 0) {
-        inputsToSign = { ...inputsToSign, ...ordinalAddressData }
-      }
+        if (ordinalAddressData[address].length > 0) {
+          inputsToSign = { ...inputsToSign, ...ordinalAddressData }
+        }
 
-      if (paymentsAddressData[paymentAddress].length > 0) {
-        inputsToSign = { ...inputsToSign, ...paymentsAddressData }
+        if (paymentsAddressData[paymentAddress].length > 0) {
+          inputsToSign = { ...inputsToSign, ...paymentsAddressData }
+        }
       }
 
       let txId, signedPsbtHex, signedPsbtBase64

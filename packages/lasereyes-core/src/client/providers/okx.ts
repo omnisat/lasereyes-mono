@@ -246,10 +246,9 @@ export default class OkxProvider extends WalletProvider {
     | undefined
   > {
     const library = this.library
-    const address = this.$store.get().paymentAddress
     const signedPsbt = await library.signPsbt(psbtHex, omitUndefined({
       autoFinalized: finalize,
-      toSignInputs: inputsToSign?.map((index) => ({ index, address })),
+      toSignInputs: inputsToSign,
     }))
 
     const psbtSignedPsbt = bitcoin.Psbt.fromHex(signedPsbt)

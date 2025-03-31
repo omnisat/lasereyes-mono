@@ -107,27 +107,27 @@ export type ContentType =
 
 export type Config = {
   network:
-  | typeof MAINNET
-  | typeof TESTNET
-  | typeof TESTNET4
-  | typeof SIGNET
-  | typeof FRACTAL_MAINNET
-  | typeof FRACTAL_TESTNET;
+    | typeof MAINNET
+    | typeof TESTNET
+    | typeof TESTNET4
+    | typeof SIGNET
+    | typeof FRACTAL_MAINNET
+    | typeof FRACTAL_TESTNET
   dataSources?: {
     mempool?: {
-      url: string;
-    };
+      url: string
+    }
     sandshrew?: {
-      url?: string;
-      apiKey?: string;
-    };
-    esplora?: string;
+      url?: string
+      apiKey?: string
+    }
+    esplora?: string
     maestro?: {
-      apiKey?: string;
-      testnetApiKey?: string;
-    };
-  };
-};
+      apiKey?: string
+      testnetApiKey?: string
+    }
+  }
+}
 
 export type SendArgs = BTCSendArgs | RuneSendArgs | Brc20SendArgs
 
@@ -201,7 +201,8 @@ export interface SignPsbtRequestParams {
   hex: string
   signAtIndex?: number | number[]
   broadcast?: boolean
-  network: string
+  network?: string
+  account?: number
 }
 
 export interface BlockchainInfoResponse {
@@ -353,7 +354,6 @@ export * from './lasereyes'
 export * from './esplora'
 export * from './mempool-space'
 export * from './sandshrew'
-export * from "./maestro"
-export * from "./ord";
+export * from './maestro'
+export * from './ord'
 export * from './data-source'
-
