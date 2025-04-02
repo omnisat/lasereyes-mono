@@ -1,5 +1,11 @@
 # @omnisat/lasereyes-core
 
+## 0.0.66-next.2
+
+### Patch Changes
+
+- Export `MaestroDataSource`, `MempoolSpaceDataSource`, `DataSourceManager`, and `SandshrewDataSource` from `lasereyes-core`.
+
 ## 0.0.66-next.1
 
 ### Patch Changes
