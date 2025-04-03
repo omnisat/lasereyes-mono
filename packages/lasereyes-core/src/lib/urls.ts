@@ -5,10 +5,11 @@ import {
   TESTNET,
   TESTNET4,
 } from '../constants/networks'
-import { NetworkType } from '../types'
+import { BaseNetwork, BaseNetworkType, NetworkType } from '../types'
 
 
 export const SANDSHREW_URL: string = 'https://mainnet.sandshrew.io/v1/'
+export const SANDSHREW_URL_TESTNET: string = 'https://testnet.sandshrew.io/v1/'
 
 export const SANDSHREW_LASEREYES_KEY: string = "lasereyes"
 export const MAESTRO_API_KEY_MAINNET: string = "VIOi9IApvUkDFWBQ7I9oHsfUMWOIfDeO"
@@ -52,11 +53,30 @@ export const getMempoolSpaceUrl = (network: NetworkType) =>
             ? MEMPOOL_SPACE_URL_FRACTAL_TESTNET
             : MEMPOOL_SPACE_URL
 
-export const getMaestroUrl = (network: NetworkType) =>
-  network === TESTNET4
+export const getMaestroUrl = (network: NetworkType, baseNetwork?: BaseNetworkType) => {
+  if (baseNetwork) {
+    return baseNetwork === BaseNetwork.MAINNET
+      ? MAESTRO_API_URL_MAINNET
+      : MAESTRO_API_URL_TESTNET4
+  }
+  return network === BaseNetwork.TESTNET4
     ? MAESTRO_API_URL_TESTNET4
     : MAESTRO_API_URL_MAINNET
+}
 
+export const getSandshrewUrl = (network: NetworkType, baseNetwork?: BaseNetworkType) => {
+  if (baseNetwork) {
+    return baseNetwork === BaseNetwork.MAINNET
+      ? SANDSHREW_URL
+      : SANDSHREW_URL_TESTNET
+  }
+  return network === BaseNetwork.TESTNET || 
+         network === BaseNetwork.TESTNET4 || 
+         network === BaseNetwork.SIGNET ||
+         network === BaseNetwork.FRACTAL_TESTNET
+    ? SANDSHREW_URL_TESTNET
+    : SANDSHREW_URL
+}
 
 export const getUnisatContentUrl = (network: NetworkType) => {
   return network === TESTNET

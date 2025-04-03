@@ -53,13 +53,17 @@ import {
 import { BTC, RUNES, BRC20 } from '../constants/protocols'
 import { BaseNetwork } from './network'
 
-export type NetworkType =
+export type BaseNetworkType =
   | typeof BaseNetwork.MAINNET
   | typeof BaseNetwork.TESTNET
   | typeof BaseNetwork.TESTNET4
   | typeof BaseNetwork.SIGNET
   | typeof BaseNetwork.FRACTAL_MAINNET
   | typeof BaseNetwork.FRACTAL_TESTNET
+
+export type NetworkType =
+  | BaseNetworkType
+  | string
 
 export type ProviderType =
   | typeof UNISAT
@@ -113,18 +117,53 @@ export type Config = {
     | typeof SIGNET
     | typeof FRACTAL_MAINNET
     | typeof FRACTAL_TESTNET
+    | string
   dataSources?: {
     mempool?: {
       url: string
+      networks?: {
+        mainnet: {
+          apiUrl: string
+        }
+        [key: string]: {
+          apiUrl: string
+        }
+      }
     }
     sandshrew?: {
       url?: string
       apiKey?: string
+      networks?: {
+        mainnet: {
+          apiKey: string
+          apiUrl: string
+        }
+        [key: string]: {
+          apiKey: string
+          apiUrl: string
+        }
+      }
     }
     esplora?: string
     maestro?: {
       apiKey?: string
       testnetApiKey?: string
+      networks?: {
+        mainnet: {
+          apiKey: string
+          apiUrl: string
+        }
+        [key: string]: {
+          apiKey: string
+          apiUrl: string
+        }
+      }
+    }
+  },
+  customNetworks?: {
+    [key: string]: {
+      baseNetwork: BaseNetworkType
+      preferredDataSource: 'mempool' | 'sandshrew' | 'maestro' | string
     }
   }
 }

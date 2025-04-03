@@ -1,5 +1,5 @@
 import { InscriptionInfo } from "ordapi";
-import { MempoolUtxo, NetworkType } from ".";
+import { BaseNetworkType, MempoolUtxo, NetworkType } from ".";
 import { MaestroGetInscriptionInfoResponse } from "./maestro";
 
 export interface DataSource {
@@ -17,7 +17,7 @@ export interface DataSource {
   getRuneById?(runeId: string): Promise<any>;
   getRuneByName?(runeName: string): Promise<any>;
   broadcastTransaction?(rawTx: string): Promise<string>;
-  setNetwork?(network: string): void;
+  setNetwork?(network: string, baseNetwork?: BaseNetworkType): void;
   getTransactionInfo?(id: string): Promise<any>;
   getOrdAddress?(address: string): Promise<any>;
   getTxInfo?(txId: string): Promise<any>;

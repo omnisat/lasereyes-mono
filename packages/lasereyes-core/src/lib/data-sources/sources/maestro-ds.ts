@@ -5,14 +5,26 @@ import { getMaestroUrl } from "../../urls";
 import { MaestroAddressInscription, MaestroBrc20ByAddressResponse, MaestroGetAddressBalanceResponse, MaestroGetAddressInscriptions, MaestroGetBrc20InfoResponse, MaestroGetInscriptionInfoResponse, MaestroGetRuneInfoResponse, MaestroGetTransactionInfoResponse } from "../../../types/maestro";
 import { MAESTRO } from "../../../constants/data-sources";
 
+export type MaestroConfig = {
+  networks: {
+    mainnet: {
+      apiUrl: string;
+      apiKey: string;
+    },
+    [key: string]: {
+      apiUrl: string;
+      apiKey: string;
+    }
+  }
+}
+
 export class MaestroDataSource implements DataSource {
   private apiUrl: string = "";
-  private apiKey: string;
-  private testnetApiKey?: string;
+  private apiKey: string = "";
+  private networks:MaestroConfig['networks']
 
-  constructor(apiKey: string, network: NetworkType, testnetApiKey?: string) {
-    this.apiKey = apiKey;
-    this.testnetApiKey = testnetApiKey;
+  constructor(network: NetworkType, config:MaestroConfig) {
+    this.networks = config?.networks || {};
     this.setNetwork(network);
   }
 
@@ -21,11 +33,12 @@ export class MaestroDataSource implements DataSource {
   }
 
   public setNetwork(network: NetworkType) {
-    this.apiUrl = getMaestroUrl(network);
-    if (this.apiUrl.includes('testnet')) {
-      this.apiKey = this.testnetApiKey || this.apiKey;
+    if (this.networks[network]) {
+      this.apiUrl = this.networks[network].apiUrl;
+      this.apiKey = this.networks[network].apiKey;
     } else {
-      this.apiKey = this.apiKey;
+      this.apiUrl = getMaestroUrl(network);
+      this.apiKey = this.networks.mainnet.apiKey;
     }
   }
 

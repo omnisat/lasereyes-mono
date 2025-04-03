@@ -6,30 +6,71 @@ import { AddressInfo, InscriptionInfo } from 'ordapi';
 import { SandshrewGetRuneByIdOrNameResponse, SingleRuneOutpoint } from "../../../types/sandshrew";
 import { EsploraTx } from "../../../types/esplora";
 import { getPublicKeyHash } from "../../btc";
-import { SANDSHREW_LASEREYES_KEY, SANDSHREW_URL } from "../../urls";
+import { SANDSHREW_LASEREYES_KEY, getSandshrewUrl } from "../../urls";
 import { RpcResponse } from "../../../types/rpc";
 import { SANDSHREW } from "../../../constants/data-sources";
+import { NetworkType } from "../../../types";
+
+export type SandshrewConfig = {
+  networks: {
+    mainnet: {
+      apiUrl: string;
+      apiKey: string;
+    },
+    [key: string]: {
+      apiUrl: string;
+      apiKey: string;
+    }
+  }
+}
 
 export class SandshrewDataSource implements DataSource {
-  private apiUrl: string = `${SANDSHREW_URL}/${SANDSHREW_LASEREYES_KEY}`;
-  private apiKey: string = SANDSHREW_LASEREYES_KEY;
+  private apiUrl: string = "";
+  private apiKey: string = "";
+  private networks: SandshrewConfig['networks'];
 
-  constructor(baseUrl: string, apiKey: string, network: string) {
-    this.setNetwork(network, baseUrl);
-    this.apiKey = apiKey
+  constructor(network: NetworkType, config?: SandshrewConfig) {
+    this.networks = config?.networks || {
+      mainnet: {
+        apiUrl: getSandshrewUrl('mainnet'),
+        apiKey: SANDSHREW_LASEREYES_KEY
+      },
+      testnet: {
+        apiUrl: getSandshrewUrl('testnet'),
+        apiKey: SANDSHREW_LASEREYES_KEY
+      }
+    };
+    this.setNetwork(network);
   }
 
   public getName() {
     return SANDSHREW;
   }
 
-  public setNetwork(_network: string, _baseUrl?: string) {
-    this.apiUrl = `${this.apiUrl}/${this.apiKey || SANDSHREW_LASEREYES_KEY}`;
+  public setNetwork(network: NetworkType) {
+    if (this.networks[network]) {
+      this.apiUrl = this.networks[network].apiUrl;
+      this.apiKey = this.networks[network].apiKey;
+    } else {
+      // Default to mainnet if network not found in config
+      const isTestnet = network === 'testnet' || network === 'testnet4' || network === 'signet' || network === 'fractal-testnet';
+      const networkKey = isTestnet ? 'testnet' : 'mainnet';
+      
+      if (this.networks[networkKey]) {
+        this.apiUrl = this.networks[networkKey].apiUrl;
+        this.apiKey = this.networks[networkKey].apiKey;
+      } else {
+        // Fallback to default URLs
+        this.apiUrl = getSandshrewUrl(network);
+        this.apiKey = SANDSHREW_LASEREYES_KEY;
+      }
+    }
   }
 
   private async call(method: string, params: any) {
     try {
-      const response = await axios.post(this.apiUrl, {
+      const url = `${this.apiUrl}/${this.apiKey}`;
+      const response = await axios.post(url, {
         jsonrpc: '2.0',
         id: method,
         method,
