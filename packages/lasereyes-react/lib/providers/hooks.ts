@@ -1,19 +1,25 @@
-import { useContext, useMemo } from 'react'
+import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { LaserEyesStoreContext } from './context'
-import { LaserEyesContextType } from './types'
-import { batched, keepMount, onNotify } from 'nanostores'
-import { useStore } from '@nanostores/react'
+import type { LaserEyesContextType } from './types'
 import { compareValues } from '../utils/comparison'
+import type { LaserEyesStoreType, NetworkType } from '@omnisat/lasereyes-core'
+import { computed, keepMount } from 'nanostores'
+
+const defaultSelector = (x: LaserEyesContextType) => ({ ...x })
 
 export function useLaserEyes(): LaserEyesContextType
 export function useLaserEyes<T>(selector: (x: LaserEyesContextType) => T): T
 export function useLaserEyes<T>(
   selector?: (x: LaserEyesContextType) => T
 ): T | LaserEyesContextType {
-  const { $network, $store, methods, client } = useContext(LaserEyesStoreContext)
+  const { $network, $store, methods, client } = useContext(
+    LaserEyesStoreContext
+  )
 
-  const $computedStore = useMemo(() => {
-    const computedStore = batched([$store, $network], (store, network) => {
+  const selector_ = selector ?? defaultSelector
+
+  const selectValues = useCallback(
+    (store: LaserEyesStoreType, network: NetworkType) => {
       const value = {
         paymentAddress: store.paymentAddress,
         address: store.address,
@@ -23,7 +29,7 @@ export function useLaserEyes<T>(
         network,
         client: client,
         accounts: store.accounts,
-        balance: Number(store.balance),
+        balance: store.balance ? Number(store.balance) : undefined,
         connected: store.connected,
         isConnecting: store.isConnecting,
         isInitializing: store.isInitializing,
@@ -41,21 +47,33 @@ export function useLaserEyes<T>(
         hasXverse: store.hasProvider.xverse ?? false,
         ...methods,
       }
-      if (typeof selector === 'function') {
-        return selector(value)
-      }
+      // if (typeof selector === 'function') {
+      //   return selector(value)
+      // }
       return value
-    })
+    },
+    [client, methods]
+  )
 
-    keepMount(computedStore)
-    onNotify(computedStore, ({ oldValue, abort }) => {
-      if (compareValues(oldValue, computedStore.value)) {
-        abort()
+  const $computedStore = useMemo(() => {
+    const store = computed([$store, $network], selectValues)
+    keepMount(store)
+    return store
+  }, [$store, $network, selectValues])
+
+  const [laserEyesState, setLaserEyesState] = useState<
+    ReturnType<typeof selector_>
+  >(() => selector_($computedStore.get()))
+
+  useEffect(() => {
+    const unsub = $computedStore.listen((value) => {
+      const selected = selector_(value)
+      if (!compareValues(selected, laserEyesState)) {
+        setLaserEyesState(selected)
       }
     })
+    return () => unsub()
+  }, [$computedStore, selector_, laserEyesState])
 
-    return computedStore
-  }, [$network, $store, selector, methods, client])
-
-  return useStore($computedStore)
+  return laserEyesState
 }

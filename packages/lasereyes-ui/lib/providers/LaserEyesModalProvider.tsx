@@ -1,5 +1,5 @@
 import ConnectWalletModal from "@/components/modal/ConnectModal";
-import { LaserEyesModalConfig } from "@/types/config";
+import type { LaserEyesModalConfig } from "@/types/config";
 import {
   LaserEyesProvider,
   MAINNET,
@@ -8,7 +8,7 @@ import {
   useLaserEyes,
 } from "@omnisat/lasereyes-react";
 import {
-  ReactNode,
+  type ReactNode,
   useCallback,
   useState,
 } from "react";

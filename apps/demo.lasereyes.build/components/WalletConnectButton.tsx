@@ -3,17 +3,17 @@
 
 import {
   MAGIC_EDEN,
-  OKX,
-  OYL,
-  PHANTOM,
-  UNISAT,
-  WIZZ,
-  XVERSE,
-  LEATHER,
-  ORANGE,
+  type OKX,
+  type OYL,
+  type PHANTOM,
+  type UNISAT,
+  type WIZZ,
+  type XVERSE,
+  type LEATHER,
+  type ORANGE,
   useLaserEyes,
-  OP_NET,
-  ProviderType,
+  type OP_NET,
+  type ProviderType,
   SPARROW,
   WalletIcon,
 } from '@omnisat/lasereyes'
@@ -81,7 +81,6 @@ const WalletConnectButton = ({
       | typeof ORANGE
   ) => {
     try {
-      // @ts-ignore
       await connect(walletName)
     } catch (error) {
       console.log('error!', error)
@@ -119,7 +118,7 @@ const WalletConnectButton = ({
           variant="outline"
           size="lg"
         >
-          {provider && <WalletIcon walletName={wallet.name} size={24} />}{' '}
+          <WalletIcon walletName={wallet.name} size={24} />{' '}
           Download {wallet.name}
           <ImNewTab />
         </Button>
