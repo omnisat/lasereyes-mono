@@ -1,5 +1,11 @@
 # @omnisat/lasereyes-core
 
+## 0.0.66-next.3
+
+### Patch Changes
+
+- fix errors related to lagging state
+
 ## 0.0.66-next.2
 
 ### Patch Changes

@@ -1,5 +1,13 @@
 # @omnisat/lasereyes-react
 
+## 0.0.61-next.3
+
+### Patch Changes
+
+- fix errors related to lagging state
+- Updated dependencies
+  - @omnisat/lasereyes-core@0.0.66-next.3
+
 ## 0.0.61-next.2
 
 ### Patch Changes
