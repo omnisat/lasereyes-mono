@@ -1,5 +1,11 @@
 # @omnisat/lasereyes-core
 
+## 0.0.66-next.3
+
+### Patch Changes
+
+- 46cdbd4: bump to trigger deployment
+
 ## 0.0.66-next.2
 
 ### Patch Changes

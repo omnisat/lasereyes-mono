@@ -1,5 +1,15 @@
 # @omnisat/lasereyes
 
+## 0.0.144-next.3
+
+### Patch Changes
+
+- 46cdbd4: bump to trigger deployment
+- Updated dependencies [46cdbd4]
+  - @omnisat/lasereyes-react@0.0.61-next.3
+  - @omnisat/lasereyes-core@0.0.66-next.3
+  - @omnisat/lasereyes-ui@0.0.3-next.3
+
 ## 0.0.144-next.2
 
 ### Patch Changes
