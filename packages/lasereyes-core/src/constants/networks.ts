@@ -79,6 +79,9 @@ export const getNetworkForUnisat = (network: string) => {
 export const getNetworkForXverse = (network: string) => {
   if (network === XverseNetwork.MAINNET) return BaseNetwork.MAINNET
   if (network === XverseNetwork.TESTNET) return BaseNetwork.TESTNET
+  if (network === XverseNetwork.SIGNET) return BaseNetwork.SIGNET
+  if (network === XverseNetwork.FRACTAL_MAINNET) return BaseNetwork.FRACTAL_MAINNET
+  if (network === XverseNetwork.FRACTAL_TESTNET) return BaseNetwork.FRACTAL_TESTNET
   return BaseNetwork.MAINNET
 }
 

@@ -9,7 +9,7 @@ import {
 import { OYL } from '../../constants/wallets'
 import { listenKeys, MapStore, WritableAtom } from 'nanostores'
 import { persistentMap } from '@nanostores/persistent'
-import { LaserEyesStoreType, SignMessageOptions } from '../types'
+import { LaserEyesStoreType, SignMessageOptions, WalletProviderSignPsbtOptions } from '../types'
 import {
   handleStateChangePersistence,
   keysToPersist,
@@ -143,7 +143,7 @@ export default class OylProvider extends WalletProvider {
   }
 
   async sendBTC(to: string, amount: number): Promise<string> {
-    const { psbtHex } = await createSendBtcPsbt(
+    const { psbtHex, psbtBase64 } = await createSendBtcPsbt(
       this.$store.get().address,
       this.$store.get().paymentAddress,
       to,
@@ -152,7 +152,7 @@ export default class OylProvider extends WalletProvider {
       this.network,
       7
     )
-    const psbt = await this.signPsbt('', psbtHex, '', true, true)
+    const psbt = await this.signPsbt({ psbtBase64, psbtHex, tx: psbtHex, broadcast: true, finalize: true })
     if (!psbt) throw new Error('Error sending BTC')
     // @ts-ignore
     return psbt.txId
@@ -170,11 +170,7 @@ export default class OylProvider extends WalletProvider {
     return response.signature
   }
   async signPsbt(
-    _: string,
-    psbtHex: string,
-    __: string,
-    finalize?: boolean | undefined,
-    broadcast?: boolean | undefined
+    { psbtHex, broadcast, finalize }: WalletProviderSignPsbtOptions
   ): Promise<
     | {
       signedPsbtHex: string | undefined

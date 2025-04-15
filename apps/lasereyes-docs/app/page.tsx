@@ -119,7 +119,7 @@ export default function Home() {
               </div>
             </div>
             <div className="mx-auto grid max-w-5xl items-center gap-6 py-12">
-              <div className="space-y-4">
+              <div className="space-y-4 min-w-0">
                 <h3 className="text-xl font-bold">Installation</h3>
                 <CodeBlock
                   language="bash"
@@ -194,7 +194,7 @@ function WalletConnect() {
               </div>
             </div>
             <div className="mx-auto grid max-w-5xl items-center gap-6 py-12">
-              <div className="space-y-8">
+              <div className="space-y-8 min-w-0">
                 <div className="space-y-4">
                   <h3 className="text-xl font-bold">Create a New Project</h3>
                   <CodeBlock

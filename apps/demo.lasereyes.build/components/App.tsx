@@ -319,9 +319,11 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
       }
 
       const signPsbtResponse = await signPsbt(
-        unsignedPsbt!,
-        finalize,
-        broadcast
+        {
+          tx: unsignedPsbt!,
+          finalize,
+          broadcast,
+        }
       )
 
       // @ts-ignore
@@ -630,11 +632,13 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
                     type="text"
                     className={'bg-transparent text-lg text-center border-none'}
                     placeholder="Tx Hex"
-                    value={truncateString(
-                      unsignedPsbt ? unsignedPsbt : '--',
-                      24
+                    value={(
+                      unsignedPsbt ? unsignedPsbt : '--'
                     )}
-                    onChange={(e) => setUnsignedPsbt(e.target.value)}
+                    onChange={(e) => {
+                      setUnsigned(e.target.value)
+                      setUnsignedPsbt(e.target.value)
+                    }}
                   />
                 </span>
               </div>

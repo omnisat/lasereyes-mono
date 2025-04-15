@@ -1,5 +1,5 @@
 import { MapStore, WritableAtom } from 'nanostores'
-import { LaserEyesStoreType } from '../types'
+import { LaserEyesStoreType, WalletProviderSignPsbtOptions } from '../types'
 import {
   Brc20SendArgs,
   BTCSendArgs,
@@ -68,7 +68,7 @@ export abstract class WalletProvider {
   abstract connect(defaultWallet: ProviderType): Promise<void>
 
   async requestAccounts(): Promise<string[]> {
-    return [this.$store.get().address, this.$store.get().paymentAddress]
+    return this.$store.get().accounts
   }
 
   async switchNetwork(_network: NetworkType): Promise<void> {
@@ -142,11 +142,7 @@ export abstract class WalletProvider {
   ): Promise<string>
 
   abstract signPsbt(
-    tx: string,
-    psbtHex: string,
-    psbtBase64: string,
-    finalize?: boolean,
-    broadcast?: boolean
+    signPsbtOptions: WalletProviderSignPsbtOptions
   ): Promise<
     | {
       signedPsbtHex: string | undefined

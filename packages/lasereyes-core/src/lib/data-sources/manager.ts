@@ -229,3 +229,8 @@ export class DataSourceManager {
     return undefined;
   }
 }
+
+
+export { MaestroDataSource } from './sources/maestro-ds';
+export { MempoolSpaceDataSource } from './sources/mempool-space-ds';
+export { SandshrewDataSource } from './sources/sandshrew-ds';

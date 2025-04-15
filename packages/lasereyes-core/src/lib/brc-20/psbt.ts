@@ -7,6 +7,7 @@ import { broadcastTx, calculateValueOfUtxosGathered, getBitcoinNetwork } from '.
 import { getAddressType, getRedeemScript } from '../btc'
 import { toXOnly } from 'bitcoinjs-lib/src/psbt/bip371'
 import { DataSourceManager } from '../data-sources/manager'
+import { WalletProviderSignPsbtOptions } from '../../client/types'
 
 export const sendBrc20 = async ({
   ticker,
@@ -27,14 +28,8 @@ export const sendBrc20 = async ({
   paymentAddress: string
   paymentPublicKey: string
   toAddress: string
-  signPsbt: (
-    tx: string,
-    psbtHex: string,
-    psbtBase64: string,
-    finalize?: boolean,
-    broadcast?: boolean,
-    network?: NetworkType
-  ) => Promise<
+  signPsbt: (signPsbtOptions: WalletProviderSignPsbtOptions) => Promise<
+
     | {
       signedPsbtHex: string | undefined
       signedPsbtBase64: string | undefined
@@ -155,14 +150,14 @@ export const sendBrc20 = async ({
 
     const brc20SendHex = sendPsbt?.toHex()
     const brc20SendBase64 = sendPsbt?.toBase64()
-    const response = await signPsbt(
-      '',
-      brc20SendHex,
-      brc20SendBase64,
-      true,
-      true,
-      network
-    )
+    const response = await signPsbt({
+      tx: '',
+      psbtHex: brc20SendHex,
+      psbtBase64: brc20SendBase64,
+      finalize: true,
+      broadcast: true,
+      network,
+    })
     if (!response) throw new Error('sign psbt failed')
 
     const psbt = bitcoin.Psbt.fromHex(response?.signedPsbtHex || '')

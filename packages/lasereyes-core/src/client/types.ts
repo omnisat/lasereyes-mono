@@ -28,3 +28,33 @@ export type SignMessageOptions = {
   toSignAddress?: string
   protocol?: typeof BIP322 | typeof ECDSA
 }
+
+export type LaserEyesSignPsbtOptions = {
+  tx: string
+  finalize?: boolean
+  broadcast?: boolean
+  inputsToSign?: InputToSign[]
+}
+
+export type InputToSign = {
+  index: number
+  address: string
+}
+
+export type WalletProviderSignPsbtOptions = {
+  tx: string
+  psbtHex: string
+  psbtBase64: string
+  finalize?: boolean
+  broadcast?: boolean
+  inputsToSign?: InputToSign[]
+  network?: NetworkType
+}
+
+export type SignPsbtResponse =
+  | {
+      signedPsbtHex: string | undefined
+      signedPsbtBase64: string | undefined
+      txId?: string | undefined
+    }
+  | undefined

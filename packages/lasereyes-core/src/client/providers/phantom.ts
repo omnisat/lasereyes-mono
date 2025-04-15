@@ -10,14 +10,19 @@ import {
 import { listenKeys, MapStore, WritableAtom } from 'nanostores'
 import { fromOutputScript } from 'bitcoinjs-lib/src/address'
 import { fromHexString } from '../utils'
-import { LaserEyesStoreType, SignMessageOptions } from '../types'
+import {
+  LaserEyesStoreType,
+  SignMessageOptions,
+  WalletProviderSignPsbtOptions,
+} from '../types'
 import { LaserEyesClient } from '..'
 
 export default class PhantomProvider extends WalletProvider {
-  constructor(stores: {
-    $store: MapStore<LaserEyesStoreType>
-    $network: WritableAtom<NetworkType>
-  },
+  constructor(
+    stores: {
+      $store: MapStore<LaserEyesStoreType>
+      $network: WritableAtom<NetworkType>
+    },
     parent: LaserEyesClient,
     config?: Config
   ) {
@@ -116,7 +121,7 @@ export default class PhantomProvider extends WalletProvider {
   }
 
   async sendBTC(to: string, amount: number): Promise<string> {
-    const { psbtHex } = await createSendBtcPsbt(
+    const { psbtHex, psbtBase64 } = await createSendBtcPsbt(
       this.$store.get().address,
       this.$store.get().paymentAddress,
       to,
@@ -125,7 +130,13 @@ export default class PhantomProvider extends WalletProvider {
       this.network,
       7
     )
-    const psbt = await this.signPsbt('', psbtHex, '', true, true)
+    const psbt = await this.signPsbt({
+      psbtBase64,
+      psbtHex,
+      tx: psbtHex,
+      broadcast: true,
+      finalize: true,
+    })
     if (!psbt) throw new Error('Error sending BTC')
     // @ts-ignore
     return psbt.txId
@@ -146,58 +157,76 @@ export default class PhantomProvider extends WalletProvider {
     return btoa(binaryString)
   }
 
-  async signPsbt(
-    _: string,
-    psbtHex: string,
-    __: string,
-    finalize?: boolean | undefined,
-    broadcast?: boolean | undefined
-  ): Promise<
+  async signPsbt({
+    psbtHex,
+    broadcast,
+    finalize,
+    inputsToSign: inputsToSignProp,
+  }: WalletProviderSignPsbtOptions): Promise<
     | {
-      signedPsbtHex: string | undefined
-      signedPsbtBase64: string | undefined
-      txId?: string | undefined
-    }
+        signedPsbtHex: string | undefined
+        signedPsbtBase64: string | undefined
+        txId?: string | undefined
+      }
     | undefined
   > {
-    const { address, paymentAddress } = this.$store.get()
     const toSignPsbt = bitcoin.Psbt.fromHex(String(psbtHex), {
       network: getBitcoinNetwork(this.network),
     })
 
     const inputs = toSignPsbt.data.inputs
-    const inputsToSign = []
-    const ordinalAddressData = {
-      address: address,
-      signingIndexes: [] as number[],
-    }
-    const paymentsAddressData = {
-      address: paymentAddress,
-      signingIndexes: [] as number[],
-    }
+    let inputsToSign: { address: string; signingIndexes: number[] }[] = []
 
-    let counter = 0
-    for await (let input of inputs) {
-      const { script } = input.witnessUtxo!
-      const addressFromScript = fromOutputScript(
-        script,
-        getBitcoinNetwork(this.network)
+    if (inputsToSignProp) {
+      const tempInputsToSign = inputsToSignProp.reduce(
+        (acc: Record<string, number[]>, input) => ({
+          ...acc,
+          [input.address]: [...(acc[input.address] || []), input.index],
+        }),
+        {}
       )
-
-      if (addressFromScript === paymentAddress) {
-        paymentsAddressData.signingIndexes.push(Number(counter))
-      } else if (addressFromScript === address) {
-        ordinalAddressData.signingIndexes.push(Number(counter))
+      inputsToSign = Object.entries(tempInputsToSign).map(
+        ([address, indexes]) => ({
+          address,
+          signingIndexes: indexes,
+        })
+      )
+    } else {
+      const { address, paymentAddress } = this.$store.get()
+      const ordinalAddressData = {
+        address: address,
+        signingIndexes: [] as number[],
       }
-      counter++
-    }
+      const paymentsAddressData = {
+        address: paymentAddress,
+        signingIndexes: [] as number[],
+      }
+      for (let counter of inputs.keys()) {
+        const input = inputs[counter]
+        if (input.witnessUtxo === undefined) {
+          paymentsAddressData.signingIndexes.push(Number(counter))
+          continue
+        }
+        const { script } = input.witnessUtxo!
+        const addressFromScript = fromOutputScript(
+          script,
+          getBitcoinNetwork(this.network)
+        )
 
-    if (ordinalAddressData.signingIndexes.length > 0) {
-      inputsToSign.push(ordinalAddressData)
-    }
+        if (addressFromScript === paymentAddress) {
+          paymentsAddressData.signingIndexes.push(Number(counter))
+        } else if (addressFromScript === address) {
+          ordinalAddressData.signingIndexes.push(Number(counter))
+        }
+      }
 
-    if (paymentsAddressData.signingIndexes.length > 0) {
-      inputsToSign.push(paymentsAddressData)
+      if (ordinalAddressData.signingIndexes.length > 0) {
+        inputsToSign.push(ordinalAddressData)
+      }
+
+      if (paymentsAddressData.signingIndexes.length > 0) {
+        inputsToSign.push(paymentsAddressData)
+      }
     }
 
     const signedPsbt: Uint8Array = await this.library.signPSBT(

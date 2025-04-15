@@ -4,9 +4,10 @@ import { getNetworkForUnisat, getUnisatNetwork } from '../../constants/networks'
 import { Config, NetworkType, ProviderType } from '../../types'
 import { OP_NET } from '../../constants/wallets'
 import { listenKeys, MapStore, WritableAtom } from 'nanostores'
-import { LaserEyesStoreType, SignMessageOptions } from '../types'
+import { LaserEyesStoreType, SignMessageOptions, WalletProviderSignPsbtOptions } from '../types'
 import { BIP322, BIP322_SIMPLE } from '../../constants'
 import { LaserEyesClient } from '..'
+import { omitUndefined } from '../../lib/utils'
 
 export default class OpNetProvider extends WalletProvider {
   constructor(stores: {
@@ -150,11 +151,7 @@ export default class OpNetProvider extends WalletProvider {
   }
 
   async signPsbt(
-    _: string,
-    psbtHex: string,
-    __: string,
-    finalize?: boolean | undefined,
-    broadcast?: boolean | undefined
+    { psbtHex, broadcast, finalize, inputsToSign }: WalletProviderSignPsbtOptions
   ): Promise<
     | {
       signedPsbtHex: string | undefined
@@ -163,9 +160,10 @@ export default class OpNetProvider extends WalletProvider {
     }
     | undefined
   > {
-    const signedPsbt = await this.library?.signPsbt(psbtHex, {
+    const signedPsbt = await this.library?.signPsbt(psbtHex, omitUndefined({
       autoFinalized: finalize,
-    })
+      toSignInputs: inputsToSign,
+    }))
 
     const psbtSignedPsbt = bitcoin.Psbt.fromHex(signedPsbt)
 

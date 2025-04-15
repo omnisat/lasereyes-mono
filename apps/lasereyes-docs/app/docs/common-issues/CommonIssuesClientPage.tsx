@@ -1,260 +1,242 @@
 "use client"
 
+import * as React from "react"
 import { CodeBlock } from "@/components/code-block"
-import { DocNavigation } from "@/components/doc-navigation"
-import { WarningBox } from "@/components/warning-box"
+import { Heading } from "@/components/heading"
+import { ClientPageWrapper } from "@/components/client-page-wrapper"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { AlertTriangle, Bug, Wallet, Network, RefreshCcw, Zap, ShieldAlert, Settings } from "lucide-react"
+import Link from "next/link"
+import type { LucideIcon } from "lucide-react"
+import { cn } from "@/lib/utils"
+
+interface IssueCardProps {
+  icon: LucideIcon
+  title: string
+  description: string
+  solution: string
+  code?: string
+  className?: string
+}
+
+function IssueCard({ icon: Icon, title, description, solution, code, className }: IssueCardProps) {
+  return (
+    <Card className={cn(
+      "group relative overflow-hidden transition-all duration-300 hover:border-red-500/30 hover:shadow-lg hover:shadow-red-500/5",
+      className
+    )}>
+      <div className="absolute right-0 top-0 h-20 w-20 translate-x-6 -translate-y-6 rounded-full bg-red-500/10 blur-2xl filter group-hover:bg-red-500/20" />
+      <CardContent className="p-6">
+        <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-red-500/10 text-red-500">
+          <Icon className="h-6 w-6" />
+        </div>
+        <h3 className="mb-2 text-xl font-semibold">{title}</h3>
+        <p className="mb-4 text-muted-foreground">{description}</p>
+        <div className="space-y-4">
+          <div className="rounded-lg bg-muted p-4">
+            <h4 className="mb-2 font-semibold">Solution:</h4>
+            <p className="text-sm text-muted-foreground">{solution}</p>
+          </div>
+          {code && (
+            <CodeBlock
+              language="typescript"
+              code={code}
+              copyButton={true}
+            />
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+function CommonIssuesContent() {
+  return (
+    <div className="space-y-10">
+      <section className="space-y-6">
+        <h2 className="text-3xl font-bold">Connection Issues</h2>
+        <div className="grid gap-6 sm:grid-cols-2">
+          <IssueCard
+            icon={Wallet}
+            title="Wallet Not Detected"
+            description="The wallet extension is installed but not being detected by LaserEyes."
+            solution="Ensure the wallet extension is properly installed and enabled in your browser. Try refreshing the page or restarting your browser."
+            code={`// Check if wallet is available
+const { isWalletAvailable } = useLaserEyes()
+
+if (!isWalletAvailable) {
+  // Show wallet installation prompt
+}`}
+          />
+          <IssueCard
+            icon={Network}
+            title="Network Mismatch"
+            description="Wallet is connected to a different network than what's configured in LaserEyes."
+            solution="Ensure your wallet and LaserEyes provider are configured for the same network (mainnet/testnet)."
+            code={`<LaserEyesProvider
+  config={{
+    network: MAINNET, // or TESTNET
+    enforceNetwork: true // Will enforce network matching
+  }}
+>`}
+          />
+        </div>
+      </section>
+
+      <section className="space-y-6">
+        <h2 className="text-3xl font-bold">Transaction Issues</h2>
+        <div className="grid gap-6 sm:grid-cols-2">
+          <IssueCard
+            icon={AlertTriangle}
+            title="Transaction Failures"
+            description="Transactions are failing or getting stuck in a pending state."
+            solution="Check for sufficient balance, proper fee estimation, and network congestion. Use the onError callback to handle failures gracefully."
+            code={`const { sendBTC } = useLaserEyes()
+
+try {
+  await sendBTC({
+    address: recipient,
+    amount: "1000000", // in sats
+    feeRate: "high", // Use higher fee rate during congestion
+  })
+} catch (error) {
+  // Handle error appropriately
+  console.error('Transaction failed:', error)
+}`}
+          />
+          <IssueCard
+            icon={Bug}
+            title="Inscription Errors"
+            description="Issues with inscribing or transferring ordinals and BRC-20 tokens."
+            solution="Verify inscription ownership, check for proper UTXO selection, and ensure sufficient balance for fees."
+            code={`const { getInscriptions, transferInscription } = useLaserEyes()
+
+// Get all inscriptions first
+const inscriptions = await getInscriptions()
+
+// Verify ownership before transfer
+const inscription = inscriptions.find(i => i.id === inscriptionId)
+if (inscription?.owner !== address) {
+  throw new Error('Inscription not owned by connected wallet')
+}`}
+          />
+        </div>
+      </section>
+
+      <section className="space-y-6">
+        <h2 className="text-3xl font-bold">State Management</h2>
+        <div className="grid gap-6 sm:grid-cols-2">
+          <IssueCard
+            icon={RefreshCcw}
+            title="Stale State"
+            description="Wallet state not updating after transactions or network changes."
+            solution="Use the refresh methods provided by LaserEyes to manually update state when needed."
+            code={`const { refreshBalance, refreshInscriptions } = useLaserEyes()
+
+// After a transaction completes
+await refreshBalance()
+await refreshInscriptions()`}
+          />
+          <IssueCard
+            icon={ShieldAlert}
+            title="Permission Issues"
+            description="Wallet permissions being requested multiple times or unexpectedly."
+            solution="Implement proper permission handling and state persistence using the LaserEyes storage options."
+            code={`const { requestPermission, hasPermission } = useLaserEyes()
+
+// Check permission before requesting
+if (!await hasPermission('sign')) {
+  await requestPermission('sign')
+}`}
+          />
+        </div>
+      </section>
+
+      <section className="space-y-6">
+        <h2 className="text-3xl font-bold">Performance Issues</h2>
+        <div className="grid gap-6 sm:grid-cols-2">
+          <IssueCard
+            icon={Zap}
+            title="Slow Data Loading"
+            description="Wallet data and inscriptions taking too long to load."
+            solution="Implement proper loading states and consider using the LaserEyes caching system."
+            code={`const { getInscriptions, getCachedInscriptions } = useLaserEyes()
+
+// Use cached data first
+const cached = getCachedInscriptions()
+if (cached) {
+  // Show cached data immediately
+  setInscriptions(cached)
+}
+
+// Then fetch fresh data
+const fresh = await getInscriptions()
+setInscriptions(fresh)`}
+          />
+          <IssueCard
+            icon={Settings}
+            title="Memory Leaks"
+            description="Application performance degrading over time due to subscription handling."
+            solution="Properly cleanup subscriptions and event listeners when components unmount."
+            code={`useEffect(() => {
+  const unsubscribe = subscribeToWalletEvents()
+  
+  // Cleanup on unmount
+  return () => {
+    unsubscribe()
+  }
+}, [])`}
+          />
+        </div>
+      </section>
+
+      <section className="space-y-6">
+        <Card className="overflow-hidden">
+          <CardContent className="p-6">
+            <h2 className="text-2xl font-bold mb-4">Still Having Issues?</h2>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Link href="https://github.com/omnisat/lasereyes/issues" className="block">
+                <Card className="h-full transition-all hover:border-red-500/30 hover:shadow-lg hover:shadow-red-500/5">
+                  <CardContent className="p-6">
+                    <h3 className="text-lg font-semibold mb-2">Open an Issue</h3>
+                    <p className="text-sm text-muted-foreground">Report bugs and request features on our GitHub repository</p>
+                  </CardContent>
+                </Card>
+              </Link>
+              <Link href="/docs/debugging" className="block">
+                <Card className="h-full transition-all hover:border-red-500/30 hover:shadow-lg hover:shadow-red-500/5">
+                  <CardContent className="p-6">
+                    <h3 className="text-lg font-semibold mb-2">Debugging Guide</h3>
+                    <p className="text-sm text-muted-foreground">Learn advanced debugging techniques for LaserEyes apps</p>
+                  </CardContent>
+                </Card>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+      </section>
+    </div>
+  )
+}
 
 export default function CommonIssuesClientPage() {
   return (
-    <div className="max-w-3xl mx-auto py-10 px-4">
-      <h1 className="text-4xl font-bold mb-6">Common Issues</h1>
-      <p className="text-lg mb-8">
-        This guide covers common issues you might encounter when using LaserEyes and provides solutions to help you
-        resolve them quickly.
-      </p>
-
-      <div className="space-y-12">
-        <section id="wallet-connection-issues">
-          <h2 className="text-2xl font-bold mb-4">Wallet Connection Issues</h2>
-
-          <div className="space-y-6">
-            <div>
-              <h3 className="text-xl font-semibold mb-2">Wallet Not Detected</h3>
-              <p className="mb-3">If LaserEyes is not detecting an installed wallet, check the following:</p>
-              <ul className="list-disc pl-6 space-y-2">
-                <li>Ensure the wallet extension is installed and enabled in your browser</li>
-                <li>Verify the wallet supports the Bitcoin network you're targeting</li>
-                <li>Check if the wallet is locked or requires authentication</li>
-                <li>Try refreshing the page or restarting your browser</li>
-              </ul>
-
-              <CodeBlock
-                language="typescript"
-                code={`
-// Check if wallet is available
-const { isWalletAvailable } = useLaserEyes()
-
-useEffect(() => {
-  if (!isWalletAvailable) {
-    console.log("No compatible wallet detected")
-  }
-}, [isWalletAvailable])
-              `}
-              />
-            </div>
-
-            <div>
-              <h3 className="text-xl font-semibold mb-2">Connection Timeouts</h3>
-              <p className="mb-3">If wallet connections are timing out, try the following:</p>
-              <ul className="list-disc pl-6 space-y-2">
-                <li>Increase the connection timeout in your configuration</li>
-                <li>Check your network connection</li>
-                <li>Verify the wallet is responsive (try opening the wallet directly)</li>
-              </ul>
-
-              <CodeBlock
-                language="typescript"
-                code={`
-// Increase connection timeout
-const client = new LaserEyesClient({
-  connectionTimeout: 30000, // 30 seconds instead of default 10 seconds
-})
-              `}
-              />
-            </div>
-          </div>
-        </section>
-
-        <section id="transaction-issues">
-          <h2 className="text-2xl font-bold mb-4">Transaction Issues</h2>
-
-          <div className="space-y-6">
-            <div>
-              <h3 className="text-xl font-semibold mb-2">Transaction Failures</h3>
-              <p className="mb-3">Common causes of transaction failures include:</p>
-              <ul className="list-disc pl-6 space-y-2">
-                <li>Insufficient funds (including for fees)</li>
-                <li>Network congestion and fee estimation issues</li>
-                <li>UTXO selection problems</li>
-                <li>Wallet permissions not granted</li>
-              </ul>
-
-              <CodeBlock
-                language="typescript"
-                code={`
-// Handle transaction errors
-try {
-  const txid = await sendTransaction(...)
-} catch (error) {
-  if (error.code === 'INSUFFICIENT_FUNDS') {
-    // Handle insufficient funds
-  } else if (error.code === 'USER_REJECTED') {
-    // User rejected the transaction
-  } else {
-    // Handle other errors
-    console.error('Transaction failed:', error)
-  }
-}
-              `}
-              />
-            </div>
-
-            <div>
-              <h3 className="text-xl font-semibold mb-2">Fee Estimation Problems</h3>
-              <p className="mb-3">If you're experiencing fee estimation issues:</p>
-              <ul className="list-disc pl-6 space-y-2">
-                <li>Try using a different fee estimation strategy</li>
-                <li>Provide manual fee rates during high network congestion</li>
-                <li>Consider using a different DataSource for fee estimation</li>
-              </ul>
-
-              <CodeBlock
-                language="typescript"
-                code={`
-// Use a specific fee rate instead of estimation
-const txid = await sendTransaction({
-  ...txDetails,
-  feeRate: 10, // sats/vB
-  skipFeeEstimation: true
-})
-              `}
-              />
-            </div>
-          </div>
-        </section>
-
-        <section id="datasource-issues">
-          <h2 className="text-2xl font-bold mb-4">DataSource Issues</h2>
-
-          <div className="space-y-6">
-            <div>
-              <h3 className="text-xl font-semibold mb-2">API Rate Limiting</h3>
-              <p className="mb-3">If you're hitting rate limits with your DataSource:</p>
-              <ul className="list-disc pl-6 space-y-2">
-                <li>Implement caching for frequently accessed data</li>
-                <li>Reduce unnecessary API calls</li>
-                <li>Consider upgrading your API plan</li>
-                <li>Implement fallback DataSources</li>
-              </ul>
-
-              <WarningBox title="API Key Security">
-                Never expose your API keys in client-side code. Use server-side endpoints or environment variables with
-                proper security measures.
-              </WarningBox>
-            </div>
-
-            <div>
-              <h3 className="text-xl font-semibold mb-2">Data Inconsistency</h3>
-              <p className="mb-3">If you're seeing inconsistent data between different sources:</p>
-              <ul className="list-disc pl-6 space-y-2">
-                <li>Check for network differences (mainnet vs testnet)</li>
-                <li>Verify the DataSource is properly synchronized</li>
-                <li>Consider implementing data validation</li>
-                <li>Use multiple DataSources for critical operations</li>
-              </ul>
-
-              <CodeBlock
-                language="typescript"
-                code={`
-// Use multiple data sources with fallback
-const dataSourceManager = new DataSourceManager({
-  primary: new MaestroDataSource({ apiKey: process.env.MAESTRO_API_KEY }),
-  fallbacks: [
-    new SandshrewDataSource({ apiKey: process.env.SANDSHREW_API_KEY }),
-    new MempoolSpaceDataSource()
-  ]
-})
-              `}
-              />
-            </div>
-          </div>
-        </section>
-
-        <section id="browser-compatibility">
-          <h2 className="text-2xl font-bold mb-4">Browser Compatibility</h2>
-
-          <div className="space-y-6">
-            <div>
-              <h3 className="text-xl font-semibold mb-2">Browser Support Issues</h3>
-              <p className="mb-3">
-                LaserEyes is designed to work with modern browsers, but you might encounter issues with:
-              </p>
-              <ul className="list-disc pl-6 space-y-2">
-                <li>Older browser versions that don't support required features</li>
-                <li>Mobile browsers with limited extension support</li>
-                <li>Privacy-focused browsers that block certain features</li>
-              </ul>
-
-              <p className="mt-3">
-                We recommend using the latest versions of Chrome, Firefox, Brave, or Edge for the best experience.
-              </p>
-            </div>
-
-            <div>
-              <h3 className="text-xl font-semibold mb-2">Extension Conflicts</h3>
-              <p className="mb-3">Some browser extensions might interfere with LaserEyes:</p>
-              <ul className="list-disc pl-6 space-y-2">
-                <li>Ad blockers or privacy extensions might block required scripts</li>
-                <li>Multiple Bitcoin wallet extensions might conflict with each other</li>
-                <li>Developer tools extensions might affect performance</li>
-              </ul>
-
-              <p className="mt-3">Try disabling extensions one by one to identify any conflicts.</p>
-            </div>
-          </div>
-        </section>
-
-        <section id="debugging-tips">
-          <h2 className="text-2xl font-bold mb-4">Debugging Tips</h2>
-
-          <div className="space-y-4">
-            <p>When troubleshooting issues with LaserEyes, these debugging techniques can help:</p>
-
-            <ul className="list-disc pl-6 space-y-2">
-              <li>
-                <strong>Enable debug logging:</strong> Set <code>debug: true</code> in your LaserEyes configuration to
-                get detailed logs
-              </li>
-              <li>
-                <strong>Check browser console:</strong> Look for errors or warnings in your browser's developer console
-              </li>
-              <li>
-                <strong>Inspect network requests:</strong> Use the Network tab in developer tools to check API calls
-              </li>
-              <li>
-                <strong>Test with minimal configuration:</strong> Create a simple test case to isolate the issue
-              </li>
-              <li>
-                <strong>Verify wallet state:</strong> Check if the wallet is unlocked and in the correct network
-              </li>
-            </ul>
-
-            <CodeBlock
-              language="typescript"
-              code={`
-// Enable debug logging
-const client = new LaserEyesClient({
-  debug: true,
-  logLevel: 'verbose'
-})
-
-// Add custom logger
-client.setLogger({
-  debug: (message) => console.debug('[LaserEyes]', message),
-  info: (message) => console.info('[LaserEyes]', message),
-  warn: (message) => console.warn('[LaserEyes]', message),
-  error: (message) => console.error('[LaserEyes]', message),
-})
-              `}
-            />
-          </div>
-        </section>
+    <div className="space-y-8">
+      <div className="relative overflow-hidden rounded-lg border bg-gradient-to-br from-red-500/10 via-background to-background p-8">
+        <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-red-500/20 rounded-full blur-3xl -z-10 translate-x-1/2 -translate-y-1/2" />
+        <Badge variant="secondary" className="mb-4">Troubleshooting</Badge>
+        <Heading level={1} className="mb-4 bg-gradient-to-br from-red-500 to-orange-500 bg-clip-text text-transparent">
+          Common Issues
+        </Heading>
+        <p className="text-xl mb-6 max-w-2xl text-muted-foreground">
+          Solutions to common problems you might encounter when building with LaserEyes.
+        </p>
       </div>
 
-      <DocNavigation
-        prev={{ title: "Testing", href: "/docs/testing" }}
-        next={{ title: "Best Practices", href: "/docs/best-practices" }}
-      />
+      <ClientPageWrapper>
+        <CommonIssuesContent />
+      </ClientPageWrapper>
     </div>
   )
 }

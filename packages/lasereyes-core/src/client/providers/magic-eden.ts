@@ -20,6 +20,8 @@ import {
   NetworkType,
   ProviderType,
   SignMessageOptions,
+  WalletProviderSignPsbtOptions,
+  SignPsbtResponse,
 } from '../..'
 import {
   findOrdinalsAddress,
@@ -42,10 +44,11 @@ import {
 const MAGIC_EDEN_WALLET_PERSISTENCE_KEY = 'MAGIC_EDEN_CONNECTED_WALLET_STATE'
 
 export default class MagicEdenProvider extends WalletProvider {
-  constructor(stores: {
-    $store: MapStore<LaserEyesStoreType>
-    $network: WritableAtom<NetworkType>
-  },
+  constructor(
+    stores: {
+      $store: MapStore<LaserEyesStoreType>
+      $network: WritableAtom<NetworkType>
+    },
     parent: LaserEyesClient,
     config?: Config
   ) {
@@ -213,7 +216,9 @@ export default class MagicEdenProvider extends WalletProvider {
       getProvider: async () => this.library,
       payload: {
         network: {
-          type: getSatsConnectNetwork(this.network) as unknown as BitcoinNetworkType,
+          type: getSatsConnectNetwork(
+            this.network
+          ) as unknown as BitcoinNetworkType,
         },
         recipients: [
           {
@@ -275,72 +280,83 @@ export default class MagicEdenProvider extends WalletProvider {
     }
   }
 
-  async signPsbt(
-    _: string,
-    __: string,
-    psbtBase64: string,
-    _finalize?: boolean | undefined,
-    broadcast?: boolean | undefined
-  ): Promise<
-    | {
-      signedPsbtHex: string | undefined
-      signedPsbtBase64: string | undefined
-      txId?: string | undefined
-    }
-    | undefined
-  > {
-    console.log('signPsbt', psbtBase64, _finalize, broadcast)
-    const { address, paymentAddress } = this.$store.get()
+  async signPsbt({
+    psbtBase64,
+    broadcast,
+    finalize,
+    inputsToSign: inputsToSignProp,
+  }: WalletProviderSignPsbtOptions): Promise<SignPsbtResponse> {
     const toSignPsbt = bitcoin.Psbt.fromBase64(String(psbtBase64), {
       network: getBitcoinNetwork(this.network),
     })
-
-    const inputs = toSignPsbt.data.inputs
-    const inputsToSign = []
+    
     type InputAddressData = {
       address: string
       signingIndexes: number[]
       sigHash?: number
     }
-    const ordinalAddressData: InputAddressData = {
-      address: address,
-      signingIndexes: [] as number[],
-    }
-    const paymentsAddressData: InputAddressData = {
-      address: paymentAddress,
-      signingIndexes: [] as number[],
-    }
-
-    let counter = 0
-    for await (let input of inputs) {
-      const { script } = input.witnessUtxo!
-      const addressFromScript = fromOutputScript(
-        script,
-        getBitcoinNetwork(this.network)
+    
+    const inputs = toSignPsbt.data.inputs
+    let inputsToSign: InputAddressData[] = []
+    
+    if (inputsToSignProp) {
+      const tempInputsToSign = inputsToSignProp.reduce(
+        (acc: Record<string, number[]>, input) => ({
+          ...acc,
+          [input.address]: [...(acc[input.address] || []), input.index],
+        }),
+        {}
       )
-
-      if (addressFromScript === paymentAddress) {
-        paymentsAddressData.signingIndexes.push(Number(counter))
-        if (input.sighashType) {
-          console.log('Updating sigHash for paymentsAddressData')
-          paymentsAddressData.sigHash = input.sighashType
+      inputsToSign = Object.entries(tempInputsToSign).map(
+        ([address, indexes]) => ({
+          address,
+          signingIndexes: indexes,
+        })
+      )
+    } else {
+      const { address, paymentAddress } = this.$store.get()
+      const ordinalAddressData: InputAddressData = {
+        address: address,
+        signingIndexes: [] as number[],
+      }
+      const paymentsAddressData: InputAddressData = {
+        address: paymentAddress,
+        signingIndexes: [] as number[],
+      }
+      for (let counter of inputs.keys()) {
+        const input = inputs[counter]
+        if (input.witnessUtxo === undefined) {
+          paymentsAddressData.signingIndexes.push(Number(counter))
+          continue
         }
-      } else if (addressFromScript === address) {
-        ordinalAddressData.signingIndexes.push(Number(counter))
-        if (input.sighashType) {
-          console.log('Updating sigHash for ordinalAddressData')
-          ordinalAddressData.sigHash = input.sighashType
+        const { script } = input.witnessUtxo!
+        const addressFromScript = fromOutputScript(
+          script,
+          getBitcoinNetwork(this.network)
+        )
+
+        if (addressFromScript === paymentAddress) {
+          paymentsAddressData.signingIndexes.push(Number(counter))
+          if (input.sighashType) {
+            console.log('Updating sigHash for paymentsAddressData')
+            paymentsAddressData.sigHash = input.sighashType
+          }
+        } else if (addressFromScript === address) {
+          ordinalAddressData.signingIndexes.push(Number(counter))
+          if (input.sighashType) {
+            console.log('Updating sigHash for ordinalAddressData')
+            ordinalAddressData.sigHash = input.sighashType
+          }
         }
       }
-      counter++
-    }
 
-    if (ordinalAddressData.signingIndexes.length > 0) {
-      inputsToSign.push(ordinalAddressData)
-    }
+      if (ordinalAddressData.signingIndexes.length > 0) {
+        inputsToSign.push(ordinalAddressData)
+      }
 
-    if (paymentsAddressData.signingIndexes.length > 0) {
-      inputsToSign.push(paymentsAddressData)
+      if (paymentsAddressData.signingIndexes.length > 0) {
+        inputsToSign.push(paymentsAddressData)
+      }
     }
 
     let txId, signedPsbtHex, signedPsbtBase64
@@ -385,7 +401,7 @@ export default class MagicEdenProvider extends WalletProvider {
       throw new Error('signature failed')
     }
 
-    if (_finalize || broadcast) {
+    if (finalize || broadcast) {
       signedPsbt.finalizeAllInputs()
       // const signedTx = signedPsbt.extractTransaction()
       // signedPsbtHex = signedTx.toHex()

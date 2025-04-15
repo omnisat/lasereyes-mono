@@ -1,3 +1,5 @@
+import _ from 'lodash'
+
 export const isBase64 = (str: string): boolean => {
   const base64Regex =
     /^(?:[A-Za-z0-9+\/]{4})*?(?:[A-Za-z0-9+\/]{2}==|[A-Za-z0-9+\/]{3}=)?$/
@@ -23,4 +25,8 @@ export const encodeVarint = (bigIntValue: any) => {
   } while (num !== BigInt(0))
 
   return { varint: Buffer.from(bufferArray) }
+}
+
+export function omitUndefined(obj: any) {
+  return _.omitBy(obj, _.isUndefined)
 }

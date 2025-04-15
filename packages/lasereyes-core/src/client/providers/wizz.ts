@@ -11,6 +11,7 @@ import {
   LaserEyesClient,
   Config,
   LaserEyesStoreType,
+  WalletProviderSignPsbtOptions,
 } from '../..'
 import * as bitcoin from 'bitcoinjs-lib'
 import { listenKeys, MapStore, WritableAtom } from 'nanostores'
@@ -18,12 +19,14 @@ import { getNetworkForWizz } from '../../constants/networks'
 import { WizzNetwork } from '../../types/network'
 import { normalizeInscription } from '../../lib/data-sources/normalizations'
 import { UnisatInscription } from './unisat'
+import { omitUndefined } from '../../lib/utils'
 
 export class WizzProvider extends WalletProvider {
-  constructor(stores: {
-    $store: MapStore<LaserEyesStoreType>
-    $network: WritableAtom<NetworkType>
-  },
+  constructor(
+    stores: {
+      $store: MapStore<LaserEyesStoreType>
+      $network: WritableAtom<NetworkType>
+    },
     parent: LaserEyesClient,
     config?: Config
   ) {
@@ -176,24 +179,24 @@ export class WizzProvider extends WalletProvider {
     return await this.library?.signMessage(message, protocol)
   }
 
-  async signPsbt(
-    _: string,
-    psbtHex: string,
-    __: string,
-    finalize?: boolean | undefined,
-    broadcast?: boolean | undefined
-  ): Promise<
+  async signPsbt({
+    psbtHex,
+    broadcast,
+    finalize,
+    inputsToSign,
+  }: WalletProviderSignPsbtOptions): Promise<
     | {
-      signedPsbtHex: string | undefined
-      signedPsbtBase64: string | undefined
-      txId?: string | undefined
-    }
+        signedPsbtHex: string | undefined
+        signedPsbtBase64: string | undefined
+        txId?: string | undefined
+      }
     | undefined
   > {
-    const signedPsbt = await this.library?.signPsbt(psbtHex, {
+    const signedPsbt = await this.library?.signPsbt(psbtHex, omitUndefined({
       autoFinalized: finalize,
       broadcast: false,
-    })
+      toSignInputs: inputsToSign,
+    }))
 
     const psbtSignedPsbt = bitcoin.Psbt.fromHex(signedPsbt)
 
