@@ -35,6 +35,7 @@ export enum XverseNetwork {
   SIGNET = 'Signet',
   FRACTAL_MAINNET = 'fractal mainnet',
   FRACTAL_TESTNET = 'fractal testnet',
+  TESTNET4 = 'Testnet4',
 }
 
 export enum OkxNetwork {
@@ -60,6 +61,6 @@ export enum BaseNetwork {
   TESTNET = 'testnet',
   TESTNET4 = 'testnet4',
   REGTEST = 'regtest',
-  FRACTAL_MAINNET = FractalNetwork.MAINNET,
-  FRACTAL_TESTNET = FractalNetwork.TESTNET,
+  FRACTAL_MAINNET = 'fractal_mainnet',
+  FRACTAL_TESTNET = 'fractal_testnet',
 }

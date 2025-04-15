@@ -1,4 +1,4 @@
-import { BitcoinNetworkType } from '@orangecrypto/orange-connect'
+import type { BitcoinNetworkType } from '@orangecrypto/orange-connect'
 import { BaseNetwork, CmdruidNetwork, FractalNetwork, LeatherNetwork, OkxNetwork, OrangeNetwork, UnisatNetwork, WizzNetwork, XverseNetwork } from '../types/network'
 
 export const MAINNET = BaseNetwork.MAINNET
@@ -79,6 +79,7 @@ export const getNetworkForUnisat = (network: string) => {
 export const getNetworkForXverse = (network: string) => {
   if (network === XverseNetwork.MAINNET) return BaseNetwork.MAINNET
   if (network === XverseNetwork.TESTNET) return BaseNetwork.TESTNET
+  if (network === XverseNetwork.TESTNET4) return BaseNetwork.TESTNET4
   if (network === XverseNetwork.SIGNET) return BaseNetwork.SIGNET
   if (network === XverseNetwork.FRACTAL_MAINNET) return BaseNetwork.FRACTAL_MAINNET
   if (network === XverseNetwork.FRACTAL_TESTNET) return BaseNetwork.FRACTAL_TESTNET
