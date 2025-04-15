@@ -1,5 +1,19 @@
 # @omnisat/lasereyes-ui
 
+## 0.0.3
+
+### Patch Changes
+
+- 4ec0930: - add `inputsToSign` to signPsbt method as an option
+  - use stored data in leather provider rather than repeated pop-ups
+- 5bb83de: Export `MaestroDataSource`, `MempoolSpaceDataSource`, `DataSourceManager`, and `SandshrewDataSource` from `lasereyes-core`.
+- Updated dependencies [46cdbd4]
+- Updated dependencies [d76e9f1]
+- Updated dependencies [4ec0930]
+- Updated dependencies [5bb83de]
+  - @omnisat/lasereyes-react@0.0.61
+  - @omnisat/lasereyes-core@0.0.66
+
 ## 0.0.3-next.2
 
 ### Patch Changes
