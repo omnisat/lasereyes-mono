@@ -1,6 +1,6 @@
 {
   "name": "lasereyes-docs",
-  "version": "0.1.2-next.3",
+  "version": "0.1.2-next.4",
   "private": true,
   "scripts": {
     "dev": "next dev",

@@ -13,6 +13,7 @@
     "@repo/typescript-config": "0.0.0"
   },
   "changesets": [
+    "big-rooms-wait",
     "cyan-kiwis-end",
     "many-tips-worry",
     "silver-lamps-leave",
