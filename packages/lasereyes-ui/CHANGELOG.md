@@ -1,5 +1,13 @@
 # @omnisat/lasereyes-ui
 
+## 0.0.3-next.6
+
+### Patch Changes
+
+- Updated dependencies [70db360]
+  - @omnisat/lasereyes-core@0.0.66-next.6
+  - @omnisat/lasereyes-react@0.0.61-next.6
+
 ## 0.0.3-next.5
 
 ### Patch Changes

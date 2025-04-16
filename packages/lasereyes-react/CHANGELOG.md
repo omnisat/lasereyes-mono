@@ -1,5 +1,13 @@
 # @omnisat/lasereyes-react
 
+## 0.0.61-next.6
+
+### Patch Changes
+
+- 70db360: bump to publish xverse bypass to fight problems w inscription fetching.
+- Updated dependencies [70db360]
+  - @omnisat/lasereyes-core@0.0.66-next.6
+
 ## 0.0.61-next.5
 
 ### Patch Changes
