@@ -28,8 +28,8 @@ import {
   findPaymentAddress,
   getBitcoinNetwork,
 } from '../../lib/helpers'
-import { normalizeInscription } from '../../lib/data-sources/normalizations'
-import type { Inscription } from '../../types/lasereyes'
+// import { normalizeInscription } from '../../lib/data-sources/normalizations'
+// import type { Inscription } from '../../types/lasereyes'
 
 const getSatsConnectBitcoinNetwork = (network: NetworkType) => {
   if (network === MAINNET) return BitcoinNetworkType.Mainnet
@@ -367,29 +367,31 @@ export default class XVerseProvider extends WalletProvider {
     }
   }
 
-  async getInscriptions(
-    offset?: number,
-    limit?: number
-  ): Promise<Inscription[]> {
-    const offsetValue = offset || 0
-    const limitValue = limit || 10
-    const response = await request('ord_getInscriptions', {
-      offset: offsetValue,
-      limit: limitValue,
-    })
+  // this is not working
+  // TODO: Fix this
+  // async getInscriptions(
+  //   offset?: number,
+  //   limit?: number
+  // ): Promise<Inscription[]> {
+  //   const offsetValue = offset || 0
+  //   const limitValue = limit || 10
+  //   const response = await request('ord_getInscriptions', {
+  //     offset: offsetValue,
+  //     limit: limitValue,
+  //   })
 
-    if (response.status === 'success') {
-      const inscriptions = response.result.inscriptions.map((insc) => {
-        return normalizeInscription(insc, undefined, this.network)
-      })
+  //   if (response.status === 'success') {
+  //     const inscriptions = response.result.inscriptions.map((insc) => {
+  //       return normalizeInscription(insc, undefined, this.network)
+  //     })
 
-      console.log(inscriptions)
+  //     console.log(inscriptions)
 
-      return inscriptions as Inscription[]
-    }
-    console.error(response.error)
-    throw new Error('Error getting inscriptions')
-  }
+  //     return inscriptions as Inscription[]
+  //   }
+  //   console.error(response.error)
+  //   throw new Error('Error getting inscriptions')
+  // }
 }
 
 // type XVerseInscription = {
