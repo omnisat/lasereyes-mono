@@ -1,5 +1,11 @@
 # @omnisat/lasereyes-core
 
+## 0.0.66-next.6
+
+### Patch Changes
+
+- 70db360: bump to publish xverse bypass to fight problems w inscription fetching.
+
 ## 0.0.66-next.5
 
 ### Patch Changes
