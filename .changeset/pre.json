@@ -13,11 +13,7 @@
     "@repo/typescript-config": "0.0.0"
   },
   "changesets": [
-    "big-rooms-wait",
-    "cyan-kiwis-end",
-    "many-tips-worry",
     "seven-chefs-fly",
-    "silver-lamps-leave",
-    "sweet-bears-swim"
+    "silver-lamps-leave"
   ]
 }
