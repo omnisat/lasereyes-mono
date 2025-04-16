@@ -93,6 +93,11 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
+      # Main branch - Exit prerelease mode and publish stable release
+      - name: Exit Prerelease Mode (main)
+        if: github.ref == 'refs/heads/main'
+        run: pnpm changeset pre exit
+
       # Main branch - Create PR and publish stable release
       - name: Version and Publish Stable (main)
         if: github.ref == 'refs/heads/main'
