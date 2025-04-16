@@ -1,12 +1,12 @@
 'use client'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { clsx } from 'clsx'
 import {
   FRACTAL_MAINNET,
   FRACTAL_TESTNET,
   MAINNET,
-  NetworkType,
-  ProviderType,
+  type NetworkType,
+  type ProviderType,
   SIGNET,
   SUPPORTED_WALLETS,
   TESTNET,
@@ -120,26 +120,36 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
   const switchN = () => {
     try {
       if (network === MAINNET) {
-        switchNetwork(TESTNET4)
-        setNetwork(TESTNET4)
+        switchNetwork(TESTNET4).then(() => {
+          setNetwork(TESTNET4)
+        })
       } else if (network === TESTNET4) {
-        switchNetwork(TESTNET)
-        setNetwork(TESTNET)
+        switchNetwork(TESTNET).then(() => {
+          setNetwork(TESTNET)
+        })
       } else if (network === TESTNET) {
-        switchNetwork(SIGNET)
-        setNetwork(SIGNET)
+        switchNetwork(SIGNET).then(() => {
+          setNetwork(SIGNET)
+        })
       } else if (network === SIGNET) {
-        switchNetwork(FRACTAL_MAINNET)
-        setNetwork(FRACTAL_MAINNET)
+        switchNetwork(FRACTAL_MAINNET).then(() => {
+          setNetwork(FRACTAL_MAINNET)
+        })
       } else if (network === FRACTAL_MAINNET) {
-        switchNetwork(FRACTAL_TESTNET)
-        setNetwork(FRACTAL_TESTNET)
+        switchNetwork(FRACTAL_TESTNET).then(() => {
+          setNetwork(FRACTAL_TESTNET)
+        })
       } else {
-        switchNetwork(MAINNET)
-        setNetwork(MAINNET)
+        switchNetwork(MAINNET).then(() => {
+          setNetwork(MAINNET)
+        })
       }
-    } catch (e: any) {
-      toast.error(e.message)
+    } catch (e) {
+      if (e instanceof Error) {
+        toast.error(e.message)
+      } else {
+        toast.error('Unknown error')
+      }
     }
   }
 
@@ -151,6 +161,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
 
 
   useEffect(() => {
+    address
     setSignature('')
     setUnsignedPsbt(undefined)
     setSignedPsbt(undefined)
@@ -198,11 +209,10 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
     paymentAddress,
     paymentPublicKey,
     unsigned,
-    setUnsignedPsbt,
-    setSignedPsbt,
   ])
 
   useEffect(() => {
+    network
     setUnsigned(undefined)
   }, [network])
 
@@ -241,7 +251,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
 
   const sendBtc = async () => {
     try {
-      if (balance! < 1500) {
+      if (!balance || balance < 1500) {
         throw new Error('Insufficient funds')
       }
 
@@ -250,6 +260,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
         <span className={'flex flex-col gap-1 items-center justify-center'}>
           <span className={'font-black'}>View on mempool.space</span>
           <a
+            rel="noreferrer"
             target={'_blank'}
             href={`${getMempoolSpaceUrl(network as typeof MAINNET | typeof TESTNET)}/tx/${txid}`}
             className={'underline text-blue-600 text-xs'}
@@ -310,17 +321,17 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
 
   const signUnsignedPsbt = async () => {
     try {
-      if (!unsigned) {
+      if (!unsigned || !unsignedPsbt) {
         throw new Error('No unsigned PSBT')
       }
 
-      if (broadcast && balance! < 1500) {
+      if (broadcast && (!balance || balance < 1500)) {
         throw new Error('Insufficient funds')
       }
 
       const signPsbtResponse = await signPsbt(
         {
-          tx: unsignedPsbt!,
+          tx: unsignedPsbt,
           finalize,
           broadcast,
         }
@@ -358,6 +369,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
           <span className={'flex flex-col gap-1 items-center justify-center'}>
             <span className={'font-black'}>View on mempool.space</span>
             <a
+              rel="noreferrer"
               target={'_blank'}
               // @ts-ignore
               href={`${getMempoolSpaceUrl(network as typeof MAINNET | typeof TESTNET)}/tx/${signPsbtResponse?.txId}`}
@@ -390,6 +402,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
           <span className={'font-black'}>View on mempool.space</span>
           <a
             target={'_blank'}
+            rel="noreferrer"
             href={`${getMempoolSpaceUrl(network as typeof MAINNET | typeof TESTNET)}/tx/${txid}`}
             className={'underline text-blue-600 text-xs'}
           >
@@ -482,6 +495,11 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
               'flex flex-col border border-[#3c393f] hover:underline cursor-pointer hover:text-orange-400 p-4 items-center'
             }
             onClick={() => switchN()}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                switchN()
+              }
+            }}
           >
             {network}
           </div>
