@@ -20,7 +20,7 @@
     "url": "https://github.com/omnisat/lasereyes-mono.git"
   },
   "private": false,
-  "version": "0.0.144-next.4",
+  "version": "0.0.144-next.5",
   "type": "module",
   "module": "./dist/index.js",
   "files": [
