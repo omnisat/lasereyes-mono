@@ -1,5 +1,11 @@
 # @omnisat/lasereyes-core
 
+## 0.0.66-next.5
+
+### Patch Changes
+
+- 2c5f480: disable xverse inscription fetch
+
 ## 0.0.66-next.4
 
 ### Patch Changes
