@@ -1,5 +1,13 @@
 # lasereyes-docs
 
+## 0.1.3
+
+### Patch Changes
+
+- Updated dependencies
+  - @omnisat/lasereyes-core@0.1.0
+  - @omnisat/lasereyes-react@0.1.0
+
 ## 0.1.2
 
 ### Patch Changes
