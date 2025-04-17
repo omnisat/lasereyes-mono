@@ -1,5 +1,12 @@
 # @omnisat/lasereyes-core
 
+## 0.0.66-next.7
+
+### Patch Changes
+
+- 2c5f480: disable xverse inscription fetch
+- 70db360: bump to publish xverse bypass to fight problems w inscription fetching.
+
 ## 0.0.66-next.6
 
 ### Patch Changes
