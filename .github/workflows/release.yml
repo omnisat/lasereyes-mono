@@ -86,7 +86,7 @@ jobs:
           version: pnpm run version-prerelease
           commit: "chore(release): version packages prerelease"
           title: "chore(release): version packages prerelease"
-          publish: pnpm publish -r --tag next --no-git-checks
+          publish: pnpm publish -r --tag next --preid next --no-git-checks
           createGithubReleases: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
