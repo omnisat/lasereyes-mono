@@ -1,5 +1,18 @@
 # @omnisat/lasereyes
 
+## 0.2.0-next.0
+
+### Minor Changes
+
+- Development updates for next release
+
+### Patch Changes
+
+- Updated dependencies
+  - @omnisat/lasereyes-core@0.2.0-next.0
+  - @omnisat/lasereyes-react@0.2.0-next.0
+  - @omnisat/lasereyes-ui@2.0.0-next.0
+
 ## 0.1.0
 
 ### Minor Changes
