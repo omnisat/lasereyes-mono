@@ -1,5 +1,13 @@
 # @omnisat/lasereyes-react
 
+## 0.0.64-next.1
+
+### Patch Changes
+
+- 6c0eb50: testing
+- Updated dependencies [6c0eb50]
+  - @omnisat/lasereyes-core@0.0.69-next.1
+
 ## 0.0.64-next.0
 
 ### Patch Changes
