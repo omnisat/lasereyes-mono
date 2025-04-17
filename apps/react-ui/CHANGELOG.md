@@ -1,5 +1,12 @@
 # react-ui
 
+## 0.0.0-next-20250417121819
+
+### Patch Changes
+
+- Updated dependencies [6fbc528]
+  - @omnisat/lasereyes@0.0.0-next-20250417121819
+
 ## 0.0.0-next-20250417120840
 
 ### Patch Changes
