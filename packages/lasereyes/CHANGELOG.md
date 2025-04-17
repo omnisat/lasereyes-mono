@@ -1,5 +1,15 @@
 # @omnisat/lasereyes
 
+## 0.0.0-next-20250417115249
+
+### Patch Changes
+
+- 4ed5339: working through changesets
+- Updated dependencies [4ed5339]
+  - @omnisat/lasereyes-react@0.0.0-next-20250417115249
+  - @omnisat/lasereyes-core@0.0.0-next-20250417115249
+  - @omnisat/lasereyes-ui@0.0.0-next-20250417115249
+
 ## 0.0.147
 
 ### Patch Changes
