@@ -1,5 +1,27 @@
 # @omnisat/lasereyes
 
+## 0.0.144-next.7
+
+### Patch Changes
+
+- 2c5f480: disable xverse inscription fetch
+- 70db360: bump to publish xverse bypass to fight problems w inscription fetching.
+- Updated dependencies [2c5f480]
+- Updated dependencies [70db360]
+  - @omnisat/lasereyes-react@0.0.61-next.7
+  - @omnisat/lasereyes-core@0.0.66-next.7
+  - @omnisat/lasereyes-ui@0.0.3-next.7
+
+## 0.0.144-next.6
+
+### Patch Changes
+
+- 70db360: bump to publish xverse bypass to fight problems w inscription fetching.
+- Updated dependencies [70db360]
+  - @omnisat/lasereyes-core@0.0.66-next.6
+  - @omnisat/lasereyes-react@0.0.61-next.6
+  - @omnisat/lasereyes-ui@0.0.3-next.6
+
 ## 0.0.144-next.5
 
 ### Patch Changes
