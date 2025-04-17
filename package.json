@@ -18,6 +18,7 @@
     "test:watch": "vitest --watch",
     "test:coverage": "vitest run --coverage",
     "version": "changeset version",
+    "version-prerelease": "changeset version --snapshot next",
     "release": "changeset publish"
   },
   "devDependencies": {
