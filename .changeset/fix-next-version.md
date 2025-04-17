@@ -1,4 +1,5 @@
 ---
+"@omnisat/lasereyes": patch
 "@omnisat/lasereyes-core": patch
 "@omnisat/lasereyes-react": patch
 ---
