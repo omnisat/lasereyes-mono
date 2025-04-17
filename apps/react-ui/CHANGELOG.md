@@ -1,5 +1,12 @@
 # react-ui
 
+## 0.1.6
+
+### Patch Changes
+
+- Updated dependencies [bbbc320]
+  - @omnisat/lasereyes@0.0.147
+
 ## 0.1.5
 
 ### Patch Changes

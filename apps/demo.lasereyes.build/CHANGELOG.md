@@ -1,5 +1,12 @@
 # demo.lasereyes.build
 
+## 0.1.8
+
+### Patch Changes
+
+- Updated dependencies [bbbc320]
+  - @omnisat/lasereyes@0.0.147
+
 ## 0.1.7
 
 ### Patch Changes
