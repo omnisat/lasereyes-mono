@@ -1,16 +1,35 @@
-"use client"
+'use client'
 
-import * as React from "react"
-import { CodeBlock } from "@/components/code-block"
-import Link from "next/link"
-import { Heading } from "@/components/heading"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { ArrowRight, Wallet, Shield, Code2, Zap, Globe, Plug } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { WalletIcon } from "@omnisat/lasereyes-react"
-import { UNISAT, XVERSE, OYL, LEATHER, MAGIC_EDEN, OKX, PHANTOM, WIZZ, ORANGE, type ProviderType } from "@omnisat/lasereyes-core"
+import * as React from 'react'
+import { CodeBlock } from '@/components/code-block'
+import Link from 'next/link'
+import { Heading } from '@/components/heading'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import {
+  ArrowRight,
+  Wallet,
+  Shield,
+  Code2,
+  Zap,
+  Globe,
+  Plug,
+} from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { WalletIcon } from '@omnisat/lasereyes-react'
+import {
+  UNISAT,
+  XVERSE,
+  OYL,
+  LEATHER,
+  MAGIC_EDEN,
+  OKX,
+  PHANTOM,
+  WIZZ,
+  ORANGE,
+  type ProviderType,
+} from '@omnisat/lasereyes-core'
 
 interface FeatureCardProps {
   icon: React.ElementType
@@ -27,12 +46,19 @@ interface WalletCardProps {
   className?: string
 }
 
-function FeatureCard({ icon: Icon, title, description, className }: FeatureCardProps) {
+function FeatureCard({
+  icon: Icon,
+  title,
+  description,
+  className,
+}: FeatureCardProps) {
   return (
-    <Card className={cn(
-      "group relative overflow-hidden transition-all duration-300 hover:border-orange-500/30 hover:shadow-lg hover:shadow-orange-500/5",
-      className
-    )}>
+    <Card
+      className={cn(
+        'group relative overflow-hidden transition-all duration-300 hover:border-orange-500/30 hover:shadow-lg hover:shadow-orange-500/5',
+        className
+      )}
+    >
       <div className="absolute right-0 top-0 h-20 w-20 translate-x-6 -translate-y-6 rounded-full bg-orange-500/10 blur-2xl filter group-hover:bg-orange-500/20" />
       <CardContent className="p-6">
         <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-orange-500/10 text-orange-500">
@@ -45,14 +71,20 @@ function FeatureCard({ icon: Icon, title, description, className }: FeatureCardP
   )
 }
 
-function WalletCard({ name, constant, description, website, className }: WalletCardProps) {
+function WalletCard({
+  name,
+  constant,
+  description,
+  website,
+  className,
+}: WalletCardProps) {
   // Map wallet names to their provider constants
   const walletProviders: Record<string, ProviderType> = {
     UniSat: UNISAT as ProviderType,
     Xverse: XVERSE as ProviderType,
     OYL: OYL as ProviderType,
     Leather: LEATHER as ProviderType,
-    "Magic Eden": MAGIC_EDEN as ProviderType,
+    'Magic Eden': MAGIC_EDEN as ProviderType,
     OKX: OKX as ProviderType,
     Phantom: PHANTOM as ProviderType,
     Wizz: WIZZ as ProviderType,
@@ -62,10 +94,12 @@ function WalletCard({ name, constant, description, website, className }: WalletC
   const provider = walletProviders[name]
 
   return (
-    <Card className={cn(
-      "group relative overflow-hidden transition-all duration-300 hover:border-orange-500/30 hover:shadow-lg hover:shadow-orange-500/5",
-      className
-    )}>
+    <Card
+      className={cn(
+        'group relative overflow-hidden transition-all duration-300 hover:border-orange-500/30 hover:shadow-lg hover:shadow-orange-500/5',
+        className
+      )}
+    >
       <div className="absolute right-0 top-0 h-20 w-20 translate-x-6 -translate-y-6 rounded-full bg-orange-500/10 blur-2xl filter group-hover:bg-orange-500/20" />
       <CardContent className="p-6">
         <div className="flex items-center gap-4 mb-4">
@@ -75,11 +109,18 @@ function WalletCard({ name, constant, description, website, className }: WalletC
           <div className="flex-1">
             <div className="flex items-center justify-between">
               <h3 className="text-xl font-semibold">{name}</h3>
-              <a href={website} target="_blank" rel="noreferrer" className="text-orange-500 hover:text-orange-600">
+              <a
+                href={website}
+                target="_blank"
+                rel="noreferrer"
+                className="text-orange-500 hover:text-orange-600"
+              >
                 <Globe className="h-5 w-5" />
               </a>
             </div>
-            <code className="mt-1 block rounded bg-muted px-2 py-1 text-sm">{constant}</code>
+            <code className="mt-1 block rounded bg-muted px-2 py-1 text-sm">
+              {constant}
+            </code>
           </div>
         </div>
         <p className="text-muted-foreground">{description}</p>
@@ -91,7 +132,7 @@ function WalletCard({ name, constant, description, website, className }: WalletC
 function WalletProvidersContent() {
   return (
     <div className="space-y-10">
-     <section className="space-y-6" id="supported-wallets">
+      <section className="space-y-6" id="supported-wallets">
         <h2 className="text-3xl font-bold">Supported Wallets</h2>
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           <WalletCard
@@ -110,7 +151,7 @@ function WalletProvidersContent() {
             name="OYL"
             constant="OYL"
             description="Bitcoin wallet focused on Ordinals"
-            website="https://oyl.app"
+            website="https://oyl.io"
           />
           <WalletCard
             name="Magic Eden"
@@ -217,7 +258,6 @@ const availableProviders = [
         </Card>
       </section>
 
-
       <section className="space-y-6" id="next-steps">
         <h2 className="text-3xl font-bold">Next Steps</h2>
         <div className="grid gap-4 sm:grid-cols-2">
@@ -225,8 +265,12 @@ const availableProviders = [
             <Card className="h-full transition-all hover:border-orange-500/30 hover:shadow-lg hover:shadow-orange-500/5">
               <CardContent className="flex h-full flex-col justify-between p-6">
                 <div>
-                  <h3 className="mb-2 text-lg font-semibold">LaserEyes Client</h3>
-                  <p className="text-sm text-muted-foreground">Learn how to use the core client with wallet providers</p>
+                  <h3 className="mb-2 text-lg font-semibold">
+                    LaserEyes Client
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    Learn how to use the core client with wallet providers
+                  </p>
                 </div>
                 <ArrowRight className="mt-4 h-5 w-5 text-orange-500" />
               </CardContent>
@@ -236,8 +280,12 @@ const availableProviders = [
             <Card className="h-full transition-all hover:border-orange-500/30 hover:shadow-lg hover:shadow-orange-500/5">
               <CardContent className="flex h-full flex-col justify-between p-6">
                 <div>
-                  <h3 className="mb-2 text-lg font-semibold">Wallet Connection</h3>
-                  <p className="text-sm text-muted-foreground">Explore wallet connection examples and best practices</p>
+                  <h3 className="mb-2 text-lg font-semibold">
+                    Wallet Connection
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    Explore wallet connection examples and best practices
+                  </p>
                 </div>
                 <ArrowRight className="mt-4 h-5 w-5 text-orange-500" />
               </CardContent>
@@ -254,12 +302,18 @@ export default function WalletProvidersPage() {
     <div className="space-y-8">
       <div className="relative overflow-hidden rounded-lg border bg-gradient-to-br from-orange-500/10 via-background to-background p-8">
         <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-orange-500/20 rounded-full blur-3xl -z-10 translate-x-1/2 -translate-y-1/2" />
-        <Badge variant="secondary" className="mb-4">Core API</Badge>
-        <Heading level={1} className="mb-4 bg-gradient-to-br from-orange-500 to-yellow-500 bg-clip-text text-transparent">
+        <Badge variant="secondary" className="mb-4">
+          Core API
+        </Badge>
+        <Heading
+          level={1}
+          className="mb-4 bg-gradient-to-br from-orange-500 to-yellow-500 bg-clip-text text-transparent"
+        >
           Wallet Providers
         </Heading>
         <p className="text-xl mb-6 max-w-2xl text-muted-foreground">
-          LaserEyes supports multiple Bitcoin wallet providers through a unified interface, making it simple to integrate with any supported wallet.
+          LaserEyes supports multiple Bitcoin wallet providers through a unified
+          interface, making it simple to integrate with any supported wallet.
         </p>
         <div className="flex gap-4 items-center">
           <Link href="#supported-wallets">
@@ -268,7 +322,9 @@ export default function WalletProvidersPage() {
               <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Button>
           </Link>
-          <Badge variant="secondary" className="h-7 px-3">9 Wallets</Badge>
+          <Badge variant="secondary" className="h-7 px-3">
+            9 Wallets
+          </Badge>
         </div>
       </div>
 
@@ -276,4 +332,3 @@ export default function WalletProvidersPage() {
     </div>
   )
 }
-
