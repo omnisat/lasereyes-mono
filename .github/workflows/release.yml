@@ -77,14 +77,31 @@ jobs:
       - name: Build packages
         run: pnpm build --filter="@omnisat/*"
 
-      # Deprecate incorrect versions
-      - name: Deprecate incorrect versions
+      # Clean up incorrect versions
+      - name: Clean up incorrect versions
         if: github.ref == 'refs/heads/main'
         run: |
+          # Remove next tag from 0.2.0
+          npm dist-tag rm @omnisat/lasereyes next || true
+          npm dist-tag rm @omnisat/lasereyes-core next || true
+          npm dist-tag rm @omnisat/lasereyes-react next || true
+          npm dist-tag rm @omnisat/lasereyes-ui next || true
+
+          # Deprecate incorrect versions
+          npm deprecate "@omnisat/lasereyes@0.2.0" "This version was published by mistake" || true
           npm deprecate "@omnisat/lasereyes@0.2.0-next.0" "This version was published by mistake" || true
           npm deprecate "@omnisat/lasereyes@0.1.0" "This version was published by mistake" || true
+          
+          npm deprecate "@omnisat/lasereyes-core@0.2.0" "This version was published by mistake" || true
+          npm deprecate "@omnisat/lasereyes-core@0.2.0-next.0" "This version was published by mistake" || true
           npm deprecate "@omnisat/lasereyes-core@0.1.0" "This version was published by mistake" || true
+          
+          npm deprecate "@omnisat/lasereyes-react@0.2.0" "This version was published by mistake" || true
+          npm deprecate "@omnisat/lasereyes-react@0.2.0-next.0" "This version was published by mistake" || true
           npm deprecate "@omnisat/lasereyes-react@0.1.0" "This version was published by mistake" || true
+          
+          npm deprecate "@omnisat/lasereyes-ui@0.2.0" "This version was published by mistake" || true
+          npm deprecate "@omnisat/lasereyes-ui@0.2.0-next.0" "This version was published by mistake" || true
           npm deprecate "@omnisat/lasereyes-ui@0.1.0" "This version was published by mistake" || true
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
