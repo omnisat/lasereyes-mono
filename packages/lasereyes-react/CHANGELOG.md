@@ -1,5 +1,18 @@
 # @omnisat/lasereyes-react
 
+## 0.2.0
+
+### Minor Changes
+
+- 55417a2: Development updates for next release
+
+### Patch Changes
+
+- Patch updates for stable release
+- Updated dependencies [55417a2]
+- Updated dependencies
+  - @omnisat/lasereyes-core@0.2.0
+
 ## 0.2.0-next.0
 
 ### Minor Changes

@@ -1,5 +1,15 @@
 # @omnisat/lasereyes-core
 
+## 0.2.0
+
+### Minor Changes
+
+- 55417a2: Development updates for next release
+
+### Patch Changes
+
+- Patch updates for stable release
+
 ## 0.2.0-next.0
 
 ### Minor Changes
