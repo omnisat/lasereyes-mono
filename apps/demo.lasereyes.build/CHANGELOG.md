@@ -1,5 +1,12 @@
 # demo.lasereyes.build
 
+## 0.0.0-next-20250417115249
+
+### Patch Changes
+
+- Updated dependencies [4ed5339]
+  - @omnisat/lasereyes@0.0.0-next-20250417115249
+
 ## 0.1.8
 
 ### Patch Changes
