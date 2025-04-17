@@ -1,5 +1,11 @@
 # @omnisat/lasereyes-core
 
+## 0.0.68
+
+### Patch Changes
+
+- Patch updates for stable release
+
 ## 0.0.67
 
 ### Patch Changes
