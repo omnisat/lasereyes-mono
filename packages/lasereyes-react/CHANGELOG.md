@@ -1,5 +1,13 @@
 # @omnisat/lasereyes-react
 
+## 0.0.64
+
+### Patch Changes
+
+- bbbc320: Patch release for development version (maintaining 0.0.x versioning)
+- Updated dependencies [bbbc320]
+  - @omnisat/lasereyes-core@0.0.69
+
 ## 0.2.1
 
 ### Patch Changes
