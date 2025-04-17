@@ -1,5 +1,11 @@
 # @omnisat/lasereyes-core
 
+## 0.0.69-next.1
+
+### Patch Changes
+
+- 6c0eb50: testing
+
 ## 0.0.69-next.0
 
 ### Patch Changes
