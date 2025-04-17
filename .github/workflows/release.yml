@@ -11,28 +11,7 @@ permissions:
   pull-requests: write
 
 jobs:
-  check-changesets:
-    runs-on: ubuntu-latest
-    outputs:
-      has_changesets: ${{ steps.check.outputs.has_changesets }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
-      - name: Check for changesets
-        id: check
-        run: |
-          if [ -n "$(ls -A .changeset/*.md 2>/dev/null)" ]; then
-            echo "has_changesets=true" >> $GITHUB_OUTPUT
-          else
-            echo "has_changesets=false" >> $GITHUB_OUTPUT
-          fi
-
   release:
-    needs: check-changesets
-    if: needs.check-changesets.outputs.has_changesets == 'true'
     runs-on: ubuntu-latest
     environment: prod
     steps:
@@ -52,19 +31,6 @@ jobs:
         with:
           version: 8.6.6
 
-      - name: Get pnpm store directory
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
-
-      - uses: actions/cache@v3
-        name: Setup pnpm cache
-        with:
-          path: ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
@@ -77,33 +43,23 @@ jobs:
       - name: Build packages
         run: pnpm build --filter="@omnisat/*"
 
-      # Dev branch - Create PR but don't consume changesets
-      - name: Create Prerelease PR (dev)
+      # Dev branch - Direct publish to next tag
+      - name: Version and Publish Next (dev)
         if: github.ref == 'refs/heads/dev'
-        id: changesets-dev
-        uses: changesets/action@v1
-        with:
-          version: pnpm run version-prerelease
-          commit: "chore(release): version packages prerelease"
-          title: "chore(release): version packages prerelease"
-          publish: pnpm publish -r --tag next --no-git-checks
-          createGithubReleases: false
+        run: |
+          pnpm run version-prerelease
+          pnpm publish -r --tag next --no-git-checks
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      # Main branch - Consume changesets and publish stable
-      - name: Version and Publish Stable (main)
+      # Main branch - Direct publish to latest tag
+      - name: Version and Publish Latest (main)
         if: github.ref == 'refs/heads/main'
-        id: changesets-main
-        uses: changesets/action@v1
-        with:
-          version: pnpm run version
-          commit: "chore(release): version packages stable"
-          title: "chore(release): version packages stable"
-          publish: pnpm publish -r --tag latest --no-git-checks
-          createGithubReleases: true
+        run: |
+          pnpm run version
+          pnpm publish -r --tag latest --no-git-checks
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
