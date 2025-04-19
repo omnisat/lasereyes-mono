@@ -1,19 +1,23 @@
 {
-  "mode": "exit",
+  "mode": "pre",
   "tag": "next",
   "initialVersions": {
     "demo.lasereyes.build": "0.0.0-next.1",
     "lasereyes-docs": "0.0.0-next.1",
     "react-ui": "0.0.0-next.1",
     "@repo/eslint-config": "0.0.0",
-    "@omnisat/lasereyes": "0.0.147-next.1",
-    "@omnisat/lasereyes-core": "0.0.69-next.1",
-    "@omnisat/lasereyes-react": "0.0.64-next.1",
-    "@omnisat/lasereyes-ui": "0.0.6-next.1",
+    "@omnisat/lasereyes": "0.0.147-next.3",
+    "@omnisat/lasereyes-core": "0.0.69-next.4",
+    "@omnisat/lasereyes-react": "0.0.64-next.3",
+    "@omnisat/lasereyes-ui": "0.0.6-next.3",
     "@repo/typescript-config": "0.0.0"
   },
   "changesets": [
+    "free-moose-send",
+    "mean-kiwis-raise",
+    "public-tires-judge",
     "violet-bugs-unite",
+    "young-pillows-enjoy",
     "yummy-rules-wink"
   ]
 }
