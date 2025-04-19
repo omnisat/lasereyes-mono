@@ -38,6 +38,12 @@ jobs:
       - name: Build packages
         run: pnpm build --filter="@omnisat/*"
 
+      - name: Setup npmrc
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" >> .npmrc
+          echo "registry=https://registry.npmjs.org/" >> .npmrc
+          echo "always-auth=true" >> .npmrc
+
       # Dev branch - Direct publish to next tag
       - name: Version and Publish Next (dev)
         if: github.ref == 'refs/heads/dev'
@@ -57,6 +63,9 @@ jobs:
       - name: Version and Publish Latest (main)
         if: github.ref == 'refs/heads/main'
         run: |
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" >> .npmrc
+          echo "registry=https://registry.npmjs.org/" >> .npmrc
+          echo "always-auth=true" >> .npmrc
           pnpm run version
           pnpm publish -r --tag latest --no-git-checks --force
         env:
