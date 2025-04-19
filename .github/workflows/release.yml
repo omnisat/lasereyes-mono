@@ -47,7 +47,18 @@ jobs:
       - name: Version and Publish Next (dev)
         if: github.ref == 'refs/heads/dev'
         run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          
+          # Version packages
           pnpm run version-prerelease
+          
+          # Commit version updates back to dev
+          git add .
+          git commit -m "chore: update versions [skip ci]"
+          git push origin dev
+          
+          # Build and publish
           pnpm build --filter="@omnisat/*"
           pnpm publish -r --tag next --no-git-checks --force
         env:
