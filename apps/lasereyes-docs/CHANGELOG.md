@@ -1,20 +1,85 @@
 # lasereyes-docs
 
+## 0.0.0-next.1
+
+### Patch Changes
+
+- Updated dependencies [6c0eb50]
+  - @omnisat/lasereyes-react@0.0.64-next.1
+  - @omnisat/lasereyes-core@0.0.69-next.1
+
+## 0.0.0-next.0
+
+### Patch Changes
+
+- Updated dependencies [4546fa5]
+  - @omnisat/lasereyes-react@0.0.64-next.0
+  - @omnisat/lasereyes-core@0.0.69-next.0
+
+## 0.0.0-next-20250417121819
+
+### Patch Changes
+
+- Updated dependencies [6fbc528]
+  - @omnisat/lasereyes-react@0.0.0-next-20250417121819
+  - @omnisat/lasereyes-core@0.0.0-next-20250417121819
+
+## 0.0.0-next-20250417120840
+
+### Patch Changes
+
+- Updated dependencies [a19fea3]
+  - @omnisat/lasereyes-react@0.0.0-next-20250417120840
+  - @omnisat/lasereyes-core@0.0.0-next-20250417120840
+
+## 0.0.0-next-20250417115249
+
+### Patch Changes
+
+- Updated dependencies [4ed5339]
+  - @omnisat/lasereyes-react@0.0.0-next-20250417115249
+  - @omnisat/lasereyes-core@0.0.0-next-20250417115249
+
+## 0.1.6
+
+### Patch Changes
+
+- Updated dependencies [bbbc320]
+  - @omnisat/lasereyes-core@0.0.69
+  - @omnisat/lasereyes-react@0.0.64
+
+## 0.1.5
+
+### Patch Changes
+
+- Updated dependencies [9ebd105]
+  - @omnisat/lasereyes-core@0.2.1
+  - @omnisat/lasereyes-react@0.2.1
+
 ## 0.1.4
 
 ### Patch Changes
 
+- Updated dependencies [55417a2]
 - Updated dependencies
-  - @omnisat/lasereyes-core@0.0.68
-  - @omnisat/lasereyes-react@0.0.63
+  - @omnisat/lasereyes-core@0.2.0
+  - @omnisat/lasereyes-react@0.2.0
+
+## 0.1.4-next.0
+
+### Patch Changes
+
+- Updated dependencies
+  - @omnisat/lasereyes-core@0.2.0-next.0
+  - @omnisat/lasereyes-react@0.2.0-next.0
 
 ## 0.1.3
 
 ### Patch Changes
 
 - Updated dependencies
-  - @omnisat/lasereyes-core@0.0.67
-  - @omnisat/lasereyes-react@0.0.62
+  - @omnisat/lasereyes-core@0.1.0
+  - @omnisat/lasereyes-react@0.1.0
 
 ## 0.1.2
 

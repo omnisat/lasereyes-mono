@@ -1,6 +1,6 @@
 {
   "name": "demo.lasereyes.build",
-  "version": "0.1.6",
+  "version": "0.0.0-next.1",
   "private": true,
   "scripts": {
     "dev": "next dev",

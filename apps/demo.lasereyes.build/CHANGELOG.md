@@ -1,18 +1,74 @@
 # demo.lasereyes.build
 
+## 0.0.0-next.1
+
+### Patch Changes
+
+- Updated dependencies [6c0eb50]
+  - @omnisat/lasereyes@0.0.147-next.1
+
+## 0.0.0-next.0
+
+### Patch Changes
+
+- Updated dependencies [4546fa5]
+  - @omnisat/lasereyes@0.0.147-next.0
+
+## 0.0.0-next-20250417121819
+
+### Patch Changes
+
+- Updated dependencies [6fbc528]
+  - @omnisat/lasereyes@0.0.0-next-20250417121819
+
+## 0.0.0-next-20250417120840
+
+### Patch Changes
+
+- Updated dependencies [a19fea3]
+  - @omnisat/lasereyes@0.0.0-next-20250417120840
+
+## 0.0.0-next-20250417115249
+
+### Patch Changes
+
+- Updated dependencies [4ed5339]
+  - @omnisat/lasereyes@0.0.0-next-20250417115249
+
+## 0.1.8
+
+### Patch Changes
+
+- Updated dependencies [bbbc320]
+  - @omnisat/lasereyes@0.0.147
+
+## 0.1.7
+
+### Patch Changes
+
+- @omnisat/lasereyes@0.2.1
+
 ## 0.1.6
 
 ### Patch Changes
 
+- Updated dependencies [55417a2]
 - Updated dependencies
-  - @omnisat/lasereyes@0.0.146
+  - @omnisat/lasereyes@0.2.0
+
+## 0.1.6-next.0
+
+### Patch Changes
+
+- Updated dependencies
+  - @omnisat/lasereyes@0.2.0-next.0
 
 ## 0.1.5
 
 ### Patch Changes
 
 - Updated dependencies
-  - @omnisat/lasereyes@0.0.145
+  - @omnisat/lasereyes@0.1.0
 
 ## 0.1.4
 

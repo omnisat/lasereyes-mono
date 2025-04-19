@@ -11,7 +11,7 @@ import { RpcResponse } from "../../../types/rpc";
 import { SANDSHREW } from "../../../constants/data-sources";
 
 export class SandshrewDataSource implements DataSource {
-  private apiUrl: string = `${SANDSHREW_URL}/${SANDSHREW_LASEREYES_KEY}`;
+  private apiUrl: string = `${SANDSHREW_URL}`;
   private apiKey: string = SANDSHREW_LASEREYES_KEY;
 
   constructor(baseUrl: string, apiKey: string, network: string) {
