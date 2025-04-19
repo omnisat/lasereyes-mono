@@ -48,9 +48,6 @@ jobs:
       - name: Version and Publish Next (dev)
         if: github.ref == 'refs/heads/dev'
         run: |
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git config --global user.name "github-actions[bot]"
-          
           # Version packages
           pnpm run version-prerelease
           
