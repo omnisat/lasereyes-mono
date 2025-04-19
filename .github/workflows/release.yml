@@ -39,7 +39,6 @@ jobs:
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" >> .npmrc
           echo "registry=https://registry.npmjs.org/" >> .npmrc
           echo "always-auth=true" >> .npmrc
-          echo "@omnisat:registry=https://registry.npmjs.org/" >> .npmrc
 
       - name: Build packages
         run: pnpm build --filter="@omnisat/*"
@@ -48,15 +47,7 @@ jobs:
       - name: Version and Publish Next (dev)
         if: github.ref == 'refs/heads/dev'
         run: |
-          # Version packages
           pnpm run version-prerelease
-          
-          # Commit version updates back to dev
-          git add .
-          git commit -m "chore: update versions [skip ci]"
-          git push origin dev
-          
-          # Build and publish
           pnpm build --filter="@omnisat/*"
           pnpm publish -r --tag next --no-git-checks --force
         env:
