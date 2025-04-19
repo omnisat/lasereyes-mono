@@ -34,11 +34,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Setup npmrc
-        run: |
-          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" >> .npmrc
-          echo "registry=https://registry.npmjs.org/" >> .npmrc
-          echo "always-auth=true" >> .npmrc
 
       - name: Build packages
         run: pnpm build --filter="@omnisat/*"
@@ -47,6 +42,9 @@ jobs:
       - name: Version and Publish Next (dev)
         if: github.ref == 'refs/heads/dev'
         run: |
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" >> .npmrc
+          echo "registry=https://registry.npmjs.org/" >> .npmrc
+          echo "always-auth=true" >> .npmrc        
           pnpm run version-prerelease
           pnpm build --filter="@omnisat/*"
           pnpm publish -r --tag next --no-git-checks --force
