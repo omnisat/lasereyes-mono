@@ -55,8 +55,8 @@ jobs:
           pnpm run version-prerelease
           pnpm build --filter="@omnisat/*"
           
-          # Commit version changes first to get clean state
-          git add .
+          # Commit version changes first to get clean state, excluding .npmrc
+          git add "package.json" "packages/**/package.json" "pnpm-lock.yaml" ".changeset/**/*"
           git commit -m "chore: update versions [skip ci]" || echo "No changes to commit"
           
           # Now publish with clean working tree
