@@ -44,16 +44,16 @@ jobs:
           echo "registry=https://registry.npmjs.org/" >> .npmrc
           echo "always-auth=true" >> .npmrc
 
-      # Dev branch - Direct publish to next tag
+      # Dev branch - Publish to next tag
       - name: Version and Publish Next (dev)
         if: github.ref == 'refs/heads/dev'
         run: |
-          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" >> .npmrc
-          echo "registry=https://registry.npmjs.org/" >> .npmrc
-          echo "always-auth=true" >> .npmrc        
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
           pnpm run version-prerelease
           pnpm build --filter="@omnisat/*"
-          pnpm publish -r --tag next --no-git-checks --force
+          git push --follow-tags
+          pnpm publish -r --tag next
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
