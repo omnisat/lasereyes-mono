@@ -119,11 +119,15 @@ jobs:
           # Disable git checks before any operations
           pnpm config set git-checks false
           
-          # First version update
+          # Exit prerelease mode first!
+          echo "Exiting prerelease mode..."
+          pnpm changeset pre exit
+          
+          # Then do version update
           pnpm run version
           pnpm build --filter="@omnisat/*"
           
-          # Stage and commit all changes to get a clean state
+          # Stage and commit all changes to get clean state
           echo "Adding version changes to git..."
           git add package.json || true
           git add pnpm-lock.yaml || true
