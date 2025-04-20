@@ -54,14 +54,20 @@ jobs:
           
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
+          
+          # First version update
           pnpm run version-prerelease
           pnpm build --filter="@omnisat/*"
+          
+          # Commit version changes first to get clean state
+          git add .
+          git commit -m "chore: update versions [skip ci]" || echo "No changes to commit"
+          
+          # Now publish with clean working tree
           pnpm config set publish-branch dev
           pnpm publish -r --tag next --access public
           
-          # Only commit and push if publish was successful
-          git add .
-          git commit -m "chore: update versions [skip ci]" || echo "No changes to commit"
+          # Push everything including tags after successful publish
           git push --follow-tags
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
