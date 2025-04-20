@@ -83,11 +83,16 @@ jobs:
           pnpm run version-prerelease
           pnpm build --filter="@omnisat/*"
           
-          # Commit version changes first to get clean state, excluding .npmrc
-          git add "package.json" "packages/**/package.json" "pnpm-lock.yaml"
-          if [ -d ".changeset" ] && [ "$(find .changeset -name "*.md" -not -name "README.md" -not -name "config.json" | wc -l)" -gt 0 ]; then
-            git add ".changeset/**/*"
+          # More explicit git add that won't fail if files don't exist
+          echo "Adding version changes to git..."
+          git add package.json || true
+          git add pnpm-lock.yaml || true
+          git add "packages/*/package.json" || true
+          # Only try to add changeset files if the directory exists and has .md files
+          if [ -d ".changeset" ]; then
+            find .changeset -name "*.md" -not -name "README.md" -exec git add {} \; || true
           fi
+          
           git commit -m "chore: update versions [skip ci]" || echo "No changes to commit"
           
           # Now publish with clean working tree
@@ -113,11 +118,16 @@ jobs:
           pnpm run version
           pnpm build --filter="@omnisat/*"
           
-          # Commit version changes first to get clean state, excluding .npmrc
-          git add "package.json" "packages/**/package.json" "pnpm-lock.yaml"
-          if [ -d ".changeset" ] && [ "$(find .changeset -name "*.md" -not -name "README.md" -not -name "config.json" | wc -l)" -gt 0 ]; then
-            git add ".changeset/**/*"
+          # More explicit git add that won't fail if files don't exist
+          echo "Adding version changes to git..."
+          git add package.json || true
+          git add pnpm-lock.yaml || true
+          git add "packages/*/package.json" || true
+          # Only try to add changeset files if the directory exists and has .md files
+          if [ -d ".changeset" ]; then
+            find .changeset -name "*.md" -not -name "README.md" -exec git add {} \; || true
           fi
+          
           git commit -m "chore: update versions [skip ci]" || echo "No changes to commit"
           
           # Now publish with clean working tree
