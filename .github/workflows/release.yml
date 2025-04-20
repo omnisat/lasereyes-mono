@@ -5,6 +5,11 @@ on:
     branches:
       - dev
       - main
+    paths:
+      - 'packages/**'
+      - '.changeset/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
 
 permissions:
   contents: write
