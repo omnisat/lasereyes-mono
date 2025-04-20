@@ -50,16 +50,19 @@ jobs:
         run: |
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" >> .npmrc
           echo "registry=https://registry.npmjs.org/" >> .npmrc
-          echo "always-auth=true" >> .npmrc        
+          echo "always-auth=true" >> .npmrc
+          
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
           pnpm run version-prerelease
           pnpm build --filter="@omnisat/*"
+          pnpm config set publish-branch dev
+          pnpm publish -r --tag next --access public
+          
+          # Only commit and push if publish was successful
           git add .
           git commit -m "chore: update versions [skip ci]" || echo "No changes to commit"
           git push --follow-tags
-          pnpm config set publish-branch dev
-          pnpm publish -r --tag next
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
