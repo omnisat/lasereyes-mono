@@ -84,7 +84,10 @@ jobs:
           pnpm build --filter="@omnisat/*"
           
           # Commit version changes first to get clean state, excluding .npmrc
-          git add "package.json" "packages/**/package.json" "pnpm-lock.yaml" ".changeset/**/*"
+          git add "package.json" "packages/**/package.json" "pnpm-lock.yaml"
+          if [ -d ".changeset" ] && [ "$(find .changeset -name "*.md" -not -name "README.md" -not -name "config.json" | wc -l)" -gt 0 ]; then
+            git add ".changeset/**/*"
+          fi
           git commit -m "chore: update versions [skip ci]" || echo "No changes to commit"
           
           # Now publish with clean working tree
@@ -111,7 +114,10 @@ jobs:
           pnpm build --filter="@omnisat/*"
           
           # Commit version changes first to get clean state, excluding .npmrc
-          git add "package.json" "packages/**/package.json" "pnpm-lock.yaml" ".changeset/**/*"
+          git add "package.json" "packages/**/package.json" "pnpm-lock.yaml"
+          if [ -d ".changeset" ] && [ "$(find .changeset -name "*.md" -not -name "README.md" -not -name "config.json" | wc -l)" -gt 0 ]; then
+            git add ".changeset/**/*"
+          fi
           git commit -m "chore: update versions [skip ci]" || echo "No changes to commit"
           
           # Now publish with clean working tree
