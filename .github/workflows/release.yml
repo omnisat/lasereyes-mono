@@ -55,6 +55,7 @@ jobs:
           git add .
           git commit -m "chore: update versions [skip ci]" || echo "No changes to commit"
           git push --follow-tags
+          pnpm config set publish-branch dev
           pnpm publish -r --tag next
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
