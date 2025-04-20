@@ -83,23 +83,25 @@ jobs:
           pnpm run version-prerelease
           pnpm build --filter="@omnisat/*"
           
-          # More explicit git add that won't fail if files don't exist
+          # Stage and commit all changes to get a clean state
           echo "Adding version changes to git..."
           git add package.json || true
           git add pnpm-lock.yaml || true
           git add "packages/*/package.json" || true
-          # Only try to add changeset files if the directory exists and has .md files
           if [ -d ".changeset" ]; then
             find .changeset -name "*.md" -not -name "README.md" -exec git add {} \; || true
           fi
-          
           git commit -m "chore: update versions [skip ci]" || echo "No changes to commit"
           
-          # Now publish with clean working tree
+          # Temporarily disable git checks for publish
+          pnpm config set git-checks false
           pnpm config set publish-branch dev
+          
+          # Now publish
           pnpm publish -r --tag next --access public
           
-          # Push everything including tags after successful publish
+          # Re-enable git checks and push if publish was successful
+          pnpm config set git-checks true
           git push --follow-tags
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
