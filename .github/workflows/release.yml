@@ -45,7 +45,7 @@ jobs:
           echo "always-auth=true" >> .npmrc
 
       # Dev branch - Publish to next tag
-      - name: Version and Publish Next (dev)
+      - name: Version, Publish 'next' tag, Commit and Push (dev)
         if: github.ref == 'refs/heads/dev'
         run: |
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
@@ -61,14 +61,18 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      # Main branch - Direct publish to latest tag
-      - name: Version and Publish Latest (main)
+      # Main branch - Version, Publish 'latest' tag, Commit and Push
+      - name: Version, Publish 'latest' tag, Commit and Push (main)
         if: github.ref == 'refs/heads/main'
         run: |
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" >> .npmrc
           echo "registry=https://registry.npmjs.org/" >> .npmrc
           echo "always-auth=true" >> .npmrc
           pnpm run version
+          pnpm build --filter="@omnisat/*"
+          git add .
+          git commit -m "chore: update versions [skip ci]" || echo "No changes to commit"
+          git push --follow-tags
           pnpm publish -r --tag latest --no-git-checks --force
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
