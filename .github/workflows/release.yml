@@ -119,15 +119,16 @@ jobs:
           # Disable git checks before any operations
           pnpm config set git-checks false
           
-          # Exit prerelease mode first!
+          # Exit prerelease mode first
           echo "Exiting prerelease mode..."
           pnpm changeset pre exit
           
-          # Then do version update
+          # Force version and build
+          echo "Running version update..."
           pnpm run version
           pnpm build --filter="@omnisat/*"
           
-          # Stage and commit all changes to get clean state
+          # Stage and commit all changes
           echo "Adding version changes to git..."
           git add package.json || true
           git add pnpm-lock.yaml || true
@@ -135,13 +136,12 @@ jobs:
           if [ -d ".changeset" ]; then
             find .changeset -name "*.md" -not -name "README.md" -exec git add {} \; || true
           fi
-          
           git commit -m "chore: update versions [skip ci]" || echo "No changes to commit"
           
-          # Now publish with latest tag
-          pnpm publish -r --tag latest --access public
+          # Force publish with latest tag
+          pnpm publish -r --tag latest --access public --no-git-checks --force
           
-          # Re-enable git checks and push if publish was successful
+          # Re-enable git checks and push
           pnpm config set git-checks true
           git push --follow-tags
           
