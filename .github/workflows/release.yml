@@ -116,6 +116,9 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
           
+          # Disable git checks before any operations
+          pnpm config set git-checks false
+          
           # First version update
           pnpm run version
           pnpm build --filter="@omnisat/*"
@@ -130,9 +133,6 @@ jobs:
           fi
           
           git commit -m "chore: update versions [skip ci]" || echo "No changes to commit"
-          
-          # Temporarily disable git checks for publish
-          pnpm config set git-checks false
           
           # Now publish with latest tag
           pnpm publish -r --tag latest --access public
