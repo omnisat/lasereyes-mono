@@ -1,22 +1,26 @@
 import axios from "axios";
-import { DataSource } from "../../../types/data-source";
+import type { DataSource } from "../../../types/data-source";
 import { MAINNET } from "../../../constants";
-import { OrdOutputs, OrdRuneBalance } from "../../../types/ord";
-import { AddressInfo, InscriptionInfo } from 'ordapi';
-import { SandshrewGetRuneByIdOrNameResponse, SingleRuneOutpoint } from "../../../types/sandshrew";
-import { EsploraTx } from "../../../types/esplora";
+import type { OrdOutputs, OrdRuneBalance } from "../../../types/ord";
+import type { AddressInfo, InscriptionInfo } from 'ordapi';
+import type { SandshrewGetRuneByIdOrNameResponse, SingleRuneOutpoint } from "../../../types/sandshrew";
+import type { EsploraTx } from "../../../types/esplora";
 import { getPublicKeyHash } from "../../btc";
 import { SANDSHREW_LASEREYES_KEY, SANDSHREW_URL } from "../../urls";
-import { RpcResponse } from "../../../types/rpc";
+import type { RpcResponse } from "../../../types/rpc";
 import { SANDSHREW } from "../../../constants/data-sources";
+import { AlkanesRpc } from "@oyl/sdk/lib/rpclient/alkanes";
+import type { AlkanesOutpoint } from "../../../types";
 
 export class SandshrewDataSource implements DataSource {
-  private apiUrl: string = `${SANDSHREW_URL}/${SANDSHREW_LASEREYES_KEY}`;
+  private apiUrl = `${SANDSHREW_URL}/${SANDSHREW_LASEREYES_KEY}`;
   private apiKey: string = SANDSHREW_LASEREYES_KEY;
+  private alkanes: AlkanesRpc;
 
   constructor(baseUrl: string, apiKey: string, network: string) {
     this.setNetwork(network, baseUrl);
     this.apiKey = apiKey
+    this.alkanes = new AlkanesRpc(this.apiUrl);
   }
 
   public getName() {
@@ -25,9 +29,10 @@ export class SandshrewDataSource implements DataSource {
 
   public setNetwork(_network: string, _baseUrl?: string) {
     this.apiUrl = `${this.apiUrl}/${this.apiKey || SANDSHREW_LASEREYES_KEY}`;
+    this.alkanes = new AlkanesRpc(this.apiUrl);
   }
 
-  private async call(method: string, params: any) {
+  private async call(method: string, params: unknown) {
     try {
       const response = await axios.post(this.apiUrl, {
         jsonrpc: '2.0',
@@ -41,9 +46,17 @@ export class SandshrewDataSource implements DataSource {
       });
       return response.data;
     } catch (error) {
-      console.error(`SandshrewDataSource.callRPC error:`, error);
-      throw error;
+      console.error('SandshrewDataSource.callRPC error:', error)
+      throw error
     }
+  }
+
+  async getAlkanesByAddress(address: string, protocolTag: string): Promise<AlkanesOutpoint[]> {
+    const response = await this.alkanes.getAlkanesByAddress({
+      address,
+      protocolTag
+    })
+    return response as AlkanesOutpoint[];
   }
 
   async getTransaction(txId: string) {
@@ -87,7 +100,7 @@ export class SandshrewDataSource implements DataSource {
       const { result } = await this.call('sandshrew_multicall', multiCall) as RpcResponse;
 
       for (let i = 0; i < result.length; i++) {
-        result[i].result['output'] = batch[i];
+        result[i].result.output = batch[i];
       }
 
       const filteredResult = result.filter((output: OrdOutputs) =>
@@ -122,7 +135,7 @@ export class SandshrewDataSource implements DataSource {
         throw new Error('No runes data found');
       }
 
-      return runesData.map((rune: any) => ({
+      return runesData.map((rune) => ({
         name: rune[0],
         balance: rune[1],
         symbol: rune[2],
@@ -156,7 +169,6 @@ export class SandshrewDataSource implements DataSource {
   }
 
   private async mapRuneBalances({ ordOutputs }: { ordOutputs: OrdOutputs[] }): Promise<SingleRuneOutpoint[]> {
-    try {
       const runeOutpoints: SingleRuneOutpoint[] = [];
       for (let i = 0; i < ordOutputs.length; i++) {
         const ordOutput = ordOutputs[i];
@@ -176,7 +188,7 @@ export class SandshrewDataSource implements DataSource {
           value: result.value,
         };
 
-        singleRuneOutpoint['script'] = Buffer.from(
+        singleRuneOutpoint.script = Buffer.from(
           getPublicKeyHash(address, MAINNET)
         ).toString('hex');
 
@@ -191,9 +203,6 @@ export class SandshrewDataSource implements DataSource {
         runeOutpoints.push(singleRuneOutpoint);
       }
       return runeOutpoints;
-    } catch (e) {
-      throw e;
-    }
   }
 
 }

@@ -1,9 +1,10 @@
-import { InscriptionInfo } from "ordapi";
-import { MempoolUtxo, NetworkType } from ".";
-import { MaestroGetInscriptionInfoResponse } from "./maestro";
+import type { InscriptionInfo } from "ordapi";
+import type { AlkanesOutpoint, MempoolUtxo, NetworkType } from ".";
+import type { MaestroGetInscriptionInfoResponse } from "./maestro";
 
 export interface DataSource {
   getName(): string;
+  getAlkanesByAddress?(address: string, protocolTag: string): Promise<AlkanesOutpoint[]>;
   getAddressInscriptions?(address: string, offset?: number, limit?: number): Promise<any>;
   getAddressBtcBalance?(address: string): Promise<string>;
   getAddressBrc20Balances?(address: string): Promise<any>;
@@ -25,6 +26,6 @@ export interface DataSource {
   getRuneOutpoints?(params: { address: string, runeId: string }): Promise<any>;
   getAddressUtxos?(address: string): Promise<Array<MempoolUtxo>>;
   getOutputValueByVOutIndex?(txId: string, vOut: number): Promise<number | null>;
-  waitForTransaction?(id: string): Promise<Boolean>;
+  waitForTransaction?(id: string): Promise<boolean>;
   getOutputValueByVOutIndex?(txId: string, vOut: number, network: NetworkType): Promise<number | null>;
 }
