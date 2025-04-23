@@ -178,6 +178,7 @@ export interface LeatherRPCResponse {
   jsonrpc: string
   id: string
   result: LeatherRequestAddressResponse | LeatherRequestSignResponse
+  error?: LeatherError
 }
 
 export interface LeatherRequestAddressResponse {
@@ -186,6 +187,13 @@ export interface LeatherRequestAddressResponse {
 
 export interface LeatherRequestSignResponse {
   hex: string
+  txid: string
+  signature: string
+}
+
+export interface LeatherError {
+  code: number
+  message: string
 }
 
 export interface LeatherAddress {
