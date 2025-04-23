@@ -1,26 +1,60 @@
-import axios from 'axios'
-import type { DataSource } from '../../../types/data-source'
-import { getMempoolSpaceUrl } from '../../urls'
-import type { MempoolUtxo, NetworkType } from '../../../types'
-import type { MempoolSpaceGetTransactionResponse } from '../../../types/mempool-space'
-import { MEMPOOL_SPACE } from '../../../constants/data-sources'
+import axios from "axios";
+import { DataSource } from "../../../types/data-source";
+import { getMempoolSpaceUrl } from "../../urls";
+import { MempoolUtxo, NetworkType } from "../../../types";
+import { MempoolSpaceFeeRatesResponse, MempoolSpaceGetTransactionResponse } from "../../../types/mempool-space";
+import { MEMPOOL_SPACE } from "../../../constants/data-sources";
+
+export type MempoolSpaceConfig = {
+  networks: {
+    mainnet: {
+      apiUrl: string;
+    },
+    [key: string]: {
+      apiUrl: string;
+    }
+  }
+}
 
 export class MempoolSpaceDataSource implements DataSource {
-  private apiUrl = ''
+  private apiUrl: string = "";
+  private networks: MempoolSpaceConfig['networks'];
 
-  constructor(baseUrl: string, network: NetworkType) {
-    this.setNetwork(network, baseUrl)
-    console.log(this.apiUrl)
+  constructor(network: NetworkType, config?: MempoolSpaceConfig) {
+    this.networks = config?.networks || {
+      mainnet: {
+        apiUrl: getMempoolSpaceUrl('mainnet')
+      },
+      testnet: {
+        apiUrl: getMempoolSpaceUrl('testnet')
+      },
+      testnet4: {
+        apiUrl: getMempoolSpaceUrl('testnet4')
+      },
+      signet: {
+        apiUrl: getMempoolSpaceUrl('signet')
+      },
+      "fractal-mainnet": {
+        apiUrl: getMempoolSpaceUrl('fractal-mainnet')
+      },
+      "fractal-testnet": {
+        apiUrl: getMempoolSpaceUrl('fractal-testnet')
+      }
+    };
+    this.setNetwork(network);
   }
 
   public getName() {
     return MEMPOOL_SPACE
   }
 
-  public setNetwork(network: NetworkType, baseUrl?: string) {
-    this.apiUrl = baseUrl
-      ? `${baseUrl}${network === 'mainnet' ? '' : `/${network}`}`
-      : getMempoolSpaceUrl(network)
+  public setNetwork(network: NetworkType) {
+    if (this.networks[network]) {
+      this.apiUrl = this.networks[network].apiUrl;
+    } else {
+      // Fallback to default URL
+      this.apiUrl = getMempoolSpaceUrl(network);
+    }
   }
 
   private async call(method: 'get' | 'post', endpoint: string, body?: unknown) {

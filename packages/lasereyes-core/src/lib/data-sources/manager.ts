@@ -6,11 +6,12 @@ import type { MaestroAddressInscription } from '../../types/maestro'
 import { BaseNetwork } from '../../types/network'
 import type { OrdRuneBalance } from '../../types/ord'
 import {
+  getMaestroUrl,
   getMempoolSpaceUrl,
   MAESTRO_API_KEY_MAINNET,
   MAESTRO_API_KEY_TESTNET4,
   SANDSHREW_LASEREYES_KEY,
-  SANDSHREW_URL,
+  getSandshrewUrl,
 } from '../urls'
 import { normalizeBrc20Balances, normalizeInscription } from './normalizations'
 import { MaestroDataSource } from './sources/maestro-ds'
@@ -23,32 +24,81 @@ export class DataSourceManager {
   private static instance: DataSourceManager
   private dataSources: Map<string, DataSource> = new Map()
   private network: string
+  private customNetworks: Map<
+    string,
+    Exclude<Config['customNetworks'], undefined>[string]
+  > = new Map()
   private constructor(config?: Config) {
     const network = config?.network || BaseNetwork.MAINNET
     this.network = network
+    this.customNetworks = new Map(Object.entries(config?.customNetworks || {}))
     this.dataSources.set(
       'mempool',
       new MempoolSpaceDataSource(
-        config?.dataSources?.mempool?.url || getMempoolSpaceUrl(network),
-        network
+        network,
+        {
+          networks: {
+            ...config?.dataSources?.mempool?.networks,
+            mainnet: {
+              apiUrl: config?.dataSources?.mempool?.url || getMempoolSpaceUrl(BaseNetwork.MAINNET),
+            },
+            testnet: {
+              apiUrl: getMempoolSpaceUrl(BaseNetwork.TESTNET),
+            },
+            testnet4: {
+              apiUrl: getMempoolSpaceUrl(BaseNetwork.TESTNET4),
+            },
+            signet: {
+              apiUrl: getMempoolSpaceUrl(BaseNetwork.SIGNET),
+            },
+            "fractal-mainnet": {
+              apiUrl: getMempoolSpaceUrl(BaseNetwork.FRACTAL_MAINNET),
+            },
+            "fractal-testnet": {
+              apiUrl: getMempoolSpaceUrl(BaseNetwork.FRACTAL_TESTNET),
+            }
+          }
+        }
       )
     )
 
     this.dataSources.set(
       'sandshrew',
       new SandshrewDataSource(
-        config?.dataSources?.sandshrew?.url || SANDSHREW_URL,
-        config?.dataSources?.sandshrew?.apiKey || SANDSHREW_LASEREYES_KEY,
-        network
+        network,
+        {
+          networks: {
+            ...config?.dataSources?.sandshrew?.networks,
+            mainnet: {
+              apiKey: config?.dataSources?.sandshrew?.apiKey || SANDSHREW_LASEREYES_KEY,
+              apiUrl: getSandshrewUrl(BaseNetwork.MAINNET),
+            },
+            testnet: {
+              apiKey: config?.dataSources?.sandshrew?.apiKey || SANDSHREW_LASEREYES_KEY,
+              apiUrl: getSandshrewUrl(BaseNetwork.TESTNET),
+            }
+          }
+        }
       )
     )
 
     this.dataSources.set(
       'maestro',
       new MaestroDataSource(
-        config?.dataSources?.maestro?.apiKey || MAESTRO_API_KEY_MAINNET,
         network,
-        config?.dataSources?.maestro?.testnetApiKey || MAESTRO_API_KEY_TESTNET4
+        {
+          networks: {
+            ...config?.dataSources?.maestro?.networks,
+            mainnet: {
+              apiKey: config?.dataSources?.maestro?.apiKey || MAESTRO_API_KEY_MAINNET,
+              apiUrl: getMaestroUrl(BaseNetwork.MAINNET),
+            },
+            testnet4: {
+              apiKey: config?.dataSources?.maestro?.testnetApiKey || MAESTRO_API_KEY_TESTNET4,
+              apiUrl: getMaestroUrl(BaseNetwork.TESTNET4),
+            }
+          }
+        }
       )
     )
   }
@@ -69,14 +119,15 @@ export class DataSourceManager {
 
   public updateNetwork(newNetwork: string) {
     this.network = newNetwork
+    const baseNetwork = this.customNetworks.get(newNetwork)?.baseNetwork
     for (const ds of this.dataSources.values()) {
-      ds.setNetwork?.(newNetwork)
+      ds.setNetwork?.(newNetwork, baseNetwork)
     }
   }
 
   public registerDataSource(source: string, dataSource: DataSource) {
     this.dataSources.set(source, dataSource)
-    this.dataSources.get(source)?.setNetwork?.(this.network)
+    this.dataSources.get(source)?.setNetwork?.(this.network, this.customNetworks.get(this.network)?.baseNetwork)
   }
 
   public getSource(source: string): DataSource | undefined {
@@ -278,6 +329,14 @@ export class DataSourceManager {
   private findAvailableSource(
     method: keyof DataSource
   ): DataSource | undefined {
+    const customNetwork = this.customNetworks.get(this.network)
+    if (customNetwork) {
+      const dataSource = this.getSource(customNetwork.preferredDataSource)
+      if (dataSource && typeof dataSource[method] === 'function') {
+        return dataSource
+      }
+    }
+
     for (const source of this.dataSources.values()) {
       if (typeof source[method] === 'function') {
         return source

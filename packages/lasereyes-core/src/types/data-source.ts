@@ -1,5 +1,5 @@
 import type { InscriptionInfo } from "ordapi";
-import type { AlkanesOutpoint, MempoolUtxo, NetworkType } from ".";
+import type { AlkanesOutpoint, BaseNetworkType, MempoolUtxo, NetworkType } from ".";
 import type { MaestroGetInscriptionInfoResponse } from "./maestro";
 
 export interface DataSource {
@@ -18,7 +18,7 @@ export interface DataSource {
   getRuneById?(runeId: string): Promise<any>;
   getRuneByName?(runeName: string): Promise<any>;
   broadcastTransaction?(rawTx: string): Promise<string>;
-  setNetwork?(network: string): void;
+  setNetwork?(network: string, baseNetwork?: BaseNetworkType): void;
   getTransactionInfo?(id: string): Promise<any>;
   getOrdAddress?(address: string): Promise<any>;
   getTxInfo?(txId: string): Promise<any>;
