@@ -26,7 +26,8 @@
     "@types/node": "^22.7.7",
     "typescript": "^5.5.3",
     "vite": "^5.4.1",
-    "vite-plugin-dts": "^4.2.1"
+    "vite-plugin-dts": "^4.2.1",
+    "vite-plugin-node-polyfills": "^0.22.0"
   },
   "dependencies": {
     "@bitcoinerlab/secp256k1": "^1.1.1",
@@ -40,8 +41,9 @@
     "axios": "^1.7.7",
     "bip32": "5.0.0-rc.0",
     "bip39": "^3.1.0",
-    "bitcoinjs-lib": "^6.1.7",
+    "bitcoinjs-lib": "^7.0.0-rc.0",
     "buffer": "^6.0.3",
+    "crypto-browserify": "^3.12.1",
     "lodash": "^4.17.21",
     "nanostores": "^0.11.3",
     "ordapi": "^0.0.7",

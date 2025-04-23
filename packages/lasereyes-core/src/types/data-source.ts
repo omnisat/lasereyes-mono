@@ -13,7 +13,7 @@ export interface DataSource {
   batchOrdInscriptionInfo?(inscriptionIds: string[]): Promise<InscriptionInfo[]>;
   getTransaction?(txId: string): Promise<any>;
   getRawTransaction?(txId: string): Promise<any>;
-  getRecommendedFees?(): Promise<any>;
+  getRecommendedFees?(): Promise<{ fastFee: number, minFee: number }>;
   getBrc20ByTicker?(ticker: string): Promise<any>;
   getRuneById?(runeId: string): Promise<any>;
   getRuneByName?(runeName: string): Promise<any>;

@@ -5,7 +5,7 @@ import {
   TESTNET,
   TESTNET4,
 } from '../constants/networks'
-import { NetworkType } from '../types'
+import type { NetworkType } from '../types'
 
 
 export const SANDSHREW_URL: string = 'https://mainnet.sandshrew.io/v1/'

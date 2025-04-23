@@ -20,7 +20,6 @@ import { SandshrewDataSource } from './sources/sandshrew-ds'
 const ERROR_METHOD_NOT_AVAILABLE = 'Method not available on any data source'
 
 export class DataSourceManager {
-  
   private static instance: DataSourceManager
   private dataSources: Map<string, DataSource> = new Map()
   private network: string
@@ -84,7 +83,10 @@ export class DataSourceManager {
     return this.dataSources.get(source)
   }
 
-  public async getAlkanesByAddress(address: string, protocolTag: string): Promise<AlkanesOutpoint[]> {
+  public async getAlkanesByAddress(
+    address: string,
+    protocolTag: string
+  ): Promise<AlkanesOutpoint[]> {
     const dataSource = this.findAvailableSource('getAlkanesByAddress')
     if (!dataSource || !dataSource.getAlkanesByAddress) {
       throw new Error(ERROR_METHOD_NOT_AVAILABLE)
@@ -189,14 +191,21 @@ export class DataSourceManager {
     return await dataSource.getInscriptionInfo(inscriptionId)
   }
 
-  public async getRecommendedFees(): Promise<unknown> {
+  public async getRecommendedFees(): Promise<{
+    fastFee: number
+    minFee: number
+  }> {
     const dataSource = this.findAvailableSource('getRecommendedFees')
     if (!dataSource || !dataSource.getRecommendedFees) {
       throw new Error(ERROR_METHOD_NOT_AVAILABLE)
     }
 
     console.log('getting recommended fees')
-    return await dataSource.getRecommendedFees()
+    const fees = await dataSource.getRecommendedFees()
+    return {
+      fastFee: fees.fastFee,
+      minFee: fees.minFee,
+    }
   }
 
   public async getAddressUtxos(address: string): Promise<MempoolUtxo[]> {

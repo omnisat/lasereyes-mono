@@ -4,17 +4,167 @@ import { ProtoStone, encodeRunestoneProtostone } from 'alkanes/lib/index.js'
 import { ProtoruneRuneId } from 'alkanes/lib/protorune/protoruneruneid'
 import * as bitcoin from 'bitcoinjs-lib'
 import { getBitcoinNetwork } from '../../lib/helpers'
-import {
-  findXAmountOfSats,
-  formatInputsToSign,
-  getAddressType,
-  inscriptionSats,
-} from '@oyl/sdk/lib/shared/utils'
 import { u128 } from '@magiceden-oss/runestone-lib/dist/src/integer/u128'
 import { u32 } from '@magiceden-oss/runestone-lib/dist/src/integer'
-import type { GatheredUtxos } from '@oyl/sdk/lib/shared/interface'
-import { minimumFee } from '@oyl/sdk/lib/btc/btc'
-import type { MempoolSpaceFeeRatesResponse } from '../../types/mempool-space'
+import type {
+  FormattedUtxo,
+  GatheredUtxos,
+} from '@oyl/sdk/lib/shared/interface'
+import { toXOnly } from 'bitcoinjs-lib/src/psbt/bip371'
+
+export declare enum AddressType {
+  P2PKH = 0,
+  P2TR = 1,
+  P2SH_P2WPKH = 2,
+  P2WPKH = 3,
+}
+
+export function calculateTaprootTxSize(
+  taprootInputCount: number,
+  nonTaprootInputCount: number,
+  outputCount: number
+): number {
+  const baseTxSize = 10 // Base transaction size without inputs/outputs
+
+  // Size contributions from inputs
+  const taprootInputSize = 64 // Average size of a Taproot input (can vary)
+  const nonTaprootInputSize = 42 // Average size of a non-Taproot input (can vary)
+
+  const outputSize = 40
+
+  const totalInputSize =
+    taprootInputCount * taprootInputSize +
+    nonTaprootInputCount * nonTaprootInputSize
+  const totalOutputSize = outputCount * outputSize
+
+  return baseTxSize + totalInputSize + totalOutputSize
+}
+
+export const minimumFee = ({
+  taprootInputCount,
+  nonTaprootInputCount,
+  outputCount,
+}: {
+  taprootInputCount: number
+  nonTaprootInputCount: number
+  outputCount: number
+}) => {
+  return calculateTaprootTxSize(
+    taprootInputCount,
+    nonTaprootInputCount,
+    outputCount
+  )
+}
+
+export const inscriptionSats = 546
+
+export const addressFormats = {
+  mainnet: {
+    p2pkh: /^[1][a-km-zA-HJ-NP-Z1-9]{25,34}$/,
+    p2sh: /^[3][a-km-zA-HJ-NP-Z1-9]{25,34}$/,
+    p2wpkh: /^(bc1[qp])[a-zA-HJ-NP-Z0-9]{14,74}$/,
+    p2wsh: /^(bc1[qp])[a-zA-HJ-NP-Z0-9]{14,74}$/,
+    p2tr: /^(bc1p)[a-zA-HJ-NP-Z0-9]{14,74}$/,
+  },
+  testnet: {
+    p2pkh: /^[mn][a-km-zA-HJ-NP-Z1-9]{25,34}$/,
+    p2sh: /^[2][a-km-zA-HJ-NP-Z1-9]{25,34}$/,
+    p2wpkh: /^(tb1[qp]|bcrt1[qp])[a-zA-HJ-NP-Z0-9]{14,74}$/,
+    p2wsh: /^(tb1[qp]|bcrt1[qp])[a-zA-HJ-NP-Z0-9]{14,74}$/,
+    p2tr: /^(tb1p|bcrt1p)[a-zA-HJ-NP-Z0-9]{14,74}$/,
+  },
+  signet: {
+    p2pkh: /^[mn][a-km-zA-HJ-NP-Z1-9]{25,34}$/,
+    p2sh: /^[2][a-km-zA-HJ-NP-Z1-9]{25,34}$/,
+    p2wpkh: /^(tb1[qp]|bcrt1[qp])[a-zA-HJ-NP-Z0-9]{14,74}$/,
+    p2wsh: /^(tb1[qp]|bcrt1[qp])[a-zA-HJ-NP-Z0-9]{14,74}$/,
+    p2tr: /^(tb1p|bcrt1p)[a-zA-HJ-NP-Z0-9]{14,74}$/,
+  },
+  regtest: {
+    p2pkh: /^[mn][a-km-zA-HJ-NP-Z1-9]{25,34}$/,
+    p2sh: /^[2][a-km-zA-HJ-NP-Z1-9]{25,34}$/,
+    p2wpkh: /^(tb1[qp]|bcrt1[qp])[a-zA-HJ-NP-Z0-9]{14,74}$/,
+    p2wsh: /^(tb1[qp]|bcrt1[qp])[a-zA-HJ-NP-Z0-9]{14,74}$/,
+    p2tr: /^(tb1p|bcrt1p)[a-zA-HJ-NP-Z0-9]{14,74}$/,
+  },
+} as const
+
+export function getAddressType(address: string): AddressType | null {
+  if (
+    addressFormats.mainnet.p2pkh.test(address) ||
+    addressFormats.testnet.p2pkh.test(address) ||
+    addressFormats.regtest.p2pkh.test(address)
+  ) {
+    return AddressType.P2PKH
+  }
+  if (
+    addressFormats.mainnet.p2tr.test(address) ||
+    addressFormats.testnet.p2tr.test(address) ||
+    addressFormats.regtest.p2tr.test(address)
+  ) {
+    return AddressType.P2TR
+  }
+  if (
+    addressFormats.mainnet.p2sh.test(address) ||
+    addressFormats.testnet.p2sh.test(address) ||
+    addressFormats.regtest.p2sh.test(address)
+  ) {
+    return AddressType.P2SH_P2WPKH
+  }
+  if (
+    addressFormats.mainnet.p2wpkh.test(address) ||
+    addressFormats.testnet.p2wpkh.test(address) ||
+    addressFormats.regtest.p2wpkh.test(address)
+  ) {
+    return AddressType.P2WPKH
+  }
+  return null
+}
+
+export function findXAmountOfSats(utxos: FormattedUtxo[], target: number) {
+  let totalAmount = 0
+  const selectedUtxos: FormattedUtxo[] = []
+
+  for (const utxo of utxos) {
+    if (totalAmount >= target) break
+
+    selectedUtxos.push(utxo)
+    totalAmount += utxo.satoshis
+  }
+  return {
+    utxos: selectedUtxos,
+    totalAmount,
+  }
+}
+
+export const formatInputsToSign = async ({
+  _psbt,
+  senderPublicKey,
+  network,
+}: {
+  _psbt: bitcoin.Psbt
+  senderPublicKey: string
+  network: bitcoin.Network
+}) => {
+  let index = 0
+  for await (const v of _psbt.data.inputs) {
+    const isSigned = v.finalScriptSig || v.finalScriptWitness
+    const lostInternalPubkey = !v.tapInternalKey
+    if (!isSigned || lostInternalPubkey) {
+      const tapInternalKey = toXOnly(Buffer.from(senderPublicKey, 'hex'))
+      const p2tr = bitcoin.payments.p2tr({
+        internalPubkey: tapInternalKey,
+        network: network,
+      })
+      if (v.witnessUtxo?.script.toString() === p2tr.output?.toString()) {
+        v.tapInternalKey = tapInternalKey
+      }
+    }
+    index++
+  }
+
+  return _psbt
+}
 
 export const findAlkaneUtxos = async ({
   address,
@@ -171,7 +321,7 @@ export const createSendPsbt = async ({
         index: utxo.txIndex,
         redeemScript: redeemScript,
         witnessUtxo: {
-          value: utxo.satoshis,
+          value: BigInt(utxo.satoshis),
           script: bitcoin.script.compile([
             bitcoin.opcodes.OP_HASH160,
             bitcoin.crypto.hash160(redeemScript),
@@ -188,7 +338,7 @@ export const createSendPsbt = async ({
         hash: utxo.txId,
         index: utxo.txIndex,
         witnessUtxo: {
-          value: utxo.satoshis,
+          value: BigInt(utxo.satoshis),
           script: Buffer.from(utxo.script, 'hex'),
         },
       })
@@ -220,7 +370,7 @@ export const createSendPsbt = async ({
         index: gatheredUtxos.utxos[i].outputIndex,
         redeemScript: redeemScript,
         witnessUtxo: {
-          value: gatheredUtxos.utxos[i].satoshis,
+          value: BigInt(gatheredUtxos.utxos[i].satoshis),
           script: bitcoin.script.compile([
             bitcoin.opcodes.OP_HASH160,
             bitcoin.crypto.hash160(redeemScript),
@@ -237,7 +387,7 @@ export const createSendPsbt = async ({
         hash: gatheredUtxos.utxos[i].txId,
         index: gatheredUtxos.utxos[i].outputIndex,
         witnessUtxo: {
-          value: gatheredUtxos.utxos[i].satoshis,
+          value: BigInt(gatheredUtxos.utxos[i].satoshis),
           script: Buffer.from(gatheredUtxos.utxos[i].scriptPk, 'hex'),
         },
       })
@@ -266,16 +416,16 @@ export const createSendPsbt = async ({
   }).encodedRunestone
 
   psbt.addOutput({
-    value: inscriptionSats,
+    value: BigInt(inscriptionSats),
     address: account.taproot.address,
   })
 
   psbt.addOutput({
-    value: inscriptionSats,
+    value: BigInt(inscriptionSats),
     address: toAddress,
   })
 
-  const output = { script: protostone, value: 0 }
+  const output = { script: protostone, value: 0n }
 
   psbt.addOutput(output)
   const changeAmount =
@@ -283,7 +433,7 @@ export const createSendPsbt = async ({
 
   psbt.addOutput({
     address: account[account.spendStrategy.changeAddress].address,
-    value: changeAmount,
+    value: BigInt(changeAmount),
   })
 
   const formattedPsbtTx = await formatInputsToSign({
@@ -343,7 +493,7 @@ export default class AlkanesModule {
         hdPath: `m/84'/1'/0'/0/0`,
       },
     }
-    const feeRate = await this.client.dataSourceManager.getRecommendedFees()
+    const { fastFee } = await this.client.dataSourceManager.getRecommendedFees()
     const { psbt } = await createSendPsbt({
       gatheredUtxos: { utxos: [], totalAmount: 0 },
       account,
@@ -351,7 +501,7 @@ export default class AlkanesModule {
       client: this.client,
       toAddress,
       amount,
-      feeRate: (feeRate as MempoolSpaceFeeRatesResponse).fastestFee,
+      feeRate: fastFee,
     })
 
     const response = await this.client.signPsbt({ tx: psbt, broadcast: true })
