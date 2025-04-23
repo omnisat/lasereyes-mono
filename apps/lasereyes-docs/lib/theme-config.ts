@@ -1,194 +1,192 @@
 export const themeConfig = {
-  github: "https://github.com/omnisat/lasereyes",
-  twitter: "https://twitter.com/omnisat",
-  discord: "https://discord.gg/omnisat",
+  github: 'https://github.com/omnisat/lasereyes-mono',
+  twitter: 'https://twitter.com/omnisat',
+  discord: 'https://discord.gg/omnisat',
   mainNav: [
     {
-      title: "Documentation",
-      href: "/docs",
+      title: 'Documentation',
+      href: '/docs',
     },
     {
-      title: "GitHub",
-      href: "https://github.com/omnisat/lasereyes-mono",
+      title: 'GitHub',
+      href: 'https://github.com/omnisat/lasereyes-mono',
       external: true,
     },
   ],
   sidebarNav: [
     {
-      title: "Getting Started",
+      title: 'Getting Started',
       items: [
         {
-          title: "Introduction",
-          href: "/docs",
+          title: 'Introduction',
+          href: '/docs',
         },
         {
-          title: "Installation",
-          href: "/docs/installation",
+          title: 'Installation',
+          href: '/docs/installation',
         },
 
         {
-          title: "Basic Setup",
-          href: "/docs/basic-setup",
+          title: 'Basic Setup',
+          href: '/docs/basic-setup',
         },
         {
-          title: "Hello World",
-          href: "/docs/hello-world",
+          title: 'Hello World',
+          href: '/docs/hello-world',
         },
 
         {
-          title: "Create LaserEyes",
-          href: "/docs/create-lasereyes",
-        },
-      ],
-    },
-         {
-      title: "Ordinals",
-      items: [
-
-        {
-          title: "Inscriptions",
-          href: "/docs/inscriptions",
-        },
-        {
-          title: "Runes",
-          href: "/docs/runes",
-        },
-        {
-          title: "BRC-20",
-          href: "/docs/brc-20",
-        },
-      ],
-    },       {
-      title: "React",
-      items: [
-
-        {
-          title: "LaserEyesProvider",
-          href: "/docs/laser-eyes-provider",
-        },
-        {
-          title: "useLaserEyes",
-          href: "/docs/use-laser-eyes",
-        },
-        {
-          title: "Wallet Icons",
-          href: "/docs/wallet-icons",
+          title: 'Create LaserEyes',
+          href: '/docs/create-lasereyes',
         },
       ],
     },
     {
-      title: "Core Concepts",
+      title: 'Ordinals',
       items: [
         {
-          title: "Architecture",
-          href: "/docs/architecture",
+          title: 'Inscriptions',
+          href: '/docs/inscriptions',
         },
         {
-          title: "LaserEyes Client",
-          href: "/docs/laser-eyes-client",
+          title: 'Runes',
+          href: '/docs/runes',
         },
         {
-          title: "Wallets",
-          href: "/docs/wallets",
-        },
-        {
-          title: "Network Support",
-          href: "/docs/network-support",
-        },
-        {
-          title: "Transaction Types",
-          href: "/docs/transaction-types",
-        },
-        {
-          title: "Wallet Providers",
-          href: "/docs/wallet-providers",
-        },
-        {
-          title: "Core API Reference",
-          href: "/docs/core-api-reference",
+          title: 'BRC-20',
+          href: '/docs/brc-20',
         },
       ],
     },
     {
-      title: "DataSource Deep Dive",
+      title: 'React',
       items: [
         {
-          title: "DataSource System",
-          href: "/docs/datasource-system",
+          title: 'LaserEyesProvider',
+          href: '/docs/laser-eyes-provider',
         },
         {
-          title: "Data Source Manager",
-          href: "/docs/datasource-manager",
+          title: 'useLaserEyes',
+          href: '/docs/use-laser-eyes',
         },
         {
-          title: "Maestro",
-          href: "/docs/maestro",
-        },
-        {
-          title: "Sandshrew",
-          href: "/docs/sandshrew",
-        },
-        {
-          title: "Mempool.space",
-          href: "/docs/mempool-space",
-        },
-        {
-          title: "Custom DataSource",
-          href: "/docs/custom-datasource",
+          title: 'Wallet Icons',
+          href: '/docs/wallet-icons',
         },
       ],
     },
     {
-      title: "Advanced Topics",
+      title: 'Core Concepts',
       items: [
         {
-          title: "Error Handling",
-          href: "/docs/error-handling",
+          title: 'Architecture',
+          href: '/docs/architecture',
         },
         {
-          title: "Security",
-          href: "/docs/security",
+          title: 'LaserEyes Client',
+          href: '/docs/laser-eyes-client',
         },
         {
-          title: "Performance",
-          href: "/docs/performance",
+          title: 'Wallets',
+          href: '/docs/wallets',
         },
         {
-          title: "Testing",
-          href: "/docs/testing",
+          title: 'Network Support',
+          href: '/docs/network-support',
+        },
+        {
+          title: 'Transaction Types',
+          href: '/docs/transaction-types',
+        },
+        {
+          title: 'Wallet Providers',
+          href: '/docs/wallet-providers',
+        },
+        {
+          title: 'Core API Reference',
+          href: '/docs/core-api-reference',
         },
       ],
     },
     {
-      title: "FAQ & Troubleshooting",
+      title: 'DataSource Deep Dive',
       items: [
         {
-          title: "Common Issues",
-          href: "/docs/common-issues",
+          title: 'DataSource System',
+          href: '/docs/datasource-system',
         },
         {
-          title: "Best Practices",
-          href: "/docs/best-practices",
+          title: 'Data Source Manager',
+          href: '/docs/datasource-manager',
+        },
+        {
+          title: 'Maestro',
+          href: '/docs/maestro',
+        },
+        {
+          title: 'Sandshrew',
+          href: '/docs/sandshrew',
+        },
+        {
+          title: 'Mempool.space',
+          href: '/docs/mempool-space',
+        },
+        {
+          title: 'Custom DataSource',
+          href: '/docs/custom-datasource',
         },
       ],
     },
     {
-      title: "Contributing",
+      title: 'Advanced Topics',
       items: [
         {
-          title: "Development Setup",
-          href: "/docs/development-setup",
+          title: 'Error Handling',
+          href: '/docs/error-handling',
         },
         {
-          title: "PR Guidelines",
-          href: "/docs/pr-guidelines",
+          title: 'Security',
+          href: '/docs/security',
         },
         {
-          title: "Code of Conduct",
-          href: "/docs/code-of-conduct",
+          title: 'Performance',
+          href: '/docs/performance',
+        },
+        {
+          title: 'Testing',
+          href: '/docs/testing',
+        },
+      ],
+    },
+    {
+      title: 'FAQ & Troubleshooting',
+      items: [
+        {
+          title: 'Common Issues',
+          href: '/docs/common-issues',
+        },
+        {
+          title: 'Best Practices',
+          href: '/docs/best-practices',
+        },
+      ],
+    },
+    {
+      title: 'Contributing',
+      items: [
+        {
+          title: 'Development Setup',
+          href: '/docs/development-setup',
+        },
+        {
+          title: 'PR Guidelines',
+          href: '/docs/pr-guidelines',
+        },
+        {
+          title: 'Code of Conduct',
+          href: '/docs/code-of-conduct',
         },
       ],
     },
   ],
 }
-

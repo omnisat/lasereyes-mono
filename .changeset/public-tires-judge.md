@@ -5,5 +5,4 @@
 '@omnisat/lasereyes': patch
 ---
 
-- add `inputsToSign` to signPsbt method as an option
-- use stored data in leather provider rather than repeated pop-ups
+changes test

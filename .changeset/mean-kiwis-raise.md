@@ -4,4 +4,4 @@
 '@omnisat/lasereyes': patch
 ---
 
-bump to trigger deployment
+buildn

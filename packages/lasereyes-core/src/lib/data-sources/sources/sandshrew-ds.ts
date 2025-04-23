@@ -13,7 +13,7 @@ import { AlkanesRpc } from "@oyl/sdk/lib/rpclient/alkanes";
 import type { AlkanesOutpoint } from "../../../types";
 
 export class SandshrewDataSource implements DataSource {
-  private apiUrl = `${SANDSHREW_URL}/${SANDSHREW_LASEREYES_KEY}`;
+  private apiUrl: string = `${SANDSHREW_URL}`;
   private apiKey: string = SANDSHREW_LASEREYES_KEY;
   private alkanes: AlkanesRpc;
 
