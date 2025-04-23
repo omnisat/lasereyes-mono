@@ -9,7 +9,7 @@ import { BaseNetwork, type BaseNetworkType, type NetworkType } from '../types'
 
 
 export const SANDSHREW_URL: string = 'https://mainnet.sandshrew.io/v1/'
-export const SANDSHREW_URL_TESTNET: string = 'https://testnet.sandshrew.io/v1/'
+export const SANDSHREW_URL_TESTNET: string = 'https://signet.sandshrew.io/v1/'
 
 export const SANDSHREW_LASEREYES_KEY: string = "lasereyes"
 export const MAESTRO_API_KEY_MAINNET: string = "VIOi9IApvUkDFWBQ7I9oHsfUMWOIfDeO"

@@ -23,11 +23,11 @@ const AlkanesSection = () => {
   const [alkaneAmount, setAlkaneAmount] = useState('')
 
   useEffect(() => {
-    if (address) {
+    if (address && network) {
       // We'll need to modify the getMetaBalances function to support 'alkanes' protocol
       getMetaBalances('alkanes').then(setAlkanes)
     }
-  }, [address, getMetaBalances])
+  }, [address, getMetaBalances, network])
 
   const sendAlkane = async () => {
     try {

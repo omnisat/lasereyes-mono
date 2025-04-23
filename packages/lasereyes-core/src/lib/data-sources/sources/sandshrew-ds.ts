@@ -1,46 +1,53 @@
-import axios from "axios";
-import { DataSource } from "../../../types/data-source";
-import { MAINNET } from "../../../constants";
-import { OrdOutputs, OrdRuneBalance } from "../../../types/ord";
-import { AddressInfo, InscriptionInfo } from 'ordapi';
-import { SandshrewGetRuneByIdOrNameResponse, SingleRuneOutpoint } from "../../../types/sandshrew";
-import { EsploraTx } from "../../../types/esplora";
-import { getPublicKeyHash } from "../../btc";
-import { SANDSHREW_LASEREYES_KEY, getSandshrewUrl } from "../../urls";
-import { RpcResponse } from "../../../types/rpc";
-import { SANDSHREW } from "../../../constants/data-sources";
-import { NetworkType } from "../../../types";
+import axios from 'axios'
+import type { DataSource } from '../../../types/data-source'
+import { MAINNET } from '../../../constants'
+import type { OrdOutputs, OrdRuneBalance } from '../../../types/ord'
+import type { AddressInfo, InscriptionInfo } from 'ordapi'
+import type {
+  SandshrewGetRuneByIdOrNameResponse,
+  SingleRuneOutpoint,
+} from '../../../types/sandshrew'
+import type { EsploraTx } from '../../../types/esplora'
+import { getPublicKeyHash } from '../../btc'
+import { SANDSHREW_LASEREYES_KEY, getSandshrewUrl } from '../../urls'
+import type { RpcResponse } from '../../../types/rpc'
+import { SANDSHREW } from '../../../constants/data-sources'
+import { BaseNetwork, type AlkanesOutpoint, type NetworkType } from '../../../types'
+import { AlkanesRpc } from '@oyl/sdk/lib/rpclient/alkanes'
 
 export type SandshrewConfig = {
   networks: {
     mainnet: {
-      apiUrl: string;
-      apiKey: string;
-    },
+      apiUrl: string
+      apiKey: string
+    }
     [key: string]: {
-      apiUrl: string;
-      apiKey: string;
+      apiUrl: string
+      apiKey: string
     }
   }
 }
 
 export class SandshrewDataSource implements DataSource {
-  private apiUrl: string = "";
-  private apiKey: string = "";
-  private networks: SandshrewConfig['networks'];
+  private apiUrl = ''
+  private apiKey = ''
+  private networks: SandshrewConfig['networks']
+  private alkanes: AlkanesRpc
+  
 
   constructor(network: NetworkType, config?: SandshrewConfig) {
     this.networks = config?.networks || {
       mainnet: {
         apiUrl: getSandshrewUrl('mainnet'),
-        apiKey: SANDSHREW_LASEREYES_KEY
+        apiKey: SANDSHREW_LASEREYES_KEY,
       },
-      testnet: {
-        apiUrl: getSandshrewUrl('testnet'),
-        apiKey: SANDSHREW_LASEREYES_KEY
-      }
-    };
-    this.setNetwork(network);
+      signet: {
+        apiUrl: getSandshrewUrl('signet'),
+        apiKey: SANDSHREW_LASEREYES_KEY,
+      },
+    }
+    this.setNetwork(network)
+    this.alkanes = new AlkanesRpc(`${this.apiUrl}/${this.apiKey}`)
   }
 
   public getName() {
@@ -49,35 +56,47 @@ export class SandshrewDataSource implements DataSource {
 
   public setNetwork(network: NetworkType) {
     if (this.networks[network]) {
-      this.apiUrl = this.networks[network].apiUrl;
-      this.apiKey = this.networks[network].apiKey;
+      this.apiUrl = this.networks[network].apiUrl
+      this.apiKey = this.networks[network].apiKey
     } else {
       // Default to mainnet if network not found in config
-      const isTestnet = network === 'testnet' || network === 'testnet4' || network === 'signet' || network === 'fractal-testnet';
-      const networkKey = isTestnet ? 'testnet' : 'mainnet';
-      
+      const isTestnet =
+        network === BaseNetwork.TESTNET ||
+        network === BaseNetwork.TESTNET4 ||
+        network === BaseNetwork.SIGNET ||
+        network === BaseNetwork.FRACTAL_TESTNET
+      const networkKey = isTestnet ? BaseNetwork.SIGNET : BaseNetwork.MAINNET
+
       if (this.networks[networkKey]) {
-        this.apiUrl = this.networks[networkKey].apiUrl;
-        this.apiKey = this.networks[networkKey].apiKey;
+        this.apiUrl = this.networks[networkKey].apiUrl
+        this.apiKey = this.networks[networkKey].apiKey
       } else {
         // Fallback to default URLs
-        this.apiUrl = getSandshrewUrl(network);
-        this.apiKey = SANDSHREW_LASEREYES_KEY;
+        this.apiUrl = getSandshrewUrl(network)
+        this.apiKey = SANDSHREW_LASEREYES_KEY
       }
     }
+    this.alkanes = new AlkanesRpc(`${this.apiUrl}/${this.apiKey}`)
   }
 
   private async call(method: string, params: unknown) {
+    console.log('SandshrewDataSource.call', method, params)
+    console.log('SandshrewDataSource.apiUrl', this.apiUrl)
+    console.log('SandshrewDataSource.apiKey', this.apiKey)
     try {
-      const url = `${this.apiUrl}/${this.apiKey}`;
-      const response = await axios.post(url, {
-        jsonrpc: '2.0',
-        id: method,
-        method,
-        params
-      }, {
-        headers: {
-          'Content-Type': 'application/json',
+      const url = `${this.apiUrl}/${this.apiKey}`
+      const response = await axios.post(
+        url,
+        {
+          jsonrpc: '2.0',
+          id: method,
+          method,
+          params,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
         }
       )
       return response.data

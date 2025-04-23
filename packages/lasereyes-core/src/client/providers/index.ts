@@ -82,7 +82,7 @@ export abstract class WalletProvider {
     const { address } = this.$store.get()
     if (
       address.slice(0, 1) === 't' &&
-      [TESTNET, TESTNET4, SIGNET, FRACTAL_TESTNET].includes(this.$network.get())
+      ([TESTNET, TESTNET4, SIGNET, FRACTAL_TESTNET] as string[]).includes(this.$network.get())
     ) {
       return this.$network.get()
     }
@@ -102,7 +102,7 @@ export abstract class WalletProvider {
     return await this.dataSourceManager.getAddressBtcBalance(this.$store.get().paymentAddress)
   }
 
-  async getMetaBalances(protocol: Protocol): Promise<any> {
+  async getMetaBalances(protocol: Protocol) {
     switch (protocol) {
       case BTC:
         return await this.getBalance()

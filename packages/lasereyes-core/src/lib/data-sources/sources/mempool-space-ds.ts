@@ -1,8 +1,8 @@
 import axios from "axios";
-import { DataSource } from "../../../types/data-source";
+import type { DataSource } from "../../../types/data-source";
 import { getMempoolSpaceUrl } from "../../urls";
-import { MempoolUtxo, NetworkType } from "../../../types";
-import { MempoolSpaceFeeRatesResponse, MempoolSpaceGetTransactionResponse } from "../../../types/mempool-space";
+import type { MempoolUtxo, NetworkType } from "../../../types";
+import type { MempoolSpaceGetTransactionResponse } from "../../../types/mempool-space";
 import { MEMPOOL_SPACE } from "../../../constants/data-sources";
 
 export type MempoolSpaceConfig = {
@@ -17,7 +17,7 @@ export type MempoolSpaceConfig = {
 }
 
 export class MempoolSpaceDataSource implements DataSource {
-  private apiUrl: string = "";
+  private apiUrl = "";
   private networks: MempoolSpaceConfig['networks'];
 
   constructor(network: NetworkType, config?: MempoolSpaceConfig) {
