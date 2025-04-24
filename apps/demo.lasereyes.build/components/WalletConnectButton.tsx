@@ -1,4 +1,3 @@
-
 'use client'
 
 import {
@@ -90,7 +89,8 @@ const WalletConnectButton = ({
     }
   }
 
-  type WalletProvders = typeof UNISAT
+  type WalletProvders =
+    | typeof UNISAT
     | typeof XVERSE
     | typeof OYL
     | typeof MAGIC_EDEN
@@ -101,25 +101,20 @@ const WalletConnectButton = ({
     | typeof WIZZ
     | typeof ORANGE
 
-  const buttonClass = "text-xl bg-primary flex flex-row gap-2 border border-[#3c393f] bg-[#1e1d1f] hover:bg-[#3c393f] hover:text-white hover:border-black"
+  const buttonClass =
+    'text-xl bg-primary flex flex-row gap-2 border border-[#3c393f] bg-[#1e1d1f] hover:bg-[#3c393f] hover:text-white hover:border-black'
 
   if (isMissingWallet) {
     return (
-      <Link href={wallet.url} target='_blank'>
+      <Link href={wallet.url} target="_blank">
         <Button
           onClick={() => connectWallet(walletName as WalletProvders)}
-          className={
-            clsx(
-              buttonClass,
-              "text-md opacity-50 hover:opacity-100",
-            )
-          }
-
+          className={clsx(buttonClass, 'text-md opacity-50 hover:opacity-100')}
           variant="outline"
           size="lg"
         >
-          <WalletIcon walletName={wallet.name} size={24} />{' '}
-          Download {wallet.name}
+          <WalletIcon walletName={wallet.name} size={24} /> Download{' '}
+          {wallet.name}
           <ImNewTab />
         </Button>
       </Link>
@@ -131,16 +126,23 @@ const WalletConnectButton = ({
     disconnect()
   }
 
+  console.log(
+    'isConnected',
+    isConnected,
+    'provider',
+    provider,
+    'walletName',
+    walletName
+  )
+
   if (isConnected) {
     return (
       <Button
         onClick={disconnectWallet}
-        className={
-          clsx(
-            buttonClass,
-            "text-md text-orange-500 border-orange-500 hover:bg-orange-600 hover:border-orange-600",
-          )
-        }
+        className={clsx(
+          buttonClass,
+          'text-md text-orange-500 border-orange-500 hover:bg-orange-600 hover:border-orange-600'
+        )}
         variant="outline"
         size="lg"
       >
@@ -150,13 +152,10 @@ const WalletConnectButton = ({
     )
   }
 
-
   return (
     <Button
       onClick={() => connectWallet(walletName as WalletProvders)}
-      className={
-        buttonClass
-      }
+      className={buttonClass}
       variant="outline"
       size="lg"
     >

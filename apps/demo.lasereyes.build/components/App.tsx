@@ -112,8 +112,8 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
   const switchN = () => {
     try {
       if (network === MAINNET) {
-        switchNetwork(OYLNET).then(() => {
-          setNetwork(OYLNET)
+        switchNetwork(SIGNET).then(() => {
+          setNetwork(SIGNET)
         })
       } else if (network === TESTNET4) {
         switchNetwork(TESTNET).then(() => {
@@ -161,19 +161,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
   useEffect(() => {
     if (provider && utxos.length > 0 && !hasRun.current && !hasError) {
       hasRun.current = true
-      createPsbt(
-        utxos,
-        paymentAddress,
-        paymentPublicKey,
-        network as
-          | typeof MAINNET
-          | typeof TESTNET
-          | typeof TESTNET4
-          | typeof SIGNET
-          | typeof FRACTAL_MAINNET
-          | typeof FRACTAL_TESTNET
-          | typeof OYLNET
-      )
+      createPsbt(utxos, paymentAddress, paymentPublicKey, network)
         .then((psbt) => {
           if (psbt && psbt.toHex() !== unsigned) {
             setUnsignedPsbt(psbt.toHex())
