@@ -126,15 +126,6 @@ const WalletConnectButton = ({
     disconnect()
   }
 
-  console.log(
-    'isConnected',
-    isConnected,
-    'provider',
-    provider,
-    'walletName',
-    walletName
-  )
-
   if (isConnected) {
     return (
       <Button
