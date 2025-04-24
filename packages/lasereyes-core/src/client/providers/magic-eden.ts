@@ -145,7 +145,7 @@ export default class MagicEdenProvider extends WalletProvider {
     this.observer?.disconnect()
   }
 
-  async connect(_: ProviderType): Promise<void> {
+  async connect(_: ProviderType, _forceReconnect = false): Promise<void> {
     const { address, paymentAddress } = this.$valueStore!.get()
 
     try {

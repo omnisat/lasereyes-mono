@@ -130,7 +130,7 @@ export default class LeatherProvider extends WalletProvider {
     this.observer?.disconnect()
   }
 
-  async connect(_: ProviderType): Promise<void> {
+  async connect(_: ProviderType, _forceReconnect = false): Promise<void> {
     const { address, paymentAddress } = this.$valueStore!.get()
 
     if (address) {

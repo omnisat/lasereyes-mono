@@ -108,7 +108,7 @@ export default class XVerseProvider extends WalletProvider {
     this.parent.connect(XVERSE)
   }
 
-  async connect(_: ProviderType): Promise<void> {
+  async connect(_: ProviderType, _forceReconnect = false): Promise<void> {
     // if (address) {
     //   if (address.startsWith('tb1') && isMainnetNetwork(this.network)) {
     //     this.disconnect()
@@ -137,39 +137,39 @@ export default class XVerseProvider extends WalletProvider {
       | undefined
     let network: string | undefined
 
+    let response
+
     try {
-      const response = await request('wallet_getAccount', null)
-      if (response.status === 'success') {
-        foundAddress = findOrdinalsAddress(response.result.addresses)
-        foundPaymentAddress = findPaymentAddress(response.result.addresses)
-        network = response.result.network.bitcoin.name
-      } else {
-        throw new Error(`Error getting account: ${response.error.message}`)
+      if (_forceReconnect) {
+        throw new Error('force reconnect')
       }
+      response = await request('wallet_getAccount', null)
     } catch (e) {
       if (
         e instanceof Error &&
         (e.message.toLowerCase().includes('failed to get') ||
-          e.message.toLowerCase().includes('access denied'))
+          e.message.toLowerCase().includes('access denied') ||
+          e.message.toLowerCase().includes('force reconnect'))
       ) {
-        const response = await request('wallet_connect', {
+        response = await request('wallet_connect', {
           addresses: [AddressPurpose.Ordinals, AddressPurpose.Payment],
           message: 'Connecting with lasereyes',
         })
-        if (response.status === 'success') {
-          foundAddress = findOrdinalsAddress(response.result.addresses)
-          foundPaymentAddress = findPaymentAddress(response.result.addresses)
-          network = response.result.network.bitcoin.name
-        } else {
-          if (response.error.code === RpcErrorCode.USER_REJECTION) {
-            throw new Error(`User canceled lasereyes to ${XVERSE} wallet`)
-          }
-          throw new Error(response.error.message)
-        }
       } else {
         console.error(e)
         throw new Error(`Error connecting to ${XVERSE} wallet`)
       }
+    }
+
+    if (response.status === 'success') {
+      foundAddress = findOrdinalsAddress(response.result.addresses)
+      foundPaymentAddress = findPaymentAddress(response.result.addresses)
+      network = response.result.network.bitcoin.name
+    } else {
+      if (response.error.code === RpcErrorCode.USER_REJECTION) {
+        throw new Error(`User canceled lasereyes to ${XVERSE} wallet`)
+      }
+      throw new Error(response.error.message)
     }
 
     if (!foundAddress || !foundPaymentAddress) {

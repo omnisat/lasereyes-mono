@@ -112,7 +112,7 @@ export default class SparrowProvider extends WalletProvider {
     this.observer?.disconnect()
   }
 
-  async connect(_: ProviderType): Promise<void> {
+  async connect(_: ProviderType, _forceReconnect = false): Promise<void> {
     try {
       const { address: foundAddress, paymentAddress: foundPaymentAddress } =
         this.$valueStore!.get()
