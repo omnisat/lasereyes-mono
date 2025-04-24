@@ -208,4 +208,3 @@ export const isMainnetNetwork = (network: NetworkType) => {
     network === FRACTAL_TESTNET
   )
 }
-

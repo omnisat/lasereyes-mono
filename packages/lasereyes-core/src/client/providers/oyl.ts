@@ -9,7 +9,11 @@ import {
 import { OYL } from '../../constants/wallets'
 import { listenKeys, MapStore, WritableAtom } from 'nanostores'
 import { persistentMap } from '@nanostores/persistent'
-import { LaserEyesStoreType, SignMessageOptions, WalletProviderSignPsbtOptions } from '../types'
+import {
+  LaserEyesStoreType,
+  SignMessageOptions,
+  WalletProviderSignPsbtOptions,
+} from '../types'
 import {
   handleStateChangePersistence,
   keysToPersist,
@@ -20,10 +24,11 @@ import { LaserEyesClient } from '..'
 const OYL_WALLET_PERSISTENCE_KEY = 'OYL_CONNECTED_WALLET_STATE'
 
 export default class OylProvider extends WalletProvider {
-  constructor(stores: {
-    $store: MapStore<LaserEyesStoreType>
-    $network: WritableAtom<NetworkType>
-  },
+  constructor(
+    stores: {
+      $store: MapStore<LaserEyesStoreType>
+      $network: WritableAtom<NetworkType>
+    },
     parent: LaserEyesClient,
     config?: Config
   ) {
@@ -152,7 +157,13 @@ export default class OylProvider extends WalletProvider {
       this.network,
       7
     )
-    const psbt = await this.signPsbt({ psbtBase64, psbtHex, tx: psbtHex, broadcast: true, finalize: true })
+    const psbt = await this.signPsbt({
+      psbtBase64,
+      psbtHex,
+      tx: psbtHex,
+      broadcast: true,
+      finalize: true,
+    })
     if (!psbt) throw new Error('Error sending BTC')
     // @ts-ignore
     return psbt.txId
@@ -169,14 +180,16 @@ export default class OylProvider extends WalletProvider {
     })
     return response.signature
   }
-  async signPsbt(
-    { psbtHex, broadcast, finalize }: WalletProviderSignPsbtOptions
-  ): Promise<
+  async signPsbt({
+    psbtHex,
+    broadcast,
+    finalize,
+  }: WalletProviderSignPsbtOptions): Promise<
     | {
-      signedPsbtHex: string | undefined
-      signedPsbtBase64: string | undefined
-      txId?: string | undefined
-    }
+        signedPsbtHex: string | undefined
+        signedPsbtBase64: string | undefined
+        txId?: string | undefined
+      }
     | undefined
   > {
     const { psbt, txid } = await this.library.signPsbt({
@@ -215,6 +228,8 @@ export default class OylProvider extends WalletProvider {
   }
 
   async switchNetwork(network: NetworkType): Promise<void> {
-    return await this.library.switchNetwork(network)
+    await this.library.switchNetwork(network)
+    this.$network.set(network)
+    this.parent.connect(OYL)
   }
 }
