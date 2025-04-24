@@ -1,11 +1,7 @@
 import * as bitcoin from 'bitcoinjs-lib'
 import { WalletProvider } from '.'
 import { ProviderType, NetworkType, Config } from '../../types'
-import {
-  createSendBtcPsbt,
-  getBTCBalance,
-  isMainnetNetwork,
-} from '../../lib/helpers'
+import { createSendBtcPsbt } from '../../lib/helpers'
 import { OYL } from '../../constants/wallets'
 import { listenKeys, MapStore, WritableAtom } from 'nanostores'
 import { persistentMap } from '@nanostores/persistent'
@@ -119,22 +115,12 @@ export default class OylProvider extends WalletProvider {
   }
 
   async connect(_: ProviderType): Promise<void> {
-    const { address, paymentAddress } = this.$valueStore!.get()
-
-    if (address) {
-      if (address.startsWith('tb1') && isMainnetNetwork(this.network)) {
-        this.disconnect()
-      } else {
-        this.restorePersistedValues()
-        getBTCBalance(paymentAddress, this.network).then((totalBalance) => {
-          this.$store.setKey('balance', totalBalance)
-        })
-        return
-      }
-    }
-
     if (!this.library) throw new Error("Oyl isn't installed")
-
+    await this.getNetwork().then((network) => {
+      if (this.network !== network) {
+        this.switchNetwork(this.network)
+      }
+    })
     const { nativeSegwit, taproot } = await this.library.getAddresses()
     if (!nativeSegwit || !taproot) throw new Error('No accounts found')
     this.$store.setKey('address', taproot.address)
@@ -144,7 +130,7 @@ export default class OylProvider extends WalletProvider {
   }
 
   async getNetwork() {
-    return await this.library.getNetwork()
+    return this.library.getNetwork()
   }
 
   async sendBTC(to: string, amount: number): Promise<string> {

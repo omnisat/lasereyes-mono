@@ -29,6 +29,8 @@ export class SandshrewDataSource implements DataSource {
 
   public setNetwork(network: NetworkType) {
     this.apiUrl = getSandshrewUrl(network)
+
+    console.log(`SandshrewDataSource setNetwork: ${this.apiUrl}`)
     if (this.apiUrl.includes('oylnet')) {
       this.apiKey = 'regtest'
     } else {
