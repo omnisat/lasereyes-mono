@@ -88,7 +88,7 @@ export default class PhantomProvider extends WalletProvider {
     }
   }
 
-  async connect(_: ProviderType): Promise<void> {
+  async connect(_: ProviderType, _forceReconnect?: boolean): Promise<void> {
     if (!this.library) throw new Error("Phantom isn't installed")
     if (isTestnetNetwork(this.network)) {
       throw new Error(`${this.network} is not supported by ${PHANTOM}`)

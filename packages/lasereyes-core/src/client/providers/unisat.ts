@@ -111,7 +111,7 @@ export default class UnisatProvider extends WalletProvider {
     this.parent.connect(UNISAT)
   }
 
-  async connect(_: ProviderType): Promise<void> {
+  async connect(_: ProviderType, _forceReconnect = false): Promise<void> {
     if (!this.library) throw new Error("Unisat isn't installed")
     const unisatAccounts = await this.library.requestAccounts()
     if (!unisatAccounts) throw new Error('No accounts found')

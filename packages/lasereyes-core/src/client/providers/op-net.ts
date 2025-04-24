@@ -102,7 +102,7 @@ export default class OpNetProvider extends WalletProvider {
     this.parent.connect(OP_NET)
   }
 
-  async connect(_: ProviderType): Promise<void> {
+  async connect(_: ProviderType, _forceReconnect = false): Promise<void> {
     if (!this.library) throw new Error("OP_NET isn't installed")
     const opNetAccounts = await this.library.requestAccounts()
     if (!opNetAccounts) throw new Error('No accounts found')

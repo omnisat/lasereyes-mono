@@ -35,7 +35,7 @@ export type LaserEyesContextType = {
   hasPhantom: boolean
   hasWizz: boolean
 
-  connect: (walletName: ProviderType) => Promise<void>
+  connect: (walletName: ProviderType, _forceReconnect?: boolean) => Promise<void>
   disconnect: () => void
   requestAccounts: () => Promise<string[]>
   getNetwork: () => Promise<string | undefined>

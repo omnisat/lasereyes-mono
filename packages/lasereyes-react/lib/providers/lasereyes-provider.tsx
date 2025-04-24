@@ -39,7 +39,8 @@ export default function LaserEyesProvider({
   }, [clientConfig, clientStores])
 
   const connect = useCallback(
-    async (defaultWallet: ProviderType) => await client?.connect(defaultWallet),
+    async (defaultWallet: ProviderType, _forceReconnect?: boolean) =>
+      await client?.connect(defaultWallet, _forceReconnect),
     [client]
   )
   const disconnect = useCallback(() => client?.disconnect(), [client])
