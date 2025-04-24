@@ -112,8 +112,8 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
   const switchN = () => {
     try {
       if (network === MAINNET) {
-        switchNetwork(SIGNET).then(() => {
-          setNetwork(SIGNET)
+        switchNetwork(OYLNET).then(() => {
+          setNetwork(OYLNET)
         })
       } else if (network === TESTNET4) {
         switchNetwork(TESTNET).then(() => {
