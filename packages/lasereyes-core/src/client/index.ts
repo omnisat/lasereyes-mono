@@ -153,7 +153,7 @@ export class LaserEyesClient {
     }
   }
 
-  async connect(defaultWallet: ProviderType) {
+  async connect(defaultWallet: ProviderType, _forceReconnect?: boolean) {
     if (this.disposed) {
       console.warn('Client disposed, cannot connect')
       return
@@ -166,7 +166,7 @@ export class LaserEyesClient {
         throw new Error('Unsupported wallet provider')
       }
       const provider = this.$providerMap[defaultWallet]
-      await provider?.connect(defaultWallet)
+      await provider?.connect(defaultWallet, _forceReconnect ?? false)
       this.$store.setKey('connected', true)
       this.$store.setKey('provider', defaultWallet)
     } catch (error) {
