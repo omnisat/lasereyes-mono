@@ -1,15 +1,15 @@
 import * as bitcoin from 'bitcoinjs-lib'
 import { WalletProvider } from '.'
 import { ProviderType, NetworkType, Config } from '../../types'
-import {
-  createSendBtcPsbt,
-  getBTCBalance,
-  isMainnetNetwork,
-} from '../../lib/helpers'
+import { createSendBtcPsbt } from '../../lib/helpers'
 import { OYL } from '../../constants/wallets'
 import { listenKeys, MapStore, WritableAtom } from 'nanostores'
 import { persistentMap } from '@nanostores/persistent'
-import { LaserEyesStoreType, SignMessageOptions, WalletProviderSignPsbtOptions } from '../types'
+import {
+  LaserEyesStoreType,
+  SignMessageOptions,
+  WalletProviderSignPsbtOptions,
+} from '../types'
 import {
   handleStateChangePersistence,
   keysToPersist,
@@ -20,10 +20,11 @@ import { LaserEyesClient } from '..'
 const OYL_WALLET_PERSISTENCE_KEY = 'OYL_CONNECTED_WALLET_STATE'
 
 export default class OylProvider extends WalletProvider {
-  constructor(stores: {
-    $store: MapStore<LaserEyesStoreType>
-    $network: WritableAtom<NetworkType>
-  },
+  constructor(
+    stores: {
+      $store: MapStore<LaserEyesStoreType>
+      $network: WritableAtom<NetworkType>
+    },
     parent: LaserEyesClient,
     config?: Config
   ) {
@@ -114,22 +115,12 @@ export default class OylProvider extends WalletProvider {
   }
 
   async connect(_: ProviderType): Promise<void> {
-    const { address, paymentAddress } = this.$valueStore!.get()
-
-    if (address) {
-      if (address.startsWith('tb1') && isMainnetNetwork(this.network)) {
-        this.disconnect()
-      } else {
-        this.restorePersistedValues()
-        getBTCBalance(paymentAddress, this.network).then((totalBalance) => {
-          this.$store.setKey('balance', totalBalance)
-        })
-        return
-      }
-    }
-
     if (!this.library) throw new Error("Oyl isn't installed")
-
+    await this.getNetwork().then((network) => {
+      if (this.network !== network) {
+        this.switchNetwork(this.network)
+      }
+    })
     const { nativeSegwit, taproot } = await this.library.getAddresses()
     if (!nativeSegwit || !taproot) throw new Error('No accounts found')
     this.$store.setKey('address', taproot.address)
@@ -139,7 +130,7 @@ export default class OylProvider extends WalletProvider {
   }
 
   async getNetwork() {
-    return await this.library.getNetwork()
+    return this.library.getNetwork()
   }
 
   async sendBTC(to: string, amount: number): Promise<string> {
@@ -152,7 +143,13 @@ export default class OylProvider extends WalletProvider {
       this.network,
       7
     )
-    const psbt = await this.signPsbt({ psbtBase64, psbtHex, tx: psbtHex, broadcast: true, finalize: true })
+    const psbt = await this.signPsbt({
+      psbtBase64,
+      psbtHex,
+      tx: psbtHex,
+      broadcast: true,
+      finalize: true,
+    })
     if (!psbt) throw new Error('Error sending BTC')
     // @ts-ignore
     return psbt.txId
@@ -169,14 +166,16 @@ export default class OylProvider extends WalletProvider {
     })
     return response.signature
   }
-  async signPsbt(
-    { psbtHex, broadcast, finalize }: WalletProviderSignPsbtOptions
-  ): Promise<
+  async signPsbt({
+    psbtHex,
+    broadcast,
+    finalize,
+  }: WalletProviderSignPsbtOptions): Promise<
     | {
-      signedPsbtHex: string | undefined
-      signedPsbtBase64: string | undefined
-      txId?: string | undefined
-    }
+        signedPsbtHex: string | undefined
+        signedPsbtBase64: string | undefined
+        txId?: string | undefined
+      }
     | undefined
   > {
     const { psbt, txid } = await this.library.signPsbt({
@@ -215,6 +214,8 @@ export default class OylProvider extends WalletProvider {
   }
 
   async switchNetwork(network: NetworkType): Promise<void> {
-    return await this.library.switchNetwork(network)
+    await this.library.switchNetwork(network)
+    this.$network.set(network)
+    this.parent.connect(OYL)
   }
 }

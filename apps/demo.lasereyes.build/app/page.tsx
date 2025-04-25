@@ -3,6 +3,7 @@ import {
   FRACTAL_MAINNET,
   FRACTAL_TESTNET,
   MAINNET,
+  OYLNET,
   SIGNET,
   TESTNET,
   TESTNET4,
@@ -26,7 +27,8 @@ export default function Home() {
     | typeof SIGNET
     | typeof FRACTAL_MAINNET
     | typeof FRACTAL_TESTNET
-  >(MAINNET)
+    | typeof OYLNET
+  >(OYLNET)
 
   const [mounted, setMounted] = useState(false)
 
@@ -55,11 +57,7 @@ export default function Home() {
   }
 
   return (
-    <DynamicLasereyesProvider
-      config={{
-        network: network,
-      }}
-    >
+    <DynamicLasereyesProvider>
       <UtxoProvider>
         <App setNetwork={() => {}} />
       </UtxoProvider>
