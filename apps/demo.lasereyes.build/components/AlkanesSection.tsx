@@ -16,18 +16,18 @@ interface AlkaneBalance {
 }
 
 const AlkanesSection = () => {
-  const { provider, address, send, network, getMetaBalances } = useLaserEyes()
+  const { provider, address, send, network, getMetaBalances, connected } = useLaserEyes()
   const [alkanes, setAlkanes] = useState<AlkaneBalance[]>([])
   const [selectedAlkane, setSelectedAlkane] = useState<AlkaneBalance | undefined>(undefined)
   const [alkaneToAddress, setAlkaneToAddress] = useState('')
   const [alkaneAmount, setAlkaneAmount] = useState('')
 
   useEffect(() => {
-    if (address && network) {
+    if (address && network && connected) {
       // We'll need to modify the getMetaBalances function to support 'alkanes' protocol
       getMetaBalances('alkanes').then(setAlkanes)
     }
-  }, [address, getMetaBalances, network])
+  }, [address, getMetaBalances, network, connected])
 
   const sendAlkane = async () => {
     try {
@@ -68,7 +68,7 @@ const AlkanesSection = () => {
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="text-gray-500 text-md text-orange-400">alkanes</div>
+      <div className="text-md text-orange-400">alkanes</div>
       <Select
         onValueChange={(value) => {
           const alkane = alkanes?.find((a: AlkaneBalance) => a.id === value)
@@ -79,7 +79,7 @@ const AlkanesSection = () => {
         <SelectTrigger
           disabled={!provider}
           className={cn(
-            'w-full bg-[#232225] border-none items-center justify-center text-center flex flex-row gap-4 items-center disabled:text-[#737275] text-sm text-center',
+            'w-full bg-[#232225] border-none justify-center flex flex-row gap-4 items-center disabled:text-[#737275] text-sm text-center',
             'min-w-[200px]'
           )}
         >

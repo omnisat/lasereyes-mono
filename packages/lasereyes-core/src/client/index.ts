@@ -121,21 +121,20 @@ export class LaserEyesClient {
     triggerDOMShakeHack(() => this.$store.setKey('isInitializing', false))
   }
 
-  private checkNetwork() {
-    this.getNetwork().then((foundNetwork) => {
-      if (foundNetwork) {
-        this.$network.set(foundNetwork)
-        this.dataSourceManager.updateNetwork(foundNetwork)
+  private async checkNetwork() {
+    const foundNetwork = await this.getNetwork()
+    if (foundNetwork) {
+      this.$network.set(foundNetwork)
+      this.dataSourceManager.updateNetwork(foundNetwork)
+    }
+    try {
+      if (this.config?.network && this.config.network !== foundNetwork) {
+        await this.switchNetwork(this.config.network)
       }
-      try {
-        if (this.config?.network && this.config.network !== foundNetwork) {
-          this.switchNetwork(this.config.network)
-        }
-      } catch (e) {
-        console.error("Couldn't enforce config network", e)
-        this.disconnect()
-      }
-    })
+    } catch (e) {
+      console.error("Couldn't enforce config network", e)
+      this.disconnect()
+    }
   }
 
   private handleIsInitializingChanged(value: boolean) {
@@ -145,9 +144,7 @@ export class LaserEyesClient {
           LOCAL_STORAGE_DEFAULT_WALLET
         ) as ProviderType | undefined
         if (defaultWallet) {
-          this.connect(defaultWallet).then(() => {
-            this.checkNetwork()
-          })
+          this.connect(defaultWallet)
         }
       }
     }
@@ -167,8 +164,9 @@ export class LaserEyesClient {
       }
       const provider = this.$providerMap[defaultWallet]
       await provider?.connect(defaultWallet)
-      this.$store.setKey('connected', true)
       this.$store.setKey('provider', defaultWallet)
+      await this.checkNetwork()
+      this.$store.setKey('connected', true)
     } catch (error) {
       console.error('Error during connect:', error)
       this.$store.setKey('isConnecting', false)

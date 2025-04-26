@@ -19,32 +19,7 @@ const DynamicLasereyesProvider = dynamic(
 )
 
 export default function Home() {
-  const [network, setNetwork] = useState<
-    | typeof MAINNET
-    | typeof TESTNET
-    | typeof TESTNET4
-    | typeof SIGNET
-    | typeof FRACTAL_MAINNET
-    | typeof FRACTAL_TESTNET
-  >(MAINNET)
-
   const [mounted, setMounted] = useState(false)
-
-  const switchNet = () => {
-    if (network === MAINNET) {
-      setNetwork(TESTNET4)
-    } else if (network === TESTNET4) {
-      setNetwork(TESTNET)
-    } else if (network === TESTNET) {
-      setNetwork(SIGNET)
-    } else if (network === SIGNET) {
-      setNetwork(FRACTAL_MAINNET)
-    } else if (network === FRACTAL_MAINNET) {
-      setNetwork(FRACTAL_TESTNET)
-    } else {
-      setNetwork(MAINNET)
-    }
-  }
 
   useEffect(() => {
     setMounted(true)
@@ -55,11 +30,7 @@ export default function Home() {
   }
 
   return (
-    <DynamicLasereyesProvider
-      config={{
-        network: network,
-      }}
-    >
+    <DynamicLasereyesProvider>
       <UtxoProvider>
         <App setNetwork={() => {}} />
       </UtxoProvider>

@@ -1,7 +1,7 @@
 import axios from 'axios'
-import type { NetworkType } from '../../../types'
+import { BaseNetwork, type NetworkType } from '../../../types'
 import type { DataSource } from '../../../types/data-source'
-import { getMaestroUrl } from '../../urls'
+import { getMaestroUrl, MAESTRO_API_KEY_TESTNET4 } from '../../urls'
 import type {
   MaestroAddressInscription,
   MaestroBrc20ByAddressResponse,
@@ -13,28 +13,35 @@ import type {
   MaestroGetTransactionInfoResponse,
 } from '../../../types/maestro'
 import { MAESTRO } from '../../../constants/data-sources'
+import { TESTNET4 } from '../../../constants'
 
 export type MaestroConfig = {
   networks: {
     mainnet: {
-      apiUrl: string;
-      apiKey: string;
-    },
+      apiUrl: string
+      apiKey: string
+    }
     [key: string]: {
-      apiUrl: string;
-      apiKey: string;
+      apiUrl: string
+      apiKey: string
     }
   }
 }
 
 export class MaestroDataSource implements DataSource {
-  private apiUrl = "";
-  private apiKey = "";
-  private networks:MaestroConfig['networks']
+  private apiUrl = ''
+  private apiKey = ''
+  private networks: MaestroConfig['networks']
 
-  constructor(network: NetworkType, config:MaestroConfig) {
-    this.networks = config?.networks || {};
-    this.setNetwork(network);
+  constructor(network: NetworkType, config: MaestroConfig) {
+    this.networks = {
+      [TESTNET4]: {
+        apiKey: MAESTRO_API_KEY_TESTNET4,
+        apiUrl: getMaestroUrl(BaseNetwork.TESTNET4),
+      },
+      ...config?.networks,
+    }
+    this.setNetwork(network)
   }
 
   public getName() {
@@ -43,11 +50,11 @@ export class MaestroDataSource implements DataSource {
 
   public setNetwork(network: NetworkType) {
     if (this.networks[network]) {
-      this.apiUrl = this.networks[network].apiUrl;
-      this.apiKey = this.networks[network].apiKey;
+      this.apiUrl = this.networks[network].apiUrl
+      this.apiKey = this.networks[network].apiKey
     } else {
-      this.apiUrl = getMaestroUrl(network);
-      this.apiKey = this.networks.mainnet.apiKey;
+      this.apiUrl = getMaestroUrl(network)
+      this.apiKey = this.networks.mainnet.apiKey
     }
   }
 

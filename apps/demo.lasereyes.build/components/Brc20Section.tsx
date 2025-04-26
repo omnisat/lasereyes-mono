@@ -8,7 +8,7 @@ import { getMempoolSpaceUrl } from '@/lib/urls'
 import { type MAINNET, type TESTNET, useLaserEyes, type Brc20Balance, type SendArgs } from '@omnisat/lasereyes'
 
 const BRC20Section = () => {
-  const { provider, address, send, network, getMetaBalances } = useLaserEyes()
+  const { provider, address, send, network, getMetaBalances, connected } = useLaserEyes()
   const [brc20s, setBrc20s] = useState<Brc20Balance[]>([])
   const [selectedBrc20, setSelectedBrc20] = useState<Brc20Balance | undefined>(undefined)
   const [brc20ToAddress, setBrc20ToAddress] = useState('')
@@ -16,10 +16,10 @@ const BRC20Section = () => {
 
 
   useEffect(() => {
-    if (address) {
+    if (address && connected && network) {
       getMetaBalances('brc20').then(setBrc20s)
     }
-  }, [address, getMetaBalances])
+  }, [address, getMetaBalances, connected, network])
 
   const sendBrc20 = async () => {
     try {
@@ -58,7 +58,7 @@ const BRC20Section = () => {
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="text-gray-500 text-md text-orange-400">brc-20</div>
+      <div className="text-md text-orange-400">brc-20</div>
       <Select
         onValueChange={(value) => {
           const brc20 = brc20s?.find((r: Brc20Balance) => r.ticker === value)
@@ -69,7 +69,7 @@ const BRC20Section = () => {
         <SelectTrigger
           disabled={!provider}
           className={cn(
-            'w-full bg-[#232225] border-none items-center justify-center text-center flex flex-row gap-4 items-center disabled:text-[#737275] text-sm text-center',
+            'w-full bg-[#232225] border-none items-center justify-center flex flex-row gap-4 disabled:text-[#737275] text-sm text-center',
             'min-w-[200px]'
           )}
         >

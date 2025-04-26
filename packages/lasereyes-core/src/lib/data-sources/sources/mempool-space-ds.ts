@@ -4,6 +4,7 @@ import { getMempoolSpaceUrl } from "../../urls";
 import type { MempoolUtxo, NetworkType } from "../../../types";
 import type { MempoolSpaceGetTransactionResponse } from "../../../types/mempool-space";
 import { MEMPOOL_SPACE } from "../../../constants/data-sources";
+import { MAINNET, SIGNET, TESTNET, TESTNET4, FRACTAL_MAINNET, FRACTAL_TESTNET } from "../../../constants";
 
 export type MempoolSpaceConfig = {
   networks: {
@@ -21,25 +22,26 @@ export class MempoolSpaceDataSource implements DataSource {
   private networks: MempoolSpaceConfig['networks'];
 
   constructor(network: NetworkType, config?: MempoolSpaceConfig) {
-    this.networks = config?.networks || {
-      mainnet: {
+    this.networks = {
+      [MAINNET]: {
         apiUrl: getMempoolSpaceUrl('mainnet')
       },
-      testnet: {
+      [TESTNET]: {
         apiUrl: getMempoolSpaceUrl('testnet')
       },
-      testnet4: {
+      [TESTNET4]: {
         apiUrl: getMempoolSpaceUrl('testnet4')
       },
-      signet: {
+      [SIGNET]: {
         apiUrl: getMempoolSpaceUrl('signet')
       },
-      "fractal-mainnet": {
+      [FRACTAL_MAINNET]: {
         apiUrl: getMempoolSpaceUrl('fractal-mainnet')
       },
-      "fractal-testnet": {
+      [FRACTAL_TESTNET]: {
         apiUrl: getMempoolSpaceUrl('fractal-testnet')
-      }
+      },
+      ...config?.networks,
     };
     this.setNetwork(network);
   }

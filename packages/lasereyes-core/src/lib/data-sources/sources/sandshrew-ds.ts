@@ -36,7 +36,7 @@ export class SandshrewDataSource implements DataSource {
   
 
   constructor(network: NetworkType, config?: SandshrewConfig) {
-    this.networks = config?.networks || {
+    this.networks = {
       mainnet: {
         apiUrl: getSandshrewUrl('mainnet'),
         apiKey: SANDSHREW_LASEREYES_KEY,
@@ -45,6 +45,7 @@ export class SandshrewDataSource implements DataSource {
         apiUrl: getSandshrewUrl('signet'),
         apiKey: SANDSHREW_LASEREYES_KEY,
       },
+      ...config?.networks,
     }
     this.setNetwork(network)
     this.alkanes = new AlkanesRpc(`${this.apiUrl}/${this.apiKey}`)

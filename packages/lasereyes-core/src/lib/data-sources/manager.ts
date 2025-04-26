@@ -38,7 +38,6 @@ export class DataSourceManager {
         network,
         {
           networks: {
-            ...config?.dataSources?.mempool?.networks,
             mainnet: {
               apiUrl: config?.dataSources?.mempool?.url || getMempoolSpaceUrl(BaseNetwork.MAINNET),
             },
@@ -56,7 +55,8 @@ export class DataSourceManager {
             },
             "fractal-testnet": {
               apiUrl: getMempoolSpaceUrl(BaseNetwork.FRACTAL_TESTNET),
-            }
+            },
+            ...config?.dataSources?.mempool?.networks,
           }
         }
       )
@@ -68,7 +68,6 @@ export class DataSourceManager {
         network,
         {
           networks: {
-            ...config?.dataSources?.sandshrew?.networks,
             mainnet: {
               apiKey: config?.dataSources?.sandshrew?.apiKey || SANDSHREW_LASEREYES_KEY,
               apiUrl: getSandshrewUrl(BaseNetwork.MAINNET),
@@ -76,7 +75,8 @@ export class DataSourceManager {
             testnet: {
               apiKey: config?.dataSources?.sandshrew?.apiKey || SANDSHREW_LASEREYES_KEY,
               apiUrl: getSandshrewUrl(BaseNetwork.TESTNET),
-            }
+            },
+            ...config?.dataSources?.sandshrew?.networks,
           }
         }
       )
@@ -88,7 +88,6 @@ export class DataSourceManager {
         network,
         {
           networks: {
-            ...config?.dataSources?.maestro?.networks,
             mainnet: {
               apiKey: config?.dataSources?.maestro?.apiKey || MAESTRO_API_KEY_MAINNET,
               apiUrl: getMaestroUrl(BaseNetwork.MAINNET),
@@ -96,7 +95,8 @@ export class DataSourceManager {
             testnet4: {
               apiKey: config?.dataSources?.maestro?.testnetApiKey || MAESTRO_API_KEY_TESTNET4,
               apiUrl: getMaestroUrl(BaseNetwork.TESTNET4),
-            }
+            },
+            ...config?.dataSources?.maestro?.networks,
           }
         }
       )
