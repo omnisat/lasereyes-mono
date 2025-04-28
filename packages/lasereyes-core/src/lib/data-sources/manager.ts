@@ -1,5 +1,6 @@
 import { MAESTRO } from '../../constants/data-sources'
 import type { AlkanesOutpoint, Config, MempoolUtxo } from '../../types'
+import type { AlkaneBalance } from '../../types/alkane'
 import type { DataSource } from '../../types/data-source'
 import type { Inscription } from '../../types/lasereyes'
 import type { MaestroAddressInscription } from '../../types/maestro'
@@ -134,15 +135,26 @@ export class DataSourceManager {
     return this.dataSources.get(source)
   }
 
+
+
+  public async getAddressAlkanesBalances(
+    address: string,
+  ): Promise<AlkaneBalance[]> {
+    const dataSource = this.findAvailableSource('getAddressAlkanesBalances')
+    if (!dataSource || !dataSource.getAddressAlkanesBalances) {
+      throw new Error(ERROR_METHOD_NOT_AVAILABLE)
+    }
+    return await dataSource.getAddressAlkanesBalances(address)
+  }
+
   public async getAlkanesByAddress(
     address: string,
-    protocolTag: string
   ): Promise<AlkanesOutpoint[]> {
     const dataSource = this.findAvailableSource('getAlkanesByAddress')
     if (!dataSource || !dataSource.getAlkanesByAddress) {
       throw new Error(ERROR_METHOD_NOT_AVAILABLE)
     }
-    return await dataSource.getAlkanesByAddress(address, protocolTag)
+    return await dataSource.getAlkanesByAddress(address)
   }
 
   public async getAddressBtcBalance(address: string): Promise<string> {

@@ -12,8 +12,13 @@ import { getPublicKeyHash } from '../../btc'
 import { SANDSHREW_LASEREYES_KEY, getSandshrewUrl } from '../../urls'
 import type { RpcResponse } from '../../../types/rpc'
 import { SANDSHREW } from '../../../constants/data-sources'
-import { BaseNetwork, type AlkanesOutpoint, type NetworkType } from '../../../types'
+import { type AlkanesOutpoint, BaseNetwork, type NetworkType } from '../../../types'
 import { AlkanesRpc } from '@oyl/sdk/lib/rpclient/alkanes'
+import type { AlkaneBalance } from '../../../types/alkane'
+
+export function runeIdToString({block, tx}: {block: string, tx: string}) {
+    return `${block}:${tx}`
+  }
 
 export type SandshrewConfig = {
   networks: {
@@ -109,13 +114,34 @@ export class SandshrewDataSource implements DataSource {
 
   async getAlkanesByAddress(
     address: string,
-    protocolTag: string
   ): Promise<AlkanesOutpoint[]> {
     const response = await this.alkanes.getAlkanesByAddress({
       address,
-      protocolTag,
     })
-    return response as AlkanesOutpoint[]
+    return response
+  }
+
+  async getAddressAlkanesBalances(
+    address: string,
+  ): Promise<AlkaneBalance[]> {
+    const response = await this.getAlkanesByAddress(address)
+    const alkanesBalances: Record<string, AlkaneBalance> = {}
+    for (const outpoint of response) {
+      for (const rune of outpoint.runes) {
+        const runeId = runeIdToString(rune.rune.id)
+        if (!alkanesBalances[runeId]) {
+          alkanesBalances[runeId] = {
+            id: runeId,
+            balance: BigInt(rune.balance),
+            name: rune.rune.name,
+            symbol: rune.rune.symbol,
+          }
+        } else {
+          alkanesBalances[runeId].balance += BigInt(rune.balance)
+        }
+      }
+    }
+    return Object.values(alkanesBalances)
   }
 
   async getTransaction(txId: string) {

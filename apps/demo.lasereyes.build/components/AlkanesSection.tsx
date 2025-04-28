@@ -5,15 +5,8 @@ import { cn } from '@/lib/utils'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
 import { toast } from 'sonner'
 import { getMempoolSpaceUrl } from '@/lib/urls'
-import { type MAINNET, type TESTNET, useLaserEyes } from '@omnisat/lasereyes'
+import { type AlkaneBalance, type MAINNET, type TESTNET, useLaserEyes } from '@omnisat/lasereyes'
 
-// Define the AlkaneBalance type based on the structure from the alkanes module
-interface AlkaneBalance {
-  id: string
-  balance: string
-  name?: string
-  symbol?: string
-}
 
 const AlkanesSection = () => {
   const { provider, address, send, network, getMetaBalances, connected } = useLaserEyes()
@@ -25,7 +18,10 @@ const AlkanesSection = () => {
   useEffect(() => {
     if (address && network && connected) {
       // We'll need to modify the getMetaBalances function to support 'alkanes' protocol
-      getMetaBalances('alkanes').then(setAlkanes)
+      getMetaBalances('alkanes').then((x) => {
+        console.log('alkanes', x)
+        return x
+      }).then(setAlkanes)
     }
   }, [address, getMetaBalances, network, connected])
 
@@ -71,13 +67,17 @@ const AlkanesSection = () => {
       <div className="text-md text-orange-400">alkanes</div>
       <Select
         onValueChange={(value) => {
-          const alkane = alkanes?.find((a: AlkaneBalance) => a.id === value)
+          const alkane = alkanes?.find((a: AlkaneBalance, index: number) => a.name === value || index.toString() === value)
           setSelectedAlkane(alkane)
         }}
         disabled={!provider || alkanes.length === 0}
       >
         <SelectTrigger
           disabled={!provider}
+          onClick={(e) => {
+            console.log('clicked')
+            e.preventDefault()
+          }}
           className={cn(
             'w-full bg-[#232225] border-none justify-center flex flex-row gap-4 items-center disabled:text-[#737275] text-sm text-center',
             'min-w-[200px]'
@@ -88,7 +88,7 @@ const AlkanesSection = () => {
         <SelectContent>
           {alkanes?.map((alkane) => (
             <SelectItem key={alkane.id} value={alkane.id}>
-              {alkane.name || alkane.id} ({Number.parseFloat(alkane.balance)})
+              {alkane.name} ({Number(alkane.balance)})
             </SelectItem>
           ))}
         </SelectContent>

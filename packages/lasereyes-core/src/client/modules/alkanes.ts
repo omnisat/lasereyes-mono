@@ -179,7 +179,7 @@ export const findAlkaneUtxos = async ({
   alkaneId: { block: string; tx: string }
   targetNumberOfAlkanes: number
 }) => {
-  const res = await client.dataSourceManager.getAlkanesByAddress(address, '1')
+  const res = await client.dataSourceManager.getAlkanesByAddress(address)
 
   const matchingRunesWithOutpoints = res.flatMap((outpoint) =>
     outpoint.runes

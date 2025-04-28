@@ -1,10 +1,12 @@
 import type { InscriptionInfo } from "ordapi";
 import type { AlkanesOutpoint, BaseNetworkType, MempoolUtxo, NetworkType } from ".";
 import type { MaestroGetInscriptionInfoResponse } from "./maestro";
+import type { AlkaneBalance } from "./alkane";
 
 export interface DataSource {
   getName(): string;
-  getAlkanesByAddress?(address: string, protocolTag: string): Promise<AlkanesOutpoint[]>;
+  getAddressAlkanesBalances?(address: string): Promise<AlkaneBalance[]>;
+  getAlkanesByAddress?(address: string): Promise<AlkanesOutpoint[]>;
   getAddressInscriptions?(address: string, offset?: number, limit?: number): Promise<any>;
   getAddressBtcBalance?(address: string): Promise<string>;
   getAddressBrc20Balances?(address: string): Promise<any>;

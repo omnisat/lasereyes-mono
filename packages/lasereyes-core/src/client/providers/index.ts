@@ -125,11 +125,11 @@ export abstract class WalletProvider {
 
         return await this.dataSourceManager.getAddressBrc20Balances(this.$store.get().address)
       case ALKANES:
-        if (!this.dataSourceManager.getAlkanesByAddress) {
+        if (!this.dataSourceManager.getAddressAlkanesBalances) {
           throw new Error('Method not found on data source')
         }
 
-        return await this.dataSourceManager.getAlkanesByAddress(this.$store.get().address, '1')
+        return await this.dataSourceManager.getAddressAlkanesBalances(this.$store.get().address)
       default:
         throw new Error('Unsupported protocol')
     }
