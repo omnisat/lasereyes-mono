@@ -216,7 +216,7 @@ export const createRuneSendPsbt = async ({
     })
 
     psbt.addOutput({
-      address: fromAddress,
+      address: fromPaymentAddress,
       value: BigInt(changeAmount),
     })
 
