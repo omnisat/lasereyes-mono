@@ -1,10 +1,12 @@
 import axios from "axios";
+import * as bitcoin from "bitcoinjs-lib";
 import type { DataSource } from "../../../types/data-source";
 import { getMempoolSpaceUrl } from "../../urls";
 import type { MempoolUtxo, NetworkType } from "../../../types";
 import type { MempoolSpaceGetTransactionResponse } from "../../../types/mempool-space";
 import { MEMPOOL_SPACE } from "../../../constants/data-sources";
 import { MAINNET, SIGNET, TESTNET, TESTNET4, FRACTAL_MAINNET, FRACTAL_TESTNET } from "../../../constants";
+import { getBitcoinNetwork } from "../../helpers";
 
 export type MempoolSpaceConfig = {
   networks: {
@@ -20,7 +22,7 @@ export type MempoolSpaceConfig = {
 export class MempoolSpaceDataSource implements DataSource {
   private apiUrl = "";
   private networks: MempoolSpaceConfig['networks'];
-
+  private network: NetworkType;
   constructor(network: NetworkType, config?: MempoolSpaceConfig) {
     this.networks = {
       [MAINNET]: {
@@ -43,6 +45,7 @@ export class MempoolSpaceDataSource implements DataSource {
       },
       ...config?.networks,
     };
+    this.network = network;
     this.setNetwork(network);
   }
 
@@ -57,6 +60,7 @@ export class MempoolSpaceDataSource implements DataSource {
       // Fallback to default URL
       this.apiUrl = getMempoolSpaceUrl(network);
     }
+    this.network = network;
   }
 
   private async call(method: 'get' | 'post', endpoint: string, body?: unknown) {
@@ -137,8 +141,13 @@ export class MempoolSpaceDataSource implements DataSource {
     }
   }
 
-  async getAddressUtxos(address: string): Promise<Array<MempoolUtxo>> {
-    return this.call('get', `/api/address/${address}/utxo`)
+  async getAddressUtxos(address: string): Promise<Array<MempoolUtxo & { scriptPk: string }>> {
+    const utxos = await this.call('get', `/api/address/${address}/utxo`) as Array<MempoolUtxo>
+    const scriptPk = bitcoin.address.toOutputScript(address, getBitcoinNetwork(this.network))
+    return utxos.map((utxo) => ({
+      ...utxo,
+      scriptPk: Buffer.from(scriptPk).toString('hex'),
+    }))
   }
 
   async getTransaction(
@@ -148,7 +157,7 @@ export class MempoolSpaceDataSource implements DataSource {
   }
 
   async getRecommendedFees(): Promise<{ fastFee: number; minFee: number }> {
-    const response = await this.call('get', '/mempool/fee_rates')
+    const response = await this.call('get', '/api/v1/fees/recommended')
     const fastFee = response.fastestFee
     const minFee = response.minimumFee
     return { fastFee, minFee }

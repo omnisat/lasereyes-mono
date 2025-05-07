@@ -271,7 +271,7 @@ export class DataSourceManager {
     }
   }
 
-  public async getAddressUtxos(address: string): Promise<MempoolUtxo[]> {
+  public async getAddressUtxos(address: string): Promise<Array<MempoolUtxo & { scriptPk: string }>> {
     const dataSource = this.findAvailableSource('getAddressUtxos')
     if (!dataSource || !dataSource.getAddressUtxos) {
       throw new Error(ERROR_METHOD_NOT_AVAILABLE)

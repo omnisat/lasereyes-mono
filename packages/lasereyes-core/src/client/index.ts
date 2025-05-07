@@ -324,7 +324,7 @@ export class LaserEyesClient {
       tx = arg1.tx
       finalize = arg1.finalize ?? false
       broadcast = arg1.broadcast ?? false
-      inputsToSign = arg1.inputsToSign ?? []
+      inputsToSign = arg1.inputsToSign
     }
 
     let psbtHex: string

@@ -26,7 +26,7 @@ export interface DataSource {
   getTxInfo?(txId: string): Promise<any>;
   batchOrdOutput?(params: { outpoints: string[], rune_name: string }): Promise<any>;
   getRuneOutpoints?(params: { address: string, runeId: string }): Promise<any>;
-  getAddressUtxos?(address: string): Promise<Array<MempoolUtxo>>;
+  getAddressUtxos?(address: string): Promise<Array<MempoolUtxo & { scriptPk: string }>>;
   getOutputValueByVOutIndex?(txId: string, vOut: number): Promise<number | null>;
   waitForTransaction?(id: string): Promise<boolean>;
   getOutputValueByVOutIndex?(txId: string, vOut: number, network: NetworkType): Promise<number | null>;

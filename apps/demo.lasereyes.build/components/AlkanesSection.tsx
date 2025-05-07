@@ -67,7 +67,7 @@ const AlkanesSection = () => {
       <div className="text-md text-orange-400">alkanes</div>
       <Select
         onValueChange={(value) => {
-          const alkane = alkanes?.find((a: AlkaneBalance, index: number) => a.name === value || index.toString() === value)
+          const alkane = alkanes?.find((a: AlkaneBalance) => a.id === value)
           setSelectedAlkane(alkane)
         }}
         disabled={!provider || alkanes.length === 0}

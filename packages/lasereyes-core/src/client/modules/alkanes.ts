@@ -12,7 +12,7 @@ import type {
 } from '@oyl/sdk/lib/shared/interface'
 import { toXOnly } from 'bitcoinjs-lib/src/psbt/bip371'
 
-export declare enum AddressType {
+export enum AddressType {
   P2PKH = 0,
   P2TR = 1,
   P2SH_P2WPKH = 2,
@@ -156,8 +156,10 @@ export const formatInputsToSign = async ({
         internalPubkey: tapInternalKey,
         network: network,
       })
-      if (v.witnessUtxo?.script.toString() === p2tr.output?.toString()) {
-        v.tapInternalKey = tapInternalKey
+      if ((v.witnessUtxo && Buffer.from(v.witnessUtxo.script).toString('hex')) === (p2tr.output && Buffer.from(p2tr.output).toString('hex'))) {
+        _psbt.updateInput(index, {
+          tapInternalKey,
+        })
       }
     }
     index++
@@ -261,7 +263,7 @@ export const createSendPsbt = async ({
   const minFee = minimumFee({
     taprootInputCount: 2,
     nonTaprootInputCount: 0,
-    outputCount: 3,
+    outputCount: 4,
   })
   const calculatedFee = minFee * feeRate < 250 ? 250 : minFee * feeRate
   let finalFee = fee ? fee : calculatedFee
@@ -275,7 +277,7 @@ export const createSendPsbt = async ({
     const txSize = minimumFee({
       taprootInputCount: gatheredUtxos.utxos.length,
       nonTaprootInputCount: 0,
-      outputCount: 3,
+      outputCount: 4,
     })
 
     finalFee = Math.max(txSize * feeRate, 250)
@@ -301,7 +303,7 @@ export const createSendPsbt = async ({
   }
 
   for await (const utxo of alkaneUtxos) {
-    if (getAddressType(utxo.address) === 0) {
+    if (getAddressType(utxo.address) === AddressType.P2PKH) {
       // TODO: Implement this
       // const previousTxHex: string = await client.dataSourceManager.(utxo.txId)
       psbt.addInput({
@@ -310,7 +312,7 @@ export const createSendPsbt = async ({
         //   nonWitnessUtxo: Buffer.from(previousTxHex, 'hex'),
       })
     }
-    if (getAddressType(utxo.address) === 2) {
+    if (getAddressType(utxo.address) === AddressType.P2SH_P2WPKH) {
       const redeemScript = bitcoin.script.compile([
         bitcoin.opcodes.OP_0,
         bitcoin.crypto.hash160(Buffer.from(account.nestedSegwit.pubkey, 'hex')),
@@ -331,8 +333,8 @@ export const createSendPsbt = async ({
       })
     }
     if (
-      getAddressType(utxo.address) === 1 ||
-      getAddressType(utxo.address) === 3
+      getAddressType(utxo.address) === AddressType.P2TR ||
+      getAddressType(utxo.address) === AddressType.P2WPKH
     ) {
       psbt.addInput({
         hash: utxo.txId,
@@ -350,7 +352,7 @@ export const createSendPsbt = async ({
   }
 
   for (let i = 0; i < gatheredUtxos.utxos.length; i++) {
-    if (getAddressType(gatheredUtxos.utxos[i].address) === 0) {
+    if (getAddressType(gatheredUtxos.utxos[i].address) === AddressType.P2PKH) {
       // TODO: Implement this
       // const previousTxHex: string = await client.dataSourceManager.(utxo.txId)
       psbt.addInput({
@@ -359,7 +361,9 @@ export const createSendPsbt = async ({
         //   nonWitnessUtxo: Buffer.from(previousTxHex, 'hex'),
       })
     }
-    if (getAddressType(gatheredUtxos.utxos[i].address) === 2) {
+    if (
+      getAddressType(gatheredUtxos.utxos[i].address) === AddressType.P2SH_P2WPKH
+    ) {
       const redeemScript = bitcoin.script.compile([
         bitcoin.opcodes.OP_0,
         bitcoin.crypto.hash160(Buffer.from(account.nestedSegwit.pubkey, 'hex')),
@@ -380,8 +384,8 @@ export const createSendPsbt = async ({
       })
     }
     if (
-      getAddressType(gatheredUtxos.utxos[i].address) === 1 ||
-      getAddressType(gatheredUtxos.utxos[i].address) === 3
+      getAddressType(gatheredUtxos.utxos[i].address) === AddressType.P2TR ||
+      getAddressType(gatheredUtxos.utxos[i].address) === AddressType.P2WPKH
     ) {
       psbt.addInput({
         hash: gatheredUtxos.utxos[i].txId,
@@ -425,9 +429,8 @@ export const createSendPsbt = async ({
     address: toAddress,
   })
 
-  const output = { script: protostone, value: 0n }
-
-  psbt.addOutput(output)
+  psbt.addOutput({ script: protostone, value: 0n })
+  
   const changeAmount =
     gatheredUtxos.totalAmount + totalSatoshis - (finalFee + inscriptionSats * 2)
 
@@ -474,7 +477,7 @@ export default class AlkanesModule {
       taproot: {
         address: address,
         pubkey: publicKey,
-        pubKeyXOnly: publicKey.slice(2),
+        pubKeyXOnly: toXOnly(Buffer.from(publicKey, 'hex')).toString(),
         hdPath: `m/84'/1'/0'/0/0`,
       },
       nestedSegwit: {
@@ -494,8 +497,20 @@ export default class AlkanesModule {
       },
     }
     const { fastFee } = await this.client.dataSourceManager.getRecommendedFees()
+    const utxos = await this.client.dataSourceManager.getAddressUtxos(address)
     const { psbt } = await createSendPsbt({
-      gatheredUtxos: { utxos: [], totalAmount: 0 },
+      gatheredUtxos: {
+        utxos: utxos.map((utxo) => ({
+          txId: utxo.txid,
+          outputIndex: utxo.vout,
+          satoshis: utxo.value,
+          scriptPk: utxo.scriptPk,
+          address,
+          inscriptions: [],
+          confirmations: Number(utxo.status.confirmed),
+        })),
+        totalAmount: utxos.reduce((acc, utxo) => acc + utxo.value, 0),
+      },
       account,
       alkaneId,
       client: this.client,
@@ -504,10 +519,17 @@ export default class AlkanesModule {
       feeRate: fastFee,
     })
 
-    const response = await this.client.signPsbt({ tx: psbt, broadcast: true })
-    if (response?.txId) {
+    const response = await this.client.signPsbt({ tx: psbt, broadcast: true, finalize: true })
+    if (!response) {
+      throw new Error('Failed to sign transaction')
+    }
+    if (response.txId) {
       return response.txId
     }
-    throw new Error('Failed to sign transaction')
+    const txId = await this.client.pushPsbt(response.signedPsbtHex ?? response.signedPsbtBase64!)
+    if (txId) {
+      return txId
+    }
+    throw new Error('Failed to broadcast transaction')
   }
 }
