@@ -199,6 +199,7 @@ export default class XVerseProvider extends WalletProvider {
       }
       throw new Error('Error getting network')
     } catch (e) {
+      console.error(e)
       return this.network
     }
   }
@@ -279,10 +280,10 @@ export default class XVerseProvider extends WalletProvider {
 
       if (inputsToSignProp) {
         inputsToSign = inputsToSignProp.reduce(
-          (acc: Record<string, number[]>, input) => ({
-            ...acc,
-            [input.address]: [...(acc[input.address] || []), input.index],
-          }),
+          (acc: Record<string, number[]>, input) => {
+            acc[input.address] = [...(acc[input.address] || []), input.index]
+            return acc
+          },
           {}
         )
       } else {

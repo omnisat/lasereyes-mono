@@ -5,10 +5,10 @@ import { cn } from '@/lib/utils'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
 import { toast } from 'sonner'
 import { getMempoolSpaceUrl } from '@/lib/urls'
-import { MAINNET, TESTNET, useLaserEyes, Brc20Balance, SendArgs } from '@omnisat/lasereyes'
+import { type MAINNET, type TESTNET, useLaserEyes, type Brc20Balance, type SendArgs } from '@omnisat/lasereyes'
 
 const BRC20Section = () => {
-  const { provider, address, send, network, getMetaBalances } = useLaserEyes()
+  const { provider, address, send, network, getMetaBalances, connected } = useLaserEyes()
   const [brc20s, setBrc20s] = useState<Brc20Balance[]>([])
   const [selectedBrc20, setSelectedBrc20] = useState<Brc20Balance | undefined>(undefined)
   const [brc20ToAddress, setBrc20ToAddress] = useState('')
@@ -16,10 +16,10 @@ const BRC20Section = () => {
 
 
   useEffect(() => {
-    if (address) {
+    if (address && connected && network) {
       getMetaBalances('brc20').then(setBrc20s)
     }
-  }, [address, getMetaBalances])
+  }, [address, getMetaBalances, connected, network])
 
   const sendBrc20 = async () => {
     try {
@@ -39,11 +39,11 @@ const BRC20Section = () => {
         <span className={'flex flex-col gap-1 items-center justify-center'}>
           <span className={'font-black'}>View on mempool.space</span>
           <a
-            target={'_blank'}
+            target='_blank'
             href={`${getMempoolSpaceUrl(
               network as typeof MAINNET | typeof TESTNET
             )}/tx/${txid}`}
-            className={'underline text-blue-600 text-xs'}
+            className={'underline text-blue-600 text-xs'} rel="noreferrer"
           >
             {txid}
           </a>
@@ -58,7 +58,7 @@ const BRC20Section = () => {
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="text-gray-500 text-md text-orange-400">brc-20</div>
+      <div className="text-md text-orange-400">brc-20</div>
       <Select
         onValueChange={(value) => {
           const brc20 = brc20s?.find((r: Brc20Balance) => r.ticker === value)
@@ -69,16 +69,16 @@ const BRC20Section = () => {
         <SelectTrigger
           disabled={!provider}
           className={cn(
-            'w-full bg-[#232225] border-none items-center justify-center text-center flex flex-row gap-4 items-center disabled:text-[#737275] text-sm text-center',
+            'w-full bg-[#232225] border-none items-center justify-center flex flex-row gap-4 disabled:text-[#737275] text-sm text-center',
             'min-w-[200px]'
           )}
         >
           <SelectValue placeholder="Select a BRC-20" />
         </SelectTrigger>
         <SelectContent>
-          {brc20s?.map((token, index) => (
-            <SelectItem key={index} value={token.ticker}>
-              {token.ticker} ({parseFloat(token.overall)})
+          {brc20s?.map((token) => (
+            <SelectItem key={token.ticker} value={token.ticker}>
+              {token.ticker} ({Number.parseFloat(token.overall)})
             </SelectItem>
           ))}
         </SelectContent>

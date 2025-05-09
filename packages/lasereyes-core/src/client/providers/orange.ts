@@ -1,30 +1,28 @@
 import * as bitcoin from 'bitcoinjs-lib'
 import { fromOutputScript } from 'bitcoinjs-lib/src/address'
 import orange, {
-  AddressPurpose,
-  BitcoinNetworkType as OrangeBitcoinNetworkType,
-  GetAddressOptions,
+  type AddressPurpose,
+  type BitcoinNetworkType as OrangeBitcoinNetworkType,
+  type GetAddressOptions,
   getAddress,
-  SendBtcTransactionOptions,
+  type SendBtcTransactionOptions,
   request,
   RpcErrorCode,
 } from '@orangecrypto/orange-connect'
 
 import { WalletProvider } from '.'
 import {
-  ProviderType,
-  NetworkType,
+  type ProviderType,
+  type NetworkType,
   MAINNET,
   TESTNET,
   TESTNET4,
   SIGNET,
   FRACTAL_TESTNET,
-  LaserEyesStoreType,
+  type LaserEyesStoreType,
   ORANGE,
-  SignMessageOptions,
-  Config,
-  LaserEyesClient,
-  WalletProviderSignPsbtOptions,
+  type SignMessageOptions,
+  type WalletProviderSignPsbtOptions,
 } from '../..'
 import {
   findOrdinalsAddress,
@@ -33,13 +31,13 @@ import {
   getBitcoinNetwork,
 } from '../../lib/helpers'
 import { getOrangeNetwork } from '../../constants/networks'
-import { MapStore, WritableAtom, listenKeys } from 'nanostores'
+import { type MapStore, listenKeys } from 'nanostores'
 import { persistentMap } from '@nanostores/persistent'
 
 import {
   handleStateChangePersistence,
   keysToPersist,
-  PersistedKey,
+  type PersistedKey,
 } from '../utils'
 
 const { signMessage: signMessageOrange, sendBtcTransaction: sendBtcTxOrange } =
@@ -47,19 +45,8 @@ const { signMessage: signMessageOrange, sendBtcTransaction: sendBtcTxOrange } =
 
 const ORANGE_WALLET_PERSISTENCE_KEY = 'ORANGE_CONNECTED_WALLET_STATE'
 export default class OrangeProvider extends WalletProvider {
-  constructor(
-    stores: {
-      $store: MapStore<LaserEyesStoreType>
-      $network: WritableAtom<NetworkType>
-    },
-    parent: LaserEyesClient,
-    config?: Config
-  ) {
-    super(stores, parent, config)
-  }
-
-  public get library(): any | undefined {
-    return (window as any)?.OrangeWalletProviders?.OrangeBitcoinProvider
+  public get library() {
+    return window?.OrangeWalletProviders?.OrangeBitcoinProvider
   }
 
   public get network(): NetworkType {
@@ -78,7 +65,7 @@ export default class OrangeProvider extends WalletProvider {
     }
   )
 
-  removeSubscriber?: Function
+  removeSubscriber?: () => void
 
   restorePersistedValues() {
     const vals = this.$valueStore.get()
@@ -105,9 +92,7 @@ export default class OrangeProvider extends WalletProvider {
   initialize(): void {
     if (typeof window !== 'undefined' && typeof document !== 'undefined') {
       this.observer = new window.MutationObserver(() => {
-        const orangeLib = (window as any)?.OrangeBitcoinProvider
-
-        if (orangeLib) {
+        if (window.OrangeBitcoinProvider) {
           this.$store.setKey('hasProvider', {
             ...this.$store.get().hasProvider,
             [ORANGE]: true,
@@ -143,54 +128,50 @@ export default class OrangeProvider extends WalletProvider {
   }
 
   async connect(_: ProviderType): Promise<void> {
-    const { address, paymentAddress } = this.$valueStore!.get()
-    try {
-      if (address) {
-        this.restorePersistedValues()
-        getBTCBalance(paymentAddress, this.network).then((totalBalance) => {
-          this.$store.setKey('balance', totalBalance)
-        })
-        return
-      }
-
-      let orangeNetwork = getOrangeNetwork(this.network || MAINNET)
-      const getAddressOptions = {
-        payload: {
-          purposes: ['ordinals', 'payment'] as AddressPurpose[],
-          message: 'Address for receiving Ordinals and payments',
-          network: {
-            type: orangeNetwork,
-          },
-        },
-        onFinish: (response: any) => {
-          const foundAddress = findOrdinalsAddress(response.addresses)
-          const foundPaymentAddress = findPaymentAddress(response.addresses)
-          if (!foundAddress || !foundPaymentAddress?.address) {
-            throw new Error('Could not find addresses')
-          }
-
-          if (foundAddress && foundPaymentAddress) {
-            this.$store.setKey('provider', ORANGE)
-            this.$store.setKey('address', foundAddress.address)
-            this.$store.setKey('paymentAddress', foundPaymentAddress.address)
-          }
-
-          this.$store.setKey('publicKey', String(foundAddress.publicKey))
-          this.$store.setKey(
-            'paymentPublicKey',
-            String(foundPaymentAddress.publicKey)
-          )
-        },
-        onCancel: () => {
-          throw new Error(`User canceled lasereyes to ${ORANGE} wallet`)
-        },
-      } as GetAddressOptions
-
-      await getAddress(getAddressOptions)
-      this.$store.setKey('connected', true)
-    } catch (e) {
-      throw e
+    const { address, paymentAddress } = this.$valueStore.get()
+    if (address) {
+      this.restorePersistedValues()
+      getBTCBalance(paymentAddress, this.network).then((totalBalance) => {
+        this.$store.setKey('balance', totalBalance)
+      })
+      return
     }
+
+    const orangeNetwork = getOrangeNetwork(this.network || MAINNET)
+    const getAddressOptions = {
+      payload: {
+        purposes: ['ordinals', 'payment'] as AddressPurpose[],
+        message: 'Address for receiving Ordinals and payments',
+        network: {
+          type: orangeNetwork,
+        },
+      },
+      onFinish: (response) => {
+        const foundAddress = findOrdinalsAddress(response.addresses)
+        const foundPaymentAddress = findPaymentAddress(response.addresses)
+        if (!foundAddress || !foundPaymentAddress?.address) {
+          throw new Error('Could not find addresses')
+        }
+
+        if (foundAddress && foundPaymentAddress) {
+          this.$store.setKey('provider', ORANGE)
+          this.$store.setKey('address', foundAddress.address)
+          this.$store.setKey('paymentAddress', foundPaymentAddress.address)
+        }
+
+        this.$store.setKey('publicKey', String(foundAddress.publicKey))
+        this.$store.setKey(
+          'paymentPublicKey',
+          String(foundPaymentAddress.publicKey)
+        )
+      },
+      onCancel: () => {
+        throw new Error(`User canceled lasereyes to ${ORANGE} wallet`)
+      },
+    } as GetAddressOptions
+
+    await getAddress(getAddressOptions)
+    this.$store.setKey('connected', true)
   }
 
   async getNetwork(): Promise<NetworkType | undefined> {
@@ -198,7 +179,9 @@ export default class OrangeProvider extends WalletProvider {
 
     if (
       address.slice(0, 1) === 't' &&
-      [TESTNET, TESTNET4, SIGNET, FRACTAL_TESTNET].includes(this.network)
+      ([TESTNET, TESTNET4, SIGNET, FRACTAL_TESTNET] as string[]).includes(
+        this.network
+      )
     ) {
       return this.network
     }
@@ -221,7 +204,7 @@ export default class OrangeProvider extends WalletProvider {
         ],
         senderAddress: this.$store.get().paymentAddress,
       },
-      onFinish: (response: any) => {
+      onFinish: (response) => {
         txId = response
       },
       onCancel: () => {
@@ -282,10 +265,10 @@ export default class OrangeProvider extends WalletProvider {
 
       if (inputsToSignProp) {
         inputsToSign = inputsToSignProp.reduce(
-          (acc: Record<string, number[]>, input) => ({
-            ...acc,
-            [input.address]: [...(acc[input.address] || []), input.index],
-          }),
+          (acc: Record<string, number[]>, input) => {
+            acc[input.address] = [...(acc[input.address] || []), input.index]
+            return acc
+          },
           {}
         )
       } else {
@@ -296,13 +279,13 @@ export default class OrangeProvider extends WalletProvider {
         const paymentsAddressData: Record<string, number[]> = {
           [paymentAddress]: [] as number[],
         }
-        for (let counter of inputs.keys()) {
+        for (const counter of inputs.keys()) {
           const input = inputs[counter]
           if (input.witnessUtxo === undefined) {
             paymentsAddressData[paymentAddress].push(Number(counter))
             continue
           }
-          const { script } = input.witnessUtxo!
+          const { script } = input.witnessUtxo
           const addressFromScript = fromOutputScript(
             script,
             getBitcoinNetwork(this.network)
@@ -323,7 +306,9 @@ export default class OrangeProvider extends WalletProvider {
         }
       }
 
-      let txId, signedPsbtHex, signedPsbtBase64
+      let txId: string | undefined
+      let signedPsbtHex: string | undefined
+      let signedPsbtBase64: string | undefined
       let signedPsbt: bitcoin.Psbt | undefined
 
       const response = await request('signPsbt', {
@@ -340,9 +325,8 @@ export default class OrangeProvider extends WalletProvider {
       } else {
         if (response.error.code === RpcErrorCode.USER_REJECTION) {
           throw new Error('User canceled the request')
-        } else {
-          throw new Error('Error signing psbt')
         }
+        throw new Error('Error signing psbt')
       }
 
       if (!signedPsbt) {
@@ -350,7 +334,7 @@ export default class OrangeProvider extends WalletProvider {
       }
 
       if (finalize && !txId) {
-        signedPsbt!.finalizeAllInputs()
+        signedPsbt.finalizeAllInputs()
         signedPsbtHex = signedPsbt.toHex()
         signedPsbtBase64 = signedPsbt.toBase64()
       } else {

@@ -1,15 +1,18 @@
 import { MAESTRO } from '../../constants/data-sources'
-import { Config, MempoolUtxo } from '../../types'
-import { DataSource } from '../../types/data-source'
-import { Inscription } from '../../types/lasereyes'
-import { MaestroAddressInscription } from '../../types/maestro'
+import type { AlkanesOutpoint, Config, MempoolUtxo } from '../../types'
+import type { AlkaneBalance } from '../../types/alkane'
+import type { DataSource } from '../../types/data-source'
+import type { Inscription } from '../../types/lasereyes'
+import type { MaestroAddressInscription } from '../../types/maestro'
 import { BaseNetwork } from '../../types/network'
-import { OrdRuneBalance } from '../../types/ord'
+import type { OrdRuneBalance } from '../../types/ord'
 import {
+  getMaestroUrl,
   getMempoolSpaceUrl,
   MAESTRO_API_KEY_MAINNET,
   MAESTRO_API_KEY_TESTNET4,
   SANDSHREW_LASEREYES_KEY,
+  getSandshrewUrl,
 } from '../urls'
 import { normalizeBrc20Balances, normalizeInscription } from './normalizations'
 import { MaestroDataSource } from './sources/maestro-ds'
@@ -22,31 +25,81 @@ export class DataSourceManager {
   private static instance: DataSourceManager
   private dataSources: Map<string, DataSource> = new Map()
   private network: string
+  private customNetworks: Map<
+    string,
+    Exclude<Config['customNetworks'], undefined>[string]
+  > = new Map()
   private constructor(config?: Config) {
     const network = config?.network || BaseNetwork.MAINNET
     this.network = network
+    this.customNetworks = new Map(Object.entries(config?.customNetworks || {}))
     this.dataSources.set(
       'mempool',
       new MempoolSpaceDataSource(
-        config?.dataSources?.mempool?.url || getMempoolSpaceUrl(network),
-        network
+        network,
+        {
+          networks: {
+            mainnet: {
+              apiUrl: config?.dataSources?.mempool?.url || getMempoolSpaceUrl(BaseNetwork.MAINNET),
+            },
+            testnet: {
+              apiUrl: getMempoolSpaceUrl(BaseNetwork.TESTNET),
+            },
+            testnet4: {
+              apiUrl: getMempoolSpaceUrl(BaseNetwork.TESTNET4),
+            },
+            signet: {
+              apiUrl: getMempoolSpaceUrl(BaseNetwork.SIGNET),
+            },
+            "fractal-mainnet": {
+              apiUrl: getMempoolSpaceUrl(BaseNetwork.FRACTAL_MAINNET),
+            },
+            "fractal-testnet": {
+              apiUrl: getMempoolSpaceUrl(BaseNetwork.FRACTAL_TESTNET),
+            },
+            ...config?.dataSources?.mempool?.networks,
+          }
+        }
       )
     )
 
     this.dataSources.set(
       'sandshrew',
       new SandshrewDataSource(
-        config?.dataSources?.sandshrew?.apiKey || SANDSHREW_LASEREYES_KEY,
-        network
+        network,
+        {
+          networks: {
+            mainnet: {
+              apiKey: config?.dataSources?.sandshrew?.apiKey || SANDSHREW_LASEREYES_KEY,
+              apiUrl: getSandshrewUrl(BaseNetwork.MAINNET),
+            },
+            testnet: {
+              apiKey: config?.dataSources?.sandshrew?.apiKey || SANDSHREW_LASEREYES_KEY,
+              apiUrl: getSandshrewUrl(BaseNetwork.TESTNET),
+            },
+            ...config?.dataSources?.sandshrew?.networks,
+          }
+        }
       )
     )
 
     this.dataSources.set(
       'maestro',
       new MaestroDataSource(
-        config?.dataSources?.maestro?.apiKey || MAESTRO_API_KEY_MAINNET,
         network,
-        config?.dataSources?.maestro?.testnetApiKey || MAESTRO_API_KEY_TESTNET4
+        {
+          networks: {
+            mainnet: {
+              apiKey: config?.dataSources?.maestro?.apiKey || MAESTRO_API_KEY_MAINNET,
+              apiUrl: getMaestroUrl(BaseNetwork.MAINNET),
+            },
+            testnet4: {
+              apiKey: config?.dataSources?.maestro?.testnetApiKey || MAESTRO_API_KEY_TESTNET4,
+              apiUrl: getMaestroUrl(BaseNetwork.TESTNET4),
+            },
+            ...config?.dataSources?.maestro?.networks,
+          }
+        }
       )
     )
   }
@@ -67,18 +120,41 @@ export class DataSourceManager {
 
   public updateNetwork(newNetwork: string) {
     this.network = newNetwork
+    const baseNetwork = this.customNetworks.get(newNetwork)?.baseNetwork
     for (const ds of this.dataSources.values()) {
-      ds.setNetwork?.(newNetwork)
+      ds.setNetwork?.(newNetwork, baseNetwork)
     }
   }
 
   public registerDataSource(source: string, dataSource: DataSource) {
     this.dataSources.set(source, dataSource)
-    this.dataSources.get(source)?.setNetwork?.(this.network)
+    this.dataSources.get(source)?.setNetwork?.(this.network, this.customNetworks.get(this.network)?.baseNetwork)
   }
 
   public getSource(source: string): DataSource | undefined {
     return this.dataSources.get(source)
+  }
+
+
+
+  public async getAddressAlkanesBalances(
+    address: string,
+  ): Promise<AlkaneBalance[]> {
+    const dataSource = this.findAvailableSource('getAddressAlkanesBalances')
+    if (!dataSource || !dataSource.getAddressAlkanesBalances) {
+      throw new Error(ERROR_METHOD_NOT_AVAILABLE)
+    }
+    return await dataSource.getAddressAlkanesBalances(address)
+  }
+
+  public async getAlkanesByAddress(
+    address: string,
+  ): Promise<AlkanesOutpoint[]> {
+    const dataSource = this.findAvailableSource('getAlkanesByAddress')
+    if (!dataSource || !dataSource.getAlkanesByAddress) {
+      throw new Error(ERROR_METHOD_NOT_AVAILABLE)
+    }
+    return await dataSource.getAlkanesByAddress(address)
   }
 
   public async getAddressBtcBalance(address: string): Promise<string> {
@@ -90,7 +166,7 @@ export class DataSourceManager {
     return await dataSource.getAddressBtcBalance(address)
   }
 
-  public async getAddressBrc20Balances(address: string): Promise<any> {
+  public async getAddressBrc20Balances(address: string): Promise<unknown> {
     const dataSource = this.findAvailableSource('getAddressBrc20Balances')
     if (!dataSource || !dataSource.getAddressBrc20Balances) {
       throw new Error(ERROR_METHOD_NOT_AVAILABLE)
@@ -151,12 +227,14 @@ export class DataSourceManager {
       return inscriptionsWithDetails.map((insc) =>
         normalizeInscription(insc, sourceName, network)
       )
-    } else if (inscriptionsResult.inscriptions) {
-      return inscriptionsResult.inscriptions.map((insc: any) =>
+    }
+    if (inscriptionsResult.inscriptions) {
+      return inscriptionsResult.inscriptions.map((insc: unknown) =>
         normalizeInscription(insc, sourceName, network)
       )
-    } else if (Array.isArray(inscriptionsResult)) {
-      return inscriptionsResult.map((insc: any) =>
+    }
+    if (Array.isArray(inscriptionsResult)) {
+      return inscriptionsResult.map((insc: unknown) =>
         normalizeInscription(insc, sourceName, network)
       )
     }
@@ -168,7 +246,7 @@ export class DataSourceManager {
     return []
   }
 
-  public async getInscriptionInfo(inscriptionId: string): Promise<any> {
+  public async getInscriptionInfo(inscriptionId: string): Promise<unknown> {
     const dataSource = this.findAvailableSource('getInscriptionInfo')
     if (!dataSource || !dataSource.getInscriptionInfo) {
       throw new Error(ERROR_METHOD_NOT_AVAILABLE)
@@ -176,17 +254,24 @@ export class DataSourceManager {
     return await dataSource.getInscriptionInfo(inscriptionId)
   }
 
-  public async getRecommendedFees(): Promise<any> {
+  public async getRecommendedFees(): Promise<{
+    fastFee: number
+    minFee: number
+  }> {
     const dataSource = this.findAvailableSource('getRecommendedFees')
     if (!dataSource || !dataSource.getRecommendedFees) {
       throw new Error(ERROR_METHOD_NOT_AVAILABLE)
     }
 
     console.log('getting recommended fees')
-    return await dataSource.getRecommendedFees()
+    const fees = await dataSource.getRecommendedFees()
+    return {
+      fastFee: fees.fastFee,
+      minFee: fees.minFee,
+    }
   }
 
-  public async getAddressUtxos(address: string): Promise<MempoolUtxo[]> {
+  public async getAddressUtxos(address: string): Promise<Array<MempoolUtxo & { scriptPk: string }>> {
     const dataSource = this.findAvailableSource('getAddressUtxos')
     if (!dataSource || !dataSource.getAddressUtxos) {
       throw new Error(ERROR_METHOD_NOT_AVAILABLE)
@@ -256,6 +341,14 @@ export class DataSourceManager {
   private findAvailableSource(
     method: keyof DataSource
   ): DataSource | undefined {
+    const customNetwork = this.customNetworks.get(this.network)
+    if (customNetwork) {
+      const dataSource = this.getSource(customNetwork.preferredDataSource)
+      if (dataSource && typeof dataSource[method] === 'function') {
+        return dataSource
+      }
+    }
+
     for (const source of this.dataSources.values()) {
       if (typeof source[method] === 'function') {
         return source

@@ -1,26 +1,59 @@
 import axios from 'axios'
-import { DataSource } from '../../../types/data-source'
+import type { DataSource } from '../../../types/data-source'
 import { MAINNET } from '../../../constants'
-import { OrdOutputs, OrdRuneBalance } from '../../../types/ord'
-import { AddressInfo, InscriptionInfo } from 'ordapi'
-import {
+import type { OrdOutputs, OrdRuneBalance } from '../../../types/ord'
+import type { AddressInfo, InscriptionInfo } from 'ordapi'
+import type {
   SandshrewGetRuneByIdOrNameResponse,
   SingleRuneOutpoint,
 } from '../../../types/sandshrew'
-import { EsploraTx } from '../../../types/esplora'
+import type { EsploraTx } from '../../../types/esplora'
 import { getPublicKeyHash } from '../../btc'
-import { RpcResponse } from '../../../types/rpc'
+import { SANDSHREW_LASEREYES_KEY, getSandshrewUrl } from '../../urls'
+import type { RpcResponse } from '../../../types/rpc'
 import { SANDSHREW } from '../../../constants/data-sources'
-import { NetworkType } from '../../../types'
-import { getSandshrewUrl } from '../../urls'
+import { type AlkanesOutpoint, BaseNetwork, type NetworkType } from '../../../types'
+import { AlkanesRpc } from '@oyl/sdk/lib/rpclient/alkanes'
+import type { AlkaneBalance } from '../../../types/alkane'
+
+export function runeIdToString({block, tx}: {block: string, tx: string}) {
+    return `${block}:${tx}`
+  }
+
+export type SandshrewConfig = {
+  networks: {
+    mainnet: {
+      apiUrl: string
+      apiKey: string
+    }
+    [key: string]: {
+      apiUrl: string
+      apiKey: string
+    }
+  }
+}
 
 export class SandshrewDataSource implements DataSource {
-  private apiUrl: string = ''
-  private apiKey: string
+  private apiUrl = ''
+  private apiKey = ''
+  private networks: SandshrewConfig['networks']
+  private alkanes: AlkanesRpc
+  
 
-  constructor(apiKey: string, network: NetworkType) {
-    this.apiKey = apiKey
+  constructor(network: NetworkType, config?: SandshrewConfig) {
+    this.networks = {
+      mainnet: {
+        apiUrl: getSandshrewUrl('mainnet'),
+        apiKey: SANDSHREW_LASEREYES_KEY,
+      },
+      signet: {
+        apiUrl: getSandshrewUrl('signet'),
+        apiKey: SANDSHREW_LASEREYES_KEY,
+      },
+      ...config?.networks,
+    }
     this.setNetwork(network)
+    this.alkanes = new AlkanesRpc(`${this.apiUrl}/${this.apiKey}`)
   }
 
   public getName() {
@@ -28,19 +61,36 @@ export class SandshrewDataSource implements DataSource {
   }
 
   public setNetwork(network: NetworkType) {
-    this.apiUrl = getSandshrewUrl(network)
-
-    console.log(`SandshrewDataSource setNetwork: ${this.apiUrl}`)
-    if (this.apiUrl.includes('oylnet')) {
-      this.apiKey = 'regtest'
+    if (this.networks[network]) {
+      this.apiUrl = this.networks[network].apiUrl
+      this.apiKey = this.networks[network].apiKey
     } else {
-      this.apiKey = this.apiKey
+      // Default to mainnet if network not found in config
+      const isTestnet =
+        network === BaseNetwork.TESTNET ||
+        network === BaseNetwork.TESTNET4 ||
+        network === BaseNetwork.SIGNET ||
+        network === BaseNetwork.FRACTAL_TESTNET
+      const networkKey = isTestnet ? BaseNetwork.SIGNET : BaseNetwork.MAINNET
+
+      if (this.networks[networkKey]) {
+        this.apiUrl = this.networks[networkKey].apiUrl
+        this.apiKey = this.networks[networkKey].apiKey
+      } else {
+        // Fallback to default URLs
+        this.apiUrl = getSandshrewUrl(network)
+        this.apiKey = SANDSHREW_LASEREYES_KEY
+      }
     }
+    this.alkanes = new AlkanesRpc(`${this.apiUrl}/${this.apiKey}`)
   }
 
-  private async call(method: string, params: any) {
-    const url = `${this.apiUrl}/${this.apiKey}`
+  private async call(method: string, params: unknown) {
+    console.log('SandshrewDataSource.call', method, params)
+    console.log('SandshrewDataSource.apiUrl', this.apiUrl)
+    console.log('SandshrewDataSource.apiKey', this.apiKey)
     try {
+      const url = `${this.apiUrl}/${this.apiKey}`
       const response = await axios.post(
         url,
         {
@@ -57,9 +107,41 @@ export class SandshrewDataSource implements DataSource {
       )
       return response.data
     } catch (error) {
-      console.error(`SandshrewDataSource.callRPC error:`, error)
+      console.error('SandshrewDataSource.callRPC error:', error)
       throw error
     }
+  }
+
+  async getAlkanesByAddress(
+    address: string,
+  ): Promise<AlkanesOutpoint[]> {
+    const response = await this.alkanes.getAlkanesByAddress({
+      address,
+    })
+    return response
+  }
+
+  async getAddressAlkanesBalances(
+    address: string,
+  ): Promise<AlkaneBalance[]> {
+    const response = await this.getAlkanesByAddress(address)
+    const alkanesBalances: Record<string, AlkaneBalance> = {}
+    for (const outpoint of response) {
+      for (const rune of outpoint.runes) {
+        const runeId = runeIdToString(rune.rune.id)
+        if (!alkanesBalances[runeId]) {
+          alkanesBalances[runeId] = {
+            id: runeId,
+            balance: BigInt(rune.balance),
+            name: rune.rune.name,
+            symbol: rune.rune.symbol,
+          }
+        } else {
+          alkanesBalances[runeId].balance += BigInt(rune.balance)
+        }
+      }
+    }
+    return Object.values(alkanesBalances)
   }
 
   async getTransaction(txId: string) {
@@ -116,7 +198,7 @@ export class SandshrewDataSource implements DataSource {
       )) as RpcResponse
 
       for (let i = 0; i < result.length; i++) {
-        result[i].result['output'] = batch[i]
+        result[i].result.output = batch[i]
       }
 
       const filteredResult = result.filter((output: OrdOutputs) =>
@@ -156,7 +238,7 @@ export class SandshrewDataSource implements DataSource {
         throw new Error('No runes data found')
       }
 
-      return runesData.map((rune: any) => ({
+      return runesData.map((rune) => ({
         name: rune[0],
         balance: rune[1],
         symbol: rune[2],
@@ -167,11 +249,44 @@ export class SandshrewDataSource implements DataSource {
     }
   }
 
-  async getInscriptionInfo(inscriptionId: string): Promise<any> {
+  async getInscriptionInfo(inscriptionId: string) {
     const response = (await this.call('ord_inscription', [
       inscriptionId,
     ])) as RpcResponse
-    return response.result as InscriptionInfo
+    const inscriptionInfo = response.result as InscriptionInfo
+
+    // Convert to MaestroGetInscriptionInfoResponse format
+    return {
+      data: {
+        inscription_id: inscriptionInfo.id || inscriptionId,
+        inscription_number: inscriptionInfo.number || 0,
+        created_at: inscriptionInfo.timestamp || 0,
+        content_type: inscriptionInfo.effective_content_type || '',
+        content_body_preview: '',
+        content_length: inscriptionInfo.content_length || 0,
+        collection_symbol: null,
+      },
+      last_updated: {
+        block_hash: '',
+        block_height: inscriptionInfo.height || 0,
+      },
+    }
+  }
+
+  async getRecommendedFees(): Promise<{ fastFee: number; minFee: number }> {
+    const response = (await this.call(
+      'esplora_fee-estimates',
+      []
+    )) as RpcResponse
+    const feeEstimates = response.result as Record<string, number>
+
+    // Get the fee for 1 block confirmation (fastest)
+    const fastFee = feeEstimates['1'] || 0
+
+    // Get the minimum fee (lowest value in the estimates)
+    const minFee = Math.min(...Object.values(feeEstimates))
+
+    return { fastFee: Math.round(fastFee), minFee: Math.round(minFee) }
   }
 
   async getRuneOutpoints({
@@ -202,45 +317,39 @@ export class SandshrewDataSource implements DataSource {
   }: {
     ordOutputs: OrdOutputs[]
   }): Promise<SingleRuneOutpoint[]> {
-    try {
-      const runeOutpoints: SingleRuneOutpoint[] = []
-      for (let i = 0; i < ordOutputs.length; i++) {
-        const ordOutput = ordOutputs[i]
-        const { result } = ordOutput
-        if (!result.output?.split(':')) {
-          throw new Error('No output found')
-        }
-
-        const { output, address, runes } = result
-        const singleRuneOutpoint: SingleRuneOutpoint = {
-          output,
-          wallet_addr: address,
-          script: '',
-          balances: [],
-          decimals: [],
-          rune_ids: [],
-          value: result.value,
-        }
-
-        singleRuneOutpoint['script'] = Buffer.from(
-          getPublicKeyHash(address, MAINNET)
-        ).toString('hex')
-
-        if (typeof runes === 'object' && !Array.isArray(runes)) {
-          for (const rune in runes) {
-            singleRuneOutpoint.balances.push(runes[rune].amount)
-            singleRuneOutpoint.decimals.push(runes[rune].divisibility)
-            singleRuneOutpoint.rune_ids.push(
-              (await this.getRuneByName(rune)).id
-            )
-          }
-        }
-
-        runeOutpoints.push(singleRuneOutpoint)
+    const runeOutpoints: SingleRuneOutpoint[] = []
+    for (let i = 0; i < ordOutputs.length; i++) {
+      const ordOutput = ordOutputs[i]
+      const { result } = ordOutput
+      if (!result.output?.split(':')) {
+        throw new Error('No output found')
       }
-      return runeOutpoints
-    } catch (e) {
-      throw e
+
+      const { output, address, runes } = result
+      const singleRuneOutpoint: SingleRuneOutpoint = {
+        output,
+        wallet_addr: address,
+        script: '',
+        balances: [],
+        decimals: [],
+        rune_ids: [],
+        value: result.value,
+      }
+
+      singleRuneOutpoint.script = Buffer.from(
+        getPublicKeyHash(address, MAINNET)
+      ).toString('hex')
+
+      if (typeof runes === 'object' && !Array.isArray(runes)) {
+        for (const rune in runes) {
+          singleRuneOutpoint.balances.push(runes[rune].amount)
+          singleRuneOutpoint.decimals.push(runes[rune].divisibility)
+          singleRuneOutpoint.rune_ids.push((await this.getRuneByName(rune)).id)
+        }
+      }
+
+      runeOutpoints.push(singleRuneOutpoint)
     }
+    return runeOutpoints
   }
 }

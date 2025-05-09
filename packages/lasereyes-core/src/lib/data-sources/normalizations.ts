@@ -1,5 +1,5 @@
-import { Brc20Balance, Inscription } from "../../types/lasereyes";
-import { NetworkType } from "../../types";
+import type { Brc20Balance, Inscription } from "../../types/lasereyes";
+import type { NetworkType } from "../../types";
 import { getUnisatContentUrl, getUnisatPreviewUrl } from "../urls";
 
 /**
@@ -108,7 +108,7 @@ export function normalizeInscription(insc: any, source: string = "unknown", netw
     if (!txid || !vout) {
       console.warn(`Invalid inscription location from source: ${source}`);
       txid = output.split(":")[0];
-      vout = parseInt(output.split(":")[1]);
+      vout = Number.parseInt(output.split(":")[1]);
     }
   }
 

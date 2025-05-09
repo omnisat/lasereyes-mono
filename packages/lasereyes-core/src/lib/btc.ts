@@ -2,8 +2,8 @@ import * as bitcoin from 'bitcoinjs-lib'
 import * as ecc2 from '@bitcoinerlab/secp256k1'
 import { getBitcoinNetwork } from './helpers'
 import * as bip39 from 'bip39'
-import { NetworkType } from '../types'
-import { BIP32Factory, BIP32Interface } from 'bip32'
+import type { NetworkType } from '../types'
+import { BIP32Factory } from 'bip32'
 import { getTransactionMempoolSpace } from './mempool-space'
 import { P2PKH, P2SH_P2WPKH, P2SH, P2WPKH, P2WSH, P2TR } from '../constants'
 
@@ -14,8 +14,9 @@ export async function generatePrivateKey(network: NetworkType) {
   const entropy = crypto.getRandomValues(new Uint8Array(32))
   const mnemonic = bip39.entropyToMnemonic(Buffer.from(entropy))
   const seed = await bip39.mnemonicToSeed(mnemonic)
-  const root: BIP32Interface = bip32.fromSeed(seed, getBitcoinNetwork(network))
-  return root?.derivePath("m/44'/0'/0'/0/0").privateKey
+  const root = bip32.fromSeed(seed, getBitcoinNetwork(network))
+  // biome-ignore lint/style/noNonNullAssertion: root is derived from seed
+  return root.derivePath("m/44'/0'/0'/0/0").privateKey!
 }
 
 export const getAddressType = (
@@ -80,7 +81,7 @@ export async function waitForTransaction(
   const startTime: number = Date.now()
   while (true) {
     try {
-      const tx: any = await getTransactionMempoolSpace(txId, network)
+      const tx = await getTransactionMempoolSpace(txId, network)
       if (tx) {
         console.log('Transaction found in mempool:', txId)
         return true
@@ -111,9 +112,9 @@ export async function getOutputValueByVOutIndex(
 
   while (true) {
     try {
-      const rawTx: any = await getTransactionMempoolSpace(commitTxId, network)
+      const rawTx = await getTransactionMempoolSpace(commitTxId, network)
 
-      if (rawTx && rawTx.vout && rawTx.vout.length > 0) {
+      if (rawTx?.vout && rawTx.vout.length > 0) {
         return Math.floor(rawTx.vout[vOut].value)
       }
 

@@ -1,4 +1,4 @@
-import { MapStore, WritableAtom, atom, map } from 'nanostores'
+import { type MapStore, type WritableAtom, atom, map } from 'nanostores'
 import { MAINNET } from '../constants/networks'
 import {
   LEATHER,
@@ -13,8 +13,8 @@ import {
   OP_NET,
   SPARROW,
 } from '../constants/wallets'
-import { NetworkType, ProviderType, Config } from '../types'
-import { LaserEyesStoreType } from './types'
+import type { NetworkType, ProviderType, Config } from '../types'
+import type { LaserEyesStoreType } from './types'
 
 export function triggerDOMShakeHack(callback: VoidFunction) {
   if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
@@ -63,9 +63,12 @@ export function createStores(): {
   }
 }
 
-export function createConfig({ ...config }: Config) {
+export function createConfig(config?: Config) {
+  if (!config) {
+    return undefined
+  }
   return {
-    ...config
+    ...config,
   }
 }
 
@@ -112,5 +115,5 @@ export const fromHexString = (hexString: string): Uint8Array => {
   if (!matches) {
     throw new Error('Invalid hex string')
   }
-  return Uint8Array.from(matches.map((byte) => parseInt(byte, 16)))
+  return Uint8Array.from(matches.map((byte) => Number.parseInt(byte, 16)))
 }
