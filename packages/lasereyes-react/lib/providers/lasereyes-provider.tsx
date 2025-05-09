@@ -35,14 +35,13 @@ export default function LaserEyesProvider({
     [config]
   )
   const [client, setClient] = useState<LaserEyesClient | null>(null)
-
   useEffect(() => {
     const c = new LaserEyesClient(clientStores, clientConfig)
     setClient(() => c)
     c.initialize()
-    return () => c.dispose()
-  }, [clientConfig, clientStores])
 
+    return () => c.dispose()
+  }, [clientStores, clientConfig])
   const connect = useCallback(
     async (defaultWallet: ProviderType) => await client?.connect(defaultWallet),
     [client]

@@ -142,6 +142,9 @@ export class MempoolSpaceDataSource implements DataSource {
   }
 
   async getAddressUtxos(address: string): Promise<Array<MempoolUtxo & { scriptPk: string }>> {
+    if (address.startsWith('bcrt')) {
+      return []
+    }
     const utxos = await this.call('get', `/api/address/${address}/utxo`) as Array<MempoolUtxo>
     const scriptPk = bitcoin.address.toOutputScript(address, getBitcoinNetwork(this.network))
     return utxos.map((utxo) => ({

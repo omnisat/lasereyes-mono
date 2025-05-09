@@ -10,7 +10,7 @@ import type { SandshrewResponse, SingleRuneOutpoint } from '../types/sandshrew'
 import type { EsploraTx } from '../types/esplora'
 import { getPublicKeyHash } from './btc'
 import { MAINNET } from '../constants'
-import { SANDSHREW_LASEREYES_KEY, SANDSHREW_URL } from './urls'
+import { SANDSHREW_LASEREYES_KEY, SANDSHREW_URL_MAINNET } from './urls'
 
 export const callSandshrewRPC = async (
   method: string,
@@ -23,12 +23,12 @@ export const callSandshrewRPC = async (
     params: params,
   })
 
-  if (!SANDSHREW_URL) {
+  if (!SANDSHREW_URL_MAINNET) {
     throw new Error('SANDSHREW_URL is not set')
   }
 
   return await axios
-    .post(`${SANDSHREW_URL}/${SANDSHREW_LASEREYES_KEY}`, data, {
+    .post(`${SANDSHREW_URL_MAINNET}/${SANDSHREW_LASEREYES_KEY}`, data, {
       headers: {
         'content-type': 'application/json',
       },
