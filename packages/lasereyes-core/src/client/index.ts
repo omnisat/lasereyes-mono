@@ -127,6 +127,7 @@ export class LaserEyesClient {
         this.$network.set(foundNetwork)
         this.dataSourceManager.updateNetwork(foundNetwork)
       }
+
       try {
         if (this.config?.network && this.config.network !== foundNetwork) {
           this.switchNetwork(this.config.network)

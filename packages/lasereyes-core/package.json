@@ -1,7 +1,7 @@
 {
   "name": "@omnisat/lasereyes-core",
   "private": false,
-  "version": "0.0.70",
+  "version": "0.0.71-next.1",
   "type": "module",
   "main": "./dist/index.umd.cjs",
   "module": "./dist/index.js",
@@ -19,7 +19,8 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "prepare": "npm run build"
   },
   "devDependencies": {
     "@types/lodash": "^4.17.16",
