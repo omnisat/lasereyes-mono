@@ -2,7 +2,7 @@
 
 # LaserEyes
 
-Wallet connect library making it easier than ever to quickly build/maintain Bitcoin Oridnal Web Apps.
+Wallet connect library making it easier than ever to quickly build/maintain Bitcoin Ordinal Web Apps.
 
 ![Version](https://img.shields.io/npm/v/@omnisat/lasereyes)
 ![license](https://img.shields.io/github/license/omnisat/lasereyes.svg?style=flat-square)
