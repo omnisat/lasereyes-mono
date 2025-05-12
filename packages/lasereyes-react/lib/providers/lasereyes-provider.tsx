@@ -9,7 +9,6 @@ import {
   createStores,
   LaserEyesClient,
   LaserEyesSignPsbtOptions,
-  MAINNET,
   NetworkType,
   Protocol,
   ProviderType,
@@ -25,10 +24,7 @@ export default function LaserEyesProvider({
   children: ReactNode | ReactNode[]
 }) {
   const clientStores = useMemo(() => createStores(), [])
-  const clientConfig = useMemo(
-    () => createConfig(config ?? { network: MAINNET }),
-    [config]
-  )
+  const clientConfig = useMemo(() => createConfig(config ?? {}), [config])
   const [client, setClient] = useState<LaserEyesClient | null>(null)
 
   useEffect(() => {

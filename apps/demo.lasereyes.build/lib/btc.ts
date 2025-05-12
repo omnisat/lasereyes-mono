@@ -3,6 +3,8 @@ import {
   FRACTAL_MAINNET,
   FRACTAL_TESTNET,
   MAINNET,
+  NetworkType,
+  OYLNET,
   P2PKH,
   P2SH,
   P2TR,
@@ -72,13 +74,7 @@ export async function createPsbt(
   inputs: IMempoolUtxo[],
   outputAddress: string,
   paymentPublicKey: string,
-  network:
-    | typeof MAINNET
-    | typeof TESTNET
-    | typeof TESTNET4
-    | typeof SIGNET
-    | typeof FRACTAL_MAINNET
-    | typeof FRACTAL_TESTNET
+  network: NetworkType
 ) {
   if (!outputAddress) return
   const utxoWithMostValue = inputs.reduce((acc, utxo) => {
@@ -144,13 +140,7 @@ export async function createPsbt(
 
 export function getRedeemScript(
   paymentPublicKey: string,
-  network:
-    | typeof MAINNET
-    | typeof TESTNET
-    | typeof SIGNET
-    | typeof TESTNET4
-    | typeof FRACTAL_MAINNET
-    | typeof FRACTAL_TESTNET
+  network: NetworkType
 ) {
   const p2wpkh = bitcoin.payments.p2wpkh({
     pubkey: Buffer.from(paymentPublicKey, 'hex'),
@@ -207,17 +197,11 @@ export function estimateTxSize(
 //   throw new Error('Invalid address')
 // }
 
-export const getBitcoinNetwork = (
-  network:
-    | typeof MAINNET
-    | typeof TESTNET
-    | typeof TESTNET4
-    | typeof SIGNET
-    | typeof FRACTAL_MAINNET
-    | typeof FRACTAL_TESTNET
-) => {
+export const getBitcoinNetwork = (network: NetworkType) => {
   if (network === TESTNET || network === TESTNET4 || network === SIGNET) {
     return bitcoin.networks.testnet
+  } else if (network === OYLNET) {
+    return bitcoin.networks.regtest
   } else {
     return bitcoin.networks.bitcoin
   }
