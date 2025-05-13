@@ -4,6 +4,7 @@ import {
   FRACTAL_MAINNET,
   FRACTAL_TESTNET,
   MAINNET,
+  OYLNET,
   SIGNET,
   TESTNET,
   TESTNET4,
@@ -87,6 +88,15 @@ export async function getAddressUtxos(address: string, network: NetworkType) {
       return []
     }
     if (network === FRACTAL_TESTNET) {
+      return []
+    }
+  }
+
+  console.log('address', address)
+  console.log('network', network)
+
+  if (address.startsWith('bcrt')) {
+    if (network === OYLNET) {
       return []
     }
   }
@@ -206,4 +216,3 @@ export const isMainnetNetwork = (network: NetworkType) => {
     network === FRACTAL_TESTNET
   )
 }
-

@@ -1,14 +1,17 @@
 import {
   FRACTAL_MAINNET,
   FRACTAL_TESTNET,
+  OYLNET,
   SIGNET,
   TESTNET,
   TESTNET4,
 } from '../constants/networks'
 import { BaseNetwork, type BaseNetworkType, type NetworkType } from '../types'
 
-export const SANDSHREW_URL: string = 'https://mainnet.sandshrew.io/v1/'
-export const SANDSHREW_URL_TESTNET: string = 'https://signet.sandshrew.io/v1/'
+export const SANDSHREW_URL_MAINNET: string = 'https://mainnet.sandshrew.io/v2'
+export const SANDSHREW_URL_SIGNET: string = 'https://signet.sandshrew.io/v2'
+export const SANDSHREW_URL_TESTNET: string = 'https://testnet.sandshrew.io/v2'
+export const SANDSHREW_URL_OYLNET: string = 'https://oylnet.oyl.gg/v2'
 
 export const SANDSHREW_LASEREYES_KEY: string = 'lasereyes'
 export const MAESTRO_API_KEY_MAINNET: string =
@@ -88,16 +91,22 @@ export const getSandshrewUrl = (
   baseNetwork?: BaseNetworkType
 ) => {
   if (baseNetwork) {
-    return baseNetwork === BaseNetwork.MAINNET
-      ? SANDSHREW_URL
-      : SANDSHREW_URL_TESTNET
+    if (baseNetwork === BaseNetwork.MAINNET) {
+      return SANDSHREW_URL_MAINNET
+    } else if (baseNetwork === BaseNetwork.TESTNET) {
+      return SANDSHREW_URL_TESTNET
+    }
   }
-  return network === BaseNetwork.TESTNET ||
-    network === BaseNetwork.TESTNET4 ||
-    network === BaseNetwork.SIGNET ||
-    network === BaseNetwork.FRACTAL_TESTNET
-    ? SANDSHREW_URL_TESTNET
-    : SANDSHREW_URL
+  switch (network) {
+    case OYLNET:
+      return SANDSHREW_URL_OYLNET
+    case TESTNET:
+      return SANDSHREW_URL_TESTNET
+    case SIGNET:
+      return SANDSHREW_URL_SIGNET
+    default:
+      return SANDSHREW_URL_MAINNET
+  }
 }
 export const getUnisatContentUrl = (network: NetworkType) => {
   switch (network) {

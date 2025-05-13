@@ -2,6 +2,7 @@ import type {
   FRACTAL_MAINNET,
   FRACTAL_TESTNET,
   MAINNET,
+  OYLNET,
   SIGNET,
   TESTNET,
   TESTNET4,
@@ -60,6 +61,7 @@ export type BaseNetworkType =
   | typeof BaseNetwork.SIGNET
   | typeof BaseNetwork.FRACTAL_MAINNET
   | typeof BaseNetwork.FRACTAL_TESTNET
+  | typeof BaseNetwork.OYLNET
 
 export type NetworkType =
   | BaseNetworkType
@@ -110,13 +112,14 @@ export type ContentType =
   | typeof MULTIPART_FORM_DATA
 
 export type Config = {
-  network:
+  network?:
     | typeof MAINNET
     | typeof TESTNET
     | typeof TESTNET4
     | typeof SIGNET
     | typeof FRACTAL_MAINNET
     | typeof FRACTAL_TESTNET
+    | typeof OYLNET
     | string
   dataSources?: {
     mempool?: {
