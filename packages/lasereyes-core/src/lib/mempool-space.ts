@@ -1,33 +1,25 @@
 import axios from 'axios'
 import { MAINNET } from '../constants'
-import { NetworkType } from '../types'
+import type { NetworkType } from '../types'
 import { getMempoolSpaceUrl } from './urls'
-import { EsploraTx } from '../types/esplora'
+import type { EsploraTx } from '../types/esplora'
 
 export async function getTransactionMempoolSpace(
   txId: string,
   network: NetworkType = MAINNET
 ): Promise<EsploraTx> {
-  try {
     return await axios
       .get(`${getMempoolSpaceUrl(network)}/api/tx/${txId}`)
       .then((res) => res.data)
-  } catch (e: any) {
-    throw e
-  }
 }
 
 export async function getRawTransactionMempoolSpace(
   txId: string,
   network: NetworkType = MAINNET
 ): Promise<any> {
-  try {
     return await axios
       .get(`${getMempoolSpaceUrl(network)}/api/tx/${txId}/raw`)
       .then((res) => res.data)
-  } catch (e: any) {
-    throw e
-  }
 }
 
 export const getRecommendedFeesMempoolSpace = async (

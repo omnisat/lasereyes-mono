@@ -1,19 +1,25 @@
 'use client'
-import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
+import {
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
 import { defaultMethods, LaserEyesStoreContext } from './context'
 import {
-  BTCSendArgs,
-  Config,
-  ContentType,
+  type BTCSendArgs,
+  type Config,
+  type ContentType,
   createConfig,
   createStores,
   LaserEyesClient,
-  LaserEyesSignPsbtOptions,
-  NetworkType,
-  Protocol,
-  ProviderType,
-  RuneSendArgs,
-  SignMessageOptions,
+  type LaserEyesSignPsbtOptions,
+  type NetworkType,
+  type Protocol,
+  type ProviderType,
+  type RuneSendArgs,
+  type SignMessageOptions,
 } from '@omnisat/lasereyes-core'
 
 export default function LaserEyesProvider({
@@ -24,7 +30,10 @@ export default function LaserEyesProvider({
   children: ReactNode | ReactNode[]
 }) {
   const clientStores = useMemo(() => createStores(), [])
-  const clientConfig = useMemo(() => createConfig(config ?? {}), [config])
+  const clientConfig = useMemo(
+    () => createConfig(config),
+    [config]
+  )
   const [client, setClient] = useState<LaserEyesClient | null>(null)
 
   useEffect(() => {
@@ -117,11 +126,10 @@ export default function LaserEyesProvider({
             broadcast ?? false
           )) ?? defaultMethods.signPsbt()
         )
-      } else {
-        // Handle the `(options: LaserEyesSignPsbtOptions)` overload
-        const [options] = args
-        return (await client?.signPsbt?.(options)) ?? defaultMethods.signPsbt()
       }
+      // Handle the `(options: LaserEyesSignPsbtOptions)` overload
+      const [options] = args
+      return (await client?.signPsbt?.(options)) ?? defaultMethods.signPsbt()
     },
     [client]
   )

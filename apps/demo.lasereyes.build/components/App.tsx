@@ -44,6 +44,7 @@ import RunesSection from './RunesSection'
 import BRC20Section from './Brc20Section'
 
 import '@omnisat/lasereyes/ui/style.css'
+import AlkanesSection from './AlkanesSection'
 
 type colorsType =
   | 'orange'
@@ -854,6 +855,9 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
             <div className={'border-b border-2 border-[#232225] my-2'} />
             {/* BRC20 Component */}
             <BRC20Section />
+            <div className={'border-b border-2 border-[#232225] my-2'} />
+            {/* Alkanes Component */}
+            <AlkanesSection />
           </div>
         </div>
 
