@@ -1,5 +1,13 @@
 # @omnisat/lasereyes-react
 
+## 0.0.67
+
+### Patch Changes
+
+- 2450f0b: Integrate Alkanes and add oylnet
+- Updated dependencies
+  - @omnisat/lasereyes-core@0.0.72
+
 ## 0.0.67-next.0
 
 ### Patch Changes

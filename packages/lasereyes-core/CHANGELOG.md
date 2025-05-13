@@ -1,5 +1,11 @@
 # @omnisat/lasereyes-core
 
+## 0.0.72
+
+### Patch Changes
+
+- 2450f0b: Integrate Alkanes and add oylnet
+
 ## 0.0.72-next.0
 
 ### Patch Changes
