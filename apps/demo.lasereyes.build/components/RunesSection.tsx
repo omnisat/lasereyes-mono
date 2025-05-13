@@ -5,10 +5,10 @@ import { cn } from '@/lib/utils'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
 import { toast } from 'sonner'
 import { getMempoolSpaceUrl } from '@/lib/urls'
-import { MAINNET, RuneSendArgs, TESTNET, useLaserEyes, OrdRuneBalance } from '@omnisat/lasereyes'
+import { type MAINNET, type RuneSendArgs, type TESTNET, useLaserEyes, type OrdRuneBalance } from '@omnisat/lasereyes'
 
 const RunesSection = () => {
-  const { provider, address, send, network, getMetaBalances } = useLaserEyes()
+  const { provider, address, send, network, getMetaBalances, connected } = useLaserEyes()
   const [runes, setRunes] = useState<OrdRuneBalance[]>([])
 
   const [selectedRune, setSelectedRune] = useState<OrdRuneBalance>()
@@ -16,10 +16,10 @@ const RunesSection = () => {
   const [runeAmount, setRuneAmount] = useState('')
 
   useEffect(() => {
-    if (address) {
+    if (address && connected && network) {
       getMetaBalances('runes').then(setRunes)
     }
-  }, [address, getMetaBalances])
+  }, [address, getMetaBalances, connected, network])
 
   const sendRune = async () => {
     try {
@@ -39,11 +39,11 @@ const RunesSection = () => {
         <span className={'flex flex-col gap-1 items-center justify-center'}>
           <span className={'font-black'}>View on mempool.space</span>
           <a
-            target={'_blank'}
+            target='_blank'
             href={`${getMempoolSpaceUrl(
               network as typeof MAINNET | typeof TESTNET
             )}/tx/${txid}`}
-            className={'underline text-blue-600 text-xs'}
+            className={'underline text-blue-600 text-xs'} rel="noreferrer"
           >
             {txid}
           </a>
@@ -58,7 +58,7 @@ const RunesSection = () => {
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="text-gray-500 text-md text-orange-400">runes</div>
+      <div className="text-md text-orange-400">runes</div>
       <Select
         onValueChange={(value) => {
           const rune = runes?.find((r) => r.symbol === value)
@@ -69,15 +69,15 @@ const RunesSection = () => {
         <SelectTrigger
           disabled={!provider}
           className={cn(
-            'w-full bg-[#232225] border-none items-center justify-center text-center flex flex-row gap-4 items-center disabled:text-[#737275] text-sm text-center',
+            'w-full bg-[#232225] border-none justify-center flex flex-row gap-4 items-center disabled:text-[#737275] text-sm text-center',
             'min-w-[200px]'
           )}
         >
-          <SelectValue placeholder={runes.length === 0 ? "No runes found" : "Select rune to send"} ></SelectValue>
+          <SelectValue placeholder={runes.length === 0 ? "No runes found" : "Select rune to send"} />
         </SelectTrigger>
         <SelectContent>
-          {runes?.map((rune, index) => (
-            <SelectItem key={index} value={rune.symbol}>
+          {runes?.map((rune) => (
+            <SelectItem key={rune.symbol} value={rune.symbol}>
               {rune.name} ({rune.balance})
             </SelectItem>
           ))}

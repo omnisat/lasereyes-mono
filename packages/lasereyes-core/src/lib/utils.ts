@@ -11,7 +11,7 @@ export const isHex = (str: string): boolean => {
   return hexRegex.test(str)
 }
 
-export const encodeVarint = (bigIntValue: any) => {
+export const encodeVarint = (bigIntValue: bigint) => {
   const bufferArray = []
   let num = bigIntValue
 
@@ -27,6 +27,6 @@ export const encodeVarint = (bigIntValue: any) => {
   return { varint: Buffer.from(bufferArray) }
 }
 
-export function omitUndefined(obj: any) {
+export function omitUndefined(obj: object) {
   return _.omitBy(obj, _.isUndefined)
 }

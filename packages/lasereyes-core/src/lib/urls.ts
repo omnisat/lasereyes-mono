@@ -6,7 +6,7 @@ import {
   TESTNET,
   TESTNET4,
 } from '../constants/networks'
-import { NetworkType } from '../types'
+import { BaseNetwork, type BaseNetworkType, type NetworkType } from '../types'
 
 export const SANDSHREW_URL_MAINNET: string = 'https://mainnet.sandshrew.io/v2'
 export const SANDSHREW_URL_SIGNET: string = 'https://signet.sandshrew.io/v2'
@@ -55,23 +55,48 @@ export const UNISAT_PREVIEW_URL_FRACTAL_MAINNET: string =
 export const UNISAT_PREVIEW_URL_FRACTAL_TESTNET: string =
   'https://ordinals-testnet.fractalbitcoin.io/preview'
 
-export const getMempoolSpaceUrl = (network: NetworkType) =>
-  network === TESTNET
-    ? MEMPOOL_SPACE_URL_TESTNET
-    : network === TESTNET4
-      ? MEMPOOL_SPACE_URL_TESTNET4
-      : network === SIGNET
-        ? MEMPOOL_SPACE_URL_SIGNET
-        : network === FRACTAL_MAINNET
-          ? MEMPOOL_SPACE_URL_FRACTAL_MAINNET
-          : network === FRACTAL_TESTNET
-            ? MEMPOOL_SPACE_URL_FRACTAL_TESTNET
-            : MEMPOOL_SPACE_URL
+export const getMempoolSpaceUrl = (network: NetworkType) => {
+  switch (network) {
+    case TESTNET:
+      return MEMPOOL_SPACE_URL_TESTNET
+    case TESTNET4:
+      return MEMPOOL_SPACE_URL_TESTNET4
+    case SIGNET:
+      return MEMPOOL_SPACE_URL_SIGNET
+    case FRACTAL_MAINNET:
+      return MEMPOOL_SPACE_URL_FRACTAL_MAINNET
+    case FRACTAL_TESTNET:
+      return MEMPOOL_SPACE_URL_FRACTAL_TESTNET
+    default:
+      return MEMPOOL_SPACE_URL
+  }
+}
 
-export const getMaestroUrl = (network: NetworkType) =>
-  network === TESTNET4 ? MAESTRO_API_URL_TESTNET4 : MAESTRO_API_URL_MAINNET
+export const getMaestroUrl = (
+  network: NetworkType,
+  baseNetwork?: BaseNetworkType
+) => {
+  if (baseNetwork) {
+    return baseNetwork === BaseNetwork.MAINNET
+      ? MAESTRO_API_URL_MAINNET
+      : MAESTRO_API_URL_TESTNET4
+  }
+  return network === BaseNetwork.TESTNET4
+    ? MAESTRO_API_URL_TESTNET4
+    : MAESTRO_API_URL_MAINNET
+}
 
-export const getSandshrewUrl = (network: NetworkType) => {
+export const getSandshrewUrl = (
+  network: NetworkType,
+  baseNetwork?: BaseNetworkType
+) => {
+  if (baseNetwork) {
+    if (baseNetwork === BaseNetwork.MAINNET) {
+      return SANDSHREW_URL_MAINNET
+    } else if (baseNetwork === BaseNetwork.TESTNET) {
+      return SANDSHREW_URL_TESTNET
+    }
+  }
   switch (network) {
     case OYLNET:
       return SANDSHREW_URL_OYLNET
@@ -83,31 +108,36 @@ export const getSandshrewUrl = (network: NetworkType) => {
       return SANDSHREW_URL_MAINNET
   }
 }
-
 export const getUnisatContentUrl = (network: NetworkType) => {
-  return network === TESTNET
-    ? UNISAT_CONTENT_URL_TESTNET
-    : network === TESTNET4
-      ? UNISAT_CONTENT_URL_TESTNET4
-      : network === SIGNET
-        ? UNISAT_CONTENT_URL_TESTNET
-        : network === FRACTAL_MAINNET
-          ? UNISAT_CONTENT_URL_FRACTAL_MAINNET
-          : network === FRACTAL_TESTNET
-            ? UNISAT_CONTENT_URL_FRACTAL_TESTNET
-            : UNISAT_CONTENT_URL_MAINNET
+  switch (network) {
+    case TESTNET:
+      return UNISAT_CONTENT_URL_TESTNET
+    case TESTNET4:
+      return UNISAT_CONTENT_URL_TESTNET4
+    case SIGNET:
+      return UNISAT_CONTENT_URL_TESTNET
+    case FRACTAL_MAINNET:
+      return UNISAT_CONTENT_URL_FRACTAL_MAINNET
+    case FRACTAL_TESTNET:
+      return UNISAT_CONTENT_URL_FRACTAL_TESTNET
+    default:
+      return UNISAT_CONTENT_URL_MAINNET
+  }
 }
 
 export const getUnisatPreviewUrl = (network: NetworkType) => {
-  return network === TESTNET
-    ? UNISAT_PREVIEW_URL_TESTNET
-    : network === TESTNET4
-      ? UNISAT_PREVIEW_URL_TESTNET4
-      : network === SIGNET
-        ? UNISAT_PREVIEW_URL_TESTNET
-        : network === FRACTAL_MAINNET
-          ? UNISAT_PREVIEW_URL_FRACTAL_MAINNET
-          : network === FRACTAL_TESTNET
-            ? UNISAT_PREVIEW_URL_FRACTAL_TESTNET
-            : UNISAT_PREVIEW_URL_MAINNET
+  switch (network) {
+    case TESTNET:
+      return UNISAT_PREVIEW_URL_TESTNET
+    case TESTNET4:
+      return UNISAT_PREVIEW_URL_TESTNET4
+    case SIGNET:
+      return UNISAT_PREVIEW_URL_TESTNET
+    case FRACTAL_MAINNET:
+      return UNISAT_PREVIEW_URL_FRACTAL_MAINNET
+    case FRACTAL_TESTNET:
+      return UNISAT_PREVIEW_URL_FRACTAL_TESTNET
+    default:
+      return UNISAT_PREVIEW_URL_MAINNET
+  }
 }
