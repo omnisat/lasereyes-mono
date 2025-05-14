@@ -121,7 +121,7 @@ jobs:
           
           # Exit prerelease mode first
           echo "Exiting prerelease mode..."
-          pnpm changeset pre exit
+          pnpm changeset pre exit || true
           
           # Force version and build
           echo "Running version update..."
