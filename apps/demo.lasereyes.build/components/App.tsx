@@ -18,6 +18,7 @@ import {
   MAGIC_EDEN,
   XVERSE,
   UNISAT,
+  BaseNetwork,
 } from '@omnisat/lasereyes'
 import { createPsbt, satoshisToBTC } from '@/lib/btc'
 import { cn, truncateString } from '@/lib/utils'
@@ -45,6 +46,13 @@ import BRC20Section from './Brc20Section'
 
 import '@omnisat/lasereyes/ui/style.css'
 import AlkanesSection from './AlkanesSection'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from './ui/select'
 
 type colorsType =
   | 'orange'
@@ -110,42 +118,6 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
     hasOpNet,
   } = useLaserEyes()
 
-  const switchN = () => {
-    try {
-      if (network === MAINNET) {
-        switchNetwork(OYLNET).then(() => {
-          setNetwork(OYLNET)
-        })
-      } else if (network === TESTNET4) {
-        switchNetwork(TESTNET).then(() => {
-          setNetwork(TESTNET)
-        })
-      } else if (network === TESTNET) {
-        switchNetwork(SIGNET).then(() => {
-          setNetwork(SIGNET)
-        })
-      } else if (network === SIGNET) {
-        switchNetwork(FRACTAL_MAINNET).then(() => {
-          setNetwork(FRACTAL_MAINNET)
-        })
-      } else if (network === FRACTAL_MAINNET) {
-        switchNetwork(FRACTAL_TESTNET).then(() => {
-          setNetwork(FRACTAL_TESTNET)
-        })
-      } else {
-        switchNetwork(MAINNET).then(() => {
-          setNetwork(MAINNET)
-        })
-      }
-    } catch (e) {
-      if (e instanceof Error) {
-        toast.error(e.message)
-      } else {
-        toast.error('Unknown error')
-      }
-    }
-  }
-
   useEffect(() => {
     getPackageVersion().then((version) => {
       setPkgVersion(version)
@@ -210,7 +182,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
   // @ts-ignore
   const total = satoshisToBTC(balance)
 
-  const switchNet = async (desiredNetwork: typeof MAINNET | typeof TESTNET) => {
+  const switchNet = async (desiredNetwork: NetworkType) => {
     try {
       await switchNetwork(desiredNetwork)
     } catch (error) {
@@ -385,6 +357,8 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
     }
   }
 
+  console.log('network', network)
+
   // Render the updated UI with our modular components
   return (
     <div
@@ -455,23 +429,21 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
       </div>
 
       {/* Main container */}
-      <div className={'border border-[#3c393f] w-full text-xl grow '}>
-        {/* Network selector */}
-        <div className={'flex flex-row items-center gap-4 '}>
-          <div className={'grow'} />
-          <div
-            className={
-              'flex flex-col border border-[#3c393f] hover:underline cursor-pointer hover:text-orange-400 p-4 items-center'
-            }
-            onClick={() => switchN()}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                switchN()
-              }
-            }}
-          >
-            {network}
-          </div>
+      <div className={'border border-[#3c393f] w-full text-xl'}>
+        <div className="flex justify-end">
+          {/* Network selector */}
+          <Select onValueChange={switchNet} value={network}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select a network" />
+            </SelectTrigger>
+            <SelectContent className="h-[268px]">
+              {Object.entries(BaseNetwork).map(([key, value]) => (
+                <SelectItem key={key} value={value} className="h-8">
+                  {key}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Wallet information */}
