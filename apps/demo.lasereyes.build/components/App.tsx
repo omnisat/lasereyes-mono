@@ -357,8 +357,6 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
     }
   }
 
-  console.log('network', network)
-
   // Render the updated UI with our modular components
   return (
     <div
