@@ -116,11 +116,6 @@ export default class OylProvider extends WalletProvider {
 
   async connect(_: ProviderType): Promise<void> {
     if (!this.library) throw new Error("Oyl isn't installed")
-    await this.getNetwork().then((network) => {
-      if (this.network !== network) {
-        this.switchNetwork(this.network)
-      }
-    })
     const { nativeSegwit, taproot } = await this.library.getAddresses()
     if (!nativeSegwit || !taproot) throw new Error('No accounts found')
     this.$store.setKey('address', taproot.address)
@@ -216,6 +211,6 @@ export default class OylProvider extends WalletProvider {
   async switchNetwork(network: NetworkType): Promise<void> {
     await this.library.switchNetwork(network)
     this.$network.set(network)
-    this.parent.connect(OYL)
+    await this.parent.connect(OYL)
   }
 }

@@ -109,8 +109,6 @@ export class LaserEyesClient {
         return this.handleIsInitializingChanged(v.isInitializing)
     })
 
-    this.checkNetwork()
-
     // subscribeKeys(
     //   this.$store,
     //   ['hasProvider'],
@@ -118,10 +116,16 @@ export class LaserEyesClient {
     // )
 
     // Hack to trigger check for wallet providers
-    triggerDOMShakeHack(() => this.$store.setKey('isInitializing', false))
+    triggerDOMShakeHack(() => {
+      this.$store.setKey('isInitializing', false)
+      void this.checkNetwork()
+    })
   }
 
   private async checkNetwork() {
+    const { provider, isInitializing } = this.$store.get()
+    if (!provider || isInitializing) return
+
     const foundNetwork = await this.getNetwork()
     if (foundNetwork) {
       this.$network.set(foundNetwork)
