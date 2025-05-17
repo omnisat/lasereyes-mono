@@ -99,18 +99,39 @@ export class MaestroDataSource implements DataSource {
 
   async getAddressInscriptions(
     address: string,
-    offset?: number,
-    limit?: number
+    offset: number = 0,
+    limit: number = 10
   ): Promise<MaestroGetAddressInscriptions> {
-    const queryParams = new URLSearchParams()
-    if (offset !== undefined) queryParams.append('offset', offset.toString())
-    if (limit !== undefined) queryParams.append('limit', limit.toString())
+    let cursor: string | undefined = undefined
+    let toSkip = offset
+    let batchSize = 100
+    let lastResponse: any = null
 
-    const url = `/addresses/${address}/inscriptions${queryParams.toString() ? `?${queryParams.toString()}` : ''}`
-    const response = (await this.call(
-      'get',
-      url
-    )) as MaestroGetAddressInscriptions
+    while (toSkip > 0) {
+      const count = Math.min(batchSize, toSkip)
+      const queryParams = new URLSearchParams()
+      queryParams.append('count', count.toString())
+      if (cursor) queryParams.append('cursor', cursor)
+
+      const url = `/addresses/${address}/inscriptions?${queryParams.toString()}`
+      lastResponse = await this.call('get', url)
+
+      if (!lastResponse.next_cursor && toSkip > count) {
+        return { ...lastResponse, data: [] }
+      }
+
+      cursor = lastResponse.next_cursor
+      toSkip -= count
+    }
+
+    const queryParams = new URLSearchParams()
+    queryParams.append('count', limit.toString())
+    if (cursor) queryParams.append('cursor', cursor)
+
+    const url = `/addresses/${address}/inscriptions?${queryParams.toString()}`
+    const response = await this.call('get', url)
+
+    // Add address to each inscription
     const responseWithAddress = {
       ...response,
       data: response.data.map((insc: MaestroAddressInscription) => ({
