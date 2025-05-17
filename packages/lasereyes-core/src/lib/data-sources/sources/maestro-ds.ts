@@ -73,6 +73,11 @@ export class MaestroDataSource implements DataSource {
           ? await axios.get(url, options)
           : await axios.post(url, body, options)
 
+      if (!response || !response.data) {
+        throw new Error(
+          `Invalid response from Maestro API: ${JSON.stringify(response)}`
+        )
+      }
       return response.data
     } catch (error) {
       console.error('MaestroDataSource.call error:', error)
