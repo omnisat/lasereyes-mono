@@ -1,5 +1,8 @@
 import type { MapStore, WritableAtom } from 'nanostores'
-import type { LaserEyesStoreType, WalletProviderSignPsbtOptions } from '../types'
+import type {
+  LaserEyesStoreType,
+  WalletProviderSignPsbtOptions,
+} from '../types'
 import type {
   Brc20SendArgs,
   BTCSendArgs,
@@ -13,7 +16,7 @@ import type {
 } from '../../types'
 import type { LaserEyesClient } from '..'
 import { inscribeContent } from '../../lib/inscribe'
-import { broadcastTx, } from '../../lib/helpers'
+import { broadcastTx } from '../../lib/helpers'
 import * as bitcoin from 'bitcoinjs-lib'
 import {
   FRACTAL_TESTNET,
@@ -38,7 +41,7 @@ export abstract class WalletProvider {
   readonly $store: MapStore<LaserEyesStoreType>
   readonly $network: WritableAtom<NetworkType>
 
-  protected dataSourceManager: DataSourceManager;
+  protected dataSourceManager: DataSourceManager
 
   constructor(
     stores: {
@@ -50,6 +53,7 @@ export abstract class WalletProvider {
   ) {
     this.$store = stores.$store
     this.$network = stores.$network
+    this.config = config
 
     try {
       this.dataSourceManager = DataSourceManager.getInstance()
@@ -61,7 +65,7 @@ export abstract class WalletProvider {
     this.initialize()
   }
 
-  disconnect(): void { }
+  disconnect(): void {}
 
   abstract initialize(): void
 
@@ -82,7 +86,9 @@ export abstract class WalletProvider {
     const { address } = this.$store.get()
     if (
       address.slice(0, 1) === 't' &&
-      ([TESTNET, TESTNET4, SIGNET, FRACTAL_TESTNET] as string[]).includes(this.$network.get())
+      ([TESTNET, TESTNET4, SIGNET, FRACTAL_TESTNET] as string[]).includes(
+        this.$network.get()
+      )
     ) {
       return this.$network.get()
     }
@@ -99,7 +105,9 @@ export abstract class WalletProvider {
       throw new Error('Method not found on data source')
     }
 
-    return await this.dataSourceManager.getAddressBtcBalance(this.$store.get().paymentAddress)
+    return await this.dataSourceManager.getAddressBtcBalance(
+      this.$store.get().paymentAddress
+    )
   }
 
   async getMetaBalances(protocol: Protocol) {
@@ -116,31 +124,44 @@ export abstract class WalletProvider {
           throw new Error('Method not found on data source')
         }
 
-        return await this.dataSourceManager.getAddressRunesBalances(this.$store.get().address)
+        return await this.dataSourceManager.getAddressRunesBalances(
+          this.$store.get().address
+        )
       }
       case BRC20:
         if (!this.dataSourceManager.getAddressBrc20Balances) {
           throw new Error('Method not found on data source')
         }
 
-        return await this.dataSourceManager.getAddressBrc20Balances(this.$store.get().address)
+        return await this.dataSourceManager.getAddressBrc20Balances(
+          this.$store.get().address
+        )
       case ALKANES:
         if (!this.dataSourceManager.getAddressAlkanesBalances) {
           throw new Error('Method not found on data source')
         }
 
-        return await this.dataSourceManager.getAddressAlkanesBalances(this.$store.get().address)
+        return await this.dataSourceManager.getAddressAlkanesBalances(
+          this.$store.get().address
+        )
       default:
         throw new Error('Unsupported protocol')
     }
   }
 
-  async getInscriptions(offset?: number, limit?: number): Promise<Inscription[]> {
+  async getInscriptions(
+    offset?: number,
+    limit?: number
+  ): Promise<Inscription[]> {
     if (!this.dataSourceManager.getAddressInscriptions) {
       throw new Error('Method not found on data source')
     }
 
-    return await this.dataSourceManager.getAddressInscriptions(this.$store.get().address, offset, limit)
+    return await this.dataSourceManager.getAddressInscriptions(
+      this.$store.get().address,
+      offset,
+      limit
+    )
   }
 
   abstract sendBTC(to: string, amount: number): Promise<string>
@@ -150,14 +171,12 @@ export abstract class WalletProvider {
     options?: { toSignAddress?: string }
   ): Promise<string>
 
-  abstract signPsbt(
-    signPsbtOptions: WalletProviderSignPsbtOptions
-  ): Promise<
+  abstract signPsbt(signPsbtOptions: WalletProviderSignPsbtOptions): Promise<
     | {
-      signedPsbtHex: string | undefined
-      signedPsbtBase64: string | undefined
-      txId?: string
-    }
+        signedPsbtHex: string | undefined
+        signedPsbtBase64: string | undefined
+        txId?: string
+      }
     | undefined
   >
 
@@ -188,7 +207,10 @@ export abstract class WalletProvider {
     })
   }
 
-  async send(protocol: Protocol, sendArgs: BTCSendArgs | RuneSendArgs | Brc20SendArgs | AlkaneSendArgs) {
+  async send(
+    protocol: Protocol,
+    sendArgs: BTCSendArgs | RuneSendArgs | Brc20SendArgs | AlkaneSendArgs
+  ) {
     switch (protocol) {
       case BTC:
         return await this.sendBTC(sendArgs.toAddress, sendArgs.amount)
@@ -249,16 +271,23 @@ export abstract class WalletProvider {
 
         // Use the AlkanesModule to send the alkane
         const alkanesModule = new AlkanesModule(this.parent)
-        return await alkanesModule.send(alkaneArgs.id, alkaneArgs.amount, alkaneArgs.toAddress)
+        return await alkanesModule.send(
+          alkaneArgs.id,
+          alkaneArgs.amount,
+          alkaneArgs.toAddress
+        )
       }
       default:
         throw new Error('Unsupported protocol')
     }
   }
 
-  async sendInscriptions(inscriptionIds: string[], toAddress: string): Promise<string> {
+  async sendInscriptions(
+    inscriptionIds: string[],
+    toAddress: string
+  ): Promise<string> {
     const inscriptions = await this.getInscriptions()
-    const inscriptionsToSend = inscriptions.filter(inscription =>
+    const inscriptionsToSend = inscriptions.filter((inscription) =>
       inscriptionIds.includes(inscription.id)
     )
     if (inscriptionsToSend.length !== inscriptionIds.length) {
