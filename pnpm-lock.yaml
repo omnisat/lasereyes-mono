@@ -479,6 +479,9 @@ importers:
       sats-connect:
         specifier: ^3.3.0
         version: 3.3.0(typescript@5.8.2)
+      tiny-async-pool:
+        specifier: ^2.1.0
+        version: 2.1.0
     devDependencies:
       '@types/lodash':
         specifier: ^4.17.16
@@ -486,6 +489,9 @@ importers:
       '@types/node':
         specifier: ^22.7.7
         version: 22.13.11
+      '@types/tiny-async-pool':
+        specifier: ^2.0.3
+        version: 2.0.3
       typescript:
         specifier: ^5.5.3
         version: 5.8.2
@@ -7101,6 +7107,10 @@ packages:
     dependencies:
       '@types/jest': 27.5.2
     dev: false
+
+  /@types/tiny-async-pool@2.0.3:
+    resolution: {integrity: sha512-n3l1s538tKo9RBoHs4I3DG/VmD3VYhF5mHcgu1sU4Lq7JCNBtxnpBy3OkWSbZsp5r5QOuplh2UkXXXwufoAuNQ==}
+    dev: true
 
   /@types/trusted-types@2.0.7:
     resolution: {integrity: sha512-ScaPdn1dQczgbl0QFTeTOmVHFULt394XJgOQNoyVhZ6r2vLnMLJfBPd53SB52T/3G36VI1/g2MZaX0cwDuXsfw==}

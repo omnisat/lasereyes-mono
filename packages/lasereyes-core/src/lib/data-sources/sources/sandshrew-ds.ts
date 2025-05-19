@@ -112,6 +112,11 @@ export class SandshrewDataSource implements DataSource {
     }
   }
 
+  async multicall(multiCall: any[]) {
+    const response = await this.call('sandshrew_multicall', multiCall)
+    return response.result
+  }
+
   async getAlkanesByAddress(
     address: string,
   ): Promise<AlkanesOutpoint[]> {

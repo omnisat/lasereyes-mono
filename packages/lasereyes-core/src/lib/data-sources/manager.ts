@@ -1,3 +1,4 @@
+import asyncPool from 'tiny-async-pool'
 import { MAESTRO } from '../../constants/data-sources'
 import type { AlkanesOutpoint, Config, MempoolUtxo } from '../../types'
 import type { AlkaneBalance } from '../../types/alkane'
@@ -5,7 +6,13 @@ import type { DataSource } from '../../types/data-source'
 import type { Inscription } from '../../types/lasereyes'
 import type { MaestroAddressInscription } from '../../types/maestro'
 import { BaseNetwork } from '../../types/network'
-import type { OrdRuneBalance } from '../../types/ord'
+import type { OrdOutput, OrdRuneBalance } from '../../types/ord'
+import {
+  FormattedAlkane,
+  FormattedInscription,
+  FormattedRune,
+  FormattedUTXO,
+} from '../../types/utxo'
 import {
   getMaestroUrl,
   getMempoolSpaceUrl,
@@ -14,12 +21,17 @@ import {
   SANDSHREW_LASEREYES_KEY,
   getSandshrewUrl,
 } from '../urls'
+import { toBigEndian } from '../utils'
 import { normalizeBrc20Balances, normalizeInscription } from './normalizations'
 import { MaestroDataSource } from './sources/maestro-ds'
 import { MempoolSpaceDataSource } from './sources/mempool-space-ds'
 import { SandshrewDataSource } from './sources/sandshrew-ds'
 
 const ERROR_METHOD_NOT_AVAILABLE = 'Method not available on any data source'
+
+type LasereyesUTXO = MempoolUtxo & {
+  scriptPk: string
+}
 
 export class DataSourceManager {
   private static instance: DataSourceManager
@@ -35,72 +47,70 @@ export class DataSourceManager {
     this.customNetworks = new Map(Object.entries(config?.customNetworks || {}))
     this.dataSources.set(
       'mempool',
-      new MempoolSpaceDataSource(
-        network,
-        {
-          networks: {
-            mainnet: {
-              apiUrl: config?.dataSources?.mempool?.url || getMempoolSpaceUrl(BaseNetwork.MAINNET),
-            },
-            testnet: {
-              apiUrl: getMempoolSpaceUrl(BaseNetwork.TESTNET),
-            },
-            testnet4: {
-              apiUrl: getMempoolSpaceUrl(BaseNetwork.TESTNET4),
-            },
-            signet: {
-              apiUrl: getMempoolSpaceUrl(BaseNetwork.SIGNET),
-            },
-            "fractal-mainnet": {
-              apiUrl: getMempoolSpaceUrl(BaseNetwork.FRACTAL_MAINNET),
-            },
-            "fractal-testnet": {
-              apiUrl: getMempoolSpaceUrl(BaseNetwork.FRACTAL_TESTNET),
-            },
-            ...config?.dataSources?.mempool?.networks,
-          }
-        }
-      )
+      new MempoolSpaceDataSource(network, {
+        networks: {
+          mainnet: {
+            apiUrl:
+              config?.dataSources?.mempool?.url ||
+              getMempoolSpaceUrl(BaseNetwork.MAINNET),
+          },
+          testnet: {
+            apiUrl: getMempoolSpaceUrl(BaseNetwork.TESTNET),
+          },
+          testnet4: {
+            apiUrl: getMempoolSpaceUrl(BaseNetwork.TESTNET4),
+          },
+          signet: {
+            apiUrl: getMempoolSpaceUrl(BaseNetwork.SIGNET),
+          },
+          'fractal-mainnet': {
+            apiUrl: getMempoolSpaceUrl(BaseNetwork.FRACTAL_MAINNET),
+          },
+          'fractal-testnet': {
+            apiUrl: getMempoolSpaceUrl(BaseNetwork.FRACTAL_TESTNET),
+          },
+          ...config?.dataSources?.mempool?.networks,
+        },
+      })
     )
 
     this.dataSources.set(
       'sandshrew',
-      new SandshrewDataSource(
-        network,
-        {
-          networks: {
-            mainnet: {
-              apiKey: config?.dataSources?.sandshrew?.apiKey || SANDSHREW_LASEREYES_KEY,
-              apiUrl: getSandshrewUrl(BaseNetwork.MAINNET),
-            },
-            testnet: {
-              apiKey: config?.dataSources?.sandshrew?.apiKey || SANDSHREW_LASEREYES_KEY,
-              apiUrl: getSandshrewUrl(BaseNetwork.TESTNET),
-            },
-            ...config?.dataSources?.sandshrew?.networks,
-          }
-        }
-      )
+      new SandshrewDataSource(network, {
+        networks: {
+          mainnet: {
+            apiKey:
+              config?.dataSources?.sandshrew?.apiKey || SANDSHREW_LASEREYES_KEY,
+            apiUrl: getSandshrewUrl(BaseNetwork.MAINNET),
+          },
+          testnet: {
+            apiKey:
+              config?.dataSources?.sandshrew?.apiKey || SANDSHREW_LASEREYES_KEY,
+            apiUrl: getSandshrewUrl(BaseNetwork.TESTNET),
+          },
+          ...config?.dataSources?.sandshrew?.networks,
+        },
+      })
     )
 
     this.dataSources.set(
       'maestro',
-      new MaestroDataSource(
-        network,
-        {
-          networks: {
-            mainnet: {
-              apiKey: config?.dataSources?.maestro?.apiKey || MAESTRO_API_KEY_MAINNET,
-              apiUrl: getMaestroUrl(BaseNetwork.MAINNET),
-            },
-            testnet4: {
-              apiKey: config?.dataSources?.maestro?.testnetApiKey || MAESTRO_API_KEY_TESTNET4,
-              apiUrl: getMaestroUrl(BaseNetwork.TESTNET4),
-            },
-            ...config?.dataSources?.maestro?.networks,
-          }
-        }
-      )
+      new MaestroDataSource(network, {
+        networks: {
+          mainnet: {
+            apiKey:
+              config?.dataSources?.maestro?.apiKey || MAESTRO_API_KEY_MAINNET,
+            apiUrl: getMaestroUrl(BaseNetwork.MAINNET),
+          },
+          testnet4: {
+            apiKey:
+              config?.dataSources?.maestro?.testnetApiKey ||
+              MAESTRO_API_KEY_TESTNET4,
+            apiUrl: getMaestroUrl(BaseNetwork.TESTNET4),
+          },
+          ...config?.dataSources?.maestro?.networks,
+        },
+      })
     )
   }
 
@@ -128,17 +138,20 @@ export class DataSourceManager {
 
   public registerDataSource(source: string, dataSource: DataSource) {
     this.dataSources.set(source, dataSource)
-    this.dataSources.get(source)?.setNetwork?.(this.network, this.customNetworks.get(this.network)?.baseNetwork)
+    this.dataSources
+      .get(source)
+      ?.setNetwork?.(
+        this.network,
+        this.customNetworks.get(this.network)?.baseNetwork
+      )
   }
 
   public getSource(source: string): DataSource | undefined {
     return this.dataSources.get(source)
   }
 
-
-
   public async getAddressAlkanesBalances(
-    address: string,
+    address: string
   ): Promise<AlkaneBalance[]> {
     const dataSource = this.findAvailableSource('getAddressAlkanesBalances')
     if (!dataSource || !dataSource.getAddressAlkanesBalances) {
@@ -148,7 +161,7 @@ export class DataSourceManager {
   }
 
   public async getAlkanesByAddress(
-    address: string,
+    address: string
   ): Promise<AlkanesOutpoint[]> {
     const dataSource = this.findAvailableSource('getAlkanesByAddress')
     if (!dataSource || !dataSource.getAlkanesByAddress) {
@@ -271,7 +284,7 @@ export class DataSourceManager {
     }
   }
 
-  public async getAddressUtxos(address: string): Promise<Array<MempoolUtxo & { scriptPk: string }>> {
+  public async getAddressUtxos(address: string): Promise<Array<LasereyesUTXO>> {
     const dataSource = this.findAvailableSource('getAddressUtxos')
     if (!dataSource || !dataSource.getAddressUtxos) {
       throw new Error(ERROR_METHOD_NOT_AVAILABLE)
@@ -355,6 +368,109 @@ export class DataSourceManager {
       }
     }
     return undefined
+  }
+
+  async getFormattedUTXOS(address: string): Promise<FormattedUTXO[]> {
+    const alkanes = await this.getAlkanesByAddress(address)
+    const utxos = await this.getAddressUtxos(address)
+    if (utxos.length === 0) {
+      return []
+    }
+
+    alkanes.forEach((alkane) => {
+      alkane.outpoint.txid = toBigEndian(alkane.outpoint.txid)
+    })
+
+    const concurrencyLimit = 10
+    const processedUtxos: {
+      utxo: LasereyesUTXO
+      txOutput: OrdOutput
+      scriptPk: string
+      alkanesOutpoints: AlkanesOutpoint[]
+    }[] = []
+
+    const processUtxo = async (utxo: LasereyesUTXO) => {
+      try {
+        const txIdVout = `${utxo.txid}:${utxo.vout}`
+
+        const multiCall = await (
+          this.getSource('sandshrew') as SandshrewDataSource
+        ).multicall([
+          ['ord_output', [txIdVout]],
+          ['esplora_tx', [utxo.txid]],
+        ])
+
+        const txOutput = multiCall[0].result as OrdOutput
+        const txDetails = multiCall[1].result
+
+        const alkanesOutpoints = alkanes.filter(
+          (alkane) =>
+            alkane.outpoint.txid === utxo.txid &&
+            alkane.outpoint.vout === utxo.vout
+        )
+
+        return {
+          utxo,
+          txOutput,
+          scriptPk: txDetails.vout[utxo.vout].scriptpubkey,
+          alkanesOutpoints,
+        }
+      } catch (error) {
+        console.error(`Error processing UTXO ${utxo.txid}:${utxo.vout}`, error)
+        throw error
+      }
+    }
+
+    for await (const result of asyncPool(
+      concurrencyLimit,
+      utxos,
+      processUtxo
+    )) {
+      if (result !== null) {
+        processedUtxos.push(result)
+      }
+    }
+
+    processedUtxos.sort((a, b) => a.utxo.value - b.utxo.value)
+
+    return processedUtxos.map(({ utxo, txOutput, alkanesOutpoints }) => {
+      const hasInscriptions = txOutput.inscriptions.length > 0
+      const hasRunes = Object.keys(txOutput.runes).length > 0
+      const hasAlkanes = alkanesOutpoints.length > 0
+      // const confirmations = blockCount - utxo.status.block_height
+      const inscriptions: FormattedInscription[] = txOutput.inscriptions.map(
+        (inscriptionId) => ({
+          inscriptionId,
+        })
+      )
+      const runes: FormattedRune[] = Object.entries(txOutput.runes).map(
+        ([runeId, rune]) => ({
+          runeId,
+          amount: rune.amount,
+          name: rune.name,
+          symbol: rune.symbol,
+        })
+      )
+      const alkanes: FormattedAlkane[] = alkanesOutpoints.map((alkane) => ({
+        id: alkane.outpoint.txid,
+        amount: alkane.outpoint.vout,
+        name: alkane.outpoint.txid,
+        symbol: alkane.outpoint.txid,
+      }))
+
+      return {
+        alkanes,
+        runes,
+        inscriptions,
+        hasInscriptions,
+        hasRunes,
+        hasAlkanes,
+        txHash: utxo.txid,
+        txOutputIndex: utxo.vout,
+        btcValue: utxo.value,
+        scriptPubKey: txOutput.script_pubkey,
+      } as FormattedUTXO
+    })
   }
 }
 
