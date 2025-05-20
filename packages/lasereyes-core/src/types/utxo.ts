@@ -32,9 +32,6 @@ export interface FormattedUTXO {
     hasAlkanes: boolean
     alkanes: FormattedAlkane[]
 
-    hasBrc20s: boolean
-    brc20s: FormattedBrc20[]
-
     hasInscriptions: boolean
     inscriptions: FormattedInscription[]
 }
