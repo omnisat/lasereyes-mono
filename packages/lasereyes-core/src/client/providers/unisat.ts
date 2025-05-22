@@ -115,11 +115,7 @@ export default class UnisatProvider extends WalletProvider {
     if (!this.library) throw new Error("Unisat isn't installed")
     const unisatAccounts = await this.library.requestAccounts()
     if (!unisatAccounts) throw new Error('No accounts found')
-    await this.getNetwork().then((network) => {
-      if (this.network !== network) {
-        this.switchNetwork(this.network)
-      }
-    })
+
     const unisatPubKey = await this.library.getPublicKey()
     if (!unisatPubKey) throw new Error('No public key found')
     this.$store.setKey('accounts', unisatAccounts)
