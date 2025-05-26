@@ -1,5 +1,7 @@
-import { NetworkType, ProviderType } from '../types'
-import { BIP322, ECDSA } from '../constants/signing-protocol'
+import type { NetworkType, ProviderType } from '../types'
+import type { BIP322, ECDSA } from '../constants/signing-protocol'
+
+export * from './modules/types'
 
 export type LaserEyesStoreType = {
   provider: ProviderType | undefined

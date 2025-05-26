@@ -1,9 +1,9 @@
 import type { Account } from '@oyl/sdk/lib/account'
-import type { LaserEyesClient } from '../index'
+
 import { ProtoStone, encodeRunestoneProtostone } from 'alkanes/lib/index.js'
 import { ProtoruneRuneId } from 'alkanes/lib/protorune/protoruneruneid'
 import * as bitcoin from 'bitcoinjs-lib'
-import { getBitcoinNetwork } from '../../lib/helpers'
+
 import { u128 } from '@magiceden-oss/runestone-lib/dist/src/integer/u128'
 import { u32 } from '@magiceden-oss/runestone-lib/dist/src/integer'
 import type {
@@ -11,6 +11,9 @@ import type {
   GatheredUtxos,
 } from '@oyl/sdk/lib/shared/interface'
 import { toXOnly } from 'bitcoinjs-lib/src/psbt/bip371'
+import { LaserEyesClient } from '../..'
+import { getBitcoinNetwork } from '../../../lib/helpers'
+
 
 export enum AddressType {
   P2PKH = 0,
@@ -156,7 +159,10 @@ export const formatInputsToSign = async ({
         internalPubkey: tapInternalKey,
         network: network,
       })
-      if ((v.witnessUtxo && Buffer.from(v.witnessUtxo.script).toString('hex')) === (p2tr.output && Buffer.from(p2tr.output).toString('hex'))) {
+      if (
+        (v.witnessUtxo && Buffer.from(v.witnessUtxo.script).toString('hex')) ===
+        (p2tr.output && Buffer.from(p2tr.output).toString('hex'))
+      ) {
         _psbt.updateInput(index, {
           tapInternalKey,
         })
@@ -430,7 +436,7 @@ export const createSendPsbt = async ({
   })
 
   psbt.addOutput({ script: protostone, value: 0n })
-  
+
   const changeAmount =
     gatheredUtxos.totalAmount + totalSatoshis - (finalFee + inscriptionSats * 2)
 
@@ -446,90 +452,4 @@ export const createSendPsbt = async ({
   })
 
   return { psbt: formattedPsbtTx.toBase64() }
-}
-
-export default class AlkanesModule {
-  constructor(private readonly client: LaserEyesClient) {}
-
-  async send(id: string, amount: number, toAddress: string) {
-    const { connected, address, publicKey } = this.client.$store.get()
-    if (!connected) {
-      throw new Error('Client is not connected')
-    }
-
-    const alkaneId = {
-      block: id.split(':')[0],
-      tx: id.split(':')[1],
-    }
-    if (!alkaneId) {
-      throw new Error('Alkane not found')
-    }
-
-    const network = this.client.$network.get()
-    const bitcoinNetwork = getBitcoinNetwork(network)
-    const account: Account = {
-      network: bitcoinNetwork,
-      spendStrategy: {
-        utxoSortGreatestToLeast: true,
-        changeAddress: 'taproot',
-        addressOrder: ['taproot', 'nestedSegwit', 'legacy', 'nativeSegwit'],
-      },
-      taproot: {
-        address: address,
-        pubkey: publicKey,
-        pubKeyXOnly: toXOnly(Buffer.from(publicKey, 'hex')).toString(),
-        hdPath: `m/84'/1'/0'/0/0`,
-      },
-      nestedSegwit: {
-        address: address,
-        pubkey: publicKey,
-        hdPath: `m/84'/1'/0'/0/0`,
-      },
-      legacy: {
-        address: address,
-        pubkey: publicKey,
-        hdPath: `m/49'/1'/0'/0/0`,
-      },
-      nativeSegwit: {
-        address: address,
-        pubkey: publicKey,
-        hdPath: `m/84'/1'/0'/0/0`,
-      },
-    }
-    const { fastFee } = await this.client.dataSourceManager.getRecommendedFees()
-    const utxos = await this.client.dataSourceManager.getAddressUtxos(address)
-    const { psbt } = await createSendPsbt({
-      gatheredUtxos: {
-        utxos: utxos.map((utxo) => ({
-          txId: utxo.txid,
-          outputIndex: utxo.vout,
-          satoshis: utxo.value,
-          scriptPk: utxo.scriptPk,
-          address,
-          inscriptions: [],
-          confirmations: Number(utxo.status.confirmed),
-        })),
-        totalAmount: utxos.reduce((acc, utxo) => acc + utxo.value, 0),
-      },
-      account,
-      alkaneId,
-      client: this.client,
-      toAddress,
-      amount,
-      feeRate: fastFee,
-    })
-
-    const response = await this.client.signPsbt({ tx: psbt, broadcast: true, finalize: true })
-    if (!response) {
-      throw new Error('Failed to sign transaction')
-    }
-    if (response.txId) {
-      return response.txId
-    }
-    const txId = await this.client.pushPsbt(response.signedPsbtHex ?? response.signedPsbtBase64!)
-    if (txId) {
-      return txId
-    }
-    throw new Error('Failed to broadcast transaction')
-  }
 }
