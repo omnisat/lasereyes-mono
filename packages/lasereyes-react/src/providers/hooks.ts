@@ -1,3 +1,5 @@
+'use client'
+
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { LaserEyesStoreContext } from './context'
 import type { LaserEyesContextType } from './types'

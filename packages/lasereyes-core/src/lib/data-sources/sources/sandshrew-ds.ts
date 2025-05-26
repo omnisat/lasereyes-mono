@@ -13,8 +13,8 @@ import { SANDSHREW_LASEREYES_KEY, getSandshrewUrl } from '../../urls'
 import type { RpcResponse } from '../../../types/rpc'
 import { SANDSHREW } from '../../../constants/data-sources'
 import { type AlkanesOutpoint, BaseNetwork, type NetworkType } from '../../../types'
-import { AlkanesRpc } from '@oyl/sdk/lib/rpclient/alkanes'
 import type { AlkaneBalance } from '../../../types/alkane'
+import { AlkanesRpc } from '../../../client/modules/alkanes/rpc'
 
 export function runeIdToString({block, tx}: {block: string, tx: string}) {
     return `${block}:${tx}`
@@ -37,7 +37,7 @@ export class SandshrewDataSource implements DataSource {
   private apiUrl = ''
   private apiKey = ''
   private networks: SandshrewConfig['networks']
-  private alkanes: AlkanesRpc
+  alkanesRpc: AlkanesRpc
   
 
   constructor(network: NetworkType, config?: SandshrewConfig) {
@@ -53,7 +53,7 @@ export class SandshrewDataSource implements DataSource {
       ...config?.networks,
     }
     this.setNetwork(network)
-    this.alkanes = new AlkanesRpc(`${this.apiUrl}/${this.apiKey}`)
+    this.alkanesRpc = new AlkanesRpc(`${this.apiUrl}/${this.apiKey}`)
   }
 
   public getName() {
@@ -82,7 +82,7 @@ export class SandshrewDataSource implements DataSource {
         this.apiKey = SANDSHREW_LASEREYES_KEY
       }
     }
-    this.alkanes = new AlkanesRpc(`${this.apiUrl}/${this.apiKey}`)
+    this.alkanesRpc = new AlkanesRpc(`${this.apiUrl}/${this.apiKey}`)
   }
 
   private async call(method: string, params: unknown) {
@@ -120,7 +120,7 @@ export class SandshrewDataSource implements DataSource {
   async getAlkanesByAddress(
     address: string,
   ): Promise<AlkanesOutpoint[]> {
-    const response = await this.alkanes.getAlkanesByAddress({
+    const response = await this.alkanesRpc.getAlkanesByAddress({
       address,
     })
     return response

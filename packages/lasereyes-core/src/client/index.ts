@@ -49,6 +49,7 @@ import PhantomProvider from './providers/phantom'
 import OpNetProvider from './providers/op-net'
 import SparrowProvider from './providers/sparrow'
 import { DataSourceManager } from '../lib/data-sources/manager'
+import AlkanesModule from './modules/alkanes'
 
 export class LaserEyesClient {
   readonly $store: MapStore<LaserEyesStoreType>
@@ -57,6 +58,9 @@ export class LaserEyesClient {
   private disposed = false
 
   readonly dataSourceManager: DataSourceManager
+  readonly modules: {
+    readonly alkanes: AlkanesModule
+  }
 
   dispose() {
     this.disposed = true
@@ -87,6 +91,10 @@ export class LaserEyesClient {
       [UNISAT]: new UnisatProvider(stores, this, config),
       [XVERSE]: new XVerseProvider(stores, this, config),
       [WIZZ]: new WizzProvider(stores, this, config),
+    }
+
+    this.modules = {
+      alkanes: new AlkanesModule(this),
     }
 
     try {
@@ -528,3 +536,5 @@ export class LaserEyesClient {
     }
   }
 }
+
+export * from "./modules"
