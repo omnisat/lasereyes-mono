@@ -5,7 +5,7 @@ import { LaserEyesStoreContext } from './context'
 import type { LaserEyesContextType } from './types'
 import { compareValues } from '../utils/comparison'
 import type { LaserEyesStoreType, NetworkType } from '@omnisat/lasereyes-core'
-import { computed, keepMount } from 'nanostores'
+import { batched, keepMount } from 'nanostores'
 
 const defaultSelector = (x: LaserEyesContextType) => ({ ...x })
 
@@ -58,7 +58,7 @@ export function useLaserEyes<T>(
   )
 
   const $computedStore = useMemo(() => {
-    const store = computed([$store, $network], selectValues)
+    const store = batched([$store, $network], selectValues)
     keepMount(store)
     return store
   }, [$store, $network, selectValues])
