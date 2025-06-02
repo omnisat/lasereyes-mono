@@ -1,6 +1,6 @@
 {
   "name": "@omnisat/lasereyes-ui",
-  "version": "0.0.13",
+  "version": "0.0.14-next.3",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

@@ -40,8 +40,8 @@ import {
   type PersistedKey,
 } from '../utils'
 
-const { signMessage: signMessageOrange, sendBtcTransaction: sendBtcTxOrange } =
-  orange
+const signMessageOrange = orange?.signMessage
+const sendBtcTxOrange = orange?.sendBtcTransaction
 
 const ORANGE_WALLET_PERSISTENCE_KEY = 'ORANGE_CONNECTED_WALLET_STATE'
 export default class OrangeProvider extends WalletProvider {

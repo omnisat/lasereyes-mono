@@ -24,7 +24,7 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
   },
-  "include": ["index.ts", "ui.ts"],
+  "include": ["src/**/*"],
   "references": [
     { "path": "../lasereyes-core" },
     { "path": "../lasereyes-react" }

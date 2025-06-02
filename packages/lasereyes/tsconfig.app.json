@@ -29,5 +29,5 @@
       "@omnisat/lasereyes-react": ["../lasereyes-react/dist"]
     }
   },
-  "include": ["index.ts"]
+  "include": ["src/index.ts"]
 }

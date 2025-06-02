@@ -44,7 +44,6 @@ import InscriptionsSection from './InscriptionsSection'
 import RunesSection from './RunesSection'
 import BRC20Section from './Brc20Section'
 
-import '@omnisat/lasereyes/ui/style.css'
 import AlkanesSection from './AlkanesSection'
 import {
   Select,

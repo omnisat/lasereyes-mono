@@ -15,7 +15,7 @@ export default defineConfig({
   build: {
     cssCodeSplit: true,
     lib: {
-      entry: resolve(__dirname, './index.ts'),
+      entry: resolve(__dirname, './src/index.ts'),
       name: 'lasereyes',
       fileName: 'index',
       formats: ['es'],
@@ -23,9 +23,7 @@ export default defineConfig({
     rollupOptions: {
       external: ['react', 'react-dom', 'react/jsx-runtime'],
       input: {
-        index: resolve(__dirname, './index.ts'),
-        ui: resolve(__dirname, './ui.ts'),
-        "ui/style": resolve(__dirname, './node_modules/@omnisat/lasereyes-ui/dist/style.css'),
+        index: resolve(__dirname, './src/index.ts'),
       },
       output: {
         dir: resolve(__dirname, './dist'),
