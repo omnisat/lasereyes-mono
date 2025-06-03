@@ -30,13 +30,15 @@ export default function LaserEyesProvider({
   children: ReactNode | ReactNode[]
 }) {
   const clientStores = useMemo(() => createStores(), [])
-  const clientConfig = useMemo(
-    () => createConfig(config),
-    [config]
-  )
+  const clientConfig = useMemo(() => createConfig(config), [config])
   const [client, setClient] = useState<LaserEyesClient | null>(null)
 
   useEffect(() => {
+    if (clientStores) {
+      if (clientConfig?.network !== undefined) {
+        clientStores.$network.set(clientConfig.network)
+      }
+    }
     const c = new LaserEyesClient(clientStores, clientConfig)
     setClient(() => c)
     c.initialize()
