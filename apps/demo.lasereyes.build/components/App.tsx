@@ -115,6 +115,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
     hasSparrow,
     hasOrange,
     hasOpNet,
+    hasTokeo,
   } = useLaserEyes()
 
   useEffect(() => {
@@ -173,6 +174,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
     sparrow: hasSparrow,
     op_net: hasOpNet,
     leather: hasLeather,
+    tokeo: hasTokeo,
     phantom: hasPhantom,
     wizz: hasWizz,
     orange: hasOrange,
@@ -364,7 +366,11 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
       }
     >
       {/* Header section with logo and links */}
-      <div className={'w-full flex gap-2 flex-row justify-center items-center'}>
+      <div
+        className={
+          'w-full flex gap-2 flex-col md:flex-row justify-center items-center'
+        }
+      >
         <Image
           src={
             address ? '/lasereyes_connected.svg' : '/lasereyes_disconnected.svg'
@@ -709,7 +715,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
 
           {/* Bitcoin section */}
           <div className="text-md text-orange-400">bitcoin</div>
-          <div className={'flex flex-row text-xl gap-2'}>
+          <div className={'flex flex-col md:flex-row text-xl gap-2'}>
             <Button
               className={'w-full gap-2 bg-[#232225]'}
               disabled={!provider}

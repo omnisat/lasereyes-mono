@@ -54,7 +54,7 @@ export default class XVerseProvider extends WalletProvider {
         const xverseLib = (
           window as unknown as { XverseProviders: { BitcoinProvider: unknown } }
         )?.XverseProviders?.BitcoinProvider
-        if (xverseLib) {
+        if (xverseLib || this.isMobile()) {
           this.$store.setKey('hasProvider', {
             ...this.$store.get().hasProvider,
             [XVERSE]: true,
@@ -120,6 +120,13 @@ export default class XVerseProvider extends WalletProvider {
     //     return
     //   }
     // }
+
+    if (this.isMobile()) {
+      console.log('is mobile')
+      const url = `xverse://browser?url=${encodeURIComponent(window.location.href)}`
+      window.location.href = url
+      return
+    }
 
     let foundAddress:
       | {

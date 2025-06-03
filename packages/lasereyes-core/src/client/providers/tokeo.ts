@@ -1,8 +1,8 @@
 import * as bitcoin from 'bitcoinjs-lib'
-import { WalletProvider } from '.'
+import { MAINNET, WalletProvider } from '../..'
 import { ProviderType, NetworkType, Config } from '../../types'
 import { createSendBtcPsbt } from '../../lib/helpers'
-import { OYL } from '../../constants/wallets'
+import { TOKEO } from '../../constants/wallets'
 import { listenKeys, MapStore, WritableAtom } from 'nanostores'
 import { persistentMap } from '@nanostores/persistent'
 import {
@@ -15,11 +15,11 @@ import {
   keysToPersist,
   PersistedKey,
 } from '../utils'
-import { LaserEyesClient } from '..'
+import { LaserEyesClient } from '../..'
 
-const OYL_WALLET_PERSISTENCE_KEY = 'OYL_CONNECTED_WALLET_STATE'
+const TOKEO_WALLET_PERSISTENCE_KEY = 'TOKEO_CONNECTED_WALLET_STATE'
 
-export default class OylProvider extends WalletProvider {
+export default class TokeoProvider extends WalletProvider {
   constructor(
     stores: {
       $store: MapStore<LaserEyesStoreType>
@@ -32,7 +32,7 @@ export default class OylProvider extends WalletProvider {
   }
 
   public get library(): any | undefined {
-    return (window as any).oyl
+    return (window as any).tokeo?.bitcoin
   }
 
   public get network(): NetworkType {
@@ -41,7 +41,7 @@ export default class OylProvider extends WalletProvider {
 
   observer?: MutationObserver
   $valueStore: MapStore<Record<PersistedKey, string>> = persistentMap(
-    OYL_WALLET_PERSISTENCE_KEY,
+    TOKEO_WALLET_PERSISTENCE_KEY,
     {
       address: '',
       paymentAddress: '',
@@ -72,17 +72,16 @@ export default class OylProvider extends WalletProvider {
     _: LaserEyesStoreType | undefined,
     changedKey: keyof LaserEyesStoreType | undefined
   ) {
-    handleStateChangePersistence(OYL, newState, changedKey, this.$valueStore)
+    handleStateChangePersistence(TOKEO, newState, changedKey, this.$valueStore)
   }
 
   initialize() {
     if (typeof window !== 'undefined' && typeof document !== 'undefined') {
       this.observer = new window.MutationObserver(() => {
-        const oylLib = (window as any)?.oyl
-        if (oylLib) {
+        if (this.isMobile()) {
           this.$store.setKey('hasProvider', {
             ...this.$store.get().hasProvider,
-            [OYL]: true,
+            [TOKEO]: true,
           })
           this.observer?.disconnect()
         }
@@ -90,7 +89,7 @@ export default class OylProvider extends WalletProvider {
       this.observer.observe(document, { childList: true, subtree: true })
     }
     listenKeys(this.$store, ['provider'], (newStore) => {
-      if (newStore.provider !== OYL) {
+      if (newStore.provider !== TOKEO) {
         if (this.removeSubscriber) {
           this.$valueStore.set({
             address: '',
@@ -115,17 +114,33 @@ export default class OylProvider extends WalletProvider {
   }
 
   async connect(_: ProviderType): Promise<void> {
-    if (!this.library) throw new Error("Oyl isn't installed")
-    const { nativeSegwit, taproot } = await this.library.getAddresses()
-    if (!nativeSegwit || !taproot) throw new Error('No accounts found')
-    this.$store.setKey('address', taproot.address)
-    this.$store.setKey('paymentAddress', nativeSegwit.address)
-    this.$store.setKey('publicKey', taproot.publicKey)
-    this.$store.setKey('paymentPublicKey', nativeSegwit.publicKey)
+    if (!this.library) {
+      window.open('https://tokeo.io', '_blank')
+      return
+    }
+    const accounts = (await this.library.requestAccounts()) as Array<{
+      address: string
+      type: string
+      network: string
+      publicKey: string
+    }>
+
+    if (!accounts || accounts.length === 0) throw new Error('No accounts found')
+    const addressAccount = accounts.find((account) => account.type === 'p2tr')
+    const paymentAddressAccount = accounts.find(
+      (account) => account.type === 'p2wpkh'
+    )
+    if (!addressAccount) throw new Error('No p2tr address found')
+    if (!paymentAddressAccount) throw new Error('No p2wpkh address found')
+
+    this.$store.setKey('address', addressAccount.address)
+    this.$store.setKey('paymentAddress', paymentAddressAccount.address)
+    this.$store.setKey('publicKey', addressAccount.publicKey)
+    this.$store.setKey('paymentPublicKey', paymentAddressAccount.publicKey)
   }
 
   async getNetwork() {
-    return this.library.getNetwork()
+    return MAINNET
   }
 
   async sendBTC(to: string, amount: number): Promise<string> {
@@ -162,6 +177,7 @@ export default class OylProvider extends WalletProvider {
     })
     return response.signature
   }
+
   async signPsbt({
     psbtHex,
     broadcast,
@@ -186,10 +202,6 @@ export default class OylProvider extends WalletProvider {
       txId: txid,
     }
   }
-  async pushPsbt(tx: string): Promise<string | undefined> {
-    const response = await this.library.pushPsbt({ psbt: tx })
-    return response.txid
-  }
 
   async getPublicKey() {
     const { nativeSegwit, taproot } = await this.library.getAddresses()
@@ -199,19 +211,14 @@ export default class OylProvider extends WalletProvider {
     return taproot.publicKey
   }
 
-  async getBalance() {
-    const { total } = await this.library.getBalance()
-    this.$store.setKey('balance', total)
-    return total
-  }
-
   async requestAccounts(): Promise<string[]> {
-    return [this.$store.get().address, this.$store.get().paymentAddress]
-  }
+    const accounts = (await this.library.requestAccounts()) as Array<{
+      address: string
+      type: string
+      network: string
+      publicKey: string
+    }>
 
-  async switchNetwork(network: NetworkType): Promise<void> {
-    await this.library.switchNetwork(network)
-    this.$network.set(network)
-    await this.parent.connect(OYL)
+    return accounts.map((account) => account.address)
   }
 }

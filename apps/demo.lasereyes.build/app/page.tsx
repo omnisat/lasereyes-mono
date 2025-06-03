@@ -31,7 +31,15 @@ export default function Home() {
   }
 
   return (
-    <DynamicLasereyesProvider>
+    <DynamicLasereyesProvider
+      config={{
+        dataSources: {
+          sandshrew: {
+            apiKey: '348ae3256c48c15cc99dcb056d2f78df',
+          },
+        },
+      }}
+    >
       <UtxoProvider>
         <App setNetwork={() => {}} />
       </UtxoProvider>

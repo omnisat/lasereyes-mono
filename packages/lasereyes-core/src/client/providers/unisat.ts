@@ -54,10 +54,10 @@ export default class UnisatProvider extends WalletProvider {
 
     listenKeys(this.$store, ['provider'], (newStore) => {
       if (newStore.provider !== UNISAT) {
-        this.removeListeners()
+        this?.removeListeners()
         return
       }
-      this.library.getAccounts().then((accounts: string[]) => {
+      this.library?.getAccounts().then((accounts: string[]) => {
         this.handleAccountsChanged(accounts)
       })
       this.addListeners()
@@ -65,8 +65,8 @@ export default class UnisatProvider extends WalletProvider {
   }
 
   addListeners() {
-    this.library.on('accountsChanged', this.handleAccountsChanged.bind(this))
-    this.library.on('networkChanged', this.handleNetworkChanged.bind(this))
+    this.library?.on('accountsChanged', this.handleAccountsChanged.bind(this))
+    this.library?.on('networkChanged', this.handleNetworkChanged.bind(this))
   }
 
   removeListeners() {

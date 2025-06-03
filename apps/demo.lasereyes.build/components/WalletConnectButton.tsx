@@ -15,6 +15,7 @@ import {
   type ProviderType,
   SPARROW,
   WalletIcon,
+  TOKEO,
 } from '@omnisat/lasereyes'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
@@ -45,6 +46,7 @@ const WalletConnectButton = ({
     hasWizz,
     hasSparrow,
     hasOrange,
+    hasTokeo,
     hasOpNet,
   } = useLaserEyes()
 
@@ -60,6 +62,7 @@ const WalletConnectButton = ({
     phantom: hasPhantom,
     wizz: hasWizz,
     orange: hasOrange,
+    tokeo: hasTokeo,
   }
 
   const isConnected = provider === walletName
@@ -78,6 +81,7 @@ const WalletConnectButton = ({
       | typeof PHANTOM
       | typeof WIZZ
       | typeof ORANGE
+      | typeof TOKEO
   ) => {
     try {
       await connect(walletName)

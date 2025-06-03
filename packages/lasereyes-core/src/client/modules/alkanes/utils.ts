@@ -1,6 +1,10 @@
 import type { Account } from '@oyl/sdk/lib/account'
 
-import { ProtoStone, encodeRunestoneProtostone } from 'alkanes/lib/index.js'
+import {
+  ProtoStone,
+  encipher,
+  encodeRunestoneProtostone,
+} from 'alkanes/lib/index.js'
 import { ProtoruneRuneId } from 'alkanes/lib/protorune/protoruneruneid'
 import * as bitcoin from 'bitcoinjs-lib'
 
@@ -13,7 +17,6 @@ import type {
 import { toXOnly } from 'bitcoinjs-lib/src/psbt/bip371'
 import { LaserEyesClient } from '../..'
 import { getBitcoinNetwork } from '../../../lib/helpers'
-
 
 export enum AddressType {
   P2PKH = 0,
@@ -276,8 +279,29 @@ export const createSendPsbt = async ({
 
   gatheredUtxos = findXAmountOfSats(
     originalGatheredUtxos.utxos,
-    Number(finalFee) + Number(inscriptionSats)
+    Number(finalFee) + Number(inscriptionSats) * 4
   )
+
+  const calldata = [BigInt(2), BigInt(100), BigInt(77)]
+
+  const protostone23 = encodeRunestoneProtostone({
+    protostones: [
+      ProtoStone.message({
+        protocolTag: 1n,
+        pointer: 0,
+        refundPointer: 0,
+        calldata: encipher(calldata),
+        edicts: [],
+      }),
+    ],
+  }).encodedRunestone
+
+  console.log('protostone23', protostone23.toString('hex'))
+
+  if (gatheredUtxos.totalAmount < finalFee + inscriptionSats) {
+    console.log('gatheredUtxos.totalAmount', gatheredUtxos.totalAmount)
+    throw new Error('Insufficient Balanceeeee')
+  }
 
   if (gatheredUtxos.utxos.length > 1) {
     const txSize = minimumFee({
@@ -308,6 +332,8 @@ export const createSendPsbt = async ({
     throw new Error('No Alkane Utxos Found')
   }
 
+  const addedInputs: Record<string, number> = {}
+
   for await (const utxo of alkaneUtxos) {
     if (getAddressType(utxo.address) === AddressType.P2PKH) {
       // TODO: Implement this
@@ -317,6 +343,7 @@ export const createSendPsbt = async ({
         index: utxo.txIndex,
         //   nonWitnessUtxo: Buffer.from(previousTxHex, 'hex'),
       })
+      addedInputs[utxo.txId] = utxo.txIndex
     }
     if (getAddressType(utxo.address) === AddressType.P2SH_P2WPKH) {
       const redeemScript = bitcoin.script.compile([
@@ -337,6 +364,7 @@ export const createSendPsbt = async ({
           ]),
         },
       })
+      addedInputs[utxo.txId] = utxo.txIndex
     }
     if (
       getAddressType(utxo.address) === AddressType.P2TR ||
@@ -350,14 +378,19 @@ export const createSendPsbt = async ({
           script: Buffer.from(utxo.script, 'hex'),
         },
       })
+      addedInputs[utxo.txId] = utxo.txIndex
     }
   }
 
-  if (gatheredUtxos.totalAmount < finalFee + inscriptionSats * 2) {
+  if (gatheredUtxos.totalAmount < finalFee + inscriptionSats) {
     throw new Error('Insufficient Balance')
   }
 
   for (let i = 0; i < gatheredUtxos.utxos.length; i++) {
+    if (addedInputs[gatheredUtxos.utxos[i].txId]) {
+      console.log('already added', gatheredUtxos.utxos[i].txId)
+      continue
+    }
     if (getAddressType(gatheredUtxos.utxos[i].address) === AddressType.P2PKH) {
       // TODO: Implement this
       // const previousTxHex: string = await client.dataSourceManager.(utxo.txId)
@@ -388,6 +421,8 @@ export const createSendPsbt = async ({
           ]),
         },
       })
+      addedInputs[gatheredUtxos.utxos[i].txId] =
+        gatheredUtxos.utxos[i].outputIndex
     }
     if (
       getAddressType(gatheredUtxos.utxos[i].address) === AddressType.P2TR ||
@@ -401,6 +436,8 @@ export const createSendPsbt = async ({
           script: Buffer.from(gatheredUtxos.utxos[i].scriptPk, 'hex'),
         },
       })
+      addedInputs[gatheredUtxos.utxos[i].txId] =
+        gatheredUtxos.utxos[i].outputIndex
     }
   }
 

@@ -9,6 +9,7 @@ export const WIZZ = 'wizz'
 export const ORANGE = 'orange'
 export const OP_NET = 'op_net'
 export const SPARROW = 'sparrow'
+export const TOKEO = 'tokeo'
 
 export const P2TR = 'p2tr'
 export const P2PKH = 'p2pkh'
@@ -27,6 +28,7 @@ enum ProviderEnumMap {
   ORANGE = 'orange',
   OYL = 'oyl',
   SPARROW = 'sparrow',
+  TOKEO = 'tokeo',
   PHANTOM = 'phantom',
   UNISAT = 'unisat',
   WIZZ = 'wizz',
@@ -72,6 +74,10 @@ export const SUPPORTED_WALLETS: WalletInfo = {
   [ProviderEnumMap.SPARROW]: {
     name: ProviderEnumMap.SPARROW,
     url: 'https://sparrowwallet.com/',
+  },
+  [ProviderEnumMap.TOKEO]: {
+    name: ProviderEnumMap.TOKEO,
+    url: 'https://tokeo.io/',
   },
   [ProviderEnumMap.UNISAT]: {
     name: ProviderEnumMap.UNISAT,

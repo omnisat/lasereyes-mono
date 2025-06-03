@@ -55,7 +55,9 @@ export default class AlkanesModule {
       },
     }
     const { fastFee } = await this.client.dataSourceManager.getRecommendedFees()
-    const utxos = await this.client.dataSourceManager.getAddressUtxos(address)
+    const utxos = (
+      await this.client.dataSourceManager.getAddressUtxos(address)
+    ).filter((utxo) => utxo.value > 1000)
     const { psbt } = await createSendPsbt({
       gatheredUtxos: {
         utxos: utxos.map((utxo) => ({
