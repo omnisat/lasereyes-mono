@@ -34,10 +34,8 @@ export default function LaserEyesProvider({
   const [client, setClient] = useState<LaserEyesClient | null>(null)
 
   useEffect(() => {
-    if (clientStores) {
-      if (clientConfig?.network !== undefined) {
-        clientStores.$network.set(clientConfig.network)
-      }
+    if (clientConfig?.network !== undefined) {
+      clientStores.$network.set(clientConfig.network)
     }
     const c = new LaserEyesClient(clientStores, clientConfig)
     setClient(() => c)
