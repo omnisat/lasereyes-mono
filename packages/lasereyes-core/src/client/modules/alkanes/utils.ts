@@ -14,7 +14,6 @@ import { toXOnly } from 'bitcoinjs-lib/src/psbt/bip371'
 import { LaserEyesClient } from '../..'
 import { getBitcoinNetwork } from '../../../lib/helpers'
 
-
 export enum AddressType {
   P2PKH = 0,
   P2TR = 1,
@@ -232,11 +231,8 @@ export const findAlkaneUtxos = async ({
         ...alkane.rune.rune,
       })
       totalSatoshis += satoshis
-      totalBalanceBeingSent +=
-        Number(alkane.rune.balance) /
-        (alkane.rune.rune.divisibility === 1
-          ? 1
-          : 10 ** alkane.rune.rune.divisibility)
+      // Alkanes use 8 decimal places (like Bitcoin satoshis)
+      totalBalanceBeingSent += Number(alkane.rune.balance) / 10 ** 8
     }
   }
   if (totalBalanceBeingSent < targetNumberOfAlkanes) {
