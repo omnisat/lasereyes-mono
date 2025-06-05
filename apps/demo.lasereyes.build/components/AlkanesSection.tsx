@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Button } from './ui/button'
 import { Input } from '@/components/ui/input'
-import { cn } from '@/lib/utils'
+import { cn, parseFixed } from '@/lib/utils'
 import {
   Select,
   SelectContent,
@@ -70,7 +70,7 @@ const AlkanesSection = () => {
       const txid = await send('alkanes', {
         fromAddress: address,
         toAddress: alkaneToAddress,
-        amount: Number(alkaneAmount),
+        amount: parseFixed(alkaneAmount, 8),
         id: selectedAlkane.id,
         network: network as typeof MAINNET | typeof TESTNET,
       })
