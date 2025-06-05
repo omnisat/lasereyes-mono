@@ -9,7 +9,7 @@ import { AlkaneToken } from './types'
 export default class AlkanesModule {
   constructor(private readonly client: LaserEyesClient) {}
 
-  async send(id: string, amount: number, toAddress: string) {
+  async send(id: string, amount: bigint, toAddress: string) {
     const { connected, address, publicKey } = this.client.$store.get()
     if (!connected) {
       throw new Error('Client is not connected')

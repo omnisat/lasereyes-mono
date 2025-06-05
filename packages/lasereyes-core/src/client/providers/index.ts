@@ -207,13 +207,11 @@ export abstract class WalletProvider {
     })
   }
 
-  async send(
-    protocol: Protocol,
-    sendArgs: BTCSendArgs | RuneSendArgs | Brc20SendArgs | AlkaneSendArgs
-  ) {
+  send: LaserEyesClient['send'] = async (protocol, sendArgs) => {
     switch (protocol) {
       case BTC:
-        return await this.sendBTC(sendArgs.toAddress, sendArgs.amount)
+        const btcArgs = sendArgs as BTCSendArgs
+        return await this.sendBTC(btcArgs.toAddress, btcArgs.amount)
       case RUNES: {
         if (this.$network.get() !== MAINNET) {
           throw new Error('Unsupported network')
