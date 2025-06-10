@@ -12,13 +12,17 @@ import { getPublicKeyHash } from '../../btc'
 import { SANDSHREW_LASEREYES_KEY, getSandshrewUrl } from '../../urls'
 import type { RpcResponse } from '../../../types/rpc'
 import { SANDSHREW } from '../../../constants/data-sources'
-import { type AlkanesOutpoint, BaseNetwork, type NetworkType } from '../../../types'
+import {
+  type AlkanesOutpoint,
+  BaseNetwork,
+  type NetworkType,
+} from '../../../types'
 import type { AlkaneBalance } from '../../../types/alkane'
 import { AlkanesRpc } from '../../../client/modules/alkanes/rpc'
 
-export function runeIdToString({block, tx}: {block: string, tx: string}) {
-    return `${block}:${tx}`
-  }
+export function runeIdToString({ block, tx }: { block: string; tx: string }) {
+  return `${block}:${tx}`
+}
 
 export type SandshrewConfig = {
   networks: {
@@ -38,7 +42,6 @@ export class SandshrewDataSource implements DataSource {
   private apiKey = ''
   private networks: SandshrewConfig['networks']
   alkanesRpc: AlkanesRpc
-  
 
   constructor(network: NetworkType, config?: SandshrewConfig) {
     this.networks = {
@@ -117,18 +120,14 @@ export class SandshrewDataSource implements DataSource {
     return response.result
   }
 
-  async getAlkanesByAddress(
-    address: string,
-  ): Promise<AlkanesOutpoint[]> {
+  async getAlkanesByAddress(address: string): Promise<AlkanesOutpoint[]> {
     const response = await this.alkanesRpc.getAlkanesByAddress({
       address,
     })
     return response
   }
 
-  async getAddressAlkanesBalances(
-    address: string,
-  ): Promise<AlkaneBalance[]> {
+  async getAddressAlkanesBalances(address: string): Promise<AlkaneBalance[]> {
     const response = await this.getAlkanesByAddress(address)
     const alkanesBalances: Record<string, AlkaneBalance> = {}
     for (const outpoint of response) {
@@ -260,7 +259,6 @@ export class SandshrewDataSource implements DataSource {
     ])) as RpcResponse
     const inscriptionInfo = response.result as InscriptionInfo
 
-    // Convert to MaestroGetInscriptionInfoResponse format
     return {
       data: {
         inscription_id: inscriptionInfo.id || inscriptionId,

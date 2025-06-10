@@ -11,7 +11,7 @@ import { BaseNetwork, type BaseNetworkType, type NetworkType } from '../types'
 export const SANDSHREW_URL_MAINNET: string = 'https://mainnet.sandshrew.io/v2'
 export const SANDSHREW_URL_SIGNET: string = 'https://signet.sandshrew.io/v2'
 export const SANDSHREW_URL_TESTNET: string = 'https://testnet.sandshrew.io/v2'
-export const SANDSHREW_URL_OYLNET: string = 'https://oylnet.oyl.gg/v2'
+export const SANDSHREW_URL_OYLNET: string = 'https://oylnet.oyl.gg/v2/regtest'
 
 export const SANDSHREW_LASEREYES_KEY: string = 'lasereyes'
 export const MAESTRO_API_KEY_MAINNET: string =
@@ -95,6 +95,8 @@ export const getSandshrewUrl = (
       return SANDSHREW_URL_MAINNET
     } else if (baseNetwork === BaseNetwork.TESTNET) {
       return SANDSHREW_URL_TESTNET
+    } else if (baseNetwork === BaseNetwork.OYLNET) {
+      SANDSHREW_URL_OYLNET
     }
   }
   switch (network) {

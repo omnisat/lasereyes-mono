@@ -114,29 +114,37 @@ export default class TokeoProvider extends WalletProvider {
   }
 
   async connect(_: ProviderType): Promise<void> {
-    if (!this.library) {
-      window.open('https://tokeo.io', '_blank')
-      return
+    try {
+      if (!this.library) {
+        window.open('https://tokeo.io', '_blank')
+        return
+      }
+
+      const accounts = (await this.library.requestAccounts()) as Array<{
+        address: string
+        type: string
+        network: string
+        publicKey: string
+      }>
+
+      if (!accounts || accounts.length === 0)
+        throw new Error('No accounts found')
+      const addressAccount = accounts.find((account) => account.type === 'p2tr')
+      const paymentAddressAccount = accounts.find(
+        (account) => account.type === 'p2wpkh'
+      )
+
+      if (!addressAccount) throw new Error('No p2tr address found')
+      if (!paymentAddressAccount) throw new Error('No p2wpkh address found')
+
+      this.$store.setKey('address', addressAccount.address)
+      this.$store.setKey('paymentAddress', paymentAddressAccount.address)
+      this.$store.setKey('publicKey', addressAccount.publicKey)
+      this.$store.setKey('paymentPublicKey', paymentAddressAccount.publicKey)
+    } catch (error) {
+      console.error(error)
+      throw error
     }
-    const accounts = (await this.library.requestAccounts()) as Array<{
-      address: string
-      type: string
-      network: string
-      publicKey: string
-    }>
-
-    if (!accounts || accounts.length === 0) throw new Error('No accounts found')
-    const addressAccount = accounts.find((account) => account.type === 'p2tr')
-    const paymentAddressAccount = accounts.find(
-      (account) => account.type === 'p2wpkh'
-    )
-    if (!addressAccount) throw new Error('No p2tr address found')
-    if (!paymentAddressAccount) throw new Error('No p2wpkh address found')
-
-    this.$store.setKey('address', addressAccount.address)
-    this.$store.setKey('paymentAddress', paymentAddressAccount.address)
-    this.$store.setKey('publicKey', addressAccount.publicKey)
-    this.$store.setKey('paymentPublicKey', paymentAddressAccount.publicKey)
   }
 
   async getNetwork() {

@@ -362,7 +362,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
   return (
     <div
       className={
-        'flex flex-col gap-4 w-full mt-12 mb-24 max-w-[1200px] px-12 font-windows'
+        'flex flex-col gap-4 w-full mt-12 mb-24 max-w-[1200px] px-4 md:px-12 font-windows'
       }
     >
       {/* Header section with logo and links */}
@@ -456,7 +456,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
           {/* Provider info */}
           <div
             className={
-              'flex flex-row items-center gap-4 justify-center space-around'
+              'flex flex-col md:flex-row items-center gap-4 justify-center space-around'
             }
           >
             <div className={'flex flex-col items-center'}>
@@ -478,7 +478,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
           {/* Address section */}
           <div
             className={
-              'flex flex-row items-center gap-6 justify-center space-around'
+              'flex flex-col md:flex-row items-center gap-6 justify-center space-around'
             }
           >
             <div className={'flex flex-row gap-2'}>
@@ -514,7 +514,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
             {/* Payment address section */}
             <div
               className={
-                'flex flex-row items-center gap-4 justify-center space-around'
+                'flex flex-col md:flex-row items-center gap-4 justify-center space-around'
               }
             >
               <div className={'flex flex-col items-center'}>
@@ -548,7 +548,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
           </div>
 
           {/* Public keys section */}
-          <div className={'flex flex-row gap-6'}>
+          <div className={'flex flex-col md:flex-row gap-6'}>
             <div
               className={
                 'flex flex-row items-center gap-4 justify-center space-around'
@@ -602,7 +602,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
           {/* Balance */}
           <div
             className={
-              'flex flex-row items-center gap-4 justify-center space-around'
+              'flex flex-col md:flex-row items-center gap-4 justify-center space-around'
             }
           >
             <div className={'flex flex-col items-center'}>
@@ -645,7 +645,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
           {/* PSBT section */}
           <div
             className={
-              'flex flex-row items-center gap-6 justify-center space-around'
+              'flex flex-col md:flex-row items-center gap-6 justify-center space-around'
             }
           >
             <div
@@ -760,7 +760,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
           <div className={'flex flex-col gap-2'}>
             <span
               className={
-                'w-full flex flex-row px-2 py-1 items-center justify-center gap-2'
+                'w-full flex flex-col md:flex-row px-2 py-1 items-center justify-center gap-2'
               }
             >
               <Button
