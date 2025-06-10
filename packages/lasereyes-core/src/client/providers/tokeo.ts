@@ -1,9 +1,9 @@
 import * as bitcoin from 'bitcoinjs-lib'
 import { MAINNET, WalletProvider } from '../..'
-import { ProviderType, NetworkType, Config } from '../../types'
+import { ProviderType, NetworkType } from '../../types'
 import { createSendBtcPsbt } from '../../lib/helpers'
 import { TOKEO } from '../../constants/wallets'
-import { listenKeys, MapStore, WritableAtom } from 'nanostores'
+import { listenKeys, MapStore } from 'nanostores'
 import { persistentMap } from '@nanostores/persistent'
 import {
   LaserEyesStoreType,
@@ -15,22 +15,11 @@ import {
   keysToPersist,
   PersistedKey,
 } from '../utils'
-import { LaserEyesClient } from '../..'
+import { omitUndefined } from '../../lib/utils'
 
 const TOKEO_WALLET_PERSISTENCE_KEY = 'TOKEO_CONNECTED_WALLET_STATE'
 
 export default class TokeoProvider extends WalletProvider {
-  constructor(
-    stores: {
-      $store: MapStore<LaserEyesStoreType>
-      $network: WritableAtom<NetworkType>
-    },
-    parent: LaserEyesClient,
-    config?: Config
-  ) {
-    super(stores, parent, config)
-  }
-
   public get library(): any | undefined {
     return (window as any).tokeo?.bitcoin
   }
@@ -116,11 +105,15 @@ export default class TokeoProvider extends WalletProvider {
   async connect(_: ProviderType): Promise<void> {
     try {
       if (!this.library) {
-        window.open('https://tokeo.io', '_blank')
-        return
+        setTimeout(() => {
+          window.open('https://tokeo.io', '_blank')
+        }, 500)
+        throw new Error('Tokeo not found')
       }
 
-      const accounts = (await this.library.requestAccounts()) as Array<{
+      // This duplicate call is necessary because on the first connection, the response is different from subsequent calls
+      await this.library.requestAccounts()
+      const accounts = (await this.library.getAccounts()).accounts as Array<{
         address: string
         type: string
         network: string
@@ -135,12 +128,17 @@ export default class TokeoProvider extends WalletProvider {
       )
 
       if (!addressAccount) throw new Error('No p2tr address found')
-      if (!paymentAddressAccount) throw new Error('No p2wpkh address found')
 
       this.$store.setKey('address', addressAccount.address)
-      this.$store.setKey('paymentAddress', paymentAddressAccount.address)
+      this.$store.setKey(
+        'paymentAddress',
+        paymentAddressAccount?.address ?? addressAccount.address
+      )
       this.$store.setKey('publicKey', addressAccount.publicKey)
-      this.$store.setKey('paymentPublicKey', paymentAddressAccount.publicKey)
+      this.$store.setKey(
+        'paymentPublicKey',
+        paymentAddressAccount?.publicKey ?? addressAccount.publicKey
+      )
     } catch (error) {
       console.error(error)
       throw error
@@ -177,19 +175,15 @@ export default class TokeoProvider extends WalletProvider {
     message: string,
     options?: SignMessageOptions
   ): Promise<string> {
-    const tempAddy = options?.toSignAddress || this.$store.get().paymentAddress
-    const response = await this.library.signMessage({
-      address: tempAddy,
-      message,
-      protocol: options?.protocol,
-    })
-    return response.signature
+    const signature = await this.library.signMessage(message, options?.protocol)
+    return signature
   }
 
   async signPsbt({
-    psbtHex,
+    psbtBase64,
     broadcast,
     finalize,
+    inputsToSign,
   }: WalletProviderSignPsbtOptions): Promise<
     | {
         signedPsbtHex: string | undefined
@@ -198,12 +192,32 @@ export default class TokeoProvider extends WalletProvider {
       }
     | undefined
   > {
-    const { psbt, txid } = await this.library.signPsbt({
-      psbt: psbtHex,
-      finalize,
-      broadcast,
-    })
-    const psbtSignedPsbt = bitcoin.Psbt.fromHex(psbt)
+    const options: {
+      autoFinalize?: boolean
+      inputs?: {
+        index: number
+        address?: string
+        publicKey?: string
+        sighashTypes?: number[]
+        disableTweakSigner?: boolean
+        useTweakedSigner?: boolean
+      }[]
+    } = {
+      autoFinalize: finalize,
+      inputs: inputsToSign?.map((input) => ({
+        index: input.index,
+        address: input.address,
+      })),
+    }
+    const signedBase64Psbt = await this.library.signPsbt(
+      psbtBase64,
+      omitUndefined(options)
+    )
+    const psbtSignedPsbt = bitcoin.Psbt.fromBase64(signedBase64Psbt)
+    let txid: string | undefined
+    if (broadcast) {
+      txid = await this.pushPsbt(signedBase64Psbt)
+    }
     return {
       signedPsbtHex: psbtSignedPsbt.toHex(),
       signedPsbtBase64: psbtSignedPsbt.toBase64(),
