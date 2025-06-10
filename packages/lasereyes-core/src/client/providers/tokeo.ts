@@ -166,8 +166,8 @@ export default class TokeoProvider extends WalletProvider {
       broadcast: true,
       finalize: true,
     })
-    if (!psbt) throw new Error('Error sending BTC')
-    // @ts-ignore
+    if (!psbt || !psbt.txId) throw new Error('Error sending BTC')
+
     return psbt.txId
   }
 
@@ -226,15 +226,13 @@ export default class TokeoProvider extends WalletProvider {
   }
 
   async getPublicKey() {
-    const { nativeSegwit, taproot } = await this.library.getAddresses()
-    if (!nativeSegwit || !taproot) throw new Error('No accounts found')
-    this.$store.setKey('publicKey', taproot.publicKey)
-    this.$store.setKey('paymentPublicKey', nativeSegwit.publicKey)
-    return taproot.publicKey
+    return this.$store.get().publicKey
   }
 
   async requestAccounts(): Promise<string[]> {
-    const accounts = (await this.library.requestAccounts()) as Array<{
+    // This duplicate call is necessary because on the first connection, the response is different from subsequent calls
+    await this.library.requestAccounts()
+    const accounts = (await this.library.getAccounts()).accounts as Array<{
       address: string
       type: string
       network: string
