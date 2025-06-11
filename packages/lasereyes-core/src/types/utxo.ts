@@ -24,6 +24,7 @@ export interface FormattedUTXO {
     txOutputIndex: number
     btcValue: number
     scriptPubKey: string
+    address: string
     confirmations?: number
 
     hasRunes: boolean

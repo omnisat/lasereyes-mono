@@ -22,15 +22,13 @@
   "private": false,
   "version": "0.0.156",
   "type": "module",
-  "module": "./dist/index.js",
+  "module": "./src/index.ts",
   "files": [
     "dist"
   ],
   "types": "./dist/index.d.ts",
   "exports": {
-    ".": "./dist/index.js",
-    "./ui": "./dist/ui.js",
-    "./ui/style.css": "./dist/ui/style.css"
+    ".": "./src/index.ts"
   },
   "scripts": {
     "dev": "vite",
