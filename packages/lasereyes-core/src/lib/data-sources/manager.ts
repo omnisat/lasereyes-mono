@@ -77,6 +77,7 @@ export class DataSourceManager {
     this.dataSources.set(
       'sandshrew',
       new SandshrewDataSource(network, {
+        apiKey: config?.dataSources?.sandshrew?.apiKey,
         networks: {
           mainnet: {
             apiKey:

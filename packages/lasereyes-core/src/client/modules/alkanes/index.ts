@@ -131,9 +131,6 @@ export default class AlkanesModule {
     // TODO: Find out how to input alkanes into the contract call
     const inputAlkaneUtxos = utxos.filter((utxo) => utxo.hasAlkanes && false)
 
-    console.log('inputAlkaneUtxos', inputAlkaneUtxos)
-    console.log('spendableUtxos', spendableUtxos)
-
      const { fastFee } =
        await this.client.dataSourceManager.getRecommendedFees()
 

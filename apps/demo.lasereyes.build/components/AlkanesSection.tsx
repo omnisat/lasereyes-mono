@@ -104,7 +104,7 @@ const AlkanesSection = () => {
         <SelectContent className="h-fit">
           {alkanes?.map((alkane) => (
             <SelectItem key={alkane.id} value={alkane.id}>
-              {alkane.name} ({Number(alkane.balance)})
+              {alkane.name} #{alkane.id} ({Number(alkane.balance)})
             </SelectItem>
           ))}
         </SelectContent>
