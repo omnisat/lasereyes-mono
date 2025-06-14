@@ -27,7 +27,6 @@ Don't trust verify [Try Out The Demo Here](https://demo.lasereyes.build)
 - Phantom
 - Xverse
 
-
 ## Community
 
 For help, discussion about best practices, or any other conversation that would benefit from being searchable:
@@ -66,6 +65,12 @@ If you find Laser Eyes useful or use it for work, please consider [sponsoring La
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/omnisat/lasereyes-mono/dev/.github/assets/trio-light.svg">
       <img alt="Trio" src="https://raw.githubusercontent.com/omnisat/lasereyes-mono/dev/.github/assets/trio-dark.svg" width="auto" height="80">
+    </picture>
+  </a>
+  <a href="https://emblem.vision/" rel="nofollow">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/omnisat/lasereyes-mono/dev/.github/assets/emblem-light.svg">
+      <img alt="Emblem Vault" src="https://raw.githubusercontent.com/omnisat/lasereyes-mono/dev/.github/assets/emblem-dark.svg" width="auto" height="80">
     </picture>
   </a>
 </p>
