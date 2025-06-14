@@ -230,6 +230,35 @@ export default function Home() {
                   className="h-8 md:h-10 dark:hidden"
                 />
               </Link>
+              <Link
+                href="https://emblem.vision/"
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center justify-center"
+              >
+                <img
+                  src="/emblem-light.svg"
+                  alt="Emblem Vision"
+                  className="h-8 md:h-10 hidden dark:block"
+                />
+                <img
+                  src="/emblem-dark.svg"
+                  alt="Emblem Vision"
+                  className="h-8 md:h-10 dark:hidden"
+                />
+              </Link>
+            </div>
+            <div className="flex justify-center mt-8">
+              <Button asChild size="lg" className="group">
+                <Link
+                  href="https://github.com/sponsors/omnisat"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Become a Sponsor
+                  <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                </Link>
+              </Button>
             </div>
           </div>
         </div>
