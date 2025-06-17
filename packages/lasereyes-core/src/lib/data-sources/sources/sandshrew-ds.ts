@@ -56,7 +56,7 @@ export class SandshrewDataSource implements DataSource {
       },
       oylnet: {
         apiUrl: getSandshrewUrl('oylnet'),
-        apiKey: SANDSHREW_LASEREYES_KEY,
+        apiKey: config?.apiKey || SANDSHREW_LASEREYES_KEY,
       },
       ...config?.networks,
     }
