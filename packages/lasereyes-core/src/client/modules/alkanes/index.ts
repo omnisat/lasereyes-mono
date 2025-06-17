@@ -2,7 +2,7 @@ import type { Account } from '@oyl/sdk/lib/account'
 import type { LaserEyesClient } from '../../index'
 import { getBitcoinNetwork } from '../../../lib/helpers'
 import { toXOnly } from 'bitcoinjs-lib/src/psbt/bip371'
-import { createFreeMintExecutePsbt, createSendPsbt } from './utils'
+import { createMintExecutePsbt, createSendPsbt } from './utils'
 import { SandshrewDataSource } from '../../..'
 import { AlkaneToken } from './types'
 import { AlkaneId } from 'alkanes'
@@ -108,17 +108,18 @@ export default class AlkanesModule {
     }))
   }
 
-  async standardFreeMint({
+  async mintAlkane({
     toAddress,
     id: alkaneId,
     changeAddress,
     feeRate,
+    inputData,
   }: {
     id: AlkaneId
     toAddress?: string
-    repeat?: number
     changeAddress?: string
     feeRate?: number
+    inputData?: bigint[]
   }) {
     const network = this.client.$network.get()
     const { connected, address, publicKey } = this.client.$store.get()
@@ -134,7 +135,7 @@ export default class AlkanesModule {
      const { fastFee } =
        await this.client.dataSourceManager.getRecommendedFees()
 
-    const { psbtBase64 } = await createFreeMintExecutePsbt({
+    const { psbtBase64 } = await createMintExecutePsbt({
       alkaneId,
       network,
       toAddress: toAddress ?? address,
@@ -143,6 +144,7 @@ export default class AlkanesModule {
       inputAlkaneUtxos,
       spendableUtxos,
       feeRate: feeRate ?? fastFee,
+      inputData,
     })
     const response = await this.client.signPsbt({
       tx: psbtBase64,

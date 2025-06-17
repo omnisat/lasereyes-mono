@@ -456,7 +456,7 @@ export const createSendPsbt = async ({
   return { psbt: formattedPsbtTx.toBase64() }
 }
 
-export const createFreeMintExecutePsbt = async ({
+export const createMintExecutePsbt = async ({
   toAddress,
   network,
   alkaneId,
@@ -467,6 +467,7 @@ export const createFreeMintExecutePsbt = async ({
   spendableUtxos,
   inputAlkaneUtxos,
   senderPublicKey,
+  inputData,
 }: {
   toAddress: string
   network: NetworkType
@@ -478,7 +479,21 @@ export const createFreeMintExecutePsbt = async ({
   spendableUtxos: FormattedUTXO[]
   inputAlkaneUtxos: FormattedUTXO[]
   senderPublicKey: string
+  inputData?: bigint[]
 }) => {
+  const calldata = [alkaneId.block, alkaneId.tx, BigInt(MINT_OPCODE), ...(inputData ?? [])]
+
+  const protostone = encodeRunestoneProtostone({
+    protostones: [
+      
+        ProtoStone.message({
+          protocolTag: 1n,
+          calldata: encipher(calldata),
+          pointer: 0,
+          refundPointer: 0,
+        })
+    ],
+  }).encodedRunestone
   const bitcoinNetwork = getBitcoinNetwork(network)
   const psbt = new bitcoin.Psbt({
     network: bitcoinNetwork,
@@ -496,7 +511,7 @@ export const createFreeMintExecutePsbt = async ({
       inputCount,
       0,
       2 + (effectiveFeeAmount > 0 ? 1 : 0)
-    )
+    ) + protostone.byteLength
   }
 
   const minTxSize = calculateSize(2)
@@ -535,18 +550,8 @@ export const createFreeMintExecutePsbt = async ({
     addInputForUtxo(psbt, utxo)
   }
 
-  const calldata = [alkaneId.block, alkaneId.tx, BigInt(MINT_OPCODE)]
-
-  const protostone = encodeRunestoneProtostone({
-    protostones: [
-      ProtoStone.message({
-        protocolTag: 1n,
-        calldata: encipher(calldata),
-        pointer: 0,
-        refundPointer: 0,
-      }),
-    ],
-  }).encodedRunestone
+  
+  console.log('protostone byte length', protostone.length)
 
   // Add output for any output protorunes
   psbt.addOutput({
