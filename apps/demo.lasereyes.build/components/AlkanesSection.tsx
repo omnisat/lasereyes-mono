@@ -2,26 +2,41 @@ import React, { useState, useEffect } from 'react'
 import { Button } from './ui/button'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from './ui/select'
 import { toast } from 'sonner'
 import { getMempoolSpaceUrl } from '@/lib/urls'
-import { type AlkaneBalance, type MAINNET, type TESTNET, useLaserEyes } from '@omnisat/lasereyes'
-
+import {
+  type AlkaneBalance,
+  type MAINNET,
+  type TESTNET,
+  useLaserEyes,
+} from '@omnisat/lasereyes'
 
 const AlkanesSection = () => {
-  const { provider, address, send, network, getMetaBalances, connected } = useLaserEyes()
+  const { provider, address, send, network, getMetaBalances, connected } =
+    useLaserEyes()
   const [alkanes, setAlkanes] = useState<AlkaneBalance[]>([])
-  const [selectedAlkane, setSelectedAlkane] = useState<AlkaneBalance | undefined>(undefined)
+  const [selectedAlkane, setSelectedAlkane] = useState<
+    AlkaneBalance | undefined
+  >(undefined)
   const [alkaneToAddress, setAlkaneToAddress] = useState('')
   const [alkaneAmount, setAlkaneAmount] = useState('')
 
   useEffect(() => {
     if (address && network && connected) {
       // We'll need to modify the getMetaBalances function to support 'alkanes' protocol
-      getMetaBalances('alkanes').then((x) => {
-        console.log('alkanes', x)
-        return x
-      }).then(setAlkanes)
+      getMetaBalances('alkanes')
+        .then((x) => {
+          console.log('alkanes', x)
+          return x
+        })
+        .then(setAlkanes)
     }
   }, [address, getMetaBalances, network, connected])
 
@@ -45,11 +60,12 @@ const AlkanesSection = () => {
         <span className={'flex flex-col gap-1 items-center justify-center'}>
           <span className={'font-black'}>View on mempool.space</span>
           <a
-            target='_blank'
+            target="_blank"
             href={`${getMempoolSpaceUrl(
               network as typeof MAINNET | typeof TESTNET
             )}/tx/${txid}`}
-            className={'underline text-blue-600 text-xs'} rel="noreferrer"
+            className={'underline text-blue-600 text-xs'}
+            rel="noreferrer"
           >
             {txid}
           </a>
@@ -85,10 +101,10 @@ const AlkanesSection = () => {
         >
           <SelectValue placeholder="Select an Alkane" />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="h-fit">
           {alkanes?.map((alkane) => (
             <SelectItem key={alkane.id} value={alkane.id}>
-              {alkane.name} ({Number(alkane.balance)})
+              {alkane.name} #{alkane.id} ({Number(alkane.balance)})
             </SelectItem>
           ))}
         </SelectContent>
@@ -103,11 +119,7 @@ const AlkanesSection = () => {
         onChange={(e) => setAlkaneToAddress(e.target.value)}
       />
       <Input
-        disabled={
-          !provider ||
-          !selectedAlkane ||
-          !alkaneToAddress
-        }
+        disabled={!provider || !selectedAlkane || !alkaneToAddress}
         type="number"
         className={cn(
           'w-full bg-[#232225] border-none disabled:text-[#737275] text-center'
@@ -118,10 +130,7 @@ const AlkanesSection = () => {
       />
       <Button
         disabled={
-          !provider ||
-          !selectedAlkane ||
-          !alkaneToAddress ||
-          !alkaneAmount
+          !provider || !selectedAlkane || !alkaneToAddress || !alkaneAmount
         }
         className={'w-full bg-[#232225] disabled:text-[#737275]'}
         onClick={sendAlkane}
@@ -132,4 +141,4 @@ const AlkanesSection = () => {
   )
 }
 
-export default AlkanesSection 
+export default AlkanesSection

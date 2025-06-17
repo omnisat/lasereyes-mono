@@ -52,7 +52,7 @@
     "react-jsx": "^1.0.0",
     "tailwindcss": "^3.4.7",
     "tailwindcss-animate": "^1.0.7",
-    "typescript": "^5.2.2",
+    "typescript": "5.8.3",
     "vite": "^5.3.4",
     "vite-plugin-dts": "^4.0.3",
     "vite-plugin-node-polyfills": "^0.22.0"
