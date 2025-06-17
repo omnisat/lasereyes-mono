@@ -120,10 +120,10 @@ const AlkanesSection = () => {
         >
           <SelectValue placeholder="Select an Alkane" />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="h-fit">
           {alkanes?.map((alkane) => (
             <SelectItem key={alkane.id} value={alkane.id}>
-              {alkane.name} ({formatAlkaneBalance(alkane.balance)})
+              {alkane.name} #{alkane.id} ({formatAlkaneBalance(alkane.balance)})
             </SelectItem>
           ))}
         </SelectContent>

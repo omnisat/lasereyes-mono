@@ -2,9 +2,11 @@ import type { Account } from '@oyl/sdk/lib/account'
 import type { LaserEyesClient } from '../../index'
 import { getBitcoinNetwork } from '../../../lib/helpers'
 import { toXOnly } from 'bitcoinjs-lib/src/psbt/bip371'
-import { createSendPsbt } from './utils'
+import { createMintExecutePsbt, createSendPsbt } from './utils'
 import { SandshrewDataSource } from '../../..'
 import { AlkaneToken } from './types'
+import { AlkaneId } from 'alkanes'
+import { filterSpendableUTXOs } from '../../../lib/utils'
 
 export default class AlkanesModule {
   constructor(private readonly client: LaserEyesClient) {}
@@ -55,20 +57,9 @@ export default class AlkanesModule {
       },
     }
     const { fastFee } = await this.client.dataSourceManager.getRecommendedFees()
-    const utxos = await this.client.dataSourceManager.getAddressUtxos(address)
+    const utxos = await this.client.dataSourceManager.getFormattedUTXOs(address)
     const { psbt } = await createSendPsbt({
-      gatheredUtxos: {
-        utxos: utxos.map((utxo) => ({
-          txId: utxo.txid,
-          outputIndex: utxo.vout,
-          satoshis: utxo.value,
-          scriptPk: utxo.scriptPk,
-          address,
-          inscriptions: [],
-          confirmations: Number(utxo.status.confirmed),
-        })),
-        totalAmount: utxos.reduce((acc, utxo) => acc + utxo.value, 0),
-      },
+      utxos,
       account,
       alkaneId,
       client: this.client,
@@ -115,5 +106,63 @@ export default class AlkanesModule {
     ).flatMap((alkane) => ({
       ...alkane,
     }))
+  }
+
+  async mintAlkane({
+    toAddress,
+    id: alkaneId,
+    changeAddress,
+    feeRate,
+    inputData,
+  }: {
+    id: AlkaneId
+    toAddress?: string
+    changeAddress?: string
+    feeRate?: number
+    inputData?: bigint[]
+  }) {
+    const network = this.client.$network.get()
+    const { connected, address, publicKey } = this.client.$store.get()
+    if (!connected) {
+      throw new Error('Client is not connected')
+    }
+
+    const utxos = await this.client.dataSourceManager.getFormattedUTXOs(address)
+    const { utxos: spendableUtxos } = filterSpendableUTXOs(utxos)
+    // TODO: Find out how to input alkanes into the contract call
+    const inputAlkaneUtxos = utxos.filter((utxo) => utxo.hasAlkanes && false)
+
+     const { fastFee } =
+       await this.client.dataSourceManager.getRecommendedFees()
+
+    const { psbtBase64 } = await createMintExecutePsbt({
+      alkaneId,
+      network,
+      toAddress: toAddress ?? address,
+      changeAddress: changeAddress ?? address,
+      senderPublicKey: publicKey,
+      inputAlkaneUtxos,
+      spendableUtxos,
+      feeRate: feeRate ?? fastFee,
+      inputData,
+    })
+    const response = await this.client.signPsbt({
+      tx: psbtBase64,
+      broadcast: true,
+      finalize: true,
+    })
+    if (!response) {
+      throw new Error('Failed to sign transaction')
+    }
+    if (response.txId) {
+      return response.txId
+    }
+    const txId = await this.client.pushPsbt(
+      response.signedPsbtHex ?? response.signedPsbtBase64!
+    )
+    if (txId) {
+      return txId
+    }
+    throw new Error('Failed to broadcast transaction')
   }
 }

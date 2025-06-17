@@ -1,18 +1,24 @@
 import type { Account } from '@oyl/sdk/lib/account'
 
-import { ProtoStone, encodeRunestoneProtostone } from 'alkanes/lib/index.js'
+import {
+  AlkaneId,
+  ProtoStone,
+  encipher,
+  encodeRunestoneProtostone,
+} from 'alkanes/lib/index.js'
 import { ProtoruneRuneId } from 'alkanes/lib/protorune/protoruneruneid'
 import * as bitcoin from 'bitcoinjs-lib'
 
 import { u128 } from '@magiceden-oss/runestone-lib/dist/src/integer/u128'
 import { u32 } from '@magiceden-oss/runestone-lib/dist/src/integer'
-import type {
-  FormattedUtxo,
-  GatheredUtxos,
-} from '@oyl/sdk/lib/shared/interface'
 import { toXOnly } from 'bitcoinjs-lib/src/psbt/bip371'
 import { LaserEyesClient } from '../..'
 import { getBitcoinNetwork } from '../../../lib/helpers'
+import { NetworkType } from '../../../types'
+import { FormattedUTXO } from '../../../types/utxo'
+
+export const MINIMUM_RELAY_VALUE = 546n
+export const MINT_OPCODE = 77
 
 export enum AddressType {
   P2PKH = 0,
@@ -58,7 +64,7 @@ export const minimumFee = ({
   )
 }
 
-export const inscriptionSats = 546
+export const inscriptionSats = 546n
 
 export const addressFormats = {
   mainnet: {
@@ -123,15 +129,15 @@ export function getAddressType(address: string): AddressType | null {
   return null
 }
 
-export function findXAmountOfSats(utxos: FormattedUtxo[], target: number) {
+export function findXAmountOfSats(utxos: FormattedUTXO[], target: number) {
   let totalAmount = 0
-  const selectedUtxos: FormattedUtxo[] = []
+  const selectedUtxos: FormattedUTXO[] = []
 
   for (const utxo of utxos) {
     if (totalAmount >= target) break
 
     selectedUtxos.push(utxo)
-    totalAmount += utxo.satoshis
+    totalAmount += utxo.btcValue
   }
   return {
     utxos: selectedUtxos,
@@ -244,8 +250,72 @@ export const findAlkaneUtxos = async ({
   return { alkaneUtxos, totalSatoshis, totalBalanceBeingSent }
 }
 
+async function addInputForUtxo(
+  psbt: bitcoin.Psbt,
+  utxo: Pick<
+    FormattedUTXO,
+    'txHash' | 'txOutputIndex' | 'btcValue' | 'address' | 'scriptPubKey'
+  >,
+  {
+    pubkey,
+  }: {
+    pubkey?: string
+  } = {}
+) {
+  const type = getAddressType(utxo.address)
+  switch (type) {
+    case 0: {
+      // legacy P2PKH
+      // TODO: Implement this
+      // const prevHex = await provider.esplora.getTxHex(utxo.txId)
+      psbt.addInput({
+        hash: utxo.txHash,
+        index: +utxo.txOutputIndex,
+        // nonWitnessUtxo: Buffer.from(prevHex, 'hex'),
+      })
+      break
+    }
+    case 2: {
+      // nested SegWit
+      if (!pubkey) {
+        throw new Error('Pubkey is required for nested SegWit')
+      }
+      const redeem = bitcoin.script.compile([
+        bitcoin.opcodes.OP_0,
+        bitcoin.crypto.hash160(Buffer.from(pubkey, 'hex')),
+      ])
+      psbt.addInput({
+        hash: utxo.txHash,
+        index: +utxo.txOutputIndex,
+        redeemScript: redeem,
+        witnessUtxo: {
+          value: BigInt(utxo.btcValue),
+          script: bitcoin.script.compile([
+            bitcoin.opcodes.OP_HASH160,
+            bitcoin.crypto.hash160(redeem),
+            bitcoin.opcodes.OP_EQUAL,
+          ]),
+        },
+      })
+      break
+    }
+    case 1: // native P2WPKH
+    case 3: // P2TR
+    default: {
+      psbt.addInput({
+        hash: utxo.txHash,
+        index: +utxo.txOutputIndex,
+        witnessUtxo: {
+          value: BigInt(utxo.btcValue),
+          script: Buffer.from(utxo.scriptPubKey, 'hex'),
+        },
+      })
+    }
+  }
+}
+
 export const createSendPsbt = async ({
-  gatheredUtxos,
+  utxos,
   account,
   alkaneId,
   client,
@@ -254,7 +324,7 @@ export const createSendPsbt = async ({
   feeRate,
   fee,
 }: {
-  gatheredUtxos: GatheredUtxos
+  utxos: FormattedUTXO[]
   account: Account
   alkaneId: { block: string; tx: string }
   client: LaserEyesClient
@@ -263,39 +333,36 @@ export const createSendPsbt = async ({
   feeRate: number
   fee?: number
 }) => {
-  const originalGatheredUtxos = gatheredUtxos
+  const originalGatheredUtxos = {
+    utxos,
+    totalAmount: utxos.reduce((acc, utxo) => acc + utxo.btcValue, 0),
+  }
 
-  const minFee = minimumFee({
-    taprootInputCount: 2,
-    nonTaprootInputCount: 0,
-    outputCount: 4,
-  })
-  const calculatedFee = minFee * feeRate < 250 ? 250 : minFee * feeRate
-  let finalFee = fee ? fee : calculatedFee
+  const minTxSize = calculateTaprootTxSize(2, 0, 4)
+  const calculatedFee = BigInt(Math.max(minTxSize * feeRate, 250))
+  let finalFee = fee ? BigInt(fee) : calculatedFee
 
-  gatheredUtxos = findXAmountOfSats(
+  let gatheredUtxos = findXAmountOfSats(
     originalGatheredUtxos.utxos,
     Number(finalFee) + Number(inscriptionSats)
   )
 
   if (gatheredUtxos.utxos.length > 1) {
-    const txSize = minimumFee({
-      taprootInputCount: gatheredUtxos.utxos.length,
-      nonTaprootInputCount: 0,
-      outputCount: 4,
-    })
+    const txSize = calculateTaprootTxSize(gatheredUtxos.utxos.length, 0, 4)
 
-    finalFee = Math.max(txSize * feeRate, 250)
+    finalFee = BigInt(Math.max(txSize * feeRate, 250))
     gatheredUtxos = findXAmountOfSats(
       originalGatheredUtxos.utxos,
       Number(finalFee) + Number(inscriptionSats)
     )
   }
 
+  const targetInputValue = finalFee + inscriptionSats * 2n
+
   const network = client.$network.get()
   const psbt = new bitcoin.Psbt({ network: getBitcoinNetwork(network) })
 
-  const { alkaneUtxos, totalSatoshis } = await findAlkaneUtxos({
+  const { alkaneUtxos } = await findAlkaneUtxos({
     address: account.taproot.address,
     greatestToLeast: account.spendStrategy.utxoSortGreatestToLeast,
     alkaneId,
@@ -307,99 +374,35 @@ export const createSendPsbt = async ({
     throw new Error('No Alkane Utxos Found')
   }
 
-  for await (const utxo of alkaneUtxos) {
-    if (getAddressType(utxo.address) === AddressType.P2PKH) {
-      // TODO: Implement this
-      // const previousTxHex: string = await client.dataSourceManager.(utxo.txId)
-      psbt.addInput({
-        hash: utxo.txId,
-        index: utxo.txIndex,
-        //   nonWitnessUtxo: Buffer.from(previousTxHex, 'hex'),
-      })
-    }
-    if (getAddressType(utxo.address) === AddressType.P2SH_P2WPKH) {
-      const redeemScript = bitcoin.script.compile([
-        bitcoin.opcodes.OP_0,
-        bitcoin.crypto.hash160(Buffer.from(account.nestedSegwit.pubkey, 'hex')),
-      ])
+  let totalInputValue = 0n
+  const usedUTXOSet: Set<string> = new Set()
 
-      psbt.addInput({
-        hash: utxo.txId,
-        index: utxo.txIndex,
-        redeemScript: redeemScript,
-        witnessUtxo: {
-          value: BigInt(utxo.satoshis),
-          script: bitcoin.script.compile([
-            bitcoin.opcodes.OP_HASH160,
-            bitcoin.crypto.hash160(redeemScript),
-            bitcoin.opcodes.OP_EQUAL,
-          ]),
-        },
-      })
-    }
-    if (
-      getAddressType(utxo.address) === AddressType.P2TR ||
-      getAddressType(utxo.address) === AddressType.P2WPKH
-    ) {
-      psbt.addInput({
-        hash: utxo.txId,
-        index: utxo.txIndex,
-        witnessUtxo: {
-          value: BigInt(utxo.satoshis),
-          script: Buffer.from(utxo.script, 'hex'),
-        },
-      })
-    }
+  for await (const utxo of alkaneUtxos) {
+    addInputForUtxo(psbt, {
+      txHash: utxo.txId,
+      txOutputIndex: utxo.txIndex,
+      btcValue: utxo.satoshis,
+      scriptPubKey: utxo.script,
+      address: utxo.address,
+    })
+    totalInputValue += BigInt(utxo.satoshis)
+    usedUTXOSet.add(utxo.txId + ':' + utxo.txIndex.toString())
   }
 
-  if (gatheredUtxos.totalAmount < finalFee + inscriptionSats * 2) {
+  if (gatheredUtxos.totalAmount < targetInputValue) {
     throw new Error('Insufficient Balance')
   }
 
-  for (let i = 0; i < gatheredUtxos.utxos.length; i++) {
-    if (getAddressType(gatheredUtxos.utxos[i].address) === AddressType.P2PKH) {
-      // TODO: Implement this
-      // const previousTxHex: string = await client.dataSourceManager.(utxo.txId)
-      psbt.addInput({
-        hash: gatheredUtxos.utxos[i].txId,
-        index: gatheredUtxos.utxos[i].outputIndex,
-        //   nonWitnessUtxo: Buffer.from(previousTxHex, 'hex'),
-      })
+  for (const utxo of gatheredUtxos.utxos) {
+    // The `* 2` here is to account for the input going to the sender and the one going to the receiver
+    if (totalInputValue > targetInputValue) {
+      break
     }
-    if (
-      getAddressType(gatheredUtxos.utxos[i].address) === AddressType.P2SH_P2WPKH
-    ) {
-      const redeemScript = bitcoin.script.compile([
-        bitcoin.opcodes.OP_0,
-        bitcoin.crypto.hash160(Buffer.from(account.nestedSegwit.pubkey, 'hex')),
-      ])
-
-      psbt.addInput({
-        hash: gatheredUtxos.utxos[i].txId,
-        index: gatheredUtxos.utxos[i].outputIndex,
-        redeemScript: redeemScript,
-        witnessUtxo: {
-          value: BigInt(gatheredUtxos.utxos[i].satoshis),
-          script: bitcoin.script.compile([
-            bitcoin.opcodes.OP_HASH160,
-            bitcoin.crypto.hash160(redeemScript),
-            bitcoin.opcodes.OP_EQUAL,
-          ]),
-        },
-      })
-    }
-    if (
-      getAddressType(gatheredUtxos.utxos[i].address) === AddressType.P2TR ||
-      getAddressType(gatheredUtxos.utxos[i].address) === AddressType.P2WPKH
-    ) {
-      psbt.addInput({
-        hash: gatheredUtxos.utxos[i].txId,
-        index: gatheredUtxos.utxos[i].outputIndex,
-        witnessUtxo: {
-          value: BigInt(gatheredUtxos.utxos[i].satoshis),
-          script: Buffer.from(gatheredUtxos.utxos[i].scriptPk, 'hex'),
-        },
-      })
+    if (!usedUTXOSet.has(utxo.txHash + ':' + utxo.txOutputIndex.toString())) {
+      addInputForUtxo(psbt, utxo)
+      totalInputValue += BigInt(utxo.btcValue)
+      // This looks useless but it's good to have it anyways
+      usedUTXOSet.add(utxo.txHash + ':' + utxo.txOutputIndex.toString())
     }
   }
 
@@ -414,7 +417,7 @@ export const createSendPsbt = async ({
               u128(BigInt(alkaneId.tx))
             ),
             amount: u128(BigInt(amount)),
-            output: u32(BigInt(1)),
+            output: u32(1n),
           },
         ],
         pointer: 0,
@@ -425,23 +428,23 @@ export const createSendPsbt = async ({
   }).encodedRunestone
 
   psbt.addOutput({
-    value: BigInt(inscriptionSats),
+    value: inscriptionSats,
     address: account.taproot.address,
   })
 
   psbt.addOutput({
-    value: BigInt(inscriptionSats),
+    value: inscriptionSats,
     address: toAddress,
   })
 
   psbt.addOutput({ script: protostone, value: 0n })
 
-  const changeAmount =
-    gatheredUtxos.totalAmount + totalSatoshis - (finalFee + inscriptionSats * 2)
+  const outputTotal = psbt.txOutputs.reduce((sum, o) => sum + o.value, 0n)
+  const changeAmount = totalInputValue - outputTotal - finalFee
 
   psbt.addOutput({
     address: account[account.spendStrategy.changeAddress].address,
-    value: BigInt(changeAmount),
+    value: changeAmount,
   })
 
   const formattedPsbtTx = await formatInputsToSign({
@@ -451,4 +454,148 @@ export const createSendPsbt = async ({
   })
 
   return { psbt: formattedPsbtTx.toBase64() }
+}
+
+export const createMintExecutePsbt = async ({
+  toAddress,
+  network,
+  alkaneId,
+  changeAddress,
+  frontendFeeAddress,
+  frontendFeeAmount,
+  feeRate = 1,
+  spendableUtxos,
+  inputAlkaneUtxos,
+  senderPublicKey,
+  inputData,
+}: {
+  toAddress: string
+  network: NetworkType
+  alkaneId: AlkaneId
+  changeAddress: string
+  frontendFeeAddress?: string
+  frontendFeeAmount?: bigint
+  feeRate?: number
+  spendableUtxos: FormattedUTXO[]
+  inputAlkaneUtxos: FormattedUTXO[]
+  senderPublicKey: string
+  inputData?: bigint[]
+}) => {
+  const calldata = [alkaneId.block, alkaneId.tx, BigInt(MINT_OPCODE), ...(inputData ?? [])]
+
+  const protostone = encodeRunestoneProtostone({
+    protostones: [
+      
+        ProtoStone.message({
+          protocolTag: 1n,
+          calldata: encipher(calldata),
+          pointer: 0,
+          refundPointer: 0,
+        })
+    ],
+  }).encodedRunestone
+  const bitcoinNetwork = getBitcoinNetwork(network)
+  const psbt = new bitcoin.Psbt({
+    network: bitcoinNetwork,
+  })
+
+  const effectiveFeeAmount =
+    frontendFeeAddress &&
+    frontendFeeAmount &&
+    frontendFeeAmount >= MINIMUM_RELAY_VALUE
+      ? frontendFeeAmount
+      : 0n
+  const spendTarget = effectiveFeeAmount + BigInt(inscriptionSats)
+  function calculateSize(inputCount: number) {
+    return calculateTaprootTxSize(
+      inputCount,
+      0,
+      2 + (effectiveFeeAmount > 0 ? 1 : 0)
+    ) + protostone.byteLength
+  }
+
+  const minTxSize = calculateSize(2)
+  const minFee = BigInt(Math.ceil(Math.max(minTxSize * feeRate, 250)))
+  let spendableUtxosGathered = {
+    utxos: spendableUtxos,
+    totalAmount: spendableUtxos.reduce((acc, utxo) => acc + utxo.btcValue, 0),
+  }
+
+  spendableUtxosGathered = findXAmountOfSats(
+    spendableUtxosGathered.utxos,
+    Number(minFee) + Number(spendTarget)
+  )
+
+  if (spendableUtxosGathered.utxos.length < 1) {
+    throw new Error('Insufficient balance')
+  }
+  const newSize = calculateSize(spendableUtxosGathered.utxos.length)
+  const newFee = BigInt(Math.ceil(Math.max(newSize * feeRate, 250)))
+  if (spendableUtxosGathered.totalAmount < newFee) {
+    spendableUtxosGathered = findXAmountOfSats(
+      spendableUtxosGathered.utxos,
+      Number(newFee) + Number(spendTarget)
+    )
+  }
+  const finalSize = calculateSize(spendableUtxosGathered.utxos.length)
+  const finalFee = BigInt(Math.ceil(Math.max(finalSize * feeRate, 250)))
+  if (spendableUtxosGathered.totalAmount < finalFee) {
+    throw new Error('Insufficient balance')
+  }
+
+  for (const utxo of inputAlkaneUtxos) {
+    addInputForUtxo(psbt, utxo)
+  }
+  for (const utxo of spendableUtxosGathered.utxos) {
+    addInputForUtxo(psbt, utxo)
+  }
+
+  
+  console.log('protostone byte length', protostone.length)
+
+  // Add output for any output protorunes
+  psbt.addOutput({
+    value: BigInt(inscriptionSats),
+    address: toAddress,
+  })
+
+  // OP_RETURN output
+  psbt.addOutput({ script: protostone, value: 0n })
+
+  if (frontendFeeAddress && frontendFeeAmount && frontendFeeAmount > 0) {
+    psbt.addOutput({
+      value: frontendFeeAmount,
+      address: frontendFeeAddress,
+    })
+  }
+  const totalAlkanesAmount = inputAlkaneUtxos
+    ? inputAlkaneUtxos.reduce((acc, utxo) => acc + BigInt(utxo.btcValue), 0n)
+    : 0n
+
+  const inputsTotal =
+    BigInt(spendableUtxosGathered.totalAmount) + totalAlkanesAmount
+  const outputsTotal = psbt.txOutputs.reduce((sum, o) => sum + o.value, 0n)
+
+  let change = inputsTotal - outputsTotal - finalFee
+
+  if (change < 0) {
+    throw new Error('Insufficient balance')
+  }
+
+  if (change >= MINIMUM_RELAY_VALUE) {
+    psbt.addOutput({
+      address: changeAddress,
+      value: change,
+    })
+  }
+  const formattedPsbtTx = await formatInputsToSign({
+    _psbt: psbt,
+    senderPublicKey,
+    network: bitcoinNetwork,
+  })
+
+  return {
+    psbtBase64: formattedPsbtTx.toBase64(),
+    psbtHex: formattedPsbtTx.toHex(),
+  }
 }
