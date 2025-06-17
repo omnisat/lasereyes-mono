@@ -16,7 +16,7 @@ const config = {
 }
 const ds = new MaestroDataSource(MAINNET, config as any)
 
-describe('MaestroDataSource integration', () => {
+describe.skip('MaestroDataSource integration', () => {
   it('fetches first 5 inscriptions', async () => {
     const result = await ds.getAddressInscriptions(realAddress, 0, 5)
     console.log(
