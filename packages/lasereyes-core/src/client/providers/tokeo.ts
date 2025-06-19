@@ -102,13 +102,18 @@ export default class TokeoProvider extends WalletProvider {
     this.observer?.disconnect()
   }
 
-  async connect(_: ProviderType): Promise<void> {
+  async connect(_: ProviderType): Promise<boolean | void> {
     try {
       if (!this.library) {
-        setTimeout(() => {
-          window.open('https://tokeo.io', '_blank')
-        }, 500)
-        throw new Error('Tokeo not found')
+        if (this.isMobile()) {
+          const url = `tokeo://open-url?url=${encodeURIComponent(window.location.href)}`
+          const returned = window.open(url)
+          if (!returned) {
+            throw new Error('Tokeo wallet not found')
+          }
+          returned.focus()
+          return false
+        } else throw new Error('Tokeo wallet not found')
       }
 
       // This duplicate call is necessary because on the first connection, the response is different from subsequent calls

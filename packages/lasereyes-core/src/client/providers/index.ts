@@ -71,7 +71,7 @@ export abstract class WalletProvider {
 
   abstract dispose(): void
 
-  abstract connect(defaultWallet: ProviderType): Promise<void>
+  abstract connect(defaultWallet: ProviderType): Promise<boolean | void>
 
   async requestAccounts(): Promise<string[]> {
     return this.$store.get().accounts
