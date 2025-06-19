@@ -208,7 +208,7 @@ export interface AlkaneSendArgs {
   id: string
   fromAddress: string
   toAddress: string
-  amount: number
+  amount: bigint
   network: NetworkType
 }
 

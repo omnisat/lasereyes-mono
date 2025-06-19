@@ -1,7 +1,7 @@
 {
   "name": "@omnisat/lasereyes-react",
   "private": false,
-  "version": "0.0.72",
+  "version": "0.0.74-next.4",
   "type": "module",
   "main": "./dist/index.umd.cjs",
   "module": "./dist/index.js",
@@ -18,7 +18,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b tsconfig.build.json && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "prepublishOnly": "npm run build"
@@ -47,7 +47,8 @@
     "globals": "^15.9.0",
     "react": "19.0.0-rc.1",
     "react-dom": "19.0.0-rc.1",
-    "typescript": "^5.5.3",
+    "sonda": "^0.7.1",
+    "typescript": "5.8.3",
     "typescript-eslint": "^8.0.1",
     "vite": "^5.4.1",
     "vite-plugin-dts": "^4.2.1"

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Button } from './ui/button'
 import { Input } from '@/components/ui/input'
-import { cn } from '@/lib/utils'
+import { cn, parseFixed } from '@/lib/utils'
 import {
   Select,
   SelectContent,
@@ -13,23 +13,35 @@ import { toast } from 'sonner'
 import { getMempoolSpaceUrl } from '@/lib/urls'
 import {
   type AlkaneBalance,
-  ALKANES,
+    ALKANES,
   type MAINNET,
   OYLNET,
   type TESTNET,
   useLaserEyes,
 } from '@omnisat/lasereyes'
 
+// Helper function to format alkane balance with 8 decimal places (like Bitcoin)
+const formatAlkaneBalance = (balance: bigint): string => {
+  const ALKANE_DECIMALS = 8
+  const divisor = BigInt(10 ** ALKANE_DECIMALS)
+  const integerPart = balance / divisor
+  const fractionalPart = balance % divisor
+
+  if (fractionalPart === BigInt(0)) {
+    return integerPart.toString()
+  }
+
+  const fractionalStr = fractionalPart.toString().padStart(ALKANE_DECIMALS, '0')
+  const trimmedFractional = fractionalStr.replace(/0+$/, '')
+
+  return trimmedFractional
+    ? `${integerPart}.${trimmedFractional}`
+    : integerPart.toString()
+}
+
 const AlkanesSection = () => {
-  const {
-    provider,
-    address,
-    send,
-    network,
-    getMetaBalances,
-    connected,
-    client,
-  } = useLaserEyes()
+  const { provider, address, send, network, getMetaBalances, connected } =
+    useLaserEyes()
   const [alkanes, setAlkanes] = useState<AlkaneBalance[]>([])
   const [selectedAlkane, setSelectedAlkane] = useState<
     AlkaneBalance | undefined
@@ -60,7 +72,7 @@ const AlkanesSection = () => {
       const txid = await send(ALKANES, {
         fromAddress: address,
         toAddress: alkaneToAddress,
-        amount: Number(alkaneAmount),
+        amount: parseFixed(alkaneAmount, 8),
         id: selectedAlkane.id,
         network: network as typeof MAINNET | typeof TESTNET | typeof OYLNET,
       })
@@ -110,10 +122,10 @@ const AlkanesSection = () => {
         >
           <SelectValue placeholder="Select an Alkane" />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="h-fit">
           {alkanes?.map((alkane) => (
             <SelectItem key={alkane.id} value={alkane.id}>
-              {alkane.name} ({Number(alkane.balance)})
+              {alkane.name} #{alkane.id} ({formatAlkaneBalance(alkane.balance)})
             </SelectItem>
           ))}
         </SelectContent>

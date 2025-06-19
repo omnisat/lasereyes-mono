@@ -77,6 +77,7 @@ export class DataSourceManager {
     this.dataSources.set(
       'sandshrew',
       new SandshrewDataSource(network, {
+        apiKey: config?.dataSources?.sandshrew?.apiKey,
         networks: {
           mainnet: {
             apiKey:
@@ -370,7 +371,7 @@ export class DataSourceManager {
     return undefined
   }
 
-  async getFormattedUTXOS(address: string): Promise<FormattedUTXO[]> {
+  async getFormattedUTXOs(address: string): Promise<FormattedUTXO[]> {
     const alkanes = await this.getAlkanesByAddress(address)
     const utxos = await this.getAddressUtxos(address)
     if (utxos.length === 0) {

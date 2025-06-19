@@ -25,7 +25,8 @@ export function runeIdToString({ block, tx }: { block: string; tx: string }) {
 }
 
 export type SandshrewConfig = {
-  networks: {
+  apiKey?: string
+  networks?: {
     mainnet: {
       apiUrl: string
       apiKey: string
@@ -40,18 +41,22 @@ export type SandshrewConfig = {
 export class SandshrewDataSource implements DataSource {
   private apiUrl = ''
   private apiKey = ''
-  private networks: SandshrewConfig['networks']
+  private networks: NonNullable<SandshrewConfig['networks']>
   alkanesRpc: AlkanesRpc
 
   constructor(network: NetworkType, config?: SandshrewConfig) {
     this.networks = {
       mainnet: {
         apiUrl: getSandshrewUrl('mainnet'),
-        apiKey: SANDSHREW_LASEREYES_KEY,
+        apiKey: config?.apiKey || SANDSHREW_LASEREYES_KEY,
       },
       signet: {
         apiUrl: getSandshrewUrl('signet'),
-        apiKey: SANDSHREW_LASEREYES_KEY,
+        apiKey: config?.apiKey || SANDSHREW_LASEREYES_KEY,
+      },
+      oylnet: {
+        apiUrl: getSandshrewUrl('oylnet'),
+        apiKey: config?.apiKey || 'regtest',
       },
       ...config?.networks,
     }

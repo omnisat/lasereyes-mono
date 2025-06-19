@@ -13,7 +13,6 @@ import { BIP322, BIP322_SIMPLE } from '../../constants'
 import { LaserEyesClient } from '..'
 import { Inscription } from '../../types/lasereyes'
 import { normalizeInscription } from '../../lib/data-sources/normalizations'
-import _ from 'lodash'
 import { omitUndefined } from '../../lib/utils'
 
 export default class UnisatProvider extends WalletProvider {

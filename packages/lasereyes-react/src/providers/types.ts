@@ -3,7 +3,6 @@ import {
   NetworkType,
   Protocol,
   ProviderType,
-  SendArgs,
   SignMessageOptions,
   LaserEyesClient,
   MempoolUtxo,
@@ -56,10 +55,7 @@ export type LaserEyesContextType = {
     contentBase64: string,
     mimeType: ContentType
   ) => Promise<string | string[]>
-  send: (protocol: Protocol, sendArgs: SendArgs) => Promise<string>
-  sendInscriptions: (
-    inscriptionIds: string[],
-    toAddress: string
-  ) => Promise<string>
+  send: LaserEyesClient['send']
+  sendInscriptions: (inscriptionIds: string[], toAddress: string) => Promise<string>
   getUtxos: (address: string) => Promise<MempoolUtxo[]>
 }

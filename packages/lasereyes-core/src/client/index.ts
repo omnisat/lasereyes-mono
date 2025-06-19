@@ -5,6 +5,8 @@ import {
   listenKeys,
 } from 'nanostores'
 import type {
+  AlkaneSendArgs,
+  Brc20SendArgs,
   BTCSendArgs,
   Config,
   ContentType,
@@ -52,6 +54,9 @@ import SparrowProvider from './providers/sparrow'
 import { DataSourceManager } from '../lib/data-sources/manager'
 import AlkanesModule from './modules/alkanes'
 import TokeoProvider from './providers/tokeo'
+import { ALKANES } from '../constants/protocols'
+import { BTC, RUNES } from '../constants/protocols'
+import { BRC20 } from '../constants/protocols'
 
 export class LaserEyesClient {
   readonly $store: MapStore<LaserEyesStoreType>
@@ -422,7 +427,18 @@ export class LaserEyesClient {
     }
   }
 
-  async send(protocol: Protocol, sendArgs: BTCSendArgs | RuneSendArgs) {
+  async send<T extends Protocol>(
+    protocol: T,
+    sendArgs: T extends typeof BTC
+      ? BTCSendArgs
+      : T extends typeof RUNES
+      ? RuneSendArgs
+      : T extends typeof BRC20
+      ? Brc20SendArgs
+      : T extends typeof ALKANES
+      ? AlkaneSendArgs
+      : never
+  ): Promise<string | undefined> {
     const provider = this.$store.get().provider
     if (!provider) return
     if (provider && this.$providerMap[provider]) {

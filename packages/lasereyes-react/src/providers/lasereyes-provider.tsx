@@ -8,7 +8,6 @@ import {
 } from 'react'
 import { defaultMethods, LaserEyesStoreContext } from './context'
 import {
-  type BTCSendArgs,
   type Config,
   type ContentType,
   createConfig,
@@ -18,7 +17,6 @@ import {
   type NetworkType,
   type Protocol,
   type ProviderType,
-  type RuneSendArgs,
   type SignMessageOptions,
 } from '@omnisat/lasereyes-core'
 
@@ -30,13 +28,13 @@ export default function LaserEyesProvider({
   children: ReactNode | ReactNode[]
 }) {
   const clientStores = useMemo(() => createStores(), [])
-  const clientConfig = useMemo(
-    () => createConfig(config),
-    [config]
-  )
+  const clientConfig = useMemo(() => createConfig(config), [config])
   const [client, setClient] = useState<LaserEyesClient | null>(null)
 
   useEffect(() => {
+    if (clientConfig?.network) {
+      clientStores.$network.set(clientConfig.network)
+    }
     const c = new LaserEyesClient(clientStores, clientConfig)
     setClient(() => c)
     c.initialize()
@@ -144,8 +142,8 @@ export default function LaserEyesProvider({
       defaultMethods.inscribe(),
     [client]
   )
-  const send = useCallback(
-    async (protocol: Protocol, sendArgs: BTCSendArgs | RuneSendArgs) =>
+  const send: LaserEyesClient['send'] = useCallback(
+    async (protocol, sendArgs) =>
       (await client?.send.call(client, protocol, sendArgs)) ??
       defaultMethods.send(),
     [client]
