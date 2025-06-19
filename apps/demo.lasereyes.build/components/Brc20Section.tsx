@@ -33,7 +33,8 @@ const BRC20Section = () => {
         toAddress: brc20ToAddress,
         amount: Number(brc20Amount),
         ticker: selectedBrc20.ticker,
-      } as SendArgs)
+        network,
+      })
 
       toast.success(
         <span className={'flex flex-col gap-1 items-center justify-center'}>

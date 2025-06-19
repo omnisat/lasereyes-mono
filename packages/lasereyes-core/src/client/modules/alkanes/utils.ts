@@ -190,7 +190,7 @@ export const findAlkaneUtxos = async ({
   greatestToLeast: boolean
   client: LaserEyesClient
   alkaneId: { block: string; tx: string }
-  targetNumberOfAlkanes: number
+  targetNumberOfAlkanes: bigint
 }) => {
   const res = await client.dataSourceManager.getAlkanesByAddress(address)
 
@@ -329,7 +329,7 @@ export const createSendPsbt = async ({
   alkaneId: { block: string; tx: string }
   client: LaserEyesClient
   toAddress: string
-  amount: number
+  amount: bigint
   feeRate: number
   fee?: number
 }) => {
