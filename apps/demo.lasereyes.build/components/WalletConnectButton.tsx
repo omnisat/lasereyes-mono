@@ -49,7 +49,6 @@ const WalletConnectButton = ({
     hasOrange,
     hasTokeo,
     hasOpNet,
-    hasTokeo,
   } = useLaserEyes()
 
   const hasWallet = {
