@@ -344,8 +344,29 @@ export const createSendPsbt = async ({
 
   let gatheredUtxos = findXAmountOfSats(
     originalGatheredUtxos.utxos,
-    Number(finalFee) + Number(inscriptionSats)
+    Number(finalFee) + Number(inscriptionSats) * 4
   )
+
+  const calldata = [BigInt(2), BigInt(100), BigInt(77)]
+
+  const protostone23 = encodeRunestoneProtostone({
+    protostones: [
+      ProtoStone.message({
+        protocolTag: 1n,
+        pointer: 0,
+        refundPointer: 0,
+        calldata: encipher(calldata),
+        edicts: [],
+      }),
+    ],
+  }).encodedRunestone
+
+  console.log('protostone23', protostone23.toString('hex'))
+
+  if (gatheredUtxos.totalAmount < finalFee + inscriptionSats) {
+    console.log('gatheredUtxos.totalAmount', gatheredUtxos.totalAmount)
+    throw new Error('Insufficient Balanceeeee')
+  }
 
   if (gatheredUtxos.utxos.length > 1) {
     const txSize = calculateTaprootTxSize(gatheredUtxos.utxos.length, 0, 4)

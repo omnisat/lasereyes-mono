@@ -174,10 +174,10 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
     sparrow: hasSparrow,
     op_net: hasOpNet,
     leather: hasLeather,
+    tokeo: hasTokeo,
     phantom: hasPhantom,
     wizz: hasWizz,
     orange: hasOrange,
-    tokeo: hasTokeo,
   }
 
   // @ts-ignore
@@ -362,11 +362,15 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
   return (
     <div
       className={
-        'flex flex-col gap-4 w-full mt-12 mb-24 max-w-[1200px] px-12 font-windows'
+        'flex flex-col gap-4 w-full mt-12 mb-24 max-w-[1200px] px-4 md:px-12 font-windows'
       }
     >
       {/* Header section with logo and links */}
-      <div className={'w-full flex gap-2 flex-row justify-center items-center'}>
+      <div
+        className={
+          'w-full flex gap-2 flex-col md:flex-row justify-center items-center'
+        }
+      >
         <Image
           src={
             address ? '/lasereyes_connected.svg' : '/lasereyes_disconnected.svg'
@@ -452,7 +456,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
           {/* Provider info */}
           <div
             className={
-              'flex flex-row items-center gap-4 justify-center space-around'
+              'flex flex-col md:flex-row items-center gap-4 justify-center space-around'
             }
           >
             <div className={'flex flex-col items-center'}>
@@ -474,7 +478,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
           {/* Address section */}
           <div
             className={
-              'flex flex-row items-center gap-6 justify-center space-around'
+              'flex flex-col md:flex-row items-center gap-6 justify-center space-around'
             }
           >
             <div className={'flex flex-row gap-2'}>
@@ -510,7 +514,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
             {/* Payment address section */}
             <div
               className={
-                'flex flex-row items-center gap-4 justify-center space-around'
+                'flex flex-col md:flex-row items-center gap-4 justify-center space-around'
               }
             >
               <div className={'flex flex-col items-center'}>
@@ -544,7 +548,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
           </div>
 
           {/* Public keys section */}
-          <div className={'flex flex-row gap-6'}>
+          <div className={'flex flex-col md:flex-row gap-6'}>
             <div
               className={
                 'flex flex-row items-center gap-4 justify-center space-around'
@@ -598,7 +602,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
           {/* Balance */}
           <div
             className={
-              'flex flex-row items-center gap-4 justify-center space-around'
+              'flex flex-col md:flex-row items-center gap-4 justify-center space-around'
             }
           >
             <div className={'flex flex-col items-center'}>
@@ -641,7 +645,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
           {/* PSBT section */}
           <div
             className={
-              'flex flex-row items-center gap-6 justify-center space-around'
+              'flex flex-col md:flex-row items-center gap-6 justify-center space-around'
             }
           >
             <div
@@ -711,7 +715,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
 
           {/* Bitcoin section */}
           <div className="text-md text-orange-400">bitcoin</div>
-          <div className={'flex flex-row text-xl gap-2'}>
+          <div className={'flex flex-col md:flex-row text-xl gap-2'}>
             <Button
               className={'w-full gap-2 bg-[#232225]'}
               disabled={!provider}
@@ -756,7 +760,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
           <div className={'flex flex-col gap-2'}>
             <span
               className={
-                'w-full flex flex-row px-2 py-1 items-center justify-center gap-2'
+                'w-full flex flex-col md:flex-row px-2 py-1 items-center justify-center gap-2'
               }
             >
               <Button

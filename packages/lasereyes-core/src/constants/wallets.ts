@@ -28,11 +28,11 @@ enum ProviderEnumMap {
   ORANGE = 'orange',
   OYL = 'oyl',
   SPARROW = 'sparrow',
+  TOKEO = 'tokeo',
   PHANTOM = 'phantom',
   UNISAT = 'unisat',
   WIZZ = 'wizz',
   XVERSE = 'xverse',
-  TOKEO = 'tokeo',
 }
 
 type WalletInfo = {
@@ -75,6 +75,10 @@ export const SUPPORTED_WALLETS: WalletInfo = {
     name: ProviderEnumMap.SPARROW,
     url: 'https://sparrowwallet.com/',
   },
+  [ProviderEnumMap.TOKEO]: {
+    name: ProviderEnumMap.TOKEO,
+    url: 'https://tokeo.io/',
+  },
   [ProviderEnumMap.UNISAT]: {
     name: ProviderEnumMap.UNISAT,
     url: 'https://unisat.io/download',
@@ -86,9 +90,5 @@ export const SUPPORTED_WALLETS: WalletInfo = {
   [ProviderEnumMap.XVERSE]: {
     name: ProviderEnumMap.XVERSE,
     url: 'https://www.xverse.app/download',
-  },
-  [ProviderEnumMap.TOKEO]: {
-    name: ProviderEnumMap.TOKEO,
-    url: 'https://tokeo.io/',
   },
 }

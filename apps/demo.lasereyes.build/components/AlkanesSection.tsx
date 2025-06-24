@@ -13,7 +13,9 @@ import { toast } from 'sonner'
 import { getMempoolSpaceUrl } from '@/lib/urls'
 import {
   type AlkaneBalance,
+    ALKANES,
   type MAINNET,
+  OYLNET,
   type TESTNET,
   useLaserEyes,
 } from '@omnisat/lasereyes'
@@ -50,7 +52,7 @@ const AlkanesSection = () => {
   useEffect(() => {
     if (address && network && connected) {
       // We'll need to modify the getMetaBalances function to support 'alkanes' protocol
-      getMetaBalances('alkanes')
+      getMetaBalances(ALKANES)
         .then((x) => {
           console.log('alkanes', x)
           return x
@@ -67,12 +69,12 @@ const AlkanesSection = () => {
       if (!alkaneAmount) throw new Error('No amount specified')
 
       // We'll need to modify the send function to support 'alkanes' protocol
-      const txid = await send('alkanes', {
+      const txid = await send(ALKANES, {
         fromAddress: address,
         toAddress: alkaneToAddress,
         amount: parseFixed(alkaneAmount, 8),
         id: selectedAlkane.id,
-        network: network as typeof MAINNET | typeof TESTNET,
+        network: network as typeof MAINNET | typeof TESTNET | typeof OYLNET,
       })
 
       toast.success(

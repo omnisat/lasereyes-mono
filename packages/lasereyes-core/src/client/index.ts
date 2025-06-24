@@ -24,6 +24,7 @@ import {
   OYL,
   PHANTOM,
   SPARROW,
+  TOKEO,
   UNISAT,
   WIZZ,
   XVERSE,
@@ -52,6 +53,7 @@ import OpNetProvider from './providers/op-net'
 import SparrowProvider from './providers/sparrow'
 import { DataSourceManager } from '../lib/data-sources/manager'
 import AlkanesModule from './modules/alkanes'
+import TokeoProvider from './providers/tokeo'
 import { ALKANES } from '../constants/protocols'
 import { BTC, RUNES } from '../constants/protocols'
 import { BRC20 } from '../constants/protocols'
@@ -93,6 +95,7 @@ export class LaserEyesClient {
       [OYL]: new OylProvider(stores, this, config),
       [PHANTOM]: new PhantomProvider(stores, this, config),
       [SPARROW]: new SparrowProvider(stores, this, config),
+      [TOKEO]: new TokeoProvider(stores, this, config),
       [UNISAT]: new UnisatProvider(stores, this, config),
       [XVERSE]: new XVerseProvider(stores, this, config),
       [WIZZ]: new WizzProvider(stores, this, config),
@@ -180,7 +183,12 @@ export class LaserEyesClient {
         throw new Error('Unsupported wallet provider')
       }
       const provider = this.$providerMap[defaultWallet]
-      await provider?.connect(defaultWallet)
+      const connected = await provider?.connect(defaultWallet)
+      if (connected === false) {
+        this.$store.setKey('isConnecting', false)
+        this.disconnect()
+        return
+      }
       this.$store.setKey('provider', defaultWallet)
       await this.checkNetwork()
       this.$store.setKey('connected', true)
@@ -553,4 +561,4 @@ export class LaserEyesClient {
   }
 }
 
-export * from "./modules"
+export * from './modules'

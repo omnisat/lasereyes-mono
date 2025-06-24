@@ -12,6 +12,7 @@ import {
   ORANGE,
   OP_NET,
   SPARROW,
+  TOKEO,
 } from '../constants/wallets'
 import type { NetworkType, ProviderType, Config } from '../types'
 import type { LaserEyesStoreType } from './types'
@@ -53,6 +54,7 @@ export function createStores(): {
         [ORANGE]: false,
         [OYL]: false,
         [SPARROW]: true,
+        [TOKEO]: false,
         [PHANTOM]: false,
         [WIZZ]: false,
         [XVERSE]: false,

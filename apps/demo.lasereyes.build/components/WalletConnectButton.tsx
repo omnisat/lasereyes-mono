@@ -15,12 +15,14 @@ import {
   type ProviderType,
   SPARROW,
   WalletIcon,
+  TOKEO,
 } from '@omnisat/lasereyes'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 import { ImNewTab } from 'react-icons/im'
 import Link from 'next/link'
 import clsx from 'clsx'
+import { useState } from 'react'
 
 const WalletConnectButton = ({
   wallet,
@@ -45,8 +47,8 @@ const WalletConnectButton = ({
     hasWizz,
     hasSparrow,
     hasOrange,
-    hasOpNet,
     hasTokeo,
+    hasOpNet,
   } = useLaserEyes()
 
   const hasWallet = {
@@ -64,6 +66,8 @@ const WalletConnectButton = ({
     tokeo: hasTokeo,
   }
 
+  const [error, setError] = useState<string | null>(null)
+
   const isConnected = provider === walletName
   const isMissingWallet = !hasWallet[walletName]
   const isSparrow = wallet.name === SPARROW
@@ -80,11 +84,13 @@ const WalletConnectButton = ({
       | typeof PHANTOM
       | typeof WIZZ
       | typeof ORANGE
+      | typeof TOKEO
   ) => {
     try {
       await connect(walletName)
     } catch (error) {
       console.log('error!', error)
+      setError(error instanceof Error ? error.message : 'Unknown error')
       if (error instanceof Error) {
         toast.error(error.message)
       }
@@ -152,6 +158,7 @@ const WalletConnectButton = ({
       variant="outline"
       size="lg"
     >
+      {error && <div className="text-red-500">{error}</div>}
       <WalletIcon walletName={wallet.name} size={24} />
       {wallet.name}
     </Button>

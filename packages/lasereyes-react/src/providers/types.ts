@@ -5,7 +5,7 @@ import {
   ProviderType,
   SignMessageOptions,
   LaserEyesClient,
-  MempoolUtxo
+  MempoolUtxo,
 } from '@omnisat/lasereyes-core'
 
 export type LaserEyesContextType = {
@@ -33,6 +33,7 @@ export type LaserEyesContextType = {
   hasLeather: boolean
   hasPhantom: boolean
   hasWizz: boolean
+  hasTokeo: boolean
 
   connect: (walletName: ProviderType) => Promise<void>
   disconnect: () => void

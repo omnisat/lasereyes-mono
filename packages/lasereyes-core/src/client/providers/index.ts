@@ -71,7 +71,7 @@ export abstract class WalletProvider {
 
   abstract dispose(): void
 
-  abstract connect(defaultWallet: ProviderType): Promise<void>
+  abstract connect(defaultWallet: ProviderType): Promise<boolean | void>
 
   async requestAccounts(): Promise<string[]> {
     return this.$store.get().accounts
@@ -303,5 +303,65 @@ export abstract class WalletProvider {
       dataSourceManager: this.dataSourceManager,
       network: this.$network.get(),
     })
+  }
+
+  getDeviceInfo(): {
+    isMobile: boolean
+    isDesktop: boolean
+    deviceType: 'mobile' | 'tablet' | 'desktop'
+    userAgent: string
+  } {
+    const userAgent = navigator.userAgent.toLowerCase()
+
+    const mobileRegex =
+      /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i
+    const isMobile = mobileRegex.test(userAgent)
+
+    const tabletRegex = /ipad|android(?!.*mobile)|tablet/i
+    const isTablet = tabletRegex.test(userAgent)
+
+    const hasTouchScreen =
+      'ontouchstart' in window || navigator.maxTouchPoints > 0
+    const hasSmallScreen = window.innerWidth <= 768
+
+    let deviceType: 'mobile' | 'tablet' | 'desktop'
+    if (isTablet) {
+      deviceType = 'tablet'
+    } else if (isMobile || (hasTouchScreen && hasSmallScreen)) {
+      deviceType = 'mobile'
+    } else {
+      deviceType = 'desktop'
+    }
+
+    return {
+      isMobile: deviceType === 'mobile' || deviceType === 'tablet',
+      isDesktop: deviceType === 'desktop',
+      deviceType,
+      userAgent: navigator.userAgent,
+    }
+  }
+
+  isMobile(): boolean {
+    return this.getDeviceInfo().isMobile
+  }
+
+  isDesktop(): boolean {
+    return this.getDeviceInfo().isDesktop
+  }
+
+  getSuggestedConnectionMethod():
+    | 'qr-code'
+    | 'deep-link'
+    | 'browser-extension'
+    | 'web-wallet' {
+    const deviceInfo = this.getDeviceInfo()
+
+    if (deviceInfo.deviceType === 'mobile') {
+      return 'deep-link'
+    } else if (deviceInfo.deviceType === 'tablet') {
+      return 'qr-code'
+    } else {
+      return 'browser-extension'
+    }
   }
 }

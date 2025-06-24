@@ -264,7 +264,6 @@ export class SandshrewDataSource implements DataSource {
     ])) as RpcResponse
     const inscriptionInfo = response.result as InscriptionInfo
 
-    // Convert to MaestroGetInscriptionInfoResponse format
     return {
       data: {
         inscription_id: inscriptionInfo.id || inscriptionId,

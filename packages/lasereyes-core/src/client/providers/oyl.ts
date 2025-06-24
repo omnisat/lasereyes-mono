@@ -149,6 +149,7 @@ export default class OylProvider extends WalletProvider {
     // @ts-ignore
     return psbt.txId
   }
+
   async signMessage(
     message: string,
     options?: SignMessageOptions

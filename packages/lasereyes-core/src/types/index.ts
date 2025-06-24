@@ -19,6 +19,7 @@ import type {
   ORANGE,
   OP_NET,
   SPARROW,
+  TOKEO,
 } from '../constants/wallets'
 import type {
   AUDIO_OGG,
@@ -63,9 +64,7 @@ export type BaseNetworkType =
   | typeof BaseNetwork.FRACTAL_TESTNET
   | typeof BaseNetwork.OYLNET
 
-export type NetworkType =
-  | BaseNetworkType
-  | string
+export type NetworkType = BaseNetworkType | string
 
 export type ProviderType =
   | typeof UNISAT
@@ -79,6 +78,7 @@ export type ProviderType =
   | typeof ORANGE
   | typeof OP_NET
   | typeof SPARROW
+  | typeof TOKEO
 
 export type ContentType =
   | typeof TEXT_HTML
@@ -162,7 +162,7 @@ export type Config = {
         }
       }
     }
-  },
+  }
   customNetworks?: {
     [key: string]: {
       baseNetwork: BaseNetworkType
@@ -171,7 +171,11 @@ export type Config = {
   }
 }
 
-export type SendArgs = BTCSendArgs | RuneSendArgs | Brc20SendArgs | AlkaneSendArgs
+export type SendArgs =
+  | BTCSendArgs
+  | RuneSendArgs
+  | Brc20SendArgs
+  | AlkaneSendArgs
 
 export type Protocol = typeof BTC | typeof RUNES | typeof BRC20 | typeof ALKANES
 
@@ -411,7 +415,6 @@ export interface Rune {
   balance: string
 }
 
-
 export interface AlkanesOutpoint {
   runes: Rune[]
   outpoint: { txid: string; vout: number }
@@ -419,7 +422,6 @@ export interface AlkanesOutpoint {
   txindex: number
   height: number
 }
-
 
 export * from './network'
 export * from './lasereyes'

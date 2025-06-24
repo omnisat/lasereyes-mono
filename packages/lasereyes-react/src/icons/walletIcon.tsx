@@ -5,6 +5,7 @@ import { MagicEdenLogo } from './magiceden'
 import { OkxLogo } from './okx'
 import { PhantomLogo } from './phantom'
 import { UnisatLogo } from './unisat'
+import { TokeoLogo } from './tokeo'
 import { OylLogo } from './oyl'
 import OrangeLogo from './orange'
 import OpNetIcon from './op_net.tsx'
@@ -22,6 +23,7 @@ import {
   OYL,
   OP_NET,
   SPARROW,
+  TOKEO,
 } from '@omnisat/lasereyes-core'
 
 const WalletIcon = ({
@@ -57,6 +59,8 @@ const WalletIcon = ({
     return <OrangeLogo size={size} className={className} variant={variant} />
   } else if (walletName === OP_NET) {
     return <OpNetIcon size={size} className={className} variant={variant} />
+  } else if (walletName === TOKEO) {
+    return <TokeoLogo size={size} className={className} variant={variant} />
   } else {
     return <LeatherLogo size={size} className={className} variant={variant} />
   }
