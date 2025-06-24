@@ -25,6 +25,7 @@ export default function useSupportedWallets() {
     hasOpNet,
     hasOrange,
     hasSparrow,
+    hasTokeo,
     connect: connectLaserEyes,
   } = useLaserEyes();
   const hasWallet = useMemo(() => ({
@@ -39,7 +40,8 @@ export default function useSupportedWallets() {
     wizz: hasWizz,
     orange: hasOrange,
     sparrow: hasSparrow,
-  }), [hasLeather, hasMagicEden, hasOkx, hasOpNet, hasOrange, hasOyl, hasPhantom, hasSparrow, hasUnisat, hasWizz, hasXverse]);
+    tokeo: hasTokeo,
+  }), [hasLeather, hasMagicEden, hasOkx, hasOpNet, hasOrange, hasOyl, hasPhantom, hasSparrow, hasUnisat, hasWizz, hasXverse, hasTokeo]);
   const [installedWallets, otherWallets] = useMemo(() => {
     const i: (WalletInfo & {
       connect: () => Promise<string | undefined>;

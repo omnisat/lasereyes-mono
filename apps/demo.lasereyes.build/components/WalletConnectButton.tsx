@@ -46,6 +46,7 @@ const WalletConnectButton = ({
     hasSparrow,
     hasOrange,
     hasOpNet,
+    hasTokeo,
   } = useLaserEyes()
 
   const hasWallet = {
@@ -60,6 +61,7 @@ const WalletConnectButton = ({
     phantom: hasPhantom,
     wizz: hasWizz,
     orange: hasOrange,
+    tokeo: hasTokeo,
   }
 
   const isConnected = provider === walletName

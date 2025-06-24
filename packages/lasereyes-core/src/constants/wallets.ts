@@ -9,6 +9,7 @@ export const WIZZ = 'wizz'
 export const ORANGE = 'orange'
 export const OP_NET = 'op_net'
 export const SPARROW = 'sparrow'
+export const TOKEO = 'tokeo'
 
 export const P2TR = 'p2tr'
 export const P2PKH = 'p2pkh'
@@ -31,6 +32,7 @@ enum ProviderEnumMap {
   UNISAT = 'unisat',
   WIZZ = 'wizz',
   XVERSE = 'xverse',
+  TOKEO = 'tokeo',
 }
 
 type WalletInfo = {
@@ -84,5 +86,9 @@ export const SUPPORTED_WALLETS: WalletInfo = {
   [ProviderEnumMap.XVERSE]: {
     name: ProviderEnumMap.XVERSE,
     url: 'https://www.xverse.app/download',
+  },
+  [ProviderEnumMap.TOKEO]: {
+    name: ProviderEnumMap.TOKEO,
+    url: 'https://tokeo.io/',
   },
 }
