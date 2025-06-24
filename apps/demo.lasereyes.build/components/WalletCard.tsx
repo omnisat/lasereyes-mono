@@ -98,6 +98,7 @@ const WalletCard = ({
     hasSparrow,
     hasOrange,
     hasOpNet,
+    hasTokeo,
     sendBTC,
     signMessage,
     signPsbt,
@@ -153,6 +154,7 @@ const WalletCard = ({
     phantom: hasPhantom,
     wizz: hasWizz,
     orange: hasOrange,
+    tokeo: hasTokeo,
   }
 
   const isConnected = provider === walletName

@@ -178,6 +178,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
     phantom: hasPhantom,
     wizz: hasWizz,
     orange: hasOrange,
+    tokeo: hasTokeo,
   }
 
   // @ts-ignore
