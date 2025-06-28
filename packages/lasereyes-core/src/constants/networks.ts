@@ -1,8 +1,9 @@
-import type { BitcoinNetworkType } from '@orangecrypto/orange-connect'
+import { BitcoinNetworkType } from 'sats-connect'
 import {
   BaseNetwork,
   CmdruidNetwork,
   FractalNetwork,
+  KeplrChain,
   LeatherNetwork,
   OkxNetwork,
   OrangeNetwork,
@@ -20,14 +21,14 @@ export const FRACTAL_TESTNET = BaseNetwork.FRACTAL_TESTNET
 export const REGTEST = BaseNetwork.REGTEST
 export const OYLNET = BaseNetwork.OYLNET
 
-export const getSatsConnectNetwork = (network: string) => {
-  if (network === BaseNetwork.MAINNET) return XverseNetwork.MAINNET
-  if (network === BaseNetwork.TESTNET) return XverseNetwork.TESTNET
-  if (network === BaseNetwork.TESTNET4) return XverseNetwork.TESTNET
-  if (network === BaseNetwork.SIGNET) return XverseNetwork.SIGNET
-  if (network === BaseNetwork.FRACTAL_MAINNET) return XverseNetwork.MAINNET
-  if (network === BaseNetwork.FRACTAL_TESTNET) return XverseNetwork.MAINNET
-  return XverseNetwork.MAINNET
+export const getSatsConnectNetwork = (network: string): BitcoinNetworkType => {
+  if (network === BaseNetwork.MAINNET) return BitcoinNetworkType.Mainnet
+  if (network === BaseNetwork.TESTNET) return BitcoinNetworkType.Testnet
+  if (network === BaseNetwork.TESTNET4) return BitcoinNetworkType.Testnet4
+  if (network === BaseNetwork.SIGNET) return BitcoinNetworkType.Signet
+  if (network === BaseNetwork.FRACTAL_MAINNET) return BitcoinNetworkType.Mainnet
+  if (network === BaseNetwork.FRACTAL_TESTNET) return BitcoinNetworkType.Mainnet
+  return BitcoinNetworkType.Mainnet
 }
 
 export const getLeatherNetwork = (network: string) => {
@@ -46,6 +47,13 @@ export const getUnisatNetwork = (network: string) => {
   if (network === BaseNetwork.FRACTAL_TESTNET)
     return UnisatNetwork.FRACTAL_TESTNET
   return UnisatNetwork.MAINNET
+}
+
+export const getKeplrChainFromNetwork = (network: string) => {
+  if (network === BaseNetwork.MAINNET) return KeplrChain.BITCOIN_MAINNET
+  if (network === BaseNetwork.TESTNET) return KeplrChain.BITCOIN_TESTNET
+  if (network === BaseNetwork.SIGNET) return KeplrChain.BITCOIN_SIGNET
+  return KeplrChain.BITCOIN_MAINNET
 }
 
 export const getWizzNetwork = (network: string) => {
@@ -92,6 +100,13 @@ export const getNetworkForUnisat = (network: string) => {
   if (network === UnisatNetwork.FRACTAL_MAINNET)
     return BaseNetwork.FRACTAL_MAINNET
   if (network === UnisatNetwork.FRACTAL_TESTNET) return BaseNetwork.TESTNET
+  return BaseNetwork.MAINNET
+}
+
+export const getNetworkFromKeplrChain = (network: string) => {
+  if (network === KeplrChain.BITCOIN_MAINNET) return BaseNetwork.MAINNET
+  if (network === KeplrChain.BITCOIN_TESTNET) return BaseNetwork.TESTNET
+  if (network === KeplrChain.BITCOIN_SIGNET) return BaseNetwork.SIGNET
   return BaseNetwork.MAINNET
 }
 

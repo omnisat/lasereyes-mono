@@ -116,6 +116,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
     hasOrange,
     hasOpNet,
     hasTokeo,
+    hasKeplr,
   } = useLaserEyes()
 
   useEffect(() => {
@@ -178,6 +179,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
     phantom: hasPhantom,
     wizz: hasWizz,
     orange: hasOrange,
+    keplr: hasKeplr,
   }
 
   // @ts-ignore

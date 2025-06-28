@@ -20,6 +20,7 @@ import type {
   OP_NET,
   SPARROW,
   TOKEO,
+  KEPLR,
 } from '../constants/wallets'
 import type {
   AUDIO_OGG,
@@ -79,6 +80,7 @@ export type ProviderType =
   | typeof OP_NET
   | typeof SPARROW
   | typeof TOKEO
+  | typeof KEPLR
 
 export type ContentType =
   | typeof TEXT_HTML
@@ -141,10 +143,12 @@ export type Config = {
           apiKey: string
           apiUrl: string
         }
-        [key: string]: {
-          apiKey: string
-          apiUrl: string
-        } | undefined
+        [key: string]:
+          | {
+              apiKey: string
+              apiUrl: string
+            }
+          | undefined
       }
     }
     esplora?: string

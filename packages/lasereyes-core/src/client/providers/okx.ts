@@ -76,7 +76,7 @@ export default class OkxProvider extends WalletProvider {
     }
   )
 
-  removeSubscriber?: Function
+  removeSubscriber?: () => void
 
   restorePersistedValues() {
     const vals = this.$valueStore.get()

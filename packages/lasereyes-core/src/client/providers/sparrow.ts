@@ -79,7 +79,7 @@ export default class SparrowProvider extends WalletProvider {
     })
   }
 
-  removeSubscriber?: Function
+  removeSubscriber?: () => void
 
   watchStateChange(
     newState: LaserEyesStoreType,

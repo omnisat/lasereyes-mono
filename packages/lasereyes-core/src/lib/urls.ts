@@ -97,7 +97,7 @@ export const getSandshrewUrl = (
     } else if (baseNetwork === BaseNetwork.TESTNET) {
       return SANDSHREW_URL_TESTNET
     } else if (baseNetwork === BaseNetwork.OYLNET) {
-      SANDSHREW_URL_OYLNET
+      return SANDSHREW_URL_OYLNET
     }
   }
   switch (network) {
