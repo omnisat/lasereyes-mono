@@ -36,6 +36,12 @@ export default function Home() {
         dataSources: {
           sandshrew: {
             apiKey: '348ae3256c48c15cc99dcb056d2f78df',
+            networks: {
+              regtest: {
+                apiUrl: "http://localhost:18888",
+                apiKey: "",
+              }
+            }
           },
         },
       }}

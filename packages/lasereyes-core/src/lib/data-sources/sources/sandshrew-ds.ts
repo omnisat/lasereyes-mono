@@ -19,6 +19,9 @@ import {
 } from '../../../types'
 import type { AlkaneBalance } from '../../../types/alkane'
 import { AlkanesRpc } from '../../../client/modules/alkanes/rpc'
+import { LasereyesUTXO } from '../../../types/utxo'
+import { getBitcoinNetwork } from '../../helpers'
+import * as bitcoin from 'bitcoinjs-lib'
 
 export function runeIdToString({ block, tx }: { block: string; tx: string }) {
   return `${block}:${tx}`
@@ -43,6 +46,7 @@ export class SandshrewDataSource implements DataSource {
   private apiKey = ''
   private networks: NonNullable<SandshrewConfig['networks']>
   alkanesRpc: AlkanesRpc
+  network: NetworkType
 
   constructor(network: NetworkType, config?: SandshrewConfig) {
     this.networks = {
@@ -62,6 +66,7 @@ export class SandshrewDataSource implements DataSource {
     }
     this.setNetwork(network)
     this.alkanesRpc = new AlkanesRpc(`${this.apiUrl}/${this.apiKey}`)
+    this.network = network
   }
 
   public getName() {
@@ -91,6 +96,7 @@ export class SandshrewDataSource implements DataSource {
       }
     }
     this.alkanesRpc = new AlkanesRpc(`${this.apiUrl}/${this.apiKey}`)
+    this.network = network
   }
 
   private async call(method: string, params: unknown) {
@@ -130,6 +136,48 @@ export class SandshrewDataSource implements DataSource {
       address,
     })
     return response
+  }
+
+  async getAddressBtcBalance(address: string): Promise<string> {
+    const response = await this.call('esplora_address', [address])
+
+    const result = response.result as {
+      address: string
+      chain_stats: {
+        funded_txo_sum: string
+        spent_txo_sum: string
+      }
+    }
+    return (
+      BigInt(result.chain_stats.funded_txo_sum) -
+      BigInt(result.chain_stats.spent_txo_sum)
+    ).toString()
+  }
+
+  async getAddressUtxos(address: string): Promise<Array<LasereyesUTXO>> {
+    const response = await this.call('esplora_address::utxo', [address])
+    const scriptPk = bitcoin.address.toOutputScript(
+      address,
+      getBitcoinNetwork(this.network)
+    )
+    const result = response.result as Array<LasereyesUTXO>
+    return result.map((utxo) => ({
+      ...utxo,
+      scriptPk: Buffer.from(scriptPk).toString('hex'),
+    }))
+  }
+
+  async getOutputValueByVOutIndex(
+    txId: string,
+    vOut: number
+  ): Promise<number | null> {
+    const response = await this.call('esplora_tx', [txId])
+    const result = response.result as {
+      vout: {
+        value: number
+      }[]
+    }
+    return result.vout[vOut]?.value ?? null
   }
 
   async getAddressAlkanesBalances(address: string): Promise<AlkaneBalance[]> {

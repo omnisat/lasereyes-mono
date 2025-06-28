@@ -137,14 +137,14 @@ export type Config = {
       url?: string
       apiKey?: string
       networks?: {
-        mainnet: {
+        mainnet?: {
           apiKey: string
           apiUrl: string
         }
         [key: string]: {
           apiKey: string
           apiUrl: string
-        }
+        } | undefined
       }
     }
     esplora?: string

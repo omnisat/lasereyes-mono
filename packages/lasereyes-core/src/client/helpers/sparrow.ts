@@ -1,6 +1,7 @@
 import { NetworkType, SparrowWalletProvider } from '../..'
 
 const pendingRequests: Record<string, Promise<string> | undefined> = {}
+const originalConsoleLog = console.log
 
 function waitForConsoleKey(key: string): Promise<string> {
   if (pendingRequests[key]) {
@@ -8,12 +9,18 @@ function waitForConsoleKey(key: string): Promise<string> {
     return pendingRequests[key]
   }
 
-  const p = new Promise<string>((resolve) => {
-    const originalConsoleLog = console.log
+  const p = new Promise<string>((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      console.log = originalConsoleLog
+      pendingRequests[key] = undefined
+      reject(new Error(`Timeout waiting for "${key}" value`))
+    }, 60000) // 1 minute timeout
+
     console.log = (...args: any[]) => {
       //   originalConsoleLog.apply(console, args)
 
       if (args.length > 0 && typeof args[0] === 'string') {
+        clearTimeout(timeout)
         console.log = originalConsoleLog
         pendingRequests[key] = undefined
         resolve(args[0])
@@ -29,11 +36,11 @@ function waitForConsoleKey(key: string): Promise<string> {
 }
 
 export class DefaultSparrowWalletProvider implements SparrowWalletProvider {
-  async requestAccounts(): Promise<[string, string]> {
-    const address = await waitForConsoleKey('address')
+  async requestAccounts(network?: NetworkType): Promise<[string, string]> {
+    const address = await waitForConsoleKey('address_' + (network || 'mainnet'))
     if (!address) throw new Error('No address provided')
 
-    const paymentAddress = await waitForConsoleKey('paymentAddress')
+    const paymentAddress = await waitForConsoleKey('paymentAddress_' + (network || 'mainnet'))
     if (!paymentAddress) throw new Error('No payment address provided')
 
     return [address, paymentAddress]
@@ -55,8 +62,8 @@ export class DefaultSparrowWalletProvider implements SparrowWalletProvider {
     return await waitForConsoleKey('signed psbt hex')
   }
 
-  async getPublicKey(): Promise<string> {
-    const publicKey = await waitForConsoleKey('publicKey')
+  async getPublicKey(network?: NetworkType): Promise<string> {
+    const publicKey = await waitForConsoleKey('publicKey_' + (network || 'mainnet'))
     if (!publicKey) throw new Error('No public key provided')
     return publicKey
   }
@@ -66,7 +73,9 @@ export class DefaultSparrowWalletProvider implements SparrowWalletProvider {
     return 'mainnet' as NetworkType
   }
 
-  async switchNetwork(_: NetworkType): Promise<void> {
-    return
+  async switchNetwork(_: NetworkType) {
+    const [address, paymentAddress] = await this.requestAccounts()
+    const publicKey = await this.getPublicKey()
+    return { address, paymentAddress, publicKey }
   }
 }
