@@ -191,7 +191,7 @@ export default class KeplrProvider extends WalletProvider {
     }
   }
 
-  async connect(_: ProviderType): Promise<void> {
+  async connect(_: ProviderType) {
       if (!this.library) {
         if (this.isMobile()) {
           const url = `https://deeplink.keplr.app/web-browser?url=${encodeURIComponent(window.location.href)}`
