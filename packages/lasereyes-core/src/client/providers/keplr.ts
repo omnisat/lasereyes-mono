@@ -194,7 +194,7 @@ export default class KeplrProvider extends WalletProvider {
   async connect(_: ProviderType) {
       if (!this.library) {
         if (this.isMobile()) {
-          const url = `https://deeplink.keplr.app/web-browser?url=${encodeURIComponent(window.location.href)}`
+          const url = `https://deeplink.keplr.app/web-browser?url=${window.location.href}`
           const returned = window.open(url)
           if (!returned) {
             throw new Error('Keplr wallet not found')
