@@ -34,13 +34,13 @@ export const getAddressType = (
       }
       return P2SH
     }
-  } catch (e) {
+  } catch  {
     try {
       const decoded = bitcoin.address.fromBech32(address)
       if (decoded.version === 0 && decoded.data.length === 20) return P2WPKH
       if (decoded.version === 0 && decoded.data.length === 32) return P2WSH
       if (decoded.version === 1 && decoded.data.length === 32) return P2TR
-    } catch (e2) {
+    } catch {
       return 'unknown'
     }
   }
@@ -92,7 +92,7 @@ export async function waitForTransaction(
       }
 
       await new Promise((resolve) => setTimeout(resolve, 5000))
-    } catch (error) {
+    } catch {
       if (Date.now() - startTime > timeout) {
         return false
       }

@@ -34,6 +34,7 @@ export type LaserEyesContextType = {
   hasPhantom: boolean
   hasWizz: boolean
   hasTokeo: boolean
+  hasKeplr: boolean
 
   connect: (walletName: ProviderType) => Promise<void>
   disconnect: () => void

@@ -16,6 +16,7 @@ import type {
   RuneSendArgs,
 } from '../types'
 import {
+  KEPLR,
   LEATHER,
   MAGIC_EDEN,
   OKX,
@@ -57,6 +58,7 @@ import TokeoProvider from './providers/tokeo'
 import { ALKANES } from '../constants/protocols'
 import { BTC, RUNES } from '../constants/protocols'
 import { BRC20 } from '../constants/protocols'
+import KeplrProvider from './providers/keplr'
 
 export class LaserEyesClient {
   readonly $store: MapStore<LaserEyesStoreType>
@@ -99,6 +101,7 @@ export class LaserEyesClient {
       [UNISAT]: new UnisatProvider(stores, this, config),
       [XVERSE]: new XVerseProvider(stores, this, config),
       [WIZZ]: new WizzProvider(stores, this, config),
+      [KEPLR]: new KeplrProvider(stores, this, config),
     }
 
     this.modules = {
@@ -144,8 +147,8 @@ export class LaserEyesClient {
 
     const foundNetwork = await this.getNetwork()
     if (foundNetwork) {
-      this.$network.set(foundNetwork)
       this.dataSourceManager.updateNetwork(foundNetwork)
+      this.$network.set(foundNetwork)
     }
     try {
       if (this.config?.network && this.config.network !== foundNetwork) {
@@ -245,6 +248,7 @@ export class LaserEyesClient {
     try {
       const provider = this.$store.get().provider
       if (provider) {
+        console.log('switchNetwork', network)
         await this.$providerMap[provider]?.switchNetwork(network)
         this.dataSourceManager.updateNetwork(network)
       }

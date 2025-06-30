@@ -49,6 +49,7 @@ const WalletConnectButton = ({
     hasOrange,
     hasTokeo,
     hasOpNet,
+    hasKeplr,
   } = useLaserEyes()
 
   const hasWallet = {
@@ -64,6 +65,7 @@ const WalletConnectButton = ({
     wizz: hasWizz,
     orange: hasOrange,
     tokeo: hasTokeo,
+    keplr: hasKeplr,
   }
 
   const [error, setError] = useState<string | null>(null)

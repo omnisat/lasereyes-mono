@@ -51,7 +51,7 @@ export default class OylProvider extends WalletProvider {
     }
   )
 
-  removeSubscriber?: Function
+  removeSubscriber?: () => void
 
   restorePersistedValues() {
     const vals = this.$valueStore.get()
@@ -145,8 +145,7 @@ export default class OylProvider extends WalletProvider {
       broadcast: true,
       finalize: true,
     })
-    if (!psbt) throw new Error('Error sending BTC')
-    // @ts-ignore
+    if (!psbt || !psbt.txId) throw new Error('Error sending BTC')
     return psbt.txId
   }
 

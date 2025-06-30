@@ -1,6 +1,6 @@
 import asyncPool from 'tiny-async-pool'
 import { MAESTRO } from '../../constants/data-sources'
-import type { AlkanesOutpoint, Config, MempoolUtxo } from '../../types'
+import type { AlkanesOutpoint, Config } from '../../types'
 import type { AlkaneBalance } from '../../types/alkane'
 import type { DataSource } from '../../types/data-source'
 import type { Inscription } from '../../types/lasereyes'
@@ -12,6 +12,7 @@ import {
   FormattedInscription,
   FormattedRune,
   FormattedUTXO,
+  LasereyesUTXO,
 } from '../../types/utxo'
 import {
   getMaestroUrl,
@@ -29,9 +30,7 @@ import { SandshrewDataSource } from './sources/sandshrew-ds'
 
 const ERROR_METHOD_NOT_AVAILABLE = 'Method not available on any data source'
 
-type LasereyesUTXO = MempoolUtxo & {
-  scriptPk: string
-}
+
 
 export class DataSourceManager {
   private static instance: DataSourceManager
@@ -177,7 +176,13 @@ export class DataSourceManager {
       throw new Error(ERROR_METHOD_NOT_AVAILABLE)
     }
 
-    return await dataSource.getAddressBtcBalance(address)
+    const balance = await this.withFallback('sandshrew', async (ds) => {
+      return await ds.getAddressBtcBalance?.(address)
+    })
+    if (balance === undefined) {
+      throw new Error("Unable to get balance from any data source")
+    }
+    return balance
   }
 
   public async getAddressBrc20Balances(address: string): Promise<unknown> {
@@ -278,7 +283,12 @@ export class DataSourceManager {
     }
 
     console.log('getting recommended fees')
-    const fees = await dataSource.getRecommendedFees()
+    const fees = await this.withFallback('sandshrew', async (ds) => {
+      return await ds.getRecommendedFees?.()
+    })
+    if (fees === undefined) {
+      throw new Error("Unable to get recommended fees from any data source")
+    }
     return {
       fastFee: fees.fastFee,
       minFee: fees.minFee,
@@ -290,7 +300,13 @@ export class DataSourceManager {
     if (!dataSource || !dataSource.getAddressUtxos) {
       throw new Error(ERROR_METHOD_NOT_AVAILABLE)
     }
-    return await dataSource.getAddressUtxos(address)
+    const utxos = await this.withFallback('sandshrew', async (ds) => {
+      return await ds.getAddressUtxos?.(address)
+    })
+    if (utxos === undefined) {
+      throw new Error("Unable to get utxos from any data source")
+    }
+    return utxos
   }
 
   public async getOutputValueByVOutIndex(
@@ -301,7 +317,13 @@ export class DataSourceManager {
     if (!dataSource || !dataSource.getOutputValueByVOutIndex) {
       throw new Error(ERROR_METHOD_NOT_AVAILABLE)
     }
-    return await dataSource.getOutputValueByVOutIndex(txId, vOut)
+    const value = await this.withFallback('sandshrew', async (ds) => {
+      return await ds.getOutputValueByVOutIndex?.(txId, vOut)
+    })
+    if (value === undefined) {
+      throw new Error("Unable to get output value from any data source")
+    }
+    return value
   }
 
   public async waitForTransaction(txId: string): Promise<boolean> {

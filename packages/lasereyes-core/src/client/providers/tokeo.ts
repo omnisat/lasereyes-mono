@@ -1,5 +1,4 @@
 import * as bitcoin from 'bitcoinjs-lib'
-import { MAINNET, WalletProvider } from '../..'
 import { ProviderType, NetworkType } from '../../types'
 import { createSendBtcPsbt } from '../../lib/helpers'
 import { TOKEO } from '../../constants/wallets'
@@ -16,6 +15,8 @@ import {
   PersistedKey,
 } from '../utils'
 import { omitUndefined } from '../../lib/utils'
+import { WalletProvider } from '.'
+import { MAINNET } from '../../constants/networks'
 
 const TOKEO_WALLET_PERSISTENCE_KEY = 'TOKEO_CONNECTED_WALLET_STATE'
 
@@ -40,7 +41,7 @@ export default class TokeoProvider extends WalletProvider {
     }
   )
 
-  removeSubscriber?: Function
+  removeSubscriber?: () => void
 
   restorePersistedValues() {
     const vals = this.$valueStore.get()
@@ -67,7 +68,7 @@ export default class TokeoProvider extends WalletProvider {
   initialize() {
     if (typeof window !== 'undefined' && typeof document !== 'undefined') {
       this.observer = new window.MutationObserver(() => {
-        if (this.isMobile()) {
+        if (this.library || this.isMobile()) {
           this.$store.setKey('hasProvider', {
             ...this.$store.get().hasProvider,
             [TOKEO]: true,

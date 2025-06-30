@@ -24,7 +24,9 @@ import {
   OP_NET,
   SPARROW,
   TOKEO,
+  KEPLR,
 } from '@omnisat/lasereyes-core'
+import KeplrLogo from './keplr.tsx'
 
 const WalletIcon = ({
   size,
@@ -61,8 +63,10 @@ const WalletIcon = ({
     return <OpNetIcon size={size} className={className} variant={variant} />
   } else if (walletName === TOKEO) {
     return <TokeoLogo size={size} className={className} variant={variant} />
+  } else if (walletName === KEPLR) {
+    return <KeplrLogo size={size} className={className} variant={variant} />
   } else {
-    return <LeatherLogo size={size} className={className} variant={variant} />
+    return <OylLogo size={size} className={className} variant={variant} />
   }
 }
 

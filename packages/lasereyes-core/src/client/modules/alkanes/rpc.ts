@@ -353,14 +353,14 @@ export class AlkanesRpc {
           vout: 0,
         })
         if (result.status === 0) {
-          // @ts-ignore
+          // @ts-expect-error const array can't be indexed
           alkaneData[opcodesHRV[j]] = Number(result.parsed?.le || 0)
           if (
             opcodesHRV[j] === 'name' ||
             opcodesHRV[j] === 'symbol' ||
             opcodesHRV[j] === 'data'
           ) {
-            // @ts-ignore
+            // @ts-expect-error const array can't be indexed
             alkaneData[opcodesHRV[j]] = result.parsed?.string || ''
           }
           alkaneData.mintActive =
