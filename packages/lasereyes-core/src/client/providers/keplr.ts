@@ -192,7 +192,17 @@ export default class KeplrProvider extends WalletProvider {
   }
 
   async connect(_: ProviderType): Promise<void> {
-    if (!this.library) throw new Error("Keplr isn't installed")
+      if (!this.library) {
+        if (this.isMobile()) {
+          const url = `https://deeplink.keplr.app/web-browser?url=${encodeURIComponent(window.location.href)}`
+          const returned = window.open(url)
+          if (!returned) {
+            throw new Error('Keplr wallet not found')
+          }
+          returned.focus()
+          return false
+        } else throw new Error('Keplr wallet not found')
+      }
     const accounts = await this.library.requestAccounts()
     if (!accounts) throw new Error('No accounts found')
 
