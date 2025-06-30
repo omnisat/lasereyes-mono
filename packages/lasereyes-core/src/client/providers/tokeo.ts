@@ -68,7 +68,7 @@ export default class TokeoProvider extends WalletProvider {
   initialize() {
     if (typeof window !== 'undefined' && typeof document !== 'undefined') {
       this.observer = new window.MutationObserver(() => {
-        if (this.isMobile()) {
+        if (this.library || this.isMobile()) {
           this.$store.setKey('hasProvider', {
             ...this.$store.get().hasProvider,
             [TOKEO]: true,
