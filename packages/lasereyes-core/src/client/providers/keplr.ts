@@ -121,7 +121,7 @@ export default class KeplrProvider extends WalletProvider {
   initialize() {
     if (typeof window !== 'undefined' && typeof document !== 'undefined') {
       this.observer = new window.MutationObserver(() => {
-        if (this.library) {
+        if (this.library || this.isMobile()) {
           this.$store.setKey('hasProvider', {
             ...this.$store.get().hasProvider,
             [KEPLR]: true,
