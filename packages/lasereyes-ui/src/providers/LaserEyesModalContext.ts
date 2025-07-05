@@ -1,6 +1,6 @@
 import { createContext, useContext } from "react";
 import { SIGNET, TESTNET, FRACTAL_TESTNET, MAINNET } from "@omnisat/lasereyes-core";
-import { LaserEyesModalConfig } from "@/types/config";
+import { LaserEyesModalConfig } from "../types/config";
 
 export interface LasereyesModalContext {
   isOpen: boolean;

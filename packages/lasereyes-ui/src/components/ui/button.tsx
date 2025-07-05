@@ -2,7 +2,7 @@ import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
 
-import { cn } from "@/lib/utils"
+import { cn } from "../../lib/utils"
 
 const buttonVariants = cva(
   "lem-inline-flex lem-items-center lem-justify-center lem-whitespace-nowrap lem-rounded-md lem-text-sm lem-font-medium lem-ring-offset-background lem-transition-colors focus-visible:lem-outline-none focus-visible:lem-ring-2 focus-visible:lem-ring-ring focus-visible:lem-ring-offset-2 disabled:lem-pointer-events-none disabled:lem-opacity-50",

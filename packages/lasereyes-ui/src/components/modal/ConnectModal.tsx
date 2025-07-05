@@ -8,15 +8,15 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import useSupportedWallets from "@/hooks/useSupportedWallets";
-import "@/i18n/setup";
+} from "../../components/ui/card";
+import useSupportedProviders from "../../hooks/useSupportedProviders";
+import "../../i18n/setup";
 import { Button } from "../ui/button";
-import { cn } from "@/lib/utils";
+import { cn } from "../../lib/utils";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { Alert } from "@/components/ui/alert";
+import { Alert } from "../../components/ui/alert";
 import { useState, useCallback, useMemo } from "react";
-import "@/components/index.css";
+import "../index.css";
 
 export interface ConnectModalProps {
   open: boolean;
@@ -26,7 +26,7 @@ export interface ConnectModalProps {
 export default function ConnectWalletModal({ onClose, open }: ConnectModalProps) {
   const { isConnecting, disconnect } = useLaserEyes();
   const { t } = useTranslation("common");
-  const { otherWallets, installedWallets } = useSupportedWallets();
+  const { otherWallets, installedWallets } = useSupportedProviders();
   const allWallets = useMemo(
     () => [...installedWallets, ...otherWallets],
     [installedWallets, otherWallets]

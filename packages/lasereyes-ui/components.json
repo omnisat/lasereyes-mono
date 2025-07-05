@@ -11,7 +11,7 @@
     "prefix": "lem-"
   },
   "aliases": {
-    "components": "@/components",
-    "utils": "@/lib/utils"
+    "utils": "../lib/utils",
+    "components": "../components"
   }
 }

@@ -1,7 +1,7 @@
 import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 
-import { cn } from "@/lib/utils"
+import { cn } from "../../lib/utils"
 
 const alertVariants = cva(
   "lem-relative lem-w-full lem-rounded-lg lem-border lem-p-4 [&>svg~*]:lem-pl-7 [&>svg+div]:lem-translate-y-[-3px] [&>svg]:lem-absolute [&>svg]:lem-left-4 [&>svg]:lem-top-4 [&>svg]:lem-text-foreground",

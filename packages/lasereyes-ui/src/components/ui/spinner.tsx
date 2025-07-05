@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from "../../lib/utils";
 
 // Use tailwindcss for styling and animations. Tailwindcss has a configuration of 'lem-' prefix
 export default function Spinner({ className }: { className?: string }) {

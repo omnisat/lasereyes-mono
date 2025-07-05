@@ -47,6 +47,9 @@ importers:
       '@omnisat/lasereyes':
         specifier: workspace:*
         version: link:../../packages/lasereyes
+      '@omnisat/lasereyes-ui':
+        specifier: workspace:*
+        version: link:../../packages/lasereyes-ui
       '@radix-ui/react-avatar':
         specifier: ^1.1.0
         version: 1.1.10(@types/react-dom@18.3.7)(@types/react@18.3.23)(react-dom@18.3.1)(react@18.3.1)
@@ -400,17 +403,13 @@ importers:
         version: 5.8.3
 
   packages/lasereyes:
-    dependencies:
+    devDependencies:
       '@omnisat/lasereyes-core':
         specifier: workspace:*
         version: link:../lasereyes-core
       '@omnisat/lasereyes-react':
         specifier: workspace:*
         version: link:../lasereyes-react
-      bip39:
-        specifier: ^3.1.0
-        version: 3.1.0
-    devDependencies:
       '@vitejs/plugin-react-swc':
         specifier: ^3.5.0
         version: 3.10.2(vite@5.4.19)
@@ -517,9 +516,9 @@ importers:
       '@nanostores/react':
         specifier: ^0.7.3
         version: 0.7.3(nanostores@0.11.4)(react@19.0.0-rc.1)
-      '@omnisat/lasereyes-core':
-        specifier: workspace:*
-        version: link:../lasereyes-core
+      '@tanstack/react-query':
+        specifier: ^5.81.5
+        version: 5.81.5(react@19.0.0-rc.1)
       bootstrap:
         specifier: ^5.3.3
         version: 5.3.6(@popperjs/core@2.11.8)
@@ -533,6 +532,9 @@ importers:
       '@eslint/js':
         specifier: ^9.9.0
         version: 9.29.0
+      '@omnisat/lasereyes-core':
+        specifier: workspace:*
+        version: link:../lasereyes-core
       '@types/node':
         specifier: ^22.5.4
         version: 22.15.32
@@ -6790,6 +6792,19 @@ packages:
     dependencies:
       '@swc/counter': 0.1.3
     dev: true
+
+  /@tanstack/query-core@5.81.5:
+    resolution: {integrity: sha512-ZJOgCy/z2qpZXWaj/oxvodDx07XcQa9BF92c0oINjHkoqUPsmm3uG08HpTaviviZ/N9eP1f9CM7mKSEkIo7O1Q==}
+    dev: false
+
+  /@tanstack/react-query@5.81.5(react@19.0.0-rc.1):
+    resolution: {integrity: sha512-lOf2KqRRiYWpQT86eeeftAGnjuTR35myTP8MXyvHa81VlomoAWNEd8x5vkcAfQefu0qtYCvyqLropFZqgI2EQw==}
+    peerDependencies:
+      react: ^18 || ^19
+    dependencies:
+      '@tanstack/query-core': 5.81.5
+      react: 19.0.0-rc.1
+    dev: false
 
   /@testing-library/dom@10.4.0:
     resolution: {integrity: sha512-pemlzrSESWbdAloYml3bAJMEfNh1Z7EduzqPKprCH5S341frlpYnUEW0H72dLxa6IsYr+mPno20GiSm+h9dEdQ==}

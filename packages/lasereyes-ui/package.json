@@ -7,6 +7,12 @@
   "files": [
     "dist"
   ],
+  "exports": {
+    ".": {
+      "import": "./src/index.ts"
+    },
+    "./style": "./dist/style.css"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc -b tsconfig.build.json && vite build",
