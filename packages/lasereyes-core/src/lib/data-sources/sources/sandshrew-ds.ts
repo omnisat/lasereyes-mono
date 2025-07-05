@@ -12,16 +12,24 @@ import { getPublicKeyHash } from '../../btc'
 import { SANDSHREW_LASEREYES_KEY, getSandshrewUrl } from '../../urls'
 import type { RpcResponse } from '../../../types/rpc'
 import { SANDSHREW } from '../../../constants/data-sources'
-import { type AlkanesOutpoint, BaseNetwork, type NetworkType } from '../../../types'
+import {
+  type AlkanesOutpoint,
+  BaseNetwork,
+  type NetworkType,
+} from '../../../types'
 import type { AlkaneBalance } from '../../../types/alkane'
 import { AlkanesRpc } from '../../../client/modules/alkanes/rpc'
+import { LasereyesUTXO } from '../../../types/utxo'
+import { getBitcoinNetwork } from '../../helpers'
+import * as bitcoin from 'bitcoinjs-lib'
 
-export function runeIdToString({block, tx}: {block: string, tx: string}) {
-    return `${block}:${tx}`
-  }
+export function runeIdToString({ block, tx }: { block: string; tx: string }) {
+  return `${block}:${tx}`
+}
 
 export type SandshrewConfig = {
-  networks: {
+  apiKey?: string
+  networks?: {
     mainnet: {
       apiUrl: string
       apiKey: string
@@ -36,24 +44,29 @@ export type SandshrewConfig = {
 export class SandshrewDataSource implements DataSource {
   private apiUrl = ''
   private apiKey = ''
-  private networks: SandshrewConfig['networks']
+  private networks: NonNullable<SandshrewConfig['networks']>
   alkanesRpc: AlkanesRpc
-  
+  network: NetworkType
 
   constructor(network: NetworkType, config?: SandshrewConfig) {
     this.networks = {
       mainnet: {
         apiUrl: getSandshrewUrl('mainnet'),
-        apiKey: SANDSHREW_LASEREYES_KEY,
+        apiKey: config?.apiKey || SANDSHREW_LASEREYES_KEY,
       },
       signet: {
         apiUrl: getSandshrewUrl('signet'),
-        apiKey: SANDSHREW_LASEREYES_KEY,
+        apiKey: config?.apiKey || SANDSHREW_LASEREYES_KEY,
+      },
+      oylnet: {
+        apiUrl: getSandshrewUrl('oylnet'),
+        apiKey: config?.apiKey || 'regtest',
       },
       ...config?.networks,
     }
     this.setNetwork(network)
     this.alkanesRpc = new AlkanesRpc(`${this.apiUrl}/${this.apiKey}`)
+    this.network = network
   }
 
   public getName() {
@@ -83,6 +96,7 @@ export class SandshrewDataSource implements DataSource {
       }
     }
     this.alkanesRpc = new AlkanesRpc(`${this.apiUrl}/${this.apiKey}`)
+    this.network = network
   }
 
   private async call(method: string, params: unknown) {
@@ -117,18 +131,56 @@ export class SandshrewDataSource implements DataSource {
     return response.result
   }
 
-  async getAlkanesByAddress(
-    address: string,
-  ): Promise<AlkanesOutpoint[]> {
+  async getAlkanesByAddress(address: string): Promise<AlkanesOutpoint[]> {
     const response = await this.alkanesRpc.getAlkanesByAddress({
       address,
     })
     return response
   }
 
-  async getAddressAlkanesBalances(
-    address: string,
-  ): Promise<AlkaneBalance[]> {
+  async getAddressBtcBalance(address: string): Promise<string> {
+    const response = await this.call('esplora_address', [address])
+
+    const result = response.result as {
+      address: string
+      chain_stats: {
+        funded_txo_sum: string
+        spent_txo_sum: string
+      }
+    }
+    return (
+      BigInt(result.chain_stats.funded_txo_sum) -
+      BigInt(result.chain_stats.spent_txo_sum)
+    ).toString()
+  }
+
+  async getAddressUtxos(address: string): Promise<Array<LasereyesUTXO>> {
+    const response = await this.call('esplora_address::utxo', [address])
+    const scriptPk = bitcoin.address.toOutputScript(
+      address,
+      getBitcoinNetwork(this.network)
+    )
+    const result = response.result as Array<LasereyesUTXO>
+    return result.map((utxo) => ({
+      ...utxo,
+      scriptPk: Buffer.from(scriptPk).toString('hex'),
+    }))
+  }
+
+  async getOutputValueByVOutIndex(
+    txId: string,
+    vOut: number
+  ): Promise<number | null> {
+    const response = await this.call('esplora_tx', [txId])
+    const result = response.result as {
+      vout: {
+        value: number
+      }[]
+    }
+    return result.vout[vOut]?.value ?? null
+  }
+
+  async getAddressAlkanesBalances(address: string): Promise<AlkaneBalance[]> {
     const response = await this.getAlkanesByAddress(address)
     const alkanesBalances: Record<string, AlkaneBalance> = {}
     for (const outpoint of response) {
@@ -260,7 +312,6 @@ export class SandshrewDataSource implements DataSource {
     ])) as RpcResponse
     const inscriptionInfo = response.result as InscriptionInfo
 
-    // Convert to MaestroGetInscriptionInfoResponse format
     return {
       data: {
         inscription_id: inscriptionInfo.id || inscriptionId,

@@ -1,10 +1,9 @@
-import _ from 'lodash'
 import { FormattedUTXO } from '../types/utxo'
 import { AlkaneId } from 'alkanes'
 
 export const isBase64 = (str: string): boolean => {
   const base64Regex =
-    /^(?:[A-Za-z0-9+\/]{4})*?(?:[A-Za-z0-9+\/]{2}==|[A-Za-z0-9+\/]{3}=)?$/
+    /^(?:[A-Za-z0-9+/]{4})*?(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/
   return base64Regex.test(str)
 }
 
@@ -29,8 +28,10 @@ export const encodeVarint = (bigIntValue: bigint) => {
   return { varint: Buffer.from(bufferArray) }
 }
 
-export function omitUndefined(obj: object) {
-  return _.omitBy(obj, _.isUndefined)
+export function omitUndefined<T extends Record<string, any>>(obj: T): Partial<T> {
+  return Object.fromEntries(
+    Object.entries(obj).filter(([_, value]) => value !== undefined)
+  ) as Partial<T>
 }
 
 export const toBigEndian = (rawLeTxid: string) =>

@@ -5,6 +5,8 @@ import {
   listenKeys,
 } from 'nanostores'
 import type {
+  AlkaneSendArgs,
+  Brc20SendArgs,
   BTCSendArgs,
   Config,
   ContentType,
@@ -14,6 +16,7 @@ import type {
   RuneSendArgs,
 } from '../types'
 import {
+  KEPLR,
   LEATHER,
   MAGIC_EDEN,
   OKX,
@@ -22,6 +25,7 @@ import {
   OYL,
   PHANTOM,
   SPARROW,
+  TOKEO,
   UNISAT,
   WIZZ,
   XVERSE,
@@ -50,6 +54,11 @@ import OpNetProvider from './providers/op-net'
 import SparrowProvider from './providers/sparrow'
 import { DataSourceManager } from '../lib/data-sources/manager'
 import AlkanesModule from './modules/alkanes'
+import TokeoProvider from './providers/tokeo'
+import { ALKANES } from '../constants/protocols'
+import { BTC, RUNES } from '../constants/protocols'
+import { BRC20 } from '../constants/protocols'
+import KeplrProvider from './providers/keplr'
 
 export class LaserEyesClient {
   readonly $store: MapStore<LaserEyesStoreType>
@@ -88,9 +97,11 @@ export class LaserEyesClient {
       [OYL]: new OylProvider(stores, this, config),
       [PHANTOM]: new PhantomProvider(stores, this, config),
       [SPARROW]: new SparrowProvider(stores, this, config),
+      [TOKEO]: new TokeoProvider(stores, this, config),
       [UNISAT]: new UnisatProvider(stores, this, config),
       [XVERSE]: new XVerseProvider(stores, this, config),
       [WIZZ]: new WizzProvider(stores, this, config),
+      [KEPLR]: new KeplrProvider(stores, this, config),
     }
 
     this.modules = {
@@ -136,8 +147,8 @@ export class LaserEyesClient {
 
     const foundNetwork = await this.getNetwork()
     if (foundNetwork) {
-      this.$network.set(foundNetwork)
       this.dataSourceManager.updateNetwork(foundNetwork)
+      this.$network.set(foundNetwork)
     }
     try {
       if (this.config?.network && this.config.network !== foundNetwork) {
@@ -175,7 +186,12 @@ export class LaserEyesClient {
         throw new Error('Unsupported wallet provider')
       }
       const provider = this.$providerMap[defaultWallet]
-      await provider?.connect(defaultWallet)
+      const connected = await provider?.connect(defaultWallet)
+      if (connected === false) {
+        this.$store.setKey('isConnecting', false)
+        this.disconnect()
+        return
+      }
       this.$store.setKey('provider', defaultWallet)
       await this.checkNetwork()
       this.$store.setKey('connected', true)
@@ -232,6 +248,7 @@ export class LaserEyesClient {
     try {
       const provider = this.$store.get().provider
       if (provider) {
+        console.log('switchNetwork', network)
         await this.$providerMap[provider]?.switchNetwork(network)
         this.dataSourceManager.updateNetwork(network)
       }
@@ -419,7 +436,18 @@ export class LaserEyesClient {
     }
   }
 
-  async send(protocol: Protocol, sendArgs: BTCSendArgs | RuneSendArgs) {
+  async send<T extends Protocol>(
+    protocol: T,
+    sendArgs: T extends typeof BTC
+      ? BTCSendArgs
+      : T extends typeof RUNES
+      ? RuneSendArgs
+      : T extends typeof BRC20
+      ? Brc20SendArgs
+      : T extends typeof ALKANES
+      ? AlkaneSendArgs
+      : never
+  ): Promise<string | undefined> {
     const provider = this.$store.get().provider
     if (!provider) return
     if (provider && this.$providerMap[provider]) {
@@ -537,4 +565,4 @@ export class LaserEyesClient {
   }
 }
 
-export * from "./modules"
+export * from './modules'

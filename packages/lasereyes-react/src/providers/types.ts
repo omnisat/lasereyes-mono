@@ -3,10 +3,9 @@ import {
   NetworkType,
   Protocol,
   ProviderType,
-  SendArgs,
   SignMessageOptions,
   LaserEyesClient,
-  MempoolUtxo
+  MempoolUtxo,
 } from '@omnisat/lasereyes-core'
 
 export type LaserEyesContextType = {
@@ -34,6 +33,8 @@ export type LaserEyesContextType = {
   hasLeather: boolean
   hasPhantom: boolean
   hasWizz: boolean
+  hasTokeo: boolean
+  hasKeplr: boolean
 
   connect: (walletName: ProviderType) => Promise<void>
   disconnect: () => void
@@ -55,7 +56,7 @@ export type LaserEyesContextType = {
     contentBase64: string,
     mimeType: ContentType
   ) => Promise<string | string[]>
-  send: (protocol: Protocol, sendArgs: SendArgs) => Promise<string>
+  send: LaserEyesClient['send']
   sendInscriptions: (inscriptionIds: string[], toAddress: string) => Promise<string>
   getUtxos: (address: string) => Promise<MempoolUtxo[]>
 }

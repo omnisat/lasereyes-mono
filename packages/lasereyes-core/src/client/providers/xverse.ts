@@ -46,15 +46,18 @@ export default class XVerseProvider extends WalletProvider {
     return this.$network.get()
   }
 
+  public get library(): any | undefined {
+    return (
+      window as unknown as { XverseProviders: { BitcoinProvider: unknown } }
+    )?.XverseProviders?.BitcoinProvider
+  }
+
   observer?: MutationObserver
 
   initialize(): void {
     if (typeof window !== 'undefined' && typeof document !== 'undefined') {
       this.observer = new window.MutationObserver(() => {
-        const xverseLib = (
-          window as unknown as { XverseProviders: { BitcoinProvider: unknown } }
-        )?.XverseProviders?.BitcoinProvider
-        if (xverseLib) {
+        if (this.library || this.isMobile()) {
           this.$store.setKey('hasProvider', {
             ...this.$store.get().hasProvider,
             [XVERSE]: true,
@@ -120,6 +123,12 @@ export default class XVerseProvider extends WalletProvider {
     //     return
     //   }
     // }
+
+    if (this.isMobile() && !this.library) {
+      const url = `xverse://browser?url=${encodeURIComponent(window.location.href)}`
+      window.location.href = url
+      return
+    }
 
     let foundAddress:
       | {

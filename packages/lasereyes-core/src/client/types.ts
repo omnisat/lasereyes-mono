@@ -18,10 +18,10 @@ export type LaserEyesStoreType = {
 }
 
 export interface SparrowWalletProvider {
-  requestAccounts(): Promise<string[]>
-  getPublicKey(): Promise<string>
+  requestAccounts(network?: NetworkType): Promise<string[]>
+  getPublicKey(network?: NetworkType): Promise<string>
   getNetwork(): Promise<NetworkType>
-  switchNetwork(network: NetworkType): Promise<void>
+  switchNetwork(network: NetworkType): Promise<void | { address: string; paymentAddress: string; publicKey: string }>
   signMessage(message: string): Promise<string>
   signPsbt(psbtBase64: string): Promise<string>
 }

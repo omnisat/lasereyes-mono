@@ -13,7 +13,6 @@ import { BIP322, BIP322_SIMPLE } from '../../constants'
 import { LaserEyesClient } from '..'
 import { Inscription } from '../../types/lasereyes'
 import { normalizeInscription } from '../../lib/data-sources/normalizations'
-import _ from 'lodash'
 import { omitUndefined } from '../../lib/utils'
 
 export default class UnisatProvider extends WalletProvider {
@@ -54,10 +53,10 @@ export default class UnisatProvider extends WalletProvider {
 
     listenKeys(this.$store, ['provider'], (newStore) => {
       if (newStore.provider !== UNISAT) {
-        this.removeListeners()
+        this?.removeListeners()
         return
       }
-      this.library.getAccounts().then((accounts: string[]) => {
+      this.library?.getAccounts().then((accounts: string[]) => {
         this.handleAccountsChanged(accounts)
       })
       this.addListeners()
@@ -65,12 +64,12 @@ export default class UnisatProvider extends WalletProvider {
   }
 
   addListeners() {
-    this.library.on('accountsChanged', this.handleAccountsChanged.bind(this))
-    this.library.on('networkChanged', this.handleNetworkChanged.bind(this))
+    this.library?.on('accountsChanged', this.handleAccountsChanged.bind(this))
+    this.library?.on('networkChanged', this.handleNetworkChanged.bind(this))
   }
 
   removeListeners() {
-    if (!this.library) return
+    if (!this.library || !this.library.removeListener) return
     this.library?.removeListener(
       'accountsChanged',
       this.handleAccountsChanged.bind(this)

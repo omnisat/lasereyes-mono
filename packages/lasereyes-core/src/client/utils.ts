@@ -12,11 +12,13 @@ import {
   ORANGE,
   OP_NET,
   SPARROW,
+  TOKEO,
+  KEPLR,
 } from '../constants/wallets'
 import type { NetworkType, ProviderType, Config } from '../types'
 import type { LaserEyesStoreType } from './types'
 
-export function triggerDOMShakeHack(callback: VoidFunction) {
+export function triggerDOMShakeHack(callback: () => void) {
   if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
     setTimeout(() => {
       const node = document.createTextNode(' ')
@@ -53,9 +55,11 @@ export function createStores(): {
         [ORANGE]: false,
         [OYL]: false,
         [SPARROW]: true,
+        [TOKEO]: false,
         [PHANTOM]: false,
         [WIZZ]: false,
         [XVERSE]: false,
+        [KEPLR]: false,
       },
     }),
     $network: atom(MAINNET),

@@ -81,7 +81,7 @@ const SelectContent = React.forwardRef<
       {...props}
     >
       <SelectScrollUpButton />
-      <div
+      <SelectPrimitive.Viewport
         className={cn(
           'p-1',
           position === 'popper' &&
@@ -89,7 +89,7 @@ const SelectContent = React.forwardRef<
         )}
       >
         {children}
-      </div>
+      </SelectPrimitive.Viewport>
       <SelectScrollDownButton />
     </SelectPrimitive.Content>
   </SelectPrimitive.Portal>

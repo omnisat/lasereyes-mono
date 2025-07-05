@@ -98,6 +98,8 @@ const WalletCard = ({
     hasSparrow,
     hasOrange,
     hasOpNet,
+    hasTokeo,
+    hasKeplr,
     sendBTC,
     signMessage,
     signPsbt,
@@ -153,6 +155,8 @@ const WalletCard = ({
     phantom: hasPhantom,
     wizz: hasWizz,
     orange: hasOrange,
+    tokeo: hasTokeo,
+    keplr: hasKeplr,
   }
 
   const isConnected = provider === walletName
@@ -218,14 +222,14 @@ const WalletCard = ({
       getMetaBalances('runes').then(setRunes)
       setRuneToAddress(address)
     }
-  }, [address])
+  }, [address, getMetaBalances])
 
 
   useEffect(() => {
     if (address) {
       getMetaBalances('brc20').then(setBrc20s)
     }
-  }, [address])
+  }, [address, getMetaBalances])
 
   const sendBtc = async () => {
     try {
@@ -462,7 +466,8 @@ const WalletCard = ({
         toAddress: runeToAddress,
         amount: Number(runeAmount),
         runeId: selectedRune.name,
-      } as SendArgs)
+        network,
+      })
 
       toast.success(
         <span className={'flex flex-col gap-1 items-center justify-center'}>
