@@ -43,9 +43,10 @@ export type LaserEyesSignPsbtOptions = {
 }
 
 export type LaserEyesSignPsbtsOptions = {
-  psbts: { tx: string; inputsToSign?: InputToSign[] }[]
+  psbts: string[]
   finalize?: boolean
   broadcast?: boolean
+  inputsToSign?: InputToSign[]
 }
 
 export type InputToSign = {
@@ -64,14 +65,10 @@ export type WalletProviderSignPsbtOptions = {
 }
 
 export type WalletProviderSignPsbtsOptions = {
-  psbts: {
-    tx: string
-    psbtHex: string
-    psbtBase64: string
-    inputsToSign?: InputToSign[]
-  }[]
+  psbts: string[]
   finalize?: boolean
   broadcast?: boolean
+  inputsToSign?: InputToSign[]
   network?: NetworkType
 }
 

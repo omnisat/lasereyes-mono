@@ -195,16 +195,13 @@ export default class UnisatProvider extends WalletProvider {
   async signPsbts(
     signPsbtsOptions: WalletProviderSignPsbtsOptions
   ): Promise<SignPsbtsResponse> {
-    const { psbts, finalize, broadcast } = signPsbtsOptions
-
-    const psbtHexArray = psbts.map((p) => p.psbtHex)
-    const toSignInputsArray = psbts.map((p) => p.inputsToSign)
+    const { psbts, finalize, broadcast, inputsToSign } = signPsbtsOptions
 
     const signedPsbts = await this.library.signPsbts(
-      psbtHexArray,
+      psbts,
       omitUndefined({
         autoFinalized: finalize,
-        toSignInputs: toSignInputsArray,
+        toSignInputs: inputsToSign,
       })
     )
 

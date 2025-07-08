@@ -192,17 +192,18 @@ export default class OylProvider extends WalletProvider {
   ): Promise<SignPsbtsResponse> {
     const { psbts, finalize, broadcast } = signPsbtsOptions
 
-    const psbtHexArray = psbts.map((p) => p.psbtHex)
-    const result = await this.library.signPsbts({
-      psbts: psbtHexArray,
+    const psbtsToSign = psbts.map((p) => ({
+      psbt: p,
       finalize,
       broadcast,
-    })
+    }))
+
+    const result = await this.library.signPsbts(psbtsToSign)
 
     // Handle the response format from OYL
     const signedPsbts =
-      result.psbts?.map((psbtHex: string, index: number) => {
-        const psbtObj = bitcoin.Psbt.fromHex(psbtHex)
+      result.map((data: { psbt: string }, index: number) => {
+        const psbtObj = bitcoin.Psbt.fromHex(data.psbt)
         return {
           signedPsbtHex: psbtObj.toHex(),
           signedPsbtBase64: psbtObj.toBase64(),

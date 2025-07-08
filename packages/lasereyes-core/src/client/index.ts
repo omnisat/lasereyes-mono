@@ -403,45 +403,21 @@ export class LaserEyesClient {
   async signPsbts(
     options: LaserEyesSignPsbtsOptions
   ): Promise<SignPsbtsResponse> {
-    const { psbts, finalize = false, broadcast = false } = options
+    const { psbts, finalize = false, broadcast = false, inputsToSign } = options
 
     if (!psbts || psbts.length === 0) {
       throw new Error('No PSBTs provided')
     }
-
-    // Process each PSBT to get hex and base64 versions
-    const processedPsbts = psbts.map(({ tx, inputsToSign }) => {
-      let psbtHex: string
-      let psbtBase64: string
-
-      if (!tx) throw new Error('No PSBT provided')
-
-      if (isHex(tx)) {
-        psbtBase64 = bitcoin.Psbt.fromHex(tx).toBase64()
-        psbtHex = tx
-      } else if (isBase64(tx)) {
-        psbtBase64 = tx
-        psbtHex = bitcoin.Psbt.fromBase64(tx).toHex()
-      } else {
-        throw new Error('Invalid PSBT format')
-      }
-
-      return {
-        tx,
-        psbtHex,
-        psbtBase64,
-        inputsToSign,
-      }
-    })
 
     const provider = this.$store.get().provider
 
     if (provider && this.$providerMap[provider]) {
       try {
         const result = await this.$providerMap[provider]?.signPsbts({
-          psbts: processedPsbts,
+          psbts,
           finalize,
           broadcast,
+          inputsToSign,
         })
         return result
       } catch (error) {

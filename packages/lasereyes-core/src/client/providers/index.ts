@@ -19,6 +19,7 @@ import type {
 import type { LaserEyesClient } from '..'
 import { inscribeContent } from '../../lib/inscribe'
 import { broadcastTx } from '../../lib/helpers'
+import { isBase64, isHex } from '../../lib/utils'
 import * as bitcoin from 'bitcoinjs-lib'
 import {
   FRACTAL_TESTNET,
@@ -185,17 +186,30 @@ export abstract class WalletProvider {
   async signPsbts(
     signPsbtsOptions: WalletProviderSignPsbtsOptions
   ): Promise<SignPsbtsResponse> {
-    const { psbts, finalize, broadcast } = signPsbtsOptions
+    const { psbts, finalize, broadcast, inputsToSign } = signPsbtsOptions
 
     const results = []
-    for (const psbt of psbts) {
+    for (const psbtString of psbts) {
+      let psbtHex: string
+      let psbtBase64: string
+
+      if (isHex(psbtString)) {
+        psbtBase64 = bitcoin.Psbt.fromHex(psbtString).toBase64()
+        psbtHex = psbtString
+      } else if (isBase64(psbtString)) {
+        psbtBase64 = psbtString
+        psbtHex = bitcoin.Psbt.fromBase64(psbtString).toHex()
+      } else {
+        throw new Error('Invalid PSBT format')
+      }
+
       const result = await this.signPsbt({
-        tx: psbt.tx,
-        psbtHex: psbt.psbtHex,
-        psbtBase64: psbt.psbtBase64,
+        tx: psbtString,
+        psbtHex,
+        psbtBase64,
         finalize,
         broadcast,
-        inputsToSign: psbt.inputsToSign,
+        inputsToSign,
         network: signPsbtsOptions.network,
       })
       results.push(result)
