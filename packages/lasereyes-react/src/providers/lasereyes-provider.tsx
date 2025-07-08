@@ -14,10 +14,12 @@ import {
   createStores,
   LaserEyesClient,
   type LaserEyesSignPsbtOptions,
+  type LaserEyesSignPsbtsOptions,
   type NetworkType,
   type Protocol,
   type ProviderType,
   type SignMessageOptions,
+  type SignPsbtsResponse,
 } from '@omnisat/lasereyes-core'
 
 export default function LaserEyesProvider({
@@ -131,6 +133,14 @@ export default function LaserEyesProvider({
     },
     [client]
   )
+
+  const signPsbts = useCallback(
+    async (options: LaserEyesSignPsbtsOptions): Promise<SignPsbtsResponse> => {
+      return (await client?.signPsbts?.(options)) ?? defaultMethods.signPsbts()
+    },
+    [client]
+  )
+
   const switchNetwork = useCallback(
     async (network: NetworkType) =>
       await client?.switchNetwork.call(client, network),
@@ -185,6 +195,7 @@ export default function LaserEyesProvider({
       requestAccounts,
       sendBTC,
       signPsbt,
+      signPsbts,
       switchNetwork,
       inscribe,
       send,
@@ -208,6 +219,7 @@ export default function LaserEyesProvider({
     sendInscriptions,
     signMessage,
     signPsbt,
+    signPsbts,
     switchNetwork,
     getUtxos,
   ])

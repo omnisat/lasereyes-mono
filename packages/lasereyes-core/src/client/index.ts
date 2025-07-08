@@ -37,9 +37,11 @@ import { isBase64, isHex } from '../lib/utils'
 import * as bitcoin from 'bitcoinjs-lib'
 import type {
   LaserEyesSignPsbtOptions,
+  LaserEyesSignPsbtsOptions,
   LaserEyesStoreType,
   SignMessageOptions,
   SignPsbtResponse,
+  SignPsbtsResponse,
 } from './types'
 import { triggerDOMShakeHack } from './utils'
 import XVerseProvider from './providers/xverse'
@@ -398,6 +400,65 @@ export class LaserEyesClient {
     }
   }
 
+  async signPsbts(
+    options: LaserEyesSignPsbtsOptions
+  ): Promise<SignPsbtsResponse> {
+    const { psbts, finalize = false, broadcast = false } = options
+
+    if (!psbts || psbts.length === 0) {
+      throw new Error('No PSBTs provided')
+    }
+
+    // Process each PSBT to get hex and base64 versions
+    const processedPsbts = psbts.map(({ tx, inputsToSign }) => {
+      let psbtHex: string
+      let psbtBase64: string
+
+      if (!tx) throw new Error('No PSBT provided')
+
+      if (isHex(tx)) {
+        psbtBase64 = bitcoin.Psbt.fromHex(tx).toBase64()
+        psbtHex = tx
+      } else if (isBase64(tx)) {
+        psbtBase64 = tx
+        psbtHex = bitcoin.Psbt.fromBase64(tx).toHex()
+      } else {
+        throw new Error('Invalid PSBT format')
+      }
+
+      return {
+        tx,
+        psbtHex,
+        psbtBase64,
+        inputsToSign,
+      }
+    })
+
+    const provider = this.$store.get().provider
+
+    if (provider && this.$providerMap[provider]) {
+      try {
+        const result = await this.$providerMap[provider]?.signPsbts({
+          psbts: processedPsbts,
+          finalize,
+          broadcast,
+        })
+        return result
+      } catch (error) {
+        if (error instanceof Error) {
+          if (error.message.toLowerCase().includes('not implemented')) {
+            throw new Error(
+              "The connected wallet doesn't support PSBT signing..."
+            )
+          }
+        }
+        throw error
+      }
+    } else {
+      throw new Error('No wallet provider connected')
+    }
+  }
+
   async pushPsbt(tx: string) {
     const provider = this.$store.get().provider
     if (!provider) return
@@ -441,12 +502,12 @@ export class LaserEyesClient {
     sendArgs: T extends typeof BTC
       ? BTCSendArgs
       : T extends typeof RUNES
-      ? RuneSendArgs
-      : T extends typeof BRC20
-      ? Brc20SendArgs
-      : T extends typeof ALKANES
-      ? AlkaneSendArgs
-      : never
+        ? RuneSendArgs
+        : T extends typeof BRC20
+          ? Brc20SendArgs
+          : T extends typeof ALKANES
+            ? AlkaneSendArgs
+            : never
   ): Promise<string | undefined> {
     const provider = this.$store.get().provider
     if (!provider) return

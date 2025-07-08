@@ -2,6 +2,8 @@ import type { MapStore, WritableAtom } from 'nanostores'
 import type {
   LaserEyesStoreType,
   WalletProviderSignPsbtOptions,
+  WalletProviderSignPsbtsOptions,
+  SignPsbtsResponse,
 } from '../types'
 import type {
   Brc20SendArgs,
@@ -179,6 +181,34 @@ export abstract class WalletProvider {
       }
     | undefined
   >
+
+  async signPsbts(
+    signPsbtsOptions: WalletProviderSignPsbtsOptions
+  ): Promise<SignPsbtsResponse> {
+    const { psbts, finalize, broadcast } = signPsbtsOptions
+
+    const results = []
+    for (const psbt of psbts) {
+      const result = await this.signPsbt({
+        tx: psbt.tx,
+        psbtHex: psbt.psbtHex,
+        psbtBase64: psbt.psbtBase64,
+        finalize,
+        broadcast,
+        inputsToSign: psbt.inputsToSign,
+        network: signPsbtsOptions.network,
+      })
+      results.push(result)
+    }
+
+    return {
+      signedPsbts: results.filter(Boolean) as {
+        signedPsbtHex: string | undefined
+        signedPsbtBase64: string | undefined
+        txId?: string | undefined
+      }[],
+    }
+  }
 
   async pushPsbt(_tx: string): Promise<string | undefined> {
     let payload = _tx

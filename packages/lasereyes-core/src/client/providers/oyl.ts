@@ -9,6 +9,8 @@ import {
   LaserEyesStoreType,
   SignMessageOptions,
   WalletProviderSignPsbtOptions,
+  WalletProviderSignPsbtsOptions,
+  SignPsbtsResponse,
 } from '../types'
 import {
   handleStateChangePersistence,
@@ -185,6 +187,32 @@ export default class OylProvider extends WalletProvider {
       txId: txid,
     }
   }
+  async signPsbts(
+    signPsbtsOptions: WalletProviderSignPsbtsOptions
+  ): Promise<SignPsbtsResponse> {
+    const { psbts, finalize, broadcast } = signPsbtsOptions
+
+    const psbtHexArray = psbts.map((p) => p.psbtHex)
+    const result = await this.library.signPsbts({
+      psbts: psbtHexArray,
+      finalize,
+      broadcast,
+    })
+
+    // Handle the response format from OYL
+    const signedPsbts =
+      result.psbts?.map((psbtHex: string, index: number) => {
+        const psbtObj = bitcoin.Psbt.fromHex(psbtHex)
+        return {
+          signedPsbtHex: psbtObj.toHex(),
+          signedPsbtBase64: psbtObj.toBase64(),
+          txId: result.txids?.[index],
+        }
+      }) || []
+
+    return { signedPsbts }
+  }
+
   async pushPsbt(tx: string): Promise<string | undefined> {
     const response = await this.library.pushPsbt({ psbt: tx })
     return response.txid

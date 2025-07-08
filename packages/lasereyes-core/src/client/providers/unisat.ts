@@ -8,6 +8,8 @@ import {
   LaserEyesStoreType,
   SignMessageOptions,
   WalletProviderSignPsbtOptions,
+  WalletProviderSignPsbtsOptions,
+  SignPsbtsResponse,
 } from '../types'
 import { BIP322, BIP322_SIMPLE } from '../../constants'
 import { LaserEyesClient } from '..'
@@ -188,6 +190,42 @@ export default class UnisatProvider extends WalletProvider {
       signedPsbtBase64: psbtSignedPsbt.toBase64(),
       txId: undefined,
     }
+  }
+
+  async signPsbts(
+    signPsbtsOptions: WalletProviderSignPsbtsOptions
+  ): Promise<SignPsbtsResponse> {
+    const { psbts, finalize, broadcast } = signPsbtsOptions
+
+    const psbtHexArray = psbts.map((p) => p.psbtHex)
+    const toSignInputsArray = psbts.map((p) => p.inputsToSign)
+
+    const signedPsbts = await this.library.signPsbts(
+      psbtHexArray,
+      omitUndefined({
+        autoFinalized: finalize,
+        toSignInputs: toSignInputsArray,
+      })
+    )
+
+    const results = await Promise.all(
+      signedPsbts.map(async (signedPsbtHex: string) => {
+        const psbtObj = bitcoin.Psbt.fromHex(signedPsbtHex)
+
+        let txId: string | undefined
+        if (finalize && broadcast) {
+          txId = await this.pushPsbt(signedPsbtHex)
+        }
+
+        return {
+          signedPsbtHex: psbtObj.toHex(),
+          signedPsbtBase64: psbtObj.toBase64(),
+          txId,
+        }
+      })
+    )
+
+    return { signedPsbts: results }
   }
 
   async getPublicKey() {
