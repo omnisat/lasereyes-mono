@@ -19,7 +19,6 @@ import type {
 import type { LaserEyesClient } from '..'
 import { inscribeContent } from '../../lib/inscribe'
 import { broadcastTx } from '../../lib/helpers'
-import { isBase64, isHex } from '../../lib/utils'
 import * as bitcoin from 'bitcoinjs-lib'
 import {
   FRACTAL_TESTNET,
