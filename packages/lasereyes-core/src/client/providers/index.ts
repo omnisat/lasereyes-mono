@@ -184,44 +184,9 @@ export abstract class WalletProvider {
   >
 
   async signPsbts(
-    signPsbtsOptions: WalletProviderSignPsbtsOptions
+    _signPsbtsOptions: WalletProviderSignPsbtsOptions
   ): Promise<SignPsbtsResponse> {
-    const { psbts, finalize, broadcast, inputsToSign } = signPsbtsOptions
-
-    const results = []
-    for (const psbtString of psbts) {
-      let psbtHex: string
-      let psbtBase64: string
-
-      if (isHex(psbtString)) {
-        psbtBase64 = bitcoin.Psbt.fromHex(psbtString).toBase64()
-        psbtHex = psbtString
-      } else if (isBase64(psbtString)) {
-        psbtBase64 = psbtString
-        psbtHex = bitcoin.Psbt.fromBase64(psbtString).toHex()
-      } else {
-        throw new Error('Invalid PSBT format')
-      }
-
-      const result = await this.signPsbt({
-        tx: psbtString,
-        psbtHex,
-        psbtBase64,
-        finalize,
-        broadcast,
-        inputsToSign,
-        network: signPsbtsOptions.network,
-      })
-      results.push(result)
-    }
-
-    return {
-      signedPsbts: results.filter(Boolean) as {
-        signedPsbtHex: string | undefined
-        signedPsbtBase64: string | undefined
-        txId?: string | undefined
-      }[],
-    }
+    throw UNSUPPORTED_PROVIDER_METHOD_ERROR
   }
 
   async pushPsbt(_tx: string): Promise<string | undefined> {
