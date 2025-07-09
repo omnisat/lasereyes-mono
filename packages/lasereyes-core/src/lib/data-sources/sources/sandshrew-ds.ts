@@ -6,6 +6,7 @@ import type { AddressInfo, InscriptionInfo } from 'ordapi'
 import type {
   SandshrewGetRuneByIdOrNameResponse,
   SingleRuneOutpoint,
+  SandshrewBalancesResult,
 } from '../../../types/sandshrew'
 import type { EsploraTx } from '../../../types/esplora'
 import { getPublicKeyHash } from '../../btc'
@@ -295,7 +296,7 @@ export class SandshrewDataSource implements DataSource {
         throw new Error('No runes data found')
       }
 
-      return runesData.map((rune) => ({
+      return runesData.map((rune: string[]) => ({
         name: rune[0],
         balance: rune[1],
         symbol: rune[2],
@@ -343,6 +344,13 @@ export class SandshrewDataSource implements DataSource {
     const minFee = Math.min(...Object.values(feeEstimates))
 
     return { fastFee: Math.round(fastFee), minFee: Math.round(minFee) }
+  }
+
+  async getBalances(address: string): Promise<SandshrewBalancesResult> {
+    const response = (await this.call('sandshrew_balances', [
+      { address },
+    ])) as RpcResponse
+    return response.result as SandshrewBalancesResult
   }
 
   async getRuneOutpoints({
