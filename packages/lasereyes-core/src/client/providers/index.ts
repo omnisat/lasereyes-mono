@@ -2,6 +2,8 @@ import type { MapStore, WritableAtom } from 'nanostores'
 import type {
   LaserEyesStoreType,
   WalletProviderSignPsbtOptions,
+  WalletProviderSignPsbtsOptions,
+  SignPsbtsResponse,
 } from '../types'
 import type {
   Brc20SendArgs,
@@ -179,6 +181,12 @@ export abstract class WalletProvider {
       }
     | undefined
   >
+
+  async signPsbts(
+    _signPsbtsOptions: WalletProviderSignPsbtsOptions
+  ): Promise<SignPsbtsResponse> {
+    throw UNSUPPORTED_PROVIDER_METHOD_ERROR
+  }
 
   async pushPsbt(_tx: string): Promise<string | undefined> {
     let payload = _tx
