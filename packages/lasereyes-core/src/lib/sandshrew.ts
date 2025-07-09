@@ -6,7 +6,11 @@ import type {
   OrdRune,
   OrdRuneBalance,
 } from '../types/ord'
-import type { SandshrewResponse, SingleRuneOutpoint } from '../types/sandshrew'
+import type {
+  SandshrewResponse,
+  SingleRuneOutpoint,
+  SandshrewBalancesResult,
+} from '../types/sandshrew'
 import type { EsploraTx } from '../types/esplora'
 import { getPublicKeyHash } from './btc'
 import { MAINNET } from '../constants'
@@ -58,6 +62,13 @@ export const getRuneByName = async (rune_name: string): Promise<OrdRune> => {
     rune_name,
   ])) as OrdResponse
   return response.result as OrdRune
+}
+
+export const getBalances = async (
+  address: string
+): Promise<SandshrewBalancesResult> => {
+  const response = await callSandshrewRPC('sandshrew_balances', [{ address }])
+  return response.result as SandshrewBalancesResult
 }
 
 export const getTxInfo = async (txId: string): Promise<EsploraTx> => {
