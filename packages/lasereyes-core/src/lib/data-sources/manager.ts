@@ -1,4 +1,3 @@
-import asyncPool from 'tiny-async-pool'
 import { MAESTRO } from '../../constants/data-sources'
 import type { AlkanesOutpoint, Config } from '../../types'
 import type { AlkaneBalance } from '../../types/alkane'
@@ -6,7 +5,7 @@ import type { DataSource } from '../../types/data-source'
 import type { Inscription } from '../../types/lasereyes'
 import type { MaestroAddressInscription } from '../../types/maestro'
 import { BaseNetwork } from '../../types/network'
-import type { OrdOutput, OrdRuneBalance } from '../../types/ord'
+import type { OrdRuneBalance } from '../../types/ord'
 import {
   FormattedAlkane,
   FormattedInscription,
@@ -22,7 +21,6 @@ import {
   SANDSHREW_LASEREYES_KEY,
   getSandshrewUrl,
 } from '../urls'
-import { toBigEndian } from '../utils'
 import { normalizeBrc20Balances, normalizeInscription } from './normalizations'
 import { MaestroDataSource } from './sources/maestro-ds'
 import { MempoolSpaceDataSource } from './sources/mempool-space-ds'
