@@ -8,13 +8,13 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "../../components/ui/card";
+} from "../ui/card";
 import useSupportedProviders from "../../hooks/useSupportedProviders";
 import "../../i18n/setup";
 import { Button } from "../ui/button";
 import { cn } from "../../lib/utils";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { Alert } from "../../components/ui/alert";
+import { Alert } from "../ui/alert";
 import { useState, useCallback, useMemo } from "react";
 import "../index.css";
 

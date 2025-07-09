@@ -25,5 +25,5 @@
 
     "baseUrl": ".",
   },
-  "include": ["src", "src/i18n/locales/**/*.json", "src"]
+  "include": ["src", "src/i18n/locales/**/*.json", "src", "../lasereyes-react/src/hooks/useBalance.ts"]
 }

@@ -19,6 +19,9 @@ import {
   type ProviderType,
   type SignMessageOptions,
 } from '@omnisat/lasereyes-core'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+
+const queryClient = new QueryClient()
 
 export default function LaserEyesProvider({
   config,
@@ -213,15 +216,17 @@ export default function LaserEyesProvider({
   ])
 
   return (
-    <LaserEyesStoreContext.Provider
-      value={{
-        $store: clientStores.$store,
-        $network: clientStores.$network,
-        client: client,
-        methods,
-      }}
-    >
-      {children}
-    </LaserEyesStoreContext.Provider>
+    <QueryClientProvider client={queryClient}>
+      <LaserEyesStoreContext.Provider
+        value={{
+          $store: clientStores.$store,
+          $network: clientStores.$network,
+          client: client,
+          methods,
+        }}
+      >
+        {children}
+      </LaserEyesStoreContext.Provider>
+    </QueryClientProvider>
   )
 }

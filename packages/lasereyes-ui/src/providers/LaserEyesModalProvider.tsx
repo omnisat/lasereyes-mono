@@ -1,4 +1,4 @@
-import ConnectWalletModal from '../components/modal/ConnectModal'
+import ConnectWalletModal from '../components/connection-modal/ConnectModal'
 import type { LaserEyesModalConfig } from '../types/config'
 import {
   MAINNET,
