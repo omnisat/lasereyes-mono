@@ -96,23 +96,23 @@ export default function AccountInfo() {
       <CardContent>
         <div className="lem-space-y-4">
           <div className="lem-grid lem-grid-cols-1 md:lem-grid-cols-2 lem-gap-4">
-            <div className="lem-p-4 lem-bg-blue-50 dark:lem-bg-blue-950 lem-border lem-border-blue-200 dark:lem-border-blue-800 lem-rounded-lg">
+            <div className="lem-p-4 lem-bg-primary/10 lem-border lem-border-primary/20 lem-rounded-lg">
               <div className="lem-flex lem-items-center lem-gap-2 lem-mb-2">
-                <Bitcoin className="lem-h-4 lem-w-4 lem-text-blue-600" />
-                <span className="lem-font-semibold lem-text-blue-700 dark:lem-text-blue-300">Balance</span>
+                <Bitcoin className="lem-h-4 lem-w-4 lem-text-foreground" />
+                <span className="lem-text-foreground lem-leading-none">Balance</span>
               </div>
-              <p className={`lem-text-sm ${btcBalanceError ? 'lem-text-red-600 dark:lem-text-red-400' : 'lem-text-blue-600 dark:lem-text-blue-400'}`}>
-                { isBtcBalancePending ? '...' : btcBalanceError ? 'Error' : `${btcBalance} BTC`}
+              <p className={`lem-text-sm ${btcBalanceError ? 'lem-text-red-600 dark:lem-text-red-400' : 'lem-text-foreground'}`}>
+                { btcBalanceError ? 'Error' : isBtcBalancePending ? '...' : `${btcBalance} BTC`}
               </p>
             </div>
             
-            <div className="lem-p-4 lem-bg-purple-50 dark:lem-bg-purple-950 lem-border lem-border-purple-200 dark:lem-border-purple-800 lem-rounded-lg">
+            <div className="lem-p-4 lem-bg-primary/10 lem-border lem-border-primary/20 lem-rounded-lg">
               <div className="lem-flex lem-items-center lem-gap-2 lem-mb-2">
-                <Globe className="lem-h-4 lem-w-4 lem-text-purple-600" />
-                <span className="lem-font-semibold lem-text-purple-700 dark:lem-text-purple-300">Network</span>
+                <Globe className="lem-h-4 lem-w-4 lem-text-foreground" />
+                <span className="lem-text-foreground lem-leading-none">Network</span>
               </div>
               <Select value={network || MAINNET} onValueChange={handleNetworkChange} disabled={isSwitchingNetwork}>
-                <SelectTrigger className="lem-w-full lem-h-6 lem-text-sm lem-bg-transparent lem-border-purple-300 dark:lem-border-purple-700 lem-text-purple-600 dark:lem-text-purple-400">
+                <SelectTrigger className="lem-w-full lem-h-6 lem-text-sm lem-bg-transparent lem-border-primary/30 lem-text-foreground">
                   <SelectValue>
                     {isSwitchingNetwork ? 'Switching...' : getCurrentNetworkLabel()}
                   </SelectValue>
