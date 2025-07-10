@@ -8,6 +8,7 @@ import {
 } from '@omnisat/lasereyes-react'
 import { type ReactNode, useCallback, useState } from 'react'
 import { laserEyesModalContext } from './LaserEyesModalContext'
+import { ThemeProvider } from './ThemeProvider'
 
 export function LaserEyesModalProvider({
   children,
@@ -32,21 +33,23 @@ export function LaserEyesModalProvider({
   const hideModal = useCallback(() => setIsOpen(false), [])
 
   return (
-    <laserEyesModalContext.Provider
-      value={{
-        isOpen,
-        isLoading,
-        showModal,
-        hideModal,
-        config: modalConfig,
-        setConfig,
-      }}
-    >
-      {children}
-      <ConnectWalletModal
-        onClose={() => setIsOpen(false)}
-        open={isOpen && !connected}
-      />
-    </laserEyesModalContext.Provider>
+    <ThemeProvider config={config?.theme}>
+      <laserEyesModalContext.Provider
+        value={{
+          isOpen,
+          isLoading,
+          showModal,
+          hideModal,
+          config: modalConfig,
+          setConfig,
+        }}
+      >
+        {children}
+        <ConnectWalletModal
+          onClose={() => setIsOpen(false)}
+          open={isOpen && !connected}
+        />
+      </laserEyesModalContext.Provider>
+    </ThemeProvider>
   )
 }

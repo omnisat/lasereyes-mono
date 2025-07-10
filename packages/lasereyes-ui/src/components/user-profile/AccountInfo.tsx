@@ -96,7 +96,7 @@ export default function AccountInfo() {
       <CardContent>
         <div className="lem-space-y-4">
           <div className="lem-grid lem-grid-cols-1 md:lem-grid-cols-2 lem-gap-4">
-            <div className="lem-p-4 lem-bg-primary/10 lem-border lem-border-primary/20 lem-rounded-lg">
+            <div className="lem-p-4 lem-bg-primary/10 dark:lem-bg-primary/20 lem-border lem-border-primary/20 dark:lem-border-primary/40 lem-rounded-lg">
               <div className="lem-flex lem-items-center lem-gap-2 lem-mb-2">
                 <Bitcoin className="lem-h-4 lem-w-4 lem-text-foreground" />
                 <span className="lem-text-foreground lem-leading-none">Balance</span>
@@ -106,7 +106,7 @@ export default function AccountInfo() {
               </p>
             </div>
             
-            <div className="lem-p-4 lem-bg-primary/10 lem-border lem-border-primary/20 lem-rounded-lg">
+            <div className="lem-p-4 lem-bg-primary/10 dark:lem-bg-primary/20 lem-border lem-border-primary/20 dark:lem-border-primary/40 lem-rounded-lg">
               <div className="lem-flex lem-items-center lem-gap-2 lem-mb-2">
                 <Globe className="lem-h-4 lem-w-4 lem-text-foreground" />
                 <span className="lem-text-foreground lem-leading-none">Network</span>
@@ -128,7 +128,7 @@ export default function AccountInfo() {
             </div>
           </div>
           
-          <div className="lem-p-4 lem-bg-slate-50 dark:lem-bg-slate-800 lem-border lem-border-slate-200 dark:lem-border-slate-700 lem-rounded-lg">
+          <div className="lem-p-4 lem-bg-slate-50/50 dark:lem-bg-slate-800/30 lem-border lem-border-slate-200/60 dark:lem-border-slate-700/40 lem-rounded-lg">
             <div className="lem-hidden sm:lem-flex lem-items-center lem-justify-between">
               <div>
                 <p className="lem-text-sm lem-font-medium lem-text-muted-foreground lem-mb-1">Wallet Address</p>

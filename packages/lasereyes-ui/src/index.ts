@@ -15,6 +15,9 @@ import {
   SelectScrollUpButton,
   SelectScrollDownButton
 } from "./components/ui/select";
+import { ThemeProvider } from "./providers/ThemeProvider";
+import { useTheme } from "./hooks";
+import ThemeControls from "./components/ThemeControls";
 
 export { 
   ConnectWalletModal, 
@@ -31,5 +34,33 @@ export {
   SelectLabel,
   SelectSeparator,
   SelectScrollUpButton,
-  SelectScrollDownButton
+  SelectScrollDownButton,
+  ThemeProvider,
+  useTheme,
+  ThemeControls
 };
+
+// Export types for theme configuration
+export type {
+  ThemeConfig,
+  ThemeColors,
+  HSLColor,
+  DarkModeStrategy,
+  ThemeState,
+  ThemeContextValue
+} from "./types/theme";
+
+// Export theme utilities
+export {
+  hexToHsl,
+  rgbToHsl,
+  parseColorToHsl,
+  hslToCssValue,
+  generateComplementaryColors,
+  applyThemeColors,
+  setPrimaryColor,
+  applyDarkModeClass,
+  getSystemDarkMode,
+  onSystemDarkModeChange,
+  getDefaultThemeColors
+} from "./lib/theme-utils";

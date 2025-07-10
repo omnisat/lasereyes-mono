@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { useLaserEyes } from '@omnisat/lasereyes'
-import { ConnectWalletButton, ConnectWalletModal } from '@omnisat/lasereyes-ui'
+import { ConnectWalletButton, ConnectWalletModal, ThemeControls, useTheme } from '@omnisat/lasereyes-ui'
 import { 
   Wallet, 
   Bitcoin, 
@@ -12,8 +12,41 @@ import {
   Shield, 
   Globe, 
   ArrowRight, 
-  ExternalLink
+  ExternalLink,
+  Palette,
+  Sun,
+  Moon
 } from 'lucide-react'
+
+// Quick theme toggle component
+function QuickThemeToggle() {
+  const { isDark, toggleDarkMode, darkMode } = useTheme()
+  
+  if (darkMode === 'disabled') {
+    return (
+      <Button disabled variant="outline" size="sm">
+        <Sun className="h-4 w-4 mr-2" />
+        Light Mode Only
+      </Button>
+    )
+  }
+  
+  return (
+    <Button onClick={toggleDarkMode} variant="outline" size="sm">
+      {isDark ? (
+        <>
+          <Sun className="h-4 w-4 mr-2" />
+          Switch to Light
+        </>
+      ) : (
+        <>
+          <Moon className="h-4 w-4 mr-2" />
+          Switch to Dark
+        </>
+      )}
+    </Button>
+  )
+}
 
 export default function UIPage() {
   const { 
@@ -51,6 +84,11 @@ export default function UIPage() {
       icon: <Globe className="h-6 w-6" />,
       title: "Cross-Platform",
       description: "Works seamlessly across web, mobile, and desktop applications"
+    },
+    {
+      icon: <Palette className="h-6 w-6" />,
+      title: "Customizable Themes",
+      description: "Full theming support with dark mode, custom colors, and real-time updates"
     }
   ]
 
@@ -67,40 +105,89 @@ export default function UIPage() {
           </p>
         </div>
 
-        {/* Connection Status */}
-        <div className="max-w-4xl mx-auto mb-8">
-          <Card className="border-2 border-dashed border-blue-200 dark:border-blue-800">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Wallet className="h-5 w-5" />
-                Wallet Connection
-              </CardTitle>
-              <CardDescription>
-                Connect your Bitcoin wallet or view your account info
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <ConnectWalletButton className="flex-1 h-12 text-lg font-semibold" />
-                  <Button 
-                    variant="outline" 
-                    onClick={() => setShowModal(true)}
-                    className="flex-1 h-12"
-                  >
-                    <Wallet className="mr-2 h-4 w-4" />
-                    Custom Modal
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        {/* Connection Status & Theme Controls */}
+        <div className="max-w-6xl mx-auto mb-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Wallet Connection */}
+            <div className="lg:col-span-2">
+              <Card className="border-2 border-dashed border-blue-200 dark:border-blue-800 h-full">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Wallet className="h-5 w-5" />
+                    Wallet Connection & Demo
+                  </CardTitle>
+                  <CardDescription>
+                    Connect your Bitcoin wallet and explore theming options
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {/* Connection buttons */}
+                  <div className="space-y-4">
+                    <div className="flex flex-col sm:flex-row gap-4">
+                      <ConnectWalletButton className="flex-1 h-12 text-lg font-semibold" />
+                      <Button 
+                        variant="outline" 
+                        onClick={() => setShowModal(true)}
+                        className="flex-1 h-12"
+                      >
+                        <Wallet className="mr-2 h-4 w-4" />
+                        Custom Modal
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Quick Theme Preview */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                      <Palette className="h-4 w-4" />
+                      Live Theme Preview
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <Button size="sm">Primary</Button>
+                      <Button size="sm" variant="secondary">Secondary</Button>
+                      <Button size="sm" variant="outline">Outline</Button>
+                      <Button size="sm" variant="ghost">Ghost</Button>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <Card className="bg-primary/10 border-primary/20">
+                        <CardContent className="pt-3 pb-3">
+                          <div className="flex items-center gap-2 text-primary text-sm">
+                            <Bitcoin className="h-3 w-3" />
+                            <span className="font-medium">Primary Theme</span>
+                          </div>
+                        </CardContent>
+                      </Card>
+                      <Card className="bg-muted">
+                        <CardContent className="pt-3 pb-3">
+                          <div className="flex items-center gap-2 text-muted-foreground text-sm">
+                            <Shield className="h-3 w-3" />
+                            <span className="font-medium">Muted Theme</span>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+
+                    <div className="flex items-center justify-between p-3 border rounded-lg bg-card">
+                      <p className="text-sm text-muted-foreground">Dark mode toggle:</p>
+                      <QuickThemeToggle />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Theme Controls */}
+            <div className="lg:col-span-1">
+              <ThemeControls />
+            </div>
+          </div>
         </div>
 
         {/* Features Grid */}
         <div className="max-w-6xl mx-auto mb-12">
           <h2 className="text-2xl font-bold text-center mb-8">Why Choose LaserEyes?</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
             {features.map((feature, index) => (
               <Card key={index} className="hover:shadow-lg transition-shadow duration-300">
                 <CardHeader>
@@ -151,6 +238,8 @@ export default function UIPage() {
             </CardContent>
           </Card>
         </div>
+
+
 
         {/* Call to Action */}
         <div className="max-w-2xl mx-auto text-center">
