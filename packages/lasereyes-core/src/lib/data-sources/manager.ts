@@ -400,17 +400,15 @@ export class DataSourceManager {
       )
     }
 
-    console.log('getting balances', address)
-
     // Single fetch call to get all UTXOs and their data
     const balancesArray = await sandshrewDS.getBalances(address)
 
-    console.log('balances', balancesArray)
-
     const formattedUTXOs: FormattedUTXO[] = []
 
-    // Convert single address to array for consistent processing
-    const addressArray = Array.isArray(address) ? address : [address]
+    // Convert single address to array for consistent processing and ensure uniqueness
+    const addressArray = Array.isArray(address)
+      ? [...new Set(address)] // Remove duplicates
+      : [address]
 
     // Process each address's balances
     for (let i = 0; i < balancesArray.length; i++) {
