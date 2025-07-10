@@ -127,7 +127,7 @@ export class SandshrewDataSource implements DataSource {
     }
   }
 
-  async multicall(multiCall: any[]) {
+  async multicall(multiCall: any[]): Promise<RpcResponse[]> {
     const response = await this.call('sandshrew_multicall', multiCall)
     return response.result
   }
@@ -346,11 +346,23 @@ export class SandshrewDataSource implements DataSource {
     return { fastFee: Math.round(fastFee), minFee: Math.round(minFee) }
   }
 
-  async getBalances(address: string): Promise<SandshrewBalancesResult> {
+  async getBalances(
+    address: string | string[]
+  ): Promise<SandshrewBalancesResult[]> {
+    if (Array.isArray(address)) {
+      const multiCall = address.map((addr) => [
+        'sandshrew_balances',
+        [{ address: addr }],
+      ])
+      const result = await this.multicall(multiCall)
+      return result.map((e) => e.result) as SandshrewBalancesResult[]
+    }
+
     const response = (await this.call('sandshrew_balances', [
       { address },
     ])) as RpcResponse
-    return response.result as SandshrewBalancesResult
+
+    return [response.result as SandshrewBalancesResult]
   }
 
   async getRuneOutpoints({

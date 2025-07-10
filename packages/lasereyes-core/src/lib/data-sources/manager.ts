@@ -390,7 +390,9 @@ export class DataSourceManager {
     return undefined
   }
 
-  async getFormattedUTXOs(address: string): Promise<FormattedUTXO[]> {
+  async getFormattedUTXOs(
+    address: string | string[]
+  ): Promise<FormattedUTXO[]> {
     const sandshrewDS = this.getSource('sandshrew') as SandshrewDataSource
     if (!sandshrewDS || !sandshrewDS.getBalances) {
       throw new Error(
@@ -399,85 +401,102 @@ export class DataSourceManager {
     }
 
     // Single fetch call to get all UTXOs and their data
-    const balances = await sandshrewDS.getBalances(address)
+    const balancesArray = await sandshrewDS.getBalances(address)
+
     const formattedUTXOs: FormattedUTXO[] = []
 
-    const currentHeight = balances.metashrewHeight
-    const scriptPubKey = Buffer.from(
-      getAddressScriptPubKey(address, this.network)
-    ).toString('hex')
+    // Convert single address to array for consistent processing and ensure uniqueness
+    const addressArray = Array.isArray(address)
+      ? [...new Set(address)] // Remove duplicates
+      : [address]
 
-    // Process spendable UTXOs (regular bitcoin UTXOs)
-    for (const spendable of balances.spendable) {
-      const [txHash, txOutputIndex] = spendable.outpoint.split(':')
+    // Process each address's balances
+    for (let i = 0; i < balancesArray.length; i++) {
+      const balances = balancesArray[i]
+      const currentAddress = addressArray[i]
 
-      formattedUTXOs.push({
-        txHash,
-        txOutputIndex: parseInt(txOutputIndex),
-        btcValue: spendable.value,
-        scriptPubKey,
-        address,
-        hasRunes: false,
-        runes: [],
-        hasAlkanes: false, // No alkanes info in sandshrew_balances
-        alkanes: [],
-        hasInscriptions: false,
-        inscriptions: [],
-        confirmations: spendable.height
-          ? currentHeight - spendable.height
-          : undefined,
-      })
-    }
+      const currentHeight = balances.metashrewHeight
+      const scriptPubKey = Buffer.from(
+        getAddressScriptPubKey(currentAddress, this.network)
+      ).toString('hex')
 
-    // Process asset UTXOs (UTXOs with inscriptions and/or runes)
-    for (const asset of balances.assets) {
-      const [txHash, txOutputIndex] = asset.outpoint.split(':')
+      // Process spendable UTXOs (regular bitcoin UTXOs)
+      for (const spendable of balances.spendable) {
+        const [txHash, txOutputIndex] = spendable.outpoint.split(':')
 
-      // Process inscriptions
-      const inscriptions: FormattedInscription[] = (
-        asset.inscriptions || []
-      ).map((inscriptionId) => ({
-        inscriptionId,
-      }))
-
-      // Process runes (ord_runes is the actual runes data)
-      const runes: FormattedRune[] = []
-      if (asset.ord_runes) {
-        for (const [runeName, runeData] of Object.entries(asset.ord_runes)) {
-          runes.push({
-            runeId: runeName, // Using name as ID
-            amount: runeData.amount,
-          })
-        }
+        formattedUTXOs.push({
+          txHash,
+          txOutputIndex: parseInt(txOutputIndex),
+          btcValue: spendable.value,
+          scriptPubKey,
+          address: currentAddress,
+          hasRunes: false,
+          runes: [],
+          hasAlkanes: false, // No alkanes info in sandshrew_balances
+          alkanes: [],
+          hasInscriptions: false,
+          inscriptions: [],
+          confirmations: spendable.height
+            ? currentHeight - spendable.height
+            : undefined,
+        })
       }
 
-      // Process alkanes (runes[] array is actually alkanes data)
-      const alkanes: FormattedAlkane[] = []
-      if (asset.runes) {
-        for (const alkaneBalance of asset.runes) {
-          alkanes.push({
-            id: alkaneBalance.rune.id.block + ':' + alkaneBalance.rune.id.tx,
-            amount: parseInt(alkaneBalance.balance, 16), // Convert hex to number
-            name: alkaneBalance.rune.name,
-            symbol: alkaneBalance.rune.symbol,
-          })
-        }
-      }
+      // Process asset UTXOs (UTXOs with inscriptions and/or runes)
+      for (const asset of balances.assets) {
+        const [txHash, txOutputIndex] = asset.outpoint.split(':')
 
-      formattedUTXOs.push({
-        txHash,
-        txOutputIndex: parseInt(txOutputIndex),
-        btcValue: asset.value,
-        scriptPubKey,
-        address,
-        hasRunes: runes.length > 0,
-        runes,
-        hasAlkanes: alkanes.length > 0,
-        alkanes,
-        hasInscriptions: inscriptions.length > 0,
-        inscriptions,
-        confirmations: asset.height ? currentHeight - asset.height : undefined,
-      })
+        // Process inscriptions
+        const inscriptions: FormattedInscription[] = (
+          asset.inscriptions || []
+        ).map((inscriptionId: string) => ({
+          inscriptionId,
+        }))
+
+        // Process runes (ord_runes is the actual runes data)
+        const runes: FormattedRune[] = []
+        if (asset.ord_runes) {
+          for (const [runeName, runeData] of Object.entries(asset.ord_runes)) {
+            runes.push({
+              runeId: runeName, // Using name as ID
+              amount: (runeData as any).amount,
+            })
+          }
+        }
+
+        // Process alkanes (runes[] array is actually alkanes data)
+        const alkanes: FormattedAlkane[] = []
+        if (asset.runes) {
+          for (const alkaneBalance of asset.runes) {
+            alkanes.push({
+              id:
+                parseInt(alkaneBalance.rune.id.block, 16) +
+                ':' +
+                parseInt(alkaneBalance.rune.id.tx, 16),
+              amount: parseInt(alkaneBalance.balance, 16), // Convert hex to number
+              name: alkaneBalance.rune.name,
+              symbol: alkaneBalance.rune.symbol,
+            })
+          }
+        }
+
+        formattedUTXOs.push({
+          txHash,
+          txOutputIndex: parseInt(txOutputIndex),
+          btcValue: asset.value,
+          scriptPubKey,
+          address: currentAddress,
+          hasRunes: runes.length > 0,
+          runes,
+          hasAlkanes: alkanes.length > 0,
+          alkanes,
+          hasInscriptions: inscriptions.length > 0,
+          inscriptions,
+          confirmations: asset.height
+            ? currentHeight - asset.height
+            : undefined,
+        })
+      }
     }
 
     // Sort by value (smallest first)
