@@ -456,7 +456,10 @@ export class DataSourceManager {
       if (asset.runes) {
         for (const alkaneBalance of asset.runes) {
           alkanes.push({
-            id: alkaneBalance.rune.id.block + ':' + alkaneBalance.rune.id.tx,
+            id:
+              parseInt(alkaneBalance.rune.id.block, 16) +
+              ':' +
+              parseInt(alkaneBalance.rune.id.tx, 16),
             amount: parseInt(alkaneBalance.balance, 16), // Convert hex to number
             name: alkaneBalance.rune.name,
             symbol: alkaneBalance.rune.symbol,
