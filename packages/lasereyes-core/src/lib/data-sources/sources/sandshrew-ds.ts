@@ -6,6 +6,7 @@ import type { AddressInfo, InscriptionInfo } from 'ordapi'
 import type {
   SandshrewGetRuneByIdOrNameResponse,
   SingleRuneOutpoint,
+  SandshrewBalancesResult,
 } from '../../../types/sandshrew'
 import type { EsploraTx } from '../../../types/esplora'
 import { getPublicKeyHash } from '../../btc'
@@ -126,7 +127,7 @@ export class SandshrewDataSource implements DataSource {
     }
   }
 
-  async multicall(multiCall: any[]) {
+  async multicall(multiCall: any[]): Promise<RpcResponse[]> {
     const response = await this.call('sandshrew_multicall', multiCall)
     return response.result
   }
@@ -295,7 +296,7 @@ export class SandshrewDataSource implements DataSource {
         throw new Error('No runes data found')
       }
 
-      return runesData.map((rune) => ({
+      return runesData.map((rune: string[]) => ({
         name: rune[0],
         balance: rune[1],
         symbol: rune[2],
@@ -343,6 +344,25 @@ export class SandshrewDataSource implements DataSource {
     const minFee = Math.min(...Object.values(feeEstimates))
 
     return { fastFee: Math.round(fastFee), minFee: Math.round(minFee) }
+  }
+
+  async getBalances(
+    address: string | string[]
+  ): Promise<SandshrewBalancesResult[]> {
+    if (Array.isArray(address)) {
+      const multiCall = address.map((addr) => [
+        'sandshrew_balances',
+        [{ address: addr }],
+      ])
+      const result = await this.multicall(multiCall)
+      return result.map((e) => e.result) as SandshrewBalancesResult[]
+    }
+
+    const response = (await this.call('sandshrew_balances', [
+      { address },
+    ])) as RpcResponse
+
+    return [response.result as SandshrewBalancesResult]
   }
 
   async getRuneOutpoints({
