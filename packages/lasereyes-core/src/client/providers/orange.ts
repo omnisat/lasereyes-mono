@@ -157,6 +157,11 @@ export default class OrangeProvider extends WalletProvider {
           this.$store.setKey('provider', ORANGE)
           this.$store.setKey('address', foundAddress.address)
           this.$store.setKey('paymentAddress', foundPaymentAddress.address)
+
+          this.$store.setKey('accounts', [
+            foundAddress.address,
+            foundPaymentAddress.address,
+          ])
         }
 
         this.$store.setKey('publicKey', String(foundAddress.publicKey))
