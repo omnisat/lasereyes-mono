@@ -164,6 +164,7 @@ export default class OrangeProvider extends WalletProvider {
           'paymentPublicKey',
           String(foundPaymentAddress.publicKey)
         )
+        this.$store.setKey('accounts', response.addresses.map((address) => address.address))
       },
       onCancel: () => {
         throw new Error(`User canceled lasereyes to ${ORANGE} wallet`)

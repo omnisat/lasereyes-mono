@@ -114,13 +114,11 @@ export class WizzProvider extends WalletProvider {
     this.$store.setKey('paymentAddress', wizzAccounts[0])
     this.$store.setKey('publicKey', wizzPubKey)
     this.$store.setKey('paymentPublicKey', wizzPubKey)
-    this.$store.setKey('provider', WIZZ)
     await this.getNetwork().then((network) => {
       if (network && this.config?.network !== network) {
         this.parent.switchNetwork(network)
       }
     })
-    this.$store.setKey('connected', true)
   }
 
   async requestAccounts(): Promise<string[]> {
