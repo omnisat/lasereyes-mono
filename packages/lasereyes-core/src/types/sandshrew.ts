@@ -33,3 +33,57 @@ export type SandshrewGetRuneByIdOrNameResponse = {
   mintable: boolean
   parent: string
 }
+
+export interface SandshrewSpendableUtxo {
+  outpoint: string
+  value: number
+  height: number
+}
+
+export interface SandshrewRuneId {
+  block: string
+  tx: string
+}
+
+export interface SandshrewRune {
+  id: SandshrewRuneId
+  name: string
+  spacedName: string
+  divisibility: number
+  spacers: number
+  symbol: string
+}
+
+export interface SandshrewRuneBalance {
+  rune: SandshrewRune
+  balance: string
+}
+
+export interface SandshrewOrdRune {
+  amount: number
+  divisibility: number
+  symbol: string
+}
+
+export interface SandshrewAssetUtxo {
+  outpoint: string
+  value: number
+  height: number
+  inscriptions?: string[]
+  ord_runes?: Record<string, SandshrewOrdRune>
+  runes?: SandshrewRuneBalance[]
+}
+
+export interface SandshrewBalancesResult {
+  spendable: SandshrewSpendableUtxo[]
+  assets: SandshrewAssetUtxo[]
+  pending: SandshrewAssetUtxo[]
+  ordHeight: number
+  metashrewHeight: number
+}
+
+export interface SandshrewBalancesResponse {
+  id: string
+  result: SandshrewBalancesResult
+  jsonrpc: string
+}

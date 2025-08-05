@@ -145,6 +145,7 @@ export default class TokeoProvider extends WalletProvider {
         'paymentPublicKey',
         paymentAddressAccount?.publicKey ?? addressAccount.publicKey
       )
+      this.$store.setKey('accounts', accounts.map((account) => account.address))
     } catch (error) {
       console.error(error)
       throw error

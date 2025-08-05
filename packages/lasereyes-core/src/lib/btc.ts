@@ -34,7 +34,7 @@ export const getAddressType = (
       }
       return P2SH
     }
-  } catch  {
+  } catch {
     try {
       const decoded = bitcoin.address.fromBech32(address)
       if (decoded.version === 0 && decoded.data.length === 20) return P2WPKH
@@ -46,6 +46,14 @@ export const getAddressType = (
   }
 
   return 'unknown'
+}
+
+export const getAddressScriptPubKey = (
+  address: string,
+  network: NetworkType
+): Uint8Array => {
+  const btcNetwork = getBitcoinNetwork(network)
+  return bitcoin.address.toOutputScript(address, btcNetwork)
 }
 
 export function getPublicKeyHash(

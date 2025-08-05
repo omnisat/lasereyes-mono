@@ -1,4 +1,3 @@
-import asyncPool from 'tiny-async-pool'
 import { MAESTRO } from '../../constants/data-sources'
 import type { AlkanesOutpoint, Config } from '../../types'
 import type { AlkaneBalance } from '../../types/alkane'
@@ -6,7 +5,7 @@ import type { DataSource } from '../../types/data-source'
 import type { Inscription } from '../../types/lasereyes'
 import type { MaestroAddressInscription } from '../../types/maestro'
 import { BaseNetwork } from '../../types/network'
-import type { OrdOutput, OrdRuneBalance } from '../../types/ord'
+import type { OrdRuneBalance } from '../../types/ord'
 import {
   FormattedAlkane,
   FormattedInscription,
@@ -22,15 +21,13 @@ import {
   SANDSHREW_LASEREYES_KEY,
   getSandshrewUrl,
 } from '../urls'
-import { toBigEndian } from '../utils'
 import { normalizeBrc20Balances, normalizeInscription } from './normalizations'
 import { MaestroDataSource } from './sources/maestro-ds'
 import { MempoolSpaceDataSource } from './sources/mempool-space-ds'
 import { SandshrewDataSource } from './sources/sandshrew-ds'
+import { getAddressScriptPubKey } from '../btc'
 
 const ERROR_METHOD_NOT_AVAILABLE = 'Method not available on any data source'
-
-
 
 export class DataSourceManager {
   private static instance: DataSourceManager
@@ -180,7 +177,7 @@ export class DataSourceManager {
       return await ds.getAddressBtcBalance?.(address)
     })
     if (balance === undefined) {
-      throw new Error("Unable to get balance from any data source")
+      throw new Error('Unable to get balance from any data source')
     }
     return balance
   }
@@ -287,7 +284,7 @@ export class DataSourceManager {
       return await ds.getRecommendedFees?.()
     })
     if (fees === undefined) {
-      throw new Error("Unable to get recommended fees from any data source")
+      throw new Error('Unable to get recommended fees from any data source')
     }
     return {
       fastFee: fees.fastFee,
@@ -304,7 +301,7 @@ export class DataSourceManager {
       return await ds.getAddressUtxos?.(address)
     })
     if (utxos === undefined) {
-      throw new Error("Unable to get utxos from any data source")
+      throw new Error('Unable to get utxos from any data source')
     }
     return utxos
   }
@@ -321,7 +318,7 @@ export class DataSourceManager {
       return await ds.getOutputValueByVOutIndex?.(txId, vOut)
     })
     if (value === undefined) {
-      throw new Error("Unable to get output value from any data source")
+      throw new Error('Unable to get output value from any data source')
     }
     return value
   }
@@ -393,107 +390,119 @@ export class DataSourceManager {
     return undefined
   }
 
-  async getFormattedUTXOs(address: string): Promise<FormattedUTXO[]> {
-    const alkanes = await this.getAlkanesByAddress(address)
-    const utxos = await this.getAddressUtxos(address)
-    if (utxos.length === 0) {
-      return []
+  async getFormattedUTXOs(
+    address: string | string[]
+  ): Promise<FormattedUTXO[]> {
+    const sandshrewDS = this.getSource('sandshrew') as SandshrewDataSource
+    if (!sandshrewDS || !sandshrewDS.getBalances) {
+      throw new Error(
+        'Sandshrew data source with getBalances method is required'
+      )
     }
 
-    alkanes.forEach((alkane) => {
-      alkane.outpoint.txid = toBigEndian(alkane.outpoint.txid)
-    })
+    // Single fetch call to get all UTXOs and their data
+    const balancesArray = await sandshrewDS.getBalances(address)
 
-    const concurrencyLimit = 10
-    const processedUtxos: {
-      utxo: LasereyesUTXO
-      txOutput: OrdOutput
-      scriptPk: string
-      alkanesOutpoints: AlkanesOutpoint[]
-    }[] = []
+    const formattedUTXOs: FormattedUTXO[] = []
 
-    const processUtxo = async (utxo: LasereyesUTXO) => {
-      try {
-        const txIdVout = `${utxo.txid}:${utxo.vout}`
+    // Convert single address to array for consistent processing and ensure uniqueness
+    const addressArray = Array.isArray(address)
+      ? [...new Set(address)] // Remove duplicates
+      : [address]
 
-        const multiCall = await (
-          this.getSource('sandshrew') as SandshrewDataSource
-        ).multicall([
-          ['ord_output', [txIdVout]],
-          ['esplora_tx', [utxo.txid]],
-        ])
+    // Process each address's balances
+    for (let i = 0; i < balancesArray.length; i++) {
+      const balances = balancesArray[i]
+      const currentAddress = addressArray[i]
 
-        const txOutput = multiCall[0].result as OrdOutput
-        const txDetails = multiCall[1].result
+      const currentHeight = balances.metashrewHeight
+      const scriptPubKey = Buffer.from(
+        getAddressScriptPubKey(currentAddress, this.network)
+      ).toString('hex')
 
-        const alkanesOutpoints = alkanes.filter(
-          (alkane) =>
-            alkane.outpoint.txid === utxo.txid &&
-            alkane.outpoint.vout === utxo.vout
-        )
+      // Process spendable UTXOs (regular bitcoin UTXOs)
+      for (const spendable of balances.spendable) {
+        const [txHash, txOutputIndex] = spendable.outpoint.split(':')
 
-        return {
-          utxo,
-          txOutput,
-          scriptPk: txDetails.vout[utxo.vout].scriptpubkey,
-          alkanesOutpoints,
-        }
-      } catch (error) {
-        console.error(`Error processing UTXO ${utxo.txid}:${utxo.vout}`, error)
-        throw error
+        formattedUTXOs.push({
+          txHash,
+          txOutputIndex: parseInt(txOutputIndex),
+          btcValue: spendable.value,
+          scriptPubKey,
+          address: currentAddress,
+          hasRunes: false,
+          runes: [],
+          hasAlkanes: false, // No alkanes info in sandshrew_balances
+          alkanes: [],
+          hasInscriptions: false,
+          inscriptions: [],
+          confirmations: spendable.height
+            ? currentHeight - spendable.height
+            : undefined,
+        })
       }
-    }
 
-    for await (const result of asyncPool(
-      concurrencyLimit,
-      utxos,
-      processUtxo
-    )) {
-      if (result !== null) {
-        processedUtxos.push(result)
-      }
-    }
+      // Process asset UTXOs (UTXOs with inscriptions and/or runes)
+      for (const asset of balances.assets) {
+        const [txHash, txOutputIndex] = asset.outpoint.split(':')
 
-    processedUtxos.sort((a, b) => a.utxo.value - b.utxo.value)
-
-    return processedUtxos.map(({ utxo, txOutput, alkanesOutpoints }) => {
-      const hasInscriptions = txOutput.inscriptions.length > 0
-      const hasRunes = Object.keys(txOutput.runes).length > 0
-      const hasAlkanes = alkanesOutpoints.length > 0
-      // const confirmations = blockCount - utxo.status.block_height
-      const inscriptions: FormattedInscription[] = txOutput.inscriptions.map(
-        (inscriptionId) => ({
+        // Process inscriptions
+        const inscriptions: FormattedInscription[] = (
+          asset.inscriptions || []
+        ).map((inscriptionId: string) => ({
           inscriptionId,
-        })
-      )
-      const runes: FormattedRune[] = Object.entries(txOutput.runes).map(
-        ([runeId, rune]) => ({
-          runeId,
-          amount: rune.amount,
-          name: rune.name,
-          symbol: rune.symbol,
-        })
-      )
-      const alkanes: FormattedAlkane[] = alkanesOutpoints.map((alkane) => ({
-        id: alkane.outpoint.txid,
-        amount: alkane.outpoint.vout,
-        name: alkane.outpoint.txid,
-        symbol: alkane.outpoint.txid,
-      }))
+        }))
 
-      return {
-        alkanes,
-        runes,
-        inscriptions,
-        hasInscriptions,
-        hasRunes,
-        hasAlkanes,
-        txHash: utxo.txid,
-        txOutputIndex: utxo.vout,
-        btcValue: utxo.value,
-        scriptPubKey: txOutput.script_pubkey,
-      } as FormattedUTXO
-    })
+        // Process runes (ord_runes is the actual runes data)
+        const runes: FormattedRune[] = []
+        if (asset.ord_runes) {
+          for (const [runeName, runeData] of Object.entries(asset.ord_runes)) {
+            runes.push({
+              runeId: runeName, // Using name as ID
+              amount: (runeData as any).amount,
+            })
+          }
+        }
+
+        // Process alkanes (runes[] array is actually alkanes data)
+        const alkanes: FormattedAlkane[] = []
+        if (asset.runes) {
+          for (const alkaneBalance of asset.runes) {
+            alkanes.push({
+              id:
+                parseInt(alkaneBalance.rune.id.block, 16) +
+                ':' +
+                parseInt(alkaneBalance.rune.id.tx, 16),
+              amount: parseInt(alkaneBalance.balance, 16), // Convert hex to number
+              name: alkaneBalance.rune.name,
+              symbol: alkaneBalance.rune.symbol,
+            })
+          }
+        }
+
+        formattedUTXOs.push({
+          txHash,
+          txOutputIndex: parseInt(txOutputIndex),
+          btcValue: asset.value,
+          scriptPubKey,
+          address: currentAddress,
+          hasRunes: runes.length > 0,
+          runes,
+          hasAlkanes: alkanes.length > 0,
+          alkanes,
+          hasInscriptions: inscriptions.length > 0,
+          inscriptions,
+          confirmations: asset.height
+            ? currentHeight - asset.height
+            : undefined,
+        })
+      }
+    }
+
+    // Sort by value (smallest first)
+    formattedUTXOs.sort((a, b) => a.btcValue - b.btcValue)
+
+    return formattedUTXOs
   }
 }
 

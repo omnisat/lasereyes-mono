@@ -6,6 +6,8 @@ import {
   SignMessageOptions,
   LaserEyesClient,
   MempoolUtxo,
+  LaserEyesSignPsbtsOptions,
+  SignPsbtsResponse,
 } from '@omnisat/lasereyes-core'
 
 export type LaserEyesContextType = {
@@ -51,12 +53,16 @@ export type LaserEyesContextType = {
     toSignAddressOrOptions?: string | SignMessageOptions
   ) => Promise<string>
   signPsbt: LaserEyesClient['signPsbt']
+  signPsbts: (options: LaserEyesSignPsbtsOptions) => Promise<SignPsbtsResponse>
   pushPsbt: (tx: string) => Promise<string | undefined>
   inscribe: (
     contentBase64: string,
     mimeType: ContentType
   ) => Promise<string | string[]>
   send: LaserEyesClient['send']
-  sendInscriptions: (inscriptionIds: string[], toAddress: string) => Promise<string>
+  sendInscriptions: (
+    inscriptionIds: string[],
+    toAddress: string
+  ) => Promise<string>
   getUtxos: (address: string) => Promise<MempoolUtxo[]>
 }

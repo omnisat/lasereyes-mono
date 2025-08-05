@@ -9,6 +9,8 @@ import {
   LaserEyesStoreType,
   SignMessageOptions,
   WalletProviderSignPsbtOptions,
+  WalletProviderSignPsbtsOptions,
+  SignPsbtsResponse,
 } from '../types'
 import {
   handleStateChangePersistence,
@@ -18,6 +20,56 @@ import {
 import { LaserEyesClient } from '..'
 
 const OYL_WALLET_PERSISTENCE_KEY = 'OYL_CONNECTED_WALLET_STATE'
+
+type OylAccount = {
+  address: string
+  publicKey: string
+}
+
+interface OylLibrary {
+  isConnected: () => Promise<boolean>
+  disconnect: () => Promise<void>
+  getAddresses: () => Promise<{
+    nativeSegwit: OylAccount
+    taproot: OylAccount
+    nestedSegwit: OylAccount
+    legacy: OylAccount
+  }>
+  getBalance: () => Promise<{
+    confirmed: number
+    unconfirmed: number
+    total: number
+  }>
+  getNetwork: () => Promise<NetworkType>
+  switchNetwork: (network: NetworkType) => Promise<void>
+  signMessage: ({address, message, protocol}: {address: string, message: string, protocol?: 'bip322' | 'ecdsa'}) => Promise<{
+    address: string
+    signature: string
+  }>
+  signPsbt: (options: {
+    psbt: string
+    finalize?: boolean
+    broadcast?: boolean
+  }) => Promise<{
+    psbt: string
+    txid?: string
+  }>
+  signPsbts: (options: {
+    psbt: string
+    finalize?: boolean
+    broadcast?: boolean
+  }[]) => Promise<
+    {
+      psbt: string
+      txid?: string
+    }[]
+  >
+  pushPsbt: (options: {
+    psbt: string
+  }) => Promise<{
+    txid: string
+  }>
+}
 
 export default class OylProvider extends WalletProvider {
   constructor(
@@ -31,7 +83,7 @@ export default class OylProvider extends WalletProvider {
     super(stores, parent, config)
   }
 
-  public get library(): any | undefined {
+  public get library(): OylLibrary | undefined {
     return (window as any).oyl
   }
 
@@ -116,16 +168,17 @@ export default class OylProvider extends WalletProvider {
 
   async connect(_: ProviderType): Promise<void> {
     if (!this.library) throw new Error("Oyl isn't installed")
-    const { nativeSegwit, taproot } = await this.library.getAddresses()
+    const { nativeSegwit, taproot, nestedSegwit, legacy } = await this.library.getAddresses()
     if (!nativeSegwit || !taproot) throw new Error('No accounts found')
     this.$store.setKey('address', taproot.address)
     this.$store.setKey('paymentAddress', nativeSegwit.address)
     this.$store.setKey('publicKey', taproot.publicKey)
     this.$store.setKey('paymentPublicKey', nativeSegwit.publicKey)
+    this.$store.setKey('accounts', [taproot.address, nativeSegwit.address, nestedSegwit.address, legacy.address])
   }
 
   async getNetwork() {
-    return this.library.getNetwork()
+    return this.library?.getNetwork()
   }
 
   async sendBTC(to: string, amount: number): Promise<string> {
@@ -153,6 +206,7 @@ export default class OylProvider extends WalletProvider {
     message: string,
     options?: SignMessageOptions
   ): Promise<string> {
+    if (!this.library) throw new Error("Oyl isn't installed")
     const tempAddy = options?.toSignAddress || this.$store.get().paymentAddress
     const response = await this.library.signMessage({
       address: tempAddy,
@@ -173,6 +227,7 @@ export default class OylProvider extends WalletProvider {
       }
     | undefined
   > {
+    if (!this.library) throw new Error("Oyl isn't installed")
     const { psbt, txid } = await this.library.signPsbt({
       psbt: psbtHex,
       finalize,
@@ -185,12 +240,42 @@ export default class OylProvider extends WalletProvider {
       txId: txid,
     }
   }
+  async signPsbts(
+    signPsbtsOptions: WalletProviderSignPsbtsOptions
+  ): Promise<SignPsbtsResponse> {
+    if (!this.library) throw new Error("Oyl isn't installed")
+    const { psbts, finalize, broadcast } = signPsbtsOptions
+
+    const psbtsToSign = psbts.map((p) => ({
+      psbt: p,
+      finalize,
+      broadcast,
+    }))
+
+    const result = await this.library.signPsbts(psbtsToSign)
+
+    // Handle the response format from OYL
+    const signedPsbts =
+      result.map((data: { psbt: string }, index: number) => {
+        const psbtObj = bitcoin.Psbt.fromHex(data.psbt)
+        return {
+          signedPsbtHex: psbtObj.toHex(),
+          signedPsbtBase64: psbtObj.toBase64(),
+          txId: result[index].txid,
+        }
+      }) || []
+
+    return { signedPsbts }
+  }
+
   async pushPsbt(tx: string): Promise<string | undefined> {
+    if (!this.library) throw new Error("Oyl isn't installed")
     const response = await this.library.pushPsbt({ psbt: tx })
     return response.txid
   }
 
   async getPublicKey() {
+    if (!this.library) throw new Error("Oyl isn't installed")
     const { nativeSegwit, taproot } = await this.library.getAddresses()
     if (!nativeSegwit || !taproot) throw new Error('No accounts found')
     this.$store.setKey('publicKey', taproot.publicKey)
@@ -199,8 +284,9 @@ export default class OylProvider extends WalletProvider {
   }
 
   async getBalance() {
+    if (!this.library) throw new Error("Oyl isn't installed")
     const { total } = await this.library.getBalance()
-    this.$store.setKey('balance', total)
+    this.$store.setKey('balance', BigInt(total))
     return total
   }
 
@@ -209,6 +295,7 @@ export default class OylProvider extends WalletProvider {
   }
 
   async switchNetwork(network: NetworkType): Promise<void> {
+    if (!this.library) throw new Error("Oyl isn't installed")
     await this.library.switchNetwork(network)
     this.$network.set(network)
     await this.parent.connect(OYL)
