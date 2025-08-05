@@ -118,14 +118,11 @@ export default class OpNetProvider extends WalletProvider {
     this.$store.setKey('paymentAddress', opNetAccounts[0])
     this.$store.setKey('publicKey', opNetPubKey)
     this.$store.setKey('paymentPublicKey', opNetPubKey)
-    this.$store.setKey('provider', OP_NET)
     await this.getNetwork().then((network) => {
       if (this.config?.network !== network) {
         this.switchNetwork(network)
       }
     })
-
-    this.$store.setKey('connected', true)
   }
 
   async getNetwork() {

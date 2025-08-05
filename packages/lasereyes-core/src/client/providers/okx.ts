@@ -163,7 +163,7 @@ export default class OkxProvider extends WalletProvider {
       this.$store.setKey('paymentAddress', okxAccounts.address)
       this.$store.setKey('publicKey', okxAccounts.publicKey)
       this.$store.setKey('paymentPublicKey', okxAccounts.publicKey)
-      this.$store.setKey('accounts', [okxAccounts])
+      this.$store.setKey('accounts', [okxAccounts.address])
     } catch (e) {
       throw e
     }
