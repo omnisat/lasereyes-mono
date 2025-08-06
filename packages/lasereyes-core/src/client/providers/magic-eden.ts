@@ -8,6 +8,7 @@ import {
   SendBtcTransactionOptions,
   signMessage,
   signTransaction,
+  SignTransactionOptions,
 } from 'sats-connect'
 import { WalletProvider } from '.'
 import {
@@ -18,7 +19,6 @@ import {
   MAGIC_EDEN,
   MAINNET,
   NetworkType,
-  ProviderType,
   SignMessageOptions,
   WalletProviderSignPsbtOptions,
   SignPsbtResponse,
@@ -75,7 +75,7 @@ export default class MagicEdenProvider extends WalletProvider {
     }
   )
 
-  removeSubscriber?: Function
+  removeSubscriber?: () => void
 
   restorePersistedValues() {
     const vals = this.$valueStore.get()
@@ -145,10 +145,10 @@ export default class MagicEdenProvider extends WalletProvider {
     this.observer?.disconnect()
   }
 
-  async connect(_: ProviderType): Promise<void> {
+  async connect(): Promise<void> {
     const { address, paymentAddress } = this.$valueStore!.get()
 
-    try {
+
       if (address) {
         if (address.startsWith('tb1') && isMainnetNetwork(this.network)) {
           this.disconnect()
@@ -165,7 +165,7 @@ export default class MagicEdenProvider extends WalletProvider {
         throw new Error(`${this.network} is not supported by ${MAGIC_EDEN}`)
       }
 
-      let magicEdenNetwork = getSatsConnectNetwork(this.network || MAINNET)
+      const magicEdenNetwork = getSatsConnectNetwork(this.network || MAINNET)
       const getAddressOptions = {
         getProvider: async () => this.library,
         payload: {
@@ -183,10 +183,7 @@ export default class MagicEdenProvider extends WalletProvider {
           if (foundAddress && foundPaymentAddress) {
             this.$store.setKey('address', foundAddress.address)
             this.$store.setKey('paymentAddress', foundPaymentAddress.address)
-            this.$store.setKey('accounts', [
-              foundAddress.address,
-              foundPaymentAddress.address,
-            ])
+            this.$store.setKey('accounts', response.addresses.map((address: { address: string }) => address.address))
           }
           this.$store.setKey(
             'publicKey',
@@ -200,18 +197,16 @@ export default class MagicEdenProvider extends WalletProvider {
         onCancel: () => {
           throw new Error(`User canceled lasereyes to ${MAGIC_EDEN} wallet`)
         },
-        onError: (_: any) => {
+        onError: () => {
           throw new Error(`Can't lasereyes to ${MAGIC_EDEN} wallet`)
         },
       }
       await getAddress(getAddressOptions as GetAddressOptions)
-    } catch (e) {
-      throw e
-    }
+    
   }
 
   async sendBTC(to: string, amount: number): Promise<string> {
-    let sendResponse: { txid: string }
+    let sendResponse: { txid: string } | undefined
     await sendBtcTransaction({
       getProvider: async () => this.library,
       payload: {
@@ -229,17 +224,15 @@ export default class MagicEdenProvider extends WalletProvider {
         senderAddress: this.$store.get().paymentAddress,
       },
       onFinish: (response) => {
-        // @ts-ignore
-        sendResponse = response
+        sendResponse = response as unknown as typeof sendResponse
       },
       onCancel: () => {
         console.error('Request canceled')
         throw new Error('User canceled the request')
       },
     } as SendBtcTransactionOptions)
-    // @ts-ignore
-    if (!sendResponse) throw new Error('Error sending BTC')
-    // @ts-ignore
+    if (!sendResponse || !sendResponse.txid)
+      throw new Error('Error sending BTC')
     return sendResponse.txid
   }
 
@@ -247,37 +240,32 @@ export default class MagicEdenProvider extends WalletProvider {
     message: string,
     options?: SignMessageOptions
   ): Promise<string> {
-    try {
-      const tempAddy =
-        options?.toSignAddress || this.$store.get().paymentAddress
-      let signedMessage: string = ''
+    const tempAddy = options?.toSignAddress || this.$store.get().paymentAddress
+    let signedMessage: string = ''
 
-      await signMessage({
-        getProvider: async () => this.library,
-        payload: {
-          network: {
-            type: BitcoinNetworkType.Mainnet,
-          },
-          address: tempAddy,
-          message: message,
-          protocol:
-            options?.protocol === ECDSA
-              ? MessageSigningProtocols.ECDSA
-              : MessageSigningProtocols.BIP322,
+    await signMessage({
+      getProvider: async () => this.library,
+      payload: {
+        network: {
+          type: BitcoinNetworkType.Mainnet,
         },
-        onFinish: (response) => {
-          signedMessage = response
-        },
-        onCancel: () => {
-          console.error('Request canceled')
-          throw new Error('User canceled the request')
-        },
-      })
+        address: tempAddy,
+        message: message,
+        protocol:
+          options?.protocol === ECDSA
+            ? MessageSigningProtocols.ECDSA
+            : MessageSigningProtocols.BIP322,
+      },
+      onFinish: (response) => {
+        signedMessage = response
+      },
+      onCancel: () => {
+        console.error('Request canceled')
+        throw new Error('User canceled the request')
+      },
+    })
 
-      return signedMessage
-    } catch (e) {
-      throw e
-    }
+    return signedMessage
   }
 
   async signPsbt({
@@ -289,16 +277,16 @@ export default class MagicEdenProvider extends WalletProvider {
     const toSignPsbt = bitcoin.Psbt.fromBase64(String(psbtBase64), {
       network: getBitcoinNetwork(this.network),
     })
-    
+
     type InputAddressData = {
       address: string
       signingIndexes: number[]
       sigHash?: number
     }
-    
+
     const inputs = toSignPsbt.data.inputs
     let inputsToSign: InputAddressData[] = []
-    
+
     if (inputsToSignProp) {
       const tempInputsToSign = inputsToSignProp.reduce(
         (acc: Record<string, number[]>, input) => ({
@@ -323,7 +311,7 @@ export default class MagicEdenProvider extends WalletProvider {
         address: paymentAddress,
         signingIndexes: [] as number[],
       }
-      for (let counter of inputs.keys()) {
+      for (const counter of inputs.keys()) {
         const input = inputs[counter]
         if (input.witnessUtxo === undefined) {
           paymentsAddressData.signingIndexes.push(Number(counter))
@@ -392,9 +380,8 @@ export default class MagicEdenProvider extends WalletProvider {
         console.log('error', error)
         throw error
       },
-    }
+    } as SignTransactionOptions
 
-    // @ts-ignore
     await signTransaction(signPsbtOptions)
 
     if (!signedPsbt) {

@@ -4,12 +4,13 @@ import {
   FRACTAL_MAINNET,
   FRACTAL_TESTNET,
   MAINNET,
+  OYLNET,
   SIGNET,
   TESTNET,
   TESTNET4,
 } from '../constants/networks'
 import axios from 'axios'
-import { MempoolUtxo, NetworkType } from '../types'
+import type { MempoolUtxo, NetworkType } from '../types'
 import { getMempoolSpaceUrl } from './urls'
 import * as ecc from '@bitcoinerlab/secp256k1'
 import { getRedeemScript } from './btc'
@@ -19,9 +20,8 @@ bitcoin.initEccLib(ecc)
 export const getBitcoinNetwork = (network: NetworkType) => {
   if (network === TESTNET || network === TESTNET4 || network === SIGNET) {
     return bitcoin.networks.testnet
-  } else {
-    return bitcoin.networks.bitcoin
   }
+    return bitcoin.networks.bitcoin
 }
 
 export const findOrdinalsAddress = (
@@ -91,6 +91,15 @@ export async function getAddressUtxos(address: string, network: NetworkType) {
       return []
     }
   }
+
+  console.log('address', address)
+  console.log('network', network)
+
+  if (address.startsWith('bcrt')) {
+    if (network === OYLNET) {
+      return []
+    }
+  }
   return (await axios
     .get(`${getMempoolSpaceUrl(network)}/api/address/${address}/utxo`)
     .then((response) => response.data)) as Array<MempoolUtxo>
@@ -103,7 +112,7 @@ export async function createSendBtcPsbt(
   amount: number,
   paymentPublicKey: string,
   network: NetworkType,
-  feeRate: number = 7
+  feeRate = 7
 ) {
   const isTaprootOnly = address === paymentAddress
   const utxos: MempoolUtxo[] | undefined = await getAddressUtxos(
@@ -124,8 +133,7 @@ export async function createSendBtcPsbt(
   const estTxSize = estimateTxSize(1, 0, 2)
   const satsNeeded = Math.floor(estTxSize * feeRate) + amount
   let amountGathered = 0
-  let counter = 0
-  for await (let utxo of sortedUtxos) {
+  for await (const utxo of sortedUtxos) {
     const { txid, vout, value } = utxo
     const script = bitcoin.address.toOutputScript(
       paymentAddress,
@@ -142,7 +150,7 @@ export async function createSendBtcPsbt(
 
     if (!isTaprootOnly) {
       const redeemScript = getRedeemScript(paymentPublicKey, network)
-      psbt.updateInput(counter, { redeemScript })
+      psbt.updateInput(vout, { redeemScript })
     }
 
     amountGathered += value
@@ -208,4 +216,3 @@ export const isMainnetNetwork = (network: NetworkType) => {
     network === FRACTAL_TESTNET
   )
 }
-

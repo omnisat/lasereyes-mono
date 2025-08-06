@@ -25,9 +25,9 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "paths": {
-      "@": ["./lib"],
+      "@": ["./src"],
       "@omnisat/lasereyes-core": ["../lasereyes-core/dist"]
     }
   },
-  "include": ["lib/**/*"]
+  "include": ["src/**/*"]
 }

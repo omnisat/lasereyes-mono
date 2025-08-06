@@ -8,12 +8,13 @@ import {
   LaserEyesStoreType,
   SignMessageOptions,
   WalletProviderSignPsbtOptions,
+  WalletProviderSignPsbtsOptions,
+  SignPsbtsResponse,
 } from '../types'
 import { BIP322, BIP322_SIMPLE } from '../../constants'
 import { LaserEyesClient } from '..'
 import { Inscription } from '../../types/lasereyes'
 import { normalizeInscription } from '../../lib/data-sources/normalizations'
-import _ from 'lodash'
 import { omitUndefined } from '../../lib/utils'
 
 export default class UnisatProvider extends WalletProvider {
@@ -54,10 +55,10 @@ export default class UnisatProvider extends WalletProvider {
 
     listenKeys(this.$store, ['provider'], (newStore) => {
       if (newStore.provider !== UNISAT) {
-        this.removeListeners()
+        this?.removeListeners()
         return
       }
-      this.library.getAccounts().then((accounts: string[]) => {
+      this.library?.getAccounts().then((accounts: string[]) => {
         this.handleAccountsChanged(accounts)
       })
       this.addListeners()
@@ -65,12 +66,12 @@ export default class UnisatProvider extends WalletProvider {
   }
 
   addListeners() {
-    this.library.on('accountsChanged', this.handleAccountsChanged.bind(this))
-    this.library.on('networkChanged', this.handleNetworkChanged.bind(this))
+    this.library?.on('accountsChanged', this.handleAccountsChanged.bind(this))
+    this.library?.on('networkChanged', this.handleNetworkChanged.bind(this))
   }
 
   removeListeners() {
-    if (!this.library) return
+    if (!this.library || !this.library.removeListener) return
     this.library?.removeListener(
       'accountsChanged',
       this.handleAccountsChanged.bind(this)
@@ -115,11 +116,7 @@ export default class UnisatProvider extends WalletProvider {
     if (!this.library) throw new Error("Unisat isn't installed")
     const unisatAccounts = await this.library.requestAccounts()
     if (!unisatAccounts) throw new Error('No accounts found')
-    await this.getNetwork().then((network) => {
-      if (this.network !== network) {
-        this.switchNetwork(this.network)
-      }
-    })
+
     const unisatPubKey = await this.library.getPublicKey()
     if (!unisatPubKey) throw new Error('No public key found')
     this.$store.setKey('accounts', unisatAccounts)
@@ -193,6 +190,39 @@ export default class UnisatProvider extends WalletProvider {
       signedPsbtBase64: psbtSignedPsbt.toBase64(),
       txId: undefined,
     }
+  }
+
+  async signPsbts(
+    signPsbtsOptions: WalletProviderSignPsbtsOptions
+  ): Promise<SignPsbtsResponse> {
+    const { psbts, finalize, broadcast, inputsToSign } = signPsbtsOptions
+
+    const signedPsbts = await this.library.signPsbts(
+      psbts,
+      omitUndefined({
+        autoFinalized: finalize,
+        toSignInputs: inputsToSign,
+      })
+    )
+
+    const results = await Promise.all(
+      signedPsbts.map(async (signedPsbtHex: string) => {
+        const psbtObj = bitcoin.Psbt.fromHex(signedPsbtHex)
+
+        let txId: string | undefined
+        if (finalize && broadcast) {
+          txId = await this.pushPsbt(signedPsbtHex)
+        }
+
+        return {
+          signedPsbtHex: psbtObj.toHex(),
+          signedPsbtBase64: psbtObj.toBase64(),
+          txId,
+        }
+      })
+    )
+
+    return { signedPsbts: results }
   }
 
   async getPublicKey() {

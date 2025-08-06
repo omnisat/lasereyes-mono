@@ -4,30 +4,47 @@ import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 import { getMempoolSpaceUrl } from '@/lib/urls'
-import { MAINNET, TESTNET, useLaserEyes, Inscription } from '@omnisat/lasereyes'
+import {
+  type MAINNET,
+  type TESTNET,
+  useLaserEyes,
+  type Inscription,
+} from '@omnisat/lasereyes'
 
 const InscriptionsSection = () => {
-  const { provider, inscribe, address, network, getInscriptions, sendInscriptions } = useLaserEyes()
+  const {
+    provider,
+    inscribe,
+    address,
+    network,
+    getInscriptions,
+    sendInscriptions,
+    connected,
+  } = useLaserEyes()
   const [inscriptions, setInscriptions] = useState<Inscription[]>([])
-  const [inscriptionText, setInscriptionText] = useState('Inscribed 100% clientside with Laser Eyes')
-  const [selectedInscriptionIds, setSelectedInscriptionIds] = useState<string[]>([])
+  const [inscriptionText, setInscriptionText] = useState(
+    'Inscribed 100% clientside with Laser Eyes'
+  )
+  const [selectedInscriptionIds, setSelectedInscriptionIds] = useState<
+    string[]
+  >([])
   const [recipientAddress, setRecipientAddress] = useState('')
 
   // Fetch inscriptions when address changes
   useEffect(() => {
-    if (provider) {
-      getInscriptions().then(data => {
+    if (provider && connected && network) {
+      getInscriptions().then((data) => {
         console.log(data)
         setInscriptions(data)
       })
     }
-  }, [provider, getInscriptions])
+  }, [provider, getInscriptions, connected, network])
 
   useEffect(() => {
     if (!address) {
       setInscriptions([])
     }
-  }, [address, provider, network])
+  }, [address])
 
   const inscribeWithWallet = async () => {
     try {
@@ -39,9 +56,10 @@ const InscriptionsSection = () => {
         <span className={'flex flex-col gap-1 items-center justify-center'}>
           <span className={'font-black'}>View on mempool.space</span>
           <a
-            target={'_blank'}
+            target="_blank"
             href={`${getMempoolSpaceUrl(network as typeof MAINNET | typeof TESTNET)}/tx/${inscriptionTxId}`}
             className={'underline text-blue-600 text-xs'}
+            rel="noreferrer"
           >
             {inscriptionTxId}
           </a>
@@ -55,28 +73,30 @@ const InscriptionsSection = () => {
   }
 
   const toggleInscriptionSelection = (inscriptionId: string) => {
-    setSelectedInscriptionIds(prevSelected => {
+    setSelectedInscriptionIds((prevSelected) => {
       if (prevSelected.includes(inscriptionId)) {
-        return prevSelected.filter(id => id !== inscriptionId)
-      } else {
-        return [...prevSelected, inscriptionId]
+        return prevSelected.filter((id) => id !== inscriptionId)
       }
+      return [...prevSelected, inscriptionId]
     })
   }
 
   const sendSelectedInscriptions = async () => {
     if (!recipientAddress.trim()) {
-      toast.error("Please enter a recipient address")
+      toast.error('Please enter a recipient address')
       return
     }
 
     if (selectedInscriptionIds.length === 0) {
-      toast.error("Please select at least one inscription to send")
+      toast.error('Please select at least one inscription to send')
       return
     }
 
     try {
-      const txId = await sendInscriptions(selectedInscriptionIds, recipientAddress)
+      const txId = await sendInscriptions(
+        selectedInscriptionIds,
+        recipientAddress
+      )
 
       // Clear selections after successful send
       setSelectedInscriptionIds([])
@@ -86,9 +106,10 @@ const InscriptionsSection = () => {
         <span className={'flex flex-col gap-1 items-center justify-center'}>
           <span className={'font-black'}>Inscriptions sent!</span>
           <a
-            target={'_blank'}
+            target="_blank"
             href={`${getMempoolSpaceUrl(network as typeof MAINNET | typeof TESTNET)}/tx/${txId}`}
             className={'underline text-blue-600 text-xs'}
+            rel="noreferrer"
           >
             {txId}
           </a>
@@ -102,31 +123,42 @@ const InscriptionsSection = () => {
   }
 
   return (
-    <div className={"flex flex-col gap-2"}>
-      <div className="text-gray-500 text-md text-orange-400">inscriptions</div>
+    <div className={'flex flex-col gap-2'}>
+      <div className="text-md text-orange-400">inscriptions</div>
       <div className="flex flex-col gap-2 items-center justify-center">
         <div className="flex flex-wrap gap-1">
           {inscriptions?.slice(0, 4).map((insc) => (
             <div
               key={insc.id}
               className={cn(
-                "relative w-20 h-20 cursor-pointer border-2",
+                'relative w-20 h-20 cursor-pointer border-2',
                 selectedInscriptionIds.includes(insc.inscriptionId)
-                  ? "border-orange-400"
-                  : "border-transparent"
+                  ? 'border-orange-400'
+                  : 'border-transparent'
               )}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  toggleInscriptionSelection(insc.inscriptionId)
+                }
+              }}
               onClick={() => toggleInscriptionSelection(insc.inscriptionId)}
             >
               <iframe
                 src={insc.preview}
                 className="w-full h-full overflow-hidden overflow-y-hidden"
+                title={insc.location}
               />
               {/* Transparent overlay to capture clicks */}
               <div
                 className="absolute inset-0 z-10"
                 onClick={(e) => {
-                  e.stopPropagation();
-                  toggleInscriptionSelection(insc.inscriptionId);
+                  e.stopPropagation()
+                  toggleInscriptionSelection(insc.inscriptionId)
+                }}
+                onKeyUp={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    toggleInscriptionSelection(insc.inscriptionId)
+                  }
                 }}
               />
               {selectedInscriptionIds.includes(insc.inscriptionId) && (
@@ -136,7 +168,6 @@ const InscriptionsSection = () => {
               )}
             </div>
           ))}
-
         </div>
 
         <Input

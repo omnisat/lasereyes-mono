@@ -1,6 +1,11 @@
-import { MapStore, WritableAtom } from 'nanostores'
-import { LaserEyesStoreType, WalletProviderSignPsbtOptions } from '../types'
-import {
+import type { MapStore, WritableAtom } from 'nanostores'
+import type {
+  LaserEyesStoreType,
+  WalletProviderSignPsbtOptions,
+  WalletProviderSignPsbtsOptions,
+  SignPsbtsResponse,
+} from '../types'
+import type {
   Brc20SendArgs,
   BTCSendArgs,
   Config,
@@ -9,10 +14,11 @@ import {
   Protocol,
   ProviderType,
   RuneSendArgs,
+  AlkaneSendArgs,
 } from '../../types'
-import { LaserEyesClient } from '..'
+import type { LaserEyesClient } from '..'
 import { inscribeContent } from '../../lib/inscribe'
-import { broadcastTx, } from '../../lib/helpers'
+import { broadcastTx } from '../../lib/helpers'
 import * as bitcoin from 'bitcoinjs-lib'
 import {
   FRACTAL_TESTNET,
@@ -21,12 +27,13 @@ import {
   TESTNET,
   TESTNET4,
 } from '../../constants'
-import { BRC20, BTC, RUNES } from '../../constants/protocols'
+import { BRC20, BTC, RUNES, ALKANES } from '../../constants/protocols'
 import { sendRune } from '../../lib/runes/psbt'
 import { DataSourceManager } from '../../lib/data-sources/manager'
 import { sendBrc20 } from '../../lib/brc-20/psbt'
-import { Inscription } from '../../types/lasereyes'
+import type { Inscription } from '../../types/lasereyes'
 import { sendInscriptions } from '../../lib/inscriptions/psbt'
+import AlkanesModule from '../modules/alkanes'
 
 export const UNSUPPORTED_PROVIDER_METHOD_ERROR = new Error(
   "The connected wallet doesn't support this method..."
@@ -36,7 +43,7 @@ export abstract class WalletProvider {
   readonly $store: MapStore<LaserEyesStoreType>
   readonly $network: WritableAtom<NetworkType>
 
-  protected dataSourceManager: DataSourceManager;
+  protected dataSourceManager: DataSourceManager
 
   constructor(
     stores: {
@@ -48,24 +55,25 @@ export abstract class WalletProvider {
   ) {
     this.$store = stores.$store
     this.$network = stores.$network
+    this.config = config
 
     try {
       this.dataSourceManager = DataSourceManager.getInstance()
     } catch {
-      DataSourceManager.init(config!)
+      DataSourceManager.init(config)
       this.dataSourceManager = DataSourceManager.getInstance()
     }
 
     this.initialize()
   }
 
-  disconnect(): void { }
+  disconnect(): void {}
 
   abstract initialize(): void
 
   abstract dispose(): void
 
-  abstract connect(defaultWallet: ProviderType): Promise<void>
+  abstract connect(defaultWallet: ProviderType): Promise<boolean | void>
 
   async requestAccounts(): Promise<string[]> {
     return this.$store.get().accounts
@@ -80,7 +88,9 @@ export abstract class WalletProvider {
     const { address } = this.$store.get()
     if (
       address.slice(0, 1) === 't' &&
-      [TESTNET, TESTNET4, SIGNET, FRACTAL_TESTNET].includes(this.$network.get())
+      ([TESTNET, TESTNET4, SIGNET, FRACTAL_TESTNET] as string[]).includes(
+        this.$network.get()
+      )
     ) {
       return this.$network.get()
     }
@@ -97,14 +107,16 @@ export abstract class WalletProvider {
       throw new Error('Method not found on data source')
     }
 
-    return await this.dataSourceManager.getAddressBtcBalance(this.$store.get().paymentAddress)
+    return await this.dataSourceManager.getAddressBtcBalance(
+      this.$store.get().paymentAddress
+    )
   }
 
-  async getMetaBalances(protocol: Protocol): Promise<any> {
+  async getMetaBalances(protocol: Protocol) {
     switch (protocol) {
       case BTC:
         return await this.getBalance()
-      case RUNES:
+      case RUNES: {
         const network = this.$network.get()
         if (network !== MAINNET) {
           throw new Error('Unsupported network')
@@ -114,24 +126,44 @@ export abstract class WalletProvider {
           throw new Error('Method not found on data source')
         }
 
-        return await this.dataSourceManager.getAddressRunesBalances(this.$store.get().address)
+        return await this.dataSourceManager.getAddressRunesBalances(
+          this.$store.get().address
+        )
+      }
       case BRC20:
         if (!this.dataSourceManager.getAddressBrc20Balances) {
           throw new Error('Method not found on data source')
         }
 
-        return await this.dataSourceManager.getAddressBrc20Balances(this.$store.get().address)
+        return await this.dataSourceManager.getAddressBrc20Balances(
+          this.$store.get().address
+        )
+      case ALKANES:
+        if (!this.dataSourceManager.getAddressAlkanesBalances) {
+          throw new Error('Method not found on data source')
+        }
+
+        return await this.dataSourceManager.getAddressAlkanesBalances(
+          this.$store.get().address
+        )
       default:
         throw new Error('Unsupported protocol')
     }
   }
 
-  async getInscriptions(offset?: number, limit?: number): Promise<Inscription[]> {
+  async getInscriptions(
+    offset?: number,
+    limit?: number
+  ): Promise<Inscription[]> {
     if (!this.dataSourceManager.getAddressInscriptions) {
       throw new Error('Method not found on data source')
     }
 
-    return await this.dataSourceManager.getAddressInscriptions(this.$store.get().address, offset, limit)
+    return await this.dataSourceManager.getAddressInscriptions(
+      this.$store.get().address,
+      offset,
+      limit
+    )
   }
 
   abstract sendBTC(to: string, amount: number): Promise<string>
@@ -141,16 +173,20 @@ export abstract class WalletProvider {
     options?: { toSignAddress?: string }
   ): Promise<string>
 
-  abstract signPsbt(
-    signPsbtOptions: WalletProviderSignPsbtOptions
-  ): Promise<
+  abstract signPsbt(signPsbtOptions: WalletProviderSignPsbtOptions): Promise<
     | {
-      signedPsbtHex: string | undefined
-      signedPsbtBase64: string | undefined
-      txId?: string
-    }
+        signedPsbtHex: string | undefined
+        signedPsbtBase64: string | undefined
+        txId?: string
+      }
     | undefined
   >
+
+  async signPsbts(
+    _signPsbtsOptions: WalletProviderSignPsbtsOptions
+  ): Promise<SignPsbtsResponse> {
+    throw UNSUPPORTED_PROVIDER_METHOD_ERROR
+  }
 
   async pushPsbt(_tx: string): Promise<string | undefined> {
     let payload = _tx
@@ -179,11 +215,13 @@ export abstract class WalletProvider {
     })
   }
 
-  async send(protocol: Protocol, sendArgs: BTCSendArgs | RuneSendArgs | Brc20SendArgs) {
+  send: LaserEyesClient['send'] = async (protocol, sendArgs) => {
     switch (protocol) {
-      case BTC:
-        return await this.sendBTC(sendArgs.toAddress, sendArgs.amount)
-      case RUNES:
+      case BTC: {
+        const btcArgs = sendArgs as BTCSendArgs
+        return await this.sendBTC(btcArgs.toAddress, btcArgs.amount)
+      }
+      case RUNES: {
         if (this.$network.get() !== MAINNET) {
           throw new Error('Unsupported network')
         }
@@ -204,7 +242,8 @@ export abstract class WalletProvider {
           signPsbt: this.signPsbt.bind(this),
           network: this.$network.get(),
         })
-      case BRC20:
+      }
+      case BRC20: {
         if (this.$network.get() !== MAINNET) {
           throw new Error('Unsupported network')
         }
@@ -226,14 +265,36 @@ export abstract class WalletProvider {
           dataSourceManager: this.dataSourceManager,
           network: this.$network.get(),
         })
+      }
+      case ALKANES: {
+        // if (this.$network.get() !== MAINNET) {
+        //   throw new Error('Unsupported network')
+        // }
+
+        const alkaneArgs = sendArgs as AlkaneSendArgs
+        if (!alkaneArgs.id || !alkaneArgs.amount || !alkaneArgs.toAddress) {
+          throw new Error('Missing required parameters')
+        }
+
+        // Use the AlkanesModule to send the alkane
+        const alkanesModule = new AlkanesModule(this.parent)
+        return await alkanesModule.send(
+          alkaneArgs.id,
+          alkaneArgs.amount,
+          alkaneArgs.toAddress
+        )
+      }
       default:
         throw new Error('Unsupported protocol')
     }
   }
 
-  async sendInscriptions(inscriptionIds: string[], toAddress: string): Promise<string> {
+  async sendInscriptions(
+    inscriptionIds: string[],
+    toAddress: string
+  ): Promise<string> {
     const inscriptions = await this.getInscriptions()
-    const inscriptionsToSend = inscriptions.filter(inscription =>
+    const inscriptionsToSend = inscriptions.filter((inscription) =>
       inscriptionIds.includes(inscription.id)
     )
     if (inscriptionsToSend.length !== inscriptionIds.length) {
@@ -251,5 +312,65 @@ export abstract class WalletProvider {
       dataSourceManager: this.dataSourceManager,
       network: this.$network.get(),
     })
+  }
+
+  getDeviceInfo(): {
+    isMobile: boolean
+    isDesktop: boolean
+    deviceType: 'mobile' | 'tablet' | 'desktop'
+    userAgent: string
+  } {
+    const userAgent = navigator.userAgent.toLowerCase()
+
+    const mobileRegex =
+      /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i
+    const isMobile = mobileRegex.test(userAgent)
+
+    const tabletRegex = /ipad|android(?!.*mobile)|tablet/i
+    const isTablet = tabletRegex.test(userAgent)
+
+    const hasTouchScreen =
+      'ontouchstart' in window || navigator.maxTouchPoints > 0
+    const hasSmallScreen = window.innerWidth <= 768
+
+    let deviceType: 'mobile' | 'tablet' | 'desktop'
+    if (isTablet) {
+      deviceType = 'tablet'
+    } else if (isMobile || (hasTouchScreen && hasSmallScreen)) {
+      deviceType = 'mobile'
+    } else {
+      deviceType = 'desktop'
+    }
+
+    return {
+      isMobile: deviceType === 'mobile' || deviceType === 'tablet',
+      isDesktop: deviceType === 'desktop',
+      deviceType,
+      userAgent: navigator.userAgent,
+    }
+  }
+
+  isMobile(): boolean {
+    return this.getDeviceInfo().isMobile
+  }
+
+  isDesktop(): boolean {
+    return this.getDeviceInfo().isDesktop
+  }
+
+  getSuggestedConnectionMethod():
+    | 'qr-code'
+    | 'deep-link'
+    | 'browser-extension'
+    | 'web-wallet' {
+    const deviceInfo = this.getDeviceInfo()
+
+    if (deviceInfo.deviceType === 'mobile') {
+      return 'deep-link'
+    } else if (deviceInfo.deviceType === 'tablet') {
+      return 'qr-code'
+    } else {
+      return 'browser-extension'
+    }
   }
 }

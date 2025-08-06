@@ -5,6 +5,8 @@ import {
   listenKeys,
 } from 'nanostores'
 import type {
+  AlkaneSendArgs,
+  Brc20SendArgs,
   BTCSendArgs,
   Config,
   ContentType,
@@ -14,6 +16,7 @@ import type {
   RuneSendArgs,
 } from '../types'
 import {
+  KEPLR,
   LEATHER,
   MAGIC_EDEN,
   OKX,
@@ -22,6 +25,7 @@ import {
   OYL,
   PHANTOM,
   SPARROW,
+  TOKEO,
   UNISAT,
   WIZZ,
   XVERSE,
@@ -33,9 +37,11 @@ import { isBase64, isHex } from '../lib/utils'
 import * as bitcoin from 'bitcoinjs-lib'
 import type {
   LaserEyesSignPsbtOptions,
+  LaserEyesSignPsbtsOptions,
   LaserEyesStoreType,
   SignMessageOptions,
   SignPsbtResponse,
+  SignPsbtsResponse,
 } from './types'
 import { triggerDOMShakeHack } from './utils'
 import XVerseProvider from './providers/xverse'
@@ -49,6 +55,12 @@ import PhantomProvider from './providers/phantom'
 import OpNetProvider from './providers/op-net'
 import SparrowProvider from './providers/sparrow'
 import { DataSourceManager } from '../lib/data-sources/manager'
+import AlkanesModule from './modules/alkanes'
+import TokeoProvider from './providers/tokeo'
+import { ALKANES } from '../constants/protocols'
+import { BTC, RUNES } from '../constants/protocols'
+import { BRC20 } from '../constants/protocols'
+import KeplrProvider from './providers/keplr'
 
 export class LaserEyesClient {
   readonly $store: MapStore<LaserEyesStoreType>
@@ -57,6 +69,9 @@ export class LaserEyesClient {
   private disposed = false
 
   readonly dataSourceManager: DataSourceManager
+  readonly modules: {
+    readonly alkanes: AlkanesModule
+  }
 
   dispose() {
     this.disposed = true
@@ -84,9 +99,15 @@ export class LaserEyesClient {
       [OYL]: new OylProvider(stores, this, config),
       [PHANTOM]: new PhantomProvider(stores, this, config),
       [SPARROW]: new SparrowProvider(stores, this, config),
+      [TOKEO]: new TokeoProvider(stores, this, config),
       [UNISAT]: new UnisatProvider(stores, this, config),
       [XVERSE]: new XVerseProvider(stores, this, config),
       [WIZZ]: new WizzProvider(stores, this, config),
+      [KEPLR]: new KeplrProvider(stores, this, config),
+    }
+
+    this.modules = {
+      alkanes: new AlkanesModule(this),
     }
 
     try {
@@ -109,8 +130,6 @@ export class LaserEyesClient {
         return this.handleIsInitializingChanged(v.isInitializing)
     })
 
-    this.checkNetwork()
-
     // subscribeKeys(
     //   this.$store,
     //   ['hasProvider'],
@@ -118,24 +137,29 @@ export class LaserEyesClient {
     // )
 
     // Hack to trigger check for wallet providers
-    triggerDOMShakeHack(() => this.$store.setKey('isInitializing', false))
+    triggerDOMShakeHack(() => {
+      this.$store.setKey('isInitializing', false)
+      void this.checkNetwork()
+    })
   }
 
-  private checkNetwork() {
-    this.getNetwork().then((foundNetwork) => {
-      if (foundNetwork) {
-        this.$network.set(foundNetwork)
-        this.dataSourceManager.updateNetwork(foundNetwork)
+  private async checkNetwork() {
+    const { provider, isInitializing } = this.$store.get()
+    if (!provider || isInitializing) return
+
+    const foundNetwork = await this.getNetwork()
+    if (foundNetwork) {
+      this.dataSourceManager.updateNetwork(foundNetwork)
+      this.$network.set(foundNetwork)
+    }
+    try {
+      if (this.config?.network && this.config.network !== foundNetwork) {
+        await this.switchNetwork(this.config.network)
       }
-      try {
-        if (this.config?.network && this.config.network !== foundNetwork) {
-          this.switchNetwork(this.config.network)
-        }
-      } catch (e) {
-        console.error("Couldn't enforce config network", e)
-        this.disconnect()
-      }
-    })
+    } catch (e) {
+      console.error("Couldn't enforce config network", e)
+      this.disconnect()
+    }
   }
 
   private handleIsInitializingChanged(value: boolean) {
@@ -145,9 +169,7 @@ export class LaserEyesClient {
           LOCAL_STORAGE_DEFAULT_WALLET
         ) as ProviderType | undefined
         if (defaultWallet) {
-          this.connect(defaultWallet).then(() => {
-            this.checkNetwork()
-          })
+          this.connect(defaultWallet)
         }
       }
     }
@@ -166,9 +188,15 @@ export class LaserEyesClient {
         throw new Error('Unsupported wallet provider')
       }
       const provider = this.$providerMap[defaultWallet]
-      await provider?.connect(defaultWallet)
-      this.$store.setKey('connected', true)
+      const connected = await provider?.connect(defaultWallet)
+      if (connected === false) {
+        this.$store.setKey('isConnecting', false)
+        this.disconnect()
+        return
+      }
       this.$store.setKey('provider', defaultWallet)
+      await this.checkNetwork()
+      this.$store.setKey('connected', true)
     } catch (error) {
       console.error('Error during connect:', error)
       this.$store.setKey('isConnecting', false)
@@ -222,6 +250,7 @@ export class LaserEyesClient {
     try {
       const provider = this.$store.get().provider
       if (provider) {
+        console.log('switchNetwork', network)
         await this.$providerMap[provider]?.switchNetwork(network)
         this.dataSourceManager.updateNetwork(network)
       }
@@ -326,7 +355,7 @@ export class LaserEyesClient {
       tx = arg1.tx
       finalize = arg1.finalize ?? false
       broadcast = arg1.broadcast ?? false
-      inputsToSign = arg1.inputsToSign ?? []
+      inputsToSign = arg1.inputsToSign
     }
 
     let psbtHex: string
@@ -371,6 +400,41 @@ export class LaserEyesClient {
     }
   }
 
+  async signPsbts(
+    options: LaserEyesSignPsbtsOptions
+  ): Promise<SignPsbtsResponse> {
+    const { psbts, finalize = false, broadcast = false, inputsToSign } = options
+
+    if (!psbts || psbts.length === 0) {
+      throw new Error('No PSBTs provided')
+    }
+
+    const provider = this.$store.get().provider
+
+    if (provider && this.$providerMap[provider]) {
+      try {
+        const result = await this.$providerMap[provider]?.signPsbts({
+          psbts,
+          finalize,
+          broadcast,
+          inputsToSign,
+        })
+        return result
+      } catch (error) {
+        if (error instanceof Error) {
+          if (error.message.toLowerCase().includes('not implemented')) {
+            throw new Error(
+              "The connected wallet doesn't support PSBT signing..."
+            )
+          }
+        }
+        throw error
+      }
+    } else {
+      throw new Error('No wallet provider connected')
+    }
+  }
+
   async pushPsbt(tx: string) {
     const provider = this.$store.get().provider
     if (!provider) return
@@ -409,7 +473,18 @@ export class LaserEyesClient {
     }
   }
 
-  async send(protocol: Protocol, sendArgs: BTCSendArgs | RuneSendArgs) {
+  async send<T extends Protocol>(
+    protocol: T,
+    sendArgs: T extends typeof BTC
+      ? BTCSendArgs
+      : T extends typeof RUNES
+        ? RuneSendArgs
+        : T extends typeof BRC20
+          ? Brc20SendArgs
+          : T extends typeof ALKANES
+            ? AlkaneSendArgs
+            : never
+  ): Promise<string | undefined> {
     const provider = this.$store.get().provider
     if (!provider) return
     if (provider && this.$providerMap[provider]) {
@@ -526,3 +601,5 @@ export class LaserEyesClient {
     }
   }
 }
+
+export * from './modules'

@@ -20,7 +20,7 @@
     "url": "https://github.com/omnisat/lasereyes-mono.git"
   },
   "private": false,
-  "version": "0.0.148",
+  "version": "0.0.159-next.0",
   "type": "module",
   "module": "./dist/index.js",
   "files": [
@@ -28,9 +28,7 @@
   ],
   "types": "./dist/index.d.ts",
   "exports": {
-    ".": "./dist/index.js",
-    "./ui": "./dist/ui.js",
-    "./ui/style.css": "./dist/ui/style.css"
+    ".": "./dist/index.js"
   },
   "scripts": {
     "dev": "vite",
@@ -41,14 +39,14 @@
   },
   "devDependencies": {
     "@vitejs/plugin-react-swc": "^3.5.0",
-    "typescript": "^5.5.3",
+    "sonda": "^0.7.1",
+    "typescript": "5.8.3",
     "vite": "^5.4.1",
     "vite-plugin-dts": "^4.2.1"
   },
   "dependencies": {
     "@omnisat/lasereyes-core": "workspace:*",
     "@omnisat/lasereyes-react": "workspace:*",
-    "@omnisat/lasereyes-ui": "workspace:*",
     "bip39": "^3.1.0"
   },
   "license": "MIT",

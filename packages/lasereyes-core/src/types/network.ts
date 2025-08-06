@@ -24,6 +24,12 @@ export enum UnisatNetwork {
   FRACTAL_TESTNET = 'FRACTAL_BITCOIN_TESTNET',
 }
 
+export enum KeplrChain {
+  BITCOIN_MAINNET = 'BITCOIN_MAINNET',
+  BITCOIN_TESTNET = 'BITCOIN_TESTNET',
+  BITCOIN_SIGNET = 'BITCOIN_SIGNET',
+}
+
 export enum OpNetwork {
   MAINNET = 'livenet',
   TESTNET = 'testnet',
@@ -63,4 +69,5 @@ export enum BaseNetwork {
   REGTEST = 'regtest',
   FRACTAL_MAINNET = 'fractal_mainnet',
   FRACTAL_TESTNET = 'fractal_testnet',
+  OYLNET = 'oylnet',
 }

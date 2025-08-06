@@ -46,15 +46,18 @@ export default class XVerseProvider extends WalletProvider {
     return this.$network.get()
   }
 
+  public get library(): any | undefined {
+    return (
+      window as unknown as { XverseProviders: { BitcoinProvider: unknown } }
+    )?.XverseProviders?.BitcoinProvider
+  }
+
   observer?: MutationObserver
 
   initialize(): void {
     if (typeof window !== 'undefined' && typeof document !== 'undefined') {
       this.observer = new window.MutationObserver(() => {
-        const xverseLib = (
-          window as unknown as { XverseProviders: { BitcoinProvider: unknown } }
-        )?.XverseProviders?.BitcoinProvider
-        if (xverseLib) {
+        if (this.library || this.isMobile()) {
           this.$store.setKey('hasProvider', {
             ...this.$store.get().hasProvider,
             [XVERSE]: true,
@@ -121,6 +124,12 @@ export default class XVerseProvider extends WalletProvider {
     //   }
     // }
 
+    if (this.isMobile() && !this.library) {
+      const url = `xverse://browser?url=${encodeURIComponent(window.location.href)}`
+      window.location.href = url
+      return
+    }
+
     let foundAddress:
       | {
           purpose: string
@@ -136,6 +145,7 @@ export default class XVerseProvider extends WalletProvider {
         }
       | undefined
     let network: string | undefined
+    let accounts: string[] = []
 
     try {
       const response = await request('wallet_getAccount', null)
@@ -143,6 +153,7 @@ export default class XVerseProvider extends WalletProvider {
         foundAddress = findOrdinalsAddress(response.result.addresses)
         foundPaymentAddress = findPaymentAddress(response.result.addresses)
         network = response.result.network.bitcoin.name
+        accounts = response.result.addresses.map((address) => address.address)
       } else {
         throw new Error(`Error getting account: ${response.error.message}`)
       }
@@ -160,6 +171,7 @@ export default class XVerseProvider extends WalletProvider {
           foundAddress = findOrdinalsAddress(response.result.addresses)
           foundPaymentAddress = findPaymentAddress(response.result.addresses)
           network = response.result.network.bitcoin.name
+          accounts = response.result.addresses.map((address) => address.address)
         } else {
           if (response.error.code === RpcErrorCode.USER_REJECTION) {
             throw new Error(`User canceled lasereyes to ${XVERSE} wallet`)
@@ -177,15 +189,12 @@ export default class XVerseProvider extends WalletProvider {
     }
     this.$store.setKey('address', foundAddress.address)
     this.$store.setKey('paymentAddress', foundPaymentAddress.address)
-    this.$store.setKey('accounts', [
-      foundAddress.address,
-      foundPaymentAddress.address,
-    ])
     this.$store.setKey('publicKey', String(foundAddress.publicKey))
     this.$store.setKey(
       'paymentPublicKey',
       String(foundPaymentAddress.publicKey)
     )
+    this.$store.setKey('accounts', accounts)
     if (network) {
       this.$network.set(getNetworkForXverse(network))
     }
@@ -199,6 +208,7 @@ export default class XVerseProvider extends WalletProvider {
       }
       throw new Error('Error getting network')
     } catch (e) {
+      console.error(e)
       return this.network
     }
   }
@@ -279,10 +289,10 @@ export default class XVerseProvider extends WalletProvider {
 
       if (inputsToSignProp) {
         inputsToSign = inputsToSignProp.reduce(
-          (acc: Record<string, number[]>, input) => ({
-            ...acc,
-            [input.address]: [...(acc[input.address] || []), input.index],
-          }),
+          (acc: Record<string, number[]>, input) => {
+            acc[input.address] = [...(acc[input.address] || []), input.index]
+            return acc
+          },
           {}
         )
       } else {

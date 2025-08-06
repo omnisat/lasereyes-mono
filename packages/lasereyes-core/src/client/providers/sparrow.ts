@@ -79,7 +79,7 @@ export default class SparrowProvider extends WalletProvider {
     })
   }
 
-  removeSubscriber?: Function
+  removeSubscriber?: () => void
 
   watchStateChange(
     newState: LaserEyesStoreType,
@@ -147,6 +147,23 @@ export default class SparrowProvider extends WalletProvider {
 
   async getNetwork() {
     return this.network
+  }
+
+  async switchNetwork(network: NetworkType) {
+    if (!this.library) throw new Error("Sparrow wallet isn't supported")
+    try {
+      const result = await this.library!.switchNetwork(network)
+      if (!result) throw new Error('No result returned from switchNetwork')
+      const { address, paymentAddress, publicKey } = result
+      this.$store.setKey('address', address)
+      this.$store.setKey('paymentAddress', paymentAddress)
+      this.$store.setKey('publicKey', publicKey)
+      this.$store.setKey('paymentPublicKey', publicKey)
+      this.$network.set(network)
+    } catch (error) {
+      console.error('Error during sparrow switchNetwork:', error)
+      throw error
+    }
   }
 
   async sendBTC(to: string, amount: number): Promise<string> {

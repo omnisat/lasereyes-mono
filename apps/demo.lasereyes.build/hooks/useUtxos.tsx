@@ -1,4 +1,5 @@
-import React, {
+import type React from 'react'
+import {
   createContext,
   useCallback,
   useContext,
@@ -6,7 +7,7 @@ import React, {
   useState,
 } from 'react'
 import useSWR from 'swr'
-import { MempoolUtxo } from '@omnisat/lasereyes'
+import type { MempoolUtxo } from '@omnisat/lasereyes'
 import { useLaserEyes } from '@omnisat/lasereyes'
 
 type UtxoContextType = {
@@ -20,32 +21,36 @@ const UtxoContext = createContext<UtxoContextType | undefined>(undefined)
 export const UtxoProvider: React.FC<{
   children: React.ReactNode
 }> = ({ children }) => {
-  const { paymentAddress, network, getUtxos } = useLaserEyes((x) => ({
-    paymentAddress: x.paymentAddress,
-    network: x.network,
-    getUtxos: x.getUtxos,
-  }))
+  const { paymentAddress, network, getUtxos, connected } = useLaserEyes(
+    ({ paymentAddress, network, getUtxos, connected }) => ({
+      paymentAddress,
+      network,
+      getUtxos,
+      connected,
+    })
+  )
 
   const [utxos, setUtxos] = useState<MempoolUtxo[]>([])
 
-  const fetcher = useCallback(
-    async () => {
-      try {
-        const response = await getUtxos(paymentAddress)
-        return response
-      } catch (e) {
-        console.error('Error fetching UTXOs:', e)
-        return []
-      }
-    },
-    [getUtxos, paymentAddress]
-  )
+  const fetcher = useCallback(async () => {
+    if (!connected) {
+      return []
+    }
+    try {
+      const response = await getUtxos(paymentAddress)
+      return response
+    } catch (e) {
+      console.error('Error fetching UTXOs:', e)
+      return []
+    }
+  }, [connected, getUtxos, paymentAddress])
 
   const { data: utxosData, error } = useSWR<MempoolUtxo[]>(
-    paymentAddress && network,
+    connected && paymentAddress && network,
     fetcher
   )
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: need to reset utxos when network changes
   useEffect(() => {
     setUtxos([])
   }, [network, paymentAddress])

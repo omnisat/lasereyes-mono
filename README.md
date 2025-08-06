@@ -2,7 +2,7 @@
 
 # LaserEyes
 
-Wallet connect library making it easier than ever to quickly build/maintain Bitcoin Oridnal Web Apps.
+Wallet connect library making it easier than ever to quickly build/maintain Bitcoin Ordinal Web Apps.
 
 ![Version](https://img.shields.io/npm/v/@omnisat/lasereyes)
 ![license](https://img.shields.io/github/license/omnisat/lasereyes.svg?style=flat-square)
@@ -26,7 +26,6 @@ Don't trust verify [Try Out The Demo Here](https://demo.lasereyes.build)
 - Wizz
 - Phantom
 - Xverse
-
 
 ## Community
 
@@ -66,6 +65,12 @@ If you find Laser Eyes useful or use it for work, please consider [sponsoring La
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/omnisat/lasereyes-mono/dev/.github/assets/trio-light.svg">
       <img alt="Trio" src="https://raw.githubusercontent.com/omnisat/lasereyes-mono/dev/.github/assets/trio-dark.svg" width="auto" height="80">
+    </picture>
+  </a>
+  <a href="https://emblem.vision/" rel="nofollow">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/omnisat/lasereyes-mono/main/.github/assets/emblem-light.svg">
+      <img alt="Emblem Vault" src="https://raw.githubusercontent.com/omnisat/lasereyes-mono/main/.github/assets/emblem-dark.svg" width="auto" height="80">
     </picture>
   </a>
 </p>

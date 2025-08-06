@@ -83,6 +83,7 @@ export class WizzProvider extends WalletProvider {
     }
   }
   private removeLibraryListeners() {
+    if (!this.library || !this.library.removeListener) return
     this.library?.removeListener(
       'networkChanged',
       this.handleNetworkChanged.bind(this)
@@ -113,13 +114,11 @@ export class WizzProvider extends WalletProvider {
     this.$store.setKey('paymentAddress', wizzAccounts[0])
     this.$store.setKey('publicKey', wizzPubKey)
     this.$store.setKey('paymentPublicKey', wizzPubKey)
-    this.$store.setKey('provider', WIZZ)
     await this.getNetwork().then((network) => {
       if (network && this.config?.network !== network) {
         this.parent.switchNetwork(network)
       }
     })
-    this.$store.setKey('connected', true)
   }
 
   async requestAccounts(): Promise<string[]> {
@@ -192,11 +191,14 @@ export class WizzProvider extends WalletProvider {
       }
     | undefined
   > {
-    const signedPsbt = await this.library?.signPsbt(psbtHex, omitUndefined({
-      autoFinalized: finalize,
-      broadcast: false,
-      toSignInputs: inputsToSign,
-    }))
+    const signedPsbt = await this.library?.signPsbt(
+      psbtHex,
+      omitUndefined({
+        autoFinalized: finalize,
+        broadcast: false,
+        toSignInputs: inputsToSign,
+      })
+    )
 
     const psbtSignedPsbt = bitcoin.Psbt.fromHex(signedPsbt)
 

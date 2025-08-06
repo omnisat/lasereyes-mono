@@ -1,15 +1,24 @@
-"use client"
+'use client'
 
-import * as React from "react"
-import { ClientPageWrapper } from "@/components/client-page-wrapper"
-import { CodeBlock } from "@/components/code-block"
-import { Heading } from "@/components/heading"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Zap, Sparkles, Cpu, Rocket, Infinity, BarChart3, Shield, Workflow } from "lucide-react"
-import { cn } from "@/lib/utils"
-import Image from "next/image"
-import { useTheme } from "next-themes"
+import * as React from 'react'
+import { ClientPageWrapper } from '@/components/client-page-wrapper'
+import { CodeBlock } from '@/components/code-block'
+import { Heading } from '@/components/heading'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import {
+  Zap,
+  Sparkles,
+  Cpu,
+  Rocket,
+  Infinity,
+  BarChart3,
+  Shield,
+  Workflow,
+} from 'lucide-react'
+import { cn } from '@/lib/utils'
+import Image from 'next/image'
+import { useTheme } from 'next-themes'
 
 interface FeatureCardProps {
   icon: React.ElementType
@@ -24,21 +33,35 @@ export default function MaestroPage() {
       <div className="relative overflow-hidden rounded-lg border bg-gradient-to-br from-purple-600/20 via-background to-background p-8">
         <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-purple-600/20 rounded-full blur-[120px] -z-10 translate-x-1/2 -translate-y-1/2" />
         <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-amber-500/10 rounded-full blur-[100px] -z-10 -translate-x-1/2 translate-y-1/2" />
-        
+
         <div className="flex items-center gap-3 mb-4">
-          <Badge variant="secondary" className="bg-purple-500/10 text-purple-500 hover:bg-purple-500/20">Premium Provider</Badge>
-          <Badge variant="secondary" className="bg-amber-500/10 text-amber-500 hover:bg-amber-500/20">Sponsor</Badge>
+          <Badge
+            variant="secondary"
+            className="bg-purple-500/10 text-purple-500 hover:bg-purple-500/20"
+          >
+            Premium Provider
+          </Badge>
+          <Badge
+            variant="secondary"
+            className="bg-amber-500/10 text-amber-500 hover:bg-amber-500/20"
+          >
+            Sponsor
+          </Badge>
         </div>
 
         <div className="flex items-center gap-6 mb-6">
           <MaestroLogo />
-          <Heading level={1} className="bg-gradient-to-r from-purple-600 via-purple-500 to-amber-500 bg-clip-text text-transparent">
+          <Heading
+            level={1}
+            className="bg-gradient-to-r from-purple-600 via-purple-500 to-amber-500 bg-clip-text text-transparent"
+          >
             Maestro
           </Heading>
         </div>
 
         <p className="text-xl mb-8 max-w-2xl text-muted-foreground">
-          Enterprise-grade Bitcoin data infrastructure. High-performance APIs for ordinals, inscriptions, and blockchain data.
+          Enterprise-grade Bitcoin data infrastructure. High-performance APIs
+          for ordinals, inscriptions, and blockchain data.
         </p>
 
         <Card className="border-purple-500/20 bg-purple-500/5 backdrop-blur-xl">
@@ -50,7 +73,9 @@ export default function MaestroPage() {
                 </div>
                 <div>
                   <div className="text-sm font-medium">Unlimited Scale</div>
-                  <div className="text-xs text-muted-foreground">No rate limits</div>
+                  <div className="text-xs text-muted-foreground">
+                    No rate limits
+                  </div>
                 </div>
               </div>
               <div className="flex items-center gap-3">
@@ -59,7 +84,9 @@ export default function MaestroPage() {
                 </div>
                 <div>
                   <div className="text-sm font-medium">Ultra-fast APIs</div>
-                  <div className="text-xs text-muted-foreground">~50ms latency</div>
+                  <div className="text-xs text-muted-foreground">
+                    ~50ms latency
+                  </div>
                 </div>
               </div>
               <div className="flex items-center gap-3">
@@ -68,7 +95,9 @@ export default function MaestroPage() {
                 </div>
                 <div>
                   <div className="text-sm font-medium">99.9% Uptime</div>
-                  <div className="text-xs text-muted-foreground">Enterprise SLA</div>
+                  <div className="text-xs text-muted-foreground">
+                    Enterprise SLA
+                  </div>
                 </div>
               </div>
             </div>
@@ -86,7 +115,7 @@ export default function MaestroPage() {
 function MaestroLogo() {
   const { theme } = useTheme()
   const logoSrc = theme === 'dark' ? '/maestro-dark.svg' : '/maestro-light.svg'
-  
+
   return (
     <div className="relative h-12 w-12">
       <Image
@@ -100,12 +129,19 @@ function MaestroLogo() {
   )
 }
 
-function FeatureCard({ icon: Icon, title, description, className }: FeatureCardProps) {
+function FeatureCard({
+  icon: Icon,
+  title,
+  description,
+  className,
+}: FeatureCardProps) {
   return (
-    <Card className={cn(
-      "group relative overflow-hidden transition-all duration-300 hover:border-purple-500/30 hover:shadow-lg hover:shadow-purple-500/5",
-      className
-    )}>
+    <Card
+      className={cn(
+        'group relative overflow-hidden transition-all duration-300 hover:border-purple-500/30 hover:shadow-lg hover:shadow-purple-500/5',
+        className
+      )}
+    >
       <div className="absolute right-0 top-0 h-20 w-20 translate-x-6 -translate-y-6 rounded-full bg-purple-500/10 blur-2xl filter group-hover:bg-purple-500/20" />
       <CardContent className="p-6">
         <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-purple-500/10 text-purple-500">
@@ -170,7 +206,13 @@ const config = createConfig({
               copyButton={true}
             />
             <div className="mt-4 text-sm text-muted-foreground">
-              Get your API key at <a href="https://maestro.org" className="text-purple-500 hover:text-purple-400">maestro.org</a>
+              Get your API key at{' '}
+              <a
+                href="https://gomaestro.org"
+                className="text-purple-500 hover:text-purple-400"
+              >
+                maestro.org
+              </a>
             </div>
           </CardContent>
         </Card>
@@ -250,19 +292,25 @@ ws.onmessage = (event) => {
           <Card className="border-purple-500/20 bg-gradient-to-br from-purple-500/10 to-background">
             <CardContent className="p-6">
               <h3 className="text-lg font-semibold mb-2">Dedicated Support</h3>
-              <p className="text-sm text-muted-foreground">24/7 technical support with dedicated account management.</p>
+              <p className="text-sm text-muted-foreground">
+                24/7 technical support with dedicated account management.
+              </p>
             </CardContent>
           </Card>
           <Card className="border-purple-500/20 bg-gradient-to-br from-purple-500/10 to-background">
             <CardContent className="p-6">
               <h3 className="text-lg font-semibold mb-2">Custom Solutions</h3>
-              <p className="text-sm text-muted-foreground">Tailored solutions and custom API endpoints for your needs.</p>
+              <p className="text-sm text-muted-foreground">
+                Tailored solutions and custom API endpoints for your needs.
+              </p>
             </CardContent>
           </Card>
           <Card className="border-purple-500/20 bg-gradient-to-br from-purple-500/10 to-background">
             <CardContent className="p-6">
               <h3 className="text-lg font-semibold mb-2">SLA Guarantee</h3>
-              <p className="text-sm text-muted-foreground">99.9% uptime guarantee with enterprise SLA.</p>
+              <p className="text-sm text-muted-foreground">
+                99.9% uptime guarantee with enterprise SLA.
+              </p>
             </CardContent>
           </Card>
         </div>
@@ -270,4 +318,3 @@ ws.onmessage = (event) => {
     </div>
   )
 }
-

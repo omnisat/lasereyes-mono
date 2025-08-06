@@ -14,12 +14,12 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      '@': resolve(__dirname, './lib'),
+      '@': resolve(__dirname, './src'),
     },
   },
   build: {
     lib: {
-      entry: resolve(__dirname, './lib/index.ts'),
+      entry: resolve(__dirname, './src/index.ts'),
       name: 'lasereyes-react',
       fileName: 'index',
     },

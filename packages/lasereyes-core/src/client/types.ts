@@ -1,5 +1,7 @@
-import { NetworkType, ProviderType } from '../types'
-import { BIP322, ECDSA } from '../constants/signing-protocol'
+import type { NetworkType, ProviderType } from '../types'
+import type { BIP322, ECDSA } from '../constants/signing-protocol'
+
+export * from './modules/types'
 
 export type LaserEyesStoreType = {
   provider: ProviderType | undefined
@@ -16,10 +18,14 @@ export type LaserEyesStoreType = {
 }
 
 export interface SparrowWalletProvider {
-  requestAccounts(): Promise<string[]>
-  getPublicKey(): Promise<string>
+  requestAccounts(network?: NetworkType): Promise<string[]>
+  getPublicKey(network?: NetworkType): Promise<string>
   getNetwork(): Promise<NetworkType>
-  switchNetwork(network: NetworkType): Promise<void>
+  switchNetwork(network: NetworkType): Promise<void | {
+    address: string
+    paymentAddress: string
+    publicKey: string
+  }>
   signMessage(message: string): Promise<string>
   signPsbt(psbtBase64: string): Promise<string>
 }
@@ -31,6 +37,13 @@ export type SignMessageOptions = {
 
 export type LaserEyesSignPsbtOptions = {
   tx: string
+  finalize?: boolean
+  broadcast?: boolean
+  inputsToSign?: InputToSign[]
+}
+
+export type LaserEyesSignPsbtsOptions = {
+  psbts: string[]
   finalize?: boolean
   broadcast?: boolean
   inputsToSign?: InputToSign[]
@@ -51,10 +64,28 @@ export type WalletProviderSignPsbtOptions = {
   network?: NetworkType
 }
 
+export type WalletProviderSignPsbtsOptions = {
+  psbts: string[]
+  finalize?: boolean
+  broadcast?: boolean
+  inputsToSign?: InputToSign[]
+  network?: NetworkType
+}
+
 export type SignPsbtResponse =
   | {
       signedPsbtHex: string | undefined
       signedPsbtBase64: string | undefined
       txId?: string | undefined
+    }
+  | undefined
+
+export type SignPsbtsResponse =
+  | {
+      signedPsbts: {
+        signedPsbtHex: string | undefined
+        signedPsbtBase64: string | undefined
+        txId?: string | undefined
+      }[]
     }
   | undefined
