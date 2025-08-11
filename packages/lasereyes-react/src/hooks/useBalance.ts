@@ -1,5 +1,6 @@
-import { BTC, Protocol, useLaserEyes } from '@omnisat/lasereyes-react'
+import type { BTC, Protocol } from '@omnisat/lasereyes-core'
 import { useQuery } from '@tanstack/react-query'
+import { useLaserEyes } from '../providers/hooks'
 
 export default function useBalance(protocol: typeof BTC): {
   data: string
