@@ -1,8 +1,9 @@
 {
   "extends": "./tsconfig.json",
-  "include": ["lib/**/*", "src/i18n/locales/**/*.json"],
+  "include": ["src/**/*", "src/i18n/locales/**/*.json"],
   "compilerOptions": {
-    "module": "ESNext",
+    "module": "esnext",
+    "target": "esnext",
     "moduleResolution": "Bundler",
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
@@ -19,7 +20,4 @@
   "noFallthroughCasesInSwitch": true,
 
   "baseUrl": ".",
-  "paths": {
-    "@/*": ["./lib/*"]
-  }
 }

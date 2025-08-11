@@ -1,10 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   MAGIC_EDEN,
+  ProviderType,
   SUPPORTED_WALLETS,
   useLaserEyes,
 } from '@omnisat/lasereyes-react'
 import { useMemo } from 'react'
+import useModalConfig from './useModalConfig'
 
 export interface WalletInfo {
   label: string
@@ -12,7 +14,7 @@ export interface WalletInfo {
   installUrl: string
 }
 
-export default function useSupportedWallets() {
+export default function useSupportedProviders() {
   const {
     hasUnisat,
     hasLeather,
@@ -26,9 +28,12 @@ export default function useSupportedWallets() {
     hasOrange,
     hasSparrow,
     hasTokeo,
+    hasKeplr,
     connect: connectLaserEyes,
   } = useLaserEyes()
-  const hasWallet = useMemo(
+  const config = useModalConfig()
+  const allowedProviders = config.providers ?? Object.keys(SUPPORTED_WALLETS) as ProviderType[]
+  const hasWallet: Record<keyof typeof SUPPORTED_WALLETS, boolean> = useMemo(
     () => ({
       unisat: hasUnisat,
       xverse: hasXverse,
@@ -42,6 +47,7 @@ export default function useSupportedWallets() {
       orange: hasOrange,
       sparrow: hasSparrow,
       tokeo: hasTokeo,
+      keplr: hasKeplr,
     }),
     [
       hasLeather,
@@ -56,14 +62,17 @@ export default function useSupportedWallets() {
       hasUnisat,
       hasWizz,
       hasXverse,
+      hasKeplr,
     ]
   )
   const [installedWallets, otherWallets] = useMemo(() => {
+    console.log("hasWallet", hasWallet)
+    console.log("connectLaserEyes", connectLaserEyes)
     const i: (WalletInfo & {
       connect: () => Promise<string | undefined>
     })[] = []
     const o: WalletInfo[] = []
-    Object.keys(SUPPORTED_WALLETS).forEach((e) => {
+    Object.keys(SUPPORTED_WALLETS).filter(e => allowedProviders?.includes(e as ProviderType)).forEach((e) => {
       const isInstalled = hasWallet[e as keyof typeof hasWallet]
       const wallet = SUPPORTED_WALLETS[e as keyof typeof SUPPORTED_WALLETS]
       const w: WalletInfo = {
@@ -100,6 +109,6 @@ export default function useSupportedWallets() {
       }
     })
     return [i, o]
-  }, [hasWallet, connectLaserEyes])
+  }, [hasWallet, connectLaserEyes, allowedProviders])
   return { installedWallets, otherWallets }
 }

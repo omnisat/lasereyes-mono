@@ -24,11 +24,12 @@ export default defineConfig({
       fileName: 'index',
     },
     rollupOptions: {
-      external: ['react', 'react-dom', 'react/jsx-runtime'],
+      external: ['react', 'react-dom', 'react/jsx-runtime', '@omnisat/lasereyes-core'],
       output: {
         globals: {
           react: 'React',
           'react-dom': 'ReactDOM',
+          '@omnisat/lasereyes-core': 'LasereyesCore',
         },
         banner: "'use client';",
       },

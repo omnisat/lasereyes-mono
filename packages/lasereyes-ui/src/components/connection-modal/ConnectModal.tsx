@@ -8,15 +8,15 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import useSupportedWallets from "@/hooks/useSupportedWallets";
-import "@/i18n/setup";
+} from "../ui/card";
+import useSupportedProviders from "../../hooks/useSupportedProviders";
+import "../../i18n/setup";
 import { Button } from "../ui/button";
-import { cn } from "@/lib/utils";
+import { cn } from "../../lib/utils";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { Alert } from "@/components/ui/alert";
+import { Alert } from "../ui/alert";
 import { useState, useCallback, useMemo } from "react";
-import "@/components/index.css";
+import "../index.css";
 
 export interface ConnectModalProps {
   open: boolean;
@@ -26,7 +26,7 @@ export interface ConnectModalProps {
 export default function ConnectWalletModal({ onClose, open }: ConnectModalProps) {
   const { isConnecting, disconnect } = useLaserEyes();
   const { t } = useTranslation("common");
-  const { otherWallets, installedWallets } = useSupportedWallets();
+  const { otherWallets, installedWallets } = useSupportedProviders();
   const allWallets = useMemo(
     () => [...installedWallets, ...otherWallets],
     [installedWallets, otherWallets]
@@ -51,7 +51,7 @@ export default function ConnectWalletModal({ onClose, open }: ConnectModalProps)
   return (
     <Dialog onClose={onConnectModalCancel} open={open} titleId={"lwm_connect_dialog"}>
       <div className="lem-w-[480px]">
-        <DialogContent className='lem-relative lem-overflow-hidden lem-bg-gray-50 dark:lem-bg-gray-900'>
+        <DialogContent className='lem-relative lem-overflow-hidden lem-bg-background'>
           <IsConnectingStep isConnecting={isConnecting} stopConnecting={stopConnecting} />
           <CardHeader>
             {errorMsg && (
@@ -80,11 +80,11 @@ export default function ConnectWalletModal({ onClose, open }: ConnectModalProps)
                             });
                         }}
                         className={cn(
-                          "lem-w-full lem-bg-white dark:lem-bg-gray-800",
-                          "hover:lem-bg-gray-50 dark:hover:lem-bg-gray-700",
-                          "lem-text-black dark:lem-text-white lem-text-base lem-font-normal",
+                          "lem-w-full lem-bg-card",
+                          "hover:lem-bg-accent",
+                          "lem-text-card-foreground lem-text-base lem-font-normal",
                           "lem-group",
-                          "lem-h-16 lem-p-4 lem-border lem-border-gray-100 dark:lem-border-gray-700 lem-rounded-xl lem-flex lem-flex-wrap lem-w-full lem-gap-4",
+                          "lem-h-16 lem-p-4 lem-border lem-border-border lem-rounded-xl lem-flex lem-flex-wrap lem-w-full lem-gap-4",
                           "lem-transition-colors lem-duration-200"
                         )}>
                         <div className='lem-flex lem-grow lem-items-center lem-gap-3'>
@@ -94,19 +94,19 @@ export default function ConnectWalletModal({ onClose, open }: ConnectModalProps)
                         {i < installedWallets.length ? (
                           <div className='lem-flex lem-items-center'>
                             <div className='lem-flex lem-items-center lem-gap-2 group-hover:lem-hidden'>
-                              <div className='lem-w-2 lem-h-2 lem-rounded-full lem-bg-blue-500'></div>
-                              <span className='lem-text-sm lem-text-gray-500 dark:lem-text-gray-400'>
+                              <div className='lem-w-2 lem-h-2 lem-rounded-full lem-bg-primary'></div>
+                              <span className='lem-text-sm lem-text-muted-foreground'>
                                 Installed
                               </span>
                             </div>
-                            <ChevronRight className='lem-w-5 lem-h-5 lem-text-gray-400 lem-hidden group-hover:lem-block' />
+                            <ChevronRight className='lem-w-5 lem-h-5 lem-text-muted-foreground lem-hidden group-hover:lem-block' />
                           </div>
                         ) : (
                           <a
                             href={e.installUrl}
                             target='_blank'
                             rel='noopener noreferrer'
-                            className='lem-flex lem-items-center lem-gap-2 lem-text-blue-500 hover:lem-text-blue-600'
+                            className='lem-flex lem-items-center lem-gap-2 lem-text-primary/80 hover:lem-text-primary'
                             onClick={(e) => e.stopPropagation()}>
                             <ChevronRight className='lem-w-4 lem-h-4' />
                             <span className='lem-text-sm'>Install</span>
@@ -119,8 +119,8 @@ export default function ConnectWalletModal({ onClose, open }: ConnectModalProps)
               </div>
             )}
           </CardContent>
-          <CardFooter className='lem-justify-center lem-w-full lem-bg-gray-50 dark:lem-bg-gray-900 lem-p-4 lem-pt-5 lem-border-t lem-border-gray-200 dark:lem-border-gray-800 lem-group lem-relative'>
-            <div className='lem-text-gray-500 dark:lem-text-gray-400 lem-text-sm lem-text-center lem-transition-opacity lem-duration-300 lem-ease-in-out lem-opacity-100 group-hover:lem-opacity-0'>
+          <CardFooter className='lem-justify-center lem-w-full lem-bg-gradient-to-r lem-from-primary/5 lem-via-primary/10 lem-to-primary/5 lem-p-4 lem-pt-5 lem-border-t lem-border-primary/20 lem-group lem-relative'>
+            <div className='lem-text-muted-foreground lem-text-sm lem-text-center lem-transition-opacity lem-duration-300 lem-ease-in-out lem-opacity-100 group-hover:lem-opacity-0'>
               <a href='https://www.lasereyes.build/' target='_blank' rel='noopener noreferrer'>
                 Powered by LaserEyes
               </a>

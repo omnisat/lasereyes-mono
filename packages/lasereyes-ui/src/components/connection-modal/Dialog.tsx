@@ -45,7 +45,7 @@ export function Dialog({ children, onClose, open, titleId }: DialogProps) {
       {open
         ? createPortal(
             <RemoveScroll enabled={bodyScrollable}>
-              <div className="lem-dark">
+              <div>
                 <div
                   aria-modal
                   aria-labelledby={titleId}

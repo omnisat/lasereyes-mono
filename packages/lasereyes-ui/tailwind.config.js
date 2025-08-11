@@ -5,7 +5,7 @@ module.exports = {
     './pages/**/*.{ts,tsx}',
     './components/**/*.{ts,tsx}',
     './app/**/*.{ts,tsx}',
-    './lib/**/*.{ts,tsx}',
+    './src/**/*.{ts,tsx}',
   ],
   prefix: "lem-",
   theme: {

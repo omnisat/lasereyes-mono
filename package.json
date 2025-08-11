@@ -6,6 +6,7 @@
     "build:core": "turbo build --filter @omnisat/lasereyes-core",
     "build:react": "turbo build --filter @omnisat/lasereyes-react",
     "build:lasereyes": "turbo build --filter @omnisat/lasereyes",
+    "build:ui": "turbo build --filter @omnisat/lasereyes-ui",
     "dev": "turbo dev",
     "dev:demo": "turbo dev --filter demo.lasereyes.build",
     "dev:icp": "turbo dev --filter icp-lasereyes-react",

@@ -13,14 +13,9 @@ export default defineConfig({
     // }),
     dts({ tsconfigPath: "./tsconfig.build.json" }),
   ],
-  resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "./lib"),
-    },
-  },
   build: {
     lib: {
-      entry: path.resolve(__dirname, "lib/index.ts"),
+      entry: path.resolve(__dirname, "src/index.ts"),
       formats: ["es"],
     },
     rollupOptions: {
@@ -29,13 +24,17 @@ export default defineConfig({
         "react-dom",
         "react/jsx-runtime",
         "@omnisat/lasereyes",
+        "@omnisat/lasereyes-core",
+        "@omnisat/lasereyes-react",
       ],
       output: {
         entryFileNames: "[name].js",
         globals: {
           react: "React",
           "react-dom": "ReactDOM",
-          tailwindcss: "tailwindcss",
+          "@omnisat/lasereyes": "Lasereyes",
+          "@omnisat/lasereyes-core": "LasereyesCore",
+          "@omnisat/lasereyes-react": "LasereyesReact",
         },
       },
     },
