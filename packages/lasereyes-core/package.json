@@ -4,14 +4,14 @@
   "version": "0.0.81-next.1",
   "type": "module",
   "main": "./dist/index.umd.cjs",
-  "module": "./src/index.ts",
+  "module": "./dist/index.js",
   "files": [
     "dist"
   ],
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./src/index.ts",
+      "import": "./dist/index.js",
       "require": "./dist/index.umd.cjs"
     }
   },
