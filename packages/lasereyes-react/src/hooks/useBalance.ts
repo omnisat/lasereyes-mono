@@ -1,59 +1,65 @@
-import type { BTC, Protocol } from '@omnisat/lasereyes-core'
-import { useQuery } from '@tanstack/react-query'
-import { useLaserEyes } from '../providers/hooks'
+import { BTC, Protocol } from "@omnisat/lasereyes-core"
+import {
+  type UseQueryOptions,
+  type UseQueryResult,
+  useQuery,
+} from "@tanstack/react-query"
+import { useLaserEyes } from "../providers/hooks"
 
-export default function useBalance(protocol: typeof BTC): {
-  data: string
-  isPending: boolean
-  error: Error | null
+type useBalanceParams<T extends Protocol> = {
+  protocol: T
+  tokenId?: T extends typeof BTC ? never : string
+  queryOptions?: Omit<UseQueryOptions<bigint>, "queryKey" | "queryFn">
 }
-export default function useBalance(
-  protocol: Exclude<Protocol, typeof BTC>,
-  _tokenId: string
-): {
-  data: string
-  isPending: boolean
-  error: Error | null
-}
-export default function useBalance(
-  protocol: Protocol,
-  _tokenId?: string
-): {
-  data: string
-  isPending: boolean
-  error: Error | null
-} {
-  const { client } = useLaserEyes(({ client }) => ({ client }))
+export default function useBalance<T extends Protocol>({
+  protocol,
+  tokenId,
+  queryOptions,
+}: useBalanceParams<T>): UseQueryResult<bigint>
+export default function useBalance(protocol: typeof BTC): UseQueryResult<bigint>
+export default function useBalance<T extends Protocol>(
+  arg: useBalanceParams<T> | typeof BTC,
+): UseQueryResult<bigint> {
+  const { client, address, network } = useLaserEyes(
+    ({ client, address, network }) => ({
+      client,
+      address,
+      network,
+    }),
+  )
+
+  if (typeof arg === "string" && arg !== BTC) {
+    throw Error(`Invalid parameters. Expected \`${BTC}\`, got: \`${arg}\``)
+  }
+  const { protocol, tokenId, queryOptions }: useBalanceParams<T> = (
+    arg === BTC ? { protocol: BTC } : arg
+  ) as useBalanceParams<T>
 
   const fetchBalance = async () => {
-    if (protocol === 'btc') {
-      const balance = await client?.getBalance()
-      if (!balance) {
-        throw new Error('Balance not found')
-      }
-      if (typeof balance === 'number') {
-        return balance.toFixed(8)
+    if (address) {
+      if (protocol === "btc") {
+        const balance = await client?.getBalance()
+        if (!balance) {
+          throw new Error("Balance not found")
+        }
+        return BigInt(balance)
       } else {
-        return balance.toString()
+        if (!tokenId) {
+          throw new Error("Token ID is required")
+        }
+        // TODO: Implement balance fetching for other protocols
       }
-    } else {
-      if (!_tokenId) {
-        throw new Error('Token ID is required')
-      }
-      // TODO: Implement balance fetching for other protocols
     }
+    return BigInt(0)
   }
 
-  const { data, isPending, error } = useQuery({
-    queryKey: ['user-balance', protocol, _tokenId],
-    queryFn: fetchBalance,
+  const result = useQuery({
     staleTime: 1000 * 60 * 5, // 5 minutes
     refetchInterval: 1000 * 60 * 10, // 1 minute
+    ...queryOptions,
+    queryKey: ["user-balance", network, address, protocol, tokenId],
+    queryFn: fetchBalance,
   })
 
-  return {
-    data: data || '0',
-    isPending,
-    error,
-  }
+  return result
 }
