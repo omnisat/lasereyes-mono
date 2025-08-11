@@ -1,49 +1,33 @@
 import * as bitcoin from 'bitcoinjs-lib'
 import { WalletProvider } from '.'
 import {
-  ProviderType,
-  NetworkType,
-  LeatherRPCResponse,
-  LeatherRequestAddressResponse,
-  LeatherAddress,
-  LeatherRequestSignResponse,
-  SignPsbtRequestParams,
-  Config,
+  type ProviderType,
+  type NetworkType,
+  type SignPsbtRequestParams,
 } from '../../types'
+import { type LeatherProvider as LeatherRPC, RpcErrorCode, type RpcErrorResponse } from '@leather.io/rpc';
 import { getBTCBalance, isMainnetNetwork } from '../../lib/helpers'
 import { LEATHER, P2TR, P2WPKH } from '../../constants/wallets'
-import { listenKeys, MapStore, WritableAtom } from 'nanostores'
+import { listenKeys, type MapStore } from 'nanostores'
 import { persistentMap } from '@nanostores/persistent'
-import {
+import type {
   LaserEyesStoreType,
   SignMessageOptions,
   WalletProviderSignPsbtOptions,
 } from '../types'
-import { ECDSA, SIGNET, TESTNET, TESTNET4 } from '../../constants'
-import { RpcErrorCode } from 'sats-connect'
+import { ECDSA } from '../../constants'
 import {
   handleStateChangePersistence,
   keysToPersist,
-  PersistedKey,
+  type PersistedKey,
 } from '../utils'
-import { LaserEyesClient } from '..'
 
 const LEATHER_WALLET_PERSISTENCE_KEY = 'LEATHER_CONNECTED_WALLET_STATE'
 
 export default class LeatherProvider extends WalletProvider {
-  constructor(
-    stores: {
-      $store: MapStore<LaserEyesStoreType>
-      $network: WritableAtom<NetworkType>
-    },
-    parent: LaserEyesClient,
-    config?: Config
-  ) {
-    super(stores, parent, config)
-  }
 
-  public get library(): any | undefined {
-    return (window as any).LeatherProvider
+  public get library(): LeatherRPC | undefined {
+    return window?.LeatherProvider
   }
 
   public get network(): NetworkType {
@@ -94,7 +78,8 @@ export default class LeatherProvider extends WalletProvider {
   initialize() {
     if (typeof window !== 'undefined' && typeof document !== 'undefined') {
       this.observer = new window.MutationObserver(() => {
-        const leatherLib = (window as any)?.LeatherProvider
+        const leatherLib = (window as unknown as { LeatherProvider: unknown })
+          ?.LeatherProvider
         if (leatherLib) {
           this.$store.setKey('hasProvider', {
             ...this.$store.get().hasProvider,
@@ -131,7 +116,7 @@ export default class LeatherProvider extends WalletProvider {
   }
 
   async connect(_: ProviderType): Promise<void> {
-    const { address, paymentAddress } = this.$valueStore!.get()
+    const { address, paymentAddress } = this.$valueStore.get()
 
     if (address) {
       if (address.startsWith('tb1') && isMainnetNetwork(this.network)) {
@@ -146,35 +131,16 @@ export default class LeatherProvider extends WalletProvider {
     }
 
     if (!this.library) throw new Error("Leather isn't installed")
-    const getAddressesResponse: LeatherRPCResponse =
-      await this.library.request('getAddresses')
-    if (!getAddressesResponse) throw new Error('No accounts found')
-    const addressesResponse =
-      getAddressesResponse.result as LeatherRequestAddressResponse
-    const addresses: LeatherAddress[] = addressesResponse.addresses
-    const leatherAccountsParsed = addresses.map(
-      (address: LeatherAddress) => address.address
-    )
-    const taprootAddress = addresses.find(
-      (address: LeatherAddress) => address.type === P2TR
-    )
-    const segwitAddress = addresses.find(
-      (address: LeatherAddress) => address.type === P2WPKH
-    )
+
+    const addresses = (await this.library.request('getAddresses', { network: this.config?.network ?? this.network })).result.addresses
+    if (!addresses) throw new Error('No accounts found')
+
+    const leatherAccountsParsed = addresses.map((address) => address.address)
+    const taprootAddress = addresses.find((address) => address.type === P2TR)
+    const segwitAddress = addresses.find((address) => address.type === P2WPKH)
 
     if (!taprootAddress?.publicKey || !segwitAddress?.publicKey) {
       throw new Error('No accounts found')
-    }
-
-    if (
-      String(taprootAddress?.address)?.startsWith('tb') &&
-      this.network !== TESTNET &&
-      this.network !== TESTNET4 &&
-      this.network !== SIGNET
-    ) {
-      throw new Error(
-        `Please switch networks to ${this.network} in the wallet settings.`
-      )
     }
 
     this.$store.setKey('accounts', leatherAccountsParsed)
@@ -188,6 +154,30 @@ export default class LeatherProvider extends WalletProvider {
     return this.network
   }
 
+  async switchNetwork(_network: NetworkType): Promise<void> {
+    if (_network !== this.network) {
+      if (!this.library) throw new Error("Leather isn't installed")
+
+      const addresses = (await this.library.request('getAddresses', { network: _network })).result.addresses
+      if (!addresses) throw new Error('Failed to get new network details')
+
+      const leatherAccountsParsed = addresses.map((address) => address.address)
+      const taprootAddress = addresses.find((address) => address.type === P2TR)
+      const segwitAddress = addresses.find((address) => address.type === P2WPKH)
+
+      if (!taprootAddress?.publicKey || !segwitAddress?.publicKey) {
+        throw new Error('Failed to get new network details')
+      }
+
+      this.$store.setKey('accounts', leatherAccountsParsed)
+      this.$store.setKey('address', taprootAddress.address)
+      this.$store.setKey('paymentAddress', segwitAddress.address)
+      this.$store.setKey('publicKey', taprootAddress.publicKey)
+      this.$store.setKey('paymentPublicKey', segwitAddress.publicKey)
+      this.$network.set(_network)
+    }
+  }
+
   async sendBTC(to: string, amount: number): Promise<string> {
     try {
       const response = await this.library?.request('sendTransfer', {
@@ -199,18 +189,19 @@ export default class LeatherProvider extends WalletProvider {
         ],
         network: this.network,
       })
-      if (response?.result?.txid) {
-        return response.result.txid
-      } else {
-        if (response.error.code === RpcErrorCode.USER_REJECTION) {
-          throw new Error('User rejected the request')
-        } else {
-          throw new Error('Error sending BTC: ' + response.error.message)
-        }
+      if (response?.result.txid) {
+        return response?.result.txid
       }
-    } catch (e: any) {
-      console.log(e)
-      throw new Error('error sending BTC')
+      throw new Error(`Error sending BTC`)
+    } catch (e: RpcErrorResponse | any) {
+      if ((e as RpcErrorResponse).error?.code) {
+        const error = (e as RpcErrorResponse).error;
+        if (error.code === RpcErrorCode.USER_REJECTION) {
+          throw new Error('User rejected the request')
+        }
+        throw new Error(`Error sending BTC: ${error.message}`)
+      }
+      throw new Error('Error sending BTC')
     }
   }
   async signMessage(
@@ -229,11 +220,11 @@ export default class LeatherProvider extends WalletProvider {
     ) {
       throw new Error('Invalid address to sign message')
     }
-    const signed = await this.library.request('signMessage', {
+    const signed = await this.library?.request('signMessage', {
       message: message,
       paymentType,
     })
-    return signed?.result?.signature
+    return signed?.result?.signature ?? ''
   }
   async signPsbt({
     psbtHex,
@@ -242,10 +233,10 @@ export default class LeatherProvider extends WalletProvider {
     inputsToSign,
   }: WalletProviderSignPsbtOptions): Promise<
     | {
-        signedPsbtHex: string | undefined
-        signedPsbtBase64: string | undefined
-        txId?: string | undefined
-      }
+      signedPsbtHex: string | undefined
+      signedPsbtBase64: string | undefined
+      txId?: string | undefined
+    }
     | undefined
   > {
     const requestParams: SignPsbtRequestParams = {
@@ -255,11 +246,13 @@ export default class LeatherProvider extends WalletProvider {
       signAtIndex: inputsToSign?.map((input) => input.index),
     }
 
-    const response: LeatherRPCResponse = await this.library.request(
+    const response = await this.library?.request(
       'signPsbt',
       requestParams
     )
-    const leatherHexResult = response.result as LeatherRequestSignResponse
+    if (!response) throw new Error('No response from Leather')
+
+    const leatherHexResult = response.result
     const signedTx = leatherHexResult.hex
     const signed = bitcoin.Psbt.fromHex(String(signedTx))
 
@@ -271,19 +264,18 @@ export default class LeatherProvider extends WalletProvider {
         signedPsbtBase64: signed.toBase64(),
         txId,
       }
-    } else if (finalize) {
+    } if (finalize) {
       const finalized = signed.finalizeAllInputs()
       return {
         signedPsbtHex: finalized.toHex(),
         signedPsbtBase64: finalized.toBase64(),
         txId: undefined,
       }
-    } else {
-      return {
-        signedPsbtHex: signed.toHex(),
-        signedPsbtBase64: signed.toBase64(),
-        txId: undefined,
-      }
+    }
+    return {
+      signedPsbtHex: signed.toHex(),
+      signedPsbtBase64: signed.toBase64(),
+      txId: undefined,
     }
   }
 
@@ -305,11 +297,11 @@ export default class LeatherProvider extends WalletProvider {
     if (accountsFromStore.length > 0) {
       return accountsFromStore
     }
-    const { result } = (await this.library.request(
-      'getAddresses'
-    )) as LeatherRPCResponse
-    const addresses = (result as LeatherRequestAddressResponse).addresses
-    const accounts = addresses.map((address: LeatherAddress) => address.address)
+    const response = await this.library?.request('getAddresses', { network: this.network })
+    if (!response) throw new Error('No accounts found')
+    const result = response.result
+    const addresses = (result).addresses
+    const accounts = addresses.map((address) => address.address)
     this.$store.setKey('accounts', accounts)
     return accounts
   }

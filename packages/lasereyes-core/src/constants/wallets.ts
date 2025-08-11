@@ -47,7 +47,7 @@ type WalletInfo = {
 export const SUPPORTED_WALLETS: WalletInfo = {
   [ProviderEnumMap.LEATHER]: {
     name: ProviderEnumMap.LEATHER,
-    url: 'https://leather.io/install-extension',
+    url: 'https://leather.io/wallet',
   },
   [ProviderEnumMap.MAGIC_EDEN]: {
     name: ProviderEnumMap.MAGIC_EDEN,
