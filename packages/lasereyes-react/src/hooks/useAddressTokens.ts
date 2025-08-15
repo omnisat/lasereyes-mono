@@ -13,7 +13,7 @@ import { useLaserEyes } from "../providers/hooks"
 type MetaProtocolResult<T extends MetaProtocol> = T extends typeof ALKANES
   ? AlkanesOutpoint[]
   : unknown[]
-type ReturnType<T extends MetaProtocol> = UseQueryResult<MetaProtocolResult<T>>
+type HookReturnType<T extends MetaProtocol> = UseQueryResult<MetaProtocolResult<T>>
 
 type useAddressTokensParams<T extends MetaProtocol> = {
   address: string
@@ -27,17 +27,17 @@ type useAddressTokensParams<T extends MetaProtocol> = {
 export function useAddressTokens<T extends MetaProtocol>(
   protocol: MetaProtocol,
   address: string,
-): ReturnType<T>
+): HookReturnType<T>
 export function useAddressTokens<T extends MetaProtocol>({
   address,
   protocol,
   queryOptions,
-}: useAddressTokensParams<T>): ReturnType<T>
+}: useAddressTokensParams<T>): HookReturnType<T>
 
 export function useAddressTokens<T extends MetaProtocol>(
   arg: useAddressTokensParams<T> | MetaProtocol,
   arg2?: string,
-): ReturnType<T> {
+): HookReturnType<T> {
   type Params = useAddressTokensParams<T>
   if (typeof arg === "string" && arg2 === undefined)
     throw Error(`Invalid argument received, 'address' cannot be undefined`)
