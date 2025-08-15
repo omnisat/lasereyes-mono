@@ -1,33 +1,34 @@
-import * as bitcoin from 'bitcoinjs-lib'
+import * as bitcoin from "bitcoinjs-lib"
 import {
+  AddressPurpose,
+  addListener,
+  BitcoinNetworkType,
+  MessageSigningProtocols,
   RpcErrorCode,
   request,
-  MessageSigningProtocols,
-  AddressPurpose,
-  BitcoinNetworkType,
-  addListener,
-} from 'sats-connect'
-import { WalletProvider } from '.'
+} from "sats-connect"
 import {
-  type ProviderType,
-  type NetworkType,
-  XVERSE,
+  ECDSA,
+  FRACTAL_MAINNET,
+  FRACTAL_TESTNET,
+  getNetworkForXverse,
   MAINNET,
+  type NetworkType,
+  type ProviderType,
+  SIGNET,
+  type SignMessageOptions,
   TESTNET,
   TESTNET4,
-  SIGNET,
-  FRACTAL_TESTNET,
-  type SignMessageOptions,
-  ECDSA,
   type WalletProviderSignPsbtOptions,
-  getNetworkForXverse,
-  FRACTAL_MAINNET,
-} from '../..'
+  XVERSE,
+} from "../.."
 import {
   findOrdinalsAddress,
   findPaymentAddress,
   getBitcoinNetwork,
-} from '../../lib/helpers'
+} from "../../lib/helpers"
+import { WalletProvider } from "."
+
 // import { normalizeInscription } from '../../lib/data-sources/normalizations'
 // import type { Inscription } from '../../types/lasereyes'
 
@@ -46,7 +47,7 @@ export default class XVerseProvider extends WalletProvider {
     return this.$network.get()
   }
 
-  public get library(): any | undefined {
+  public get library(): unknown | undefined {
     return (
       window as unknown as { XverseProviders: { BitcoinProvider: unknown } }
     )?.XverseProviders?.BitcoinProvider
@@ -55,10 +56,10 @@ export default class XVerseProvider extends WalletProvider {
   observer?: MutationObserver
 
   initialize(): void {
-    if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+    if (typeof window !== "undefined" && typeof document !== "undefined") {
       this.observer = new window.MutationObserver(() => {
         if (this.library || this.isMobile()) {
-          this.$store.setKey('hasProvider', {
+          this.$store.setKey("hasProvider", {
             ...this.$store.get().hasProvider,
             [XVERSE]: true,
           })
@@ -75,16 +76,16 @@ export default class XVerseProvider extends WalletProvider {
   }
 
   addListeners() {
-    addListener('accountChange', () => {})
-    addListener('networkChange', (event) => {
-      if (event.type === 'networkChange') {
+    addListener("accountChange", () => {})
+    addListener("networkChange", event => {
+      if (event.type === "networkChange") {
         this.handleNetworkChanged(event.bitcoin.name)
       }
     })
   }
 
   removeListeners() {
-    console.log('removeListeners')
+    console.log("removeListeners")
   }
 
   // private handleAccountsChanged(accounts: string[]) {
@@ -148,30 +149,30 @@ export default class XVerseProvider extends WalletProvider {
     let accounts: string[] = []
 
     try {
-      const response = await request('wallet_getAccount', null)
-      if (response.status === 'success') {
+      const response = await request("wallet_getAccount", null)
+      if (response.status === "success") {
         foundAddress = findOrdinalsAddress(response.result.addresses)
         foundPaymentAddress = findPaymentAddress(response.result.addresses)
         network = response.result.network.bitcoin.name
-        accounts = response.result.addresses.map((address) => address.address)
+        accounts = response.result.addresses.map(address => address.address)
       } else {
         throw new Error(`Error getting account: ${response.error.message}`)
       }
     } catch (e) {
       if (
         e instanceof Error &&
-        (e.message.toLowerCase().includes('failed to get') ||
-          e.message.toLowerCase().includes('access denied'))
+        (e.message.toLowerCase().includes("failed to get") ||
+          e.message.toLowerCase().includes("access denied"))
       ) {
-        const response = await request('wallet_connect', {
+        const response = await request("wallet_connect", {
           addresses: [AddressPurpose.Ordinals, AddressPurpose.Payment],
-          message: 'Connecting with lasereyes',
+          message: "Connecting with lasereyes",
         })
-        if (response.status === 'success') {
+        if (response.status === "success") {
           foundAddress = findOrdinalsAddress(response.result.addresses)
           foundPaymentAddress = findPaymentAddress(response.result.addresses)
           network = response.result.network.bitcoin.name
-          accounts = response.result.addresses.map((address) => address.address)
+          accounts = response.result.addresses.map(address => address.address)
         } else {
           if (response.error.code === RpcErrorCode.USER_REJECTION) {
             throw new Error(`User canceled lasereyes to ${XVERSE} wallet`)
@@ -185,16 +186,16 @@ export default class XVerseProvider extends WalletProvider {
     }
 
     if (!foundAddress || !foundPaymentAddress) {
-      throw new Error('Could not find the addresses')
+      throw new Error("Could not find the addresses")
     }
-    this.$store.setKey('address', foundAddress.address)
-    this.$store.setKey('paymentAddress', foundPaymentAddress.address)
-    this.$store.setKey('publicKey', String(foundAddress.publicKey))
+    this.$store.setKey("address", foundAddress.address)
+    this.$store.setKey("paymentAddress", foundPaymentAddress.address)
+    this.$store.setKey("publicKey", String(foundAddress.publicKey))
     this.$store.setKey(
-      'paymentPublicKey',
-      String(foundPaymentAddress.publicKey)
+      "paymentPublicKey",
+      String(foundPaymentAddress.publicKey),
     )
-    this.$store.setKey('accounts', accounts)
+    this.$store.setKey("accounts", accounts)
     if (network) {
       this.$network.set(getNetworkForXverse(network))
     }
@@ -202,11 +203,11 @@ export default class XVerseProvider extends WalletProvider {
 
   async getNetwork(): Promise<NetworkType | undefined> {
     try {
-      const response = await request('wallet_getNetwork', null)
-      if (response.status === 'success') {
+      const response = await request("wallet_getNetwork", null)
+      if (response.status === "success") {
         return getNetworkForXverse(response.result.bitcoin.name)
       }
-      throw new Error('Error getting network')
+      throw new Error("Error getting network")
     } catch (e) {
       console.error(e)
       return this.network
@@ -214,19 +215,19 @@ export default class XVerseProvider extends WalletProvider {
   }
 
   async switchNetwork(_network: NetworkType): Promise<void> {
-    const response = await request('wallet_changeNetwork', {
+    const response = await request("wallet_changeNetwork", {
       name: getSatsConnectBitcoinNetwork(_network),
     })
-    if (response.status === 'success') {
+    if (response.status === "success") {
       // TODO: Confirm if this is necessary
       this.handleNetworkChanged(_network)
     } else {
-      throw new Error('Error switching network')
+      throw new Error("Error switching network")
     }
   }
 
   async sendBTC(to: string, amount: number): Promise<string> {
-    const response = await request('sendTransfer', {
+    const response = await request("sendTransfer", {
       recipients: [
         {
           address: to,
@@ -234,21 +235,21 @@ export default class XVerseProvider extends WalletProvider {
         },
       ],
     })
-    if (response.status === 'success') {
+    if (response.status === "success") {
       return response.result.txid
     }
     if (response.error.code === RpcErrorCode.USER_REJECTION) {
-      throw new Error('User rejected the request')
+      throw new Error("User rejected the request")
     }
     throw new Error(`Error sending BTC: ${response.error.message}`)
   }
 
   async signMessage(
     message: string,
-    { toSignAddress, protocol }: SignMessageOptions
+    { toSignAddress, protocol }: SignMessageOptions,
   ): Promise<string> {
     const tempAddy = toSignAddress || this.$store.get().paymentAddress
-    const response = await request('signMessage', {
+    const response = await request("signMessage", {
       address: tempAddy,
       message,
       protocol:
@@ -257,11 +258,11 @@ export default class XVerseProvider extends WalletProvider {
           : MessageSigningProtocols.BIP322,
     })
 
-    if (response.status === 'success') {
+    if (response.status === "success") {
       return response.result.signature as string
     }
     if (response.error.code === RpcErrorCode.USER_REJECTION) {
-      throw new Error('User rejected the request')
+      throw new Error("User rejected the request")
     }
     throw new Error(`Error signing message: ${response.error.message}`)
   }
@@ -293,7 +294,7 @@ export default class XVerseProvider extends WalletProvider {
             acc[input.address] = [...(acc[input.address] || []), input.index]
             return acc
           },
-          {}
+          {},
         )
       } else {
         const { address, paymentAddress } = this.$store.get()
@@ -312,7 +313,7 @@ export default class XVerseProvider extends WalletProvider {
           const { script } = input.witnessUtxo
           const addressFromScript = bitcoin.address.fromOutputScript(
             script,
-            getBitcoinNetwork(this.network)
+            getBitcoinNetwork(this.network),
           )
           if (addressFromScript === paymentAddress) {
             paymentsAddressData[paymentAddress].push(Number(counter))
@@ -335,26 +336,26 @@ export default class XVerseProvider extends WalletProvider {
       let signedPsbtBase64: string | undefined
       let signedPsbt: bitcoin.Psbt | undefined
 
-      const response = await request('signPsbt', {
+      const response = await request("signPsbt", {
         psbt: psbtBase64,
         broadcast: !!broadcast,
         signInputs: inputsToSign,
       })
 
-      if (response.status === 'success') {
+      if (response.status === "success") {
         signedPsbt = bitcoin.Psbt.fromBase64(response.result.psbt, {
           network: getBitcoinNetwork(this.network),
         })
         txId = response.result.txid
       } else {
         if (response.error.code === RpcErrorCode.USER_REJECTION) {
-          throw new Error('User canceled the request')
+          throw new Error("User canceled the request")
         }
-        throw new Error('Error signing psbt')
+        throw new Error("Error signing psbt")
       }
 
       if (!signedPsbt) {
-        throw new Error('Error signing psbt')
+        throw new Error("Error signing psbt")
       }
 
       if (finalize && !txId) {
