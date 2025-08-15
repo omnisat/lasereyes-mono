@@ -1,42 +1,17 @@
 import type {
-  FRACTAL_MAINNET,
-  FRACTAL_TESTNET,
-  MAINNET,
-  OYLNET,
-  SIGNET,
-  TESTNET,
-  TESTNET4,
-} from '../constants/networks'
-import type {
-  UNISAT,
-  XVERSE,
-  OYL,
-  MAGIC_EDEN,
-  OKX,
-  LEATHER,
-  PHANTOM,
-  WIZZ,
-  ORANGE,
-  OP_NET,
-  SPARROW,
-  TOKEO,
-  KEPLR,
-} from '../constants/wallets'
-import type {
-  AUDIO_OGG,
-  MULTIPART_FORM_DATA,
   APPLICATION_ATOM_XML,
   APPLICATION_FORM_URLENCODED,
   APPLICATION_GZIP,
-  APPLICATION_JSON,
   APPLICATION_JAVASCRIPT,
+  APPLICATION_JSON,
   APPLICATION_OCTET_STREAM,
   APPLICATION_PDF,
   APPLICATION_RSS_XML,
-  APPLICATION_XML,
   APPLICATION_XHTML_XML,
+  APPLICATION_XML,
   APPLICATION_ZIP,
   AUDIO_MP3,
+  AUDIO_OGG,
   AUDIO_WAV,
   IMAGE_GIF,
   IMAGE_ICON,
@@ -44,17 +19,42 @@ import type {
   IMAGE_PNG,
   IMAGE_SVG_XML,
   IMAGE_WEBP,
+  MULTIPART_FORM_DATA,
   TEXT_CSS,
   TEXT_HTML,
   TEXT_JAVASCRIPT,
+  TEXT_MARKDOWN,
   TEXT_PLAIN,
   VIDEO_MP4,
   VIDEO_OGG,
   VIDEO_WEBM,
-  TEXT_MARKDOWN,
-} from '../constants/content'
-import type { BTC, RUNES, BRC20, ALKANES } from '../constants/protocols'
-import type { BaseNetwork } from './network'
+} from "../constants/content"
+import type {
+  FRACTAL_MAINNET,
+  FRACTAL_TESTNET,
+  MAINNET,
+  OYLNET,
+  SIGNET,
+  TESTNET,
+  TESTNET4,
+} from "../constants/networks"
+import type { ALKANES, BRC20, BTC, RUNES } from "../constants/protocols"
+import type {
+  KEPLR,
+  LEATHER,
+  MAGIC_EDEN,
+  OKX,
+  OP_NET,
+  ORANGE,
+  OYL,
+  PHANTOM,
+  SPARROW,
+  TOKEO,
+  UNISAT,
+  WIZZ,
+  XVERSE,
+} from "../constants/wallets"
+import type { BaseNetwork } from "./network"
 
 export type BaseNetworkType =
   | typeof BaseNetwork.MAINNET
@@ -170,7 +170,7 @@ export type Config = {
   customNetworks?: {
     [key: string]: {
       baseNetwork: BaseNetworkType
-      preferredDataSource: 'mempool' | 'sandshrew' | 'maestro' | string
+      preferredDataSource: "mempool" | "sandshrew" | "maestro" | string
     }
   }
 }
@@ -182,6 +182,7 @@ export type SendArgs =
   | AlkaneSendArgs
 
 export type Protocol = typeof BTC | typeof RUNES | typeof BRC20 | typeof ALKANES
+export type MetaProtocol = Exclude<Protocol, typeof BTC>
 
 export interface BTCSendArgs {
   fromAddress: string
@@ -190,7 +191,7 @@ export interface BTCSendArgs {
   network: NetworkType
 }
 
-export * from './lasereyes'
+export * from "./lasereyes"
 
 export interface RuneSendArgs {
   runeId: string
@@ -301,9 +302,9 @@ export interface MempoolUtxo {
 
 export type PhantomBtcAccount = {
   address: string
-  addressType: 'p2tr' | 'p2wpkh' | 'p2sh' | 'p2pkh'
+  addressType: "p2tr" | "p2wpkh" | "p2sh" | "p2pkh"
   publicKey: string
-  purpose: 'payment' | 'ordinals'
+  purpose: "payment" | "ordinals"
 }
 
 export type WizzBalanceResponse = {
@@ -435,13 +436,13 @@ export interface AlkanesOutpoint {
   height: number
 }
 
-export * from './network'
-export * from './lasereyes'
-export * from './esplora'
-export * from './mempool-space'
-export * from './sandshrew'
-export * from './maestro'
-export * from './ord'
-export * from './data-source'
-export * from './alkane'
-export * from './utxo'
+export * from "./alkane"
+export * from "./data-source"
+export * from "./esplora"
+export * from "./lasereyes"
+export * from "./maestro"
+export * from "./mempool-space"
+export * from "./network"
+export * from "./ord"
+export * from "./sandshrew"
+export * from "./utxo"
