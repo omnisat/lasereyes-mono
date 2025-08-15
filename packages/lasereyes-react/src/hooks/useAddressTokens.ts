@@ -24,17 +24,17 @@ type useAddressTokensParams<T extends MetaProtocol> = {
   >
 }
 
-export default function useAddressTokens<T extends MetaProtocol>(
+export function useAddressTokens<T extends MetaProtocol>(
   protocol: MetaProtocol,
   address: string,
 ): ReturnType<T>
-export default function useAddressTokens<T extends MetaProtocol>({
+export function useAddressTokens<T extends MetaProtocol>({
   address,
   protocol,
   queryOptions,
 }: useAddressTokensParams<T>): ReturnType<T>
 
-export default function useAddressTokens<T extends MetaProtocol>(
+export function useAddressTokens<T extends MetaProtocol>(
   arg: useAddressTokensParams<T> | MetaProtocol,
   arg2?: string,
 ): ReturnType<T> {

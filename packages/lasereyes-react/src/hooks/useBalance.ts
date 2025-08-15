@@ -11,13 +11,13 @@ type useBalanceParams<T extends Protocol> = {
   tokenId?: T extends typeof BTC ? never : string
   queryOptions?: Omit<UseQueryOptions<bigint>, "queryKey" | "queryFn">
 }
-export default function useBalance<T extends Protocol>({
+export function useBalance<T extends Protocol>({
   protocol,
   tokenId,
   queryOptions,
 }: useBalanceParams<T>): UseQueryResult<bigint>
-export default function useBalance(protocol: typeof BTC): UseQueryResult<bigint>
-export default function useBalance<T extends Protocol>(
+export function useBalance(protocol: typeof BTC): UseQueryResult<bigint>
+export function useBalance<T extends Protocol>(
   arg: useBalanceParams<T> | typeof BTC,
 ): UseQueryResult<bigint> {
   const { client, address, network } = useLaserEyes(

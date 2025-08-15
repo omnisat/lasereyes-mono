@@ -26,7 +26,7 @@ type useAlkanesListParams = {
   >
 }
 
-export default function useAlkanesList(
+export function useAlkanesList(
   options?: useAlkanesListParams,
 ): Omit<UseInfiniteQueryResult, "data"> & { data: AlkaneToken[] | undefined } {
   const { client } = useLaserEyes(({ client }) => ({ client }))

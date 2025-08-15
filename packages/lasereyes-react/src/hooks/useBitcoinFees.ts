@@ -9,7 +9,7 @@ type useBitcoinFeesParams = {
   queryOptions?: Omit<UseQueryOptions<FeesResult>, "queryKey" | "queryFn">
 }
 
-export default function useBitcoinFees(options?: useBitcoinFeesParams) {
+export function useBitcoinFees(options?: useBitcoinFeesParams) {
   const { client, network } = useLaserEyes(({ client, network }) => ({
     client,
     network,
