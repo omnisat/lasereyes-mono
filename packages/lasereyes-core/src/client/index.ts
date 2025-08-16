@@ -454,12 +454,17 @@ export class LaserEyesClient {
     }
   }
 
-  async inscribe(content: string, mimeType: ContentType) {
+  async inscribe(content: string, mimeType: ContentType, opReturn?: string) {
     const provider = this.$store.get().provider
     if (!provider) return
     if (provider && this.$providerMap[provider]) {
       try {
-        return await this.$providerMap[provider]?.inscribe(content, mimeType)
+        return await this.$providerMap[provider]?.inscribe(
+          content,
+          mimeType,
+          this.dataSourceManager,
+          opReturn
+        )
       } catch (error) {
         if (error instanceof Error) {
           if (error.message.toLowerCase().includes('not implemented')) {

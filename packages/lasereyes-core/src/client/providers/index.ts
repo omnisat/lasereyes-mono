@@ -201,7 +201,8 @@ export abstract class WalletProvider {
   async inscribe(
     contentBase64: string,
     mimeType: ContentType,
-    dataSourceManager?: DataSourceManager
+    dataSourceManager?: DataSourceManager,
+    opReturn?: string
   ): Promise<string | string[]> {
     return await inscribeContent({
       contentBase64,
@@ -211,6 +212,7 @@ export abstract class WalletProvider {
       paymentPublicKey: this.$store.get().paymentPublicKey,
       signPsbt: this.signPsbt.bind(this),
       dataSourceManager: dataSourceManager || this.dataSourceManager,
+      opReturn,
       network: this.$network.get(),
     })
   }
