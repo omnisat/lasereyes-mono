@@ -1,5 +1,5 @@
 import { createContext, useContext } from "react";
-import { SIGNET, TESTNET, FRACTAL_TESTNET, MAINNET } from "@omnisat/lasereyes-core";
+import { SIGNET, TESTNET, FRACTAL_TESTNET, MAINNET } from "@omnisat/lasereyes";
 import { LaserEyesModalConfig } from "../types/config";
 
 export interface LasereyesModalContext {

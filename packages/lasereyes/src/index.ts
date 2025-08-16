@@ -1,6 +1,10 @@
 export * from '@omnisat/lasereyes-core'
 export {
   useLaserEyes,
+  useBalance,
+  useFees,
+  useAddressAlkanes,
+  useAlkanes,
   LaserEyesProvider,
   WalletIcon,
   LeatherLogo,
