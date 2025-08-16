@@ -4,7 +4,7 @@ import {
   ProviderType,
   SUPPORTED_WALLETS,
   useLaserEyes,
-} from '@omnisat/lasereyes-react'
+} from '@omnisat/lasereyes'
 import { useMemo } from 'react'
 import useModalConfig from './useModalConfig'
 

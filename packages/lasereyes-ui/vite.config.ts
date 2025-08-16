@@ -24,8 +24,6 @@ export default defineConfig({
         "react-dom",
         "react/jsx-runtime",
         "@omnisat/lasereyes",
-        "@omnisat/lasereyes-core",
-        "@omnisat/lasereyes-react",
       ],
       output: {
         entryFileNames: "[name].js",
@@ -33,8 +31,6 @@ export default defineConfig({
           react: "React",
           "react-dom": "ReactDOM",
           "@omnisat/lasereyes": "Lasereyes",
-          "@omnisat/lasereyes-core": "LasereyesCore",
-          "@omnisat/lasereyes-react": "LasereyesReact",
         },
       },
     },

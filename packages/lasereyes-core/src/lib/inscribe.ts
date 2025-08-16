@@ -25,6 +25,7 @@ export const inscribeContent = async ({
   paymentPublicKey,
   signPsbt,
   dataSourceManager,
+  opReturn,
   network = MAINNET,
 }: {
   contentBase64?: string
@@ -43,6 +44,7 @@ export const inscribeContent = async ({
     | undefined
   >
   dataSourceManager: DataSourceManager
+  opReturn?: string
   network: NetworkType
 }) => {
   if (!contentBase64 && !inscriptions) {
@@ -102,6 +104,7 @@ export const inscribeContent = async ({
     privKey,
     commitTxId,
     dataSourceManager,
+    opReturn,
   })
 }
 
@@ -240,6 +243,7 @@ export const executeRevealTransaction = async ({
   commitTxId,
   privKey,
   dataSourceManager,
+  opReturn,
   isDry,
 }: {
   inscriptions: { content: string; mimeType: ContentType }[]
@@ -247,6 +251,7 @@ export const executeRevealTransaction = async ({
   commitTxId: string
   privKey: string
   dataSourceManager: DataSourceManager
+  opReturn?: string
   isDry?: boolean
 }): Promise<string> => {
   const secKey = ecc.keys.get_seckey(privKey)
@@ -303,6 +308,16 @@ export const executeRevealTransaction = async ({
         scriptPubKey: Address.toScriptPubKey(ordinalAddress),
       }),
     ],
+    ...(opReturn
+      ? {
+          vout: [
+            {
+              value: 0,
+              scriptPubKey: ['OP_RETURN', opReturn],
+            },
+          ],
+        }
+      : {}),
   })
 
   const sig = Signer.taproot.sign(secKey, txData, 0, { extension: tapleaf })
