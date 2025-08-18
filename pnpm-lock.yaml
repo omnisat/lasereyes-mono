@@ -403,13 +403,14 @@ importers:
         version: 5.8.3
 
   packages/lasereyes:
-    devDependencies:
+    dependencies:
       '@omnisat/lasereyes-core':
         specifier: workspace:*
         version: link:../lasereyes-core
       '@omnisat/lasereyes-react':
         specifier: workspace:*
         version: link:../lasereyes-react
+    devDependencies:
       '@vitejs/plugin-react-swc':
         specifier: ^3.5.0
         version: 3.10.2(vite@5.4.19)
@@ -519,6 +520,9 @@ importers:
       '@nanostores/react':
         specifier: ^0.7.3
         version: 0.7.3(nanostores@0.11.4)(react@19.0.0-rc.1)
+      '@omnisat/lasereyes-core':
+        specifier: workspace:*
+        version: link:../lasereyes-core
       '@tanstack/react-query':
         specifier: ^5.81.5
         version: 5.81.5(react@19.0.0-rc.1)
@@ -535,9 +539,6 @@ importers:
       '@eslint/js':
         specifier: ^9.9.0
         version: 9.29.0
-      '@omnisat/lasereyes-core':
-        specifier: workspace:*
-        version: link:../lasereyes-core
       '@types/node':
         specifier: ^22.5.4
         version: 22.15.32
@@ -620,12 +621,9 @@ importers:
         specifier: ^2.4.0
         version: 2.6.0
     devDependencies:
-      '@omnisat/lasereyes-core':
+      '@omnisat/lasereyes':
         specifier: workspace:*
-        version: link:../lasereyes-core
-      '@omnisat/lasereyes-react':
-        specifier: workspace:*
-        version: link:../lasereyes-react
+        version: link:../lasereyes
       '@types/node':
         specifier: ^22.0.0
         version: 22.15.32

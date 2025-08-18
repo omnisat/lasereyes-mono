@@ -21,7 +21,7 @@ export default defineConfig({
       formats: ['es'],
     },
     rollupOptions: {
-      external: ['react', 'react-dom', 'react/jsx-runtime', '@omnisat/lasereyes-core', '@omnisat/lasereyes-react'],
+      external: ['react', 'react-dom', 'react/jsx-runtime'],
       input: {
         index: resolve(__dirname, './src/index.ts'),
       },
@@ -33,8 +33,6 @@ export default defineConfig({
         globals: {
           react: 'React',
           'react-dom': 'ReactDOM',
-          '@omnisat/lasereyes-core': 'LasereyesCore',
-          '@omnisat/lasereyes-react': 'LasereyesReact',
         },
         banner: "'use client';",
       },

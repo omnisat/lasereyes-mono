@@ -1,7 +1,7 @@
 {
   "name": "@omnisat/lasereyes-react",
   "private": false,
-  "version": "0.0.76-next.2",
+  "version": "0.0.76-next.3",
   "type": "module",
   "main": "./dist/index.umd.cjs",
   "module": "./dist/index.js",
@@ -25,19 +25,18 @@
   },
   "dependencies": {
     "@nanostores/react": "^0.7.3",
+    "@omnisat/lasereyes-core": "workspace:*",
     "@tanstack/react-query": "^5.81.5",
     "bootstrap": "^5.3.3",
     "nanostores": "^0.11.3",
     "vite-plugin-ssr": "^0.4.142"
   },
   "peerDependencies": {
-    "@omnisat/lasereyes-core": "workspace:*",
     "react": ">=17",
     "react-dom": ">=17"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",
-    "@omnisat/lasereyes-core": "workspace:*",
     "@types/node": "^22.5.4",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",

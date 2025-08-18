@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Button } from "../ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
-import { useLaserEyes, useBalance, MAINNET, TESTNET, TESTNET4, SIGNET, FRACTAL_MAINNET, FRACTAL_TESTNET, BTC } from '@omnisat/lasereyes-react'
+import { useLaserEyes, useBalance, MAINNET, TESTNET, TESTNET4, SIGNET, FRACTAL_MAINNET, FRACTAL_TESTNET, BTC } from '@omnisat/lasereyes'
 import { 
   Wallet, 
   Bitcoin, 

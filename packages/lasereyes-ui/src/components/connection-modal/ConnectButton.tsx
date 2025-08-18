@@ -1,6 +1,6 @@
 import { Button } from "../ui/button";
 import { useTranslation } from "react-i18next";
-import { useLaserEyes } from "@omnisat/lasereyes-react";
+import { useLaserEyes } from "@omnisat/lasereyes";
 import { useCallback, useState, useLayoutEffect } from "react";
 import Spinner from "../ui/spinner";
 import { useLaserEyesModal } from "../../providers/LaserEyesModalContext";
