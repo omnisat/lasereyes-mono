@@ -1,3 +1,4 @@
+export * from "./alkanes/useToken"
 export * from "./useAccount"
 export * from "./useAddressTokens"
 export * from "./useAlkanes"
