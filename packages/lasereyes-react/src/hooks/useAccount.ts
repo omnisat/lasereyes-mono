@@ -1,4 +1,6 @@
+import { type DependencyList, type EffectCallback, useEffect } from "react"
 import { useLaserEyes } from "../providers/hooks"
+import { compareValues } from "../utils/comparison"
 
 type UseAccountReturnType =
   | {
@@ -27,4 +29,30 @@ export function useAccount(): UseAccountReturnType {
         ordinals: address,
         publicKey,
       }
+}
+
+export function useAccountEffect(
+  callback: EffectCallback,
+  dependencies: DependencyList,
+) {
+  const store = useLaserEyes(x => x.client?.$store)
+
+  useEffect(() => {
+    if (!store) return
+
+    let unsub: ReturnType<EffectCallback>
+    const stUnsub = store.subscribe((v, ov, ck) => {
+      if (ck === "accounts") {
+        if (!compareValues(v.accounts, ov?.accounts)) {
+          unsub?.()
+          unsub = callback()
+        }
+      }
+    })
+
+    return () => {
+      stUnsub()
+      unsub?.()
+    }
+  }, [store, callback, ...dependencies])
 }

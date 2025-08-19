@@ -10,7 +10,7 @@ import {
   useInfiniteQuery,
 } from "@tanstack/react-query"
 import { useMemo } from "react"
-import { useLaserEyes } from "../providers/hooks"
+import { useLaserEyes } from "../../providers/hooks"
 
 type useAlkanesListParams = {
   batchSize?: number
