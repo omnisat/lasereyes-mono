@@ -55,7 +55,7 @@ const AlkanesSection = () => {
       getMetaBalances(ALKANES)
         .then((x) => {
           console.log('alkanes', x)
-          return x
+          return x as AlkaneBalance[]
         })
         .then(setAlkanes)
     }

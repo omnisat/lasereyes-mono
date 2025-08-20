@@ -1,8 +1,8 @@
-import React, { ReactNode, useEffect, useRef, useState } from 'react'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import type { ContentType } from '@omnisat/lasereyes'
 import { usePathname } from 'next/navigation'
+import { type ReactNode, useEffect, useRef, useState } from 'react'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
-import { ContentType } from '@omnisat/lasereyes'
 
 const InscriptionComponent = ({
   contentUrl,

@@ -13,9 +13,9 @@ import {
   useLaserEyes,
   type OP_NET,
   type ProviderType,
-  SPARROW,
+  // SPARROW,
   WalletIcon,
-  TOKEO,
+  type TOKEO,
 } from '@omnisat/lasereyes'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
@@ -72,7 +72,7 @@ const WalletConnectButton = ({
 
   const isConnected = provider === walletName
   const isMissingWallet = !hasWallet[walletName]
-  const isSparrow = wallet.name === SPARROW
+  // const isSparrow = wallet.name === SPARROW
 
   const connectWallet = async (
     walletName:

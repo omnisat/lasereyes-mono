@@ -76,7 +76,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
       }
     | undefined
   >()
-  const [selectedColor, setSelectedColor] = useState<colorsType>(
+  const [selectedColor, ] = useState<colorsType>(
     colors[Math.floor(Math.random() * 5)]
   )
 
@@ -468,11 +468,11 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
               <span
                 className={clsx(
                   'text-lg flex flex-row gap-2 items-center justify-center',
-                  provider?.length > 0 ? 'text-white' : 'text-gray-500'
+                  provider ? 'text-white' : 'text-gray-500'
                 )}
               >
                 {provider && <WalletIcon walletName={provider} size={24} />}{' '}
-                {provider?.length > 0 ? provider : '--'}
+                {provider ? provider : '--'}
               </span>
             </div>
           </div>

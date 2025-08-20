@@ -1,14 +1,10 @@
-import {
-  ContentType,
+import type {
+  Inscription,
+  LaserEyesClient, MempoolUtxo,
   NetworkType,
   Protocol,
-  ProviderType,
-  SignMessageOptions,
-  LaserEyesClient,
-  MempoolUtxo,
-  LaserEyesSignPsbtsOptions,
-  SignPsbtsResponse,
-} from '@omnisat/lasereyes-core'
+  ProviderType
+} from "@omnisat/lasereyes-core"
 
 export type LaserEyesContextType = {
   isInitializing: boolean
@@ -20,9 +16,9 @@ export type LaserEyesContextType = {
   paymentPublicKey: string
   balance: number | undefined
   network: NetworkType
-  library: any
+  library: unknown
   client: LaserEyesClient | null
-  provider: any
+  provider: ProviderType | undefined
   accounts: string[]
   hasUnisat: boolean
   hasXverse: boolean
@@ -45,24 +41,15 @@ export type LaserEyesContextType = {
   switchNetwork: (network: NetworkType) => Promise<void>
   getPublicKey: () => Promise<string>
   getBalance: () => Promise<string>
-  getMetaBalances: (protocol: Protocol) => Promise<any>
-  getInscriptions: (offset?: number, limit?: number) => Promise<any[]>
-  sendBTC: (to: string, amount: number) => Promise<string>
-  signMessage: (
-    message: string,
-    toSignAddressOrOptions?: string | SignMessageOptions
-  ) => Promise<string>
-  signPsbt: LaserEyesClient['signPsbt']
-  signPsbts: (options: LaserEyesSignPsbtsOptions) => Promise<SignPsbtsResponse>
-  pushPsbt: (tx: string) => Promise<string | undefined>
-  inscribe: (
-    contentBase64: string,
-    mimeType: ContentType
-  ) => Promise<string | string[]>
-  send: LaserEyesClient['send']
-  sendInscriptions: (
-    inscriptionIds: string[],
-    toAddress: string
-  ) => Promise<string>
+  getMetaBalances: (protocol: Protocol) => Promise<unknown>
+  getInscriptions: (offset?: number, limit?: number) => Promise<Inscription[]>
+  sendBTC: LaserEyesClient["sendBTC"]
+  signMessage: LaserEyesClient["signMessage"]
+  signPsbt: LaserEyesClient["signPsbt"]
+  signPsbts: LaserEyesClient["signPsbts"]
+  pushPsbt: LaserEyesClient["pushPsbt"]
+  inscribe: LaserEyesClient["inscribe"]
+  send: LaserEyesClient["send"]
+  sendInscriptions: LaserEyesClient["sendInscriptions"]
   getUtxos: (address: string) => Promise<MempoolUtxo[]>
 }

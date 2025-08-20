@@ -1,7 +1,7 @@
 {
   "name": "@omnisat/lasereyes-core",
   "private": false,
-  "version": "0.0.81",
+  "version": "0.0.82-next.0",
   "type": "module",
   "main": "./dist/index.umd.cjs",
   "module": "./dist/index.js",
