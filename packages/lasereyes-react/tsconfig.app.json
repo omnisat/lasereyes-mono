@@ -26,7 +26,7 @@
     "noFallthroughCasesInSwitch": true,
     "paths": {
       "@": ["./src"],
-      "@omnisat/lasereyes-core": ["../lasereyes-core/dist"]
+      "@omnisat/lasereyes-core": ["../core/dist"]
     }
   },
   "include": ["src/**/*"]
