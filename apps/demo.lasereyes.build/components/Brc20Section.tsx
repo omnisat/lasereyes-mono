@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react'
-import { Button } from './ui/button'
-import { Input } from '@/components/ui/input'
-import { cn } from '@/lib/utils'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
+import { type Brc20Balance, type MAINNET, type TESTNET, useLaserEyes } from '@omnisat/lasereyes'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
+import { Input } from '@/components/ui/input'
 import { getMempoolSpaceUrl } from '@/lib/urls'
-import { type MAINNET, type TESTNET, useLaserEyes, type Brc20Balance, type SendArgs } from '@omnisat/lasereyes'
+import { cn } from '@/lib/utils'
+import { Button } from './ui/button'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
 
 const BRC20Section = () => {
   const { provider, address, send, network, getMetaBalances, connected } = useLaserEyes()
@@ -17,7 +17,7 @@ const BRC20Section = () => {
 
   useEffect(() => {
     if (address && connected && network) {
-      getMetaBalances('brc20').then(setBrc20s)
+      getMetaBalances('brc20').then((v) => setBrc20s(v as Brc20Balance[]))
     }
   }, [address, getMetaBalances, connected, network])
 

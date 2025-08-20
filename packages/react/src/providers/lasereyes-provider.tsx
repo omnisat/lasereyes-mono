@@ -1,13 +1,5 @@
 'use client'
 import {
-  type ReactNode,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react'
-import { defaultMethods, LaserEyesStoreContext } from './context'
-import {
   type Config,
   type ContentType,
   createConfig,
@@ -22,6 +14,14 @@ import {
   type SignPsbtsResponse,
 } from '@omnisat/lasereyes-core'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import {
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
+import { defaultMethods, LaserEyesStoreContext } from './context'
 
 const queryClient = new QueryClient()
 

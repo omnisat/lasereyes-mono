@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from './ui/button'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
@@ -17,7 +17,7 @@ const RunesSection = () => {
 
   useEffect(() => {
     if (address && connected && network) {
-      getMetaBalances('runes').then(setRunes)
+      getMetaBalances('runes').then((x) => setRunes(x as OrdRuneBalance[]))
     }
   }, [address, getMetaBalances, connected, network])
 

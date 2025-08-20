@@ -2,30 +2,30 @@ import { MAESTRO } from '../../constants/data-sources'
 import type { AlkanesOutpoint, Config } from '../../types'
 import type { AlkaneBalance } from '../../types/alkane'
 import type { DataSource } from '../../types/data-source'
-import type { Inscription } from '../../types/lasereyes'
+import type { Brc20Balance, Inscription } from '../../types/lasereyes'
 import type { MaestroAddressInscription } from '../../types/maestro'
 import { BaseNetwork } from '../../types/network'
 import type { OrdRuneBalance } from '../../types/ord'
-import {
+import type {
   FormattedAlkane,
   FormattedInscription,
   FormattedRune,
   FormattedUTXO,
   LasereyesUTXO,
 } from '../../types/utxo'
+import { getAddressScriptPubKey } from '../btc'
 import {
   getMaestroUrl,
   getMempoolSpaceUrl,
+  getSandshrewUrl,
   MAESTRO_API_KEY_MAINNET,
   MAESTRO_API_KEY_TESTNET4,
   SANDSHREW_LASEREYES_KEY,
-  getSandshrewUrl,
 } from '../urls'
 import { normalizeBrc20Balances, normalizeInscription } from './normalizations'
 import { MaestroDataSource } from './sources/maestro-ds'
 import { MempoolSpaceDataSource } from './sources/mempool-space-ds'
 import { SandshrewDataSource } from './sources/sandshrew-ds'
-import { getAddressScriptPubKey } from '../btc'
 
 const ERROR_METHOD_NOT_AVAILABLE = 'Method not available on any data source'
 
@@ -182,7 +182,7 @@ export class DataSourceManager {
     return balance
   }
 
-  public async getAddressBrc20Balances(address: string): Promise<unknown> {
+  public async getAddressBrc20Balances(address: string): Promise<Brc20Balance[]> {
     const dataSource = this.findAvailableSource('getAddressBrc20Balances')
     if (!dataSource || !dataSource.getAddressBrc20Balances) {
       throw new Error(ERROR_METHOD_NOT_AVAILABLE)
@@ -509,3 +509,4 @@ export class DataSourceManager {
 export { MaestroDataSource } from './sources/maestro-ds'
 export { MempoolSpaceDataSource } from './sources/mempool-space-ds'
 export { SandshrewDataSource } from './sources/sandshrew-ds'
+

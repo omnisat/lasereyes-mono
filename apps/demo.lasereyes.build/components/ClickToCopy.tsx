@@ -1,13 +1,13 @@
 'use client'
 
-import { JSX, SVGProps, useState } from 'react'
-import {
-  TooltipProvider,
-  Tooltip,
-  TooltipTrigger,
-  TooltipContent,
-} from '@/components/ui/tooltip'
 import { Button } from '@/components/ui/button'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
+import { type JSX, type SVGProps, useState } from 'react'
 
 export default function ClickToCopy({ value }: { value: string | undefined }) {
   const [copied, setCopied] = useState(false)
