@@ -87,10 +87,10 @@ function ArchitectureContent() {
               language="text"
               code={`lasereyes/
 ├── packages/
-│   ├── lasereyes-core/     # Core functionality
-│   ├── lasereyes-react/    # React integration
-│   ├── lasereyes-vue/      # Vue integration
-│   └── lasereyes-ui/       # Shared UI components
+│   ├── core/     # Core functionality
+│   ├── react/    # React integration
+│   ├── vue/      # Vue integration
+│   └── ui/       # Shared UI components
 └── apps/
     ├── docs/               # Documentation site
     └── examples/           # Example applications`}
