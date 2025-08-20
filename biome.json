@@ -1,0 +1,12 @@
+{
+    "$schema": "https://biomejs.dev/schemas/2.1.4/schema.json",
+    "root": true,
+    "javascript": {
+        "formatter": {
+            "semicolons": "asNeeded",
+            "arrowParentheses": "asNeeded",
+            "indentStyle": "space",
+            "bracketSameLine": true
+        }
+    }
+}

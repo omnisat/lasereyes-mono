@@ -16,8 +16,8 @@
 
 This package exports two core packages:
 
-1. **[lasereyes-core](https://github.com/omnisat/lasereyes-mono/tree/main/packages/lasereyes-core)**: The framework-agnostic core logic for wallet interactions.
-2. **[lasereyes-react](https://github.com/omnisat/lasereyes-mono/tree/main/packages/lasereyes-react)**: React-specific components, including hooks, providers, and wallet icons.
+1. **[lasereyes-core](https://github.com/omnisat/lasereyes-mono/tree/main/packages/core)**: The framework-agnostic core logic for wallet interactions.
+2. **[lasereyes-react](https://github.com/omnisat/lasereyes-mono/tree/main/packages/react)**: React-specific components, including hooks, providers, and wallet icons.
 
 ## Installation
 

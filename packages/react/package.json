@@ -1,0 +1,60 @@
+{
+  "name": "@omnisat/lasereyes-react",
+  "private": false,
+  "version": "0.0.76-next.4",
+  "type": "module",
+  "main": "./dist/index.umd.cjs",
+  "module": "./dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "types": "./dist/index.d.ts",
+  "typings": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.umd.cjs"
+    }
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b tsconfig.build.json && vite build",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "@nanostores/react": "^0.7.3",
+    "@omnisat/lasereyes-core": "workspace:*",
+    "@tanstack/react-query": "^5.81.5",
+    "bootstrap": "^5.3.3",
+    "nanostores": "^0.11.3",
+    "vite-plugin-ssr": "^0.4.142"
+  },
+  "peerDependencies": {
+    "react": ">=17",
+    "react-dom": ">=17"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.9.0",
+    "@types/node": "^22.5.4",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react-swc": "^3.7.0",
+    "bip39": "^3.1.0",
+    "eslint": "^9.9.0",
+    "eslint-plugin-react-hooks": "^5.1.0-rc.0",
+    "eslint-plugin-react-refresh": "^0.4.9",
+    "globals": "^15.9.0",
+    "react": "19.0.0-rc.1",
+    "react-dom": "19.0.0-rc.1",
+    "sonda": "^0.7.1",
+    "typescript": "5.8.3",
+    "typescript-eslint": "^8.0.1",
+    "vite": "^5.4.1",
+    "vite-plugin-dts": "^4.2.1"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

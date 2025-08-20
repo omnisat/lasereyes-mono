@@ -1,0 +1,61 @@
+{
+  "name": "@omnisat/lasereyes-core",
+  "private": false,
+  "version": "0.0.81-next.4",
+  "type": "module",
+  "main": "./dist/index.umd.cjs",
+  "module": "./dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.umd.cjs"
+    }
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "prepublishOnly": "npm run build",
+    "prepare": "npm run build",
+    "lint": "eslint ."
+  },
+  "devDependencies": {
+    "@leather.io/rpc": "^2.20.3",
+    "@types/node": "^22.7.7",
+    "@types/tiny-async-pool": "^2.0.3",
+    "eslint": "^9.30.0",
+    "globals": "^15.9.0",
+    "sonda": "^0.7.1",
+    "typescript": "5.8.3",
+    "vite": "^5.4.1",
+    "vite-plugin-dts": "^4.2.1",
+    "vite-plugin-node-polyfills": "^0.22.0"
+  },
+  "dependencies": {
+    "@bitcoinerlab/secp256k1": "^1.1.1",
+    "@cmdcode/crypto-utils": "^2.4.6",
+    "@cmdcode/tapscript": "^1.4.6",
+    "@magiceden-oss/runestone-lib": "^1.0.2",
+    "@nanostores/persistent": "^0.10.2",
+    "@orangecrypto/orange-connect": "^1.2.2",
+    "@oyl/sdk": "^1.16.0",
+    "alkanes": "git+https://github.com/kungfuflex/alkanes.git",
+    "axios": "^1.7.7",
+    "bip32": "5.0.0-rc.0",
+    "bip39": "^3.1.0",
+    "bitcoinjs-lib": "^7.0.0-rc.0",
+    "buffer": "^6.0.3",
+    "crypto-browserify": "^3.12.1",
+    "nanostores": "^0.11.3",
+    "ordapi": "^0.0.7",
+    "sats-connect": "^3.3.0",
+    "tiny-async-pool": "^2.1.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

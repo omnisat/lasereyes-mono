@@ -1,18 +1,17 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
+    "composite": true,
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+    "target": "esnext",
     "useDefineForClassFields": true,
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "skipLibCheck": true,
 
-    "declaration": true,
-    "declarationMap": true,
-    "composite": true,  // Add this line
-
     /* Bundler mode */
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
     "isolatedModules": true,
     "moduleDetection": "force",
     "noEmit": true,
@@ -23,10 +22,8 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
+
+    "baseUrl": ".",
   },
-  "include": ["src/**/*"],
-  "references": [
-    { "path": "../core" },
-    { "path": "../react" }
-  ]
+  "include": ["src", "src/i18n/locales/**/*.json", "src", "../react/src/hooks/useBalance.ts"]
 }
