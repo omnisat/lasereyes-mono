@@ -1,29 +1,29 @@
-import ConnectWalletButton from "./components/connection-modal/ConnectButton";
-import ConnectWalletModal from "./components/connection-modal/ConnectModal";
-import { useLaserEyesModal } from "./providers/LaserEyesModalContext";
-import { LaserEyesModalProvider } from "./providers/LaserEyesModalProvider";
-import AccountInfo from "./components/user-profile/AccountInfo";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue,
+import ConnectWalletButton from "./components/connection-modal/ConnectButton"
+import ConnectWalletModal from "./components/connection-modal/ConnectModal"
+import ThemeControls from "./components/ThemeControls"
+import {
+  Select,
+  SelectContent,
   SelectGroup,
+  SelectItem,
   SelectLabel,
-  SelectSeparator,
+  SelectScrollDownButton,
   SelectScrollUpButton,
-  SelectScrollDownButton
-} from "./components/ui/select";
-import { ThemeProvider } from "./providers/ThemeProvider";
-import { useTheme } from "./hooks";
-import ThemeControls from "./components/ThemeControls";
+  SelectSeparator,
+  SelectTrigger,
+  SelectValue,
+} from "./components/ui/select"
+import AccountInfo from "./components/user-profile/AccountInfo"
+import { useTheme } from "./hooks"
+import { useLaserEyesModal } from "./providers/LaserEyesModalContext"
+import { LaserEyesModalProvider } from "./providers/LaserEyesModalProvider"
+import { ThemeProvider } from "./providers/ThemeProvider"
 
-export { 
-  ConnectWalletModal, 
-  useLaserEyesModal, 
-  LaserEyesModalProvider, 
-  ConnectWalletButton, 
+export {
+  ConnectWalletModal,
+  useLaserEyesModal,
+  LaserEyesModalProvider,
+  ConnectWalletButton,
   AccountInfo,
   Select,
   SelectContent,
@@ -37,30 +37,29 @@ export {
   SelectScrollDownButton,
   ThemeProvider,
   useTheme,
-  ThemeControls
-};
-
-// Export types for theme configuration
-export type {
-  ThemeConfig,
-  ThemeColors,
-  HSLColor,
-  DarkModeStrategy,
-  ThemeState,
-  ThemeContextValue
-} from "./types/theme";
+  ThemeControls,
+}
 
 // Export theme utilities
 export {
-  hexToHsl,
-  rgbToHsl,
-  parseColorToHsl,
-  hslToCssValue,
-  generateComplementaryColors,
-  applyThemeColors,
-  setPrimaryColor,
   applyDarkModeClass,
+  applyThemeColors,
+  generateComplementaryColors,
+  getDefaultThemeColors,
   getSystemDarkMode,
+  hexToHsl,
+  hslToCssValue,
   onSystemDarkModeChange,
-  getDefaultThemeColors
-} from "./lib/theme-utils";
+  parseColorToHsl,
+  rgbToHsl,
+  setPrimaryColor,
+} from "./lib/theme-utils"
+// Export types for theme configuration
+export type {
+  DarkModeStrategy,
+  HSLColor,
+  ThemeColors,
+  ThemeConfig,
+  ThemeContextValue,
+  ThemeState,
+} from "./types/theme"
