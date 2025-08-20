@@ -15,8 +15,8 @@ The library is written in TypeScript and is designed for flexibility, making it 
 
 `@omnisat/lasereyes` is split into modular packages to keep it framework-agnostic and flexible:
 
-1. **[lasereyes-core](../packages/lasereyes-core/README.md)**: The main package with wallet implementations and the core logic for handling Bitcoin wallets. This package is not tied to any specific framework.
-2. **[lasereyes-react](../packages/lasereyes-react/README.md)**: A React-specific package that builds on `lasereyes-core`, providing React hooks, context providers, and wallet icons to simplify integration into React applications.
+1. **[lasereyes-core](../packages/core/README.md)**: The main package with wallet implementations and the core logic for handling Bitcoin wallets. This package is not tied to any specific framework.
+2. **[lasereyes-react](../packages/react/README.md)**: A React-specific package that builds on `lasereyes-core`, providing React hooks, context providers, and wallet icons to simplify integration into React applications.
 3. **[lasereyes](../packages/lasereyes/README.md)**: The main entry point that bundles both `lasereyes-core` and `lasereyes-react`, providing easy access to the functionality of both packages.
 
 ## Apps
