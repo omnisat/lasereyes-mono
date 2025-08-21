@@ -13,6 +13,7 @@ import type {
   AUDIO_MP3,
   AUDIO_OGG,
   AUDIO_WAV,
+  BIN,
   IMAGE_GIF,
   IMAGE_ICON,
   IMAGE_JPEG,
@@ -112,17 +113,18 @@ export type ContentType =
   | typeof AUDIO_WAV
   | typeof AUDIO_OGG
   | typeof MULTIPART_FORM_DATA
+  | typeof BIN
 
 export type Config = {
   network?:
-    | typeof MAINNET
-    | typeof TESTNET
-    | typeof TESTNET4
-    | typeof SIGNET
-    | typeof FRACTAL_MAINNET
-    | typeof FRACTAL_TESTNET
-    | typeof OYLNET
-    | string
+  | typeof MAINNET
+  | typeof TESTNET
+  | typeof TESTNET4
+  | typeof SIGNET
+  | typeof FRACTAL_MAINNET
+  | typeof FRACTAL_TESTNET
+  | typeof OYLNET
+  | string
   dataSources?: {
     mempool?: {
       url: string
@@ -144,11 +146,11 @@ export type Config = {
           apiUrl: string
         }
         [key: string]:
-          | {
-              apiKey: string
-              apiUrl: string
-            }
-          | undefined
+        | {
+          apiKey: string
+          apiUrl: string
+        }
+        | undefined
       }
     }
     esplora?: string
