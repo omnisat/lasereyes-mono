@@ -32,3 +32,4 @@ export const AUDIO_WAV = 'audio/wav'
 export const AUDIO_OGG = 'audio/ogg'
 
 export const MULTIPART_FORM_DATA = 'multipart/form-data'
+export const BIN = ''
