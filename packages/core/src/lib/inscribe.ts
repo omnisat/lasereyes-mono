@@ -307,17 +307,7 @@ export const executeRevealTransaction = async ({
         value: 546,
         scriptPubKey: Address.toScriptPubKey(ordinalAddress),
       }),
-    ],
-    ...(opReturn
-      ? {
-          vout: [
-            {
-              value: 0,
-              scriptPubKey: ['OP_RETURN', opReturn],
-            },
-          ],
-        }
-      : {}),
+    ].concat(opReturn ? [{ value: 0, scriptPubKey: bitcoin.script.decompile(opReturn) }] : [])
   })
 
   const sig = Signer.taproot.sign(secKey, txData, 0, { extension: tapleaf })
