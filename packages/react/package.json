@@ -25,7 +25,6 @@
   },
   "dependencies": {
     "@nanostores/react": "^0.7.3",
-    "@omnisat/lasereyes-core": "file:../core",
     "@tanstack/react-query": "^5.81.5",
     "bootstrap": "^5.3.3",
     "nanostores": "^0.11.3",
@@ -33,7 +32,8 @@
   },
   "peerDependencies": {
     "react": ">=17",
-    "react-dom": ">=17"
+    "react-dom": ">=17",
+    "@omnisat/lasereyes-core": "0.0.82"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",

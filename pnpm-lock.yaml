@@ -521,8 +521,8 @@ importers:
         specifier: ^0.7.3
         version: 0.7.3(nanostores@0.11.4)(react@19.0.0-rc.1)
       '@omnisat/lasereyes-core':
-        specifier: file:../core
-        version: file:packages/core(@types/node@22.15.32)(typescript@5.8.3)
+        specifier: 0.0.82
+        version: link:../core
       '@tanstack/react-query':
         specifier: ^5.81.5
         version: 5.81.5(react@19.0.0-rc.1)
@@ -21284,41 +21284,6 @@ packages:
 
   /zod@3.25.67:
     resolution: {integrity: sha512-idA2YXwpCdqUSKRCACDE6ItZD9TZzy3OZMtpfLoh6oPR47lipysRrJfjzMqFxQ3uJuUPyUeWe1r9vLH33xO/Qw==}
-    dev: false
-
-  file:packages/core(@types/node@22.15.32)(typescript@5.8.3):
-    resolution: {directory: packages/core, type: directory}
-    id: file:packages/core
-    name: '@omnisat/lasereyes-core'
-    dependencies:
-      '@bitcoinerlab/secp256k1': 1.2.0
-      '@cmdcode/crypto-utils': 2.4.6
-      '@cmdcode/tapscript': 1.5.3
-      '@magiceden-oss/runestone-lib': 1.0.2
-      '@nanostores/persistent': 0.10.2(nanostores@0.11.4)
-      '@orangecrypto/orange-connect': 1.2.3
-      '@oyl/sdk': 1.17.0(@types/node@22.15.32)(typescript@5.8.3)
-      alkanes: github.com/kungfuflex/alkanes/283ad4b7bc61db4788f4b86b532cff981b5d8475(typescript@5.8.3)
-      axios: 1.10.0
-      bip32: 5.0.0-rc.0(typescript@5.8.3)
-      bip39: 3.1.0
-      bitcoinjs-lib: 7.0.0-rc.0(typescript@5.8.3)
-      buffer: 6.0.3
-      crypto-browserify: 3.12.1
-      nanostores: 0.11.4
-      ordapi: 0.0.7
-      sats-connect: 3.5.0(typescript@5.8.3)
-      tiny-async-pool: 2.1.0
-    transitivePeerDependencies:
-      - '@swc/core'
-      - '@swc/wasm'
-      - '@types/node'
-      - bufferutil
-      - debug
-      - encoding
-      - supports-color
-      - typescript
-      - utf-8-validate
     dev: false
 
   github.com/kungfuflex/alkanes/283ad4b7bc61db4788f4b86b532cff981b5d8475(typescript@5.8.3):
