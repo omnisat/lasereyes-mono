@@ -7,6 +7,10 @@ settings:
 importers:
 
   .:
+    dependencies:
+      lasereyes-mono:
+        specifier: 'link:'
+        version: 'link:'
     devDependencies:
       '@changesets/cli':
         specifier: ^2.27.9

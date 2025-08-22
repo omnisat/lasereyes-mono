@@ -15,6 +15,8 @@ import type { WalletProviderSignPsbtOptions } from '../client/types'
 
 bitcoin.initEccLib(ecc2)
 
+const stripHexPrefix = function (v: string) { return v.substr(0, 2) === '0x' ? v.substr(2) : v; }
+
 export const inscribeContent = async ({
   contentBase64,
   mimeType,
@@ -307,7 +309,7 @@ export const executeRevealTransaction = async ({
         value: 546,
         scriptPubKey: Address.toScriptPubKey(ordinalAddress),
       }),
-    ].concat(opReturn ? [{ value: 0, scriptPubKey: bitcoin.script.decompile(opReturn) }] : [])
+    ].concat(opReturn ? [{ value: 0, scriptPubKey: bitcoin.script.decompile(Buffer.from(stripHexPrefix(opReturn))) }] : [])
   })
 
   const sig = Signer.taproot.sign(secKey, txData, 0, { extension: tapleaf })
