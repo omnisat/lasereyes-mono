@@ -1,9 +1,9 @@
 {
   "name": "react-ui",
-  "version": "0.0.0",
+  "version": "0.0.2",
   "private": true,
   "dependencies": {
-    "@omnisat/lasereyes": "workspace:*",
+    "@kevinoyl/lasereyes": "workspace:*",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "web-vitals": "^2.1.4"

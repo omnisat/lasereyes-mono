@@ -15,7 +15,7 @@ function UseLaserEyesContent() {
         <Card className="overflow-hidden">
           <CardContent className="p-6">
             <p className="text-lg leading-relaxed">
-              The <code>useLaserEyes</code> hook is your gateway to Bitcoin wallet integration in React. It provides a simple, 
+              The <code>useLaserEyes</code> hook is your gateway to Bitcoin wallet integration in React. It provides a simple,
               yet powerful interface to connect wallets, send transactions, and manage Bitcoin-related functionality in your application.
             </p>
           </CardContent>
@@ -31,8 +31,8 @@ function UseLaserEyesContent() {
           <CardContent className="p-6">
             <CodeBlock
               language="tsx"
-              code={`import { useLaserEyes } from '@omnisat/lasereyes-react'
-import { UNISAT } from '@omnisat/lasereyes-core'
+              code={`import { useLaserEyes } from '@kevinoyl/lasereyes-react'
+import { UNISAT } from '@kevinoyl/lasereyes-core'
 
 function WalletConnect() {
   const { 

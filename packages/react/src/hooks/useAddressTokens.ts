@@ -2,7 +2,7 @@ import {
   ALKANES,
   type AlkanesOutpoint,
   type MetaProtocol,
-} from "@omnisat/lasereyes-core"
+} from "@kevinoyl/lasereyes-core"
 import {
   type UseQueryOptions,
   type UseQueryResult,

@@ -25,7 +25,7 @@ import {
   SPARROW,
   TOKEO,
   KEPLR,
-} from '@omnisat/lasereyes-core'
+} from '@kevinoyl/lasereyes-core'
 import KeplrLogo from './keplr.tsx'
 
 const WalletIcon = ({

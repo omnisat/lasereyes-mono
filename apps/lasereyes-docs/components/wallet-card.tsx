@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils"
 import { Card, CardContent } from "@/components/ui/card"
-import { WalletIcon } from "@omnisat/lasereyes-react"
-import { UNISAT, XVERSE, OYL, LEATHER, MAGIC_EDEN, OKX, PHANTOM, WIZZ, ORANGE, OP_NET } from "@omnisat/lasereyes-core"
+import { WalletIcon } from "@kevinoyl/lasereyes-react"
+import { UNISAT, XVERSE, OYL, LEATHER, MAGIC_EDEN, OKX, PHANTOM, WIZZ, ORANGE, OP_NET } from "@kevinoyl/lasereyes-core"
 
 interface WalletCardProps {
   name: string

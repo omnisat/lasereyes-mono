@@ -180,8 +180,8 @@ function DataSourceContent() {
           <CardContent className="p-6">
             <CodeBlock
               language="tsx"
-              code={`import { LaserEyesProvider } from '@omnisat/lasereyes-react'
-import { MAINNET } from '@omnisat/lasereyes-core'
+              code={`import { LaserEyesProvider } from '@kevinoyl/lasereyes-react'
+import { MAINNET } from '@kevinoyl/lasereyes-core'
 
 function App() {
   return (
@@ -277,7 +277,7 @@ function App() {
           <CardContent className="p-6">
             <CodeBlock
               language="typescript"
-              code={`import { DataSource, NetworkType } from '@omnisat/lasereyes-core'
+              code={`import { DataSource, NetworkType } from '@kevinoyl/lasereyes-core'
 
 class CustomDataSource implements DataSource {
   constructor(private apiKey: string, private network: NetworkType) {}

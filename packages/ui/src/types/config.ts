@@ -1,4 +1,4 @@
-import { NetworkType, ProviderType } from "@omnisat/lasereyes";
+import { NetworkType, ProviderType } from "@kevinoyl/lasereyes";
 import { ThemeConfig } from "./theme";
 
 export interface LaserEyesModalConfig {

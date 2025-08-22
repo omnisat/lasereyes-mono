@@ -3,15 +3,15 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { useLaserEyes } from '@omnisat/lasereyes'
-import { ConnectWalletButton, ConnectWalletModal, ThemeControls, useTheme } from '@omnisat/lasereyes-ui'
-import { 
-  Wallet, 
-  Bitcoin, 
-  Zap, 
-  Shield, 
-  Globe, 
-  ArrowRight, 
+import { useLaserEyes } from '@kevinoyl/lasereyes'
+import { ConnectWalletButton, ConnectWalletModal, ThemeControls, useTheme } from '@kevinoyl/lasereyes-ui'
+import {
+  Wallet,
+  Bitcoin,
+  Zap,
+  Shield,
+  Globe,
+  ArrowRight,
   ExternalLink,
   Palette,
   Sun,
@@ -21,7 +21,7 @@ import {
 // Quick theme toggle component
 function QuickThemeToggle() {
   const { isDark, toggleDarkMode, darkMode } = useTheme()
-  
+
   if (darkMode === 'disabled') {
     return (
       <Button disabled variant="outline" size="sm">
@@ -30,7 +30,7 @@ function QuickThemeToggle() {
       </Button>
     )
   }
-  
+
   return (
     <Button onClick={toggleDarkMode} variant="outline" size="sm">
       {isDark ? (
@@ -49,11 +49,11 @@ function QuickThemeToggle() {
 }
 
 export default function UIPage() {
-  const { 
+  const {
     isConnecting,
-  } = useLaserEyes(({ 
+  } = useLaserEyes(({
     isConnecting,
-  }) => ({ 
+  }) => ({
     isConnecting,
   }))
 
@@ -125,8 +125,8 @@ export default function UIPage() {
                   <div className="space-y-4">
                     <div className="flex flex-col sm:flex-row gap-4">
                       <ConnectWalletButton className="flex-1 h-12 text-lg font-semibold" />
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         onClick={() => setShowModal(true)}
                         className="flex-1 h-12"
                       >
@@ -148,7 +148,7 @@ export default function UIPage() {
                       <Button size="sm" variant="outline">Outline</Button>
                       <Button size="sm" variant="ghost">Ghost</Button>
                     </div>
-                    
+
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <Card className="bg-primary/10 border-primary/20">
                         <CardContent className="pt-3 pb-3">
@@ -265,8 +265,8 @@ export default function UIPage() {
       </div>
 
       {/* Custom Modal */}
-      <ConnectWalletModal 
-        open={showModal} 
+      <ConnectWalletModal
+        open={showModal}
         onClose={() => setShowModal(false)}
       />
     </div>

@@ -1,5 +1,5 @@
 import { createContext, useContext } from "react";
-import { SIGNET, TESTNET, FRACTAL_TESTNET, MAINNET } from "@omnisat/lasereyes";
+import { SIGNET, TESTNET, FRACTAL_TESTNET, MAINNET } from "@kevinoyl/lasereyes";
 import { LaserEyesModalConfig } from "../types/config";
 
 export interface LasereyesModalContext {
@@ -14,13 +14,13 @@ export interface LasereyesModalContext {
 export const laserEyesModalContext = createContext<LasereyesModalContext>({
   isOpen: false,
   isLoading: false,
-  showModal: () => {},
-  hideModal: () => {},
+  showModal: () => { },
+  hideModal: () => { },
   config: {
     networks: [MAINNET, TESTNET, SIGNET, FRACTAL_TESTNET],
     defaultNetwork: MAINNET,
   },
-  setConfig: () => {},
+  setConfig: () => { },
 });
 
 export const useLaserEyesModal = (): LasereyesModalContext => {

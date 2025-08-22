@@ -31,7 +31,7 @@ export default function PerformancePage() {
         <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-orange-500/20 rounded-full blur-[120px] -z-10 translate-x-1/2 -translate-y-1/2 animate-pulse" />
         <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-yellow-500/10 rounded-full blur-[100px] -z-10 -translate-x-1/2 translate-y-1/2 animate-pulse" />
         <div className="absolute top-1/2 left-1/2 w-[200px] h-[200px] bg-orange-800/10 rounded-full blur-[80px] -z-10 -translate-x-1/2 -translate-y-1/2" />
-        
+
         <div className="flex items-center gap-3 mb-4">
           <Badge variant="secondary" className="bg-orange-900/10 text-orange-400 hover:bg-orange-900/20">Performance</Badge>
           <Badge variant="secondary" className="bg-yellow-900/10 text-yellow-400 hover:bg-yellow-900/20">Optimization</Badge>
@@ -214,7 +214,7 @@ function PerformanceContent() {
           <CardContent className="p-6">
             <CodeBlock
               language="typescript"
-              code={`import { useLaserEyes, createBatchLoader } from '@omnisat/lasereyes-react'
+              code={`import { useLaserEyes, createBatchLoader } from '@kevinoyl/lasereyes-react'
 
 // Create a batched loader for UTXO fetching
 const utxoLoader = createBatchLoader({
@@ -249,7 +249,7 @@ function WalletBalance() {
           <CardContent className="p-6">
             <CodeBlock
               language="typescript"
-              code={`import { useLaserEyes, useOptimizedState } from '@omnisat/lasereyes-react'
+              code={`import { useLaserEyes, useOptimizedState } from '@kevinoyl/lasereyes-react'
 
 function TransactionList() {
   const { transactions } = useLaserEyes()
@@ -284,7 +284,7 @@ function TransactionList() {
           <CardContent className="p-6">
             <CodeBlock
               language="typescript"
-              code={`import { useLaserEyes, ResourceManager } from '@omnisat/lasereyes-react'
+              code={`import { useLaserEyes, ResourceManager } from '@kevinoyl/lasereyes-react'
 
 // Configure resource management
 const resourceManager = new ResourceManager({

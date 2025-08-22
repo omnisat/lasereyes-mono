@@ -167,7 +167,7 @@ import {
   XVERSE,
   SUPPORTED_WALLETS,
   LaserEyesLogo,
-} from "@omnisat/lasereyes";
+} from "@kevinoyl/lasereyes";
 import {
   Dialog,
   DialogContent,
@@ -191,7 +191,7 @@ The `DefaultLayout.tsx` component wraps your application in the necessary provid
 ```tsx
 "use client";
 import React, { ReactNode } from "react";
-import { LaserEyesProvider } from "@omnisat/lasereyes";
+import { LaserEyesProvider } from "@kevinoyl/lasereyes";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 
 export default function DefaultLayout({ children }: { children: ReactNode }) {
@@ -312,8 +312,8 @@ When running the CLI, you have several configuration options:
 
 ### Core Dependencies
 
-- **@omnisat/lasereyes**: Bitcoin wallet integration for React
-- **@omnisat/lasereyes-vue**: Bitcoin wallet integration for Vue (coming soon)
+- **@kevinoyl/lasereyes**: Bitcoin wallet integration for React
+- **@kevinoyl/lasereyes-vue**: Bitcoin wallet integration for Vue (coming soon)
 - **next-themes**: Theme switching functionality
 
 ### CLI Dependencies

@@ -19,7 +19,7 @@ import {
   XVERSE,
   UNISAT,
   BaseNetwork,
-} from '@omnisat/lasereyes'
+} from '@kevinoyl/lasereyes'
 import { createPsbt, satoshisToBTC } from '@/lib/btc'
 import { cn, truncateString } from '@/lib/utils'
 import ClickToCopy from '@/components/ClickToCopy'
@@ -71,12 +71,12 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
   const [signedPsbt, setSignedPsbt] = useState<
     | string
     | {
-        signedPsbtHex: string
-        signedPsbtBase64: string
-      }
+      signedPsbtHex: string
+      signedPsbtBase64: string
+    }
     | undefined
   >()
-  const [selectedColor, ] = useState<colorsType>(
+  const [selectedColor,] = useState<colorsType>(
     colors[Math.floor(Math.random() * 5)]
   )
 

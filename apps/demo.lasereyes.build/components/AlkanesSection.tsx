@@ -13,12 +13,12 @@ import { toast } from 'sonner'
 import { getMempoolSpaceUrl } from '@/lib/urls'
 import {
   type AlkaneBalance,
-    ALKANES,
+  ALKANES,
   type MAINNET,
   OYLNET,
   type TESTNET,
   useLaserEyes,
-} from '@omnisat/lasereyes'
+} from '@kevinoyl/lasereyes'
 
 // Helper function to format alkane balance with 8 decimal places (like Bitcoin)
 const formatAlkaneBalance = (balance: bigint): string => {

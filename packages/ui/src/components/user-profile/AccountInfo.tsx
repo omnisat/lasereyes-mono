@@ -4,32 +4,32 @@ import { useState } from 'react'
 import { Button } from "../ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
-import { useLaserEyes, useBalance, MAINNET, TESTNET, TESTNET4, SIGNET, FRACTAL_MAINNET, FRACTAL_TESTNET, BTC } from '@omnisat/lasereyes'
-import { 
-  Wallet, 
-  Bitcoin, 
-  Globe, 
+import { useLaserEyes, useBalance, MAINNET, TESTNET, TESTNET4, SIGNET, FRACTAL_MAINNET, FRACTAL_TESTNET, BTC } from '@kevinoyl/lasereyes'
+import {
+  Wallet,
+  Bitcoin,
+  Globe,
   Copy,
   LogOut
 } from 'lucide-react'
 
 export default function AccountInfo() {
-  const { 
-    connected, 
-    address, 
-    disconnect, 
+  const {
+    connected,
+    address,
+    disconnect,
     network,
     switchNetwork,
-  } = useLaserEyes(({ 
-    connected, 
-    address, 
-    disconnect, 
+  } = useLaserEyes(({
+    connected,
+    address,
+    disconnect,
     network,
     switchNetwork,
-  }) => ({ 
-    connected, 
-    address, 
-    disconnect, 
+  }) => ({
+    connected,
+    address,
+    disconnect,
     network,
     switchNetwork,
   }))
@@ -64,7 +64,7 @@ export default function AccountInfo() {
 
   const handleNetworkChange = async (networkValue: string) => {
     if (networkValue === network) return
-    
+
     setIsSwitchingNetwork(true)
     try {
       await switchNetwork(networkValue)
@@ -102,10 +102,10 @@ export default function AccountInfo() {
                 <span className="lem-text-foreground lem-leading-none">Balance</span>
               </div>
               <p className={`lem-text-sm ${btcBalanceError ? 'lem-text-red-600 dark:lem-text-red-400' : 'lem-text-foreground'}`}>
-                { btcBalanceError ? 'Error' : isBtcBalancePending ? '...' : `${btcBalance} BTC`}
+                {btcBalanceError ? 'Error' : isBtcBalancePending ? '...' : `${btcBalance} BTC`}
               </p>
             </div>
-            
+
             <div className="lem-p-4 lem-bg-primary/10 dark:lem-bg-primary/20 lem-border lem-border-primary/20 dark:lem-border-primary/40 lem-rounded-lg">
               <div className="lem-flex lem-items-center lem-gap-2 lem-mb-2">
                 <Globe className="lem-h-4 lem-w-4 lem-text-foreground" />
@@ -127,7 +127,7 @@ export default function AccountInfo() {
               </Select>
             </div>
           </div>
-          
+
           <div className="lem-p-4 lem-bg-slate-50/50 dark:lem-bg-slate-800/30 lem-border lem-border-slate-200/60 dark:lem-border-slate-700/40 lem-rounded-lg">
             <div className="lem-hidden sm:lem-flex lem-items-center lem-justify-between">
               <div>

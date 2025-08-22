@@ -36,16 +36,16 @@ export function DocsPageContent() {
       <Heading level={3}>Installation</Heading>
       <CodeBlock
         language="bash"
-        code={`npm install @omnisat/lasereyes-core @omnisat/lasereyes-react`}
+        code={`npm install @kevinoyl/lasereyes-core @kevinoyl/lasereyes-react`}
         copyButton={true}
       />
 
       <Heading level={3}>Basic Usage</Heading>
       <CodeBlock
         language="typescript"
-        code={`import { LaserEyesProvider } from '@omnisat/lasereyes-react'
-import { useLaserEyes } from '@omnisat/lasereyes-react'
-import { MAINNET, UNISAT } from '@omnisat/lasereyes-core'
+        code={`import { LaserEyesProvider } from '@kevinoyl/lasereyes-react'
+import { useLaserEyes } from '@kevinoyl/lasereyes-react'
+import { MAINNET, UNISAT } from '@kevinoyl/lasereyes-core'
 
 function App() {
   return (

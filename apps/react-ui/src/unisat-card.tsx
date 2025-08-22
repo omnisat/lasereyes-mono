@@ -1,4 +1,4 @@
-import { useLaserEyes, UNISAT } from '@omnisat/lasereyes'
+import { useLaserEyes, UNISAT } from '@kevinoyl/lasereyes'
 
 export default function UnisatCard() {
   const { connected, connect, disconnect, address, balance, publicKey } =

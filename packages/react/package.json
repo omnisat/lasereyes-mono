@@ -1,7 +1,7 @@
 {
-  "name": "@omnisat/lasereyes-react",
+  "name": "@kevinoyl/lasereyes-react",
   "private": false,
-  "version": "0.0.77",
+  "version": "0.0.79",
   "type": "module",
   "main": "./dist/index.umd.cjs",
   "module": "./dist/index.js",
@@ -33,7 +33,7 @@
   "peerDependencies": {
     "react": ">=17",
     "react-dom": ">=17",
-    "@omnisat/lasereyes-core": "0.0.82"
+    "@kevinoyl/lasereyes-core": "0.0.84"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",

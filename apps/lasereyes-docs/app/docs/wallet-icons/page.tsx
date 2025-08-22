@@ -21,7 +21,7 @@ import {
   WIZZ,
   XVERSE,
   type ProviderType,
-} from "@omnisat/lasereyes-react"
+} from "@kevinoyl/lasereyes-react"
 import { cn } from "@/lib/utils"
 
 interface WalletIconInfo {
@@ -60,48 +60,48 @@ function WalletIconsContent() {
 
   const walletIcons = React.useMemo<WalletIconInfo[]>(
     () => [
-      { 
-        name: "UniSat", 
+      {
+        name: "UniSat",
         constant: UNISAT as ProviderType,
         description: "The most popular Bitcoin wallet for Ordinals"
       },
-      { 
-        name: "Xverse", 
+      {
+        name: "Xverse",
         constant: XVERSE as ProviderType,
         description: "Feature-rich Bitcoin and Ordinals wallet"
       },
-      { 
-        name: "OYL", 
+      {
+        name: "OYL",
         constant: OYL as ProviderType,
         description: "Modern Bitcoin wallet with Ordinals support"
       },
-      { 
-        name: "Magic Eden", 
+      {
+        name: "Magic Eden",
         constant: MAGIC_EDEN as ProviderType,
         description: "Leading NFT marketplace's Bitcoin wallet"
       },
-      { 
-        name: "OKX", 
+      {
+        name: "OKX",
         constant: OKX as ProviderType,
         description: "Secure and reliable exchange wallet"
       },
-      { 
-        name: "Leather", 
+      {
+        name: "Leather",
         constant: LEATHER as ProviderType,
         description: "Formerly known as Stacks Wallet"
       },
-      { 
-        name: "Phantom", 
+      {
+        name: "Phantom",
         constant: PHANTOM as ProviderType,
         description: "Multi-chain wallet with Bitcoin support"
       },
-      { 
-        name: "Wizz", 
+      {
+        name: "Wizz",
         constant: WIZZ as ProviderType,
         description: "Innovative Bitcoin and Ordinals wallet"
       },
-      { 
-        name: "Orange", 
+      {
+        name: "Orange",
         constant: ORANGE as ProviderType,
         description: "Bitcoin-focused wallet solution"
       },
@@ -120,7 +120,7 @@ function WalletIconsContent() {
           <CardContent className="p-6">
             <CodeBlock
               language="bash"
-              code="npm install @omnisat/lasereyes-react"
+              code="npm install @kevinoyl/lasereyes-react"
               copyButton={true}
             />
           </CardContent>
@@ -150,7 +150,7 @@ function WalletIconsContent() {
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {walletIcons.map((wallet) => (
-            <Card 
+            <Card
               key={wallet.name}
               className="group relative overflow-hidden transition-all duration-300 hover:border-orange-500/30 hover:shadow-lg hover:shadow-orange-500/5"
             >
@@ -179,7 +179,7 @@ function WalletIconsContent() {
           <CardContent className="p-6">
             <CodeBlock
               language="tsx"
-              code={`import { WalletIcon, UNISAT } from "@omnisat/lasereyes-react"
+              code={`import { WalletIcon, UNISAT } from "@kevinoyl/lasereyes-react"
 
 export function MyComponent() {
   return <WalletIcon walletName={UNISAT} size={24} />
@@ -207,7 +207,7 @@ export function MyComponent() {
                 <tr>
                   <td className="py-4 font-mono text-sm">walletName</td>
                   <td className="py-4 font-mono text-sm">ProviderType</td>
-                  <td className="py-4 text-sm">The wallet identifier from @omnisat/lasereyes-react</td>
+                  <td className="py-4 text-sm">The wallet identifier from @kevinoyl/lasereyes-react</td>
                 </tr>
                 <tr>
                   <td className="py-4 font-mono text-sm">size</td>

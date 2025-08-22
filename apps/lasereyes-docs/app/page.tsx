@@ -31,7 +31,7 @@ import {
   UNISAT,
   WIZZ,
   XVERSE,
-} from '@omnisat/lasereyes-react'
+} from '@kevinoyl/lasereyes-react'
 
 export default function Home() {
   return (
@@ -286,7 +286,7 @@ export default function Home() {
                 <h3 className="text-xl font-bold">Installation</h3>
                 <CodeBlock
                   language="bash"
-                  code={`npm install @omnisat/lasereyes-core @omnisat/lasereyes-react`}
+                  code={`npm install @kevinoyl/lasereyes-core @kevinoyl/lasereyes-react`}
                   copyButton={true}
                 />
                 <h3 className="text-xl font-bold mt-8">Basic Setup</h3>
@@ -297,7 +297,7 @@ export default function Home() {
   useLaserEyes,
   MAINNET,
   OYL,
-} from "@omnisat/lasereyes";
+} from "@kevinoyl/lasereyes";
 
 function App() {
   return (
@@ -738,7 +738,7 @@ function WalletConnect() {
                   GitHub
                 </Link>
                 <Link
-                  href="https://www.npmjs.com/package/@omnisat/lasereyes"
+                  href="https://www.npmjs.com/package/@kevinoyl/lasereyes"
                   target="_blank"
                   rel="noreferrer"
                   className="text-sm text-muted-foreground hover:text-foreground"

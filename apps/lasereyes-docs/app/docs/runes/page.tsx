@@ -124,7 +124,7 @@ function RunesContent() {
           <CardContent className="p-6">
             <CodeBlock
               language="typescript"
-              code={`import { useLaserEyes } from '@omnisat/lasereyes-react'
+              code={`import { useLaserEyes } from '@kevinoyl/lasereyes-react'
 import { useState, useEffect } from 'react'
 
 function RuneBalances() {
@@ -176,9 +176,9 @@ function RuneBalances() {
           <CardContent className="p-6">
             <CodeBlock
               language="typescript"
-              code={`import { useLaserEyes } from '@omnisat/lasereyes-react'
+              code={`import { useLaserEyes } from '@kevinoyl/lasereyes-react'
 import { useState } from 'react'
-import { RUNES } from '@omnisat/lasereyes-core'
+import { RUNES } from '@kevinoyl/lasereyes-core'
 
 function SendRune() {
   const { send } = useLaserEyes()
@@ -230,7 +230,7 @@ function SendRune() {
                 Network issues, insufficient balances, or wallet rejections should be handled gracefully.
               </p>
             </div>
-            
+
             <div>
               <h3 className="text-lg font-semibold mb-2">2. Loading States</h3>
               <p className="text-muted-foreground">
@@ -238,7 +238,7 @@ function SendRune() {
                 Both fetching balances and sending can take time to complete.
               </p>
             </div>
-            
+
             <div>
               <h3 className="text-lg font-semibold mb-2">3. Balance Validation</h3>
               <p className="text-muted-foreground">
@@ -246,7 +246,7 @@ function SendRune() {
                 Check both the balance amount and if the user owns the Rune.
               </p>
             </div>
-            
+
             <div>
               <h3 className="text-lg font-semibold mb-2">4. Data Source Fallbacks</h3>
               <p className="text-muted-foreground">
@@ -267,9 +267,9 @@ function SendRune() {
           <CardContent className="p-6">
             <CodeBlock
               language="typescript"
-              code={`import { useLaserEyes } from '@omnisat/lasereyes-react'
+              code={`import { useLaserEyes } from '@kevinoyl/lasereyes-react'
 import { useState, useEffect } from 'react'
-import { RUNES } from '@omnisat/lasereyes-core'
+import { RUNES } from '@kevinoyl/lasereyes-core'
 
 function RunesDashboard() {
   const { getAddressRunesBalances, send, address } = useLaserEyes()

@@ -39,10 +39,10 @@ export const inscribeContent = async ({
   paymentPublicKey?: string
   signPsbt: (signPsbtOptions: WalletProviderSignPsbtOptions) => Promise<
     | {
-        signedPsbtHex: string | undefined
-        signedPsbtBase64: string | undefined
-        txId?: string
-      }
+      signedPsbtHex: string | undefined
+      signedPsbtBase64: string | undefined
+      txId?: string
+    }
     | undefined
   >
   dataSourceManager: DataSourceManager
@@ -66,9 +66,9 @@ export const inscribeContent = async ({
   const ixs = inscriptions
     ? inscriptions
     : Array(quantity).fill({
-        content: contentBase64,
-        mimeType,
-      })
+      content: contentBase64,
+      mimeType,
+    })
 
   const commitTx = await getCommitPsbt({
     inscriptions: ixs,
@@ -127,9 +127,9 @@ export const getCommitPsbt = async ({
   isDry?: boolean
 }): Promise<
   | {
-      psbtHex: string
-      psbtBase64: string
-    }
+    psbtHex: string
+    psbtBase64: string
+  }
   | undefined
 > => {
   const quantity = inscriptions.length
@@ -293,6 +293,7 @@ export const executeRevealTransaction = async ({
     throw new Error('ERROR GETTING FIRST INPUT VALUE')
   }
 
+  console.log("opreturn in lasereyes inscribe: ", opReturn);
   const txData = Tx.create({
     vin: [
       {
@@ -309,8 +310,10 @@ export const executeRevealTransaction = async ({
         value: 546,
         scriptPubKey: Address.toScriptPubKey(ordinalAddress),
       }),
-    ].concat(opReturn ? [{ value: 0, scriptPubKey: bitcoin.script.toASM(Buffer.from(stripHexPrefix(opReturn), 'hex')).split(' ') }] : [])
+    ].concat(opReturn ? [{ value: 0, scriptPubKey: ['OP_RETURN', stripHexPrefix(opReturn)] }] : [])
   })
+
+  console.log("txData: ", txData);
 
   const sig = Signer.taproot.sign(secKey, txData, 0, { extension: tapleaf })
   txData.vin[0].witness = [sig, script, cblock]

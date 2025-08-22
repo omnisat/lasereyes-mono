@@ -12,7 +12,7 @@ import {
   type ProviderType,
   type SignMessageOptions,
   type SignPsbtsResponse,
-} from '@omnisat/lasereyes-core'
+} from '@kevinoyl/lasereyes-core'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import {
   type ReactNode,

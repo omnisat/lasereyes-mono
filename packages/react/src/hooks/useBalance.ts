@@ -1,4 +1,4 @@
-import { BTC, type Protocol } from "@omnisat/lasereyes-core"
+import { BTC, type Protocol } from "@kevinoyl/lasereyes-core"
 import {
   type UseQueryOptions,
   type UseQueryResult,

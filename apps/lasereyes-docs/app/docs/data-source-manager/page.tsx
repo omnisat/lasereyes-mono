@@ -39,7 +39,7 @@ export default function DataSourceManagerPage() {
   createStores, 
   createConfig, 
   MAINNET 
-} from '@omnisat/lasereyes-core'
+} from '@kevinoyl/lasereyes-core'
 
 // Create and initialize the client
 const stores = createStores()
@@ -166,7 +166,7 @@ const transfers = await dataSourceManager.getTokenTransfers('bc1q...', 'ORDI', '
       <p className="mb-6">You can register custom data sources with the DataSourceManager:</p>
       <CodeBlock
         language="typescript"
-        code={`import { DataSource } from '@omnisat/lasereyes-core'
+        code={`import { DataSource } from '@kevinoyl/lasereyes-core'
 
 // Implement the DataSource interface
 class CustomDataSource implements DataSource {

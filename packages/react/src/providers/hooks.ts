@@ -4,7 +4,7 @@ import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { LaserEyesStoreContext } from './context'
 import type { LaserEyesContextType } from './types'
 import { compareValues } from '../utils/comparison'
-import type { LaserEyesStoreType, NetworkType } from '@omnisat/lasereyes-core'
+import type { LaserEyesStoreType, NetworkType } from '@kevinoyl/lasereyes-core'
 import { batched, keepMount } from 'nanostores'
 
 const defaultSelector = (x: LaserEyesContextType) => ({ ...x })

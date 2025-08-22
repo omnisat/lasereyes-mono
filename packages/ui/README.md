@@ -1,8 +1,8 @@
 # Lasereyes Modal
 
-Lasereyes Modal makes it easy for developers to integrate Bitcoin wallet connection flows into their applications with minimal setup. It builds on top of the `@omnisat/lasereyes` library to provide a convenient modal-based UI.
+Lasereyes Modal makes it easy for developers to integrate Bitcoin wallet connection flows into their applications with minimal setup. It builds on top of the `@kevinoyl/lasereyes` library to provide a convenient modal-based UI.
 
-![Version](https://img.shields.io/npm/v/@omnisat/lasereyes-modal)
+![Version](https://img.shields.io/npm/v/@kevinoyl/lasereyes-modal)
 ![license](https://img.shields.io/github/license/omnisat/lasereyes-modal.svg?style=flat-square)
 
 ## Wallets Supported:
@@ -23,23 +23,23 @@ Lasereyes Modal makes it easy for developers to integrate Bitcoin wallet connect
 You could install the Lasereyes package which contains everything lasereyes:
 
 ```bash
-npm install @omnisat/lasereyes
+npm install @kevinoyl/lasereyes
 # OR
-yarn add @omnisat/lasereyes
+yarn add @kevinoyl/lasereyes
 ```
 
 Or you could install the Lasereyes UI package which contains the modal and the styles:
 
 ```bash
-npm install @omnisat/lasereyes-ui
+npm install @kevinoyl/lasereyes-ui
 # OR
-yarn add @omnisat/lasereyes-ui
+yarn add @kevinoyl/lasereyes-ui
 ```
 
 If you installed the lasereyes package, then you can access lasereyes-ui through `lasereyes/ui`
 
 ```tsx
-import { LaserEyesModalProvider } from '@omnisat/lasereyes/ui';
+import { LaserEyesModalProvider } from '@kevinoyl/lasereyes/ui';
 ```
 
 Make sure your project uses React 18+.
@@ -57,8 +57,8 @@ You can then use:
 ### Example Usage
 
 ```tsx
-import { ConnectWalletButton, LaserEyesModalProvider } from '@omnisat/lasereyes/ui';
-import '@omnisat/lasereyes/ui/style.css';
+import { ConnectWalletButton, LaserEyesModalProvider } from '@kevinoyl/lasereyes/ui';
+import '@kevinoyl/lasereyes/ui/style.css';
 
 function App() {
   return (
@@ -79,7 +79,7 @@ export default App;
 If you want to create a custom button to open the modal, use the `useLaserEyesModal` hook:
 
 ```tsx
-import { useLaserEyesModal } from '@omnisat/lasereyes/ui';
+import { useLaserEyesModal } from '@kevinoyl/lasereyes/ui';
 
 function CustomWalletButton() {
   const { showModal } = useLaserEyesModal();
@@ -94,7 +94,7 @@ You can also use `<ConnectWalletModal>` directly:
 
 ```tsx
 import { useState } from 'react';
-import { ConnectWalletModal } from '@omnisat/lasereyes/ui';
+import { ConnectWalletModal } from '@kevinoyl/lasereyes/ui';
 
 function ManualModalExample() {
   const [isOpen, setIsOpen] = useState(false);

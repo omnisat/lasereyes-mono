@@ -1,4 +1,4 @@
-import type { ContentType } from '@omnisat/lasereyes'
+import type { ContentType } from '@kevinoyl/lasereyes'
 import { usePathname } from 'next/navigation'
 import { type ReactNode, useEffect, useRef, useState } from 'react'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'

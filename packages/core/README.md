@@ -2,7 +2,7 @@
 
 ## Overview
 
-`@omnisat/lasereyes-core` is a framework-agnostic library designed to provide Bitcoin wallet integration for dApps. It abstracts wallet-specific interactions and offers a unified interface, enabling developers to interact with various Bitcoin wallets seamlessly.
+`@kevinoyl/lasereyes-core` is a framework-agnostic library designed to provide Bitcoin wallet integration for dApps. It abstracts wallet-specific interactions and offers a unified interface, enabling developers to interact with various Bitcoin wallets seamlessly.
 
 This package is not tied to any specific framework and can be used in any TypeScript or JavaScript environment.
 
@@ -10,16 +10,16 @@ This package is not tied to any specific framework and can be used in any TypeSc
 
 ```bash
 # NPM
-npm install @omnisat/lasereyes-core
+npm install @kevinoyl/lasereyes-core
 
 # Yarn
-yarn add @omnisat/lasereyes-core
+yarn add @kevinoyl/lasereyes-core
 
 # PNPM
-pnpm install @omnisat/lasereyes-core
+pnpm install @kevinoyl/lasereyes-core
 
 # Bun
-bun install @omnisat/lasereyes-core
+bun install @kevinoyl/lasereyes-core
 ```
 
 ## Key Concepts
@@ -64,7 +64,7 @@ LaserEyes Core supports multiple Bitcoin networks:
 ### Initializing the Client
 
 ```typescript
-import { LaserEyesClient, createStores, createConfig, XVERSE } from '@omnisat/lasereyes-core';
+import { LaserEyesClient, createStores, createConfig, XVERSE } from '@kevinoyl/lasereyes-core';
 
 // Create stores for state management
 const stores = createStores();
@@ -240,7 +240,7 @@ const inscriptions = await client.getInscriptions();
 Inscribes content onto the blockchain.
 
 ```typescript
-import { TEXT_PLAIN } from '@omnisat/lasereyes-core';
+import { TEXT_PLAIN } from '@kevinoyl/lasereyes-core';
 
 const contentBase64 = Buffer.from('Hello, LaserEyes!').toString('base64');
 const txId = await client.inscribe(contentBase64, TEXT_PLAIN);
@@ -251,7 +251,7 @@ const txId = await client.inscribe(contentBase64, TEXT_PLAIN);
 Sends assets using the specified protocol.
 
 ```typescript
-import { BTC } from '@omnisat/lasereyes-core';
+import { BTC } from '@kevinoyl/lasereyes-core';
 
 const txId = await client.send(BTC, {
   fromAddress: 'senderAddress',
@@ -286,7 +286,7 @@ import {
   UNISAT,
   WIZZ,
   XVERSE
-} from '@omnisat/lasereyes-core';
+} from '@kevinoyl/lasereyes-core';
 ```
 
 #### Networks
@@ -299,7 +299,7 @@ import {
   SIGNET,
   FRACTAL_MAINNET,
   FRACTAL_TESTNET
-} from '@omnisat/lasereyes-core';
+} from '@kevinoyl/lasereyes-core';
 ```
 
 #### Content Types
@@ -312,7 +312,7 @@ import {
   IMAGE_JPEG,
   IMAGE_PNG
   // ... many more available
-} from '@omnisat/lasereyes-core';
+} from '@kevinoyl/lasereyes-core';
 ```
 
 #### Protocols
@@ -323,7 +323,7 @@ import {
   BRC20,
   RUNES,
   ALKANES
-} from '@omnisat/lasereyes-core';
+} from '@kevinoyl/lasereyes-core';
 ```
 
 ## Error Handling
@@ -375,7 +375,7 @@ console.log('Inscriptions:', inscriptions);
 ### Working with Runes
 
 ```typescript
-import { RUNES } from '@omnisat/lasereyes-core';
+import { RUNES } from '@kevinoyl/lasereyes-core';
 
 // Send runes
 const txId = await client.send(RUNES, {
@@ -422,7 +422,7 @@ const runeBalances = await client.getMetaBalances(RUNES);
 ### Basic Wallet Connection
 
 ```typescript
-import { LaserEyesClient, createStores, UNISAT } from '@omnisat/lasereyes-core';
+import { LaserEyesClient, createStores, UNISAT } from '@kevinoyl/lasereyes-core';
 
 const client = new LaserEyesClient(createStores());
 client.initialize();

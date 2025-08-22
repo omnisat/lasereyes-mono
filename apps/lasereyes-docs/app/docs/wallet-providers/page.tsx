@@ -17,7 +17,7 @@ import {
   Plug,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { WalletIcon } from '@omnisat/lasereyes-react'
+import { WalletIcon } from '@kevinoyl/lasereyes-react'
 import {
   UNISAT,
   XVERSE,
@@ -29,7 +29,7 @@ import {
   WIZZ,
   ORANGE,
   type ProviderType,
-} from '@omnisat/lasereyes-core'
+} from '@kevinoyl/lasereyes-core'
 
 interface FeatureCardProps {
   icon: React.ElementType
@@ -211,7 +211,7 @@ function WalletProvidersContent() {
   PHANTOM, 
   WIZZ, 
   ORANGE 
-} from '@omnisat/lasereyes-core'
+} from '@kevinoyl/lasereyes-core'
 
 // Connect to UniSat wallet
 await client.connect(UNISAT)
@@ -234,7 +234,7 @@ await client.connect(OYL)`}
           <CardContent className="p-6">
             <CodeBlock
               language="typescript"
-              code={`import { isWalletAvailable } from '@omnisat/lasereyes-core'
+              code={`import { isWalletAvailable } from '@kevinoyl/lasereyes-core'
 
 // Check if UniSat wallet is available
 const isUnisatAvailable = isWalletAvailable(UNISAT)

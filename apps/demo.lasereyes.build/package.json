@@ -1,6 +1,6 @@
 {
   "name": "demo.lasereyes.build",
-  "version": "0.0.0",
+  "version": "0.0.2",
   "private": true,
   "scripts": {
     "dev": "next dev --hostname 0.0.0.0",
@@ -10,8 +10,8 @@
   },
   "dependencies": {
     "@bitcoinerlab/secp256k1": "^1.1.1",
-    "@omnisat/lasereyes": "workspace:*",
-    "@omnisat/lasereyes-ui": "workspace:*",
+    "@kevinoyl/lasereyes": "workspace:*",
+    "@kevinoyl/lasereyes-ui": "workspace:*",
     "@radix-ui/react-avatar": "^1.1.0",
     "@radix-ui/react-checkbox": "^1.1.1",
     "@radix-ui/react-select": "^2.1.1",

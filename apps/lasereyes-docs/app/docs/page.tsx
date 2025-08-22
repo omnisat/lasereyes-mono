@@ -126,7 +126,7 @@ function DocsPageContent() {
           <CardContent className="p-6">
             <CodeBlock
               language="bash"
-              code={`npm install @omnisat/lasereyes-core @omnisat/lasereyes-react`}
+              code={`npm install @kevinoyl/lasereyes-core @kevinoyl/lasereyes-react`}
               copyButton={true}
             />
           </CardContent>
@@ -142,9 +142,9 @@ function DocsPageContent() {
           <CardContent className="p-6">
             <CodeBlock
               language="tsx"
-              code={`import { LaserEyesProvider } from '@omnisat/lasereyes-react'
-import { useLaserEyes } from '@omnisat/lasereyes-react'
-import { MAINNET, UNISAT } from '@omnisat/lasereyes-core'
+              code={`import { LaserEyesProvider } from '@kevinoyl/lasereyes-react'
+import { useLaserEyes } from '@kevinoyl/lasereyes-react'
+import { MAINNET, UNISAT } from '@kevinoyl/lasereyes-core'
 
 function App() {
   return (

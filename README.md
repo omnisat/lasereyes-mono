@@ -4,7 +4,7 @@
 
 Wallet connect library making it easier than ever to quickly build/maintain Bitcoin Ordinal Web Apps.
 
-![Version](https://img.shields.io/npm/v/@omnisat/lasereyes)
+![Version](https://img.shields.io/npm/v/@kevinoyl/lasereyes)
 ![license](https://img.shields.io/github/license/omnisat/lasereyes.svg?style=flat-square)
 
 ## Documentation

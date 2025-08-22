@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Menu, X } from "lucide-react"
 import { useState } from "react"
-import { LaserEyesLogo } from "@omnisat/lasereyes-react"
+import { LaserEyesLogo } from "@kevinoyl/lasereyes-react"
 
 
 export function Header() {
@@ -25,7 +25,7 @@ export function Header() {
       <div className="max-w-[90rem] mx-auto flex h-16 items-center justify-between">
         <div className="flex items-center gap-6 md:gap-10">
           <Link href="/" className="flex items-center space-x-2">
-            <LaserEyesLogo width={32} color={"orange" } className="mr-1" />
+            <LaserEyesLogo width={32} color={"orange"} className="mr-1" />
             <span className="font-bold text-xl inline-block">
               <span className="text-primary">Laser</span>Eyes
             </span>

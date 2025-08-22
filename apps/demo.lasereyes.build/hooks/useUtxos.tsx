@@ -7,8 +7,8 @@ import {
   useState,
 } from 'react'
 import useSWR from 'swr'
-import type { MempoolUtxo } from '@omnisat/lasereyes'
-import { useLaserEyes } from '@omnisat/lasereyes'
+import type { MempoolUtxo } from '@kevinoyl/lasereyes'
+import { useLaserEyes } from '@kevinoyl/lasereyes'
 
 type UtxoContextType = {
   utxos: MempoolUtxo[]

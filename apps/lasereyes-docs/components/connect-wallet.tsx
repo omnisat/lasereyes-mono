@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useLaserEyes } from "@omnisat/lasereyes-react";
+import { useLaserEyes } from "@kevinoyl/lasereyes-react";
 import { ComponentProps } from "react";
 
 interface ConnectWalletProps extends ComponentProps<typeof Button> {
@@ -25,8 +25,8 @@ export function ConnectWallet({
       {isThisWalletConnected
         ? "Connected"
         : isConnecting
-        ? "Connecting..."
-        : "Connect"}
+          ? "Connecting..."
+          : "Connect"}
     </Button>
   );
 } 

@@ -2,15 +2,17 @@
   "compilerOptions": {
     "target": "ES2020",
     "useDefineForClassFields": true,
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "lib": [
+      "ES2020",
+      "DOM",
+      "DOM.Iterable"
+    ],
     "module": "ESNext",
     "skipLibCheck": true,
-
     "declaration": true,
     "declarationMap": true,
-    "composite": true,  // Required for emitDeclarationOnly
+    "composite": true, // Required for emitDeclarationOnly
     "outDir": "dist",
-
     /* Bundler mode */
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
@@ -18,16 +20,21 @@
     "moduleDetection": "force",
     "noEmit": true,
     "jsx": "react-jsx",
-
     /* Linting */
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "paths": {
-      "@omnisat/lasereyes-core": ["../core/dist"],
-      "@omnisat/lasereyes-react": ["../react/dist"]
+      "@kevinoyl/lasereyes-core": [
+        "../core/dist"
+      ],
+      "@kevinoyl/lasereyes-react": [
+        "../react/dist"
+      ]
     }
   },
-  "include": ["src/index.ts"]
+  "include": [
+    "src/index.ts"
+  ]
 }

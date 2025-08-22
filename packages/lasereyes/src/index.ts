@@ -1,4 +1,4 @@
-export * from '@omnisat/lasereyes-core'
+export * from '@kevinoyl/lasereyes-core'
 export {
   useLaserEyes,
   useBalance,
@@ -16,5 +16,5 @@ export {
   WizzLogo,
   XverseLogo,
   LaserEyesLogo,
-} from '@omnisat/lasereyes-react'
-export type { LaserEyesContextType } from '@omnisat/lasereyes-react'
+} from '@kevinoyl/lasereyes-react'
+export type { LaserEyesContextType } from '@kevinoyl/lasereyes-react'

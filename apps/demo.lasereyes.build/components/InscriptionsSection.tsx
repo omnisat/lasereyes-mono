@@ -9,7 +9,7 @@ import {
   type TESTNET,
   useLaserEyes,
   type Inscription,
-} from '@omnisat/lasereyes'
+} from '@kevinoyl/lasereyes'
 
 const InscriptionsSection = () => {
   const {

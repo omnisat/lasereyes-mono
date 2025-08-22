@@ -6,7 +6,7 @@ import {
   FRACTAL_MAINNET,
   TESTNET4,
   NetworkType,
-} from '@omnisat/lasereyes'
+} from '@kevinoyl/lasereyes'
 
 export const MEMPOOL_SPACE_URL = 'https://mempool.space'
 export const MEMPOOL_SPACE_TESTNET_URL = 'https://mempool.space/testnet'

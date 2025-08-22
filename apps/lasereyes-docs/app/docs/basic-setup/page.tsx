@@ -122,7 +122,7 @@ function BasicSetupContent() {
           >
             <CodeBlock
               language="bash"
-              code={`npm install @omnisat/lasereyes-core @omnisat/lasereyes-react`}
+              code={`npm install @kevinoyl/lasereyes-core @kevinoyl/lasereyes-react`}
               copyButton={true}
             />
           </StepCard>
@@ -134,8 +134,8 @@ function BasicSetupContent() {
           >
             <CodeBlock
               language="typescript"
-              code={`import { LaserEyesProvider } from '@omnisat/lasereyes-react'
-import { MAINNET } from '@omnisat/lasereyes-core'
+              code={`import { LaserEyesProvider } from '@kevinoyl/lasereyes-react'
+import { MAINNET } from '@kevinoyl/lasereyes-core'
 
 function App() {
   return (
@@ -160,7 +160,7 @@ function App() {
           >
             <CodeBlock
               language="typescript"
-              code={`import { useLaserEyes } from '@omnisat/lasereyes-react'
+              code={`import { useLaserEyes } from '@kevinoyl/lasereyes-react'
 
 function WalletStatus() {
   const { 

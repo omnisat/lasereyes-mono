@@ -3,13 +3,13 @@ description:
 globs: 
 alwaysApply: true
 ---
-# Project Rules for `@omnisat/lasereyes-react`
+# Project Rules for `@kevinoyl/lasereyes-react`
 
-This document outlines the guidelines and standards for contributing to the `@omnisat/lasereyes-react` package. Following these rules will ensure consistency, maintainability, and quality throughout the React-specific implementation.
+This document outlines the guidelines and standards for contributing to the `@kevinoyl/lasereyes-react` package. Following these rules will ensure consistency, maintainability, and quality throughout the React-specific implementation.
 
 ## 🌟 Overview
 
-`@omnisat/lasereyes-react` is a React-specific package built on top of `@omnisat/lasereyes-core`. It provides React hooks, context providers, and wallet icon components to make it easy to integrate Bitcoin wallet support into React applications.
+`@kevinoyl/lasereyes-react` is a React-specific package built on top of `@kevinoyl/lasereyes-core`. It provides React hooks, context providers, and wallet icon components to make it easy to integrate Bitcoin wallet support into React applications.
 
 ## 📋 General Code Guidelines
 

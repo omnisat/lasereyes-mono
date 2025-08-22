@@ -70,7 +70,7 @@ function DataSourceManagerContent() {
               </p>
               <div className="relative overflow-hidden rounded-lg bg-muted p-4">
                 <pre className="text-xs md:text-sm whitespace-pre text-muted-foreground">
-{`┌─────────────────────────────────────────────────────────────┐
+                  {`┌─────────────────────────────────────────────────────────────┐
 │                     Your Application                         │
 └──────────────────────────┬──────────────────────────────────┘
                           │
@@ -161,7 +161,7 @@ function DataSourceManagerContent() {
           <CardContent className="p-6">
             <CodeBlock
               language="tsx"
-              code={`import { useLaserEyes } from '@omnisat/lasereyes-react'
+              code={`import { useLaserEyes } from '@kevinoyl/lasereyes-react'
 import { useState, useEffect } from 'react'
 
 function BitcoinData() {
@@ -218,7 +218,7 @@ function BitcoinData() {
           <CardContent className="p-6">
             <CodeBlock
               language="typescript"
-              code={`import { LaserEyesClient, createConfig, MAINNET } from '@omnisat/lasereyes-core'
+              code={`import { LaserEyesClient, createConfig, MAINNET } from '@kevinoyl/lasereyes-core'
 
 const config = createConfig({
   network: MAINNET,

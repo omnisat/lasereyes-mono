@@ -4,7 +4,7 @@ import type {
   NetworkType,
   Protocol,
   ProviderType
-} from "@omnisat/lasereyes-core"
+} from "@kevinoyl/lasereyes-core"
 
 export type LaserEyesContextType = {
   isInitializing: boolean

@@ -6,12 +6,12 @@ import { Heading } from "@/components/heading"
 import { ClientPageWrapper } from "@/components/client-page-wrapper"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { 
-  Code2, 
-  GitBranch, 
-  Terminal, 
-  PackageSearch, 
-  FolderTree, 
+import {
+  Code2,
+  GitBranch,
+  Terminal,
+  PackageSearch,
+  FolderTree,
   Wrench,
   Bug,
   FileCode,
@@ -205,7 +205,7 @@ pnpm dev`}
 pnpm test
 
 # Test specific package
-pnpm test --filter=@omnisat/lasereyes-core
+pnpm test --filter=@kevinoyl/lasereyes-core
 
 # Watch mode
 pnpm test:watch`}

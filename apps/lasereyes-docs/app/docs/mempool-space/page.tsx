@@ -26,7 +26,7 @@ export default function MempoolSpacePage() {
         <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-blue-600/20 rounded-full blur-[120px] -z-10 translate-x-1/2 -translate-y-1/2 animate-pulse" />
         <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-sky-500/10 rounded-full blur-[100px] -z-10 -translate-x-1/2 translate-y-1/2 animate-pulse" />
         <div className="absolute top-1/2 left-1/2 w-[200px] h-[200px] bg-blue-400/10 rounded-full blur-[80px] -z-10 -translate-x-1/2 -translate-y-1/2" />
-        
+
         <div className="flex items-center gap-3 mb-4">
           <Badge variant="secondary" className="bg-blue-500/10 text-blue-500 hover:bg-blue-500/20">Community Favorite</Badge>
           <Badge variant="secondary" className="bg-sky-500/10 text-sky-500 hover:bg-sky-500/20">Open Source</Badge>
@@ -183,7 +183,7 @@ function MempoolSpaceContent() {
           <CardContent className="p-6">
             <CodeBlock
               language="typescript"
-              code={`import { LaserEyesClient, createConfig, MAINNET } from '@omnisat/lasereyes-core'
+              code={`import { LaserEyesClient, createConfig, MAINNET } from '@kevinoyl/lasereyes-core'
 
 const config = createConfig({
   network: MAINNET,
@@ -212,7 +212,7 @@ const config = createConfig({
           <CardContent className="p-6">
             <CodeBlock
               language="typescript"
-              code={`import { useLaserEyes } from '@omnisat/lasereyes-react'
+              code={`import { useLaserEyes } from '@kevinoyl/lasereyes-react'
 
 function BitcoinData() {
   const { client } = useLaserEyes()
@@ -275,8 +275,8 @@ function BitcoinData() {
             <p className="text-muted-foreground mb-4">
               mempool.space is an open-source project supported by the Bitcoin community. Run your own instance or contribute to the project!
             </p>
-            <Link 
-              href="https://github.com/mempool/mempool" 
+            <Link
+              href="https://github.com/mempool/mempool"
               className="inline-flex items-center text-blue-500 hover:text-blue-400"
             >
               Learn More

@@ -1,4 +1,4 @@
-import { useLaserEyes, WalletIcon, LaserEyesLogo } from "@omnisat/lasereyes";
+import { useLaserEyes, WalletIcon, LaserEyesLogo } from "@kevinoyl/lasereyes";
 import { useTranslation } from "react-i18next";
 
 import { Dialog } from "./Dialog";

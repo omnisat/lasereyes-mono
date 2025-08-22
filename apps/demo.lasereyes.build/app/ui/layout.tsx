@@ -1,9 +1,9 @@
 'use client'
 
-import { LaserEyesModalProvider } from '@omnisat/lasereyes-ui'
+import { LaserEyesModalProvider } from '@kevinoyl/lasereyes-ui'
 import { ReactNode } from 'react'
-import '@omnisat/lasereyes-ui/style'
-import { KEPLR, LaserEyesProvider, OYL, UNISAT } from '@omnisat/lasereyes'
+import '@kevinoyl/lasereyes-ui/style'
+import { KEPLR, LaserEyesProvider, OYL, UNISAT } from '@kevinoyl/lasereyes'
 
 export default function UILayout({ children }: { children: ReactNode }) {
   return (

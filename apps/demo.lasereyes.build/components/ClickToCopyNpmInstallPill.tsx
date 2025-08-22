@@ -21,7 +21,7 @@ export const ClickToCopyNpmInstallPill = ({
 
   useEffect(() => {
     setSignature(
-      `${dependencyManager} ${dependencyManager === 'yarn' ? 'add' : 'install'} @omnisat/lasereyes`
+      `${dependencyManager} ${dependencyManager === 'yarn' ? 'add' : 'install'} @kevinoyl/lasereyes`
     )
   }, [dependencyManager])
 
@@ -84,8 +84,8 @@ export const ClickToCopyNpmInstallPill = ({
         onClick={() =>
           setDepManagerAndSignature(
             DEPENDENCY_MANAGERS[
-              (DEPENDENCY_MANAGERS.indexOf(String(dependencyManager)) + 1) %
-                DEPENDENCY_MANAGERS.length
+            (DEPENDENCY_MANAGERS.indexOf(String(dependencyManager)) + 1) %
+            DEPENDENCY_MANAGERS.length
             ]
           )
         }

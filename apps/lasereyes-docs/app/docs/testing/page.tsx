@@ -123,7 +123,7 @@ describe('formatBitcoinAmount', () => {
             <CodeBlock
               language="typescript"
               code={`// Create a mock for useLaserEyes hook
-jest.mock('@omnisat/lasereyes-react', () => ({
+jest.mock('@kevinoyl/lasereyes-react', () => ({
   useLaserEyes: () => ({
     connect: jest.fn(),
     disconnect: jest.fn(),
@@ -186,8 +186,8 @@ jest.mock('@omnisat/lasereyes-react', () => ({
             <CodeBlock
               language="typescript"
               code={`// Configure LaserEyes to use Testnet for testing
-import { LaserEyesProvider } from '@omnisat/lasereyes-react'
-import { TESTNET } from '@omnisat/lasereyes-core'
+import { LaserEyesProvider } from '@kevinoyl/lasereyes-react'
+import { TESTNET } from '@kevinoyl/lasereyes-core'
 
 const renderWithTestnet = (ui) => {
   return render(

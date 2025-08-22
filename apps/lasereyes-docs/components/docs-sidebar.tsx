@@ -7,8 +7,8 @@ import { cn } from "@/lib/utils"
 import { themeConfig } from "@/lib/theme-config"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { ChevronDown, ChevronRight } from "lucide-react"
-import { LaserEyesLogo } from "@omnisat/lasereyes-react"
-import type { colorsType } from "@omnisat/lasereyes-react"
+import { LaserEyesLogo } from "@kevinoyl/lasereyes-react"
+import type { colorsType } from "@kevinoyl/lasereyes-react"
 
 function DocsSidebarContent({
   className,

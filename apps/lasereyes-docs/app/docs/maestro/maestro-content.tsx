@@ -33,8 +33,8 @@ export default function MaestroContent() {
       <p className="mb-6">To use Maestro with LaserEyes, you need to configure it in your LaserEyes setup:</p>
       <CodeBlock
         language="typescript"
-        code={`import { LaserEyesProvider } from '@omnisat/lasereyes-react'
-import { MAINNET } from '@omnisat/lasereyes-core'
+        code={`import { LaserEyesProvider } from '@kevinoyl/lasereyes-react'
+import { MAINNET } from '@kevinoyl/lasereyes-core'
 
 function App() {
   return (
@@ -120,7 +120,7 @@ function App() {
       <p className="mb-6">Here's how to use Maestro-specific features with LaserEyes:</p>
       <CodeBlock
         language="typescript"
-        code={`import { useLaserEyes } from '@omnisat/lasereyes-react'
+        code={`import { useLaserEyes } from '@kevinoyl/lasereyes-react'
 
 function BitcoinData() {
   const { client } = useLaserEyes()

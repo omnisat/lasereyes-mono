@@ -135,7 +135,7 @@ function InscriptionsContent() {
           <CardContent className="p-6">
             <CodeBlock
               language="typescript"
-              code={`import { useLaserEyes } from '@omnisat/lasereyes-react'
+              code={`import { useLaserEyes } from '@kevinoyl/lasereyes-react'
 import { useState, useEffect } from 'react'
 
 function InscriptionsList() {
@@ -182,7 +182,7 @@ function InscriptionsList() {
           <CardContent className="p-6">
             <CodeBlock
               language="typescript"
-              code={`import { useLaserEyes } from '@omnisat/lasereyes-react'
+              code={`import { useLaserEyes } from '@kevinoyl/lasereyes-react'
 import { useState } from 'react'
 
 function SendInscription() {
@@ -233,7 +233,7 @@ function SendInscription() {
                 The getInscriptions method accepts offset and limit parameters.
               </p>
             </div>
-            
+
             <div>
               <h3 className="text-lg font-semibold mb-2">2. Error Handling</h3>
               <p className="text-muted-foreground">
@@ -241,7 +241,7 @@ function SendInscription() {
                 Network issues or wallet rejections should be handled gracefully.
               </p>
             </div>
-            
+
             <div>
               <h3 className="text-lg font-semibold mb-2">3. Loading States</h3>
               <p className="text-muted-foreground">
@@ -249,7 +249,7 @@ function SendInscription() {
                 Both fetching and sending can take time to complete.
               </p>
             </div>
-            
+
             <div>
               <h3 className="text-lg font-semibold mb-2">4. Validation</h3>
               <p className="text-muted-foreground">

@@ -25,7 +25,7 @@ import {
   WIZZ,
   XVERSE,
   type ProviderType,
-} from '@omnisat/lasereyes-react'
+} from '@kevinoyl/lasereyes-react'
 import { ExternalLink } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { CodeBlock } from '@/components/code-block'
@@ -172,8 +172,8 @@ function WalletsContent() {
           <CardContent className="p-6">
             <CodeBlock
               language="tsx"
-              code={`import { useLaserEyes } from '@omnisat/lasereyes-react'
-import { UNISAT, XVERSE } from '@omnisat/lasereyes-core'
+              code={`import { useLaserEyes } from '@kevinoyl/lasereyes-react'
+import { UNISAT, XVERSE } from '@kevinoyl/lasereyes-core'
 
 function WalletConnect() {
   const { connect, disconnect, connected, address } = useLaserEyes()

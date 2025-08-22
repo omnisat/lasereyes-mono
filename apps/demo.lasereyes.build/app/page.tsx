@@ -7,7 +7,7 @@ import {
   SIGNET,
   TESTNET,
   TESTNET4,
-} from '@omnisat/lasereyes'
+} from '@kevinoyl/lasereyes'
 import dynamic from 'next/dynamic'
 
 import App from '@/components/App'
@@ -15,7 +15,7 @@ import { useEffect, useState } from 'react'
 import { UtxoProvider } from '@/hooks/useUtxos'
 
 const DynamicLasereyesProvider = dynamic(
-  () => import('@omnisat/lasereyes').then((mod) => mod.LaserEyesProvider),
+  () => import('@kevinoyl/lasereyes').then((mod) => mod.LaserEyesProvider),
   { ssr: false }
 )
 
@@ -47,7 +47,7 @@ export default function Home() {
       }}
     >
       <UtxoProvider>
-        <App setNetwork={() => {}} />
+        <App setNetwork={() => { }} />
       </UtxoProvider>
     </DynamicLasereyesProvider>
   )

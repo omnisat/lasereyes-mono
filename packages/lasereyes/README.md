@@ -2,7 +2,7 @@
 
 # lasereyes
 
-`@omnisat/lasereyes` is the main package that bundles both `lasereyes-core` and `lasereyes-react`, offering a unified interface for Bitcoin wallet integration in both framework-agnostic and React-based environments. This package simplifies wallet interactions across various Bitcoin wallets, making it easy for developers to build dApps with Bitcoin support.
+`@kevinoyl/lasereyes` is the main package that bundles both `lasereyes-core` and `lasereyes-react`, offering a unified interface for Bitcoin wallet integration in both framework-agnostic and React-based environments. This package simplifies wallet interactions across various Bitcoin wallets, making it easy for developers to build dApps with Bitcoin support.
 
 ## Key Features
 
@@ -21,20 +21,20 @@ This package exports two core packages:
 
 ## Installation
 
-To install the `@omnisat/lasereyes` package:
+To install the `@kevinoyl/lasereyes` package:
 
 ```bash
-yarn add @omnisat/lasereyes
+yarn add @kevinoyl/lasereyes
 ```
 
 ## Usage
 
-`@omnisat/lasereyes` provides both framework-agnostic and React-specific integrations. You can use it in either environment based on your app’s requirements.
+`@kevinoyl/lasereyes` provides both framework-agnostic and React-specific integrations. You can use it in either environment based on your app’s requirements.
 
 ### Example Usage (React)
 
 ```typescript
-import { LaserEyesProvider, useLaserEyes, UNISAT, MAINNET } from '@omnisat/lasereyes-react';
+import { LaserEyesProvider, useLaserEyes, UNISAT, MAINNET } from '@kevinoyl/lasereyes-react';
 
 function App() {
   return (
@@ -61,7 +61,7 @@ function WalletInfo() {
 
 ## Development
 
-To develop the `@omnisat/lasereyes` package within the monorepo:
+To develop the `@kevinoyl/lasereyes` package within the monorepo:
 
 1. Clone the repository and navigate to the monorepo root.
 2. Install dependencies:
@@ -83,6 +83,6 @@ Contributions are welcome! Feel free to submit pull requests or open issues for 
 
 ## License
 
-`@omnisat/lasereyes` is MIT licensed.
+`@kevinoyl/lasereyes` is MIT licensed.
 
 If you find Laser Eyes useful or use it for work, please consider [sponsoring Laser Eyes](https://github.com/sponsors/omnisat). Thank you 🙏

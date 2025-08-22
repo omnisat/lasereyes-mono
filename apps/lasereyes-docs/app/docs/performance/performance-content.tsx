@@ -158,7 +158,7 @@ async function getBalanceWithCache(address: string): Promise<string> {
 
       <CodeBlock
         language="typescript"
-        code={`import { useLaserEyes } from '@omnisat/lasereyes-react'
+        code={`import { useLaserEyes } from '@kevinoyl/lasereyes-react'
 import { useState, useEffect } from 'react'
 
 // Debounce function
@@ -262,7 +262,7 @@ function OptimizedSearch() {
 
       <CodeBlock
         language="typescript"
-        code={`import { useLaserEyes } from '@omnisat/lasereyes-react'
+        code={`import { useLaserEyes } from '@kevinoyl/lasereyes-react'
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { useVirtualizer } from '@tanstack/react-virtual'
 
@@ -397,7 +397,7 @@ function VirtualizedInscriptionsList() {
 
       <CodeBlock
         language="typescript"
-        code={`import { useLaserEyes } from '@omnisat/lasereyes-react'
+        code={`import { useLaserEyes } from '@kevinoyl/lasereyes-react'
 import { useState, useEffect } from 'react'
 
 function OptimizedWalletInteraction() {

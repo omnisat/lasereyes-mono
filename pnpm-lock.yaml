@@ -44,10 +44,10 @@ importers:
       '@bitcoinerlab/secp256k1':
         specifier: ^1.1.1
         version: 1.2.0
-      '@omnisat/lasereyes':
+      '@kevinoyl/lasereyes':
         specifier: workspace:*
         version: link:../../packages/lasereyes
-      '@omnisat/lasereyes-ui':
+      '@kevinoyl/lasereyes-ui':
         specifier: workspace:*
         version: link:../../packages/ui
       '@radix-ui/react-avatar':
@@ -159,10 +159,10 @@ importers:
       '@hookform/resolvers':
         specifier: ^3.9.1
         version: 3.10.0(react-hook-form@7.58.1)
-      '@omnisat/lasereyes-core':
+      '@kevinoyl/lasereyes-core':
         specifier: workspace:*
         version: link:../../packages/core
-      '@omnisat/lasereyes-react':
+      '@kevinoyl/lasereyes-react':
         specifier: workspace:*
         version: link:../../packages/react
       '@radix-ui/react-accordion':
@@ -337,7 +337,7 @@ importers:
 
   apps/react-ui:
     dependencies:
-      '@omnisat/lasereyes':
+      '@kevinoyl/lasereyes':
         specifier: workspace:*
         version: link:../../packages/lasereyes
       react:
@@ -492,10 +492,10 @@ importers:
 
   packages/lasereyes:
     dependencies:
-      '@omnisat/lasereyes-core':
+      '@kevinoyl/lasereyes-core':
         specifier: workspace:*
         version: link:../core
-      '@omnisat/lasereyes-react':
+      '@kevinoyl/lasereyes-react':
         specifier: workspace:*
         version: link:../react
     devDependencies:
@@ -517,12 +517,12 @@ importers:
 
   packages/react:
     dependencies:
+      '@kevinoyl/lasereyes-core':
+        specifier: 0.0.83
+        version: link:../core
       '@nanostores/react':
         specifier: ^0.7.3
         version: 0.7.3(nanostores@0.11.4)(react@19.0.0-rc.1)
-      '@omnisat/lasereyes-core':
-        specifier: 0.0.82
-        version: link:../core
       '@tanstack/react-query':
         specifier: ^5.81.5
         version: 5.81.5(react@19.0.0-rc.1)
@@ -623,7 +623,7 @@ importers:
         specifier: ^2.4.0
         version: 2.6.0
     devDependencies:
-      '@omnisat/lasereyes':
+      '@kevinoyl/lasereyes':
         specifier: workspace:*
         version: link:../lasereyes
       '@types/node':

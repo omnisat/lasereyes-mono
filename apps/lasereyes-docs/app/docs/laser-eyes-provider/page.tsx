@@ -60,8 +60,8 @@ function LaserEyesProviderContent() {
           <CardContent className="p-6">
             <CodeBlock
               language="tsx"
-              code={`import { LaserEyesProvider } from '@omnisat/lasereyes-react'
-import { MAINNET } from '@omnisat/lasereyes-core'
+              code={`import { LaserEyesProvider } from '@kevinoyl/lasereyes-react'
+import { MAINNET } from '@kevinoyl/lasereyes-core'
 
 function App() {
   return (
@@ -145,7 +145,7 @@ function App() {
             </CardContent>
           </Card>
 
-          
+
         </div>
       </section>
 

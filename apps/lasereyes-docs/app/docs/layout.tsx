@@ -8,8 +8,8 @@ import { ThemeToggle } from "@/components/theme-toggle"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { themeConfig } from "@/lib/theme-config"
-import { LaserEyesLogo } from "@omnisat/lasereyes-react"
-import type { colorsType } from "@omnisat/lasereyes-react"
+import { LaserEyesLogo } from "@kevinoyl/lasereyes-react"
+import type { colorsType } from "@kevinoyl/lasereyes-react"
 import { Suspense } from "react"
 
 export const metadata: Metadata = {

@@ -53,15 +53,15 @@ No, there is no need to thank us.
 
 The sunny skies over the `lasereyes` repository are gleaming brighter than ever because we heard your mumbles! Folks from QA would be delighted to know and test in their over-caffeinated enthusiasm that we have a new release candidate available as Version 0.0.125-rc.8. Bonus? We've even bumped the versions of the packages. Let's get into it.
 
-### @omnisat/lasereyes-core [0.0.47-rc.5]
+### @kevinoyl/lasereyes-core [0.0.47-rc.5]
 
 The core package saw a version update from 0.0.46-rc.4 to 0.0.47-rc.5. This isn't just a number change but a hard-work-drenched improvement. We promise, not a single piece of cake was harmed during this transition! Strap up and prepare to experience enhancements of the sort you've never seen before.
 
-### @omnisat/lasereyes-react [0.0.42-rc.4]
+### @kevinoyl/lasereyes-react [0.0.42-rc.4]
 
 And we didn't stop at the core. No sir, we've gone farther! Our React package, in all its glory, evolved from version 0.0.41-rc.4 to version 0.0.42-rc.4. There may be no additional bite-sized burgers in this release, but we are definitely filling up on React goodness.
 
-### @omnisat/lasereyes-vue [0.0.8-rc.1]
+### @kevinoyl/lasereyes-vue [0.0.8-rc.1]
 
 Our Vue package took some time for self-discovery and has metamorphized from version 0.0.7-rc.1 to version 0.0.8-rc.1. Though this might seem like just an incremental update, it’s like hiring your second cat, small change, monumental effect!
 
@@ -75,19 +75,19 @@ This release - version 0.0.123-rc.6 - is a tour de force to excite even the most
 
 ### 1. LaserEyes Core: Version change 0.0.46-rc.1 -> 0.0.46-rc.2
 
-The moment you've all been waiting for – a version change in the @omnisat/lasereyes-core in package.json file! Cherish this moment - there aren't many like this in life.
+The moment you've all been waiting for – a version change in the @kevinoyl/lasereyes-core in package.json file! Cherish this moment - there aren't many like this in life.
 
 ### 2. LaserEyes React: Version change 0.0.40-rc.1 -> 0.0.40-rc.2
 
-For those of you who were growing tired of the old version of @omnisat/lasereyes-react in our package.json file, rejoice! We've liberated you from the burden of an old version, by moving from 0.0.40-rc.1 to 0.0.40-rc.2. A giant leap for developer kind!
+For those of you who were growing tired of the old version of @kevinoyl/lasereyes-react in our package.json file, rejoice! We've liberated you from the burden of an old version, by moving from 0.0.40-rc.1 to 0.0.40-rc.2. A giant leap for developer kind!
 
 ### 3. LaserEyes: Change of Installation Command
 
-In the lasereyes README.md, we've replaced the command `pnpm add @omnisat/lasereyes` with `yarn add @omnisat/lasereyes`. Because why not? We thought it wasn't confusing enough, so we decided to turn some tables.
+In the lasereyes README.md, we've replaced the command `pnpm add @kevinoyl/lasereyes` with `yarn add @kevinoyl/lasereyes`. Because why not? We thought it wasn't confusing enough, so we decided to turn some tables.
 
 ### 4. LaserEyes: Version change 0.0.123-rc.4 -> 0.0.123-rc.6
 
-At last, we've the long-awaited update in the heart of our project, the version change of @omnisat/lasereyes package from "0.0.123-rc.4" to "0.0.123-rc.6!". Please play fanfare music as you read this.
+At last, we've the long-awaited update in the heart of our project, the version change of @kevinoyl/lasereyes package from "0.0.123-rc.4" to "0.0.123-rc.6!". Please play fanfare music as you read this.
 
 Thank you for your continued support and keep an eye out for thrilling changes in our upcoming releases.
 
@@ -105,15 +105,15 @@ That's all folks! We promise to continue tweaking things behind the scenes to he
 
 In this release, there have been some significant adjustments across three core packages of the LaserEye project - LaserEyes Core, LaserEyes React, and LaserEyes itself. Let's break it down. Some will say these changes are out of this world, but don't worry, we remain grounded.
 
-**@omnisat/lasereyes-core:**
+**@kevinoyl/lasereyes-core:**
 
 Our core library had a suitable increase from version 0.0.45-rc.2 to 0.0.45-rc.3. There may or may not be additional white spaces added to the README. We won't validate your life by divulging that information.
 
-**@omnisat/lasereyes-react:**
+**@kevinoyl/lasereyes-react:**
 
 We moved LaserEyes React from version 0.0.39-rc.0 to 0.0.39-rc.1. Once again, an enigma is introduced via mysterious blank lines in the README file. These strange additions will continue to impress or confound - we're not mind readers, guys.
 
-**@omnisat/lasereyes:**
+**@kevinoyl/lasereyes:**
 
 The updates to LaserEyes are far more objective. We've leveled up from version 0.0.122-rc.1 to 0.0.122-rc.4. Don’t you feel better knowing that? We also made some tweaks to the example usage in the README, showing how to use LaserEyes with React. Frankly, it's revolutionary - a sphere-shaped revolution, if you will.
 
@@ -129,15 +129,15 @@ And that’s it for this release, aren’t you glad you read this? Stay tuned fo
 
 Version: 0.0.121-rc.1
 
-## Updates in `@omnisat/lasereyes-react`
+## Updates in `@kevinoyl/lasereyes-react`
 
-We've successfully incremented your favorite package `@omnisat/lasereyes-react` from version `0.0.37` to `0.0.38-rc.0`. This shift may not have started a revolution, but surely your code is enjoying a breath of fresh air.
+We've successfully incremented your favorite package `@kevinoyl/lasereyes-react` from version `0.0.37` to `0.0.38-rc.0`. This shift may not have started a revolution, but surely your code is enjoying a breath of fresh air.
 
-## Fine Tuning in `@omnisat/lasereyes`
+## Fine Tuning in `@kevinoyl/lasereyes`
 
-In our campaign to make the world a better place, we figured we'd start by changing version `0.0.120` of `@omnisat/lasereyes` to `0.0.121-rc.1`. Alas, the new version carries all the wisdom of its predecessor, plus some bonus rationale.
+In our campaign to make the world a better place, we figured we'd start by changing version `0.0.120` of `@kevinoyl/lasereyes` to `0.0.121-rc.1`. Alas, the new version carries all the wisdom of its predecessor, plus some bonus rationale.
 
-Now, remember those `@omnisat/lasereyes-core` and `@omnisat/lasereyes-react` dependencies? They're now secured with the power of `workspace:*`, unifying versions across your project like never before.
+Now, remember those `@kevinoyl/lasereyes-core` and `@kevinoyl/lasereyes-react` dependencies? They're now secured with the power of `workspace:*`, unifying versions across your project like never before.
 
 ## Additional Tinkering
 
@@ -230,7 +230,7 @@ Dear user, we believe in continuous improvement, so here we are again with yet a
 
 4. **Global Version Update:** And finally, we saved the best for the last. Drumrolls, please... we've nudged our global version from 0.0.114 to 0.0.115-rc.3! We're one step closer to version 1.0, friends. One jolly step closer.
 
-5. **Minor Dependencies Shift:** Lastly, we have changed the dependency requirements within the lasereyes package for "@omnisat/lasereyes-core" and "@omnisat/lasereyes-react". They now point to workspace:\*. There will be no apparent changes or impact due to this update, but we thought you'd like to know... just because.
+5. **Minor Dependencies Shift:** Lastly, we have changed the dependency requirements within the lasereyes package for "@kevinoyl/lasereyes-core" and "@kevinoyl/lasereyes-react". They now point to workspace:\*. There will be no apparent changes or impact due to this update, but we thought you'd like to know... just because.
 
 CAUTION: Please avoid looking directly into the laser eyes. Enjoy the version update!
 
@@ -240,12 +240,12 @@ CAUTION: Please avoid looking directly into the laser eyes. Enjoy the version up
 
 #### Tiny step forward, giant leap for kind
 
-- We've updated the `version` of `@omnisat/lasereyes-core` from `0.0.38` to `0.0.39-rc.1` - a minor bump. But, you know, even the Moon is reached by small steps, and we all know what's happened there, right?
+- We've updated the `version` of `@kevinoyl/lasereyes-core` from `0.0.38` to `0.0.39-rc.1` - a minor bump. But, you know, even the Moon is reached by small steps, and we all know what's happened there, right?
 - In the file `op-net.ts`, we've added `?` after `this.library` for method `removeListener`. Now, if `this.library` decides to play hide and seek game, we're prepared. We're always one step ahead.
 
 - Similar changes in the file `unisat.ts` are also observed. `if (!this.library) return` is the new mantra for method `removeListener`. We believe in treating every code file with equality.
 
-- Paving way for the future, `version` in `@omnisat/lasereyes-react` has been moved up from `0.0.30` to `0.0.31-rc.0`. Small progress, but we never despise humble beginnings.
+- Paving way for the future, `version` in `@kevinoyl/lasereyes-react` has been moved up from `0.0.30` to `0.0.31-rc.0`. Small progress, but we never despise humble beginnings.
 
 - Following the trend, `version` in `lasereyes` got an update from `0.0.113` to `0.0.114-rc.1`. We're keeping up with the trend, aren't we?
 
@@ -259,13 +259,13 @@ Leaps and bounds are reserved for superheroes. For us, slight numerical tweaks a
 
 Oh hey there! Surprised to see you here, but since you are, let's talk about the changes in our swanky new update.
 
-1. **Your favorite @omnisat/lasereyes-core** couldn't stay at "0.0.36-rc.5", because well, change is the only constant in life. It now boasts a shiny version "0.0.38-rc.6". Nothing gets rid of Monday blues like new version numbers, amirite?
+1. **Your favorite @kevinoyl/lasereyes-core** couldn't stay at "0.0.36-rc.5", because well, change is the only constant in life. It now boasts a shiny version "0.0.38-rc.6". Nothing gets rid of Monday blues like new version numbers, amirite?
 
-2. In the spirit of the age-old tradition of "always leave things slightly better than you found them", **@omnisat/lasereyes-react** decided to shake things up from "0.0.29-rc.7" and stepped up to "0.0.30-rc.7". We’ve got a good feeling about the number '30'.
+2. In the spirit of the age-old tradition of "always leave things slightly better than you found them", **@kevinoyl/lasereyes-react** decided to shake things up from "0.0.29-rc.7" and stepped up to "0.0.30-rc.7". We’ve got a good feeling about the number '30'.
 
-3. Raising the stakes, we present to you eight – count 'em, EIGHT – new additions to your @omnisat/lasereyes-react exports. Welcome **LeatherLogo, MagicEdenLogo, OkxLogo, PhantomLogo, OylLogo, UnisatLogo, WizzLogo,** and **XverseLogo.** More is always better, except when it’s worse. In this case, we're certain it's better.
+3. Raising the stakes, we present to you eight – count 'em, EIGHT – new additions to your @kevinoyl/lasereyes-react exports. Welcome **LeatherLogo, MagicEdenLogo, OkxLogo, PhantomLogo, OylLogo, UnisatLogo, WizzLogo,** and **XverseLogo.** More is always better, except when it’s worse. In this case, we're certain it's better.
 
-4. Last, but not the least, the self-titled celebrity **@omnisat/lasereyes** has leapfrogged from the quaint "0.0.113-rc.16" to the majestic "0.0.113-rc.18". Yeah, you saw that right, we completely skipped 'rc.17'. Because we are mavericks who play by our own rules.
+4. Last, but not the least, the self-titled celebrity **@kevinoyl/lasereyes** has leapfrogged from the quaint "0.0.113-rc.16" to the majestic "0.0.113-rc.18". Yeah, you saw that right, we completely skipped 'rc.17'. Because we are mavericks who play by our own rules.
 
 So, buckle up, update your packages, and remember – we make these changes because we care... and because it's our job.
 
@@ -303,17 +303,17 @@ But don’t worry, we will "always ensure we are informative and helpful," even 
 
 4. Version of the `lasereyes` package has been updated from `0.0.102` to `0.0.103-rc.18`.
 
-5. We now use `workspace:*` for dependencies on `@omnisat/lasereyes-core` and `@omnisat/lasereyes-react`.
+5. We now use `workspace:*` for dependencies on `@kevinoyl/lasereyes-core` and `@kevinoyl/lasereyes-react`.
 
 ## Dependency Changes
 
-1. In `lasereyes` package, the dependencies for `@omnisat/lasereyes-core` and `@omnisat/lasereyes-react` have switched from specific versions to workspace:\*. This designates that the local versions of these packages should be used, which can speed up the development process as changes in the local packages are immediately available.
+1. In `lasereyes` package, the dependencies for `@kevinoyl/lasereyes-core` and `@kevinoyl/lasereyes-react` have switched from specific versions to workspace:\*. This designates that the local versions of these packages should be used, which can speed up the development process as changes in the local packages are immediately available.
 
 2. Our `pnpm-lock.yaml` file has been updated to indicate this shift to using the workspace packages. Now, instead of pointing to a specific version of the `lasereyes-core` and `lasereyes-react` packages, they point to the local workspace version.
 
 ## Misc
 
-Two empty line spaces have been added to the end of the `@omnisat/lasereyes-react` README.md file.
+Two empty line spaces have been added to the end of the `@kevinoyl/lasereyes-react` README.md file.
 
 # Release Notes
 
@@ -376,7 +376,7 @@ All of these changes are meant to better the reliability and functionality of th
 
 ### Package Updates:
 
-1. `@omnisat/lasereyes-core`:
+1. `@kevinoyl/lasereyes-core`:
 
    - The package version has been updated from "0.0.6" to "0.0.7-rc.0".
 
@@ -385,7 +385,7 @@ All of these changes are meant to better the reliability and functionality of th
    - The package version in the package-lock.json file was updated from "0.0.4" to "0.0.5-rc.0".
    - The package version in the package.json file got updated from "0.0.4" to "0.0.5-rc.0".
 
-3. `@omnisat/lasereyes`:
+3. `@kevinoyl/lasereyes`:
    - The package version in the package.json file was updated from "0.0.36" to "0.0.37-rc.0".
 
 #### Please note:
@@ -420,21 +420,21 @@ Please note that all the updates are related to the versions of the packages. Mo
 
 ### Packages Updated
 
-- **@omnisat/lasereyes-core**
+- **@kevinoyl/lasereyes-core**
 
   - Version bumped from `0.0.5-rc.3` to `0.0.5-rc.4`.
 
-- **@omnisat/lasereyes-react**
+- **@kevinoyl/lasereyes-react**
 
   - Updated `package-lock.json` and `package.json` files.
     - Version bumped from `0.0.3-rc.2` to `0.0.3-rc.3` in both files.
 
-- **@omnisat/lasereyes**
+- **@kevinoyl/lasereyes**
   - Version updated from `0.0.34` to `0.0.35-rc.0` in the `package.json` file.
 
 ### Summary
 
-This release primarily involves updates to the package versions across the libraries for `@omnisat/lasereyes-core`, `@omnisat/lasereyes-react`, and `@omnisat/lasereyes`. No notable features or bug fixes were introduced in this version.
+This release primarily involves updates to the package versions across the libraries for `@kevinoyl/lasereyes-core`, `@kevinoyl/lasereyes-react`, and `@kevinoyl/lasereyes`. No notable features or bug fixes were introduced in this version.
 
 # Release Notes - Version v0.0.33
 
@@ -446,13 +446,13 @@ New version v0.0.33 brings a few important updates across several packages. Enha
 
 Here is the summary of the version changes:
 
-- **@omnisat/lasereyes-core**
+- **@kevinoyl/lasereyes-core**
   The version has been updated from v0.0.5-rc.2 to v0.0.5-rc.3.
 
 - **lasereyes-react**
   The versions in both `package-lock.json` and `package.json` files have been updated from v0.0.3-rc.1 to v0.0.3-rc.2.
 
-- **@omnisat/lasereyes**
+- **@kevinoyl/lasereyes**
   The version has been updated from v0.0.33 to v0.0.34-rc.0.
 
 Please note the new changes and update your packages accordingly for optimal performance and latest features.
@@ -463,7 +463,7 @@ Remember to always start with backing up your application and data before applyi
 
 ## Version: v0.0.33-rc.0
 
-In this new release, the main highlight is the version bump of `@omnisat/lasereyes` from version `0.0.32` to `0.0.33-rc.0`. This new version is a release candidate and this change reflects the preparation for the next potential stable release.
+In this new release, the main highlight is the version bump of `@kevinoyl/lasereyes` from version `0.0.32` to `0.0.33-rc.0`. This new version is a release candidate and this change reflects the preparation for the next potential stable release.
 
 No other documented changes were made to the codebase in this update.
 
@@ -487,7 +487,7 @@ Remember to update your dependencies to ensure compatibility with this new versi
 
 1. Version Upgrade: The package has been upgraded from version `0.0.30` to version `0.0.31-rc.0`.
 
-No additional changes have been made in the package's modules or structure as per the git diff provided. Please ensure to update your dependencies to stay up-to-date with the latest features and improvements of the "@omnisat/lasereyes" package.
+No additional changes have been made in the package's modules or structure as per the git diff provided. Please ensure to update your dependencies to stay up-to-date with the latest features and improvements of the "@kevinoyl/lasereyes" package.
 
 # Release Notes
 
@@ -495,7 +495,7 @@ No additional changes have been made in the package's modules or structure as pe
 
 ## Updates
 
-- The package version of '@omnisat/lasereyes' has been upgraded from "0.0.29" to "0.0.30-rc.0"
+- The package version of '@kevinoyl/lasereyes' has been upgraded from "0.0.29" to "0.0.30-rc.0"
 
 Please note that this is a release candidate version, so it might not be completely stable or might contain bugs. The purpose is to gather feedback and make improvements before the final stable version is released.
 
@@ -509,11 +509,11 @@ Thank you for supporting our work. We are looking forward to serving you better 
 
 ## Updated Information
 
-The package version for "@omnisat/lasereyes" has been incremented from v0.0.27 to v0.0.28-rc.0.
+The package version for "@kevinoyl/lasereyes" has been incremented from v0.0.27 to v0.0.28-rc.0.
 
 ## General Changes
 
-- Updated the package version in the package.json file of "@omnisat/lasereyes" from "0.0.27" to "0.0.28-rc.0".
+- Updated the package version in the package.json file of "@kevinoyl/lasereyes" from "0.0.27" to "0.0.28-rc.0".
 - No changes have been made to the "name", "private", "type", "main", and "module" fields in the package.json file.
 
 ## NOTE:
@@ -566,7 +566,7 @@ As always, you are more than welcome to participate in the testing. Your feedbac
 
 Please continue using the package and report back any bugs, issues you encounter, or improvements you'd like to see. Your help is very much appreciated!
 
-# Release Notes for @omnisat/lasereyes version 0.0.20-rc.0
+# Release Notes for @kevinoyl/lasereyes version 0.0.20-rc.0
 
 ## Changes:
 
@@ -580,7 +580,7 @@ Please checkout the new version and let us know if you encounter any issues, so 
 
 As always, we appreciate your support and contributions to making our software better.
 
-# Release Notes for @omnisat/lasereyes version 0.0.19-rc.0
+# Release Notes for @kevinoyl/lasereyes version 0.0.19-rc.0
 
 ## Changes:
 

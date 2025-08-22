@@ -23,14 +23,14 @@ export default defineConfig({
         "react",
         "react-dom",
         "react/jsx-runtime",
-        "@omnisat/lasereyes",
+        "@kevinoyl/lasereyes",
       ],
       output: {
         entryFileNames: "[name].js",
         globals: {
           react: "React",
           "react-dom": "ReactDOM",
-          "@omnisat/lasereyes": "Lasereyes",
+          "@kevinoyl/lasereyes": "Lasereyes",
         },
       },
     },

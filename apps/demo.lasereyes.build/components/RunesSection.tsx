@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
 import { toast } from 'sonner'
 import { getMempoolSpaceUrl } from '@/lib/urls'
-import { type MAINNET, type RuneSendArgs, type TESTNET, useLaserEyes, type OrdRuneBalance } from '@omnisat/lasereyes'
+import { type MAINNET, type RuneSendArgs, type TESTNET, useLaserEyes, type OrdRuneBalance } from '@kevinoyl/lasereyes'
 
 const RunesSection = () => {
   const { provider, address, send, network, getMetaBalances, connected } = useLaserEyes()

@@ -5,7 +5,7 @@ import {
   SIGNET,
   TESTNET,
   useLaserEyes,
-} from '@omnisat/lasereyes'
+} from '@kevinoyl/lasereyes'
 import { type ReactNode, useCallback, useState } from 'react'
 import { laserEyesModalContext } from './LaserEyesModalContext'
 import { ThemeProvider } from './ThemeProvider'

@@ -25,7 +25,7 @@ export default function SandshrewPage() {
         <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-emerald-600/20 rounded-full blur-[120px] -z-10 translate-x-1/2 -translate-y-1/2 animate-pulse" />
         <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-teal-500/10 rounded-full blur-[100px] -z-10 -translate-x-1/2 translate-y-1/2 animate-pulse" />
         <div className="absolute top-1/2 left-1/2 w-[200px] h-[200px] bg-emerald-400/10 rounded-full blur-[80px] -z-10 -translate-x-1/2 -translate-y-1/2" />
-        
+
         <div className="flex items-center gap-3 mb-4">
           <Badge variant="secondary" className="bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20">High Performance</Badge>
           <Badge variant="secondary" className="bg-teal-500/10 text-teal-500 hover:bg-teal-500/20">Open Source</Badge>
@@ -182,7 +182,7 @@ function SandshrewContent() {
           <CardContent className="p-6">
             <CodeBlock
               language="typescript"
-              code={`import { LaserEyesClient, createConfig, MAINNET } from '@omnisat/lasereyes-core'
+              code={`import { LaserEyesClient, createConfig, MAINNET } from '@kevinoyl/lasereyes-core'
 
 const config = createConfig({
   network: MAINNET,
@@ -211,7 +211,7 @@ const config = createConfig({
           <CardContent className="p-6">
             <CodeBlock
               language="typescript"
-              code={`import { useLaserEyes } from '@omnisat/lasereyes-react'
+              code={`import { useLaserEyes } from '@kevinoyl/lasereyes-react'
 
 function BitcoinData() {
   const { client } = useLaserEyes()
@@ -311,8 +311,8 @@ ws.onmessage = (event) => {
             <p className="text-muted-foreground mb-4">
               Sandshrew is open source under the MIT license. We welcome contributions from the community!
             </p>
-            <Link 
-              href="https://github.com/sandshrew/sandshrew" 
+            <Link
+              href="https://github.com/sandshrew/sandshrew"
               className="inline-flex items-center text-emerald-500 hover:text-emerald-400"
             >
               View on GitHub

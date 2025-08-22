@@ -53,7 +53,7 @@ function LaserEyesClientContent() {
   createStores, 
   createConfig, 
   MAINNET 
-} from '@omnisat/lasereyes-core'
+} from '@kevinoyl/lasereyes-core'
 
 // Create stores for state management
 const stores = createStores()

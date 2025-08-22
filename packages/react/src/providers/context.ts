@@ -3,15 +3,15 @@ import {
   LaserEyesClient,
   LaserEyesStoreType,
   NetworkType,
-} from '@omnisat/lasereyes-core'
+} from '@kevinoyl/lasereyes-core'
 import { createContext } from 'react'
 import { LaserEyesContextType } from './types'
 import { MapStore, WritableAtom } from 'nanostores'
 
 const { $store, $network } = createStores()
 export const defaultMethods = {
-  connect: async () => {},
-  disconnect: () => {},
+  connect: async () => { },
+  disconnect: () => { },
   getBalance: async () => '',
   getMetaBalances: async () => [],
   getInscriptions: async () => [],
@@ -28,7 +28,7 @@ export const defaultMethods = {
   signPsbts: async () => ({
     signedPsbts: [],
   }),
-  switchNetwork: async () => {},
+  switchNetwork: async () => { },
   inscribe: async () => '',
   send: async () => '',
   sendInscriptions: async () => '',

@@ -16,7 +16,7 @@ import {
   // SPARROW,
   WalletIcon,
   type TOKEO,
-} from '@omnisat/lasereyes'
+} from '@kevinoyl/lasereyes'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 import { ImNewTab } from 'react-icons/im'

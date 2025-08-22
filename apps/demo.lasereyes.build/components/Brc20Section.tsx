@@ -1,4 +1,4 @@
-import { type Brc20Balance, type MAINNET, type TESTNET, useLaserEyes } from '@omnisat/lasereyes'
+import { type Brc20Balance, type MAINNET, type TESTNET, useLaserEyes } from '@kevinoyl/lasereyes'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Input } from '@/components/ui/input'

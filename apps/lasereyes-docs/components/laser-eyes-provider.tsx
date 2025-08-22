@@ -1,7 +1,7 @@
 "use client"
 
-import { LaserEyesProvider as Provider } from "@omnisat/lasereyes-react"
-import { MAINNET } from "@omnisat/lasereyes-core"
+import { LaserEyesProvider as Provider } from "@kevinoyl/lasereyes-react"
+import { MAINNET } from "@kevinoyl/lasereyes-core"
 import type { ReactNode } from "react"
 
 interface LaserEyesProviderProps {

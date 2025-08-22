@@ -1,8 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useLaserEyes } from "@omnisat/lasereyes-react"
-import { UNISAT, XVERSE, OYL, LEATHER, MAGIC_EDEN, OKX, PHANTOM, WIZZ, ORANGE, OP_NET } from "@omnisat/lasereyes-core"
+import { useLaserEyes } from "@kevinoyl/lasereyes-react"
+import { UNISAT, XVERSE, OYL, LEATHER, MAGIC_EDEN, OKX, PHANTOM, WIZZ, ORANGE, OP_NET } from "@kevinoyl/lasereyes-core"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -10,8 +10,8 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Copy, Check, ExternalLink, Send, Pencil, Upload, FileText } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { LaserEyesLogo, WalletIcon } from "@omnisat/lasereyes-react"
-import type { colorsType } from "@omnisat/lasereyes-react"
+import { LaserEyesLogo, WalletIcon } from "@kevinoyl/lasereyes-react"
+import type { colorsType } from "@kevinoyl/lasereyes-react"
 import Link from "next/link"
 
 export function WalletConnectCard() {
@@ -319,7 +319,7 @@ export function WalletConnectCard() {
               </div>
               {error && <p className="text-red-500 text-sm">{error}</p>}
               <p className="text-sm text-muted-foreground text-center">
-                Don't have a wallet? <br/>
+                Don't have a wallet? <br />
                 <Link href="/docs/installation" className="text-primary hover:underline inline-flex items-center gap-1">Click here to see some options</Link>
               </p>
             </div>

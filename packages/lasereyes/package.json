@@ -1,5 +1,5 @@
 {
-  "name": "@omnisat/lasereyes",
+  "name": "@kevinoyl/lasereyes",
   "description": "Simplifies wallet interactions across various Bitcoin wallets, making it easy for developers to build dApps with Bitcoin support",
   "keywords": [
     "bitcoin",
@@ -20,7 +20,7 @@
     "url": "https://github.com/omnisat/lasereyes-mono.git"
   },
   "private": false,
-  "version": "0.0.160",
+  "version": "0.0.162",
   "type": "module",
   "module": "./dist/index.js",
   "files": [
@@ -45,8 +45,8 @@
     "vite-plugin-dts": "^4.2.1"
   },
   "dependencies": {
-    "@omnisat/lasereyes-core": "workspace:*",
-    "@omnisat/lasereyes-react": "workspace:*"
+    "@kevinoyl/lasereyes-core": "workspace:*",
+    "@kevinoyl/lasereyes-react": "workspace:*"
   },
   "license": "MIT",
   "publishConfig": {

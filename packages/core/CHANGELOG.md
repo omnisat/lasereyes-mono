@@ -1,4 +1,30 @@
-# @omnisat/lasereyes-core
+# @kevinoyl/lasereyes-core
+
+## 0.0.84
+
+### Patch Changes
+
+- opreturn opcode
+
+## 0.0.83
+
+### Patch Changes
+
+- 6a0ad55: integrate tokeo wallet with deep-linking into app if possible
+- d39bb4a: re-add config setting in WalletProvider
+- 3293c46: Fix Oyl network issues.
+- 286bffc: add integration test for maestro
+- 16111da: sieve for oylnet
+- 0ec77d8: fix unisat logo
+- 21f1ab5: fix get inscriptions for maestro with cursor / count
+- opreturn fix
+- 1bc4f34: ---
+- f227c55: new newwwww
+- 2271bd8: fix network initialization, thanks jon
+- 6421b55: Added UTXO formatting to datasource manager
+- 8cb3dd8: Integrate Keplr wallet (browser extension)
+- f9e9121: fix oylnet
+- 922c161: fix oylnet
 
 ## 0.0.72
 

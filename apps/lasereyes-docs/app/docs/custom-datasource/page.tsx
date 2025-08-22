@@ -26,7 +26,7 @@ export default function CustomDataSourcePage() {
         <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-violet-600/20 rounded-full blur-[120px] -z-10 translate-x-1/2 -translate-y-1/2 animate-pulse" />
         <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-indigo-500/10 rounded-full blur-[100px] -z-10 -translate-x-1/2 translate-y-1/2 animate-pulse" />
         <div className="absolute top-1/2 left-1/2 w-[200px] h-[200px] bg-violet-400/10 rounded-full blur-[80px] -z-10 -translate-x-1/2 -translate-y-1/2" />
-        
+
         <div className="flex items-center gap-3 mb-4">
           <Badge variant="secondary" className="bg-violet-500/10 text-violet-500 hover:bg-violet-500/20">Advanced</Badge>
           <Badge variant="secondary" className="bg-indigo-500/10 text-indigo-500 hover:bg-indigo-500/20">Extensible</Badge>
@@ -183,7 +183,7 @@ function CustomDataSourceContent() {
           <CardContent className="p-6">
             <CodeBlock
               language="typescript"
-              code={`import { DataSource, DataSourceConfig } from '@omnisat/lasereyes-core'
+              code={`import { DataSource, DataSourceConfig } from '@kevinoyl/lasereyes-core'
 
 interface CustomConfig extends DataSourceConfig {
   apiKey?: string
@@ -225,7 +225,7 @@ export class CustomDataSource implements DataSource {
           <CardContent className="p-6">
             <CodeBlock
               language="typescript"
-              code={`import { LaserEyesClient, createConfig } from '@omnisat/lasereyes-core'
+              code={`import { LaserEyesClient, createConfig } from '@kevinoyl/lasereyes-core'
 import { CustomDataSource } from './custom-datasource'
 
 const config = createConfig({

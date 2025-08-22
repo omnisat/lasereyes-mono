@@ -11,11 +11,11 @@ import { Wallet, Code2, ArrowRight, Send, Coins, FileCode } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { useState } from 'react'
-import { LaserEyesProvider } from '@omnisat/lasereyes-react'
-import { useLaserEyes } from '@omnisat/lasereyes-react'
-import { 
-  MAINNET, 
-  UNISAT, 
+import { LaserEyesProvider } from '@kevinoyl/lasereyes-react'
+import { useLaserEyes } from '@kevinoyl/lasereyes-react'
+import {
+  MAINNET,
+  UNISAT,
   XVERSE,
   OYL,
   LEATHER,
@@ -24,7 +24,7 @@ import {
   PHANTOM,
   WIZZ,
   ORANGE
-} from '@omnisat/lasereyes-core'
+} from '@kevinoyl/lasereyes-core'
 
 interface StepCardProps {
   step: number
@@ -111,8 +111,8 @@ function HelloWorldContent() {
             <CodeBlock
               language="tsx"
               code={`import { useState } from 'react'
-import { LaserEyesProvider } from '@omnisat/lasereyes-react'
-import { useLaserEyes } from '@omnisat/lasereyes-react'
+import { LaserEyesProvider } from '@kevinoyl/lasereyes-react'
+import { useLaserEyes } from '@kevinoyl/lasereyes-react'
 import { 
   MAINNET, 
   UNISAT, 
@@ -124,7 +124,7 @@ import {
   PHANTOM,
   WIZZ,
   ORANGE
-} from '@omnisat/lasereyes-core'
+} from '@kevinoyl/lasereyes-core'
 
 // Main App Component
 export default function App() {
@@ -409,7 +409,7 @@ const handleSendBTC = async () => {
             <CodeBlock
               language="tsx"
               code={`import { useState, useEffect } from 'react'
-import { useLaserEyes } from '@omnisat/lasereyes-react'
+import { useLaserEyes } from '@kevinoyl/lasereyes-react'
 
 function InscriptionsList() {
   const { 

@@ -23,8 +23,8 @@ export function BasicSetupContent() {
       </p>
       <CodeBlock
         language="tsx"
-        code={`import { LaserEyesProvider } from '@omnisat/lasereyes-react'
-import { MAINNET } from '@omnisat/lasereyes-core'
+        code={`import { LaserEyesProvider } from '@kevinoyl/lasereyes-react'
+import { MAINNET } from '@kevinoyl/lasereyes-core'
 
 function App() {
   return (
@@ -63,8 +63,8 @@ function App() {
       </p>
       <CodeBlock
         language="tsx"
-        code={`import { useLaserEyes } from '@omnisat/lasereyes-react'
-import { UNISAT } from '@omnisat/lasereyes-core'
+        code={`import { useLaserEyes } from '@kevinoyl/lasereyes-react'
+import { UNISAT } from '@kevinoyl/lasereyes-core'
 
 function WalletConnect() {
   const { 
@@ -113,7 +113,7 @@ function WalletConnect() {
   createConfig,
   MAINNET,
   UNISAT
-} from '@omnisat/lasereyes-core'
+} from '@kevinoyl/lasereyes-core'
 
 // Create stores and config
 const stores = createStores()
@@ -157,7 +157,7 @@ function cleanup() {
   TESTNET,  // Bitcoin Testnet
   SIGNET,   // Bitcoin Signet
   TESTNET4  // Bitcoin Testnet4
-} from '@omnisat/lasereyes-core'
+} from '@kevinoyl/lasereyes-core'
 
 // Use mainnet
 const mainnetConfig = createConfig({ network: MAINNET })

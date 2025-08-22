@@ -3,13 +3,13 @@ description:
 globs: 
 alwaysApply: true
 ---
-# Project Rules for `@omnisat/lasereyes-core`
+# Project Rules for `@kevinoyl/lasereyes-core`
 
-This document outlines the guidelines and standards for contributing to the `@omnisat/lasereyes-core` package. Following these rules will ensure consistency, maintainability, and quality throughout the project.
+This document outlines the guidelines and standards for contributing to the `@kevinoyl/lasereyes-core` package. Following these rules will ensure consistency, maintainability, and quality throughout the project.
 
 ## 🌟 Overview
 
-`@omnisat/lasereyes-core` is a framework-agnostic library designed to provide Bitcoin wallet integration for dApps. It abstracts wallet-specific interactions and offers a unified interface for working with various Bitcoin wallets.
+`@kevinoyl/lasereyes-core` is a framework-agnostic library designed to provide Bitcoin wallet integration for dApps. It abstracts wallet-specific interactions and offers a unified interface for working with various Bitcoin wallets.
 
 ## 📋 General Code Guidelines
 

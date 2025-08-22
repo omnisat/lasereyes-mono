@@ -1,4 +1,4 @@
-import type { LaserEyesClient } from "@omnisat/lasereyes-core"
+import type { LaserEyesClient } from "@kevinoyl/lasereyes-core"
 import { useLaserEyes } from "../providers/hooks"
 
 export function useClient(): LaserEyesClient | null {

@@ -61,7 +61,7 @@ export default function InstallationPage() {
               <CardHeader className="border-b bg-muted/50 px-6 py-4">
                 <div className="flex items-center gap-2">
                   <Package className="h-4 w-4" />
-                  <h3 className="font-mono text-sm font-medium">@omnisat/lasereyes-core</h3>
+                  <h3 className="font-mono text-sm font-medium">@kevinoyl/lasereyes-core</h3>
                 </div>
               </CardHeader>
               <CardContent className="p-6">
@@ -72,7 +72,7 @@ export default function InstallationPage() {
               <CardHeader className="border-b bg-muted/50 px-6 py-4">
                 <div className="flex items-center gap-2">
                   <Box className="h-4 w-4" />
-                  <h3 className="font-mono text-sm font-medium">@omnisat/lasereyes-react</h3>
+                  <h3 className="font-mono text-sm font-medium">@kevinoyl/lasereyes-react</h3>
                 </div>
               </CardHeader>
               <CardContent className="p-6">
@@ -90,7 +90,7 @@ export default function InstallationPage() {
                 <span className="text-sm text-muted-foreground">Select your package manager:</span>
                 <PackageManagerSelector />
               </div>
-              <InstallationCommand packages={["@omnisat/lasereyes-core", "@omnisat/lasereyes-react"]} />
+              <InstallationCommand packages={["@kevinoyl/lasereyes-core", "@kevinoyl/lasereyes-react"]} />
             </CardContent>
           </Card>
         </section>

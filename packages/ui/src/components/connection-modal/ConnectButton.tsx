@@ -1,6 +1,6 @@
 import { Button } from "../ui/button";
 import { useTranslation } from "react-i18next";
-import { useLaserEyes } from "@omnisat/lasereyes";
+import { useLaserEyes } from "@kevinoyl/lasereyes";
 import { useCallback, useState, useLayoutEffect } from "react";
 import Spinner from "../ui/spinner";
 import { useLaserEyesModal } from "../../providers/LaserEyesModalContext";
@@ -32,10 +32,10 @@ export default function ConnectWalletButton({
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 640); // sm breakpoint
     };
-    
+
     checkMobile();
     window.addEventListener('resize', checkMobile);
-    
+
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
@@ -59,9 +59,9 @@ export default function ConnectWalletButton({
   };
 
   const AccountInfoModal = () => (
-    <Dialog 
-      open={popoverOpen} 
-      onClose={() => setPopoverOpen(false)} 
+    <Dialog
+      open={popoverOpen}
+      onClose={() => setPopoverOpen(false)}
       titleId="account-info-modal"
     >
       <DialogContent className="lem-relative lem-border-none lem-overflow-hidden lem-bg-background lem-p-0">
@@ -83,15 +83,15 @@ export default function ConnectWalletButton({
         >
           {/* Status dot */}
           <div className="lem-w-2 lem-h-2 lem-bg-green-500 lem-rounded-full lem-animate-pulse lem-flex-shrink-0"></div>
-          
+
           {/* Wallet icon */}
           <Wallet className="lem-h-4 lem-w-4 lem-text-green-700 dark:lem-text-green-300 lem-flex-shrink-0" />
-          
+
           {/* Address */}
           <span className="lem-font-mono lem-text-sm lem-font-medium lem-text-green-800 dark:lem-text-green-200">
             {formatAddress(address)}
           </span>
-          
+
           {/* Dropdown indicator */}
           <ChevronDown className="lem-h-3.5 lem-w-3.5 lem-text-green-600 dark:lem-text-green-400 lem-flex-shrink-0" />
         </button>
@@ -109,15 +109,15 @@ export default function ConnectWalletButton({
           >
             {/* Status dot */}
             <div className="lem-w-2 lem-h-2 lem-bg-green-500 lem-rounded-full lem-animate-pulse lem-flex-shrink-0"></div>
-            
+
             {/* Wallet icon */}
             <Wallet className="lem-h-4 lem-w-4 lem-text-green-700 dark:lem-text-green-300 lem-flex-shrink-0" />
-            
+
             {/* Address */}
             <span className="lem-font-mono lem-text-sm lem-font-medium lem-text-green-800 dark:lem-text-green-200">
               {formatAddress(address)}
             </span>
-            
+
             {/* Dropdown indicator */}
             <ChevronDown className="lem-h-3.5 lem-w-3.5 lem-text-green-600 dark:lem-text-green-400 lem-flex-shrink-0" />
           </button>

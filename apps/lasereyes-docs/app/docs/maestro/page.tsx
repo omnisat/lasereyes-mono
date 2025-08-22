@@ -192,7 +192,7 @@ function MaestroContent() {
           <CardContent className="p-6">
             <CodeBlock
               language="typescript"
-              code={`import { LaserEyesClient, createConfig, MAINNET } from '@omnisat/lasereyes-core'
+              code={`import { LaserEyesClient, createConfig, MAINNET } from '@kevinoyl/lasereyes-core'
 
 const config = createConfig({
   network: MAINNET,
@@ -227,7 +227,7 @@ const config = createConfig({
           <CardContent className="p-6">
             <CodeBlock
               language="typescript"
-              code={`import { useLaserEyes } from '@omnisat/lasereyes-react'
+              code={`import { useLaserEyes } from '@kevinoyl/lasereyes-react'
 
 function BitcoinData() {
   const { client } = useLaserEyes()

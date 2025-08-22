@@ -1,6 +1,6 @@
 "use client"
 
-import type { AlkaneToken } from "@omnisat/lasereyes-core"
+import type { AlkaneToken } from "@kevinoyl/lasereyes-core"
 import {
   type DefaultError,
   type InfiniteData,
