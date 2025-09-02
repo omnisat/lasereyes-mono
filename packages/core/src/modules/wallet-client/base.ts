@@ -1,36 +1,41 @@
-export type Account = {
-  publicKey: string;
-  address: string;
-}
-
-export type MainnetBitcoinAddress = `1${string}` | `3${string}` | `bc1${string}`;
-
-export type TestnetBitcoinAddress = `2${string}` | `bcrt${string}` | `tb1${string}`
-
-export type BitcoinAddress = MainnetBitcoinAddress | TestnetBitcoinAddress
-
-export type BitcoinNetwork = 'mainnet' | 'regtest'
-
-export type TXID = `0x${string}`
-
-export type SignPSBTReturnType = {}
-
-export type SignMessageReturnType = {}
+import type { BitcoinAccount, BitcoinAddress, GetAddressesOptionsType, GetNetworkOptionsType, PushPSBTOptionsType, RequestAccountsOptionsType, SignMessageOptionsType, SignMessageReturnType, SignPSBTOptionsType, SignPSBTReturnType, SwitchNetworkOptionsType } from "../account/types";
+import type { BitcoinNetwork } from "../network/types";
+import type { TXID } from "../shared/types";
 
 export interface BaseWalletClient {
   /** Returns a list of account addresses owned by the wallet or client. */
-  getAddresses(): Promise<BitcoinAddress[]>;
+  getAddresses(options?: GetAddressesOptionsType): PromiseLike<BitcoinAddress[]>;
 
   /** Returns the network currently connected to */
-  getNetwork(): Promise<BitcoinNetwork>;
+  getNetwork(options?: GetNetworkOptionsType): PromiseLike<BitcoinNetwork>;
 
-  requestAddresses(): Promise<BitcoinAddress[]>
+  /** Switch the currently active network to the specified network */
+  switchNetwork(network: BitcoinNetwork, options?: SwitchNetworkOptionsType): PromiseLike<void>
 
-  pushPSBT(): Promise<TXID>
+  /** Requests a list of {@link BitcoinAccount}s owned by the wallet or client. 
+   * 
+   * Typically used for connecting to the wallet 
+   */
+  requestAccounts(options?: RequestAccountsOptionsType): PromiseLike<BitcoinAccount[]>
 
-  signPSBT(): Promise<SignPSBTReturnType>
+  /** (Optional) Sends a signed PSBT to the network.
+   * 
+   * Sends it with the wallet if supported, defaults to
+   * a public client (e.g mempool.space)
+   */
+  pushPSBT?(psbt: string, options?: PushPSBTOptionsType): PromiseLike<TXID>
 
-  signMessage(): Promise<SignMessageReturnType>
+  /** Signs a PSBT and optionally broadcast it to the network
+   * 
+   * Defaults to using `pushPSBT` if the wallet doesn't 
+   * support directly broadcasting upon signing when 
+   * `broadcast` is `true`
+   */
+  signPSBT(psbt: string, options?: SignPSBTOptionsType): PromiseLike<SignPSBTReturnType>
 
-  switchNetwork(): Promise<void>
+  /** Signs `message` */
+  signMessage(message: string, options?: SignMessageOptionsType): PromiseLike<SignMessageReturnType>
+
+  /** Sends bitcoin to the address specified */
+  sendBTC(to: BitcoinAddress, amount: bigint): PromiseLike<TXID>
 }

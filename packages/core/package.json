@@ -53,7 +53,8 @@
     "nanostores": "^0.11.3",
     "ordapi": "^0.0.7",
     "sats-connect": "^3.3.0",
-    "tiny-async-pool": "^2.1.0"
+    "tiny-async-pool": "^2.1.0",
+    "uint8array-tools": "^0.0.9"
   },
   "publishConfig": {
     "access": "public"

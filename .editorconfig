@@ -8,6 +8,10 @@ root = true
 end_of_line = lf
 insert_final_newline = true
 
+[*.{js,jsx,ts,tsx}]
+indent_size = 2
+indent_style = space
+
 # Matches multiple files with brace expansion notation
 # Set default charset
 [*.{js,py}]

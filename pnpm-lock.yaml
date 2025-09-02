@@ -434,6 +434,9 @@ importers:
       tiny-async-pool:
         specifier: ^2.1.0
         version: 2.1.0
+      uint8array-tools:
+        specifier: ^0.0.9
+        version: 0.0.9
     devDependencies:
       '@leather.io/rpc':
         specifier: ^2.20.3
