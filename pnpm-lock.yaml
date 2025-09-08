@@ -462,6 +462,9 @@ importers:
       vite:
         specifier: ^5.4.1
         version: 5.4.19(@types/node@22.15.32)
+      vite-plugin-bundlesize:
+        specifier: ^0.3.0
+        version: 0.3.0(vite@5.4.19)
       vite-plugin-dts:
         specifier: ^4.2.1
         version: 4.5.4(@types/node@22.15.32)(typescript@5.8.3)(vite@5.4.19)
@@ -16456,6 +16459,11 @@ packages:
     engines: {node: '>=12'}
     dev: true
 
+  /picomatch@4.0.3:
+    resolution: {integrity: sha512-5gTmgEY/sqK6gFXLIsQNH19lWb4ebPDLA4SdLP7dsWkIXHWlG66oPuVvXSGFPppYZz8ZDZq0dYYrbHfBCVUb1Q==}
+    engines: {node: '>=12'}
+    dev: true
+
   /pify@2.3.0:
     resolution: {integrity: sha512-udgsAY+fTnvv7kI7aaxbqwWNb0AHiB0qBO89PZKPkoTmGOgdbrHDKD+0B2X4uTfJ/FT1R09r9gTsjUjNJotuog==}
     engines: {node: '>=0.10.0'}
@@ -20436,6 +20444,18 @@ packages:
       - terser
     dev: true
 
+  /vite-plugin-bundlesize@0.3.0(vite@5.4.19):
+    resolution: {integrity: sha512-fWMp40J+PEh9uXrYUD5Afqn4nrAFSYFfZeu+7XqyuCsFhwpTSJ4ZlnTz7JBED0Rht6dyKujVXWe8E/ns/Sqjng==}
+    hasBin: true
+    peerDependencies:
+      vite: '>= 6.0.0'
+    dependencies:
+      picomatch: 4.0.3
+      strip-ansi: 7.1.0
+      vite: 5.4.19(@types/node@22.15.32)
+      vlq: 2.0.4
+    dev: true
+
   /vite-plugin-dts@4.5.4(@types/node@22.15.32)(typescript@5.8.3)(vite@5.4.19):
     resolution: {integrity: sha512-d4sOM8M/8z7vRXHHq/ebbblfaxENjogAAekcfcDCCwAyvGqnPrc7f4NZbvItS+g4WTgerW0xDwSz5qz11JT3vg==}
     peerDependencies:
@@ -20598,6 +20618,10 @@ packages:
   /vlq@0.2.3:
     resolution: {integrity: sha512-DRibZL6DsNhIgYQ+wNdWDL2SL3bKPlVrRiBqV5yuMm++op8W4kGFtaQfCs4KEJn0wBZcHVHJ3eoywX8983k1ow==}
     dev: false
+
+  /vlq@2.0.4:
+    resolution: {integrity: sha512-aodjPa2wPQFkra1G8CzJBTHXhgk3EVSwxSWXNPr1fgdFLUb8kvLV1iEb6rFgasIsjP82HWI6dsb5Io26DDnasA==}
+    dev: true
 
   /vm-browserify@1.1.2:
     resolution: {integrity: sha512-2ham8XPWTONajOR0ohOKOHXkm3+gaBmGut3SRuu75xLd/RRaY6vqgh8NBYYk7+RW3u5AtzPQZG8F10LHkl0lAQ==}
