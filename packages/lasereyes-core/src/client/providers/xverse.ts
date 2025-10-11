@@ -6,7 +6,7 @@ import {
   request,
   MessageSigningProtocols,
   BitcoinNetworkType,
-} from 'sats-connect'
+} from '../../lib/nexus-connector'
 import { WalletProvider } from '.'
 import {
   ProviderType,

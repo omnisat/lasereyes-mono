@@ -63,3 +63,10 @@ export enum BaseNetwork {
   FRACTAL_MAINNET = FractalNetwork.MAINNET,
   FRACTAL_TESTNET = FractalNetwork.TESTNET,
 }
+
+// Internal BitcoinNetworkType enum to replace sats-connect dependency
+export enum BitcoinNetworkType {
+  Mainnet = 'Mainnet',
+  Testnet = 'Testnet',
+  Signet = 'Signet',
+}

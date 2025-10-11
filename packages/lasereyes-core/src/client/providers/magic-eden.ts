@@ -8,7 +8,7 @@ import {
   SendBtcTransactionOptions,
   signMessage,
   signTransaction,
-} from 'sats-connect'
+} from '../../lib/nexus-connector'
 import { WalletProvider } from '.'
 import {
   Config,
