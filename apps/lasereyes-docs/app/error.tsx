@@ -1,8 +1,8 @@
-"use client"
+'use client'
 
-import { useEffect } from "react"
-import { Suspense } from "react"
-import Link from "next/link"
+import { useEffect } from 'react'
+import { Suspense } from 'react'
+import Link from 'next/link'
 
 export default function Error({
   error,
@@ -19,7 +19,9 @@ export default function Error({
     <Suspense fallback={<div>Loading error page...</div>}>
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] p-4 text-center">
         <h1 className="text-4xl font-bold mb-4">Something went wrong</h1>
-        <p className="text-muted-foreground mb-8 max-w-md">An unexpected error has occurred.</p>
+        <p className="text-muted-foreground mb-8 max-w-md">
+          An unexpected error has occurred.
+        </p>
         <div className="flex gap-4">
           <button
             onClick={() => reset()}
@@ -38,4 +40,3 @@ export default function Error({
     </Suspense>
   )
 }
-

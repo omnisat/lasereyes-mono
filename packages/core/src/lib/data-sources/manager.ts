@@ -182,7 +182,9 @@ export class DataSourceManager {
     return balance
   }
 
-  public async getAddressBrc20Balances(address: string): Promise<Brc20Balance[]> {
+  public async getAddressBrc20Balances(
+    address: string
+  ): Promise<Brc20Balance[]> {
     const dataSource = this.findAvailableSource('getAddressBrc20Balances')
     if (!dataSource || !dataSource.getAddressBrc20Balances) {
       throw new Error(ERROR_METHOD_NOT_AVAILABLE)
@@ -509,4 +511,3 @@ export class DataSourceManager {
 export { MaestroDataSource } from './sources/maestro-ds'
 export { MempoolSpaceDataSource } from './sources/mempool-space-ds'
 export { SandshrewDataSource } from './sources/sandshrew-ds'
-

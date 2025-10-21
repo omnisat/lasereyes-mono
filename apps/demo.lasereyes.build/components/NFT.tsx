@@ -53,32 +53,32 @@ const InscriptionComponent = ({
   useEffect(() => {
     const fetchContent = async () => {
       try {
-        const response = await fetch(contentUrl);
-        const content = await response.text();
+        const response = await fetch(contentUrl)
+        const content = await response.text()
 
         if (isSvgContentType(contentType)) {
-          setSvgContent(content);
+          setSvgContent(content)
         } else if (isTextContentType(contentType)) {
-          setTextContent(content);
+          setTextContent(content)
         } else if (isJsonContentType(contentType)) {
           try {
-            setJsonContent(JSON.parse(content));
+            setJsonContent(JSON.parse(content))
           } catch (error) {
-            console.error('Error parsing JSON:', error);
-            setJsonContent({ error: 'Invalid JSON format', raw: content });
+            console.error('Error parsing JSON:', error)
+            setJsonContent({ error: 'Invalid JSON format', raw: content })
           }
         } else if (isJavaScriptContentType(contentType)) {
-          setJsContent(content);
+          setJsContent(content)
         }
       } catch (error) {
-        console.error(`Error fetching content (${contentType}):`, error);
+        console.error(`Error fetching content (${contentType}):`, error)
       }
-    };
+    }
 
     if (contentUrl) {
-      fetchContent();
+      fetchContent()
     }
-  }, [contentUrl, contentType]);
+  }, [contentUrl, contentType])
 
   useEffect(() => {
     if (contentUrl && contentType && isImageContentType(contentType)) {
@@ -144,7 +144,7 @@ const InscriptionComponent = ({
   }, [contentUrl, size, contentType])
 
   const renderContent = () => {
-    const mimeType = getMimeType(contentType);
+    const mimeType = getMimeType(contentType)
 
     if (isHtmlContentType(contentType)) {
       return (
@@ -155,7 +155,7 @@ const InscriptionComponent = ({
           style={{ border: 'none', borderRadius: '0.5rem' }}
           sandbox="allow-scripts allow-same-origin"
         />
-      );
+      )
     }
 
     if (isGifContentType(contentType)) {
@@ -170,7 +170,7 @@ const InscriptionComponent = ({
             height: 'auto',
           }}
         />
-      );
+      )
     }
 
     if (isSvgContentType(contentType)) {
@@ -181,8 +181,10 @@ const InscriptionComponent = ({
           size={size}
         />
       ) : (
-        <div className="flex items-center justify-center h-full">Loading SVG...</div>
-      );
+        <div className="flex items-center justify-center h-full">
+          Loading SVG...
+        </div>
+      )
     }
 
     if (isImageContentType(contentType)) {
@@ -197,7 +199,7 @@ const InscriptionComponent = ({
             height: '100%',
           }}
         />
-      );
+      )
     }
 
     if (isTextContentType(contentType)) {
@@ -216,14 +218,14 @@ const InscriptionComponent = ({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: '16px'
+            fontSize: '16px',
           }}
         >
           <pre style={{ margin: 0, width: '100%' }}>
             {textContent || 'Loading text content...'}
           </pre>
         </div>
-      );
+      )
     }
 
     if (isJsonContentType(contentType)) {
@@ -242,14 +244,16 @@ const InscriptionComponent = ({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: '14px'
+            fontSize: '14px',
           }}
         >
           <pre style={{ margin: 0, width: '100%' }}>
-            {jsonContent ? JSON.stringify(jsonContent, null, 2) : 'Loading JSON content...'}
+            {jsonContent
+              ? JSON.stringify(jsonContent, null, 2)
+              : 'Loading JSON content...'}
           </pre>
         </div>
-      );
+      )
     }
 
     if (isJavaScriptContentType(contentType)) {
@@ -268,14 +272,14 @@ const InscriptionComponent = ({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: '14px'
+            fontSize: '14px',
           }}
         >
           <pre style={{ margin: 0, width: '100%' }}>
             {jsContent || 'Loading JavaScript content...'}
           </pre>
         </div>
-      );
+      )
     }
 
     // Fallback for unsupported content types - Display a more user-friendly message with mime type
@@ -291,7 +295,7 @@ const InscriptionComponent = ({
           color: '#fff',
           padding: '1rem',
           textAlign: 'center',
-          fontFamily: 'sans-serif'
+          fontFamily: 'sans-serif',
         }}
       >
         <div>
@@ -303,7 +307,7 @@ const InscriptionComponent = ({
           </div>
         </div>
       </div>
-    );
+    )
   }
 
   return (

@@ -1,5 +1,5 @@
-import { cn } from "@/lib/utils"
-import type { LucideIcon } from "lucide-react"
+import { cn } from '@/lib/utils'
+import type { LucideIcon } from 'lucide-react'
 
 interface FeatureCardProps {
   title: string
@@ -8,12 +8,17 @@ interface FeatureCardProps {
   className?: string
 }
 
-export function FeatureCard({ title, description, icon: Icon, className }: FeatureCardProps) {
+export function FeatureCard({
+  title,
+  description,
+  icon: Icon,
+  className,
+}: FeatureCardProps) {
   return (
     <div
       className={cn(
-        "group relative overflow-hidden rounded-xl border border-border/50 bg-card p-6 transition-all duration-300 hover:border-primary/20 hover:shadow-md hover:shadow-primary/5",
-        className,
+        'group relative overflow-hidden rounded-xl border border-border/50 bg-card p-6 transition-all duration-300 hover:border-primary/20 hover:shadow-md hover:shadow-primary/5',
+        className
       )}
     >
       <div className="absolute right-0 top-0 h-20 w-20 translate-x-6 -translate-y-6 rounded-full bg-primary/10 blur-2xl filter group-hover:bg-primary/20 group-hover:blur-3xl" />
@@ -28,4 +33,3 @@ export function FeatureCard({ title, description, icon: Icon, className }: Featu
     </div>
   )
 }
-

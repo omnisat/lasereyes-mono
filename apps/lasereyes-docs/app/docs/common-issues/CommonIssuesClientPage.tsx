@@ -1,15 +1,24 @@
-"use client"
+'use client'
 
-import * as React from "react"
-import { CodeBlock } from "@/components/code-block"
-import { Heading } from "@/components/heading"
-import { ClientPageWrapper } from "@/components/client-page-wrapper"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { AlertTriangle, Bug, Wallet, Network, RefreshCcw, Zap, ShieldAlert, Settings } from "lucide-react"
-import Link from "next/link"
-import type { LucideIcon } from "lucide-react"
-import { cn } from "@/lib/utils"
+import * as React from 'react'
+import { CodeBlock } from '@/components/code-block'
+import { Heading } from '@/components/heading'
+import { ClientPageWrapper } from '@/components/client-page-wrapper'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import {
+  AlertTriangle,
+  Bug,
+  Wallet,
+  Network,
+  RefreshCcw,
+  Zap,
+  ShieldAlert,
+  Settings,
+} from 'lucide-react'
+import Link from 'next/link'
+import type { LucideIcon } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 interface IssueCardProps {
   icon: LucideIcon
@@ -20,12 +29,21 @@ interface IssueCardProps {
   className?: string
 }
 
-function IssueCard({ icon: Icon, title, description, solution, code, className }: IssueCardProps) {
+function IssueCard({
+  icon: Icon,
+  title,
+  description,
+  solution,
+  code,
+  className,
+}: IssueCardProps) {
   return (
-    <Card className={cn(
-      "group relative overflow-hidden transition-all duration-300 hover:border-red-500/30 hover:shadow-lg hover:shadow-red-500/5",
-      className
-    )}>
+    <Card
+      className={cn(
+        'group relative overflow-hidden transition-all duration-300 hover:border-red-500/30 hover:shadow-lg hover:shadow-red-500/5',
+        className
+      )}
+    >
       <div className="absolute right-0 top-0 h-20 w-20 translate-x-6 -translate-y-6 rounded-full bg-red-500/10 blur-2xl filter group-hover:bg-red-500/20" />
       <CardContent className="p-6">
         <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-red-500/10 text-red-500">
@@ -39,11 +57,7 @@ function IssueCard({ icon: Icon, title, description, solution, code, className }
             <p className="text-sm text-muted-foreground">{solution}</p>
           </div>
           {code && (
-            <CodeBlock
-              language="typescript"
-              code={code}
-              copyButton={true}
-            />
+            <CodeBlock language="typescript" code={code} copyButton={true} />
           )}
         </div>
       </CardContent>
@@ -196,19 +210,30 @@ setInscriptions(fresh)`}
           <CardContent className="p-6">
             <h2 className="text-2xl font-bold mb-4">Still Having Issues?</h2>
             <div className="grid gap-4 sm:grid-cols-2">
-              <Link href="https://github.com/omnisat/lasereyes/issues" className="block">
+              <Link
+                href="https://github.com/omnisat/lasereyes/issues"
+                className="block"
+              >
                 <Card className="h-full transition-all hover:border-red-500/30 hover:shadow-lg hover:shadow-red-500/5">
                   <CardContent className="p-6">
-                    <h3 className="text-lg font-semibold mb-2">Open an Issue</h3>
-                    <p className="text-sm text-muted-foreground">Report bugs and request features on our GitHub repository</p>
+                    <h3 className="text-lg font-semibold mb-2">
+                      Open an Issue
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      Report bugs and request features on our GitHub repository
+                    </p>
                   </CardContent>
                 </Card>
               </Link>
               <Link href="/docs/debugging" className="block">
                 <Card className="h-full transition-all hover:border-red-500/30 hover:shadow-lg hover:shadow-red-500/5">
                   <CardContent className="p-6">
-                    <h3 className="text-lg font-semibold mb-2">Debugging Guide</h3>
-                    <p className="text-sm text-muted-foreground">Learn advanced debugging techniques for LaserEyes apps</p>
+                    <h3 className="text-lg font-semibold mb-2">
+                      Debugging Guide
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      Learn advanced debugging techniques for LaserEyes apps
+                    </p>
                   </CardContent>
                 </Card>
               </Link>
@@ -225,12 +250,18 @@ export default function CommonIssuesClientPage() {
     <div className="space-y-8">
       <div className="relative overflow-hidden rounded-lg border bg-gradient-to-br from-red-500/10 via-background to-background p-8">
         <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-red-500/20 rounded-full blur-3xl -z-10 translate-x-1/2 -translate-y-1/2" />
-        <Badge variant="secondary" className="mb-4">Troubleshooting</Badge>
-        <Heading level={1} className="mb-4 bg-gradient-to-br from-red-500 to-orange-500 bg-clip-text text-transparent">
+        <Badge variant="secondary" className="mb-4">
+          Troubleshooting
+        </Badge>
+        <Heading
+          level={1}
+          className="mb-4 bg-gradient-to-br from-red-500 to-orange-500 bg-clip-text text-transparent"
+        >
           Common Issues
         </Heading>
         <p className="text-xl mb-6 max-w-2xl text-muted-foreground">
-          Solutions to common problems you might encounter when building with LaserEyes.
+          Solutions to common problems you might encounter when building with
+          LaserEyes.
         </p>
       </div>
 
@@ -240,4 +271,3 @@ export default function CommonIssuesClientPage() {
     </div>
   )
 }
-

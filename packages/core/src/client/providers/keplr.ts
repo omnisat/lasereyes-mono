@@ -192,17 +192,17 @@ export default class KeplrProvider extends WalletProvider {
   }
 
   async connect(_: ProviderType) {
-      if (!this.library) {
-        if (this.isMobile()) {
-          const url = `https://deeplink.keplr.app/web-browser?url=${window.location.href}`
-          const returned = window.open(url)
-          if (!returned) {
-            throw new Error('Keplr wallet not found')
-          }
-          returned.focus()
-          return false
-        } else throw new Error('Keplr wallet not found')
-      }
+    if (!this.library) {
+      if (this.isMobile()) {
+        const url = `https://deeplink.keplr.app/web-browser?url=${window.location.href}`
+        const returned = window.open(url)
+        if (!returned) {
+          throw new Error('Keplr wallet not found')
+        }
+        returned.focus()
+        return false
+      } else throw new Error('Keplr wallet not found')
+    }
     const accounts = await this.library.requestAccounts()
     if (!accounts) throw new Error('No accounts found')
 
@@ -306,11 +306,7 @@ export default class KeplrProvider extends WalletProvider {
       BaseNetwork.TESTNET,
       BaseNetwork.SIGNET,
     ] as string[]
-    if (
-      !(
-        supportedNetworks
-      ).includes(network)
-    ) {
+    if (!supportedNetworks.includes(network)) {
       throw new Error(
         `Invalid network: ${network}. Keplr supports ${supportedNetworks.join(', ')}`
       )

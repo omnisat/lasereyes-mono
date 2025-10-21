@@ -2,13 +2,26 @@ import { useState, useEffect } from 'react'
 import { Button } from './ui/button'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from './ui/select'
 import { toast } from 'sonner'
 import { getMempoolSpaceUrl } from '@/lib/urls'
-import { type MAINNET, type RuneSendArgs, type TESTNET, useLaserEyes, type OrdRuneBalance } from '@omnisat/lasereyes'
+import {
+  type MAINNET,
+  type RuneSendArgs,
+  type TESTNET,
+  useLaserEyes,
+  type OrdRuneBalance,
+} from '@omnisat/lasereyes'
 
 const RunesSection = () => {
-  const { provider, address, send, network, getMetaBalances, connected } = useLaserEyes()
+  const { provider, address, send, network, getMetaBalances, connected } =
+    useLaserEyes()
   const [runes, setRunes] = useState<OrdRuneBalance[]>([])
 
   const [selectedRune, setSelectedRune] = useState<OrdRuneBalance>()
@@ -39,11 +52,12 @@ const RunesSection = () => {
         <span className={'flex flex-col gap-1 items-center justify-center'}>
           <span className={'font-black'}>View on mempool.space</span>
           <a
-            target='_blank'
+            target="_blank"
             href={`${getMempoolSpaceUrl(
               network as typeof MAINNET | typeof TESTNET
             )}/tx/${txid}`}
-            className={'underline text-blue-600 text-xs'} rel="noreferrer"
+            className={'underline text-blue-600 text-xs'}
+            rel="noreferrer"
           >
             {txid}
           </a>
@@ -73,7 +87,11 @@ const RunesSection = () => {
             'min-w-[200px]'
           )}
         >
-          <SelectValue placeholder={runes.length === 0 ? "No runes found" : "Select rune to send"} />
+          <SelectValue
+            placeholder={
+              runes.length === 0 ? 'No runes found' : 'Select rune to send'
+            }
+          />
         </SelectTrigger>
         <SelectContent>
           {runes?.map((rune) => (
@@ -93,11 +111,7 @@ const RunesSection = () => {
         onChange={(e) => setRuneToAddress(e.target.value)}
       />
       <Input
-        disabled={
-          !provider ||
-          !selectedRune ||
-          !runeToAddress
-        }
+        disabled={!provider || !selectedRune || !runeToAddress}
         type="number"
         className={cn(
           'w-full bg-[#232225] border-none disabled:text-[#737275] text-center'
@@ -107,12 +121,7 @@ const RunesSection = () => {
         onChange={(e) => setRuneAmount(e.target.value)}
       />
       <Button
-        disabled={
-          !provider ||
-          !selectedRune ||
-          !runeToAddress ||
-          !runeAmount
-        }
+        disabled={!provider || !selectedRune || !runeToAddress || !runeAmount}
         className={'w-full bg-[#232225] disabled:text-[#737275]'}
         onClick={sendRune}
       >

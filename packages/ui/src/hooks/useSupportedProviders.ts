@@ -29,10 +29,12 @@ export default function useSupportedProviders() {
     hasSparrow,
     hasTokeo,
     hasKeplr,
+    hasUniversal,
     connect: connectLaserEyes,
   } = useLaserEyes()
   const config = useModalConfig()
-  const allowedProviders = config.providers ?? Object.keys(SUPPORTED_WALLETS) as ProviderType[]
+  const allowedProviders =
+    config.providers ?? (Object.keys(SUPPORTED_WALLETS) as ProviderType[])
   const hasWallet: Record<keyof typeof SUPPORTED_WALLETS, boolean> = useMemo(
     () => ({
       unisat: hasUnisat,
@@ -48,6 +50,7 @@ export default function useSupportedProviders() {
       sparrow: hasSparrow,
       tokeo: hasTokeo,
       keplr: hasKeplr,
+      universal: hasUniversal,
     }),
     [
       hasLeather,
@@ -60,54 +63,58 @@ export default function useSupportedProviders() {
       hasSparrow,
       hasTokeo,
       hasUnisat,
+      hasUniversal,
       hasWizz,
       hasXverse,
       hasKeplr,
     ]
   )
   const [installedWallets, otherWallets] = useMemo(() => {
-    console.log("hasWallet", hasWallet)
-    console.log("connectLaserEyes", connectLaserEyes)
+    console.log('hasWallet', hasWallet)
+    console.log('connectLaserEyes', connectLaserEyes)
     const i: (WalletInfo & {
       connect: () => Promise<string | undefined>
     })[] = []
     const o: WalletInfo[] = []
-    Object.keys(SUPPORTED_WALLETS).filter(e => allowedProviders?.includes(e as ProviderType)).forEach((e) => {
-      const isInstalled = hasWallet[e as keyof typeof hasWallet]
-      const wallet = SUPPORTED_WALLETS[e as keyof typeof SUPPORTED_WALLETS]
-      const w: WalletInfo = {
-        ...wallet,
-        connectorId: e as keyof typeof SUPPORTED_WALLETS,
-        installUrl: wallet.url,
-        label: wallet.name
-          .replace(/[-_]/g, ' ')
-          .split(' ')
-          .map(
-            (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-          )
-          .join(' '),
-      }
-      if (isInstalled) {
-        i.push({
-          ...w,
-          connect: async () => {
-            try {
-              await connectLaserEyes(w.connectorId)
-            } catch (e) {
-              console.error(e)
-              if (e instanceof Error) {
-                return e.message
-              } else if ('message' in (e as any)) {
-                return `${(e as any).message}`
+    Object.keys(SUPPORTED_WALLETS)
+      .filter((e) => allowedProviders?.includes(e as ProviderType))
+      .forEach((e) => {
+        const isInstalled = hasWallet[e as keyof typeof hasWallet]
+        const wallet = SUPPORTED_WALLETS[e as keyof typeof SUPPORTED_WALLETS]
+        const w: WalletInfo = {
+          ...wallet,
+          connectorId: e as keyof typeof SUPPORTED_WALLETS,
+          installUrl: wallet.url,
+          label: wallet.name
+            .replace(/[-_]/g, ' ')
+            .split(' ')
+            .map(
+              (word) =>
+                word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+            )
+            .join(' '),
+        }
+        if (isInstalled) {
+          i.push({
+            ...w,
+            connect: async () => {
+              try {
+                await connectLaserEyes(w.connectorId)
+              } catch (e) {
+                console.error(e)
+                if (e instanceof Error) {
+                  return e.message
+                } else if ('message' in (e as any)) {
+                  return `${(e as any).message}`
+                }
+                return `${e}`
               }
-              return `${e}`
-            }
-          },
-        })
-      } else {
-        o.push(w)
-      }
-    })
+            },
+          })
+        } else {
+          o.push(w)
+        }
+      })
     return [i, o]
   }, [hasWallet, connectLaserEyes, allowedProviders])
   return { installedWallets, otherWallets }

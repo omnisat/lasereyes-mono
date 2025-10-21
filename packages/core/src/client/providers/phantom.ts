@@ -109,7 +109,10 @@ export default class PhantomProvider extends WalletProvider {
     this.$store.setKey('paymentAddress', payment.address)
     this.$store.setKey('publicKey', taproot.publicKey)
     this.$store.setKey('paymentPublicKey', payment.publicKey)
-    this.$store.setKey('accounts', phantomAccounts.map((account: { address: string }) => account.address))
+    this.$store.setKey(
+      'accounts',
+      phantomAccounts.map((account: { address: string }) => account.address)
+    )
   }
 
   async getNetwork() {

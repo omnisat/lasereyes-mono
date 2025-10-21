@@ -1,19 +1,32 @@
-import { type Brc20Balance, type MAINNET, type TESTNET, useLaserEyes } from '@omnisat/lasereyes'
+import {
+  type Brc20Balance,
+  type MAINNET,
+  type TESTNET,
+  useLaserEyes,
+} from '@omnisat/lasereyes'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Input } from '@/components/ui/input'
 import { getMempoolSpaceUrl } from '@/lib/urls'
 import { cn } from '@/lib/utils'
 import { Button } from './ui/button'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from './ui/select'
 
 const BRC20Section = () => {
-  const { provider, address, send, network, getMetaBalances, connected } = useLaserEyes()
+  const { provider, address, send, network, getMetaBalances, connected } =
+    useLaserEyes()
   const [brc20s, setBrc20s] = useState<Brc20Balance[]>([])
-  const [selectedBrc20, setSelectedBrc20] = useState<Brc20Balance | undefined>(undefined)
+  const [selectedBrc20, setSelectedBrc20] = useState<Brc20Balance | undefined>(
+    undefined
+  )
   const [brc20ToAddress, setBrc20ToAddress] = useState('')
   const [brc20Amount, setBrc20Amount] = useState('')
-
 
   useEffect(() => {
     if (address && connected && network) {
@@ -40,11 +53,12 @@ const BRC20Section = () => {
         <span className={'flex flex-col gap-1 items-center justify-center'}>
           <span className={'font-black'}>View on mempool.space</span>
           <a
-            target='_blank'
+            target="_blank"
             href={`${getMempoolSpaceUrl(
               network as typeof MAINNET | typeof TESTNET
             )}/tx/${txid}`}
-            className={'underline text-blue-600 text-xs'} rel="noreferrer"
+            className={'underline text-blue-600 text-xs'}
+            rel="noreferrer"
           >
             {txid}
           </a>
@@ -94,11 +108,7 @@ const BRC20Section = () => {
         onChange={(e) => setBrc20ToAddress(e.target.value)}
       />
       <Input
-        disabled={
-          !provider ||
-          !selectedBrc20 ||
-          !brc20ToAddress
-        }
+        disabled={!provider || !selectedBrc20 || !brc20ToAddress}
         type="number"
         className={cn(
           'w-full bg-[#232225] border-none disabled:text-[#737275] text-center'
@@ -109,10 +119,7 @@ const BRC20Section = () => {
       />
       <Button
         disabled={
-          !provider ||
-          !selectedBrc20 ||
-          !brc20ToAddress ||
-          !brc20Amount
+          !provider || !selectedBrc20 || !brc20ToAddress || !brc20Amount
         }
         className={'w-full bg-[#232225] disabled:text-[#737275]'}
         onClick={sendBrc20}

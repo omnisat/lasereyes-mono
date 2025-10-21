@@ -1,8 +1,8 @@
-"use client"
+'use client'
 
-import type React from "react"
+import type React from 'react'
 
-import { Suspense } from "react"
+import { Suspense } from 'react'
 
 export default function NotFoundWrapper({
   children,
@@ -11,4 +11,3 @@ export default function NotFoundWrapper({
 }) {
   return <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
 }
-

@@ -1,4 +1,4 @@
-import { MempoolUtxo } from "."
+import { MempoolUtxo } from '.'
 
 export type LasereyesUTXO = MempoolUtxo & {
   scriptPk: string

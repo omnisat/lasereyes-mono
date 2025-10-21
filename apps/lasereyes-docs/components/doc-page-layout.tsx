@@ -1,5 +1,5 @@
-import type React from "react"
-import { cn } from "@/lib/utils"
+import type React from 'react'
+import { cn } from '@/lib/utils'
 
 interface DocPageLayoutProps {
   children: React.ReactNode
@@ -7,6 +7,7 @@ interface DocPageLayoutProps {
 }
 
 export function DocPageLayout({ children, className }: DocPageLayoutProps) {
-  return <div className={cn("w-full max-w-3xl mx-auto", className)}>{children}</div>
+  return (
+    <div className={cn('w-full max-w-3xl mx-auto', className)}>{children}</div>
+  )
 }
-

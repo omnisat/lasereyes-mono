@@ -1,4 +1,3 @@
-
 export const getBrc20SendJsonStr = (
   ticker: string,
   amount: number | string

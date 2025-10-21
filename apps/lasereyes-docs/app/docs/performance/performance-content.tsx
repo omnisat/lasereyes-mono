@@ -1,61 +1,77 @@
-"use client"
+'use client'
 
-import { CodeBlock } from "@/components/code-block"
-import Link from "next/link"
-import { Heading } from "@/components/heading"
+import { CodeBlock } from '@/components/code-block'
+import Link from 'next/link'
+import { Heading } from '@/components/heading'
 
 export default function PerformanceContent() {
   return (
     <>
       <Heading level="h1">Performance Optimization</Heading>
       <p className="text-lg mb-4">
-        Optimizing the performance of your LaserEyes integration is crucial for providing a smooth user experience. This
-        page covers strategies and best practices for improving performance.
+        Optimizing the performance of your LaserEyes integration is crucial for
+        providing a smooth user experience. This page covers strategies and best
+        practices for improving performance.
       </p>
 
       <Heading level="h2">Performance Considerations</Heading>
       <p className="mb-6">
-        When working with Bitcoin wallets and blockchain data, several factors can affect performance:
+        When working with Bitcoin wallets and blockchain data, several factors
+        can affect performance:
       </p>
       <ul className="list-disc pl-6 mb-6 space-y-2">
         <li>
-          <strong>Network Latency</strong>: API calls to data providers can take time
+          <strong>Network Latency</strong>: API calls to data providers can take
+          time
         </li>
         <li>
-          <strong>Wallet Interactions</strong>: Wallet operations like signing can be slow
+          <strong>Wallet Interactions</strong>: Wallet operations like signing
+          can be slow
         </li>
         <li>
-          <strong>Data Volume</strong>: Large amounts of data (e.g., many UTXOs or inscriptions) can be slow to process
+          <strong>Data Volume</strong>: Large amounts of data (e.g., many UTXOs
+          or inscriptions) can be slow to process
         </li>
         <li>
-          <strong>UI Rendering</strong>: Rendering large lists or complex data can impact performance
+          <strong>UI Rendering</strong>: Rendering large lists or complex data
+          can impact performance
         </li>
         <li>
-          <strong>Rate Limits</strong>: Data provider rate limits can throttle your application
+          <strong>Rate Limits</strong>: Data provider rate limits can throttle
+          your application
         </li>
       </ul>
 
       <Heading level="h2">Caching Strategies</Heading>
-      <p className="mb-6">Implementing effective caching is one of the most important performance optimizations:</p>
+      <p className="mb-6">
+        Implementing effective caching is one of the most important performance
+        optimizations:
+      </p>
       <ul className="list-disc pl-6 mb-6 space-y-2">
         <li>
-          <strong>In-Memory Caching</strong>: Cache frequently accessed data in memory
+          <strong>In-Memory Caching</strong>: Cache frequently accessed data in
+          memory
         </li>
         <li>
-          <strong>Local Storage</strong>: Use browser local storage for persistent caching
+          <strong>Local Storage</strong>: Use browser local storage for
+          persistent caching
         </li>
         <li>
           <strong>IndexedDB</strong>: Store larger datasets in IndexedDB
         </li>
         <li>
-          <strong>Service Workers</strong>: Use service workers for network request caching
+          <strong>Service Workers</strong>: Use service workers for network
+          request caching
         </li>
         <li>
-          <strong>Time-Based Expiration</strong>: Set appropriate cache expiration times
+          <strong>Time-Based Expiration</strong>: Set appropriate cache
+          expiration times
         </li>
       </ul>
 
-      <p className="mb-6">LaserEyes includes built-in caching that you can configure:</p>
+      <p className="mb-6">
+        LaserEyes includes built-in caching that you can configure:
+      </p>
       <CodeBlock
         language="typescript"
         code={`const config = createConfig({
@@ -137,10 +153,13 @@ async function getBalanceWithCache(address: string): Promise<string> {
       />
 
       <Heading level="h2">Optimizing Data Fetching</Heading>
-      <p className="mb-6">Efficient data fetching is crucial for performance:</p>
+      <p className="mb-6">
+        Efficient data fetching is crucial for performance:
+      </p>
       <ul className="list-disc pl-6 mb-6 space-y-2">
         <li>
-          <strong>Fetch Only What You Need</strong>: Request only the data you actually need
+          <strong>Fetch Only What You Need</strong>: Request only the data you
+          actually need
         </li>
         <li>
           <strong>Pagination</strong>: Use pagination for large datasets
@@ -152,7 +171,8 @@ async function getBalanceWithCache(address: string): Promise<string> {
           <strong>Debouncing</strong>: Debounce user input to reduce API calls
         </li>
         <li>
-          <strong>Prefetching</strong>: Prefetch data that users are likely to need
+          <strong>Prefetching</strong>: Prefetch data that users are likely to
+          need
         </li>
       </ul>
 
@@ -241,22 +261,27 @@ function OptimizedSearch() {
       />
 
       <Heading level="h2">Optimizing UI Rendering</Heading>
-      <p className="mb-6">Efficient UI rendering is important for a smooth user experience:</p>
+      <p className="mb-6">
+        Efficient UI rendering is important for a smooth user experience:
+      </p>
       <ul className="list-disc pl-6 mb-6 space-y-2">
         <li>
           <strong>Virtualized Lists</strong>: Use virtualization for long lists
         </li>
         <li>
-          <strong>Lazy Loading</strong>: Load components and data only when needed
+          <strong>Lazy Loading</strong>: Load components and data only when
+          needed
         </li>
         <li>
-          <strong>Memoization</strong>: Memoize expensive calculations and components
+          <strong>Memoization</strong>: Memoize expensive calculations and
+          components
         </li>
         <li>
           <strong>Code Splitting</strong>: Split your code into smaller chunks
         </li>
         <li>
-          <strong>Optimized Images</strong>: Use optimized images and lazy loading
+          <strong>Optimized Images</strong>: Use optimized images and lazy
+          loading
         </li>
       </ul>
 
@@ -376,22 +401,29 @@ function VirtualizedInscriptionsList() {
       />
 
       <Heading level="h2">Optimizing Wallet Interactions</Heading>
-      <p className="mb-6">Wallet interactions can be slow, so it's important to optimize them:</p>
+      <p className="mb-6">
+        Wallet interactions can be slow, so it's important to optimize them:
+      </p>
       <ul className="list-disc pl-6 mb-6 space-y-2">
         <li>
-          <strong>Minimize Wallet Calls</strong>: Reduce the number of calls to the wallet
+          <strong>Minimize Wallet Calls</strong>: Reduce the number of calls to
+          the wallet
         </li>
         <li>
-          <strong>Batch Operations</strong>: Combine multiple operations when possible
+          <strong>Batch Operations</strong>: Combine multiple operations when
+          possible
         </li>
         <li>
-          <strong>Provide Feedback</strong>: Show loading indicators during wallet operations
+          <strong>Provide Feedback</strong>: Show loading indicators during
+          wallet operations
         </li>
         <li>
-          <strong>Cache Wallet Data</strong>: Cache wallet data like address and balance
+          <strong>Cache Wallet Data</strong>: Cache wallet data like address and
+          balance
         </li>
         <li>
-          <strong>Optimize PSBT Construction</strong>: Construct PSBTs efficiently
+          <strong>Optimize PSBT Construction</strong>: Construct PSBTs
+          efficiently
         </li>
       </ul>
 
@@ -505,19 +537,25 @@ function OptimizedWalletInteraction() {
       />
 
       <Heading level="h2">Data Provider Selection</Heading>
-      <p className="mb-6">Choosing the right data provider can significantly impact performance:</p>
+      <p className="mb-6">
+        Choosing the right data provider can significantly impact performance:
+      </p>
       <ul className="list-disc pl-6 mb-6 space-y-2">
         <li>
-          <strong>Use Multiple Providers</strong>: Configure multiple providers for redundancy and performance
+          <strong>Use Multiple Providers</strong>: Configure multiple providers
+          for redundancy and performance
         </li>
         <li>
-          <strong>Choose Providers by Feature</strong>: Use different providers for different features
+          <strong>Choose Providers by Feature</strong>: Use different providers
+          for different features
         </li>
         <li>
-          <strong>Consider Geographic Location</strong>: Choose providers with servers close to your users
+          <strong>Consider Geographic Location</strong>: Choose providers with
+          servers close to your users
         </li>
         <li>
-          <strong>Monitor Performance</strong>: Track provider performance and adjust as needed
+          <strong>Monitor Performance</strong>: Track provider performance and
+          adjust as needed
         </li>
       </ul>
 
@@ -545,24 +583,27 @@ function OptimizedWalletInteraction() {
       />
 
       <Heading level="h2">Performance Monitoring</Heading>
-      <p className="mb-6">Monitor your application's performance to identify bottlenecks:</p>
+      <p className="mb-6">
+        Monitor your application's performance to identify bottlenecks:
+      </p>
       <ul className="list-disc pl-6 mb-6 space-y-2">
         <li>
           <strong>Track API Call Times</strong>: Measure how long API calls take
         </li>
         <li>
-          <strong>Monitor Wallet Operation Times</strong>: Track wallet operation performance
+          <strong>Monitor Wallet Operation Times</strong>: Track wallet
+          operation performance
         </li>
         <li>
-          <strong>Use Performance Metrics</strong>: Track metrics like First Contentful Paint (FCP) and Time to
-          Interactive (TTI)
+          <strong>Use Performance Metrics</strong>: Track metrics like First
+          Contentful Paint (FCP) and Time to Interactive (TTI)
         </li>
         <li>
           <strong>Implement Logging</strong>: Log performance data for analysis
         </li>
         <li>
-          <strong>Use Performance Monitoring Tools</strong>: Tools like Lighthouse, WebPageTest, or commercial
-          monitoring services
+          <strong>Use Performance Monitoring Tools</strong>: Tools like
+          Lighthouse, WebPageTest, or commercial monitoring services
         </li>
       </ul>
 
@@ -614,7 +655,10 @@ const balance = await getBalanceWithTracking('bc1q...')`}
       />
 
       <Heading level="h2">Performance Checklist</Heading>
-      <p className="mb-6">Use this checklist to ensure your LaserEyes integration is optimized for performance:</p>
+      <p className="mb-6">
+        Use this checklist to ensure your LaserEyes integration is optimized for
+        performance:
+      </p>
       <div className="overflow-x-auto mb-6">
         <table className="w-full border-collapse">
           <thead>
@@ -642,7 +686,9 @@ const balance = await getBalanceWithTracking('bc1q...')`}
             </tr>
             <tr>
               <td className="border p-2">Set cache expiration</td>
-              <td className="border p-2">Use appropriate TTL for different data types</td>
+              <td className="border p-2">
+                Use appropriate TTL for different data types
+              </td>
             </tr>
             <tr>
               <td className="border p-2">Implement cache invalidation</td>
@@ -661,7 +707,9 @@ const balance = await getBalanceWithTracking('bc1q...')`}
             </tr>
             <tr>
               <td className="border p-2">Fetch in parallel</td>
-              <td className="border p-2">Use Promise.all for independent data</td>
+              <td className="border p-2">
+                Use Promise.all for independent data
+              </td>
             </tr>
             <tr>
               <td className="border p-2">Debounce user input</td>
@@ -692,7 +740,9 @@ const balance = await getBalanceWithTracking('bc1q...')`}
             </tr>
             <tr>
               <td className="border p-2">Optimize images</td>
-              <td className="border p-2">Use optimized images and lazy loading</td>
+              <td className="border p-2">
+                Use optimized images and lazy loading
+              </td>
             </tr>
             <tr>
               <td className="border p-2" rowSpan={4}>
@@ -719,35 +769,41 @@ const balance = await getBalanceWithTracking('bc1q...')`}
 
       <Heading level="h2">Next Steps</Heading>
       <p className="mb-6">
-        Now that you understand performance optimization for LaserEyes, you can explore related topics:
+        Now that you understand performance optimization for LaserEyes, you can
+        explore related topics:
       </p>
       <ul className="list-disc pl-6 mb-6 space-y-2">
         <li>
-          <Link href="/docs/error-handling" className="text-primary hover:underline">
+          <Link
+            href="/docs/error-handling"
+            className="text-primary hover:underline"
+          >
             Error Handling
-          </Link>{" "}
+          </Link>{' '}
           - Learn how to handle errors effectively
         </li>
         <li>
           <Link href="/docs/security" className="text-primary hover:underline">
             Security Considerations
-          </Link>{" "}
+          </Link>{' '}
           - Understand security best practices
         </li>
         <li>
           <Link href="/docs/testing" className="text-primary hover:underline">
             Testing
-          </Link>{" "}
+          </Link>{' '}
           - Learn how to test your LaserEyes integration
         </li>
         <li>
-          <Link href="/docs/best-practices" className="text-primary hover:underline">
+          <Link
+            href="/docs/best-practices"
+            className="text-primary hover:underline"
+          >
             Best Practices
-          </Link>{" "}
+          </Link>{' '}
           - General best practices for LaserEyes
         </li>
       </ul>
     </>
   )
 }
-

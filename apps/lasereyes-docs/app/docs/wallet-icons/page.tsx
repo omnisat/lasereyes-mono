@@ -1,14 +1,14 @@
-"use client"
+'use client'
 
-import * as React from "react"
-import { CodeBlock } from "@/components/code-block"
-import { Heading } from "@/components/heading"
-import { ClientPageWrapper } from "@/components/client-page-wrapper"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Paintbrush, Palette, Zap, Settings2, ArrowRight } from "lucide-react"
-import Link from "next/link"
+import * as React from 'react'
+import { CodeBlock } from '@/components/code-block'
+import { Heading } from '@/components/heading'
+import { ClientPageWrapper } from '@/components/client-page-wrapper'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Paintbrush, Palette, Zap, Settings2, ArrowRight } from 'lucide-react'
+import Link from 'next/link'
 import {
   LEATHER,
   MAGIC_EDEN,
@@ -21,8 +21,8 @@ import {
   WIZZ,
   XVERSE,
   type ProviderType,
-} from "@omnisat/lasereyes-react"
-import { cn } from "@/lib/utils"
+} from '@omnisat/lasereyes-react'
+import { cn } from '@/lib/utils'
 
 interface WalletIconInfo {
   name: string
@@ -37,12 +37,19 @@ interface FeatureCardProps {
   className?: string
 }
 
-function FeatureCard({ icon: Icon, title, description, className }: FeatureCardProps) {
+function FeatureCard({
+  icon: Icon,
+  title,
+  description,
+  className,
+}: FeatureCardProps) {
   return (
-    <Card className={cn(
-      "group relative overflow-hidden transition-all duration-300 hover:border-orange-500/30 hover:shadow-lg hover:shadow-orange-500/5",
-      className
-    )}>
+    <Card
+      className={cn(
+        'group relative overflow-hidden transition-all duration-300 hover:border-orange-500/30 hover:shadow-lg hover:shadow-orange-500/5',
+        className
+      )}
+    >
       <div className="absolute right-0 top-0 h-20 w-20 translate-x-6 -translate-y-6 rounded-full bg-orange-500/10 blur-2xl filter group-hover:bg-orange-500/20" />
       <CardContent className="p-6">
         <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-orange-500/10 text-orange-500">
@@ -59,53 +66,54 @@ function WalletIconsContent() {
   const [selectedSize, setSelectedSize] = React.useState(24)
 
   const walletIcons = React.useMemo<WalletIconInfo[]>(
-    () => [
-      { 
-        name: "UniSat", 
-        constant: UNISAT as ProviderType,
-        description: "The most popular Bitcoin wallet for Ordinals"
-      },
-      { 
-        name: "Xverse", 
-        constant: XVERSE as ProviderType,
-        description: "Feature-rich Bitcoin and Ordinals wallet"
-      },
-      { 
-        name: "OYL", 
-        constant: OYL as ProviderType,
-        description: "Modern Bitcoin wallet with Ordinals support"
-      },
-      { 
-        name: "Magic Eden", 
-        constant: MAGIC_EDEN as ProviderType,
-        description: "Leading NFT marketplace's Bitcoin wallet"
-      },
-      { 
-        name: "OKX", 
-        constant: OKX as ProviderType,
-        description: "Secure and reliable exchange wallet"
-      },
-      { 
-        name: "Leather", 
-        constant: LEATHER as ProviderType,
-        description: "Formerly known as Stacks Wallet"
-      },
-      { 
-        name: "Phantom", 
-        constant: PHANTOM as ProviderType,
-        description: "Multi-chain wallet with Bitcoin support"
-      },
-      { 
-        name: "Wizz", 
-        constant: WIZZ as ProviderType,
-        description: "Innovative Bitcoin and Ordinals wallet"
-      },
-      { 
-        name: "Orange", 
-        constant: ORANGE as ProviderType,
-        description: "Bitcoin-focused wallet solution"
-      },
-    ].sort((a, b) => a.name.localeCompare(b.name)),
+    () =>
+      [
+        {
+          name: 'UniSat',
+          constant: UNISAT as ProviderType,
+          description: 'The most popular Bitcoin wallet for Ordinals',
+        },
+        {
+          name: 'Xverse',
+          constant: XVERSE as ProviderType,
+          description: 'Feature-rich Bitcoin and Ordinals wallet',
+        },
+        {
+          name: 'OYL',
+          constant: OYL as ProviderType,
+          description: 'Modern Bitcoin wallet with Ordinals support',
+        },
+        {
+          name: 'Magic Eden',
+          constant: MAGIC_EDEN as ProviderType,
+          description: "Leading NFT marketplace's Bitcoin wallet",
+        },
+        {
+          name: 'OKX',
+          constant: OKX as ProviderType,
+          description: 'Secure and reliable exchange wallet',
+        },
+        {
+          name: 'Leather',
+          constant: LEATHER as ProviderType,
+          description: 'Formerly known as Stacks Wallet',
+        },
+        {
+          name: 'Phantom',
+          constant: PHANTOM as ProviderType,
+          description: 'Multi-chain wallet with Bitcoin support',
+        },
+        {
+          name: 'Wizz',
+          constant: WIZZ as ProviderType,
+          description: 'Innovative Bitcoin and Ordinals wallet',
+        },
+        {
+          name: 'Orange',
+          constant: ORANGE as ProviderType,
+          description: 'Bitcoin-focused wallet solution',
+        },
+      ].sort((a, b) => a.name.localeCompare(b.name)),
     []
   )
 
@@ -150,14 +158,17 @@ function WalletIconsContent() {
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {walletIcons.map((wallet) => (
-            <Card 
+            <Card
               key={wallet.name}
               className="group relative overflow-hidden transition-all duration-300 hover:border-orange-500/30 hover:shadow-lg hover:shadow-orange-500/5"
             >
               <div className="absolute right-0 top-0 h-20 w-20 translate-x-6 -translate-y-6 rounded-full bg-orange-500/10 blur-2xl filter group-hover:bg-orange-500/20" />
               <CardContent className="flex items-center gap-4 p-4">
                 <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-orange-500/10">
-                  <WalletIcon walletName={wallet.constant} size={selectedSize} />
+                  <WalletIcon
+                    walletName={wallet.constant}
+                    size={selectedSize}
+                  />
                 </div>
                 <div>
                   <h3 className="font-medium">{wallet.name}</h3>
@@ -190,7 +201,6 @@ export function MyComponent() {
         </Card>
       </section>
 
-
       <section className="space-y-6">
         <h2 className="text-3xl font-bold">Props</h2>
         <Card className="overflow-hidden">
@@ -207,17 +217,23 @@ export function MyComponent() {
                 <tr>
                   <td className="py-4 font-mono text-sm">walletName</td>
                   <td className="py-4 font-mono text-sm">ProviderType</td>
-                  <td className="py-4 text-sm">The wallet identifier from @omnisat/lasereyes-react</td>
+                  <td className="py-4 text-sm">
+                    The wallet identifier from @omnisat/lasereyes-react
+                  </td>
                 </tr>
                 <tr>
                   <td className="py-4 font-mono text-sm">size</td>
                   <td className="py-4 font-mono text-sm">number</td>
-                  <td className="py-4 text-sm">Icon size in pixels (default: 24)</td>
+                  <td className="py-4 text-sm">
+                    Icon size in pixels (default: 24)
+                  </td>
                 </tr>
                 <tr>
                   <td className="py-4 font-mono text-sm">className</td>
                   <td className="py-4 font-mono text-sm">string</td>
-                  <td className="py-4 text-sm">Additional CSS classes for custom styling</td>
+                  <td className="py-4 text-sm">
+                    Additional CSS classes for custom styling
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -272,12 +288,18 @@ export default function WalletIconsPage() {
     <div className="space-y-8">
       <div className="relative overflow-hidden rounded-lg border bg-gradient-to-br from-orange-500/10 via-background to-background p-8">
         <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-orange-500/20 rounded-full blur-3xl -z-10 translate-x-1/2 -translate-y-1/2" />
-        <Badge variant="secondary" className="mb-4">React Component</Badge>
-        <Heading level={1} className="mb-4 bg-gradient-to-br from-orange-500 to-yellow-500 bg-clip-text text-transparent">
+        <Badge variant="secondary" className="mb-4">
+          React Component
+        </Badge>
+        <Heading
+          level={1}
+          className="mb-4 bg-gradient-to-br from-orange-500 to-yellow-500 bg-clip-text text-transparent"
+        >
           Wallet Icons
         </Heading>
         <p className="text-xl mb-6 max-w-2xl text-muted-foreground">
-          Beautiful, customizable wallet icons that automatically adapt to your theme and enhance your application's user experience.
+          Beautiful, customizable wallet icons that automatically adapt to your
+          theme and enhance your application's user experience.
         </p>
         <div className="flex gap-4 items-center">
           <Link href="#usage">
@@ -286,7 +308,9 @@ export default function WalletIconsPage() {
               <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Button>
           </Link>
-          <Badge variant="secondary" className="h-7 px-3">v1.0.0</Badge>
+          <Badge variant="secondary" className="h-7 px-3">
+            v1.0.0
+          </Badge>
         </div>
       </div>
 
@@ -295,4 +319,4 @@ export default function WalletIconsPage() {
       </ClientPageWrapper>
     </div>
   )
-} 
+}

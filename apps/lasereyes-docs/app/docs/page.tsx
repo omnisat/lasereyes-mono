@@ -1,13 +1,13 @@
-"use client"
+'use client'
 
-import * as React from "react"
-import { ClientPageWrapper } from "@/components/client-page-wrapper"
-import { CodeBlock } from "@/components/code-block"
-import { Heading } from "@/components/heading"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Zap, Shield, Wallet, Database, Code2, Rocket } from "lucide-react"
-import { cn } from "@/lib/utils"
+import * as React from 'react'
+import { ClientPageWrapper } from '@/components/client-page-wrapper'
+import { CodeBlock } from '@/components/code-block'
+import { Heading } from '@/components/heading'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Zap, Shield, Wallet, Database, Code2, Rocket } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 interface FeatureCardProps {
   icon: React.ElementType
@@ -21,12 +21,18 @@ export default function DocsPage() {
     <div className="space-y-8">
       <div className="relative overflow-hidden rounded-lg border bg-gradient-to-br from-orange-500/10 via-background to-background p-8">
         <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-orange-500/20 rounded-full blur-3xl -z-10 translate-x-1/2 -translate-y-1/2" />
-        <Badge variant="secondary" className="mb-4">Documentation</Badge>
-        <Heading level={1} className="mb-4 bg-gradient-to-br from-orange-500 to-yellow-500 bg-clip-text text-transparent">
+        <Badge variant="secondary" className="mb-4">
+          Documentation
+        </Badge>
+        <Heading
+          level={1}
+          className="mb-4 bg-gradient-to-br from-orange-500 to-yellow-500 bg-clip-text text-transparent"
+        >
           Introduction to LaserEyes
         </Heading>
         <p className="text-xl mb-6 max-w-2xl text-muted-foreground">
-          A powerful wallet connect library making it easier than ever to build and maintain Bitcoin Ordinal Web Apps.
+          A powerful wallet connect library making it easier than ever to build
+          and maintain Bitcoin Ordinal Web Apps.
         </p>
       </div>
 
@@ -37,12 +43,19 @@ export default function DocsPage() {
   )
 }
 
-function FeatureCard({ icon: Icon, title, description, className }: FeatureCardProps) {
+function FeatureCard({
+  icon: Icon,
+  title,
+  description,
+  className,
+}: FeatureCardProps) {
   return (
-    <Card className={cn(
-      "group relative overflow-hidden transition-all duration-300 hover:border-orange-500/30 hover:shadow-lg hover:shadow-orange-500/5",
-      className
-    )}>
+    <Card
+      className={cn(
+        'group relative overflow-hidden transition-all duration-300 hover:border-orange-500/30 hover:shadow-lg hover:shadow-orange-500/5',
+        className
+      )}
+    >
       <div className="absolute right-0 top-0 h-20 w-20 translate-x-6 -translate-y-6 rounded-full bg-orange-500/10 blur-2xl filter group-hover:bg-orange-500/20" />
       <CardContent className="p-6">
         <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-orange-500/10 text-orange-500">
@@ -62,8 +75,9 @@ function DocsPageContent() {
         <Card className="overflow-hidden">
           <CardContent className="p-6">
             <p className="text-lg leading-relaxed">
-              LaserEyes provides a unified interface to interact with multiple Bitcoin wallets, making it simple to add
-              wallet connectivity to your web applications.
+              LaserEyes provides a unified interface to interact with multiple
+              Bitcoin wallets, making it simple to add wallet connectivity to
+              your web applications.
             </p>
           </CardContent>
         </Card>
@@ -74,8 +88,10 @@ function DocsPageContent() {
         <Card className="overflow-hidden">
           <CardContent className="p-6">
             <p className="text-lg leading-relaxed">
-              Building Bitcoin web applications can be challenging due to the variety of wallet providers and their different
-              APIs. LaserEyes solves this problem by providing a unified interface that works with all major Bitcoin wallets.
+              Building Bitcoin web applications can be challenging due to the
+              variety of wallet providers and their different APIs. LaserEyes
+              solves this problem by providing a unified interface that works
+              with all major Bitcoin wallets.
             </p>
           </CardContent>
         </Card>
@@ -185,4 +201,3 @@ function WalletConnect() {
     </div>
   )
 }
-

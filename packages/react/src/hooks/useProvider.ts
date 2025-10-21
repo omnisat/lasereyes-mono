@@ -1,5 +1,5 @@
-import type { ProviderType, WalletProvider } from "@omnisat/lasereyes-core"
-import { useLaserEyes } from "../providers/hooks"
+import type { ProviderType, WalletProvider } from '@omnisat/lasereyes-core'
+import { useLaserEyes } from '../providers/hooks'
 
 export function useConnectedProvider(): WalletProvider | undefined {
   const { client, provider } = useLaserEyes(({ client, provider }) => ({

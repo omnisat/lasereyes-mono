@@ -1,16 +1,24 @@
-"use client"
+'use client'
 
-import * as React from "react"
-import { ClientPageWrapper } from "@/components/client-page-wrapper"
-import { CodeBlock } from "@/components/code-block"
-import { Heading } from "@/components/heading"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { ArrowRight, Layers, Database, Wallet, Code2, Puzzle, Shield } from "lucide-react"
-import Link from "next/link"
-import { cn } from "@/lib/utils"
-import type { LucideIcon } from "lucide-react"
+import * as React from 'react'
+import { ClientPageWrapper } from '@/components/client-page-wrapper'
+import { CodeBlock } from '@/components/code-block'
+import { Heading } from '@/components/heading'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import {
+  ArrowRight,
+  Layers,
+  Database,
+  Wallet,
+  Code2,
+  Puzzle,
+  Shield,
+} from 'lucide-react'
+import Link from 'next/link'
+import { cn } from '@/lib/utils'
+import type { LucideIcon } from 'lucide-react'
 
 interface FeatureCardProps {
   icon: LucideIcon
@@ -19,12 +27,19 @@ interface FeatureCardProps {
   className?: string
 }
 
-function FeatureCard({ icon: Icon, title, description, className }: FeatureCardProps) {
+function FeatureCard({
+  icon: Icon,
+  title,
+  description,
+  className,
+}: FeatureCardProps) {
   return (
-    <Card className={cn(
-      "group relative overflow-hidden transition-all duration-300 hover:border-orange-500/30 hover:shadow-lg hover:shadow-orange-500/5",
-      className
-    )}>
+    <Card
+      className={cn(
+        'group relative overflow-hidden transition-all duration-300 hover:border-orange-500/30 hover:shadow-lg hover:shadow-orange-500/5',
+        className
+      )}
+    >
       <div className="absolute right-0 top-0 h-20 w-20 translate-x-6 -translate-y-6 rounded-full bg-orange-500/10 blur-2xl filter group-hover:bg-orange-500/20" />
       <CardContent className="p-6">
         <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-orange-500/10 text-orange-500">
@@ -44,7 +59,10 @@ function ArchitectureContent() {
         <Card className="overflow-hidden">
           <CardContent className="p-6">
             <p className="text-lg leading-relaxed">
-              LaserEyes is built with a modular architecture that separates concerns and provides flexibility through its provider system. This guide explains the core concepts and how different parts work together.
+              LaserEyes is built with a modular architecture that separates
+              concerns and provides flexibility through its provider system.
+              This guide explains the core concepts and how different parts work
+              together.
             </p>
           </CardContent>
         </Card>
@@ -123,7 +141,8 @@ function ArchitectureContent() {
                 copyButton={true}
               />
               <p className="mt-4 text-sm text-muted-foreground">
-                Each wallet provider implements this interface, ensuring consistent behavior across different wallet implementations.
+                Each wallet provider implements this interface, ensuring
+                consistent behavior across different wallet implementations.
               </p>
             </CardContent>
           </Card>
@@ -147,7 +166,8 @@ function ArchitectureContent() {
                 copyButton={true}
               />
               <p className="mt-4 text-sm text-muted-foreground">
-                Data sources provide a standardized way to interact with the Bitcoin network and fetch required data.
+                Data sources provide a standardized way to interact with the
+                Bitcoin network and fetch required data.
               </p>
             </CardContent>
           </Card>
@@ -169,7 +189,9 @@ function ArchitectureContent() {
               <li>Validate all transaction parameters before signing</li>
               <li>Implement proper error handling for failed transactions</li>
               <li>Use secure communication channels with wallet providers</li>
-              <li>Follow Bitcoin network best practices for transaction handling</li>
+              <li>
+                Follow Bitcoin network best practices for transaction handling
+              </li>
             </ul>
           </CardContent>
         </Card>
@@ -182,23 +204,24 @@ function ArchitectureContent() {
             <div className="grid gap-4">
               {[
                 {
-                  href: "/docs/wallet-providers",
-                  title: "Wallet Providers",
-                  description: "Learn about implementing custom wallet providers",
-                  icon: Wallet
+                  href: '/docs/wallet-providers',
+                  title: 'Wallet Providers',
+                  description:
+                    'Learn about implementing custom wallet providers',
+                  icon: Wallet,
                 },
                 {
-                  href: "/docs/datasource-system",
-                  title: "Data Sources",
-                  description: "Understand the data source system in depth",
-                  icon: Database
+                  href: '/docs/datasource-system',
+                  title: 'Data Sources',
+                  description: 'Understand the data source system in depth',
+                  icon: Database,
                 },
                 {
-                  href: "/docs/framework-integration",
-                  title: "Framework Integration",
-                  description: "Explore framework-specific implementations",
-                  icon: Code2
-                }
+                  href: '/docs/framework-integration',
+                  title: 'Framework Integration',
+                  description: 'Explore framework-specific implementations',
+                  icon: Code2,
+                },
               ].map((item) => (
                 <Link key={item.href} href={item.href}>
                   <Card className="group relative overflow-hidden transition-all duration-300 hover:border-orange-500/30 hover:shadow-lg hover:shadow-orange-500/5">
@@ -208,8 +231,12 @@ function ArchitectureContent() {
                           <item.icon className="h-5 w-5" />
                         </div>
                         <div>
-                          <h3 className="font-semibold group-hover:text-orange-500 transition-colors">{item.title}</h3>
-                          <p className="text-sm text-muted-foreground">{item.description}</p>
+                          <h3 className="font-semibold group-hover:text-orange-500 transition-colors">
+                            {item.title}
+                          </h3>
+                          <p className="text-sm text-muted-foreground">
+                            {item.description}
+                          </p>
                         </div>
                       </div>
                       <ArrowRight className="h-5 w-5 text-muted-foreground/50 transition-transform group-hover:translate-x-1 group-hover:text-orange-500" />
@@ -230,12 +257,18 @@ export default function ArchitecturePage() {
     <div className="space-y-8">
       <div className="relative overflow-hidden rounded-lg border bg-gradient-to-br from-orange-500/10 via-background to-background p-8">
         <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-orange-500/20 rounded-full blur-3xl -z-10 translate-x-1/2 -translate-y-1/2" />
-        <Badge variant="secondary" className="mb-4">Architecture</Badge>
-        <Heading level={1} className="mb-4 bg-gradient-to-br from-orange-500 to-yellow-500 bg-clip-text text-transparent">
+        <Badge variant="secondary" className="mb-4">
+          Architecture
+        </Badge>
+        <Heading
+          level={1}
+          className="mb-4 bg-gradient-to-br from-orange-500 to-yellow-500 bg-clip-text text-transparent"
+        >
           System Architecture
         </Heading>
         <p className="text-xl mb-6 max-w-2xl text-muted-foreground">
-          Understand how LaserEyes is built and how its components work together to provide a seamless Bitcoin wallet integration experience.
+          Understand how LaserEyes is built and how its components work together
+          to provide a seamless Bitcoin wallet integration experience.
         </p>
         <div className="flex flex-col gap-4 sm:flex-row">
           <Link href="#core-concepts">
@@ -259,4 +292,3 @@ export default function ArchitecturePage() {
     </div>
   )
 }
-

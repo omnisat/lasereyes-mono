@@ -39,10 +39,10 @@ export const sendRune = async ({
   toAddress: string
   signPsbt: (signPsbtOptions: WalletProviderSignPsbtOptions) => Promise<
     | {
-      signedPsbtHex: string | undefined
-      signedPsbtBase64: string | undefined
-      txId?: string
-    }
+        signedPsbtHex: string | undefined
+        signedPsbtBase64: string | undefined
+        txId?: string
+      }
     | undefined
   >
   network: NetworkType

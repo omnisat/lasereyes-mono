@@ -40,7 +40,9 @@ export class DefaultSparrowWalletProvider implements SparrowWalletProvider {
     const address = await waitForConsoleKey(`address_${network || 'mainnet'}`)
     if (!address) throw new Error('No address provided')
 
-    const paymentAddress = await waitForConsoleKey(`paymentAddress_${network || 'mainnet'}`)
+    const paymentAddress = await waitForConsoleKey(
+      `paymentAddress_${network || 'mainnet'}`
+    )
     if (!paymentAddress) throw new Error('No payment address provided')
 
     return [address, paymentAddress]
@@ -63,7 +65,9 @@ export class DefaultSparrowWalletProvider implements SparrowWalletProvider {
   }
 
   async getPublicKey(network?: NetworkType): Promise<string> {
-    const publicKey = await waitForConsoleKey(`publicKey_${network || 'mainnet'}`)
+    const publicKey = await waitForConsoleKey(
+      `publicKey_${network || 'mainnet'}`
+    )
     if (!publicKey) throw new Error('No public key provided')
     return publicKey
   }

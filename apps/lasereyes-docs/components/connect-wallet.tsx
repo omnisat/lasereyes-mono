@@ -1,20 +1,17 @@
-"use client";
+'use client'
 
-import { Button } from "@/components/ui/button";
-import { useLaserEyes } from "@omnisat/lasereyes-react";
-import { ComponentProps } from "react";
+import { Button } from '@/components/ui/button'
+import { useLaserEyes } from '@omnisat/lasereyes-react'
+import { ComponentProps } from 'react'
 
 interface ConnectWalletProps extends ComponentProps<typeof Button> {
-  walletId: string;
+  walletId: string
 }
 
-export function ConnectWallet({
-  walletId,
-  ...props
-}: ConnectWalletProps) {
-  const { connect, isConnecting, isConnected, connectedWallet } = useLaserEyes();
+export function ConnectWallet({ walletId, ...props }: ConnectWalletProps) {
+  const { connect, isConnecting, isConnected, connectedWallet } = useLaserEyes()
 
-  const isThisWalletConnected = isConnected && connectedWallet?.id === walletId;
+  const isThisWalletConnected = isConnected && connectedWallet?.id === walletId
 
   return (
     <Button
@@ -23,10 +20,10 @@ export function ConnectWallet({
       {...props}
     >
       {isThisWalletConnected
-        ? "Connected"
+        ? 'Connected'
         : isConnecting
-        ? "Connecting..."
-        : "Connect"}
+          ? 'Connecting...'
+          : 'Connect'}
     </Button>
-  );
-} 
+  )
+}

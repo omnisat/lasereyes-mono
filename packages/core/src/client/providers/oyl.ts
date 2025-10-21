@@ -42,7 +42,15 @@ interface OylLibrary {
   }>
   getNetwork: () => Promise<NetworkType>
   switchNetwork: (network: NetworkType) => Promise<void>
-  signMessage: ({address, message, protocol}: {address: string, message: string, protocol?: 'bip322' | 'ecdsa'}) => Promise<{
+  signMessage: ({
+    address,
+    message,
+    protocol,
+  }: {
+    address: string
+    message: string
+    protocol?: 'bip322' | 'ecdsa'
+  }) => Promise<{
     address: string
     signature: string
   }>
@@ -54,19 +62,19 @@ interface OylLibrary {
     psbt: string
     txid?: string
   }>
-  signPsbts: (options: {
-    psbt: string
-    finalize?: boolean
-    broadcast?: boolean
-  }[]) => Promise<
+  signPsbts: (
+    options: {
+      psbt: string
+      finalize?: boolean
+      broadcast?: boolean
+    }[]
+  ) => Promise<
     {
       psbt: string
       txid?: string
     }[]
   >
-  pushPsbt: (options: {
-    psbt: string
-  }) => Promise<{
+  pushPsbt: (options: { psbt: string }) => Promise<{
     txid: string
   }>
 }
@@ -168,13 +176,19 @@ export default class OylProvider extends WalletProvider {
 
   async connect(_: ProviderType): Promise<void> {
     if (!this.library) throw new Error("Oyl isn't installed")
-    const { nativeSegwit, taproot, nestedSegwit, legacy } = await this.library.getAddresses()
+    const { nativeSegwit, taproot, nestedSegwit, legacy } =
+      await this.library.getAddresses()
     if (!nativeSegwit || !taproot) throw new Error('No accounts found')
     this.$store.setKey('address', taproot.address)
     this.$store.setKey('paymentAddress', nativeSegwit.address)
     this.$store.setKey('publicKey', taproot.publicKey)
     this.$store.setKey('paymentPublicKey', nativeSegwit.publicKey)
-    this.$store.setKey('accounts', [taproot.address, nativeSegwit.address, nestedSegwit.address, legacy.address])
+    this.$store.setKey('accounts', [
+      taproot.address,
+      nativeSegwit.address,
+      nestedSegwit.address,
+      legacy.address,
+    ])
   }
 
   async getNetwork() {

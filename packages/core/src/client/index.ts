@@ -1,12 +1,12 @@
-import * as bitcoin from "bitcoinjs-lib"
+import * as bitcoin from 'bitcoinjs-lib'
 import {
   keepMount,
   listenKeys,
   type MapStore,
   type WritableAtom,
-} from "nanostores"
-import type { ALKANES, BRC20, BTC, RUNES } from "../constants/protocols"
-import { LOCAL_STORAGE_DEFAULT_WALLET } from "../constants/settings"
+} from 'nanostores'
+import type { ALKANES, BRC20, BTC, RUNES } from '../constants/protocols'
+import { LOCAL_STORAGE_DEFAULT_WALLET } from '../constants/settings'
 import {
   KEPLR,
   LEATHER,
@@ -19,11 +19,12 @@ import {
   SPARROW,
   TOKEO,
   UNISAT,
+  UNIVERSAL,
   WIZZ,
   XVERSE,
-} from "../constants/wallets"
-import { DataSourceManager } from "../lib/data-sources/manager"
-import { isBase64, isHex } from "../lib/utils"
+} from '../constants/wallets'
+import { DataSourceManager } from '../lib/data-sources/manager'
+import { isBase64, isHex } from '../lib/utils'
 import type {
   AlkaneSendArgs,
   Brc20SendArgs,
@@ -34,22 +35,23 @@ import type {
   Protocol,
   ProviderType,
   RuneSendArgs,
-} from "../types"
-import AlkanesModule from "./modules/alkanes"
-import type { WalletProvider } from "./providers"
-import KeplrProvider from "./providers/keplr"
-import LeatherProvider from "./providers/leather"
-import MagicEdenProvider from "./providers/magic-eden"
-import OkxProvider from "./providers/okx"
-import OpNetProvider from "./providers/op-net"
-import OrangeProvider from "./providers/orange"
-import OylProvider from "./providers/oyl"
-import PhantomProvider from "./providers/phantom"
-import SparrowProvider from "./providers/sparrow"
-import TokeoProvider from "./providers/tokeo"
-import UnisatProvider from "./providers/unisat"
-import { WizzProvider } from "./providers/wizz"
-import XVerseProvider from "./providers/xverse"
+} from '../types'
+import AlkanesModule from './modules/alkanes'
+import type { WalletProvider } from './providers'
+import KeplrProvider from './providers/keplr'
+import LeatherProvider from './providers/leather'
+import MagicEdenProvider from './providers/magic-eden'
+import OkxProvider from './providers/okx'
+import OpNetProvider from './providers/op-net'
+import OrangeProvider from './providers/orange'
+import OylProvider from './providers/oyl'
+import PhantomProvider from './providers/phantom'
+import SparrowProvider from './providers/sparrow'
+import TokeoProvider from './providers/tokeo'
+import UnisatProvider from './providers/unisat'
+import UniversalProvider from './providers/universal'
+import { WizzProvider } from './providers/wizz'
+import XVerseProvider from './providers/xverse'
 import type {
   LaserEyesSignPsbtOptions,
   LaserEyesSignPsbtsOptions,
@@ -57,8 +59,8 @@ import type {
   SignMessageOptions,
   SignPsbtResponse,
   SignPsbtsResponse,
-} from "./types"
-import { triggerDOMShakeHack } from "./utils"
+} from './types'
+import { triggerDOMShakeHack } from './utils'
 
 export class LaserEyesClient {
   readonly $store: MapStore<LaserEyesStoreType>
@@ -83,7 +85,7 @@ export class LaserEyesClient {
       readonly $store: MapStore<LaserEyesStoreType>
       readonly $network: WritableAtom<NetworkType>
     },
-    readonly config?: Config,
+    readonly config?: Config
   ) {
     this.$store = stores.$store
     this.$network = stores.$network
@@ -99,6 +101,7 @@ export class LaserEyesClient {
       [SPARROW]: new SparrowProvider(stores, this, config),
       [TOKEO]: new TokeoProvider(stores, this, config),
       [UNISAT]: new UnisatProvider(stores, this, config),
+      [UNIVERSAL]: new UniversalProvider(stores, this, config),
       [XVERSE]: new XVerseProvider(stores, this, config),
       [WIZZ]: new WizzProvider(stores, this, config),
       [KEPLR]: new KeplrProvider(stores, this, config),
@@ -119,7 +122,7 @@ export class LaserEyesClient {
   initialize() {
     this.$network.listen(this.watchNetworkChange.bind(this))
 
-    listenKeys(this.$store, ["isInitializing"], (v, oldValue) => {
+    listenKeys(this.$store, ['isInitializing'], (v, oldValue) => {
       if (this.disposed) {
         return
       }
@@ -136,7 +139,7 @@ export class LaserEyesClient {
 
     // Hack to trigger check for wallet providers
     triggerDOMShakeHack(() => {
-      this.$store.setKey("isInitializing", false)
+      this.$store.setKey('isInitializing', false)
       void this.checkNetwork()
     })
   }
@@ -161,10 +164,10 @@ export class LaserEyesClient {
   }
 
   private handleIsInitializingChanged(value: boolean) {
-    if (typeof window !== "undefined" && typeof localStorage !== "undefined") {
+    if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
       if (!value) {
         const defaultWallet = localStorage?.getItem(
-          LOCAL_STORAGE_DEFAULT_WALLET,
+          LOCAL_STORAGE_DEFAULT_WALLET
         ) as ProviderType | undefined
         if (defaultWallet) {
           this.connect(defaultWallet)
@@ -175,40 +178,40 @@ export class LaserEyesClient {
 
   async connect(defaultWallet: ProviderType) {
     if (this.disposed) {
-      console.warn("Client disposed, cannot connect")
+      console.warn('Client disposed, cannot connect')
       return
     }
 
-    this.$store.setKey("isConnecting", true)
+    this.$store.setKey('isConnecting', true)
     try {
       localStorage?.setItem(LOCAL_STORAGE_DEFAULT_WALLET, defaultWallet)
       if (!this.$providerMap[defaultWallet]) {
-        throw new Error("Unsupported wallet provider")
+        throw new Error('Unsupported wallet provider')
       }
       const provider = this.$providerMap[defaultWallet]
       const connected = await provider?.connect(defaultWallet)
       if (connected === false) {
-        this.$store.setKey("isConnecting", false)
+        this.$store.setKey('isConnecting', false)
         this.disconnect()
         return
       }
-      this.$store.setKey("provider", defaultWallet)
+      this.$store.setKey('provider', defaultWallet)
       await this.checkNetwork()
-      this.$store.setKey("connected", true)
+      this.$store.setKey('connected', true)
     } catch (error) {
-      console.error("Error during connect:", error)
-      this.$store.setKey("isConnecting", false)
+      console.error('Error during connect:', error)
+      this.$store.setKey('isConnecting', false)
       this.disconnect()
       throw error
     } finally {
-      this.$store.setKey("isConnecting", false)
+      this.$store.setKey('isConnecting', false)
     }
   }
 
   async requestAccounts() {
     const provider = this.$store.get().provider
     if (!provider) {
-      throw new Error("No wallet provider connected")
+      throw new Error('No wallet provider connected')
     }
 
     // if (!this.$providerMap[this.$store.get().provider!]) {
@@ -219,7 +222,7 @@ export class LaserEyesClient {
       return await this.$providerMap[provider]?.requestAccounts()
     } catch (error) {
       if (error instanceof Error) {
-        if (error.message.toLowerCase().includes("not implemented")) {
+        if (error.message.toLowerCase().includes('not implemented')) {
           throw new Error("The connected wallet doesn't support this method")
         }
       }
@@ -230,10 +233,10 @@ export class LaserEyesClient {
   disconnect() {
     this.$store.set({
       provider: undefined,
-      address: "",
-      paymentAddress: "",
-      publicKey: "",
-      paymentPublicKey: "",
+      address: '',
+      paymentAddress: '',
+      publicKey: '',
+      paymentPublicKey: '',
       balance: undefined,
       accounts: [],
       connected: false,
@@ -248,16 +251,16 @@ export class LaserEyesClient {
     try {
       const provider = this.$store.get().provider
       if (provider) {
-        console.log("switchNetwork", network)
+        console.log('switchNetwork', network)
         await this.$providerMap[provider]?.switchNetwork(network)
         this.dataSourceManager.updateNetwork(network)
       }
     } catch (error) {
       if (error instanceof Error) {
-        if (error.message.toLowerCase().includes("not implemented")) {
+        if (error.message.toLowerCase().includes('not implemented')) {
           this.disconnect()
           throw new Error(
-            "The connected wallet doesn't support programmatic network changes..",
+            "The connected wallet doesn't support programmatic network changes.."
           )
         }
       }
@@ -266,7 +269,7 @@ export class LaserEyesClient {
   }
 
   private watchNetworkChange() {
-    this.$store.setKey("balance", undefined)
+    this.$store.setKey('balance', undefined)
     this.getBalance()
   }
 
@@ -280,74 +283,74 @@ export class LaserEyesClient {
   }
 
   async sendBTC(to: string, amount: number) {
-    if (amount <= 0) throw new Error("Amount must be greater than 0")
-    if (!Number.isInteger(amount)) throw new Error("Amount must be an integer")
+    if (amount <= 0) throw new Error('Amount must be greater than 0')
+    if (!Number.isInteger(amount)) throw new Error('Amount must be an integer')
     const provider = this.$store.get().provider
-    if (!provider) throw new Error("No wallet connected")
+    if (!provider) throw new Error('No wallet connected')
     if (provider && this.$providerMap[provider]) {
       try {
         return await this.$providerMap[provider]?.sendBTC(to, amount)
       } catch (error) {
         if (error instanceof Error) {
-          if (error.message.toLowerCase().includes("not implemented")) {
+          if (error.message.toLowerCase().includes('not implemented')) {
             throw new Error(
-              "The connected wallet doesn't support sending BTC...",
+              "The connected wallet doesn't support sending BTC..."
             )
           }
         }
         throw error
       }
     }
-    throw new Error("Something went wrong")
+    throw new Error('Something went wrong')
   }
 
   async signMessage(
     message: string,
-    toSignAddressOrOptions?: string | SignMessageOptions,
+    toSignAddressOrOptions?: string | SignMessageOptions
   ) {
     let options: SignMessageOptions = {}
-    if (typeof toSignAddressOrOptions === "string") {
+    if (typeof toSignAddressOrOptions === 'string') {
       options = { toSignAddress: toSignAddressOrOptions }
     } else if (toSignAddressOrOptions) {
       options = toSignAddressOrOptions
     }
 
     const provider = this.$store.get().provider
-    if (!provider) throw new Error("No wallet connected")
+    if (!provider) throw new Error('No wallet connected')
     if (provider && this.$providerMap[provider]) {
       try {
         return await this.$providerMap[provider].signMessage(message, options)
       } catch (error) {
         if (error instanceof Error) {
-          if (error.message.toLowerCase().includes("not implemented")) {
+          if (error.message.toLowerCase().includes('not implemented')) {
             throw new Error(
-              "The connected wallet doesn't support message signing...",
+              "The connected wallet doesn't support message signing..."
             )
           }
         }
         throw error
       }
     }
-    throw new Error("Something went wrong")
+    throw new Error('Something went wrong')
   }
 
   async signPsbt(options: LaserEyesSignPsbtOptions): Promise<SignPsbtResponse>
   async signPsbt(
     tx: string,
     finalize?: boolean,
-    broadcast?: boolean,
+    broadcast?: boolean
   ): Promise<SignPsbtResponse>
   async signPsbt(
     arg1: string | LaserEyesSignPsbtOptions,
     arg2?: boolean,
-    arg3?: boolean,
+    arg3?: boolean
   ) {
     let tx: string
     let finalize: boolean
     let broadcast: boolean
-    let inputsToSign: LaserEyesSignPsbtOptions["inputsToSign"]
+    let inputsToSign: LaserEyesSignPsbtOptions['inputsToSign']
 
-    if (typeof arg1 === "string") {
+    if (typeof arg1 === 'string') {
       tx = arg1
       finalize = arg2 ?? false
       broadcast = arg3 ?? false
@@ -360,7 +363,7 @@ export class LaserEyesClient {
 
     let psbtHex: string
     let psbtBase64: string
-    if (!tx) throw new Error("No PSBT provided")
+    if (!tx) throw new Error('No PSBT provided')
     if (isHex(tx)) {
       psbtBase64 = bitcoin.Psbt.fromHex(tx).toBase64()
       psbtHex = tx
@@ -368,7 +371,7 @@ export class LaserEyesClient {
       psbtBase64 = tx
       psbtHex = bitcoin.Psbt.fromBase64(tx).toHex()
     } else {
-      throw new Error("Invalid PSBT format")
+      throw new Error('Invalid PSBT format')
     }
 
     const provider = this.$store.get().provider
@@ -386,9 +389,9 @@ export class LaserEyesClient {
         return signedPsbt
       } catch (error) {
         if (error instanceof Error) {
-          if (error.message.toLowerCase().includes("not implemented")) {
+          if (error.message.toLowerCase().includes('not implemented')) {
             throw new Error(
-              "The connected wallet doesn't support PSBT signing...",
+              "The connected wallet doesn't support PSBT signing..."
             )
           }
         }
@@ -396,17 +399,17 @@ export class LaserEyesClient {
       }
     } else {
       // !! Unsure
-      throw new Error("No wallet provider connected")
+      throw new Error('No wallet provider connected')
     }
   }
 
   async signPsbts(
-    options: LaserEyesSignPsbtsOptions,
+    options: LaserEyesSignPsbtsOptions
   ): Promise<SignPsbtsResponse> {
     const { psbts, finalize = false, broadcast = false, inputsToSign } = options
 
     if (!psbts || psbts.length === 0) {
-      throw new Error("No PSBTs provided")
+      throw new Error('No PSBTs provided')
     }
 
     const provider = this.$store.get().provider
@@ -422,16 +425,16 @@ export class LaserEyesClient {
         return result
       } catch (error) {
         if (error instanceof Error) {
-          if (error.message.toLowerCase().includes("not implemented")) {
+          if (error.message.toLowerCase().includes('not implemented')) {
             throw new Error(
-              "The connected wallet doesn't support PSBT signing...",
+              "The connected wallet doesn't support PSBT signing..."
             )
           }
         }
         throw error
       }
     } else {
-      throw new Error("No wallet provider connected")
+      throw new Error('No wallet provider connected')
     }
   }
 
@@ -443,9 +446,9 @@ export class LaserEyesClient {
         return await this.$providerMap[provider]?.pushPsbt(tx)
       } catch (error) {
         if (error instanceof Error) {
-          if (error.message.toLowerCase().includes("not implemented")) {
+          if (error.message.toLowerCase().includes('not implemented')) {
             throw new Error(
-              "The connected wallet doesn't support PSBT signing...",
+              "The connected wallet doesn't support PSBT signing..."
             )
           }
         }
@@ -463,13 +466,13 @@ export class LaserEyesClient {
           content,
           mimeType,
           this.dataSourceManager,
-          opReturn,
+          opReturn
         )
       } catch (error) {
         if (error instanceof Error) {
-          if (error.message.toLowerCase().includes("not implemented")) {
+          if (error.message.toLowerCase().includes('not implemented')) {
             throw new Error(
-              "The connected wallet doesn't support inscribing...",
+              "The connected wallet doesn't support inscribing..."
             )
           }
         }
@@ -488,7 +491,7 @@ export class LaserEyesClient {
           ? Brc20SendArgs
           : T extends typeof ALKANES
             ? AlkaneSendArgs
-            : never,
+            : never
   ): Promise<string | undefined> {
     const provider = this.$store.get().provider
     if (!provider) return
@@ -497,9 +500,9 @@ export class LaserEyesClient {
         return await this.$providerMap[provider]?.send(protocol, sendArgs)
       } catch (error) {
         if (error instanceof Error) {
-          if (error.message.toLowerCase().includes("not implemented")) {
+          if (error.message.toLowerCase().includes('not implemented')) {
             throw new Error(
-              "The connected wallet doesn't support sending stuff...",
+              "The connected wallet doesn't support sending stuff..."
             )
           }
         }
@@ -516,7 +519,7 @@ export class LaserEyesClient {
         return await this.$providerMap[provider]?.getPublicKey()
       } catch (error) {
         if (error instanceof Error) {
-          if (error.message.toLowerCase().includes("not implemented")) {
+          if (error.message.toLowerCase().includes('not implemented')) {
             throw new Error("The connected wallet doesn't support getPublicKey")
           }
         }
@@ -531,11 +534,11 @@ export class LaserEyesClient {
     if (provider && this.$providerMap[provider]) {
       try {
         const bal = await this.$providerMap[provider].getBalance()
-        this.$store.setKey("balance", BigInt(bal))
+        this.$store.setKey('balance', BigInt(bal))
         return bal
       } catch (error) {
         if (error instanceof Error) {
-          if (error.message.toLowerCase().includes("not implemented")) {
+          if (error.message.toLowerCase().includes('not implemented')) {
             throw new Error("The connected wallet doesn't support getBalance")
           }
         }
@@ -550,7 +553,7 @@ export class LaserEyesClient {
     if (provider && this.$providerMap[provider]) {
       try {
         if (!protocol) {
-          throw new Error("No protocol provided")
+          throw new Error('No protocol provided')
         }
 
         const balances =
@@ -560,7 +563,7 @@ export class LaserEyesClient {
         return balances
       } catch (error) {
         if (error instanceof Error) {
-          if (error.message.toLowerCase().includes("not implemented")) {
+          if (error.message.toLowerCase().includes('not implemented')) {
             throw new Error("The connected wallet doesn't support getBalance")
           }
         }
@@ -577,7 +580,7 @@ export class LaserEyesClient {
         return await this.$providerMap[provider]?.getInscriptions(offset, limit)
       } catch (error) {
         if (error instanceof Error) {
-          if (error.message.toLowerCase().includes("not implemented")) {
+          if (error.message.toLowerCase().includes('not implemented')) {
             throw new Error("The connected wallet doesn't support this method")
           }
         }
@@ -593,11 +596,11 @@ export class LaserEyesClient {
       try {
         return await this.$providerMap[provider]?.sendInscriptions(
           inscriptionIds,
-          toAddress,
+          toAddress
         )
       } catch (error) {
         if (error instanceof Error) {
-          if (error.message.toLowerCase().includes("not implemented")) {
+          if (error.message.toLowerCase().includes('not implemented')) {
             throw new Error("The connected wallet doesn't support this method")
           }
         }
@@ -607,4 +610,4 @@ export class LaserEyesClient {
   }
 }
 
-export * from "./modules"
+export * from './modules'

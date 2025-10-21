@@ -76,7 +76,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
       }
     | undefined
   >()
-  const [selectedColor, ] = useState<colorsType>(
+  const [selectedColor] = useState<colorsType>(
     colors[Math.floor(Math.random() * 5)]
   )
 
@@ -117,6 +117,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
     hasOpNet,
     hasTokeo,
     hasKeplr,
+    hasUniversal,
   } = useLaserEyes()
 
   useEffect(() => {
@@ -180,6 +181,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
     wizz: hasWizz,
     orange: hasOrange,
     keplr: hasKeplr,
+    universal: hasUniversal,
   }
 
   // @ts-ignore

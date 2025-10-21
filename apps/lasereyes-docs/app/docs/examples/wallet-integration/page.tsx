@@ -1,8 +1,8 @@
-"use client"
+'use client'
 
-import { Heading } from "@/components/heading"
-import { CodeBlock } from "@/components/code-block"
-import { WarningBox } from "@/components/warning-box"
+import { Heading } from '@/components/heading'
+import { CodeBlock } from '@/components/code-block'
+import { WarningBox } from '@/components/warning-box'
 
 export default function WalletIntegrationExample() {
   return (
@@ -12,7 +12,8 @@ export default function WalletIntegrationExample() {
       </Heading>
 
       <p className="text-lg mb-6">
-        Connect to Bitcoin wallets faster than a maximalist can say "have fun staying poor!"
+        Connect to Bitcoin wallets faster than a maximalist can say "have fun
+        staying poor!"
       </p>
 
       <Heading level={2} className="text-2xl font-semibold mt-8 mb-4">
@@ -20,15 +21,19 @@ export default function WalletIntegrationExample() {
       </Heading>
 
       <p className="mb-4">
-        You want to connect to a user's Bitcoin wallet without the complexity of managing wallet connections yourself.
-        You need a solution that works across different wallet providers and handles all the edge cases.
+        You want to connect to a user's Bitcoin wallet without the complexity of
+        managing wallet connections yourself. You need a solution that works
+        across different wallet providers and handles all the edge cases.
       </p>
 
       <Heading level={2} className="text-2xl font-semibold mt-8 mb-4">
         The LaserEyes Solution
       </Heading>
 
-      <p className="mb-4">LaserEyes makes wallet integration as easy as ordering pizza (but with fewer calories):</p>
+      <p className="mb-4">
+        LaserEyes makes wallet integration as easy as ordering pizza (but with
+        fewer calories):
+      </p>
 
       <CodeBlock
         code={`import { useLaserEyes } from 'laser-eyes';
@@ -76,10 +81,12 @@ export function WalletConnector() {
 
       <ol className="list-decimal pl-6 space-y-2 mb-6">
         <li>
-          We use the <code>useLaserEyes</code> hook to access wallet functionality
+          We use the <code>useLaserEyes</code> hook to access wallet
+          functionality
         </li>
         <li>
-          The <code>WalletConnectCard</code> component provides a pre-styled UI for connecting wallets
+          The <code>WalletConnectCard</code> component provides a pre-styled UI
+          for connecting wallets
         </li>
         <li>When connected, we display wallet info and balance</li>
         <li>The disconnect button lets users disconnect their wallet</li>
@@ -121,16 +128,21 @@ export function CustomWalletSelector() {
       />
 
       <WarningBox title="Security Note">
-        Always verify the wallet connection is secure. LaserEyes handles this for you, but it's good practice to
-        understand what's happening under the hood. Never ask users for seed phrases - not even if they offer to send
+        Always verify the wallet connection is secure. LaserEyes handles this
+        for you, but it's good practice to understand what's happening under the
+        hood. Never ask users for seed phrases - not even if they offer to send
         you 2 BTC if you send 1 BTC first.
       </WarningBox>
 
       <div className="p-4 bg-green-100 dark:bg-green-900 rounded-lg mt-8">
-        <p className="font-semibold">🎉 Achievement Unlocked: Wallet Whisperer</p>
-        <p>You can now connect to Bitcoin wallets with the elegance of a blockchain ballet dancer!</p>
+        <p className="font-semibold">
+          🎉 Achievement Unlocked: Wallet Whisperer
+        </p>
+        <p>
+          You can now connect to Bitcoin wallets with the elegance of a
+          blockchain ballet dancer!
+        </p>
       </div>
     </div>
   )
 }
-

@@ -1,10 +1,10 @@
-"use client"
+'use client'
 
-import { useState, Suspense } from "react"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { Menu } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { DocsSidebar } from "@/components/docs-sidebar"
+import { useState, Suspense } from 'react'
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
+import { Menu } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { DocsSidebar } from '@/components/docs-sidebar'
 
 function MobileNavContent() {
   const [open, setOpen] = useState(false)
@@ -38,4 +38,3 @@ export function MobileNav() {
     </Suspense>
   )
 }
-

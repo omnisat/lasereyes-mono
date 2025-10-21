@@ -1,14 +1,22 @@
-"use client"
+'use client'
 
-import * as React from "react"
-import { CodeBlock } from "@/components/code-block"
-import Link from "next/link"
-import { Heading } from "@/components/heading"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { ArrowRight, Wallet, Database, Code2, Shield, Settings2, Zap } from "lucide-react"
-import { cn } from "@/lib/utils"
+import * as React from 'react'
+import { CodeBlock } from '@/components/code-block'
+import Link from 'next/link'
+import { Heading } from '@/components/heading'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import {
+  ArrowRight,
+  Wallet,
+  Database,
+  Code2,
+  Shield,
+  Settings2,
+  Zap,
+} from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 interface FeatureCardProps {
   icon: React.ElementType
@@ -17,12 +25,19 @@ interface FeatureCardProps {
   className?: string
 }
 
-function FeatureCard({ icon: Icon, title, description, className }: FeatureCardProps) {
+function FeatureCard({
+  icon: Icon,
+  title,
+  description,
+  className,
+}: FeatureCardProps) {
   return (
-    <Card className={cn(
-      "group relative overflow-hidden transition-all duration-300 hover:border-orange-500/30 hover:shadow-lg hover:shadow-orange-500/5",
-      className
-    )}>
+    <Card
+      className={cn(
+        'group relative overflow-hidden transition-all duration-300 hover:border-orange-500/30 hover:shadow-lg hover:shadow-orange-500/5',
+        className
+      )}
+    >
       <div className="absolute right-0 top-0 h-20 w-20 translate-x-6 -translate-y-6 rounded-full bg-orange-500/10 blur-2xl filter group-hover:bg-orange-500/20" />
       <CardContent className="p-6">
         <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-orange-500/10 text-orange-500">
@@ -38,7 +53,6 @@ function FeatureCard({ icon: Icon, title, description, className }: FeatureCardP
 function LaserEyesClientContent() {
   return (
     <div className="space-y-10">
-
       <section className="space-y-6" id="initialization">
         <h2 className="text-3xl font-bold">Initialization</h2>
         <Card className="overflow-hidden border-2 border-dashed">
@@ -87,7 +101,9 @@ console.log('Client initialized')`}
         <div className="grid gap-6 sm:grid-cols-2">
           <Card className="overflow-hidden">
             <CardHeader className="border-b bg-muted/50 px-6">
-              <h3 className="font-mono text-sm font-medium">Connection Management</h3>
+              <h3 className="font-mono text-sm font-medium">
+                Connection Management
+              </h3>
             </CardHeader>
             <CardContent className="p-6">
               <CodeBlock
@@ -114,7 +130,9 @@ await client.switchProvider(XVERSE)`}
 
           <Card className="overflow-hidden">
             <CardHeader className="border-b bg-muted/50 px-6">
-              <h3 className="font-mono text-sm font-medium">Transaction Operations</h3>
+              <h3 className="font-mono text-sm font-medium">
+                Transaction Operations
+              </h3>
             </CardHeader>
             <CardContent className="p-6">
               <CodeBlock
@@ -259,8 +277,12 @@ try {
             <Card className="h-full transition-all hover:border-orange-500/30 hover:shadow-lg hover:shadow-orange-500/5">
               <CardContent className="flex h-full flex-col justify-between p-6">
                 <div>
-                  <h3 className="mb-2 text-lg font-semibold">Data Source Manager</h3>
-                  <p className="text-sm text-muted-foreground">Learn how to interact with Bitcoin data providers</p>
+                  <h3 className="mb-2 text-lg font-semibold">
+                    Data Source Manager
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    Learn how to interact with Bitcoin data providers
+                  </p>
                 </div>
                 <ArrowRight className="mt-4 h-5 w-5 text-orange-500" />
               </CardContent>
@@ -270,8 +292,12 @@ try {
             <Card className="h-full transition-all hover:border-orange-500/30 hover:shadow-lg hover:shadow-orange-500/5">
               <CardContent className="flex h-full flex-col justify-between p-6">
                 <div>
-                  <h3 className="mb-2 text-lg font-semibold">Wallet Providers</h3>
-                  <p className="text-sm text-muted-foreground">Explore the supported wallet providers</p>
+                  <h3 className="mb-2 text-lg font-semibold">
+                    Wallet Providers
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    Explore the supported wallet providers
+                  </p>
                 </div>
                 <ArrowRight className="mt-4 h-5 w-5 text-orange-500" />
               </CardContent>
@@ -288,12 +314,19 @@ export default function LaserEyesClientPage() {
     <div className="space-y-8">
       <div className="relative overflow-hidden rounded-lg border bg-gradient-to-br from-orange-500/10 via-background to-background p-8">
         <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-orange-500/20 rounded-full blur-3xl -z-10 translate-x-1/2 -translate-y-1/2" />
-        <Badge variant="secondary" className="mb-4">Core API</Badge>
-        <Heading level={1} className="mb-4 bg-gradient-to-br from-orange-500 to-yellow-500 bg-clip-text text-transparent">
+        <Badge variant="secondary" className="mb-4">
+          Core API
+        </Badge>
+        <Heading
+          level={1}
+          className="mb-4 bg-gradient-to-br from-orange-500 to-yellow-500 bg-clip-text text-transparent"
+        >
           LaserEyesClient
         </Heading>
         <p className="text-xl mb-6 max-w-2xl text-muted-foreground">
-          The central component of the LaserEyes core API, orchestrating wallet connections, transactions, and data retrieval through a unified interface.
+          The central component of the LaserEyes core API, orchestrating wallet
+          connections, transactions, and data retrieval through a unified
+          interface.
         </p>
         <div className="flex gap-4 items-center">
           <Link href="#initialization">
@@ -302,7 +335,9 @@ export default function LaserEyesClientPage() {
               <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Button>
           </Link>
-          <Badge variant="secondary" className="h-7 px-3">v1.0.0</Badge>
+          <Badge variant="secondary" className="h-7 px-3">
+            v1.0.0
+          </Badge>
         </div>
       </div>
 
@@ -310,4 +345,3 @@ export default function LaserEyesClientPage() {
     </div>
   )
 }
-

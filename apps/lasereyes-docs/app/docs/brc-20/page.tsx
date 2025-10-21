@@ -1,13 +1,13 @@
-"use client"
+'use client'
 
-import * as React from "react"
-import { ClientPageWrapper } from "@/components/client-page-wrapper"
-import { CodeBlock } from "@/components/code-block"
-import { Heading } from "@/components/heading"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Coins, Search, Send, Code2, Database, Shield } from "lucide-react"
-import { cn } from "@/lib/utils"
+import * as React from 'react'
+import { ClientPageWrapper } from '@/components/client-page-wrapper'
+import { CodeBlock } from '@/components/code-block'
+import { Heading } from '@/components/heading'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Coins, Search, Send, Code2, Database, Shield } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 interface FeatureCardProps {
   icon: React.ElementType
@@ -21,12 +21,18 @@ export default function Brc20Page() {
     <div className="space-y-8">
       <div className="relative overflow-hidden rounded-lg border bg-gradient-to-br from-emerald-500/10 via-background to-background p-8">
         <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-emerald-500/20 rounded-full blur-3xl -z-10 translate-x-1/2 -translate-y-1/2" />
-        <Badge variant="secondary" className="mb-4">Guide</Badge>
-        <Heading level={1} className="mb-4 bg-gradient-to-br from-emerald-500 to-teal-500 bg-clip-text text-transparent">
+        <Badge variant="secondary" className="mb-4">
+          Guide
+        </Badge>
+        <Heading
+          level={1}
+          className="mb-4 bg-gradient-to-br from-emerald-500 to-teal-500 bg-clip-text text-transparent"
+        >
           Working with BRC-20 Tokens
         </Heading>
         <p className="text-xl mb-6 max-w-2xl text-muted-foreground">
-          Learn how to interact with BRC-20 tokens using LaserEyes - fetch balances, send tokens, and manage transfers.
+          Learn how to interact with BRC-20 tokens using LaserEyes - fetch
+          balances, send tokens, and manage transfers.
         </p>
       </div>
 
@@ -37,12 +43,19 @@ export default function Brc20Page() {
   )
 }
 
-function FeatureCard({ icon: Icon, title, description, className }: FeatureCardProps) {
+function FeatureCard({
+  icon: Icon,
+  title,
+  description,
+  className,
+}: FeatureCardProps) {
   return (
-    <Card className={cn(
-      "group relative overflow-hidden transition-all duration-300 hover:border-emerald-500/30 hover:shadow-lg hover:shadow-emerald-500/5",
-      className
-    )}>
+    <Card
+      className={cn(
+        'group relative overflow-hidden transition-all duration-300 hover:border-emerald-500/30 hover:shadow-lg hover:shadow-emerald-500/5',
+        className
+      )}
+    >
       <div className="absolute right-0 top-0 h-20 w-20 translate-x-6 -translate-y-6 rounded-full bg-emerald-500/10 blur-2xl filter group-hover:bg-emerald-500/20" />
       <CardContent className="p-6">
         <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-500">
@@ -62,8 +75,9 @@ function Brc20Content() {
         <Card className="overflow-hidden">
           <CardContent className="p-6">
             <p className="text-lg leading-relaxed">
-              LaserEyes provides comprehensive support for BRC-20 tokens, allowing you to easily fetch balances,
-              send tokens, and manage transfers through a unified interface.
+              LaserEyes provides comprehensive support for BRC-20 tokens,
+              allowing you to easily fetch balances, send tokens, and manage
+              transfers through a unified interface.
             </p>
           </CardContent>
         </Card>
@@ -99,7 +113,9 @@ function Brc20Content() {
         <h2 className="text-3xl font-bold">The BRC-20 Balance Type</h2>
         <Card className="overflow-hidden">
           <CardHeader className="border-b bg-muted/50 px-6">
-            <h2 className="font-mono text-sm font-medium">BRC-20 Balance Interface</h2>
+            <h2 className="font-mono text-sm font-medium">
+              BRC-20 Balance Interface
+            </h2>
           </CardHeader>
           <CardContent className="p-6">
             <CodeBlock
@@ -227,34 +243,40 @@ function SendToken() {
         <Card className="overflow-hidden">
           <CardContent className="p-6 space-y-4">
             <div>
-              <h3 className="text-lg font-semibold mb-2">1. Balance Validation</h3>
+              <h3 className="text-lg font-semibold mb-2">
+                1. Balance Validation
+              </h3>
               <p className="text-muted-foreground">
                 Always validate token balances before attempting transfers.
                 Check both the transferable and available amounts.
               </p>
             </div>
-            
+
             <div>
               <h3 className="text-lg font-semibold mb-2">2. Error Handling</h3>
               <p className="text-muted-foreground">
-                Implement proper error handling for token operations.
-                Network issues, insufficient balances, or wallet rejections should be handled gracefully.
+                Implement proper error handling for token operations. Network
+                issues, insufficient balances, or wallet rejections should be
+                handled gracefully.
               </p>
             </div>
-            
+
             <div>
               <h3 className="text-lg font-semibold mb-2">3. Loading States</h3>
               <p className="text-muted-foreground">
-                Show appropriate loading states during token operations.
-                Both fetching balances and sending can take time to complete.
+                Show appropriate loading states during token operations. Both
+                fetching balances and sending can take time to complete.
               </p>
             </div>
-            
+
             <div>
-              <h3 className="text-lg font-semibold mb-2">4. Data Source Fallbacks</h3>
+              <h3 className="text-lg font-semibold mb-2">
+                4. Data Source Fallbacks
+              </h3>
               <p className="text-muted-foreground">
-                Consider implementing fallback data sources for token operations.
-                LaserEyes supports multiple data providers to ensure reliability.
+                Consider implementing fallback data sources for token
+                operations. LaserEyes supports multiple data providers to ensure
+                reliability.
               </p>
             </div>
           </CardContent>
@@ -265,7 +287,9 @@ function SendToken() {
         <h2 className="text-3xl font-bold">Complete Example</h2>
         <Card className="overflow-hidden">
           <CardHeader className="border-b bg-muted/50 px-6">
-            <h2 className="font-mono text-sm font-medium">BRC-20 Token Dashboard</h2>
+            <h2 className="font-mono text-sm font-medium">
+              BRC-20 Token Dashboard
+            </h2>
           </CardHeader>
           <CardContent className="p-6">
             <CodeBlock
@@ -400,4 +424,4 @@ function TokenDashboard() {
       </section>
     </div>
   )
-} 
+}

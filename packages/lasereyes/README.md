@@ -76,7 +76,6 @@ pnpm install
 pnpm dev
 ```
 
-
 ## Contributing
 
 Contributions are welcome! Feel free to submit pull requests or open issues for bug fixes, feature enhancements, or documentation improvements.

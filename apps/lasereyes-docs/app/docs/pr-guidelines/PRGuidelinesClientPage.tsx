@@ -1,12 +1,12 @@
-"use client"
+'use client'
 
-import * as React from "react"
-import { CodeBlock } from "@/components/code-block"
-import { Heading } from "@/components/heading"
-import { ClientPageWrapper } from "@/components/client-page-wrapper"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { 
+import * as React from 'react'
+import { CodeBlock } from '@/components/code-block'
+import { Heading } from '@/components/heading'
+import { ClientPageWrapper } from '@/components/client-page-wrapper'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import {
   GitBranch,
   CheckCircle2,
   GitPullRequest,
@@ -18,10 +18,10 @@ import {
   TestTube,
   Hammer,
   CheckCheck,
-  HelpCircle
-} from "lucide-react"
-import type { LucideIcon } from "lucide-react"
-import { cn } from "@/lib/utils"
+  HelpCircle,
+} from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 interface GuidelineCardProps {
   icon: LucideIcon
@@ -31,19 +31,29 @@ interface GuidelineCardProps {
   className?: string
 }
 
-function GuidelineCard({ icon: Icon, title, description, content, className }: GuidelineCardProps) {
+function GuidelineCard({
+  icon: Icon,
+  title,
+  description,
+  content,
+  className,
+}: GuidelineCardProps) {
   return (
-    <Card className={cn(
-      "group relative overflow-hidden transition-all duration-300 hover:border-teal-500/30 hover:shadow-lg hover:shadow-teal-500/5",
-      className
-    )}>
+    <Card
+      className={cn(
+        'group relative overflow-hidden transition-all duration-300 hover:border-teal-500/30 hover:shadow-lg hover:shadow-teal-500/5',
+        className
+      )}
+    >
       <div className="absolute right-0 top-0 h-20 w-20 translate-x-6 -translate-y-6 rounded-full bg-teal-500/10 blur-2xl filter group-hover:bg-teal-500/20" />
       <CardContent className="p-6">
         <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-teal-500/10 text-teal-500">
           <Icon className="h-6 w-6" />
         </div>
         <h3 className="mb-2 text-xl font-semibold">{title}</h3>
-        {description && <p className="mb-4 text-muted-foreground">{description}</p>}
+        {description && (
+          <p className="mb-4 text-muted-foreground">{description}</p>
+        )}
         {content}
       </CardContent>
     </Card>
@@ -186,7 +196,9 @@ test(core): add fee estimation tests`}
                 <div className="rounded-md border-l-4 border-yellow-500 bg-yellow-500/10 p-4">
                   <div className="flex items-center gap-2 text-sm">
                     <AlertTriangle className="h-4 w-4 text-yellow-500" />
-                    <span>PRs that decrease coverage may need additional tests</span>
+                    <span>
+                      PRs that decrease coverage may need additional tests
+                    </span>
                   </div>
                 </div>
               </div>
@@ -248,21 +260,30 @@ git branch -d feature/your-feature`}
               </div>
               <div>
                 <h2 className="text-2xl font-bold">Need Help?</h2>
-                <p className="text-muted-foreground">We're here to support your contribution journey</p>
+                <p className="text-muted-foreground">
+                  We're here to support your contribution journey
+                </p>
               </div>
             </div>
             <div className="space-y-4">
               <div className="rounded-md bg-muted p-4">
                 <ul className="space-y-2 text-sm text-muted-foreground">
                   <li>• Join our Discord community for real-time help</li>
-                  <li>• Open a Discussion on GitHub for longer conversations</li>
-                  <li>• Check our Contributing Guide for detailed information</li>
+                  <li>
+                    • Open a Discussion on GitHub for longer conversations
+                  </li>
+                  <li>
+                    • Check our Contributing Guide for detailed information
+                  </li>
                   <li>• Review existing PRs for examples and patterns</li>
                 </ul>
               </div>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <CheckCheck className="h-4 w-4 text-teal-500" />
-                <span>Remember: No question is too small - we value all contributions!</span>
+                <span>
+                  Remember: No question is too small - we value all
+                  contributions!
+                </span>
               </div>
             </div>
           </CardContent>
@@ -277,12 +298,18 @@ export default function PRGuidelinesClientPage() {
     <div className="space-y-8">
       <div className="relative overflow-hidden rounded-lg border bg-gradient-to-br from-teal-500/10 via-background to-background p-8">
         <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-teal-500/20 rounded-full blur-3xl -z-10 translate-x-1/2 -translate-y-1/2" />
-        <Badge variant="secondary" className="mb-4">Contributing</Badge>
-        <Heading level={1} className="mb-4 bg-gradient-to-br from-teal-500 to-cyan-500 bg-clip-text text-transparent">
+        <Badge variant="secondary" className="mb-4">
+          Contributing
+        </Badge>
+        <Heading
+          level={1}
+          className="mb-4 bg-gradient-to-br from-teal-500 to-cyan-500 bg-clip-text text-transparent"
+        >
           Pull Request Guidelines
         </Heading>
         <p className="text-xl mb-6 max-w-2xl text-muted-foreground">
-          Learn how to contribute effectively to LaserEyes with our comprehensive pull request guidelines and best practices.
+          Learn how to contribute effectively to LaserEyes with our
+          comprehensive pull request guidelines and best practices.
         </p>
       </div>
 
@@ -291,4 +318,4 @@ export default function PRGuidelinesClientPage() {
       </ClientPageWrapper>
     </div>
   )
-} 
+}

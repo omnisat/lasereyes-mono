@@ -1,4 +1,3 @@
-
 export type MaestroBrc20ByAddressResponse = {
   data: {
     [key: string]: {
@@ -55,7 +54,6 @@ export type MaestroInscriptionInfoResponse = {
   }
 }
 
-
 export type MaestroGetInscriptionInfoResponse = {
   data: {
     inscription_id: string
@@ -92,7 +90,6 @@ export type MaestroGetBrc20InfoResponse = {
   }
 }
 
-
 export type MaestroGetRuneInfoResponse = {
   data: {
     id: string
@@ -122,7 +119,6 @@ export type MaestroGetRuneInfoResponse = {
     block_height: number
   }
 }
-
 
 export type MaestroGetTransactionInfoResponse = {
   data: {
@@ -177,7 +173,6 @@ export type MaestroGetTransactionInfoResponse = {
     block_hash: string
   }
 }
-
 
 export type MaestroGetFeeRatesResponse = {
   data: Array<{

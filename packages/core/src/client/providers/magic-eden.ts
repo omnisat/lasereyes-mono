@@ -148,61 +148,61 @@ export default class MagicEdenProvider extends WalletProvider {
   async connect(): Promise<void> {
     const { address, paymentAddress } = this.$valueStore!.get()
 
+    if (address) {
+      if (address.startsWith('tb1') && isMainnetNetwork(this.network)) {
+        this.disconnect()
+      } else {
+        getBTCBalance(paymentAddress, this.network).then((totalBalance) => {
+          this.$store.setKey('balance', totalBalance)
+        })
+        this.restorePersistedValues()
+        return
+      }
+    }
 
-      if (address) {
-        if (address.startsWith('tb1') && isMainnetNetwork(this.network)) {
-          this.disconnect()
-        } else {
-          getBTCBalance(paymentAddress, this.network).then((totalBalance) => {
-            this.$store.setKey('balance', totalBalance)
-          })
-          this.restorePersistedValues()
-          return
+    if (isTestnetNetwork(this.network)) {
+      throw new Error(`${this.network} is not supported by ${MAGIC_EDEN}`)
+    }
+
+    const magicEdenNetwork = getSatsConnectNetwork(this.network || MAINNET)
+    const getAddressOptions = {
+      getProvider: async () => this.library,
+      payload: {
+        purposes: ['ordinals', 'payment'],
+        message: 'Connecting with lasereyes',
+        network: {
+          type: magicEdenNetwork as unknown as BitcoinNetworkType,
+        },
+      },
+      onFinish: (response: any) => {
+        const foundAddress = findOrdinalsAddress(response.addresses)
+        const foundPaymentAddress = findPaymentAddress(response.addresses)
+        if (!foundAddress || !foundPaymentAddress)
+          throw new Error('No address found')
+        if (foundAddress && foundPaymentAddress) {
+          this.$store.setKey('address', foundAddress.address)
+          this.$store.setKey('paymentAddress', foundPaymentAddress.address)
+          this.$store.setKey(
+            'accounts',
+            response.addresses.map(
+              (address: { address: string }) => address.address
+            )
+          )
         }
-      }
-
-      if (isTestnetNetwork(this.network)) {
-        throw new Error(`${this.network} is not supported by ${MAGIC_EDEN}`)
-      }
-
-      const magicEdenNetwork = getSatsConnectNetwork(this.network || MAINNET)
-      const getAddressOptions = {
-        getProvider: async () => this.library,
-        payload: {
-          purposes: ['ordinals', 'payment'],
-          message: 'Connecting with lasereyes',
-          network: {
-            type: magicEdenNetwork as unknown as BitcoinNetworkType,
-          },
-        },
-        onFinish: (response: any) => {
-          const foundAddress = findOrdinalsAddress(response.addresses)
-          const foundPaymentAddress = findPaymentAddress(response.addresses)
-          if (!foundAddress || !foundPaymentAddress)
-            throw new Error('No address found')
-          if (foundAddress && foundPaymentAddress) {
-            this.$store.setKey('address', foundAddress.address)
-            this.$store.setKey('paymentAddress', foundPaymentAddress.address)
-            this.$store.setKey('accounts', response.addresses.map((address: { address: string }) => address.address))
-          }
-          this.$store.setKey(
-            'publicKey',
-            String(response.addresses[0].publicKey)
-          )
-          this.$store.setKey(
-            'paymentPublicKey',
-            String(response.addresses[1].publicKey)
-          )
-        },
-        onCancel: () => {
-          throw new Error(`User canceled lasereyes to ${MAGIC_EDEN} wallet`)
-        },
-        onError: () => {
-          throw new Error(`Can't lasereyes to ${MAGIC_EDEN} wallet`)
-        },
-      }
-      await getAddress(getAddressOptions as GetAddressOptions)
-    
+        this.$store.setKey('publicKey', String(response.addresses[0].publicKey))
+        this.$store.setKey(
+          'paymentPublicKey',
+          String(response.addresses[1].publicKey)
+        )
+      },
+      onCancel: () => {
+        throw new Error(`User canceled lasereyes to ${MAGIC_EDEN} wallet`)
+      },
+      onError: () => {
+        throw new Error(`Can't lasereyes to ${MAGIC_EDEN} wallet`)
+      },
+    }
+    await getAddress(getAddressOptions as GetAddressOptions)
   }
 
   async sendBTC(to: string, amount: number): Promise<string> {

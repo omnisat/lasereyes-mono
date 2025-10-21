@@ -1,8 +1,8 @@
-"use client"
+'use client'
 
-import { Heading } from "@/components/heading"
-import { CodeBlock } from "@/components/code-block"
-import Image from "next/image"
+import { Heading } from '@/components/heading'
+import { CodeBlock } from '@/components/code-block'
+import Image from 'next/image'
 
 export default function TransactionHistoryRecipe() {
   return (
@@ -12,8 +12,9 @@ export default function TransactionHistoryRecipe() {
       </Heading>
 
       <p className="text-lg mb-6">
-        Build a complete transaction history viewer that would make block explorers jealous. Perfect for wallets,
-        portfolio trackers, or just showing off your Bitcoin street cred.
+        Build a complete transaction history viewer that would make block
+        explorers jealous. Perfect for wallets, portfolio trackers, or just
+        showing off your Bitcoin street cred.
       </p>
 
       <div className="flex justify-center mb-8">
@@ -34,7 +35,10 @@ export default function TransactionHistoryRecipe() {
 
       <ul className="list-disc pl-6 space-y-2 mb-6">
         <li>Displays transactions for a Bitcoin address</li>
-        <li>Shows transaction details including amount, date, and confirmation status</li>
+        <li>
+          Shows transaction details including amount, date, and confirmation
+          status
+        </li>
         <li>Supports pagination for addresses with many transactions</li>
         <li>Includes filtering options (sent, received, all)</li>
         <li>Provides links to block explorers for more details</li>
@@ -283,19 +287,23 @@ export default function WalletPage() {
 
       <ul className="list-disc pl-6 space-y-2 mb-6">
         <li>
-          <strong>CSV Export:</strong> Add a button to export transactions as CSV
+          <strong>CSV Export:</strong> Add a button to export transactions as
+          CSV
         </li>
         <li>
           <strong>Date Filtering:</strong> Allow users to filter by date range
         </li>
         <li>
-          <strong>Transaction Search:</strong> Add a search box to find specific transactions
+          <strong>Transaction Search:</strong> Add a search box to find specific
+          transactions
         </li>
         <li>
-          <strong>Transaction Categories:</strong> Add the ability to categorize and tag transactions
+          <strong>Transaction Categories:</strong> Add the ability to categorize
+          and tag transactions
         </li>
         <li>
-          <strong>Fiat Conversion:</strong> Show transaction values in USD or other fiat currencies
+          <strong>Fiat Conversion:</strong> Show transaction values in USD or
+          other fiat currencies
         </li>
       </ul>
 
@@ -305,7 +313,10 @@ export default function WalletPage() {
 
       <ul className="list-disc pl-6 space-y-2 mb-6">
         <li>Always use pagination for addresses with many transactions</li>
-        <li>Consider implementing virtual scrolling for very large transaction lists</li>
+        <li>
+          Consider implementing virtual scrolling for very large transaction
+          lists
+        </li>
         <li>Cache transaction data to reduce API calls</li>
         <li>Use skeleton loaders for better UX during loading states</li>
       </ul>
@@ -313,11 +324,11 @@ export default function WalletPage() {
       <div className="p-4 bg-blue-100 dark:bg-blue-900 rounded-lg mt-8">
         <p className="font-semibold">💡 Pro Tip:</p>
         <p>
-          For wallets with multiple addresses (like HD wallets), you can create a tabbed interface to switch between
-          addresses or aggregate all transactions into a single view.
+          For wallets with multiple addresses (like HD wallets), you can create
+          a tabbed interface to switch between addresses or aggregate all
+          transactions into a single view.
         </p>
       </div>
     </div>
   )
 }
-

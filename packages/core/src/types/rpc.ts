@@ -1,4 +1,3 @@
-
 export type RpcResponse = {
   jsonrpc: string
   id: number

@@ -16,7 +16,7 @@ export function truncateString(str: string, maxLength: number): string {
 }
 
 function getMultiplier(decimals: number): bigint {
-  return BigInt("1" + "0".repeat(decimals))
+  return BigInt('1' + '0'.repeat(decimals))
 }
 
 function throwFault(
@@ -30,7 +30,7 @@ function throwFault(
     params.value = value
   }
   throw new Error(message, {
-    cause: params
+    cause: params,
   })
 }
 

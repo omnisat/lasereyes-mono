@@ -1,10 +1,10 @@
-"use client"
+'use client'
 
-import { usePathname } from "next/navigation"
-import Link from "next/link"
-import { ChevronLeft, ChevronRight } from "lucide-react"
-import { themeConfig } from "@/lib/theme-config"
-import { Suspense } from "react"
+import { usePathname } from 'next/navigation'
+import Link from 'next/link'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { themeConfig } from '@/lib/theme-config'
+import { Suspense } from 'react'
 
 function DocNavigationContent() {
   const pathname = usePathname()
@@ -31,7 +31,10 @@ function DocNavigationContent() {
 
   // Get previous and next pages
   const prevPage = currentPageIndex > 0 ? allPages[currentPageIndex - 1] : null
-  const nextPage = currentPageIndex < allPages.length - 1 ? allPages[currentPageIndex + 1] : null
+  const nextPage =
+    currentPageIndex < allPages.length - 1
+      ? allPages[currentPageIndex + 1]
+      : null
 
   if (!prevPage && !nextPage) return null
 
@@ -72,9 +75,12 @@ function DocNavigationContent() {
 
 export function DocNavigation() {
   return (
-    <Suspense fallback={<div className="mt-16 pt-8 border-t">Loading navigation...</div>}>
+    <Suspense
+      fallback={
+        <div className="mt-16 pt-8 border-t">Loading navigation...</div>
+      }
+    >
       <DocNavigationContent />
     </Suspense>
   )
 }
-

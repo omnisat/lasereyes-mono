@@ -39,7 +39,7 @@ yarn add @omnisat/lasereyes-ui
 If you installed the lasereyes package, then you can access lasereyes-ui through `lasereyes/ui`
 
 ```tsx
-import { LaserEyesModalProvider } from '@omnisat/lasereyes/ui';
+import { LaserEyesModalProvider } from '@omnisat/lasereyes/ui'
 ```
 
 Make sure your project uses React 18+.
@@ -57,8 +57,11 @@ You can then use:
 ### Example Usage
 
 ```tsx
-import { ConnectWalletButton, LaserEyesModalProvider } from '@omnisat/lasereyes/ui';
-import '@omnisat/lasereyes/ui/style.css';
+import {
+  ConnectWalletButton,
+  LaserEyesModalProvider,
+} from '@omnisat/lasereyes/ui'
+import '@omnisat/lasereyes/ui/style.css'
 
 function App() {
   return (
@@ -68,10 +71,10 @@ function App() {
         <ConnectWalletButton />
       </div>
     </LaserEyesModalProvider>
-  );
+  )
 }
 
-export default App;
+export default App
 ```
 
 ### Using `useLaserEyesModal`
@@ -79,12 +82,12 @@ export default App;
 If you want to create a custom button to open the modal, use the `useLaserEyesModal` hook:
 
 ```tsx
-import { useLaserEyesModal } from '@omnisat/lasereyes/ui';
+import { useLaserEyesModal } from '@omnisat/lasereyes/ui'
 
 function CustomWalletButton() {
-  const { showModal } = useLaserEyesModal();
+  const { showModal } = useLaserEyesModal()
 
-  return <button onClick={showModal}>Connect Wallet</button>;
+  return <button onClick={showModal}>Connect Wallet</button>
 }
 ```
 
@@ -93,18 +96,18 @@ function CustomWalletButton() {
 You can also use `<ConnectWalletModal>` directly:
 
 ```tsx
-import { useState } from 'react';
-import { ConnectWalletModal } from '@omnisat/lasereyes/ui';
+import { useState } from 'react'
+import { ConnectWalletModal } from '@omnisat/lasereyes/ui'
 
 function ManualModalExample() {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false)
 
   return (
     <>
       <button onClick={() => setIsOpen(true)}>Connect</button>
       <ConnectWalletModal open={isOpen} onClose={() => setIsOpen(false)} />
     </>
-  );
+  )
 }
 ```
 
@@ -114,24 +117,21 @@ function ManualModalExample() {
 
 ```ts
 interface LaserEyesModalContext {
-  isOpen: boolean;
-  isLoading: boolean;
-  showModal: () => void;
-  hideModal: () => void;
-  config: LaserEyesModalConfig;
-  setConfig: (config: LaserEyesModalConfig) => void;
+  isOpen: boolean
+  isLoading: boolean
+  showModal: () => void
+  hideModal: () => void
+  config: LaserEyesModalConfig
+  setConfig: (config: LaserEyesModalConfig) => void
 }
 ```
 
-
 ### `<ConnectWalletModal>`
 
-| Prop    | Type      | Description                             |
-|---------|----------|-----------------------------------------|
-| `open`  | boolean  | Controls whether the modal is visible. |
-| `onClose` | function | Called when the modal should close.  |
-
-
+| Prop      | Type     | Description                            |
+| --------- | -------- | -------------------------------------- |
+| `open`    | boolean  | Controls whether the modal is visible. |
+| `onClose` | function | Called when the modal should close.    |
 
 ## Community
 
@@ -211,5 +211,3 @@ If you find Laser Eyes Modal useful or use it for work, please consider [sponsor
 <h4 style="text-align: center; font-size: 1.5em; margin-top: 20px; margin-bottom: 20px;">
   <a href="https://github.com/sponsors/omnisat">Become A Sponsor</a>
 </h4>
-
-

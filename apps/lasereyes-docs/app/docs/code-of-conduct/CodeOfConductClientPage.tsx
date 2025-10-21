@@ -1,11 +1,11 @@
-"use client"
+'use client'
 
-import * as React from "react"
-import { Heading } from "@/components/heading"
-import { ClientPageWrapper } from "@/components/client-page-wrapper"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { 
+import * as React from 'react'
+import { Heading } from '@/components/heading'
+import { ClientPageWrapper } from '@/components/client-page-wrapper'
+import { Card, CardContent } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import {
   Heart,
   ShieldCheck,
   Users,
@@ -15,11 +15,11 @@ import {
   Globe,
   MessageCircleWarning,
   Handshake,
-  Link as LinkIcon
-} from "lucide-react"
-import type { LucideIcon } from "lucide-react"
-import { cn } from "@/lib/utils"
-import Link from "next/link"
+  Link as LinkIcon,
+} from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import Link from 'next/link'
 
 interface ConductCardProps {
   icon: LucideIcon
@@ -27,47 +27,64 @@ interface ConductCardProps {
   description?: string
   content: React.ReactNode
   className?: string
-  variant?: "default" | "warning" | "success"
+  variant?: 'default' | 'warning' | 'success'
 }
 
-function ConductCard({ icon: Icon, title, description, content, className, variant = "default" }: ConductCardProps) {
+function ConductCard({
+  icon: Icon,
+  title,
+  description,
+  content,
+  className,
+  variant = 'default',
+}: ConductCardProps) {
   const variantStyles = {
-    default: "hover:border-indigo-500/30 hover:shadow-indigo-500/5",
-    warning: "hover:border-yellow-500/30 hover:shadow-yellow-500/5 border-yellow-500/20",
-    success: "hover:border-green-500/30 hover:shadow-green-500/5 border-green-500/20"
+    default: 'hover:border-indigo-500/30 hover:shadow-indigo-500/5',
+    warning:
+      'hover:border-yellow-500/30 hover:shadow-yellow-500/5 border-yellow-500/20',
+    success:
+      'hover:border-green-500/30 hover:shadow-green-500/5 border-green-500/20',
   }
 
   const iconStyles = {
-    default: "bg-indigo-500/10 text-indigo-500",
-    warning: "bg-yellow-500/10 text-yellow-500",
-    success: "bg-green-500/10 text-green-500"
+    default: 'bg-indigo-500/10 text-indigo-500',
+    warning: 'bg-yellow-500/10 text-yellow-500',
+    success: 'bg-green-500/10 text-green-500',
   }
 
   const blurStyles = {
-    default: "bg-indigo-500/10 group-hover:bg-indigo-500/20",
-    warning: "bg-yellow-500/10 group-hover:bg-yellow-500/20",
-    success: "bg-green-500/10 group-hover:bg-green-500/20"
+    default: 'bg-indigo-500/10 group-hover:bg-indigo-500/20',
+    warning: 'bg-yellow-500/10 group-hover:bg-yellow-500/20',
+    success: 'bg-green-500/10 group-hover:bg-green-500/20',
   }
 
   return (
-    <Card className={cn(
-      "group relative overflow-hidden transition-all duration-300 hover:shadow-lg",
-      variantStyles[variant],
-      className
-    )}>
-      <div className={cn(
-        "absolute right-0 top-0 h-20 w-20 translate-x-6 -translate-y-6 rounded-full blur-2xl filter",
-        blurStyles[variant]
-      )} />
+    <Card
+      className={cn(
+        'group relative overflow-hidden transition-all duration-300 hover:shadow-lg',
+        variantStyles[variant],
+        className
+      )}
+    >
+      <div
+        className={cn(
+          'absolute right-0 top-0 h-20 w-20 translate-x-6 -translate-y-6 rounded-full blur-2xl filter',
+          blurStyles[variant]
+        )}
+      />
       <CardContent className="p-6">
-        <div className={cn(
-          "mb-4 flex h-12 w-12 items-center justify-center rounded-lg",
-          iconStyles[variant]
-        )}>
+        <div
+          className={cn(
+            'mb-4 flex h-12 w-12 items-center justify-center rounded-lg',
+            iconStyles[variant]
+          )}
+        >
           <Icon className="h-6 w-6" />
         </div>
         <h3 className="mb-2 text-xl font-semibold">{title}</h3>
-        {description && <p className="mb-4 text-muted-foreground">{description}</p>}
+        {description && (
+          <p className="mb-4 text-muted-foreground">{description}</p>
+        )}
         {content}
       </CardContent>
     </Card>
@@ -122,7 +139,9 @@ function CodeOfConductContent() {
             content={
               <div className="space-y-4">
                 <p className="text-muted-foreground">
-                  Project maintainers are responsible for clarifying and enforcing acceptable behavior standards. They have the right and responsibility to:
+                  Project maintainers are responsible for clarifying and
+                  enforcing acceptable behavior standards. They have the right
+                  and responsibility to:
                 </p>
                 <ul className="space-y-2 text-muted-foreground">
                   <li>• Remove, edit, or reject inappropriate content</li>
@@ -162,19 +181,27 @@ function CodeOfConductContent() {
               <div className="space-y-4">
                 <div className="rounded-md border-l-4 border-indigo-500 bg-indigo-500/5 p-4">
                   <h4 className="mb-2 font-semibold">1. Correction</h4>
-                  <p className="text-sm text-muted-foreground">Warning and education for minor violations</p>
+                  <p className="text-sm text-muted-foreground">
+                    Warning and education for minor violations
+                  </p>
                 </div>
                 <div className="rounded-md border-l-4 border-yellow-500 bg-yellow-500/5 p-4">
                   <h4 className="mb-2 font-semibold">2. Warning</h4>
-                  <p className="text-sm text-muted-foreground">Consequences for repeated minor violations</p>
+                  <p className="text-sm text-muted-foreground">
+                    Consequences for repeated minor violations
+                  </p>
                 </div>
                 <div className="rounded-md border-l-4 border-orange-500 bg-orange-500/5 p-4">
                   <h4 className="mb-2 font-semibold">3. Temporary Ban</h4>
-                  <p className="text-sm text-muted-foreground">Temporary ban for serious violations</p>
+                  <p className="text-sm text-muted-foreground">
+                    Temporary ban for serious violations
+                  </p>
                 </div>
                 <div className="rounded-md border-l-4 border-red-500 bg-red-500/5 p-4">
                   <h4 className="mb-2 font-semibold">4. Permanent Ban</h4>
-                  <p className="text-sm text-muted-foreground">Permanent ban for sustained misconduct</p>
+                  <p className="text-sm text-muted-foreground">
+                    Permanent ban for sustained misconduct
+                  </p>
                 </div>
               </div>
             }
@@ -190,7 +217,10 @@ function CodeOfConductContent() {
                 <div className="rounded-md bg-muted p-4">
                   <div className="flex items-center gap-2">
                     <MessageCircleWarning className="h-5 w-5 text-indigo-500" />
-                    <a href="mailto:conduct@omnisat.io" className="text-primary hover:underline">
+                    <a
+                      href="mailto:conduct@omnisat.io"
+                      className="text-primary hover:underline"
+                    >
                       conduct@omnisat.io
                     </a>
                   </div>
@@ -213,7 +243,9 @@ function CodeOfConductContent() {
               </div>
               <div>
                 <h2 className="text-2xl font-bold">Scope & Attribution</h2>
-                <p className="text-muted-foreground">Where and how this code applies</p>
+                <p className="text-muted-foreground">
+                  Where and how this code applies
+                </p>
               </div>
             </div>
             <div className="space-y-4">
@@ -223,7 +255,8 @@ function CodeOfConductContent() {
                   <span className="font-semibold">Scope of Application</span>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  This Code of Conduct applies in all project spaces, including public and private spaces when representing the project.
+                  This Code of Conduct applies in all project spaces, including
+                  public and private spaces when representing the project.
                 </p>
               </div>
               <div className="rounded-md bg-muted p-4">
@@ -232,8 +265,11 @@ function CodeOfConductContent() {
                   <span className="font-semibold">Attribution</span>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  This Code of Conduct is adapted from the{" "}
-                  <Link href="https://www.contributor-covenant.org" className="text-primary hover:underline">
+                  This Code of Conduct is adapted from the{' '}
+                  <Link
+                    href="https://www.contributor-covenant.org"
+                    className="text-primary hover:underline"
+                  >
                     Contributor Covenant
                   </Link>
                   , version 2.0.
@@ -252,12 +288,18 @@ export default function CodeOfConductClientPage() {
     <div className="space-y-8">
       <div className="relative overflow-hidden rounded-lg border bg-gradient-to-br from-indigo-500/10 via-background to-background p-8">
         <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-indigo-500/20 rounded-full blur-3xl -z-10 translate-x-1/2 -translate-y-1/2" />
-        <Badge variant="secondary" className="mb-4">Community</Badge>
-        <Heading level={1} className="mb-4 bg-gradient-to-br from-indigo-500 to-violet-500 bg-clip-text text-transparent">
+        <Badge variant="secondary" className="mb-4">
+          Community
+        </Badge>
+        <Heading
+          level={1}
+          className="mb-4 bg-gradient-to-br from-indigo-500 to-violet-500 bg-clip-text text-transparent"
+        >
           Code of Conduct
         </Heading>
         <p className="text-xl mb-6 max-w-2xl text-muted-foreground">
-          Our commitment to fostering an open, welcoming, and safe environment for all contributors and community members.
+          Our commitment to fostering an open, welcoming, and safe environment
+          for all contributors and community members.
         </p>
       </div>
 
@@ -266,4 +308,4 @@ export default function CodeOfConductClientPage() {
       </ClientPageWrapper>
     </div>
   )
-} 
+}

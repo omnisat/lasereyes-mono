@@ -1,10 +1,11 @@
 import type {
   Inscription,
-  LaserEyesClient, MempoolUtxo,
+  LaserEyesClient,
+  MempoolUtxo,
   NetworkType,
   Protocol,
-  ProviderType
-} from "@omnisat/lasereyes-core"
+  ProviderType,
+} from '@omnisat/lasereyes-core'
 
 export type LaserEyesContextType = {
   isInitializing: boolean
@@ -33,6 +34,7 @@ export type LaserEyesContextType = {
   hasWizz: boolean
   hasTokeo: boolean
   hasKeplr: boolean
+  hasUniversal: boolean
 
   connect: (walletName: ProviderType) => Promise<void>
   disconnect: () => void
@@ -43,13 +45,13 @@ export type LaserEyesContextType = {
   getBalance: () => Promise<string>
   getMetaBalances: (protocol: Protocol) => Promise<unknown>
   getInscriptions: (offset?: number, limit?: number) => Promise<Inscription[]>
-  sendBTC: LaserEyesClient["sendBTC"]
-  signMessage: LaserEyesClient["signMessage"]
-  signPsbt: LaserEyesClient["signPsbt"]
-  signPsbts: LaserEyesClient["signPsbts"]
-  pushPsbt: LaserEyesClient["pushPsbt"]
-  inscribe: LaserEyesClient["inscribe"]
-  send: LaserEyesClient["send"]
-  sendInscriptions: LaserEyesClient["sendInscriptions"]
+  sendBTC: LaserEyesClient['sendBTC']
+  signMessage: LaserEyesClient['signMessage']
+  signPsbt: LaserEyesClient['signPsbt']
+  signPsbts: LaserEyesClient['signPsbts']
+  pushPsbt: LaserEyesClient['pushPsbt']
+  inscribe: LaserEyesClient['inscribe']
+  send: LaserEyesClient['send']
+  sendInscriptions: LaserEyesClient['sendInscriptions']
   getUtxos: (address: string) => Promise<MempoolUtxo[]>
 }

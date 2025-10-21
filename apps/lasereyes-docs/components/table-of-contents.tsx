@@ -1,20 +1,24 @@
-"use client"
+'use client'
 
-import { useEffect, useState } from "react"
-import { usePathname } from "next/navigation"
-import { Suspense } from "react"
+import { useEffect, useState } from 'react'
+import { usePathname } from 'next/navigation'
+import { Suspense } from 'react'
 
 function TableOfContentsContent() {
-  const [headings, setHeadings] = useState<{ id: string; text: string; level: number }[]>([])
-  const [activeId, setActiveId] = useState<string>("")
+  const [headings, setHeadings] = useState<
+    { id: string; text: string; level: number }[]
+  >([])
+  const [activeId, setActiveId] = useState<string>('')
   const pathname = usePathname()
 
   useEffect(() => {
-    const headingElements = Array.from(document.querySelectorAll("h1, h2, h3, h4, h5, h6"))
+    const headingElements = Array.from(
+      document.querySelectorAll('h1, h2, h3, h4, h5, h6')
+    )
       .filter((element) => element.id)
       .map((element) => ({
         id: element.id,
-        text: element.textContent || "",
+        text: element.textContent || '',
         level: Number.parseInt(element.tagName.substring(1)),
       }))
     setHeadings(headingElements)
@@ -29,7 +33,7 @@ function TableOfContentsContent() {
           }
         })
       },
-      { rootMargin: "0px 0px -80% 0px" },
+      { rootMargin: '0px 0px -80% 0px' }
     )
 
     headings.forEach((heading) => {
@@ -68,7 +72,9 @@ function TableOfContentsContent() {
               <a
                 href={`#${heading.id}`}
                 className={`block py-1 hover:text-primary transition-colors ${
-                  activeId === heading.id ? "text-primary font-medium" : "text-muted-foreground"
+                  activeId === heading.id
+                    ? 'text-primary font-medium'
+                    : 'text-muted-foreground'
                 }`}
               >
                 {heading.text}
@@ -83,9 +89,10 @@ function TableOfContentsContent() {
 
 export function TableOfContents() {
   return (
-    <Suspense fallback={<div className="p-4">Loading table of contents...</div>}>
+    <Suspense
+      fallback={<div className="p-4">Loading table of contents...</div>}
+    >
       <TableOfContentsContent />
     </Suspense>
   )
 }
-

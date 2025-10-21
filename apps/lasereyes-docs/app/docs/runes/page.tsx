@@ -1,13 +1,13 @@
-"use client"
+'use client'
 
-import * as React from "react"
-import { ClientPageWrapper } from "@/components/client-page-wrapper"
-import { CodeBlock } from "@/components/code-block"
-import { Heading } from "@/components/heading"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Coins, Search, Send, Code2, Database, Shield } from "lucide-react"
-import { cn } from "@/lib/utils"
+import * as React from 'react'
+import { ClientPageWrapper } from '@/components/client-page-wrapper'
+import { CodeBlock } from '@/components/code-block'
+import { Heading } from '@/components/heading'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Coins, Search, Send, Code2, Database, Shield } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 interface FeatureCardProps {
   icon: React.ElementType
@@ -21,12 +21,18 @@ export default function RunesPage() {
     <div className="space-y-8">
       <div className="relative overflow-hidden rounded-lg border bg-gradient-to-br from-purple-500/10 via-background to-background p-8">
         <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-purple-500/20 rounded-full blur-3xl -z-10 translate-x-1/2 -translate-y-1/2" />
-        <Badge variant="secondary" className="mb-4">Guide</Badge>
-        <Heading level={1} className="mb-4 bg-gradient-to-br from-purple-500 to-pink-500 bg-clip-text text-transparent">
+        <Badge variant="secondary" className="mb-4">
+          Guide
+        </Badge>
+        <Heading
+          level={1}
+          className="mb-4 bg-gradient-to-br from-purple-500 to-pink-500 bg-clip-text text-transparent"
+        >
           Working with Runes
         </Heading>
         <p className="text-xl mb-6 max-w-2xl text-muted-foreground">
-          Learn how to interact with Bitcoin Runes using LaserEyes - fetch balances, send tokens, and more.
+          Learn how to interact with Bitcoin Runes using LaserEyes - fetch
+          balances, send tokens, and more.
         </p>
       </div>
 
@@ -37,12 +43,19 @@ export default function RunesPage() {
   )
 }
 
-function FeatureCard({ icon: Icon, title, description, className }: FeatureCardProps) {
+function FeatureCard({
+  icon: Icon,
+  title,
+  description,
+  className,
+}: FeatureCardProps) {
   return (
-    <Card className={cn(
-      "group relative overflow-hidden transition-all duration-300 hover:border-purple-500/30 hover:shadow-lg hover:shadow-purple-500/5",
-      className
-    )}>
+    <Card
+      className={cn(
+        'group relative overflow-hidden transition-all duration-300 hover:border-purple-500/30 hover:shadow-lg hover:shadow-purple-500/5',
+        className
+      )}
+    >
       <div className="absolute right-0 top-0 h-20 w-20 translate-x-6 -translate-y-6 rounded-full bg-purple-500/10 blur-2xl filter group-hover:bg-purple-500/20" />
       <CardContent className="p-6">
         <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-purple-500/10 text-purple-500">
@@ -62,8 +75,9 @@ function RunesContent() {
         <Card className="overflow-hidden">
           <CardContent className="p-6">
             <p className="text-lg leading-relaxed">
-              LaserEyes provides comprehensive support for Bitcoin Runes, allowing you to easily fetch balances,
-              send tokens, and interact with the Runes protocol through a unified interface.
+              LaserEyes provides comprehensive support for Bitcoin Runes,
+              allowing you to easily fetch balances, send tokens, and interact
+              with the Runes protocol through a unified interface.
             </p>
           </CardContent>
         </Card>
@@ -99,7 +113,9 @@ function RunesContent() {
         <h2 className="text-3xl font-bold">The Rune Balance Type</h2>
         <Card className="overflow-hidden">
           <CardHeader className="border-b bg-muted/50 px-6">
-            <h2 className="font-mono text-sm font-medium">Rune Balance Interface</h2>
+            <h2 className="font-mono text-sm font-medium">
+              Rune Balance Interface
+            </h2>
           </CardHeader>
           <CardContent className="p-6">
             <CodeBlock
@@ -227,31 +243,37 @@ function SendRune() {
               <h3 className="text-lg font-semibold mb-2">1. Error Handling</h3>
               <p className="text-muted-foreground">
                 Always implement proper error handling for Rune operations.
-                Network issues, insufficient balances, or wallet rejections should be handled gracefully.
+                Network issues, insufficient balances, or wallet rejections
+                should be handled gracefully.
               </p>
             </div>
-            
+
             <div>
               <h3 className="text-lg font-semibold mb-2">2. Loading States</h3>
               <p className="text-muted-foreground">
-                Show appropriate loading states during Rune operations.
-                Both fetching balances and sending can take time to complete.
+                Show appropriate loading states during Rune operations. Both
+                fetching balances and sending can take time to complete.
               </p>
             </div>
-            
+
             <div>
-              <h3 className="text-lg font-semibold mb-2">3. Balance Validation</h3>
+              <h3 className="text-lg font-semibold mb-2">
+                3. Balance Validation
+              </h3>
               <p className="text-muted-foreground">
-                Always validate Rune balances before attempting transfers.
-                Check both the balance amount and if the user owns the Rune.
+                Always validate Rune balances before attempting transfers. Check
+                both the balance amount and if the user owns the Rune.
               </p>
             </div>
-            
+
             <div>
-              <h3 className="text-lg font-semibold mb-2">4. Data Source Fallbacks</h3>
+              <h3 className="text-lg font-semibold mb-2">
+                4. Data Source Fallbacks
+              </h3>
               <p className="text-muted-foreground">
                 Consider implementing fallback data sources for Rune operations.
-                LaserEyes supports multiple data providers to ensure reliability.
+                LaserEyes supports multiple data providers to ensure
+                reliability.
               </p>
             </div>
           </CardContent>
@@ -262,7 +284,9 @@ function SendRune() {
         <h2 className="text-3xl font-bold">Complete Example</h2>
         <Card className="overflow-hidden">
           <CardHeader className="border-b bg-muted/50 px-6">
-            <h2 className="font-mono text-sm font-medium">Runes Dashboard Example</h2>
+            <h2 className="font-mono text-sm font-medium">
+              Runes Dashboard Example
+            </h2>
           </CardHeader>
           <CardContent className="p-6">
             <CodeBlock
@@ -395,4 +419,4 @@ function RunesDashboard() {
       </section>
     </div>
   )
-} 
+}

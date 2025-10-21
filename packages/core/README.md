@@ -26,7 +26,7 @@ bun install @omnisat/lasereyes-core
 
 ### Client
 
-The `LaserEyesClient` is the main entry point for the library. It manages wallet connections, handles user authentication, and facilitates interactions with Bitcoin wallets. 
+The `LaserEyesClient` is the main entry point for the library. It manages wallet connections, handles user authentication, and facilitates interactions with Bitcoin wallets.
 
 ### Provider
 
@@ -64,48 +64,53 @@ LaserEyes Core supports multiple Bitcoin networks:
 ### Initializing the Client
 
 ```typescript
-import { LaserEyesClient, createStores, createConfig, XVERSE } from '@omnisat/lasereyes-core';
+import {
+  LaserEyesClient,
+  createStores,
+  createConfig,
+  XVERSE,
+} from '@omnisat/lasereyes-core'
 
 // Create stores for state management
-const stores = createStores();
+const stores = createStores()
 
 // Optional: Create configuration with network setting
-const config = createConfig({ network: 'mainnet' });
+const config = createConfig({ network: 'mainnet' })
 
 // Initialize the client
-const client = new LaserEyesClient(stores, config);
-client.initialize();
+const client = new LaserEyesClient(stores, config)
+client.initialize()
 
 // Connect to a wallet (e.g., Xverse)
 client.connect(XVERSE).then(() => {
-  console.log('Connected to Xverse wallet');
-});
+  console.log('Connected to Xverse wallet')
+})
 ```
 
 ### Basic Usage
 
 ```typescript
 // Connect to a wallet
-await client.connect(XVERSE);
+await client.connect(XVERSE)
 
 // Request wallet accounts
-const accounts = await client.requestAccounts();
-console.log('Accounts:', accounts);
+const accounts = await client.requestAccounts()
+console.log('Accounts:', accounts)
 
 // Get wallet balance
-const balance = await client.getBalance();
-console.log('Balance:', balance.toString());
+const balance = await client.getBalance()
+console.log('Balance:', balance.toString())
 
 // Send Bitcoin
-const txId = await client.sendBTC('recipient-address', 10000); // 10,000 satoshis
-console.log('Transaction ID:', txId);
+const txId = await client.sendBTC('recipient-address', 10000) // 10,000 satoshis
+console.log('Transaction ID:', txId)
 
 // Sign a message
-const signature = await client.signMessage('Hello, LaserEyes!');
-console.log('Signature:', signature);
+const signature = await client.signMessage('Hello, LaserEyes!')
+console.log('Signature:', signature)
 
 // Disconnect
-client.disconnect();
+client.disconnect()
 ```
 
 ## API Reference
@@ -136,7 +141,7 @@ constructor(
 Initializes the client and checks for wallet providers.
 
 ```typescript
-client.initialize();
+client.initialize()
 ```
 
 ##### `connect(defaultWallet: ProviderType)`
@@ -144,7 +149,7 @@ client.initialize();
 Connects to the specified wallet provider.
 
 ```typescript
-await client.connect(XVERSE);
+await client.connect(XVERSE)
 ```
 
 ##### `disconnect()`
@@ -152,7 +157,7 @@ await client.connect(XVERSE);
 Disconnects from the currently connected wallet provider.
 
 ```typescript
-client.disconnect();
+client.disconnect()
 ```
 
 ##### `requestAccounts()`
@@ -160,7 +165,7 @@ client.disconnect();
 Requests accounts from the connected wallet provider.
 
 ```typescript
-const accounts = await client.requestAccounts();
+const accounts = await client.requestAccounts()
 ```
 
 ##### `getNetwork()`
@@ -168,7 +173,7 @@ const accounts = await client.requestAccounts();
 Gets the current network for the connected wallet provider.
 
 ```typescript
-const network = await client.getNetwork();
+const network = await client.getNetwork()
 ```
 
 ##### `switchNetwork(network: NetworkType)`
@@ -176,7 +181,7 @@ const network = await client.getNetwork();
 Switches the network for the connected wallet provider.
 
 ```typescript
-await client.switchNetwork('testnet');
+await client.switchNetwork('testnet')
 ```
 
 ##### `getBalance()`
@@ -184,7 +189,7 @@ await client.switchNetwork('testnet');
 Gets the balance of the connected wallet.
 
 ```typescript
-const balance = await client.getBalance();
+const balance = await client.getBalance()
 ```
 
 ##### `sendBTC(to: string, amount: number)`
@@ -192,7 +197,7 @@ const balance = await client.getBalance();
 Sends Bitcoin to the specified address.
 
 ```typescript
-const txId = await client.sendBTC('recipientAddress', 10000); // 10,000 satoshis
+const txId = await client.sendBTC('recipientAddress', 10000) // 10,000 satoshis
 ```
 
 ##### `signMessage(message: string, toSignAddressOrOptions?: string | SignMessageOptions)`
@@ -200,7 +205,7 @@ const txId = await client.sendBTC('recipientAddress', 10000); // 10,000 satoshis
 Signs a message with the connected wallet.
 
 ```typescript
-const signature = await client.signMessage('Hello, LaserEyes!');
+const signature = await client.signMessage('Hello, LaserEyes!')
 ```
 
 ##### `signPsbt(tx: string, finalize?: boolean, broadcast?: boolean)`
@@ -208,7 +213,7 @@ const signature = await client.signMessage('Hello, LaserEyes!');
 Signs a Partially Signed Bitcoin Transaction (PSBT).
 
 ```typescript
-const result = await client.signPsbt(psbtHex, true, false);
+const result = await client.signPsbt(psbtHex, true, false)
 ```
 
 ##### `pushPsbt(tx: string)`
@@ -216,7 +221,7 @@ const result = await client.signPsbt(psbtHex, true, false);
 Pushes a PSBT to the network.
 
 ```typescript
-const txId = await client.pushPsbt(psbtHex);
+const txId = await client.pushPsbt(psbtHex)
 ```
 
 ##### `getPublicKey()`
@@ -224,7 +229,7 @@ const txId = await client.pushPsbt(psbtHex);
 Gets the public key from the connected wallet.
 
 ```typescript
-const publicKey = await client.getPublicKey();
+const publicKey = await client.getPublicKey()
 ```
 
 ##### `getInscriptions(offset?: number, limit?: number)`
@@ -232,7 +237,7 @@ const publicKey = await client.getPublicKey();
 Gets inscriptions (NFTs) associated with the connected wallet.
 
 ```typescript
-const inscriptions = await client.getInscriptions();
+const inscriptions = await client.getInscriptions()
 ```
 
 ##### `inscribe(content: string, mimeType: ContentType)`
@@ -240,10 +245,10 @@ const inscriptions = await client.getInscriptions();
 Inscribes content onto the blockchain.
 
 ```typescript
-import { TEXT_PLAIN } from '@omnisat/lasereyes-core';
+import { TEXT_PLAIN } from '@omnisat/lasereyes-core'
 
-const contentBase64 = Buffer.from('Hello, LaserEyes!').toString('base64');
-const txId = await client.inscribe(contentBase64, TEXT_PLAIN);
+const contentBase64 = Buffer.from('Hello, LaserEyes!').toString('base64')
+const txId = await client.inscribe(contentBase64, TEXT_PLAIN)
 ```
 
 ##### `send(protocol: Protocol, sendArgs: BTCSendArgs | RuneSendArgs)`
@@ -251,14 +256,14 @@ const txId = await client.inscribe(contentBase64, TEXT_PLAIN);
 Sends assets using the specified protocol.
 
 ```typescript
-import { BTC } from '@omnisat/lasereyes-core';
+import { BTC } from '@omnisat/lasereyes-core'
 
 const txId = await client.send(BTC, {
   fromAddress: 'senderAddress',
   toAddress: 'recipientAddress',
   amount: 10000,
-  network: 'mainnet'
-});
+  network: 'mainnet',
+})
 ```
 
 ##### `dispose()`
@@ -266,7 +271,7 @@ const txId = await client.send(BTC, {
 Disposes of all wallet providers.
 
 ```typescript
-client.dispose();
+client.dispose()
 ```
 
 ### Constants
@@ -285,8 +290,8 @@ import {
   SPARROW,
   UNISAT,
   WIZZ,
-  XVERSE
-} from '@omnisat/lasereyes-core';
+  XVERSE,
+} from '@omnisat/lasereyes-core'
 ```
 
 #### Networks
@@ -298,8 +303,8 @@ import {
   TESTNET4,
   SIGNET,
   FRACTAL_MAINNET,
-  FRACTAL_TESTNET
-} from '@omnisat/lasereyes-core';
+  FRACTAL_TESTNET,
+} from '@omnisat/lasereyes-core'
 ```
 
 #### Content Types
@@ -310,20 +315,15 @@ import {
   TEXT_PLAIN,
   APPLICATION_JSON,
   IMAGE_JPEG,
-  IMAGE_PNG
+  IMAGE_PNG,
   // ... many more available
-} from '@omnisat/lasereyes-core';
+} from '@omnisat/lasereyes-core'
 ```
 
 #### Protocols
 
 ```typescript
-import {
-  BTC,
-  BRC20,
-  RUNES,
-  ALKANES
-} from '@omnisat/lasereyes-core';
+import { BTC, BRC20, RUNES, ALKANES } from '@omnisat/lasereyes-core'
 ```
 
 ## Error Handling
@@ -332,11 +332,11 @@ LaserEyes Core throws appropriate errors when operations fail. Always wrap your 
 
 ```typescript
 try {
-  await client.connect(XVERSE);
-  const balance = await client.getBalance();
-  console.log('Balance:', balance.toString());
+  await client.connect(XVERSE)
+  const balance = await client.getBalance()
+  console.log('Balance:', balance.toString())
 } catch (error) {
-  console.error('Wallet error:', error);
+  console.error('Wallet error:', error)
 }
 ```
 
@@ -347,15 +347,15 @@ try {
 ```typescript
 // Sign a PSBT
 const { signedPsbtHex, signedPsbtBase64, txId } = await client.signPsbt(
-  psbtHex,   // PSBT in hex format
-  true,      // finalize
-  true       // broadcast
-);
+  psbtHex, // PSBT in hex format
+  true, // finalize
+  true // broadcast
+)
 
 // If not broadcasting immediately, push the PSBT later
 if (!txId) {
-  const broadcastTxId = await client.pushPsbt(signedPsbtHex);
-  console.log('Broadcast transaction ID:', broadcastTxId);
+  const broadcastTxId = await client.pushPsbt(signedPsbtHex)
+  console.log('Broadcast transaction ID:', broadcastTxId)
 }
 ```
 
@@ -363,19 +363,19 @@ if (!txId) {
 
 ```typescript
 // Create an inscription
-const content = Buffer.from('Hello, Ordinals!').toString('base64');
-const txId = await client.inscribe(content, TEXT_PLAIN);
-console.log('Inscription transaction ID:', txId);
+const content = Buffer.from('Hello, Ordinals!').toString('base64')
+const txId = await client.inscribe(content, TEXT_PLAIN)
+console.log('Inscription transaction ID:', txId)
 
 // Get all inscriptions for the connected wallet
-const inscriptions = await client.getInscriptions();
-console.log('Inscriptions:', inscriptions);
+const inscriptions = await client.getInscriptions()
+console.log('Inscriptions:', inscriptions)
 ```
 
 ### Working with Runes
 
 ```typescript
-import { RUNES } from '@omnisat/lasereyes-core';
+import { RUNES } from '@omnisat/lasereyes-core'
 
 // Send runes
 const txId = await client.send(RUNES, {
@@ -383,11 +383,11 @@ const txId = await client.send(RUNES, {
   fromAddress: 'senderAddress',
   toAddress: 'recipientAddress',
   amount: 100,
-  network: 'mainnet'
-});
+  network: 'mainnet',
+})
 
 // Get rune balances
-const runeBalances = await client.getMetaBalances(RUNES);
+const runeBalances = await client.getMetaBalances(RUNES)
 ```
 
 ## Best Practices
@@ -422,52 +422,58 @@ const runeBalances = await client.getMetaBalances(RUNES);
 ### Basic Wallet Connection
 
 ```typescript
-import { LaserEyesClient, createStores, UNISAT } from '@omnisat/lasereyes-core';
+import { LaserEyesClient, createStores, UNISAT } from '@omnisat/lasereyes-core'
 
-const client = new LaserEyesClient(createStores());
-client.initialize();
+const client = new LaserEyesClient(createStores())
+client.initialize()
 
-document.getElementById('connect-button').addEventListener('click', async () => {
-  try {
-    await client.connect(UNISAT);
-    const address = client.$store.get().address;
-    document.getElementById('address-display').textContent = address;
-  } catch (error) {
-    console.error('Connection error:', error);
-  }
-});
+document
+  .getElementById('connect-button')
+  .addEventListener('click', async () => {
+    try {
+      await client.connect(UNISAT)
+      const address = client.$store.get().address
+      document.getElementById('address-display').textContent = address
+    } catch (error) {
+      console.error('Connection error:', error)
+    }
+  })
 ```
 
 ### Sending Bitcoin
 
 ```typescript
 document.getElementById('send-button').addEventListener('click', async () => {
-  const recipient = document.getElementById('recipient').value;
-  const amountSats = parseInt(document.getElementById('amount').value);
-  
+  const recipient = document.getElementById('recipient').value
+  const amountSats = parseInt(document.getElementById('amount').value)
+
   try {
-    const txId = await client.sendBTC(recipient, amountSats);
-    document.getElementById('tx-display').textContent = `Transaction sent: ${txId}`;
+    const txId = await client.sendBTC(recipient, amountSats)
+    document.getElementById('tx-display').textContent =
+      `Transaction sent: ${txId}`
   } catch (error) {
-    console.error('Send error:', error);
+    console.error('Send error:', error)
   }
-});
+})
 ```
 
 ### Creating an Inscription
 
 ```typescript
-document.getElementById('inscribe-button').addEventListener('click', async () => {
-  const text = document.getElementById('inscription-text').value;
-  const contentBase64 = Buffer.from(text).toString('base64');
-  
-  try {
-    const txId = await client.inscribe(contentBase64, TEXT_PLAIN);
-    document.getElementById('inscription-display').textContent = `Inscription created: ${txId}`;
-  } catch (error) {
-    console.error('Inscription error:', error);
-  }
-});
+document
+  .getElementById('inscribe-button')
+  .addEventListener('click', async () => {
+    const text = document.getElementById('inscription-text').value
+    const contentBase64 = Buffer.from(text).toString('base64')
+
+    try {
+      const txId = await client.inscribe(contentBase64, TEXT_PLAIN)
+      document.getElementById('inscription-display').textContent =
+        `Inscription created: ${txId}`
+    } catch (error) {
+      console.error('Inscription error:', error)
+    }
+  })
 ```
 
 ## Contributing

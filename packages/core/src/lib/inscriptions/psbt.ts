@@ -32,10 +32,10 @@ export const sendInscriptions = async ({
   toAddress: string
   signPsbt: (signPsbtOptions: WalletProviderSignPsbtOptions) => Promise<
     | {
-      signedPsbtHex: string | undefined
-      signedPsbtBase64: string | undefined
-      txId?: string
-    }
+        signedPsbtHex: string | undefined
+        signedPsbtBase64: string | undefined
+        txId?: string
+      }
     | undefined
   >
   dataSourceManager: DataSourceManager
@@ -115,7 +115,8 @@ export const createInscriptionsSendPsbt = async ({
       throw new Error('Sandshrew data source not found')
     }
 
-    const inscriptions = await sandshrew?.batchOrdInscriptionInfo(inscriptionIds)
+    const inscriptions =
+      await sandshrew?.batchOrdInscriptionInfo(inscriptionIds)
 
     console.log(inscriptions)
 
@@ -133,13 +134,16 @@ export const createInscriptionsSendPsbt = async ({
         throw new Error('Invalid satpoint or value')
       }
 
-      const script = bitcoin.address.toOutputScript(fromAddress, getBitcoinNetwork(MAINNET))
+      const script = bitcoin.address.toOutputScript(
+        fromAddress,
+        getBitcoinNetwork(MAINNET)
+      )
       psbt.addInput({
         hash: txHash,
         index: parseInt(vout),
         witnessUtxo: {
           value: BigInt(value),
-          script
+          script,
         },
         tapInternalKey: toXOnly(Buffer.from(fromAddressPublicKey, 'hex')),
       })
@@ -196,7 +200,7 @@ export const createInscriptionsSendPsbt = async ({
       }
     }
 
-    const changeAmount = amountGathered - (finalFee)
+    const changeAmount = amountGathered - finalFee
 
     psbt.addOutput({
       address: fromAddress,
@@ -208,4 +212,3 @@ export const createInscriptionsSendPsbt = async ({
     throw error
   }
 }
-

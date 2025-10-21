@@ -1,25 +1,29 @@
-"use client"
+'use client'
 
-import { CodeBlock } from "@/components/code-block"
-import { WarningBox } from "@/components/warning-box"
-import Link from "next/link"
-import { Heading } from "@/components/heading"
+import { CodeBlock } from '@/components/code-block'
+import { WarningBox } from '@/components/warning-box'
+import Link from 'next/link'
+import { Heading } from '@/components/heading'
 
 export function BasicSetupContent() {
   return (
     <>
       <Heading level={1}>Basic Setup</Heading>
-      <p className="text-lg mb-4">This guide will walk you through the basic setup of LaserEyes in your application.</p>
+      <p className="text-lg mb-4">
+        This guide will walk you through the basic setup of LaserEyes in your
+        application.
+      </p>
 
       <Heading level={2}>React Setup</Heading>
       <p className="mb-6">
-        If you're using React, LaserEyes provides a convenient provider component and hooks to make integration
-        seamless.
+        If you're using React, LaserEyes provides a convenient provider
+        component and hooks to make integration seamless.
       </p>
 
       <Heading level={3}>Setting up the Provider</Heading>
       <p className="mb-4">
-        First, wrap your application with the <code>LaserEyesProvider</code> component:
+        First, wrap your application with the <code>LaserEyesProvider</code>{' '}
+        component:
       </p>
       <CodeBlock
         language="tsx"
@@ -53,13 +57,15 @@ function App() {
       />
 
       <WarningBox title="Development API Keys" className="mt-4 mb-6">
-        LaserEyes includes development API keys for Maestro and Sandshrew, but these are rate-limited. For production
-        applications, you should register for your own API keys.
+        LaserEyes includes development API keys for Maestro and Sandshrew, but
+        these are rate-limited. For production applications, you should register
+        for your own API keys.
       </WarningBox>
 
       <Heading level={3}>Using the Hook</Heading>
       <p className="mb-4">
-        Once the provider is set up, you can use the <code>useLaserEyes</code> hook in any component:
+        Once the provider is set up, you can use the <code>useLaserEyes</code>{' '}
+        hook in any component:
       </p>
       <CodeBlock
         language="tsx"
@@ -104,7 +110,10 @@ function WalletConnect() {
       />
 
       <Heading level={2}>Core Setup (Framework-Agnostic)</Heading>
-      <p className="mb-6">If you're not using React or want more control, you can use the core client directly:</p>
+      <p className="mb-6">
+        If you're not using React or want more control, you can use the core
+        client directly:
+      </p>
       <CodeBlock
         language="typescript"
         code={`import { 
@@ -148,7 +157,8 @@ function cleanup() {
 
       <Heading level={2}>Network Configuration</Heading>
       <p className="mb-6">
-        LaserEyes supports multiple Bitcoin networks. You can specify the network in the configuration:
+        LaserEyes supports multiple Bitcoin networks. You can specify the
+        network in the configuration:
       </p>
       <CodeBlock
         language="typescript"
@@ -170,8 +180,8 @@ const testnetConfig = createConfig({ network: TESTNET })`}
 
       <Heading level={2}>DataSource Configuration</Heading>
       <p className="mb-6">
-        LaserEyes uses a DataSource system to interact with Bitcoin data providers. You can configure multiple data
-        sources:
+        LaserEyes uses a DataSource system to interact with Bitcoin data
+        providers. You can configure multiple data sources:
       </p>
       <CodeBlock
         language="typescript"
@@ -200,28 +210,39 @@ const testnetConfig = createConfig({ network: TESTNET })`}
       />
 
       <Heading level={2}>Next Steps</Heading>
-      <p className="mb-6">Now that you have set up LaserEyes, you can start building your Bitcoin web application:</p>
+      <p className="mb-6">
+        Now that you have set up LaserEyes, you can start building your Bitcoin
+        web application:
+      </p>
       <ul className="list-disc pl-6 mb-6 space-y-2">
         <li>
-          <Link href="/docs/hello-world" className="text-primary hover:underline">
+          <Link
+            href="/docs/hello-world"
+            className="text-primary hover:underline"
+          >
             Hello World Example
-          </Link>{" "}
+          </Link>{' '}
           - A simple example to get you started
         </li>
         <li>
-          <Link href="/docs/wallet-connection" className="text-primary hover:underline">
+          <Link
+            href="/docs/wallet-connection"
+            className="text-primary hover:underline"
+          >
             Wallet Connection
-          </Link>{" "}
+          </Link>{' '}
           - Learn how to connect to different wallets
         </li>
         <li>
-          <Link href="/docs/basic-transactions" className="text-primary hover:underline">
+          <Link
+            href="/docs/basic-transactions"
+            className="text-primary hover:underline"
+          >
             Basic Transactions
-          </Link>{" "}
+          </Link>{' '}
           - Send BTC and other assets
         </li>
       </ul>
     </>
   )
 }
-

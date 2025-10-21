@@ -2,26 +2,37 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 import { useLaserEyes } from '@omnisat/lasereyes'
-import { ConnectWalletButton, ConnectWalletModal, ThemeControls, useTheme } from '@omnisat/lasereyes-ui'
-import { 
-  Wallet, 
-  Bitcoin, 
-  Zap, 
-  Shield, 
-  Globe, 
-  ArrowRight, 
+import {
+  ConnectWalletButton,
+  ConnectWalletModal,
+  ThemeControls,
+  useTheme,
+} from '@omnisat/lasereyes-ui'
+import {
+  Wallet,
+  Bitcoin,
+  Zap,
+  Shield,
+  Globe,
+  ArrowRight,
   ExternalLink,
   Palette,
   Sun,
-  Moon
+  Moon,
 } from 'lucide-react'
 
 // Quick theme toggle component
 function QuickThemeToggle() {
   const { isDark, toggleDarkMode, darkMode } = useTheme()
-  
+
   if (darkMode === 'disabled') {
     return (
       <Button disabled variant="outline" size="sm">
@@ -30,7 +41,7 @@ function QuickThemeToggle() {
       </Button>
     )
   }
-  
+
   return (
     <Button onClick={toggleDarkMode} variant="outline" size="sm">
       {isDark ? (
@@ -49,11 +60,7 @@ function QuickThemeToggle() {
 }
 
 export default function UIPage() {
-  const { 
-    isConnecting,
-  } = useLaserEyes(({ 
-    isConnecting,
-  }) => ({ 
+  const { isConnecting } = useLaserEyes(({ isConnecting }) => ({
     isConnecting,
   }))
 
@@ -62,34 +69,40 @@ export default function UIPage() {
   const features = [
     {
       icon: <Wallet className="h-6 w-6" />,
-      title: "Multi-Wallet Support",
-      description: "Connect with UniSat, Xverse, Oyl, Magic Eden, OKX, Leather, Phantom, Wizz, and Orange"
+      title: 'Multi-Wallet Support',
+      description:
+        'Connect with UniSat, Xverse, Oyl, Magic Eden, OKX, Leather, Phantom, Wizz, and Orange',
     },
     {
       icon: <Bitcoin className="h-6 w-6" />,
-      title: "Bitcoin Native",
-      description: "Built specifically for Bitcoin ecosystem with support for inscriptions and runes"
+      title: 'Bitcoin Native',
+      description:
+        'Built specifically for Bitcoin ecosystem with support for inscriptions and runes',
     },
     {
       icon: <Zap className="h-6 w-6" />,
-      title: "Lightning Fast",
-      description: "Optimized for performance with instant wallet detection and connection"
+      title: 'Lightning Fast',
+      description:
+        'Optimized for performance with instant wallet detection and connection',
     },
     {
       icon: <Shield className="h-6 w-6" />,
-      title: "Secure by Design",
-      description: "No private key storage, direct wallet communication for maximum security"
+      title: 'Secure by Design',
+      description:
+        'No private key storage, direct wallet communication for maximum security',
     },
     {
       icon: <Globe className="h-6 w-6" />,
-      title: "Cross-Platform",
-      description: "Works seamlessly across web, mobile, and desktop applications"
+      title: 'Cross-Platform',
+      description:
+        'Works seamlessly across web, mobile, and desktop applications',
     },
     {
       icon: <Palette className="h-6 w-6" />,
-      title: "Customizable Themes",
-      description: "Full theming support with dark mode, custom colors, and real-time updates"
-    }
+      title: 'Customizable Themes',
+      description:
+        'Full theming support with dark mode, custom colors, and real-time updates',
+    },
   ]
 
   return (
@@ -101,7 +114,8 @@ export default function UIPage() {
             LaserEyes UI Demo
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Experience the future of Bitcoin wallet integration with our comprehensive React components
+            Experience the future of Bitcoin wallet integration with our
+            comprehensive React components
           </p>
         </div>
 
@@ -125,8 +139,8 @@ export default function UIPage() {
                   <div className="space-y-4">
                     <div className="flex flex-col sm:flex-row gap-4">
                       <ConnectWalletButton className="flex-1 h-12 text-lg font-semibold" />
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         onClick={() => setShowModal(true)}
                         className="flex-1 h-12"
                       >
@@ -144,11 +158,17 @@ export default function UIPage() {
                     </div>
                     <div className="flex flex-wrap gap-2">
                       <Button size="sm">Primary</Button>
-                      <Button size="sm" variant="secondary">Secondary</Button>
-                      <Button size="sm" variant="outline">Outline</Button>
-                      <Button size="sm" variant="ghost">Ghost</Button>
+                      <Button size="sm" variant="secondary">
+                        Secondary
+                      </Button>
+                      <Button size="sm" variant="outline">
+                        Outline
+                      </Button>
+                      <Button size="sm" variant="ghost">
+                        Ghost
+                      </Button>
                     </div>
-                    
+
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <Card className="bg-primary/10 border-primary/20">
                         <CardContent className="pt-3 pb-3">
@@ -169,7 +189,9 @@ export default function UIPage() {
                     </div>
 
                     <div className="flex items-center justify-between p-3 border rounded-lg bg-card">
-                      <p className="text-sm text-muted-foreground">Dark mode toggle:</p>
+                      <p className="text-sm text-muted-foreground">
+                        Dark mode toggle:
+                      </p>
                       <QuickThemeToggle />
                     </div>
                   </div>
@@ -186,10 +208,15 @@ export default function UIPage() {
 
         {/* Features Grid */}
         <div className="max-w-6xl mx-auto mb-12">
-          <h2 className="text-2xl font-bold text-center mb-8">Why Choose LaserEyes?</h2>
+          <h2 className="text-2xl font-bold text-center mb-8">
+            Why Choose LaserEyes?
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
             {features.map((feature, index) => (
-              <Card key={index} className="hover:shadow-lg transition-shadow duration-300">
+              <Card
+                key={index}
+                className="hover:shadow-lg transition-shadow duration-300"
+              >
                 <CardHeader>
                   <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center text-white mb-4">
                     {feature.icon}
@@ -239,8 +266,6 @@ export default function UIPage() {
           </Card>
         </div>
 
-
-
         {/* Call to Action */}
         <div className="max-w-2xl mx-auto text-center">
           <Card className="bg-gradient-to-r from-blue-600 to-purple-600 text-white border-0">
@@ -250,11 +275,17 @@ export default function UIPage() {
                 Start building Bitcoin applications with LaserEyes today
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <Button variant="secondary" className="bg-white text-blue-600 hover:bg-gray-100">
+                <Button
+                  variant="secondary"
+                  className="bg-white text-blue-600 hover:bg-gray-100"
+                >
                   <ExternalLink className="mr-2 h-4 w-4" />
                   View Documentation
                 </Button>
-                <Button variant="outline" className="border-white text-white hover:bg-white hover:text-blue-600">
+                <Button
+                  variant="outline"
+                  className="border-white text-white hover:bg-white hover:text-blue-600"
+                >
                   <ArrowRight className="mr-2 h-4 w-4" />
                   Get Started
                 </Button>
@@ -265,8 +296,8 @@ export default function UIPage() {
       </div>
 
       {/* Custom Modal */}
-      <ConnectWalletModal 
-        open={showModal} 
+      <ConnectWalletModal
+        open={showModal}
         onClose={() => setShowModal(false)}
       />
     </div>

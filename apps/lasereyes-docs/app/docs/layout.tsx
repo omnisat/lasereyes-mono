@@ -1,20 +1,20 @@
-import type React from "react"
-import { DocsSidebar } from "@/components/docs-sidebar"
-import { DocNavigation } from "@/components/doc-navigation"
-import { MobileNav } from "@/components/mobile-nav"
-import type { Metadata } from "next"
-import { TableOfContents } from "@/components/table-of-contents"
-import { ThemeToggle } from "@/components/theme-toggle"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { themeConfig } from "@/lib/theme-config"
-import { LaserEyesLogo } from "@omnisat/lasereyes-react"
-import type { colorsType } from "@omnisat/lasereyes-react"
-import { Suspense } from "react"
+import type React from 'react'
+import { DocsSidebar } from '@/components/docs-sidebar'
+import { DocNavigation } from '@/components/doc-navigation'
+import { MobileNav } from '@/components/mobile-nav'
+import type { Metadata } from 'next'
+import { TableOfContents } from '@/components/table-of-contents'
+import { ThemeToggle } from '@/components/theme-toggle'
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+import { themeConfig } from '@/lib/theme-config'
+import { LaserEyesLogo } from '@omnisat/lasereyes-react'
+import type { colorsType } from '@omnisat/lasereyes-react'
+import { Suspense } from 'react'
 
 export const metadata: Metadata = {
-  title: "Documentation",
-  description: "Learn how to use LaserEyes in your projects",
+  title: 'Documentation',
+  description: 'Learn how to use LaserEyes in your projects',
 }
 
 export default function DocsLayout({
@@ -30,7 +30,11 @@ export default function DocsLayout({
           <div className="flex items-center gap-4">
             <MobileNav />
             <Link href="/" className="flex items-center space-x-2">
-              <LaserEyesLogo width={32} color={"orange" as colorsType} className="mr-1" />
+              <LaserEyesLogo
+                width={32}
+                color={'orange' as colorsType}
+                className="mr-1"
+              />
               <span className="font-bold text-xl inline-block">
                 <span className="text-primary">Laser</span>Eyes
               </span>
@@ -41,7 +45,9 @@ export default function DocsLayout({
                   key={item.href}
                   href={item.href}
                   className="text-sm font-medium transition-colors hover:text-primary"
-                  {...(item.external ? { target: "_blank", rel: "noreferrer" } : {})}
+                  {...(item.external
+                    ? { target: '_blank', rel: 'noreferrer' }
+                    : {})}
                 >
                   {item.title}
                 </Link>
@@ -50,12 +56,22 @@ export default function DocsLayout({
           </div>
           <div className="flex items-center gap-2">
             <ThemeToggle />
-            <Button variant="outline" size="sm" className="hidden md:flex" asChild>
+            <Button
+              variant="outline"
+              size="sm"
+              className="hidden md:flex"
+              asChild
+            >
               <Link href={themeConfig.github} target="_blank" rel="noreferrer">
                 GitHub
               </Link>
             </Button>
-            <Button variant="default" size="sm" className="hidden md:flex" asChild>
+            <Button
+              variant="default"
+              size="sm"
+              className="hidden md:flex"
+              asChild
+            >
               <Link href="/docs/installation">Get Started</Link>
             </Button>
           </div>
@@ -75,7 +91,11 @@ export default function DocsLayout({
             {/* Main content area */}
             <main className="flex-auto min-w-0 px-4 md:px-8 pt-4 md:pt-10 pb-8 md:pb-12">
               <div className="max-w-4xl mx-auto">
-                <Suspense fallback={<div className="py-4">Loading content...</div>}>{children}</Suspense>
+                <Suspense
+                  fallback={<div className="py-4">Loading content...</div>}
+                >
+                  {children}
+                </Suspense>
                 <DocNavigation />
               </div>
             </main>
@@ -92,4 +112,3 @@ export default function DocsLayout({
     </div>
   )
 }
-

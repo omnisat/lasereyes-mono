@@ -1,18 +1,49 @@
-"use client"
+'use client'
 
-import { useState, useEffect } from "react"
-import { useLaserEyes } from "@omnisat/lasereyes-react"
-import { UNISAT, XVERSE, OYL, LEATHER, MAGIC_EDEN, OKX, PHANTOM, WIZZ, ORANGE, OP_NET } from "@omnisat/lasereyes-core"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Copy, Check, ExternalLink, Send, Pencil, Upload, FileText } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { LaserEyesLogo, WalletIcon } from "@omnisat/lasereyes-react"
-import type { colorsType } from "@omnisat/lasereyes-react"
-import Link from "next/link"
+import { useState, useEffect } from 'react'
+import { useLaserEyes } from '@omnisat/lasereyes-react'
+import {
+  UNISAT,
+  XVERSE,
+  OYL,
+  LEATHER,
+  MAGIC_EDEN,
+  OKX,
+  PHANTOM,
+  WIZZ,
+  ORANGE,
+  OP_NET,
+} from '@omnisat/lasereyes-core'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import {
+  Copy,
+  Check,
+  ExternalLink,
+  Send,
+  Pencil,
+  Upload,
+  FileText,
+} from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { LaserEyesLogo, WalletIcon } from '@omnisat/lasereyes-react'
+import type { colorsType } from '@omnisat/lasereyes-react'
+import Link from 'next/link'
 
 export function WalletConnectCard() {
   const {
@@ -32,45 +63,49 @@ export function WalletConnectCard() {
   } = useLaserEyes()
 
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState("")
+  const [error, setError] = useState('')
   const [copied, setCopied] = useState(false)
-  const [signature, setSignature] = useState("")
-  const [activeTab, setActiveTab] = useState("wallet")
+  const [signature, setSignature] = useState('')
+  const [activeTab, setActiveTab] = useState('wallet')
 
   // Inscriptions state
   const [inscriptions, setInscriptions] = useState<any[]>([])
-  const [inscriptionText, setInscriptionText] = useState("Inscribed with LaserEyes")
-  const [selectedInscriptionIds, setSelectedInscriptionIds] = useState<string[]>([])
-  const [inscriptionRecipient, setInscriptionRecipient] = useState("")
+  const [inscriptionText, setInscriptionText] = useState(
+    'Inscribed with LaserEyes'
+  )
+  const [selectedInscriptionIds, setSelectedInscriptionIds] = useState<
+    string[]
+  >([])
+  const [inscriptionRecipient, setInscriptionRecipient] = useState('')
 
   // BRC-20 state
   const [brc20Tokens, setBrc20Tokens] = useState<any[]>([])
   const [selectedToken, setSelectedToken] = useState<any>()
-  const [tokenRecipient, setTokenRecipient] = useState("")
-  const [tokenAmount, setTokenAmount] = useState("")
+  const [tokenRecipient, setTokenRecipient] = useState('')
+  const [tokenAmount, setTokenAmount] = useState('')
 
   // Runes state
   const [runes, setRunes] = useState<any[]>([])
   const [selectedRune, setSelectedRune] = useState<any>()
-  const [runeRecipient, setRuneRecipient] = useState("")
-  const [runeAmount, setRuneAmount] = useState("")
+  const [runeRecipient, setRuneRecipient] = useState('')
+  const [runeAmount, setRuneAmount] = useState('')
 
   // BTC send state
-  const [btcRecipient, setBtcRecipient] = useState("")
-  const [btcAmount, setBtcAmount] = useState("")
+  const [btcRecipient, setBtcRecipient] = useState('')
+  const [btcAmount, setBtcAmount] = useState('')
 
   // Define all supported wallets
   const wallets = [
-    { name: "UniSat", provider: UNISAT },
-    { name: "Xverse", provider: XVERSE },
-    { name: "OYL", provider: OYL },
-    { name: "Leather", provider: LEATHER },
-    { name: "Magic Eden", provider: MAGIC_EDEN },
-    { name: "OKX", provider: OKX },
-    { name: "Phantom", provider: PHANTOM },
-    { name: "Wizz", provider: WIZZ },
-    { name: "Orange", provider: ORANGE },
-    { name: "OP_NET", provider: OP_NET },
+    { name: 'UniSat', provider: UNISAT },
+    { name: 'Xverse', provider: XVERSE },
+    { name: 'OYL', provider: OYL },
+    { name: 'Leather', provider: LEATHER },
+    { name: 'Magic Eden', provider: MAGIC_EDEN },
+    { name: 'OKX', provider: OKX },
+    { name: 'Phantom', provider: PHANTOM },
+    { name: 'Wizz', provider: WIZZ },
+    { name: 'Orange', provider: ORANGE },
+    { name: 'OP_NET', provider: OP_NET },
   ]
 
   // Load data when connected
@@ -89,14 +124,14 @@ export function WalletConnectCard() {
       setInscriptions(inscriptionsData || [])
 
       // Fetch BRC-20 tokens
-      const brc20Data = await getMetaBalances("brc20")
+      const brc20Data = await getMetaBalances('brc20')
       setBrc20Tokens(brc20Data || [])
 
       // Fetch Runes
-      const runesData = await getMetaBalances("runes")
+      const runesData = await getMetaBalances('runes')
       setRunes(runesData || [])
     } catch (error) {
-      console.error("Error fetching data:", error)
+      console.error('Error fetching data:', error)
     }
   }
 
@@ -107,23 +142,23 @@ export function WalletConnectCard() {
     setSelectedInscriptionIds([])
     setSelectedToken(undefined)
     setSelectedRune(undefined)
-    setInscriptionRecipient("")
-    setTokenRecipient("")
-    setRuneRecipient("")
-    setTokenAmount("")
-    setRuneAmount("")
-    setBtcRecipient("")
-    setBtcAmount("")
-    setSignature("")
+    setInscriptionRecipient('')
+    setTokenRecipient('')
+    setRuneRecipient('')
+    setTokenAmount('')
+    setRuneAmount('')
+    setBtcRecipient('')
+    setBtcAmount('')
+    setSignature('')
   }
 
   const connectWallet = async (walletProvider: string) => {
-    setError("")
+    setError('')
     setLoading(true)
     try {
       await connect(walletProvider)
     } catch (error: any) {
-      setError(error.message || "Failed to connect wallet")
+      setError(error.message || 'Failed to connect wallet')
     } finally {
       setLoading(false)
     }
@@ -138,23 +173,23 @@ export function WalletConnectCard() {
   }
 
   const formatBalance = () => {
-    if (!balance) return "0"
+    if (!balance) return '0'
     // Convert from satoshis to BTC
     return (Number(balance) / 100000000).toFixed(8)
   }
 
   const truncateAddress = (addr: string) => {
-    if (!addr) return ""
+    if (!addr) return ''
     return `${addr.slice(0, 6)}...${addr.slice(-4)}`
   }
 
   const handleSendBTC = async () => {
     if (!btcRecipient || !btcAmount) {
-      setError("Please enter recipient address and amount")
+      setError('Please enter recipient address and amount')
       return
     }
 
-    setError("")
+    setError('')
     setLoading(true)
 
     try {
@@ -164,10 +199,10 @@ export function WalletConnectCard() {
       // Send transaction
       const txid = await sendBTC(btcRecipient, satoshis)
       alert(`Transaction sent! TXID: ${txid}`)
-      setBtcAmount("")
-      setBtcRecipient("")
+      setBtcAmount('')
+      setBtcRecipient('')
     } catch (error: any) {
-      setError(error.message || "Transaction failed")
+      setError(error.message || 'Transaction failed')
     } finally {
       setLoading(false)
     }
@@ -175,24 +210,27 @@ export function WalletConnectCard() {
 
   const handleSignMessage = async () => {
     try {
-      const message = "Verify with LaserEyes"
+      const message = 'Verify with LaserEyes'
       const sig = await signMessage(message, address)
       setSignature(sig)
     } catch (error: any) {
-      setError(error.message || "Failed to sign message")
+      setError(error.message || 'Failed to sign message')
     }
   }
 
   const handleInscribe = async () => {
     try {
       setLoading(true)
-      const txid = await inscribe(Buffer.from(inscriptionText).toString("base64"), "text/plain")
+      const txid = await inscribe(
+        Buffer.from(inscriptionText).toString('base64'),
+        'text/plain'
+      )
       alert(`Inscription created! TXID: ${txid}`)
-      setInscriptionText("Inscribed with LaserEyes")
+      setInscriptionText('Inscribed with LaserEyes')
       // Refresh inscriptions
       fetchData()
     } catch (error: any) {
-      setError(error.message || "Failed to inscribe")
+      setError(error.message || 'Failed to inscribe')
     } finally {
       setLoading(false)
     }
@@ -215,20 +253,23 @@ export function WalletConnectCard() {
 
   const handleSendInscriptions = async () => {
     if (!inscriptionRecipient || selectedInscriptionIds.length === 0) {
-      setError("Please select inscriptions and enter recipient address")
+      setError('Please select inscriptions and enter recipient address')
       return
     }
 
     try {
       setLoading(true)
-      const txid = await sendInscriptions(selectedInscriptionIds, inscriptionRecipient)
+      const txid = await sendInscriptions(
+        selectedInscriptionIds,
+        inscriptionRecipient
+      )
       alert(`Inscriptions sent! TXID: ${txid}`)
       setSelectedInscriptionIds([])
-      setInscriptionRecipient("")
+      setInscriptionRecipient('')
       // Refresh inscriptions
       fetchData()
     } catch (error: any) {
-      setError(error.message || "Failed to send inscriptions")
+      setError(error.message || 'Failed to send inscriptions')
     } finally {
       setLoading(false)
     }
@@ -236,13 +277,13 @@ export function WalletConnectCard() {
 
   const handleSendToken = async () => {
     if (!selectedToken || !tokenRecipient || !tokenAmount) {
-      setError("Please select token, recipient, and amount")
+      setError('Please select token, recipient, and amount')
       return
     }
 
     try {
       setLoading(true)
-      const txid = await send("brc20", {
+      const txid = await send('brc20', {
         fromAddress: address,
         toAddress: tokenRecipient,
         amount: Number(tokenAmount),
@@ -250,12 +291,12 @@ export function WalletConnectCard() {
       })
       alert(`Token sent! TXID: ${txid}`)
       setSelectedToken(undefined)
-      setTokenRecipient("")
-      setTokenAmount("")
+      setTokenRecipient('')
+      setTokenAmount('')
       // Refresh tokens
       fetchData()
     } catch (error: any) {
-      setError(error.message || "Failed to send token")
+      setError(error.message || 'Failed to send token')
     } finally {
       setLoading(false)
     }
@@ -263,13 +304,13 @@ export function WalletConnectCard() {
 
   const handleSendRune = async () => {
     if (!selectedRune || !runeRecipient || !runeAmount) {
-      setError("Please select rune, recipient, and amount")
+      setError('Please select rune, recipient, and amount')
       return
     }
 
     try {
       setLoading(true)
-      const txid = await send("runes", {
+      const txid = await send('runes', {
         fromAddress: address,
         toAddress: runeRecipient,
         amount: Number(runeAmount),
@@ -277,12 +318,12 @@ export function WalletConnectCard() {
       })
       alert(`Rune sent! TXID: ${txid}`)
       setSelectedRune(undefined)
-      setRuneRecipient("")
-      setRuneAmount("")
+      setRuneRecipient('')
+      setRuneAmount('')
       // Refresh runes
       fetchData()
     } catch (error: any) {
-      setError(error.message || "Failed to send rune")
+      setError(error.message || 'Failed to send rune')
     } finally {
       setLoading(false)
     }
@@ -292,10 +333,16 @@ export function WalletConnectCard() {
     <Card className="w-full overflow-hidden border-2">
       <CardHeader className="pb-2">
         <div className="flex items-center">
-          <LaserEyesLogo width={32} color={(connected ? "green" : "orange") as colorsType} className="mr-2" />
+          <LaserEyesLogo
+            width={32}
+            color={(connected ? 'green' : 'orange') as colorsType}
+            className="mr-2"
+          />
           <div>
             <CardTitle>LaserEyes Wallet Connect</CardTitle>
-            <CardDescription>Connect your Bitcoin wallet to explore LaserEyes features</CardDescription>
+            <CardDescription>
+              Connect your Bitcoin wallet to explore LaserEyes features
+            </CardDescription>
           </div>
         </div>
       </CardHeader>
@@ -319,19 +366,35 @@ export function WalletConnectCard() {
               </div>
               {error && <p className="text-red-500 text-sm">{error}</p>}
               <p className="text-sm text-muted-foreground text-center">
-                Don't have a wallet? <br/>
-                <Link href="/docs/installation" className="text-primary hover:underline inline-flex items-center gap-1">Click here to see some options</Link>
+                Don't have a wallet? <br />
+                <Link
+                  href="/docs/installation"
+                  className="text-primary hover:underline inline-flex items-center gap-1"
+                >
+                  Click here to see some options
+                </Link>
               </p>
             </div>
           ) : (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Connected Wallet</p>
+                  <p className="text-sm text-muted-foreground">
+                    Connected Wallet
+                  </p>
                   <div className="flex items-center gap-2">
                     <p className="font-mono">{truncateAddress(address)}</p>
-                    <Button variant="ghost" size="icon" className="h-6 w-6" onClick={copyAddress}>
-                      {copied ? <Check className="h-3 w-3 text-green-500" /> : <Copy className="h-3 w-3" />}
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6"
+                      onClick={copyAddress}
+                    >
+                      {copied ? (
+                        <Check className="h-3 w-3 text-green-500" />
+                      ) : (
+                        <Copy className="h-3 w-3" />
+                      )}
                       <span className="sr-only">Copy address</span>
                     </Button>
                   </div>
@@ -342,7 +405,11 @@ export function WalletConnectCard() {
                 </div>
               </div>
 
-              <Tabs defaultValue="wallet" value={activeTab} onValueChange={setActiveTab}>
+              <Tabs
+                defaultValue="wallet"
+                value={activeTab}
+                onValueChange={setActiveTab}
+              >
                 <TabsList className="grid w-full grid-cols-4">
                   <TabsTrigger value="wallet">Wallet</TabsTrigger>
                   <TabsTrigger value="inscriptions">Inscriptions</TabsTrigger>
@@ -353,7 +420,9 @@ export function WalletConnectCard() {
                 {/* Wallet Tab */}
                 <TabsContent value="wallet" className="space-y-4 pt-4">
                   <div>
-                    <label className="text-sm text-muted-foreground block mb-1">Recipient Address</label>
+                    <label className="text-sm text-muted-foreground block mb-1">
+                      Recipient Address
+                    </label>
                     <Input
                       type="text"
                       className="w-full p-2 bg-muted border rounded"
@@ -363,7 +432,9 @@ export function WalletConnectCard() {
                     />
                   </div>
                   <div>
-                    <label className="text-sm text-muted-foreground block mb-1">Amount (BTC)</label>
+                    <label className="text-sm text-muted-foreground block mb-1">
+                      Amount (BTC)
+                    </label>
                     <Input
                       type="number"
                       className="w-full p-2 bg-muted border rounded"
@@ -383,7 +454,12 @@ export function WalletConnectCard() {
                       <Send className="h-4 w-4" />
                       Send BTC
                     </Button>
-                    <Button variant="outline" className="flex-1 gap-1" onClick={handleSignMessage} disabled={loading}>
+                    <Button
+                      variant="outline"
+                      className="flex-1 gap-1"
+                      onClick={handleSignMessage}
+                      disabled={loading}
+                    >
                       <Pencil className="h-4 w-4" />
                       Sign Message
                     </Button>
@@ -405,16 +481,21 @@ export function WalletConnectCard() {
                         <div
                           key={insc.id || insc.inscriptionId}
                           className={cn(
-                            "relative w-[60px] h-[60px] border-2",
-                            selectedInscriptionIds.includes(insc.inscriptionId || insc.id)
-                              ? "border-primary"
-                              : "border-transparent",
+                            'relative w-[60px] h-[60px] border-2',
+                            selectedInscriptionIds.includes(
+                              insc.inscriptionId || insc.id
+                            )
+                              ? 'border-primary'
+                              : 'border-transparent'
                           )}
                         >
                           {/* The iframe for preview */}
                           <div className="w-full h-full bg-muted flex items-center justify-center text-xs overflow-hidden">
                             {insc.preview ? (
-                              <iframe src={insc.preview} className="w-full h-full pointer-events-none" />
+                              <iframe
+                                src={insc.preview}
+                                className="w-full h-full pointer-events-none"
+                              />
                             ) : (
                               <FileText className="h-6 w-6 text-muted-foreground" />
                             )}
@@ -423,11 +504,17 @@ export function WalletConnectCard() {
                           {/* Transparent overlay to capture clicks */}
                           <div
                             className="absolute inset-0 cursor-pointer z-10"
-                            onClick={() => toggleInscriptionSelection(insc.inscriptionId || insc.id)}
+                            onClick={() =>
+                              toggleInscriptionSelection(
+                                insc.inscriptionId || insc.id
+                              )
+                            }
                           />
 
                           {/* Selection indicator */}
-                          {selectedInscriptionIds.includes(insc.inscriptionId || insc.id) && (
+                          {selectedInscriptionIds.includes(
+                            insc.inscriptionId || insc.id
+                          ) && (
                             <div className="absolute top-0 right-0 bg-primary text-primary-foreground w-4 h-4 flex items-center justify-center text-[10px] z-20">
                               ✓
                             </div>
@@ -435,7 +522,9 @@ export function WalletConnectCard() {
                         </div>
                       ))
                     ) : (
-                      <p className="text-sm text-muted-foreground">No inscriptions found</p>
+                      <p className="text-sm text-muted-foreground">
+                        No inscriptions found
+                      </p>
                     )}
                   </div>
 
@@ -446,12 +535,18 @@ export function WalletConnectCard() {
                         className="w-full p-2 bg-muted border rounded"
                         placeholder="Recipient address"
                         value={inscriptionRecipient}
-                        onChange={(e) => setInscriptionRecipient(e.target.value)}
+                        onChange={(e) =>
+                          setInscriptionRecipient(e.target.value)
+                        }
                       />
                       <Button
                         className="w-full gap-1"
                         onClick={handleSendInscriptions}
-                        disabled={selectedInscriptionIds.length === 0 || !inscriptionRecipient || loading}
+                        disabled={
+                          selectedInscriptionIds.length === 0 ||
+                          !inscriptionRecipient ||
+                          loading
+                        }
                       >
                         <Send className="h-4 w-4" />
                         Send Inscriptions ({selectedInscriptionIds.length})
@@ -460,7 +555,9 @@ export function WalletConnectCard() {
                   )}
 
                   <div className="border-t pt-3">
-                    <label className="text-sm text-muted-foreground block mb-1">Create New Inscription</label>
+                    <label className="text-sm text-muted-foreground block mb-1">
+                      Create New Inscription
+                    </label>
                     <Input
                       type="text"
                       className="w-full p-2 bg-muted border rounded mb-2"
@@ -468,7 +565,11 @@ export function WalletConnectCard() {
                       value={inscriptionText}
                       onChange={(e) => setInscriptionText(e.target.value)}
                     />
-                    <Button className="w-full gap-1" onClick={handleInscribe} disabled={!inscriptionText || loading}>
+                    <Button
+                      className="w-full gap-1"
+                      onClick={handleInscribe}
+                      disabled={!inscriptionText || loading}
+                    >
                       <Upload className="h-4 w-4" />
                       Inscribe Text
                     </Button>
@@ -490,7 +591,11 @@ export function WalletConnectCard() {
                       {brc20Tokens.length > 0 ? (
                         brc20Tokens.map((token, i) => (
                           <SelectItem key={i} value={token.ticker}>
-                            {token.ticker} ({Number.parseFloat(token.overall || token.balance).toFixed(2)})
+                            {token.ticker} (
+                            {Number.parseFloat(
+                              token.overall || token.balance
+                            ).toFixed(2)}
+                            )
                           </SelectItem>
                         ))
                       ) : (
@@ -522,10 +627,15 @@ export function WalletConnectCard() {
                   <Button
                     className="w-full gap-1"
                     onClick={handleSendToken}
-                    disabled={!selectedToken || !tokenRecipient || !tokenAmount || loading}
+                    disabled={
+                      !selectedToken ||
+                      !tokenRecipient ||
+                      !tokenAmount ||
+                      loading
+                    }
                   >
                     <Send className="h-4 w-4" />
-                    Send {selectedToken?.ticker || "Token"}
+                    Send {selectedToken?.ticker || 'Token'}
                   </Button>
                 </TabsContent>
 
@@ -576,10 +686,12 @@ export function WalletConnectCard() {
                   <Button
                     className="w-full gap-1"
                     onClick={handleSendRune}
-                    disabled={!selectedRune || !runeRecipient || !runeAmount || loading}
+                    disabled={
+                      !selectedRune || !runeRecipient || !runeAmount || loading
+                    }
                   >
                     <Send className="h-4 w-4" />
-                    Send {selectedRune?.name || "Rune"}
+                    Send {selectedRune?.name || 'Rune'}
                   </Button>
                 </TabsContent>
               </Tabs>
@@ -594,4 +706,3 @@ export function WalletConnectCard() {
     </Card>
   )
 }
-

@@ -66,15 +66,7 @@ export function unmapFromPrimitives(v: any): any {
   }
 }
 
-const opcodes = [
-  '99',
-  '100',
-  '101',
-  '102',
-  '103',
-  '104',
-  '1000',
-]
+const opcodes = ['99', '100', '101', '102', '103', '104', '1000']
 const opcodesHRV = [
   'name',
   'symbol',
@@ -94,9 +86,7 @@ export class AlkanesRpc {
   async _metashrewCall(method: string, params: any[] = []) {
     const rpc = new alkanes_rpc.AlkanesRpc({ baseUrl: metashrew.get() }) as any
     return mapToPrimitives(
-      await rpc[method.split('_')[1]](
-        unmapFromPrimitives(params[0] || {})
-      )
+      await rpc[method.split('_')[1]](unmapFromPrimitives(params[0] || {}))
     )
   }
   async _call(method: string, params: any[] = []) {
@@ -165,12 +155,12 @@ export class AlkanesRpc {
     name?: string
   }): Promise<AlkanesOutpoint[]> {
     try {
-      const ret = await this._call('alkanes_protorunesbyaddress', [
+      const ret = (await this._call('alkanes_protorunesbyaddress', [
         {
           address,
           protocolTag,
         },
-      ]) as AlkanesResponse
+      ])) as AlkanesResponse
 
       const alkanesList = ret.outpoints
         .filter((outpoint) => outpoint.runes.length > 0)
@@ -293,14 +283,14 @@ export class AlkanesRpc {
     protocolTag?: string
     height?: string
   }): Promise<any> {
-    const alkaneList = await this._call('alkanes_protorunesbyoutpoint', [
+    const alkaneList = (await this._call('alkanes_protorunesbyoutpoint', [
       {
         txid: Buffer.from(txid, 'hex').reverse().toString('hex'),
         vout,
         protocolTag,
       },
       height,
-    ]) as any
+    ])) as any
 
     return alkaneList.map((outpoint: any) => ({
       ...outpoint,

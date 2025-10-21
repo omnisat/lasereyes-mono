@@ -1,9 +1,9 @@
-"use client"
+'use client'
 
-import type React from "react"
+import type React from 'react'
 
-import { cn } from "@/lib/utils"
-import { useSidebar } from "./sidebar"
+import { cn } from '@/lib/utils'
+import { useSidebar } from './sidebar'
 
 interface SidebarBackdropProps extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -14,10 +14,12 @@ export function SidebarBackdrop({ className, ...props }: SidebarBackdropProps) {
 
   return (
     <div
-      className={cn("fixed inset-0 z-40 bg-background/80 backdrop-blur-sm md:hidden", className)}
+      className={cn(
+        'fixed inset-0 z-40 bg-background/80 backdrop-blur-sm md:hidden',
+        className
+      )}
       onClick={() => setOpen(false)}
       {...props}
     />
   )
 }
-

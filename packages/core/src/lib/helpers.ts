@@ -21,7 +21,7 @@ export const getBitcoinNetwork = (network: NetworkType) => {
   if (network === TESTNET || network === TESTNET4 || network === SIGNET) {
     return bitcoin.networks.testnet
   }
-    return bitcoin.networks.bitcoin
+  return bitcoin.networks.bitcoin
 }
 
 export const findOrdinalsAddress = (

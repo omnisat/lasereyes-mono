@@ -35,10 +35,11 @@ import { omitUndefined } from '../../lib/utils'
 const OKX_WALLET_PERSISTENCE_KEY = 'OKX_CONNECTED_WALLET_STATE'
 
 export default class OkxProvider extends WalletProvider {
-  constructor(stores: {
-    $store: MapStore<LaserEyesStoreType>
-    $network: WritableAtom<NetworkType>
-  },
+  constructor(
+    stores: {
+      $store: MapStore<LaserEyesStoreType>
+      $network: WritableAtom<NetworkType>
+    },
     parent: LaserEyesClient,
     config?: Config
   ) {
@@ -207,7 +208,10 @@ export default class OkxProvider extends WalletProvider {
     return await library?.getPublicKey()
   }
 
-  async getInscriptions(offset?: number, limit?: number): Promise<Inscription[]> {
+  async getInscriptions(
+    offset?: number,
+    limit?: number
+  ): Promise<Inscription[]> {
     const offsetValue = offset || 0
     const limitValue = limit || 10
     const response = await this.library.getInscriptions(offsetValue, limitValue)
@@ -235,21 +239,27 @@ export default class OkxProvider extends WalletProvider {
     return await library?.signMessage(message, protocol)
   }
 
-  async signPsbt(
-    { psbtHex, broadcast, finalize, inputsToSign }: WalletProviderSignPsbtOptions
-  ): Promise<
+  async signPsbt({
+    psbtHex,
+    broadcast,
+    finalize,
+    inputsToSign,
+  }: WalletProviderSignPsbtOptions): Promise<
     | {
-      signedPsbtHex: string | undefined
-      signedPsbtBase64: string | undefined
-      txId?: string | undefined
-    }
+        signedPsbtHex: string | undefined
+        signedPsbtBase64: string | undefined
+        txId?: string | undefined
+      }
     | undefined
   > {
     const library = this.library
-    const signedPsbt = await library.signPsbt(psbtHex, omitUndefined({
-      autoFinalized: finalize,
-      toSignInputs: inputsToSign,
-    }))
+    const signedPsbt = await library.signPsbt(
+      psbtHex,
+      omitUndefined({
+        autoFinalized: finalize,
+        toSignInputs: inputsToSign,
+      })
+    )
 
     const psbtSignedPsbt = bitcoin.Psbt.fromHex(signedPsbt)
 

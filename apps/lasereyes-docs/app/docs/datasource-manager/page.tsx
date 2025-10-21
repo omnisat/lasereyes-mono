@@ -1,14 +1,23 @@
-"use client"
+'use client'
 
-import * as React from "react"
-import { ClientPageWrapper } from "@/components/client-page-wrapper"
-import { CodeBlock } from "@/components/code-block"
-import { Heading } from "@/components/heading"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Database, Server, Code2, Workflow, GitFork, Layers, ArrowRight, Cpu } from "lucide-react"
-import { cn } from "@/lib/utils"
-import Link from "next/link"
+import * as React from 'react'
+import { ClientPageWrapper } from '@/components/client-page-wrapper'
+import { CodeBlock } from '@/components/code-block'
+import { Heading } from '@/components/heading'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import {
+  Database,
+  Server,
+  Code2,
+  Workflow,
+  GitFork,
+  Layers,
+  ArrowRight,
+  Cpu,
+} from 'lucide-react'
+import { cn } from '@/lib/utils'
+import Link from 'next/link'
 
 interface FeatureCardProps {
   icon: React.ElementType
@@ -22,12 +31,19 @@ export default function DataSourceManagerPage() {
     <div className="space-y-8">
       <div className="relative overflow-hidden rounded-lg border bg-gradient-to-br from-indigo-500/10 via-background to-background p-8">
         <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-indigo-500/20 rounded-full blur-3xl -z-10 translate-x-1/2 -translate-y-1/2" />
-        <Badge variant="secondary" className="mb-4">Core Component</Badge>
-        <Heading level={1} className="mb-4 bg-gradient-to-br from-indigo-500 to-blue-500 bg-clip-text text-transparent">
+        <Badge variant="secondary" className="mb-4">
+          Core Component
+        </Badge>
+        <Heading
+          level={1}
+          className="mb-4 bg-gradient-to-br from-indigo-500 to-blue-500 bg-clip-text text-transparent"
+        >
           DataSource Manager
         </Heading>
         <p className="text-xl mb-6 max-w-2xl text-muted-foreground">
-          The central orchestrator for Bitcoin data retrieval, providing seamless access to multiple data providers through a unified interface.
+          The central orchestrator for Bitcoin data retrieval, providing
+          seamless access to multiple data providers through a unified
+          interface.
         </p>
       </div>
 
@@ -38,12 +54,19 @@ export default function DataSourceManagerPage() {
   )
 }
 
-function FeatureCard({ icon: Icon, title, description, className }: FeatureCardProps) {
+function FeatureCard({
+  icon: Icon,
+  title,
+  description,
+  className,
+}: FeatureCardProps) {
   return (
-    <Card className={cn(
-      "group relative overflow-hidden transition-all duration-300 hover:border-indigo-500/30 hover:shadow-lg hover:shadow-indigo-500/5",
-      className
-    )}>
+    <Card
+      className={cn(
+        'group relative overflow-hidden transition-all duration-300 hover:border-indigo-500/30 hover:shadow-lg hover:shadow-indigo-500/5',
+        className
+      )}
+    >
       <div className="absolute right-0 top-0 h-20 w-20 translate-x-6 -translate-y-6 rounded-full bg-indigo-500/10 blur-2xl filter group-hover:bg-indigo-500/20" />
       <CardContent className="p-6">
         <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-indigo-500/10 text-indigo-500">
@@ -64,13 +87,15 @@ function DataSourceManagerContent() {
           <CardContent className="p-6">
             <div className="text-lg leading-relaxed space-y-4">
               <p>
-                The DataSource Manager is the central component that orchestrates data retrieval from different Bitcoin data providers.
-                It handles provider selection, fallbacks, caching, and data normalization, ensuring your application maintains
+                The DataSource Manager is the central component that
+                orchestrates data retrieval from different Bitcoin data
+                providers. It handles provider selection, fallbacks, caching,
+                and data normalization, ensuring your application maintains
                 consistent access to blockchain data.
               </p>
               <div className="relative overflow-hidden rounded-lg bg-muted p-4">
                 <pre className="text-xs md:text-sm whitespace-pre text-muted-foreground">
-{`┌─────────────────────────────────────────────────────────────┐
+                  {`┌─────────────────────────────────────────────────────────────┐
 │                     Your Application                         │
 └──────────────────────────┬──────────────────────────────────┘
                           │
@@ -120,7 +145,9 @@ function DataSourceManagerContent() {
         <h2 className="text-3xl font-bold">Core Methods</h2>
         <Card className="overflow-hidden">
           <CardHeader className="border-b bg-muted/50 px-6">
-            <h2 className="font-mono text-sm font-medium">DataSourceManager Interface</h2>
+            <h2 className="font-mono text-sm font-medium">
+              DataSourceManager Interface
+            </h2>
           </CardHeader>
           <CardContent className="p-6">
             <CodeBlock
@@ -156,7 +183,9 @@ function DataSourceManagerContent() {
         <h2 className="text-3xl font-bold">Usage Example</h2>
         <Card className="overflow-hidden">
           <CardHeader className="border-b bg-muted/50 px-6">
-            <h2 className="font-mono text-sm font-medium">React Component Example</h2>
+            <h2 className="font-mono text-sm font-medium">
+              React Component Example
+            </h2>
           </CardHeader>
           <CardContent className="p-6">
             <CodeBlock
@@ -213,7 +242,9 @@ function BitcoinData() {
         <h2 className="text-3xl font-bold">Provider Configuration</h2>
         <Card className="overflow-hidden">
           <CardHeader className="border-b bg-muted/50 px-6">
-            <h2 className="font-mono text-sm font-medium">Configuration Example</h2>
+            <h2 className="font-mono text-sm font-medium">
+              Configuration Example
+            </h2>
           </CardHeader>
           <CardContent className="p-6">
             <CodeBlock
@@ -259,7 +290,8 @@ const config = createConfig({
               </div>
               <h3 className="text-lg font-semibold mb-2">Multiple Providers</h3>
               <p className="text-muted-foreground">
-                Configure multiple data providers with different priorities for optimal reliability and performance.
+                Configure multiple data providers with different priorities for
+                optimal reliability and performance.
               </p>
             </CardContent>
           </Card>
@@ -270,7 +302,8 @@ const config = createConfig({
               </div>
               <h3 className="text-lg font-semibold mb-2">Error Handling</h3>
               <p className="text-muted-foreground">
-                Implement proper error handling and retries for network issues or provider outages.
+                Implement proper error handling and retries for network issues
+                or provider outages.
               </p>
             </CardContent>
           </Card>
@@ -281,7 +314,8 @@ const config = createConfig({
               </div>
               <h3 className="text-lg font-semibold mb-2">Caching Strategy</h3>
               <p className="text-muted-foreground">
-                Utilize the built-in caching system effectively to reduce API calls and improve response times.
+                Utilize the built-in caching system effectively to reduce API
+                calls and improve response times.
               </p>
             </CardContent>
           </Card>
@@ -292,7 +326,8 @@ const config = createConfig({
               </div>
               <h3 className="text-lg font-semibold mb-2">API Keys</h3>
               <p className="text-muted-foreground">
-                Use environment variables for API keys and register for production keys with data providers.
+                Use environment variables for API keys and register for
+                production keys with data providers.
               </p>
             </CardContent>
           </Card>
@@ -300,4 +335,4 @@ const config = createConfig({
       </section>
     </div>
   )
-} 
+}

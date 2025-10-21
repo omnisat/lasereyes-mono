@@ -1,4 +1,4 @@
-import { Psbt } from "bitcoinjs-lib";
+import { Psbt } from 'bitcoinjs-lib'
 
 export function estimateTxSize(psbt: Psbt) {
   const tx = psbt.extractTransaction()

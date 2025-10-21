@@ -1,15 +1,29 @@
-"use client"
+'use client'
 
-import * as React from "react"
-import { ClientPageWrapper } from "@/components/client-page-wrapper"
-import { CodeBlock } from "@/components/code-block"
-import { Heading } from "@/components/heading"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Zap, Sparkles, Cpu, Rocket, Scale, BarChart3, Shield, Workflow, Database, Code2, ArrowRight, Terminal, Github } from "lucide-react"
-import { cn } from "@/lib/utils"
-import Link from "next/link"
+import * as React from 'react'
+import { ClientPageWrapper } from '@/components/client-page-wrapper'
+import { CodeBlock } from '@/components/code-block'
+import { Heading } from '@/components/heading'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import {
+  Zap,
+  Sparkles,
+  Cpu,
+  Rocket,
+  Scale,
+  BarChart3,
+  Shield,
+  Workflow,
+  Database,
+  Code2,
+  ArrowRight,
+  Terminal,
+  Github,
+} from 'lucide-react'
+import { cn } from '@/lib/utils'
+import Link from 'next/link'
 
 interface FeatureCardProps {
   icon: React.ElementType
@@ -25,11 +39,26 @@ export default function SandshrewPage() {
         <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-emerald-600/20 rounded-full blur-[120px] -z-10 translate-x-1/2 -translate-y-1/2 animate-pulse" />
         <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-teal-500/10 rounded-full blur-[100px] -z-10 -translate-x-1/2 translate-y-1/2 animate-pulse" />
         <div className="absolute top-1/2 left-1/2 w-[200px] h-[200px] bg-emerald-400/10 rounded-full blur-[80px] -z-10 -translate-x-1/2 -translate-y-1/2" />
-        
+
         <div className="flex items-center gap-3 mb-4">
-          <Badge variant="secondary" className="bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20">High Performance</Badge>
-          <Badge variant="secondary" className="bg-teal-500/10 text-teal-500 hover:bg-teal-500/20">Open Source</Badge>
-          <Badge variant="secondary" className="bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20">Sponsor</Badge>
+          <Badge
+            variant="secondary"
+            className="bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20"
+          >
+            High Performance
+          </Badge>
+          <Badge
+            variant="secondary"
+            className="bg-teal-500/10 text-teal-500 hover:bg-teal-500/20"
+          >
+            Open Source
+          </Badge>
+          <Badge
+            variant="secondary"
+            className="bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20"
+          >
+            Sponsor
+          </Badge>
         </div>
 
         <div className="flex items-center gap-6 mb-6">
@@ -37,15 +66,21 @@ export default function SandshrewPage() {
             <Database className="h-7 w-7 text-emerald-500" />
           </div>
           <div>
-            <Heading level={1} className="bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-500 bg-clip-text text-transparent">
+            <Heading
+              level={1}
+              className="bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-500 bg-clip-text text-transparent"
+            >
               Sandshrew
             </Heading>
-            <p className="text-sm text-muted-foreground">Enterprise-grade Bitcoin Indexer</p>
+            <p className="text-sm text-muted-foreground">
+              Enterprise-grade Bitcoin Indexer
+            </p>
           </div>
         </div>
 
         <p className="text-xl mb-8 max-w-2xl text-muted-foreground">
-          High-performance, open-source Bitcoin indexer and API. Built for speed, reliability, and scalability.
+          High-performance, open-source Bitcoin indexer and API. Built for
+          speed, reliability, and scalability.
         </p>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
@@ -57,7 +92,9 @@ export default function SandshrewPage() {
                 </div>
                 <div>
                   <div className="text-sm font-medium">Scalable</div>
-                  <div className="text-xs text-muted-foreground">Handles high load</div>
+                  <div className="text-xs text-muted-foreground">
+                    Handles high load
+                  </div>
                 </div>
               </div>
             </CardContent>
@@ -70,7 +107,9 @@ export default function SandshrewPage() {
                 </div>
                 <div>
                   <div className="text-sm font-medium">Lightning Fast</div>
-                  <div className="text-xs text-muted-foreground">Sub-100ms queries</div>
+                  <div className="text-xs text-muted-foreground">
+                    Sub-100ms queries
+                  </div>
                 </div>
               </div>
             </CardContent>
@@ -83,7 +122,9 @@ export default function SandshrewPage() {
                 </div>
                 <div>
                   <div className="text-sm font-medium">Open Source</div>
-                  <div className="text-xs text-muted-foreground">MIT Licensed</div>
+                  <div className="text-xs text-muted-foreground">
+                    MIT Licensed
+                  </div>
                 </div>
               </div>
             </CardContent>
@@ -96,7 +137,9 @@ export default function SandshrewPage() {
                 </div>
                 <div>
                   <div className="text-sm font-medium">Easy Setup</div>
-                  <div className="text-xs text-muted-foreground">Docker ready</div>
+                  <div className="text-xs text-muted-foreground">
+                    Docker ready
+                  </div>
                 </div>
               </div>
             </CardContent>
@@ -105,7 +148,10 @@ export default function SandshrewPage() {
 
         <div className="flex gap-4 items-center">
           <Link href="https://sandshrew.io" target="_blank">
-            <Button size="lg" className="bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 group">
+            <Button
+              size="lg"
+              className="bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 group"
+            >
               Get Started
               <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Button>
@@ -126,12 +172,19 @@ export default function SandshrewPage() {
   )
 }
 
-function FeatureCard({ icon: Icon, title, description, className }: FeatureCardProps) {
+function FeatureCard({
+  icon: Icon,
+  title,
+  description,
+  className,
+}: FeatureCardProps) {
   return (
-    <Card className={cn(
-      "group relative overflow-hidden transition-all duration-300 hover:border-emerald-500/30 hover:shadow-lg hover:shadow-emerald-500/5",
-      className
-    )}>
+    <Card
+      className={cn(
+        'group relative overflow-hidden transition-all duration-300 hover:border-emerald-500/30 hover:shadow-lg hover:shadow-emerald-500/5',
+        className
+      )}
+    >
       <div className="absolute right-0 top-0 h-20 w-20 translate-x-6 -translate-y-6 rounded-full bg-emerald-500/10 blur-2xl filter group-hover:bg-emerald-500/20" />
       <CardContent className="p-6">
         <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-500/20 to-teal-500/20 text-emerald-500 ring-1 ring-emerald-500/20">
@@ -196,7 +249,13 @@ const config = createConfig({
               copyButton={true}
             />
             <div className="mt-4 text-sm text-muted-foreground">
-              Get your API key at <a href="https://sandshrew.io" className="text-emerald-500 hover:text-emerald-400">sandshrew.io</a>
+              Get your API key at{' '}
+              <a
+                href="https://sandshrew.io"
+                className="text-emerald-500 hover:text-emerald-400"
+              >
+                sandshrew.io
+              </a>
             </div>
           </CardContent>
         </Card>
@@ -281,19 +340,26 @@ ws.onmessage = (event) => {
           <Card className="border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 to-background">
             <CardContent className="p-6">
               <h3 className="text-lg font-semibold mb-2">Docker Support</h3>
-              <p className="text-sm text-muted-foreground">Easy deployment with official Docker images and compose files.</p>
+              <p className="text-sm text-muted-foreground">
+                Easy deployment with official Docker images and compose files.
+              </p>
             </CardContent>
           </Card>
           <Card className="border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 to-background">
             <CardContent className="p-6">
               <h3 className="text-lg font-semibold mb-2">Full Control</h3>
-              <p className="text-sm text-muted-foreground">Run your own instance with complete control over data and settings.</p>
+              <p className="text-sm text-muted-foreground">
+                Run your own instance with complete control over data and
+                settings.
+              </p>
             </CardContent>
           </Card>
           <Card className="border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 to-background">
             <CardContent className="p-6">
               <h3 className="text-lg font-semibold mb-2">Community Support</h3>
-              <p className="text-sm text-muted-foreground">Active community and maintainers for support and contributions.</p>
+              <p className="text-sm text-muted-foreground">
+                Active community and maintainers for support and contributions.
+              </p>
             </CardContent>
           </Card>
         </div>
@@ -309,10 +375,11 @@ ws.onmessage = (event) => {
               <h2 className="text-2xl font-bold">Open Source</h2>
             </div>
             <p className="text-muted-foreground mb-4">
-              Sandshrew is open source under the MIT license. We welcome contributions from the community!
+              Sandshrew is open source under the MIT license. We welcome
+              contributions from the community!
             </p>
-            <Link 
-              href="https://github.com/sandshrew/sandshrew" 
+            <Link
+              href="https://github.com/sandshrew/sandshrew"
               className="inline-flex items-center text-emerald-500 hover:text-emerald-400"
             >
               View on GitHub
@@ -324,4 +391,3 @@ ws.onmessage = (event) => {
     </div>
   )
 }
-

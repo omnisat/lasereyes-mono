@@ -7,6 +7,7 @@ import {
   OYL,
   PHANTOM,
   UNISAT,
+  UNIVERSAL,
   WIZZ,
   XVERSE,
   ORANGE,
@@ -49,6 +50,7 @@ export function createStores(): {
       hasProvider: {
         [LEATHER]: false,
         [UNISAT]: false,
+        [UNIVERSAL]: false,
         [MAGIC_EDEN]: false,
         [OKX]: false,
         [OP_NET]: false,

@@ -1,4 +1,3 @@
-
 export interface EsploraTx {
   txid: string
   version: number

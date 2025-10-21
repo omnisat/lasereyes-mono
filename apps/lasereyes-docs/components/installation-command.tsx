@@ -1,30 +1,39 @@
-"use client"
+'use client'
 
-import { usePackageManager } from "./package-manager-provider"
-import { CodeBlock } from "./code-block"
+import { usePackageManager } from './package-manager-provider'
+import { CodeBlock } from './code-block'
 
 interface InstallationCommandProps {
   packages: string[]
   className?: string
 }
 
-export function InstallationCommand({ packages, className }: InstallationCommandProps) {
+export function InstallationCommand({
+  packages,
+  className,
+}: InstallationCommandProps) {
   const { packageManager } = usePackageManager()
 
   const getCommand = () => {
-    const pkgs = packages.join(" ")
+    const pkgs = packages.join(' ')
     switch (packageManager) {
-      case "npm":
+      case 'npm':
         return `npm install ${pkgs}`
-      case "yarn":
+      case 'yarn':
         return `yarn add ${pkgs}`
-      case "pnpm":
+      case 'pnpm':
         return `pnpm add ${pkgs}`
       default:
         return `npm install ${pkgs}`
     }
   }
 
-  return <CodeBlock language="bash" code={getCommand()} copyButton={true} className={className} />
+  return (
+    <CodeBlock
+      language="bash"
+      code={getCommand()}
+      copyButton={true}
+      className={className}
+    />
+  )
 }
-

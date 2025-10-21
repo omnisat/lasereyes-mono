@@ -1,8 +1,8 @@
-import path from "node:path"
-import react from "@vitejs/plugin-react"
-import { defineConfig } from "vite"
+import path from 'node:path'
+import react from '@vitejs/plugin-react'
+import { defineConfig } from 'vite'
 // import { nodePolyfills } from "vite-plugin-node-polyfills";
-import dts from "vite-plugin-dts"
+import dts from 'vite-plugin-dts'
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -11,26 +11,26 @@ export default defineConfig({
     // nodePolyfills({
     //   include: ["buffer"],
     // }),
-    dts({ tsconfigPath: "./tsconfig.build.json" }),
+    dts({ tsconfigPath: './tsconfig.build.json' }),
   ],
   build: {
     lib: {
-      entry: path.resolve(__dirname, "src/index.ts"),
-      formats: ["es"],
+      entry: path.resolve(__dirname, 'src/index.ts'),
+      formats: ['es'],
     },
     rollupOptions: {
       external: [
-        "react",
-        "react-dom",
-        "react/jsx-runtime",
-        "@omnisat/lasereyes",
+        'react',
+        'react-dom',
+        'react/jsx-runtime',
+        '@omnisat/lasereyes',
       ],
       output: {
-        entryFileNames: "[name].js",
+        entryFileNames: '[name].js',
         globals: {
-          react: "React",
-          "react-dom": "ReactDOM",
-          "@omnisat/lasereyes": "Lasereyes",
+          react: 'React',
+          'react-dom': 'ReactDOM',
+          '@omnisat/lasereyes': 'Lasereyes',
         },
       },
     },

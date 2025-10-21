@@ -8,18 +8,18 @@ export async function getTransactionMempoolSpace(
   txId: string,
   network: NetworkType = MAINNET
 ): Promise<EsploraTx> {
-    return await axios
-      .get(`${getMempoolSpaceUrl(network)}/api/tx/${txId}`)
-      .then((res) => res.data)
+  return await axios
+    .get(`${getMempoolSpaceUrl(network)}/api/tx/${txId}`)
+    .then((res) => res.data)
 }
 
 export async function getRawTransactionMempoolSpace(
   txId: string,
   network: NetworkType = MAINNET
 ): Promise<any> {
-    return await axios
-      .get(`${getMempoolSpaceUrl(network)}/api/tx/${txId}/raw`)
-      .then((res) => res.data)
+  return await axios
+    .get(`${getMempoolSpaceUrl(network)}/api/tx/${txId}/raw`)
+    .then((res) => res.data)
 }
 
 export const getRecommendedFeesMempoolSpace = async (

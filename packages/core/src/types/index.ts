@@ -29,7 +29,7 @@ import type {
   VIDEO_MP4,
   VIDEO_OGG,
   VIDEO_WEBM,
-} from "../constants/content"
+} from '../constants/content'
 import type {
   FRACTAL_MAINNET,
   FRACTAL_TESTNET,
@@ -38,8 +38,8 @@ import type {
   SIGNET,
   TESTNET,
   TESTNET4,
-} from "../constants/networks"
-import type { ALKANES, BRC20, BTC, RUNES } from "../constants/protocols"
+} from '../constants/networks'
+import type { ALKANES, BRC20, BTC, RUNES } from '../constants/protocols'
 import type {
   KEPLR,
   LEATHER,
@@ -52,10 +52,11 @@ import type {
   SPARROW,
   TOKEO,
   UNISAT,
+  UNIVERSAL,
   WIZZ,
   XVERSE,
-} from "../constants/wallets"
-import type { BaseNetwork } from "./network"
+} from '../constants/wallets'
+import type { BaseNetwork } from './network'
 
 export type BaseNetworkType =
   | typeof BaseNetwork.MAINNET
@@ -70,6 +71,7 @@ export type NetworkType = BaseNetworkType | string
 
 export type ProviderType =
   | typeof UNISAT
+  | typeof UNIVERSAL
   | typeof XVERSE
   | typeof OYL
   | typeof MAGIC_EDEN
@@ -117,14 +119,14 @@ export type ContentType =
 
 export type Config = {
   network?:
-  | typeof MAINNET
-  | typeof TESTNET
-  | typeof TESTNET4
-  | typeof SIGNET
-  | typeof FRACTAL_MAINNET
-  | typeof FRACTAL_TESTNET
-  | typeof OYLNET
-  | string
+    | typeof MAINNET
+    | typeof TESTNET
+    | typeof TESTNET4
+    | typeof SIGNET
+    | typeof FRACTAL_MAINNET
+    | typeof FRACTAL_TESTNET
+    | typeof OYLNET
+    | string
   dataSources?: {
     mempool?: {
       url: string
@@ -146,11 +148,11 @@ export type Config = {
           apiUrl: string
         }
         [key: string]:
-        | {
-          apiKey: string
-          apiUrl: string
-        }
-        | undefined
+          | {
+              apiKey: string
+              apiUrl: string
+            }
+          | undefined
       }
     }
     esplora?: string
@@ -172,7 +174,7 @@ export type Config = {
   customNetworks?: {
     [key: string]: {
       baseNetwork: BaseNetworkType
-      preferredDataSource: "mempool" | "sandshrew" | "maestro" | string
+      preferredDataSource: 'mempool' | 'sandshrew' | 'maestro' | string
     }
   }
 }
@@ -193,7 +195,7 @@ export interface BTCSendArgs {
   network: NetworkType
 }
 
-export * from "./lasereyes"
+export * from './lasereyes'
 
 export interface RuneSendArgs {
   runeId: string
@@ -304,9 +306,9 @@ export interface MempoolUtxo {
 
 export type PhantomBtcAccount = {
   address: string
-  addressType: "p2tr" | "p2wpkh" | "p2sh" | "p2pkh"
+  addressType: 'p2tr' | 'p2wpkh' | 'p2sh' | 'p2pkh'
   publicKey: string
-  purpose: "payment" | "ordinals"
+  purpose: 'payment' | 'ordinals'
 }
 
 export type WizzBalanceResponse = {
@@ -438,13 +440,13 @@ export interface AlkanesOutpoint {
   height: number
 }
 
-export * from "./alkane"
-export * from "./data-source"
-export * from "./esplora"
-export * from "./lasereyes"
-export * from "./maestro"
-export * from "./mempool-space"
-export * from "./network"
-export * from "./ord"
-export * from "./sandshrew"
-export * from "./utxo"
+export * from './alkane'
+export * from './data-source'
+export * from './esplora'
+export * from './lasereyes'
+export * from './maestro'
+export * from './mempool-space'
+export * from './network'
+export * from './ord'
+export * from './sandshrew'
+export * from './utxo'

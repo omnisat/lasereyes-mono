@@ -1,15 +1,31 @@
-"use client"
+'use client'
 
-import * as React from "react"
-import { ClientPageWrapper } from "@/components/client-page-wrapper"
-import { CodeBlock } from "@/components/code-block"
-import { Heading } from "@/components/heading"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Zap, Sparkles, Cpu, Rocket, Scale, BarChart3, Shield, Workflow, Database, Code2, ArrowRight, Terminal, Github, Globe, Activity } from "lucide-react"
-import { cn } from "@/lib/utils"
-import Link from "next/link"
+import * as React from 'react'
+import { ClientPageWrapper } from '@/components/client-page-wrapper'
+import { CodeBlock } from '@/components/code-block'
+import { Heading } from '@/components/heading'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import {
+  Zap,
+  Sparkles,
+  Cpu,
+  Rocket,
+  Scale,
+  BarChart3,
+  Shield,
+  Workflow,
+  Database,
+  Code2,
+  ArrowRight,
+  Terminal,
+  Github,
+  Globe,
+  Activity,
+} from 'lucide-react'
+import { cn } from '@/lib/utils'
+import Link from 'next/link'
 
 interface FeatureCardProps {
   icon: React.ElementType
@@ -26,11 +42,26 @@ export default function MempoolSpacePage() {
         <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-blue-600/20 rounded-full blur-[120px] -z-10 translate-x-1/2 -translate-y-1/2 animate-pulse" />
         <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-sky-500/10 rounded-full blur-[100px] -z-10 -translate-x-1/2 translate-y-1/2 animate-pulse" />
         <div className="absolute top-1/2 left-1/2 w-[200px] h-[200px] bg-blue-400/10 rounded-full blur-[80px] -z-10 -translate-x-1/2 -translate-y-1/2" />
-        
+
         <div className="flex items-center gap-3 mb-4">
-          <Badge variant="secondary" className="bg-blue-500/10 text-blue-500 hover:bg-blue-500/20">Community Favorite</Badge>
-          <Badge variant="secondary" className="bg-sky-500/10 text-sky-500 hover:bg-sky-500/20">Open Source</Badge>
-          <Badge variant="secondary" className="bg-blue-500/10 text-blue-500 hover:bg-blue-500/20">Real-time Data</Badge>
+          <Badge
+            variant="secondary"
+            className="bg-blue-500/10 text-blue-500 hover:bg-blue-500/20"
+          >
+            Community Favorite
+          </Badge>
+          <Badge
+            variant="secondary"
+            className="bg-sky-500/10 text-sky-500 hover:bg-sky-500/20"
+          >
+            Open Source
+          </Badge>
+          <Badge
+            variant="secondary"
+            className="bg-blue-500/10 text-blue-500 hover:bg-blue-500/20"
+          >
+            Real-time Data
+          </Badge>
         </div>
 
         <div className="flex items-center gap-6 mb-6">
@@ -38,15 +69,21 @@ export default function MempoolSpacePage() {
             <Activity className="h-7 w-7 text-blue-500" />
           </div>
           <div>
-            <Heading level={1} className="bg-gradient-to-r from-blue-600 via-blue-500 to-sky-500 bg-clip-text text-transparent">
+            <Heading
+              level={1}
+              className="bg-gradient-to-r from-blue-600 via-blue-500 to-sky-500 bg-clip-text text-transparent"
+            >
               mempool.space
             </Heading>
-            <p className="text-sm text-muted-foreground">Real-time Bitcoin Network Explorer</p>
+            <p className="text-sm text-muted-foreground">
+              Real-time Bitcoin Network Explorer
+            </p>
           </div>
         </div>
 
         <p className="text-xl mb-8 max-w-2xl text-muted-foreground">
-          The most advanced Bitcoin mempool visualizer and blockchain explorer. Trusted by the community for real-time network insights.
+          The most advanced Bitcoin mempool visualizer and blockchain explorer.
+          Trusted by the community for real-time network insights.
         </p>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
@@ -58,7 +95,9 @@ export default function MempoolSpacePage() {
                 </div>
                 <div>
                   <div className="text-sm font-medium">Global Network</div>
-                  <div className="text-xs text-muted-foreground">Worldwide nodes</div>
+                  <div className="text-xs text-muted-foreground">
+                    Worldwide nodes
+                  </div>
                 </div>
               </div>
             </CardContent>
@@ -71,7 +110,9 @@ export default function MempoolSpacePage() {
                 </div>
                 <div>
                   <div className="text-sm font-medium">Real-time Data</div>
-                  <div className="text-xs text-muted-foreground">Live updates</div>
+                  <div className="text-xs text-muted-foreground">
+                    Live updates
+                  </div>
                 </div>
               </div>
             </CardContent>
@@ -84,7 +125,9 @@ export default function MempoolSpacePage() {
                 </div>
                 <div>
                   <div className="text-sm font-medium">Open API</div>
-                  <div className="text-xs text-muted-foreground">Free access</div>
+                  <div className="text-xs text-muted-foreground">
+                    Free access
+                  </div>
                 </div>
               </div>
             </CardContent>
@@ -97,7 +140,9 @@ export default function MempoolSpacePage() {
                 </div>
                 <div>
                   <div className="text-sm font-medium">Trusted</div>
-                  <div className="text-xs text-muted-foreground">Community backed</div>
+                  <div className="text-xs text-muted-foreground">
+                    Community backed
+                  </div>
                 </div>
               </div>
             </CardContent>
@@ -106,7 +151,10 @@ export default function MempoolSpacePage() {
 
         <div className="flex gap-4 items-center">
           <Link href="https://mempool.space" target="_blank">
-            <Button size="lg" className="bg-gradient-to-r from-blue-600 to-sky-500 hover:from-blue-500 hover:to-sky-400 group">
+            <Button
+              size="lg"
+              className="bg-gradient-to-r from-blue-600 to-sky-500 hover:from-blue-500 hover:to-sky-400 group"
+            >
               Explore Network
               <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Button>
@@ -127,12 +175,19 @@ export default function MempoolSpacePage() {
   )
 }
 
-function FeatureCard({ icon: Icon, title, description, className }: FeatureCardProps) {
+function FeatureCard({
+  icon: Icon,
+  title,
+  description,
+  className,
+}: FeatureCardProps) {
   return (
-    <Card className={cn(
-      "group relative overflow-hidden transition-all duration-300 hover:border-blue-500/30 hover:shadow-lg hover:shadow-blue-500/5",
-      className
-    )}>
+    <Card
+      className={cn(
+        'group relative overflow-hidden transition-all duration-300 hover:border-blue-500/30 hover:shadow-lg hover:shadow-blue-500/5',
+        className
+      )}
+    >
       <div className="absolute right-0 top-0 h-20 w-20 translate-x-6 -translate-y-6 rounded-full bg-blue-500/10 blur-2xl filter group-hover:bg-blue-500/20" />
       <CardContent className="p-6">
         <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500/20 to-sky-500/20 text-blue-500 ring-1 ring-blue-500/20">
@@ -197,7 +252,8 @@ const config = createConfig({
               copyButton={true}
             />
             <div className="mt-4 text-sm text-muted-foreground">
-              No API key required! mempool.space provides free access to their public API.
+              No API key required! mempool.space provides free access to their
+              public API.
             </div>
           </CardContent>
         </Card>
@@ -245,19 +301,25 @@ function BitcoinData() {
           <Card className="border-blue-500/20 bg-gradient-to-br from-blue-500/10 to-background">
             <CardContent className="p-6">
               <h3 className="text-lg font-semibold mb-2">Fee Estimation</h3>
-              <p className="text-sm text-muted-foreground">Accurate fee estimates based on real-time mempool analysis.</p>
+              <p className="text-sm text-muted-foreground">
+                Accurate fee estimates based on real-time mempool analysis.
+              </p>
             </CardContent>
           </Card>
           <Card className="border-blue-500/20 bg-gradient-to-br from-blue-500/10 to-background">
             <CardContent className="p-6">
               <h3 className="text-lg font-semibold mb-2">Block Explorer</h3>
-              <p className="text-sm text-muted-foreground">Detailed block and transaction data with visual insights.</p>
+              <p className="text-sm text-muted-foreground">
+                Detailed block and transaction data with visual insights.
+              </p>
             </CardContent>
           </Card>
           <Card className="border-blue-500/20 bg-gradient-to-br from-blue-500/10 to-background">
             <CardContent className="p-6">
               <h3 className="text-lg font-semibold mb-2">Network Stats</h3>
-              <p className="text-sm text-muted-foreground">Comprehensive network statistics and health metrics.</p>
+              <p className="text-sm text-muted-foreground">
+                Comprehensive network statistics and health metrics.
+              </p>
             </CardContent>
           </Card>
         </div>
@@ -273,10 +335,11 @@ function BitcoinData() {
               <h2 className="text-2xl font-bold">Community Driven</h2>
             </div>
             <p className="text-muted-foreground mb-4">
-              mempool.space is an open-source project supported by the Bitcoin community. Run your own instance or contribute to the project!
+              mempool.space is an open-source project supported by the Bitcoin
+              community. Run your own instance or contribute to the project!
             </p>
-            <Link 
-              href="https://github.com/mempool/mempool" 
+            <Link
+              href="https://github.com/mempool/mempool"
               className="inline-flex items-center text-blue-500 hover:text-blue-400"
             >
               Learn More
@@ -288,4 +351,3 @@ function BitcoinData() {
     </div>
   )
 }
-

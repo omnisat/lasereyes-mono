@@ -1,6 +1,6 @@
-"use client"
+'use client'
 
-import { useEffect } from "react"
+import { useEffect } from 'react'
 
 export default function DocsError({
   error,
@@ -29,4 +29,3 @@ export default function DocsError({
     </div>
   )
 }
-
