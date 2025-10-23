@@ -52,6 +52,7 @@ import type {
   SPARROW,
   TOKEO,
   UNISAT,
+  UNIVERSAL,
   WIZZ,
   XVERSE,
 } from "../constants/wallets"
@@ -70,6 +71,7 @@ export type NetworkType = BaseNetworkType | string
 
 export type ProviderType =
   | typeof UNISAT
+  | typeof UNIVERSAL
   | typeof XVERSE
   | typeof OYL
   | typeof MAGIC_EDEN

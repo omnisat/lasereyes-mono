@@ -13,6 +13,7 @@ Lasereyes Modal makes it easy for developers to integrate Bitcoin wallet connect
 - Orange Wallet
 - OYL
 - Unisat
+- Universal
 - Wizz
 - Phantom
 - Xverse

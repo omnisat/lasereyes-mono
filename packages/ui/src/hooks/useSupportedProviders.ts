@@ -17,6 +17,7 @@ export interface WalletInfo {
 export default function useSupportedProviders() {
   const {
     hasUnisat,
+	hasUniversal,
     hasLeather,
     hasMagicEden,
     hasOkx,
@@ -36,6 +37,7 @@ export default function useSupportedProviders() {
   const hasWallet: Record<keyof typeof SUPPORTED_WALLETS, boolean> = useMemo(
     () => ({
       unisat: hasUnisat,
+      universal: hasUniversal,
       xverse: hasXverse,
       oyl: hasOyl,
       [MAGIC_EDEN]: hasMagicEden,
@@ -60,6 +62,7 @@ export default function useSupportedProviders() {
       hasSparrow,
       hasTokeo,
       hasUnisat,
+      hasUniversal,
       hasWizz,
       hasXverse,
       hasKeplr,

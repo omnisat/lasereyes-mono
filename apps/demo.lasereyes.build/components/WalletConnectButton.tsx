@@ -6,6 +6,7 @@ import {
   type OYL,
   type PHANTOM,
   type UNISAT,
+  type UNIVERSAL,
   type WIZZ,
   type XVERSE,
   type LEATHER,
@@ -38,6 +39,7 @@ const WalletConnectButton = ({
     disconnect,
     provider,
     hasUnisat,
+    hasUniversal,
     hasXverse,
     hasOyl,
     hasMagicEden,
@@ -54,6 +56,7 @@ const WalletConnectButton = ({
 
   const hasWallet = {
     unisat: hasUnisat,
+    universal: hasUniversal,
     xverse: hasXverse,
     oyl: hasOyl,
     [MAGIC_EDEN]: hasMagicEden,
@@ -77,6 +80,7 @@ const WalletConnectButton = ({
   const connectWallet = async (
     walletName:
       | typeof UNISAT
+      | typeof UNIVERSAL
       | typeof XVERSE
       | typeof OYL
       | typeof MAGIC_EDEN
@@ -101,6 +105,7 @@ const WalletConnectButton = ({
 
   type WalletProvders =
     | typeof UNISAT
+    | typeof UNIVERSAL
     | typeof XVERSE
     | typeof OYL
     | typeof MAGIC_EDEN

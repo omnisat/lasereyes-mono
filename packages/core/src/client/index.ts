@@ -19,6 +19,7 @@ import {
   SPARROW,
   TOKEO,
   UNISAT,
+  UNIVERSAL,
   WIZZ,
   XVERSE,
 } from "../constants/wallets"
@@ -48,6 +49,7 @@ import PhantomProvider from "./providers/phantom"
 import SparrowProvider from "./providers/sparrow"
 import TokeoProvider from "./providers/tokeo"
 import UnisatProvider from "./providers/unisat"
+import UniversalProvider from "./providers/universal"
 import { WizzProvider } from "./providers/wizz"
 import XVerseProvider from "./providers/xverse"
 import type {
@@ -99,6 +101,7 @@ export class LaserEyesClient {
       [SPARROW]: new SparrowProvider(stores, this, config),
       [TOKEO]: new TokeoProvider(stores, this, config),
       [UNISAT]: new UnisatProvider(stores, this, config),
+      [UNIVERSAL]: new UniversalProvider(stores, this, config),
       [XVERSE]: new XVerseProvider(stores, this, config),
       [WIZZ]: new WizzProvider(stores, this, config),
       [KEPLR]: new KeplrProvider(stores, this, config),

@@ -21,6 +21,7 @@ export type LaserEyesContextType = {
   provider: ProviderType | undefined
   accounts: string[]
   hasUnisat: boolean
+  hasUniversal: boolean
   hasXverse: boolean
   hasOrange: boolean
   hasOpNet: boolean

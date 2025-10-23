@@ -5,6 +5,7 @@ import { MagicEdenLogo } from './magiceden.tsx'
 import { OkxLogo } from './okx.tsx'
 import { PhantomLogo } from './phantom.tsx'
 import { UnisatLogo } from './unisat.tsx'
+import { UniversalLogo } from './universal.tsx'
 import { TokeoLogo } from './tokeo.tsx'
 import { OylLogo } from './oyl.tsx'
 import OrangeLogo from './orange.tsx'
@@ -18,6 +19,7 @@ import {
   OKX,
   PHANTOM,
   UNISAT,
+  UNIVERSAL,
   WIZZ,
   ORANGE,
   OYL,
@@ -55,6 +57,8 @@ const WalletIcon = ({
     return <PhantomLogo size={size} className={className} variant={variant} />
   } else if (walletName === UNISAT) {
     return <UnisatLogo size={size} className={className} variant={variant} />
+  } else if (walletName === UNIVERSAL) {
+    return <UniversalLogo size={size} className={className} variant={variant} />
   } else if (walletName === OYL) {
     return <OylLogo size={size} className={className} variant={variant} />
   } else if (walletName === ORANGE) {
