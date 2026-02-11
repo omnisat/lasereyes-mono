@@ -1,0 +1,88 @@
+{
+  "name": "@omnisat/lasereyes-client",
+  "private": false,
+  "version": "0.0.1",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./runes": {
+      "import": "./dist/runes/index.js",
+      "types": "./dist/runes/index.d.ts"
+    },
+    "./brc20": {
+      "import": "./dist/brc20/index.js",
+      "types": "./dist/brc20/index.d.ts"
+    },
+    "./alkanes": {
+      "import": "./dist/alkanes/index.js",
+      "types": "./dist/alkanes/index.d.ts"
+    },
+    "./inscriptions": {
+      "import": "./dist/inscriptions/index.js",
+      "types": "./dist/inscriptions/index.d.ts"
+    },
+    "./vendors/mempool": {
+      "import": "./dist/vendors/mempool/index.js",
+      "types": "./dist/vendors/mempool/index.d.ts"
+    },
+    "./vendors/sandshrew": {
+      "import": "./dist/vendors/sandshrew/index.js",
+      "types": "./dist/vendors/sandshrew/index.d.ts"
+    },
+    "./vendors/maestro": {
+      "import": "./dist/vendors/maestro/index.js",
+      "types": "./dist/vendors/maestro/index.d.ts"
+    }
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "prepublishOnly": "npm run build",
+    "prepare": "npm run build",
+    "test": "vitest run",
+    "size": "size-limit",
+    "size:why": "size-limit --why"
+  },
+  "devDependencies": {
+    "@size-limit/esbuild-why": "^12.0.0",
+    "@size-limit/preset-small-lib": "^12.0.0",
+    "@types/node": "^22.7.7",
+    "size-limit": "^12.0.0",
+    "typescript": "5.8.3",
+    "vite": "^5.4.1",
+    "vite-plugin-dts": "^4.2.1",
+    "vitest": "^2.1.2"
+  },
+  "dependencies": {
+    "@noble/hashes": "^1.7.0",
+    "@scure/base": "^1.2.0",
+    "@scure/btc-signer": "^1.5.0"
+  },
+  "size-limit": [
+    {
+      "path": "dist/index.js",
+      "limit": "35 kB"
+    },
+    {
+      "path": "dist/vendors/mempool/index.js",
+      "limit": "25 kB"
+    },
+    {
+      "path": "dist/vendors/sandshrew/index.js",
+      "limit": "27 kB"
+    }
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}
