@@ -1,7 +1,8 @@
 import axios from 'axios'
+import { TESTNET4 } from '../../../constants'
+import { MAESTRO } from '../../../constants/data-sources'
 import { BaseNetwork, type NetworkType } from '../../../types'
 import type { DataSource } from '../../../types/data-source'
-import { getMaestroUrl, MAESTRO_API_KEY_TESTNET4 } from '../../urls'
 import type {
   MaestroAddressInscription,
   MaestroBrc20ByAddressResponse,
@@ -12,8 +13,7 @@ import type {
   MaestroGetRuneInfoResponse,
   MaestroGetTransactionInfoResponse,
 } from '../../../types/maestro'
-import { MAESTRO } from '../../../constants/data-sources'
-import { TESTNET4 } from '../../../constants'
+import { getMaestroUrl, MAESTRO_API_KEY_TESTNET4 } from '../../urls'
 
 export type MaestroConfig = {
   networks: {
@@ -69,14 +69,10 @@ export class MaestroDataSource implements DataSource {
       }
 
       const response =
-        method === 'get'
-          ? await axios.get(url, options)
-          : await axios.post(url, body, options)
+        method === 'get' ? await axios.get(url, options) : await axios.post(url, body, options)
 
       if (!response || !response.data) {
-        throw new Error(
-          `Invalid response from Maestro API: ${JSON.stringify(response)}`
-        )
+        throw new Error(`Invalid response from Maestro API: ${JSON.stringify(response)}`)
       }
       return response.data
     } catch (error) {
@@ -93,13 +89,8 @@ export class MaestroDataSource implements DataSource {
     return balanceResp.data
   }
 
-  async getAddressBrc20Balances(
-    address: string
-  ): Promise<MaestroBrc20ByAddressResponse> {
-    return (await this.call(
-      'get',
-      `/addresses/${address}/brc20`
-    )) as MaestroBrc20ByAddressResponse
+  async getAddressBrc20Balances(address: string): Promise<MaestroBrc20ByAddressResponse> {
+    return (await this.call('get', `/addresses/${address}/brc20`)) as MaestroBrc20ByAddressResponse
   }
 
   async getAddressInscriptions(
@@ -107,9 +98,9 @@ export class MaestroDataSource implements DataSource {
     offset: number = 0,
     limit: number = 10
   ): Promise<MaestroGetAddressInscriptions> {
-    let cursor: string | undefined = undefined
+    let cursor: string | undefined
     let toSkip = offset
-    let batchSize = 100
+    const batchSize = 100
     let lastResponse: any = null
 
     while (toSkip > 0) {
@@ -148,9 +139,7 @@ export class MaestroDataSource implements DataSource {
     return responseWithAddress
   }
 
-  async getInscriptionInfo(
-    inscriptionId: string
-  ): Promise<MaestroGetInscriptionInfoResponse> {
+  async getInscriptionInfo(inscriptionId: string): Promise<MaestroGetInscriptionInfoResponse> {
     return await this.call('get', `/assets/inscriptions/${inscriptionId}`)
   }
 
@@ -166,9 +155,7 @@ export class MaestroDataSource implements DataSource {
     return this.call('get', `/assets/runes/${runeName}`)
   }
 
-  async getTransactionInfo(
-    txHash: string
-  ): Promise<MaestroGetTransactionInfoResponse> {
+  async getTransactionInfo(txHash: string): Promise<MaestroGetTransactionInfoResponse> {
     return this.call('get', `/rpc/transaction/${txHash}`)
   }
 

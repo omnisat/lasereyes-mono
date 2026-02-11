@@ -1,34 +1,21 @@
 import * as bitcoin from 'bitcoinjs-lib'
-import { WalletProvider } from '.'
-import { getNetworkForUnisat, getUnisatNetwork } from '../../constants/networks'
-import { Config, NetworkType, ProviderType } from '../../types'
-import { UNISAT } from '../../constants/wallets'
-import { listenKeys, MapStore, WritableAtom } from 'nanostores'
-import {
-  LaserEyesStoreType,
-  SignMessageOptions,
-  WalletProviderSignPsbtOptions,
-  WalletProviderSignPsbtsOptions,
-  SignPsbtsResponse,
-} from '../types'
+import { listenKeys } from 'nanostores'
 import { BIP322, BIP322_SIMPLE } from '../../constants'
-import { LaserEyesClient } from '..'
-import { Inscription } from '../../types/lasereyes'
+import { getNetworkForUnisat, getUnisatNetwork } from '../../constants/networks'
+import { UNISAT } from '../../constants/wallets'
 import { normalizeInscription } from '../../lib/data-sources/normalizations'
 import { omitUndefined } from '../../lib/utils'
+import type { NetworkType, ProviderType } from '../../types'
+import type { Inscription } from '../../types/lasereyes'
+import type {
+  SignMessageOptions,
+  SignPsbtsResponse,
+  WalletProviderSignPsbtOptions,
+  WalletProviderSignPsbtsOptions,
+} from '../types'
+import { WalletProvider } from '.'
 
 export default class UnisatProvider extends WalletProvider {
-  constructor(
-    stores: {
-      $store: MapStore<LaserEyesStoreType>
-      $network: WritableAtom<NetworkType>
-    },
-    parent: LaserEyesClient,
-    config?: Config
-  ) {
-    super(stores, parent, config)
-  }
-
   public get library(): any | undefined {
     return (window as any).unisat
   }
@@ -53,7 +40,7 @@ export default class UnisatProvider extends WalletProvider {
       this.observer.observe(document, { childList: true, subtree: true })
     }
 
-    listenKeys(this.$store, ['provider'], (newStore) => {
+    listenKeys(this.$store, ['provider'], newStore => {
       if (newStore.provider !== UNISAT) {
         this?.removeListeners()
         return
@@ -72,14 +59,8 @@ export default class UnisatProvider extends WalletProvider {
 
   removeListeners() {
     if (!this.library || !this.library.removeListener) return
-    this.library?.removeListener(
-      'accountsChanged',
-      this.handleAccountsChanged.bind(this)
-    )
-    this.library?.removeListener(
-      'networkChanged',
-      this.handleNetworkChanged.bind(this)
-    )
+    this.library?.removeListener('accountsChanged', this.handleAccountsChanged.bind(this))
+    this.library?.removeListener('networkChanged', this.handleNetworkChanged.bind(this))
   }
 
   dispose() {
@@ -144,12 +125,8 @@ export default class UnisatProvider extends WalletProvider {
     return txId
   }
 
-  override async signMessage(
-    message: string,
-    options?: SignMessageOptions
-  ): Promise<string> {
-    const protocol =
-      options?.protocol === BIP322 ? BIP322_SIMPLE : options?.protocol
+  override async signMessage(message: string, options?: SignMessageOptions): Promise<string> {
+    const protocol = options?.protocol === BIP322 ? BIP322_SIMPLE : options?.protocol
     return await this.library?.signMessage(message, protocol)
   }
 
@@ -192,9 +169,7 @@ export default class UnisatProvider extends WalletProvider {
     }
   }
 
-  async signPsbts(
-    signPsbtsOptions: WalletProviderSignPsbtsOptions
-  ): Promise<SignPsbtsResponse> {
+  async signPsbts(signPsbtsOptions: WalletProviderSignPsbtsOptions): Promise<SignPsbtsResponse> {
     const { psbts, finalize, broadcast, inputsToSign } = signPsbtsOptions
 
     const signedPsbts = await this.library.signPsbts(
@@ -233,10 +208,7 @@ export default class UnisatProvider extends WalletProvider {
     return bal.total
   }
 
-  async getInscriptions(
-    offset?: number,
-    limit?: number
-  ): Promise<Inscription[]> {
+  async getInscriptions(offset?: number, limit?: number): Promise<Inscription[]> {
     const offsetValue = offset || 0
     const limitValue = limit || 10
     const response = await this.library.getInscriptions(offsetValue, limitValue)

@@ -14,7 +14,13 @@
     "dev:react": "turbo dev --filter react-ui",
     "dev:vue": "turbo dev --filter vue-ui",
     "lint": "turbo lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "lint:biome": "biome check .",
+    "lint:biome:fix": "biome check --write .",
+    "format": "biome format --write .",
+    "format:check": "biome format .",
+    "format:legacy": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "check": "biome check .",
+    "check:fix": "biome check --write --unsafe .",
     "test": "vitest run",
     "test:watch": "vitest --watch",
     "test:coverage": "vitest run --coverage",
@@ -25,6 +31,7 @@
     "revert-package-json": "node scripts/revert-package-json.js"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.3.14",
     "@changesets/cli": "^2.27.9",
     "@types/jest": "^29.5.13",
     "@vitejs/plugin-react": "^4.3.3",

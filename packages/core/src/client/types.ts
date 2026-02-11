@@ -1,5 +1,5 @@
-import type { NetworkType, ProviderType } from '../types'
 import type { BIP322, ECDSA } from '../constants/signing-protocol'
+import type { NetworkType, ProviderType } from '../types'
 
 export * from './modules/types'
 
@@ -21,11 +21,14 @@ export interface SparrowWalletProvider {
   requestAccounts(network?: NetworkType): Promise<string[]>
   getPublicKey(network?: NetworkType): Promise<string>
   getNetwork(): Promise<NetworkType>
-  switchNetwork(network: NetworkType): Promise<void | {
-    address: string
-    paymentAddress: string
-    publicKey: string
-  }>
+  switchNetwork(network: NetworkType): Promise<
+    | undefined
+    | {
+        address: string
+        paymentAddress: string
+        publicKey: string
+      }
+  >
   signMessage(message: string): Promise<string>
   signPsbt(psbtBase64: string): Promise<string>
 }

@@ -1,9 +1,8 @@
-import { FormattedUTXO } from '../types/utxo'
-import { AlkaneId } from 'alkanes'
+import type { AlkaneId } from 'alkanes'
+import type { FormattedUTXO } from '../types/utxo'
 
 export const isBase64 = (str: string): boolean => {
-  const base64Regex =
-    /^(?:[A-Za-z0-9+/]{4})*?(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/
+  const base64Regex = /^(?:[A-Za-z0-9+/]{4})*?(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/
   return base64Regex.test(str)
 }
 
@@ -80,7 +79,7 @@ export const selectSpendableUTXOs = (
 
   spendableUTXOs.utxos.sort((a, b) => b.btcValue - a.btcValue)
 
-  let selectedUTXOs: FormattedUTXO[] = []
+  const selectedUTXOs: FormattedUTXO[] = []
 
   for (const utxo of spendableUTXOs.utxos) {
     selectedUTXOs.push(utxo)
@@ -113,7 +112,7 @@ export const selectAlkanesUTXOs = (
 
   for (const utxo of utxos) {
     if (utxo.alkanes.length > 0) {
-      const alkane = utxo.alkanes.find((a) => a.id === alkaneIdToString(alkaneId))
+      const alkane = utxo.alkanes.find(a => a.id === alkaneIdToString(alkaneId))
       if (alkane) {
         selectedUTXOs.push(utxo)
         totalBtcAmount += BigInt(utxo.btcValue)
@@ -125,7 +124,7 @@ export const selectAlkanesUTXOs = (
 
   if (totalAlkanesAmount < targetAlkanesAmount) {
     throw new Error('Not enough alkanes')
-  } 
+  }
 
   return {
     utxos: selectedUTXOs,

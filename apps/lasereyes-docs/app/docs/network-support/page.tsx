@@ -1,15 +1,15 @@
-"use client"
+'use client'
 
-import * as React from "react"
-import { ClientPageWrapper } from "@/components/client-page-wrapper"
-import { CodeBlock } from "@/components/code-block"
-import { Heading } from "@/components/heading"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Network, Globe, Zap, Shield, ArrowRight, Blocks, Laptop, Server, Wifi } from "lucide-react"
-import { cn } from "@/lib/utils"
-import Link from "next/link"
+import { ArrowRight, Blocks, Globe, Laptop, Network, Server, Shield, Wifi, Zap } from 'lucide-react'
+import Link from 'next/link'
+import type * as React from 'react'
+import { ClientPageWrapper } from '@/components/client-page-wrapper'
+import { CodeBlock } from '@/components/code-block'
+import { Heading } from '@/components/heading'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { cn } from '@/lib/utils'
 
 interface FeatureCardProps {
   icon: React.ElementType
@@ -26,11 +26,26 @@ export default function NetworkSupportPage() {
         <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-orange-500/20 rounded-full blur-[120px] -z-10 translate-x-1/2 -translate-y-1/2 animate-pulse" />
         <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-yellow-500/10 rounded-full blur-[100px] -z-10 -translate-x-1/2 translate-y-1/2 animate-pulse" />
         <div className="absolute top-1/2 left-1/2 w-[200px] h-[200px] bg-orange-800/10 rounded-full blur-[80px] -z-10 -translate-x-1/2 -translate-y-1/2" />
-        
+
         <div className="flex items-center gap-3 mb-4">
-          <Badge variant="secondary" className="bg-orange-900/10 text-orange-400 hover:bg-orange-900/20">Multi-Network</Badge>
-          <Badge variant="secondary" className="bg-yellow-900/10 text-yellow-400 hover:bg-yellow-900/20">Testnet Ready</Badge>
-          <Badge variant="secondary" className="bg-orange-900/10 text-orange-400 hover:bg-orange-900/20">Mainnet Secure</Badge>
+          <Badge
+            variant="secondary"
+            className="bg-orange-900/10 text-orange-400 hover:bg-orange-900/20"
+          >
+            Multi-Network
+          </Badge>
+          <Badge
+            variant="secondary"
+            className="bg-yellow-900/10 text-yellow-400 hover:bg-yellow-900/20"
+          >
+            Testnet Ready
+          </Badge>
+          <Badge
+            variant="secondary"
+            className="bg-orange-900/10 text-orange-400 hover:bg-orange-900/20"
+          >
+            Mainnet Secure
+          </Badge>
         </div>
 
         <div className="flex items-center gap-6 mb-6">
@@ -38,7 +53,10 @@ export default function NetworkSupportPage() {
             <Network className="h-7 w-7 text-orange-400" />
           </div>
           <div>
-            <Heading level={1} className="bg-gradient-to-r from-orange-400 via-orange-500 to-yellow-400 bg-clip-text text-transparent">
+            <Heading
+              level={1}
+              className="bg-gradient-to-r from-orange-400 via-orange-500 to-yellow-400 bg-clip-text text-transparent"
+            >
               Network Support
             </Heading>
             <p className="text-sm text-muted-foreground">Seamless Bitcoin Network Integration</p>
@@ -46,7 +64,8 @@ export default function NetworkSupportPage() {
         </div>
 
         <p className="text-xl mb-8 max-w-2xl text-muted-foreground">
-          Build with confidence across Bitcoin networks. Full support for mainnet and testnet with automatic network detection and switching.
+          Build with confidence across Bitcoin networks. Full support for mainnet and testnet with
+          automatic network detection and switching.
         </p>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
@@ -106,7 +125,10 @@ export default function NetworkSupportPage() {
 
         <div className="flex gap-4 items-center">
           <Link href="#implementation">
-            <Button size="lg" className="bg-gradient-to-r from-orange-600 to-yellow-600 hover:from-orange-500 hover:to-yellow-500 group">
+            <Button
+              size="lg"
+              className="bg-gradient-to-r from-orange-600 to-yellow-600 hover:from-orange-500 hover:to-yellow-500 group"
+            >
               Configure Networks
               <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Button>
@@ -129,10 +151,12 @@ export default function NetworkSupportPage() {
 
 function FeatureCard({ icon: Icon, title, description, className }: FeatureCardProps) {
   return (
-    <Card className={cn(
-      "group relative overflow-hidden transition-all duration-300 hover:border-orange-500/30 hover:shadow-lg hover:shadow-orange-500/5",
-      className
-    )}>
+    <Card
+      className={cn(
+        'group relative overflow-hidden transition-all duration-300 hover:border-orange-500/30 hover:shadow-lg hover:shadow-orange-500/5',
+        className
+      )}
+    >
       <div className="absolute right-0 top-0 h-20 w-20 translate-x-6 -translate-y-6 rounded-full bg-orange-500/10 blur-2xl filter group-hover:bg-orange-500/20" />
       <CardContent className="p-6">
         <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-orange-500/20 to-yellow-500/20 text-orange-400 ring-1 ring-orange-500/20">
@@ -319,13 +343,15 @@ function NetworkMonitor() {
               <div>
                 <h3 className="font-semibold mb-2">Network Validation</h3>
                 <p className="text-sm text-muted-foreground">
-                  Always validate network compatibility before executing transactions to prevent errors.
+                  Always validate network compatibility before executing transactions to prevent
+                  errors.
                 </p>
               </div>
               <div>
                 <h3 className="font-semibold mb-2">Environment Separation</h3>
                 <p className="text-sm text-muted-foreground">
-                  Use different configurations for development, staging, and production environments.
+                  Use different configurations for development, staging, and production
+                  environments.
                 </p>
               </div>
               <div>
@@ -347,4 +373,3 @@ function NetworkMonitor() {
     </div>
   )
 }
-

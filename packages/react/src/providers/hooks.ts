@@ -1,11 +1,11 @@
 'use client'
 
-import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
-import { LaserEyesStoreContext } from './context'
-import type { LaserEyesContextType } from './types'
-import { compareValues } from '../utils/comparison'
 import type { LaserEyesStoreType, NetworkType } from '@omnisat/lasereyes-core'
 import { batched, keepMount } from 'nanostores'
+import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { compareValues } from '../utils/comparison'
+import { LaserEyesStoreContext } from './context'
+import type { LaserEyesContextType } from './types'
 
 const defaultSelector = (x: LaserEyesContextType) => ({ ...x })
 
@@ -14,9 +14,7 @@ export function useLaserEyes<T>(selector: (x: LaserEyesContextType) => T): T
 export function useLaserEyes<T>(
   selector?: (x: LaserEyesContextType) => T
 ): T | LaserEyesContextType {
-  const { $network, $store, methods, client } = useContext(
-    LaserEyesStoreContext
-  )
+  const { $network, $store, methods, client } = useContext(LaserEyesStoreContext)
 
   const selector_ = selector ?? defaultSelector
 
@@ -66,12 +64,12 @@ export function useLaserEyes<T>(
     return store
   }, [$store, $network, selectValues])
 
-  const [laserEyesState, setLaserEyesState] = useState<
-    ReturnType<typeof selector_>
-  >(() => selector_($computedStore.get()))
+  const [laserEyesState, setLaserEyesState] = useState<ReturnType<typeof selector_>>(() =>
+    selector_($computedStore.get())
+  )
 
   useEffect(() => {
-    const unsub = $computedStore.listen((value) => {
+    const unsub = $computedStore.listen(value => {
       const selected = selector_(value)
       if (!compareValues(selected, laserEyesState)) {
         setLaserEyesState(selected)

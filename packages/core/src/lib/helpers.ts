@@ -1,5 +1,6 @@
+import * as ecc from '@bitcoinerlab/secp256k1'
+import axios from 'axios'
 import * as bitcoin from 'bitcoinjs-lib'
-
 import {
   FRACTAL_MAINNET,
   FRACTAL_TESTNET,
@@ -9,11 +10,9 @@ import {
   TESTNET,
   TESTNET4,
 } from '../constants/networks'
-import axios from 'axios'
 import type { MempoolUtxo, NetworkType } from '../types'
-import { getMempoolSpaceUrl } from './urls'
-import * as ecc from '@bitcoinerlab/secp256k1'
 import { getRedeemScript } from './btc'
+import { getMempoolSpaceUrl } from './urls'
 
 bitcoin.initEccLib(ecc)
 
@@ -21,34 +20,24 @@ export const getBitcoinNetwork = (network: NetworkType) => {
   if (network === TESTNET || network === TESTNET4 || network === SIGNET) {
     return bitcoin.networks.testnet
   }
-    return bitcoin.networks.bitcoin
+  return bitcoin.networks.bitcoin
 }
 
 export const findOrdinalsAddress = (
   addresses: { purpose: string; address: string; publicKey: string }[]
 ) => {
-  return addresses.find(
-    ({ purpose }: { purpose: string }) => purpose === 'ordinals'
-  )
+  return addresses.find(({ purpose }: { purpose: string }) => purpose === 'ordinals')
 }
 
 export const findPaymentAddress = (
   addresses: { purpose: string; address: string; publicKey: string }[]
 ) => {
-  return addresses.find(
-    ({ purpose }: { purpose: string }) => purpose === 'payment'
-  )
+  return addresses.find(({ purpose }: { purpose: string }) => purpose === 'payment')
 }
 
-export const getBTCBalance = async (
-  address: string,
-  network: NetworkType
-): Promise<bigint> => {
+export const getBTCBalance = async (address: string, network: NetworkType): Promise<bigint> => {
   try {
-    const utxos: MempoolUtxo[] | undefined = await getAddressUtxos(
-      address,
-      network
-    )
+    const utxos: MempoolUtxo[] | undefined = await getAddressUtxos(address, network)
     if (!utxos) return 0n
     return utxos.reduce((acc, utxo) => acc + BigInt(utxo.value), 0n)
   } catch (error) {
@@ -73,8 +62,7 @@ export function estimateTxSize(
   const nonTaprootInputSize = 41
   const outputSize = 34
   const totalInputSize =
-    taprootInputCount * taprootInputSize +
-    nonTaprootInputCount * nonTaprootInputSize
+    taprootInputCount * taprootInputSize + nonTaprootInputCount * nonTaprootInputSize
   const totalOutputSize = outputCount * outputSize
   return baseTxSize + totalInputSize + totalOutputSize
 }
@@ -102,7 +90,7 @@ export async function getAddressUtxos(address: string, network: NetworkType) {
   }
   return (await axios
     .get(`${getMempoolSpaceUrl(network)}/api/address/${address}/utxo`)
-    .then((response) => response.data)) as Array<MempoolUtxo>
+    .then(response => response.data)) as Array<MempoolUtxo>
 }
 
 export async function createSendBtcPsbt(
@@ -115,18 +103,13 @@ export async function createSendBtcPsbt(
   feeRate = 7
 ) {
   const isTaprootOnly = address === paymentAddress
-  const utxos: MempoolUtxo[] | undefined = await getAddressUtxos(
-    paymentAddress,
-    network
-  )
+  const utxos: MempoolUtxo[] | undefined = await getAddressUtxos(paymentAddress, network)
 
   if (!utxos) {
     throw new Error('No UTXOs found')
   }
 
-  const sortedUtxos = utxos.sort(
-    (a: { value: number }, b: { value: number }) => b.value - a.value
-  )
+  const sortedUtxos = utxos.sort((a: { value: number }, b: { value: number }) => b.value - a.value)
 
   const psbt = new bitcoin.Psbt({ network: getBitcoinNetwork(network) })
 
@@ -135,10 +118,7 @@ export async function createSendBtcPsbt(
   let amountGathered = 0
   for await (const utxo of sortedUtxos) {
     const { txid, vout, value } = utxo
-    const script = bitcoin.address.toOutputScript(
-      paymentAddress,
-      getBitcoinNetwork(network)
-    )
+    const script = bitcoin.address.toOutputScript(paymentAddress, getBitcoinNetwork(network))
     psbt.addInput({
       hash: txid,
       index: vout,
@@ -182,26 +162,19 @@ export async function createSendBtcPsbt(
 }
 
 export function delay(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms))
+  return new Promise(resolve => setTimeout(resolve, ms))
 }
 
 export function calculateValueOfUtxosGathered(utxoArray: MempoolUtxo[]) {
   return utxoArray?.reduce((prev, currentValue) => prev + currentValue.value, 0)
 }
 
-export async function broadcastTx(
-  txHex: string,
-  network: NetworkType
-): Promise<string> {
-  const response = await axios.post(
-    `${getMempoolSpaceUrl(network)}/api/tx`,
-    txHex,
-    {
-      headers: {
-        'Content-Type': 'text/plain',
-      },
-    }
-  )
+export async function broadcastTx(txHex: string, network: NetworkType): Promise<string> {
+  const response = await axios.post(`${getMempoolSpaceUrl(network)}/api/tx`, txHex, {
+    headers: {
+      'Content-Type': 'text/plain',
+    },
+  })
   return response.data
 }
 
@@ -210,9 +183,5 @@ export const isTestnetNetwork = (network: NetworkType) => {
 }
 
 export const isMainnetNetwork = (network: NetworkType) => {
-  return (
-    network === MAINNET ||
-    network === FRACTAL_MAINNET ||
-    network === FRACTAL_TESTNET
-  )
+  return network === MAINNET || network === FRACTAL_MAINNET || network === FRACTAL_TESTNET
 }

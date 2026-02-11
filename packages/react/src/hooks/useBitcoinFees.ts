@@ -1,12 +1,12 @@
-import { type UseQueryOptions, useQuery } from "@tanstack/react-query"
-import { useLaserEyes } from "../providers/hooks"
+import { type UseQueryOptions, useQuery } from '@tanstack/react-query'
+import { useLaserEyes } from '../providers/hooks'
 
 type FeesResult = {
   fastFee: number
   minFee: number
 }
 type useBitcoinFeesParams = {
-  queryOptions?: Omit<UseQueryOptions<FeesResult>, "queryKey" | "queryFn">
+  queryOptions?: Omit<UseQueryOptions<FeesResult>, 'queryKey' | 'queryFn'>
 }
 
 export function useBitcoinFees(options?: useBitcoinFeesParams) {
@@ -24,7 +24,7 @@ export function useBitcoinFees(options?: useBitcoinFeesParams) {
     staleTime: 1000 * 60 * 5, // 5 minutes
     refetchInterval: 1000 * 60 * 1, // 1 minute
     ...options?.queryOptions,
-    queryKey: ["mempool-fees", network],
+    queryKey: ['mempool-fees', network],
     queryFn: fetchFees,
   })
 

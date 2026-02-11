@@ -1,34 +1,14 @@
 import * as bitcoin from 'bitcoinjs-lib'
-import { WalletProvider } from '.'
-import { ECDSA, MAINNET, PHANTOM, TESTNET } from '../../constants'
-import { ProviderType, NetworkType, Config } from '../../types'
-import {
-  createSendBtcPsbt,
-  getBitcoinNetwork,
-  isTestnetNetwork,
-} from '../../lib/helpers'
-import { listenKeys, MapStore, WritableAtom } from 'nanostores'
 import { fromOutputScript } from 'bitcoinjs-lib/src/address'
+import { listenKeys } from 'nanostores'
+import { ECDSA, MAINNET, PHANTOM, TESTNET } from '../../constants'
+import { createSendBtcPsbt, getBitcoinNetwork, isTestnetNetwork } from '../../lib/helpers'
+import type { NetworkType, ProviderType } from '../../types'
+import type { SignMessageOptions, WalletProviderSignPsbtOptions } from '../types'
 import { fromHexString } from '../utils'
-import {
-  LaserEyesStoreType,
-  SignMessageOptions,
-  WalletProviderSignPsbtOptions,
-} from '../types'
-import { LaserEyesClient } from '..'
+import { WalletProvider } from '.'
 
 export default class PhantomProvider extends WalletProvider {
-  constructor(
-    stores: {
-      $store: MapStore<LaserEyesStoreType>
-      $network: WritableAtom<NetworkType>
-    },
-    parent: LaserEyesClient,
-    config?: Config
-  ) {
-    super(stores, parent, config)
-  }
-
   public get library(): any | undefined {
     return (window as any)?.phantom?.bitcoin
   }
@@ -53,7 +33,7 @@ export default class PhantomProvider extends WalletProvider {
       this.observer.observe(document, { childList: true, subtree: true })
     }
 
-    listenKeys(this.$store, ['provider'], (newStore) => {
+    listenKeys(this.$store, ['provider'], newStore => {
       if (newStore.provider !== PHANTOM) {
         // this.removeListeners()
         return
@@ -109,7 +89,10 @@ export default class PhantomProvider extends WalletProvider {
     this.$store.setKey('paymentAddress', payment.address)
     this.$store.setKey('publicKey', taproot.publicKey)
     this.$store.setKey('paymentPublicKey', payment.publicKey)
-    this.$store.setKey('accounts', phantomAccounts.map((account: { address: string }) => account.address))
+    this.$store.setKey(
+      'accounts',
+      phantomAccounts.map((account: { address: string }) => account.address)
+    )
   }
 
   async getNetwork() {
@@ -141,10 +124,7 @@ export default class PhantomProvider extends WalletProvider {
     return psbt.txId
   }
 
-  async signMessage(
-    message: string,
-    options?: SignMessageOptions
-  ): Promise<string> {
+  async signMessage(message: string, options?: SignMessageOptions): Promise<string> {
     if (options?.protocol === ECDSA) {
       throw new Error('ECDSA signing is not supported by Phantom')
     }
@@ -184,12 +164,10 @@ export default class PhantomProvider extends WalletProvider {
         }),
         {}
       )
-      inputsToSign = Object.entries(tempInputsToSign).map(
-        ([address, indexes]) => ({
-          address,
-          signingIndexes: indexes,
-        })
-      )
+      inputsToSign = Object.entries(tempInputsToSign).map(([address, indexes]) => ({
+        address,
+        signingIndexes: indexes,
+      }))
     } else {
       const { address, paymentAddress } = this.$store.get()
       const ordinalAddressData = {
@@ -200,17 +178,14 @@ export default class PhantomProvider extends WalletProvider {
         address: paymentAddress,
         signingIndexes: [] as number[],
       }
-      for (let counter of inputs.keys()) {
+      for (const counter of inputs.keys()) {
         const input = inputs[counter]
         if (input.witnessUtxo === undefined) {
           paymentsAddressData.signingIndexes.push(Number(counter))
           continue
         }
         const { script } = input.witnessUtxo!
-        const addressFromScript = fromOutputScript(
-          script,
-          getBitcoinNetwork(this.network)
-        )
+        const addressFromScript = fromOutputScript(script, getBitcoinNetwork(this.network))
 
         if (addressFromScript === paymentAddress) {
           paymentsAddressData.signingIndexes.push(Number(counter))
@@ -228,18 +203,15 @@ export default class PhantomProvider extends WalletProvider {
       }
     }
 
-    const signedPsbt: Uint8Array = await this.library.signPSBT(
-      fromHexString(psbtHex),
-      {
-        inputsToSign,
-      }
-    )
+    const signedPsbt: Uint8Array = await this.library.signPSBT(fromHexString(psbtHex), {
+      inputsToSign,
+    })
 
     const psbtSignedPsbt = bitcoin.Psbt.fromBuffer(signedPsbt)
 
     if (finalize) {
-      inputsToSign.forEach((inputData) => {
-        inputData.signingIndexes.forEach((index) => {
+      inputsToSign.forEach(inputData => {
+        inputData.signingIndexes.forEach(index => {
           psbtSignedPsbt.finalizeInput(index)
         })
       })

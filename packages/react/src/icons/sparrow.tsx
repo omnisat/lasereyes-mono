@@ -3,11 +3,7 @@ interface SparrowLogoProps extends React.SVGProps<SVGSVGElement> {
   variant?: 'first' | 'second'
 }
 
-const SparrowLogo: React.FC<SparrowLogoProps> = ({
-  size = 42,
-  className,
-  ...props
-}) => (
+const SparrowLogo: React.FC<SparrowLogoProps> = ({ size = 42, className, ...props }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width={size}

@@ -1,11 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import { Check, Copy } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import Prism from 'prismjs'
+import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import Prism from 'prismjs'
+import { cn } from '@/lib/utils'
 
 // Import Prism languages
 import 'prismjs/components/prism-javascript'
@@ -47,7 +47,7 @@ export function CodeBlock({
     if (typeof window !== 'undefined') {
       Prism.highlightAll()
     }
-  }, [code, language, tabs])
+  }, [])
 
   const copyToClipboard = async () => {
     await navigator.clipboard.writeText(code)
@@ -58,7 +58,7 @@ export function CodeBlock({
   // Fix the line number alignment by updating the renderCode function
 
   const renderCode = (codeString: string, lang: string) => {
-    const lines = codeString.split('\n')
+    const _lines = codeString.split('\n')
 
     return (
       <div
@@ -69,9 +69,7 @@ export function CodeBlock({
       >
         <div className="flex w-full rounded-md px-4 bg-[hsl(var(--code-bg))]">
           <pre className={cn('overflow-x-auto py-4 flex-1 m-0 !bg-none')}>
-            <code
-              className={`language-${lang} leading-[1.5rem] text-[13px] md:text-sm`}
-            >
+            <code className={`language-${lang} leading-[1.5rem] text-[13px] md:text-sm`}>
               {codeString}
             </code>
           </pre>
@@ -83,11 +81,7 @@ export function CodeBlock({
             className="absolute right-2 top-3 h-8 w-8 rounded-md opacity-70 hover:opacity-100"
             onClick={copyToClipboard}
           >
-            {copied ? (
-              <Check className="h-4 w-4 text-green-500" />
-            ) : (
-              <Copy className="h-4 w-4" />
-            )}
+            {copied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
             <span className="sr-only">Copy code</span>
           </Button>
         )}
@@ -98,13 +92,11 @@ export function CodeBlock({
   if (tabs) {
     return (
       <div className="relative w-full max-w-full overflow-x-auto">
-        {fileName && (
-          <div className="text-sm text-muted-foreground mb-2">{fileName}</div>
-        )}
+        {fileName && <div className="text-sm text-muted-foreground mb-2">{fileName}</div>}
         <Tabs defaultValue={Object.keys(tabs)[0]}>
           <div className="flex items-center justify-between">
             <TabsList>
-              {Object.keys(tabs).map((tab) => (
+              {Object.keys(tabs).map(tab => (
                 <TabsTrigger key={tab} value={tab}>
                   {tab}
                 </TabsTrigger>
@@ -123,9 +115,7 @@ export function CodeBlock({
 
   return (
     <div className="relative w-full max-w-full overflow-x-auto">
-      {fileName && (
-        <div className="text-sm text-muted-foreground mb-2">{fileName}</div>
-      )}
+      {fileName && <div className="text-sm text-muted-foreground mb-2">{fileName}</div>}
       {renderCode(code, language)}
     </div>
   )

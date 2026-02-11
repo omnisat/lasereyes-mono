@@ -1,24 +1,15 @@
 'use client'
 
-import * as React from 'react'
+import { BarChart3, Cpu, InfinityIcon, Rocket, Shield, Sparkles, Workflow, Zap } from 'lucide-react'
+import Image from 'next/image'
+import { useTheme } from 'next-themes'
+import type * as React from 'react'
 import { ClientPageWrapper } from '@/components/client-page-wrapper'
 import { CodeBlock } from '@/components/code-block'
 import { Heading } from '@/components/heading'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import {
-  Zap,
-  Sparkles,
-  Cpu,
-  Rocket,
-  Infinity,
-  BarChart3,
-  Shield,
-  Workflow,
-} from 'lucide-react'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
-import Image from 'next/image'
-import { useTheme } from 'next-themes'
 
 interface FeatureCardProps {
   icon: React.ElementType
@@ -60,8 +51,8 @@ export default function MaestroPage() {
         </div>
 
         <p className="text-xl mb-8 max-w-2xl text-muted-foreground">
-          Enterprise-grade Bitcoin data infrastructure. High-performance APIs
-          for ordinals, inscriptions, and blockchain data.
+          Enterprise-grade Bitcoin data infrastructure. High-performance APIs for ordinals,
+          inscriptions, and blockchain data.
         </p>
 
         <Card className="border-purple-500/20 bg-purple-500/5 backdrop-blur-xl">
@@ -69,13 +60,11 @@ export default function MaestroPage() {
             <div className="grid gap-4 sm:grid-cols-3">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-500/10">
-                  <Infinity className="h-5 w-5 text-purple-500" />
+                  <InfinityIcon className="h-5 w-5 text-purple-500" />
                 </div>
                 <div>
                   <div className="text-sm font-medium">Unlimited Scale</div>
-                  <div className="text-xs text-muted-foreground">
-                    No rate limits
-                  </div>
+                  <div className="text-xs text-muted-foreground">No rate limits</div>
                 </div>
               </div>
               <div className="flex items-center gap-3">
@@ -84,9 +73,7 @@ export default function MaestroPage() {
                 </div>
                 <div>
                   <div className="text-sm font-medium">Ultra-fast APIs</div>
-                  <div className="text-xs text-muted-foreground">
-                    ~50ms latency
-                  </div>
+                  <div className="text-xs text-muted-foreground">~50ms latency</div>
                 </div>
               </div>
               <div className="flex items-center gap-3">
@@ -95,9 +82,7 @@ export default function MaestroPage() {
                 </div>
                 <div>
                   <div className="text-sm font-medium">99.9% Uptime</div>
-                  <div className="text-xs text-muted-foreground">
-                    Enterprise SLA
-                  </div>
+                  <div className="text-xs text-muted-foreground">Enterprise SLA</div>
                 </div>
               </div>
             </div>
@@ -118,23 +103,12 @@ function MaestroLogo() {
 
   return (
     <div className="relative h-12 w-12">
-      <Image
-        src={logoSrc}
-        alt="Maestro Logo"
-        fill
-        className="object-contain"
-        priority
-      />
+      <Image src={logoSrc} alt="Maestro Logo" fill className="object-contain" priority />
     </div>
   )
 }
 
-function FeatureCard({
-  icon: Icon,
-  title,
-  description,
-  className,
-}: FeatureCardProps) {
+function FeatureCard({ icon: Icon, title, description, className }: FeatureCardProps) {
   return (
     <Card
       className={cn(
@@ -207,10 +181,7 @@ const config = createConfig({
             />
             <div className="mt-4 text-sm text-muted-foreground">
               Get your API key at{' '}
-              <a
-                href="https://gomaestro.org"
-                className="text-purple-500 hover:text-purple-400"
-              >
+              <a href="https://gomaestro.org" className="text-purple-500 hover:text-purple-400">
                 maestro.org
               </a>
             </div>
@@ -231,19 +202,19 @@ const config = createConfig({
 
 function BitcoinData() {
   const { client } = useLaserEyes()
-  
+
   async function fetchData() {
     const manager = client.getDataSourceManager()
-    
+
     // Get BRC-20 token balances
     const brc20Balances = await manager.getMetaBalances('bc1p...', 'brc20')
-    
+
     // Get inscription content
     const inscription = await manager.getInscriptionContent('123...')
-    
+
     // Get UTXO set
     const utxos = await manager.getUtxos('bc1p...')
-    
+
     // Get detailed transaction data
     const tx = await manager.getTransaction('abc...')
   }
@@ -270,11 +241,11 @@ const ws = new WebSocket('wss://api.maestro.org/v1/ws')
 
 ws.onmessage = (event) => {
   const data = JSON.parse(event.data)
-  
+
   if (data.type === 'inscription') {
     console.log('New inscription:', data.inscription)
   }
-  
+
   if (data.type === 'transaction') {
     console.log('New transaction:', data.transaction)
   }

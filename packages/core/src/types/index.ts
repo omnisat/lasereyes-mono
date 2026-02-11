@@ -179,11 +179,7 @@ export type Config = {
   }
 }
 
-export type SendArgs =
-  | BTCSendArgs
-  | RuneSendArgs
-  | Brc20SendArgs
-  | AlkaneSendArgs
+export type SendArgs = BTCSendArgs | RuneSendArgs | Brc20SendArgs | AlkaneSendArgs
 
 export type Protocol = typeof BTC | typeof RUNES | typeof BRC20 | typeof ALKANES
 export type MetaProtocol = Exclude<Protocol, typeof BTC>

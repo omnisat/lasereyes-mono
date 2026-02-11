@@ -6,7 +6,6 @@ export type MempoolSpaceFeeRatesResponse = {
   minimumFee: number
 }
 
-
 export type MempoolSpaceGetTransactionResponse = {
   txid: string
   version: number

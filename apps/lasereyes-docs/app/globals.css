@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/suspicious/noUnknownAtRules: <explanation> */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -111,7 +112,7 @@ pre code {
 
 /* Syntax Highlighting Customization - High Contrast Theme */
 .light pre[class*="language-"] {
-  background: hsl(var(--bg-muted)) !important;
+  background: hsl(var(--bg-muted));
 }
 
 .token.comment,
@@ -214,13 +215,13 @@ pre[class*="language-"] code {
 .line-numbers-rows {
   padding-top: 1rem;
   padding-bottom: 1rem;
-  background-color: hsl(var(--code-line-numbers-bg)) !important;
-  border-right: 1px solid #444 !important;
+  background-color: hsl(var(--code-line-numbers-bg));
+  border-right: 1px solid #444;
 }
 
 .line-numbers-rows > span {
   line-height: 1.5;
-  color: #aaa !important;
+  color: #aaa;
 }
 
 /* Fix code and line number alignment */
@@ -432,4 +433,3 @@ img {
 .dark .token.variable {
   color: #ffa657;
 }
-

@@ -1,15 +1,12 @@
 import * as bitcoin from 'bitcoinjs-lib'
-import { WalletProvider } from '.'
-import {
-  getKeplrChainFromNetwork,
-  getNetworkFromKeplrChain,
-} from '../../constants/networks'
-import { BaseNetwork, NetworkType, ProviderType } from '../../types'
-import { KEPLR } from '../../constants/wallets'
 import { listenKeys } from 'nanostores'
-import { SignMessageOptions, WalletProviderSignPsbtOptions } from '../types'
 import { BIP322, BIP322_SIMPLE } from '../../constants'
+import { getKeplrChainFromNetwork, getNetworkFromKeplrChain } from '../../constants/networks'
+import { KEPLR } from '../../constants/wallets'
 import { omitUndefined } from '../../lib/utils'
+import { BaseNetwork, type NetworkType, type ProviderType } from '../../types'
+import type { SignMessageOptions, WalletProviderSignPsbtOptions } from '../types'
+import { WalletProvider } from '.'
 
 interface KeplrBitcoinProvider {
   connectWallet: () => Promise<string[]> // return an array of address of current account
@@ -85,14 +82,8 @@ interface KeplrBitcoinProvider {
     psbtHex: string // hex string of psbt to push
   ) => Promise<string> // return the tx id
 
-  on<T extends KeplrBitcoinEvent>(
-    event: T,
-    handler: KeplrBitcoinEventHandler<T>
-  ): void
-  off<T extends KeplrBitcoinEvent>(
-    event: T,
-    handler: KeplrBitcoinEventHandler<T>
-  ): void
+  on<T extends KeplrBitcoinEvent>(event: T, handler: KeplrBitcoinEventHandler<T>): void
+  off<T extends KeplrBitcoinEvent>(event: T, handler: KeplrBitcoinEventHandler<T>): void
 }
 
 type KeplrBitcoinNetwork = 'mainnet' | 'signet' | 'testnet'
@@ -105,8 +96,7 @@ type KeplrBitcoinEventMap = {
   [KeplrNetworkChangedEvent]: (network: KeplrBitcoinNetwork) => void
 }
 
-type KeplrBitcoinEventHandler<T extends KeplrBitcoinEvent> =
-  KeplrBitcoinEventMap[T]
+type KeplrBitcoinEventHandler<T extends KeplrBitcoinEvent> = KeplrBitcoinEventMap[T]
 
 export default class KeplrProvider extends WalletProvider {
   public get library(): KeplrBitcoinProvider | undefined {
@@ -133,7 +123,7 @@ export default class KeplrProvider extends WalletProvider {
       this.observer.observe(document, { childList: true, subtree: true })
     }
 
-    listenKeys(this.$store, ['provider'], (newStore) => {
+    listenKeys(this.$store, ['provider'], newStore => {
       if (newStore.provider !== KEPLR) {
         this?.removeListeners()
         return
@@ -177,32 +167,31 @@ export default class KeplrProvider extends WalletProvider {
       this.parent.disconnect()
     }
   }
-  private handleNetworkChanged: KeplrBitcoinEventHandler<
-    typeof KeplrNetworkChangedEvent
-  > = (network) => {
-    const foundNetwork =
-      network === 'mainnet'
-        ? BaseNetwork.MAINNET
-        : network === 'testnet'
-          ? BaseNetwork.TESTNET
-          : BaseNetwork.SIGNET
-    if (this.network !== foundNetwork) {
-      this.connect(KEPLR)
+  private handleNetworkChanged: KeplrBitcoinEventHandler<typeof KeplrNetworkChangedEvent> =
+    network => {
+      const foundNetwork =
+        network === 'mainnet'
+          ? BaseNetwork.MAINNET
+          : network === 'testnet'
+            ? BaseNetwork.TESTNET
+            : BaseNetwork.SIGNET
+      if (this.network !== foundNetwork) {
+        this.connect(KEPLR)
+      }
     }
-  }
 
   async connect(_: ProviderType) {
-      if (!this.library) {
-        if (this.isMobile()) {
-          const url = `https://deeplink.keplr.app/web-browser?url=${window.location.href}`
-          const returned = window.open(url)
-          if (!returned) {
-            throw new Error('Keplr wallet not found')
-          }
-          returned.focus()
-          return false
-        } else throw new Error('Keplr wallet not found')
-      }
+    if (!this.library) {
+      if (this.isMobile()) {
+        const url = `https://deeplink.keplr.app/web-browser?url=${window.location.href}`
+        const returned = window.open(url)
+        if (!returned) {
+          throw new Error('Keplr wallet not found')
+        }
+        returned.focus()
+        return false
+      } else throw new Error('Keplr wallet not found')
+    }
     const accounts = await this.library.requestAccounts()
     if (!accounts) throw new Error('No accounts found')
 
@@ -235,13 +224,9 @@ export default class KeplrProvider extends WalletProvider {
     return txId
   }
 
-  override async signMessage(
-    message: string,
-    options?: SignMessageOptions
-  ): Promise<string> {
+  override async signMessage(message: string, options?: SignMessageOptions): Promise<string> {
     if (!this.library) throw new Error("Keplr isn't installed")
-    const protocol =
-      options?.protocol === BIP322 ? BIP322_SIMPLE : options?.protocol
+    const protocol = options?.protocol === BIP322 ? BIP322_SIMPLE : options?.protocol
     return await this.library.signMessage(message, protocol)
   }
 
@@ -306,14 +291,8 @@ export default class KeplrProvider extends WalletProvider {
       BaseNetwork.TESTNET,
       BaseNetwork.SIGNET,
     ] as string[]
-    if (
-      !(
-        supportedNetworks
-      ).includes(network)
-    ) {
-      throw new Error(
-        `Invalid network: ${network}. Keplr supports ${supportedNetworks.join(', ')}`
-      )
+    if (!supportedNetworks.includes(network)) {
+      throw new Error(`Invalid network: ${network}. Keplr supports ${supportedNetworks.join(', ')}`)
     }
     const wantedNetwork = getKeplrChainFromNetwork(network)
     await this.library.switchChain(wantedNetwork)

@@ -1,23 +1,18 @@
-import * as bitcoin from 'bitcoinjs-lib'
-import { WalletProvider } from '.'
-import { ProviderType, NetworkType, Config } from '../../types'
-import { createSendBtcPsbt } from '../../lib/helpers'
-import { OYL } from '../../constants/wallets'
-import { listenKeys, MapStore, WritableAtom } from 'nanostores'
 import { persistentMap } from '@nanostores/persistent'
-import {
+import * as bitcoin from 'bitcoinjs-lib'
+import { listenKeys, type MapStore } from 'nanostores'
+import { OYL } from '../../constants/wallets'
+import { createSendBtcPsbt } from '../../lib/helpers'
+import type { NetworkType, ProviderType } from '../../types'
+import type {
   LaserEyesStoreType,
   SignMessageOptions,
+  SignPsbtsResponse,
   WalletProviderSignPsbtOptions,
   WalletProviderSignPsbtsOptions,
-  SignPsbtsResponse,
 } from '../types'
-import {
-  handleStateChangePersistence,
-  keysToPersist,
-  PersistedKey,
-} from '../utils'
-import { LaserEyesClient } from '..'
+import { handleStateChangePersistence, keysToPersist, type PersistedKey } from '../utils'
+import { WalletProvider } from '.'
 
 const OYL_WALLET_PERSISTENCE_KEY = 'OYL_CONNECTED_WALLET_STATE'
 
@@ -42,47 +37,40 @@ interface OylLibrary {
   }>
   getNetwork: () => Promise<NetworkType>
   switchNetwork: (network: NetworkType) => Promise<void>
-  signMessage: ({address, message, protocol}: {address: string, message: string, protocol?: 'bip322' | 'ecdsa'}) => Promise<{
+  signMessage: ({
+    address,
+    message,
+    protocol,
+  }: {
+    address: string
+    message: string
+    protocol?: 'bip322' | 'ecdsa'
+  }) => Promise<{
     address: string
     signature: string
   }>
-  signPsbt: (options: {
-    psbt: string
-    finalize?: boolean
-    broadcast?: boolean
-  }) => Promise<{
+  signPsbt: (options: { psbt: string; finalize?: boolean; broadcast?: boolean }) => Promise<{
     psbt: string
     txid?: string
   }>
-  signPsbts: (options: {
-    psbt: string
-    finalize?: boolean
-    broadcast?: boolean
-  }[]) => Promise<
+  signPsbts: (
+    options: {
+      psbt: string
+      finalize?: boolean
+      broadcast?: boolean
+    }[]
+  ) => Promise<
     {
       psbt: string
       txid?: string
     }[]
   >
-  pushPsbt: (options: {
-    psbt: string
-  }) => Promise<{
+  pushPsbt: (options: { psbt: string }) => Promise<{
     txid: string
   }>
 }
 
 export default class OylProvider extends WalletProvider {
-  constructor(
-    stores: {
-      $store: MapStore<LaserEyesStoreType>
-      $network: WritableAtom<NetworkType>
-    },
-    parent: LaserEyesClient,
-    config?: Config
-  ) {
-    super(stores, parent, config)
-  }
-
   public get library(): OylLibrary | undefined {
     return (window as any).oyl
   }
@@ -92,16 +80,13 @@ export default class OylProvider extends WalletProvider {
   }
 
   observer?: MutationObserver
-  $valueStore: MapStore<Record<PersistedKey, string>> = persistentMap(
-    OYL_WALLET_PERSISTENCE_KEY,
-    {
-      address: '',
-      paymentAddress: '',
-      paymentPublicKey: '',
-      publicKey: '',
-      balance: '',
-    }
-  )
+  $valueStore: MapStore<Record<PersistedKey, string>> = persistentMap(OYL_WALLET_PERSISTENCE_KEY, {
+    address: '',
+    paymentAddress: '',
+    paymentPublicKey: '',
+    publicKey: '',
+    balance: '',
+  })
 
   removeSubscriber?: () => void
 
@@ -113,10 +98,7 @@ export default class OylProvider extends WalletProvider {
       }
       this.$store.setKey(key, vals[key])
     }
-    this.$store.setKey(
-      'accounts',
-      [vals.address, vals.paymentAddress].filter(Boolean)
-    )
+    this.$store.setKey('accounts', [vals.address, vals.paymentAddress].filter(Boolean))
   }
 
   watchStateChange(
@@ -141,7 +123,7 @@ export default class OylProvider extends WalletProvider {
       })
       this.observer.observe(document, { childList: true, subtree: true })
     }
-    listenKeys(this.$store, ['provider'], (newStore) => {
+    listenKeys(this.$store, ['provider'], newStore => {
       if (newStore.provider !== OYL) {
         if (this.removeSubscriber) {
           this.$valueStore.set({
@@ -155,9 +137,7 @@ export default class OylProvider extends WalletProvider {
           this.removeSubscriber = undefined
         }
       } else {
-        this.removeSubscriber = this.$store.subscribe(
-          this.watchStateChange.bind(this)
-        )
+        this.removeSubscriber = this.$store.subscribe(this.watchStateChange.bind(this))
       }
     })
   }
@@ -174,7 +154,12 @@ export default class OylProvider extends WalletProvider {
     this.$store.setKey('paymentAddress', nativeSegwit.address)
     this.$store.setKey('publicKey', taproot.publicKey)
     this.$store.setKey('paymentPublicKey', nativeSegwit.publicKey)
-    this.$store.setKey('accounts', [taproot.address, nativeSegwit.address, nestedSegwit.address, legacy.address])
+    this.$store.setKey('accounts', [
+      taproot.address,
+      nativeSegwit.address,
+      nestedSegwit.address,
+      legacy.address,
+    ])
   }
 
   async getNetwork() {
@@ -202,10 +187,7 @@ export default class OylProvider extends WalletProvider {
     return psbt.txId
   }
 
-  async signMessage(
-    message: string,
-    options?: SignMessageOptions
-  ): Promise<string> {
+  async signMessage(message: string, options?: SignMessageOptions): Promise<string> {
     if (!this.library) throw new Error("Oyl isn't installed")
     const tempAddy = options?.toSignAddress || this.$store.get().paymentAddress
     const response = await this.library.signMessage({
@@ -215,11 +197,7 @@ export default class OylProvider extends WalletProvider {
     })
     return response.signature
   }
-  async signPsbt({
-    psbtHex,
-    broadcast,
-    finalize,
-  }: WalletProviderSignPsbtOptions): Promise<
+  async signPsbt({ psbtHex, broadcast, finalize }: WalletProviderSignPsbtOptions): Promise<
     | {
         signedPsbtHex: string | undefined
         signedPsbtBase64: string | undefined
@@ -240,13 +218,11 @@ export default class OylProvider extends WalletProvider {
       txId: txid,
     }
   }
-  async signPsbts(
-    signPsbtsOptions: WalletProviderSignPsbtsOptions
-  ): Promise<SignPsbtsResponse> {
+  async signPsbts(signPsbtsOptions: WalletProviderSignPsbtsOptions): Promise<SignPsbtsResponse> {
     if (!this.library) throw new Error("Oyl isn't installed")
     const { psbts, finalize, broadcast } = signPsbtsOptions
 
-    const psbtsToSign = psbts.map((p) => ({
+    const psbtsToSign = psbts.map(p => ({
       psbt: p,
       finalize,
       broadcast,

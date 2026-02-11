@@ -1,4 +1,4 @@
-import Link from "next/link"
+import Link from 'next/link'
 
 export default function DocsNotFound() {
   return (
@@ -24,4 +24,3 @@ export default function DocsNotFound() {
     </div>
   )
 }
-

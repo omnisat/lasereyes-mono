@@ -1,39 +1,26 @@
-import React, { useState, useEffect } from 'react'
-import { Button } from './ui/button'
-import { Input } from '@/components/ui/input'
-import { cn } from '@/lib/utils'
+/** biome-ignore-all lint/a11y/noStaticElementInteractions:  Need to swap the components with a shadcn one which provides accessibility by default */
+import { type Inscription, type MAINNET, type TESTNET, useLaserEyes } from '@omnisat/lasereyes'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
+import { Input } from '@/components/ui/input'
 import { getMempoolSpaceUrl } from '@/lib/urls'
-import {
-  type MAINNET,
-  type TESTNET,
-  useLaserEyes,
-  type Inscription,
-} from '@omnisat/lasereyes'
+import { cn } from '@/lib/utils'
+import { Button } from './ui/button'
 
 const InscriptionsSection = () => {
-  const {
-    provider,
-    inscribe,
-    address,
-    network,
-    getInscriptions,
-    sendInscriptions,
-    connected,
-  } = useLaserEyes()
+  const { provider, inscribe, address, network, getInscriptions, sendInscriptions, connected } =
+    useLaserEyes()
   const [inscriptions, setInscriptions] = useState<Inscription[]>([])
   const [inscriptionText, setInscriptionText] = useState(
     'Inscribed 100% clientside with Laser Eyes'
   )
-  const [selectedInscriptionIds, setSelectedInscriptionIds] = useState<
-    string[]
-  >([])
+  const [selectedInscriptionIds, setSelectedInscriptionIds] = useState<string[]>([])
   const [recipientAddress, setRecipientAddress] = useState('')
 
   // Fetch inscriptions when address changes
   useEffect(() => {
     if (provider && connected && network) {
-      getInscriptions().then((data) => {
+      getInscriptions().then(data => {
         console.log(data)
         setInscriptions(data)
       })
@@ -73,9 +60,9 @@ const InscriptionsSection = () => {
   }
 
   const toggleInscriptionSelection = (inscriptionId: string) => {
-    setSelectedInscriptionIds((prevSelected) => {
+    setSelectedInscriptionIds(prevSelected => {
       if (prevSelected.includes(inscriptionId)) {
-        return prevSelected.filter((id) => id !== inscriptionId)
+        return prevSelected.filter(id => id !== inscriptionId)
       }
       return [...prevSelected, inscriptionId]
     })
@@ -93,10 +80,7 @@ const InscriptionsSection = () => {
     }
 
     try {
-      const txId = await sendInscriptions(
-        selectedInscriptionIds,
-        recipientAddress
-      )
+      const txId = await sendInscriptions(selectedInscriptionIds, recipientAddress)
 
       // Clear selections after successful send
       setSelectedInscriptionIds([])
@@ -127,7 +111,7 @@ const InscriptionsSection = () => {
       <div className="text-md text-orange-400">inscriptions</div>
       <div className="flex flex-col gap-2 items-center justify-center">
         <div className="flex flex-wrap gap-1">
-          {inscriptions?.slice(0, 4).map((insc) => (
+          {inscriptions?.slice(0, 4).map(insc => (
             <div
               key={insc.id}
               className={cn(
@@ -136,7 +120,7 @@ const InscriptionsSection = () => {
                   ? 'border-orange-400'
                   : 'border-transparent'
               )}
-              onKeyDown={(e) => {
+              onKeyDown={e => {
                 if (e.key === 'Enter' || e.key === ' ') {
                   toggleInscriptionSelection(insc.inscriptionId)
                 }
@@ -151,11 +135,11 @@ const InscriptionsSection = () => {
               {/* Transparent overlay to capture clicks */}
               <div
                 className="absolute inset-0 z-10"
-                onClick={(e) => {
+                onClick={e => {
                   e.stopPropagation()
                   toggleInscriptionSelection(insc.inscriptionId)
                 }}
-                onKeyUp={(e) => {
+                onKeyUp={e => {
                   if (e.key === 'Enter' || e.key === ' ') {
                     toggleInscriptionSelection(insc.inscriptionId)
                   }
@@ -177,7 +161,7 @@ const InscriptionsSection = () => {
           placeholder={'Enter recipient address...'}
           value={recipientAddress}
           disabled={!provider}
-          onChange={(e) => setRecipientAddress(e.target.value)}
+          onChange={e => setRecipientAddress(e.target.value)}
         />
 
         <Button
@@ -196,7 +180,7 @@ const InscriptionsSection = () => {
             placeholder={'Inscribe some text...'}
             value={inscriptionText}
             disabled={!provider}
-            onChange={(e) => setInscriptionText(e.target.value)}
+            onChange={e => setInscriptionText(e.target.value)}
           />
           <Button
             className={'w-full mt-2 bg-[#232225] disabled:text-[#737275]'}

@@ -1,25 +1,16 @@
 import axios from 'axios'
+import { MAINNET } from '../constants'
+import type { EsploraTx } from '../types/esplora'
+import type { OrdAddress, OrdOutputs, OrdResponse, OrdRune, OrdRuneBalance } from '../types/ord'
 import type {
-  OrdAddress,
-  OrdResponse,
-  OrdOutputs,
-  OrdRune,
-  OrdRuneBalance,
-} from '../types/ord'
-import type {
+  SandshrewBalancesResult,
   SandshrewResponse,
   SingleRuneOutpoint,
-  SandshrewBalancesResult,
 } from '../types/sandshrew'
-import type { EsploraTx } from '../types/esplora'
 import { getPublicKeyHash } from './btc'
-import { MAINNET } from '../constants'
 import { SANDSHREW_LASEREYES_KEY, SANDSHREW_URL_MAINNET } from './urls'
 
-export const callSandshrewRPC = async (
-  method: string,
-  params: string | any
-) => {
+export const callSandshrewRPC = async (method: string, params: string | any) => {
   const data = JSON.stringify({
     jsonrpc: '2.0',
     id: method,
@@ -37,45 +28,35 @@ export const callSandshrewRPC = async (
         'content-type': 'application/json',
       },
     })
-    .then((res) => res.data)
-    .catch((e) => {
+    .then(res => res.data)
+    .catch(e => {
       throw e
     })
 }
 
 export const getOrdAddress = async (address: string): Promise<OrdAddress> => {
-  const response = (await callSandshrewRPC('ord_address', [
-    address,
-  ])) as OrdResponse
+  const response = (await callSandshrewRPC('ord_address', [address])) as OrdResponse
   return response.result as OrdAddress
 }
 
 export const getRuneById = async (rune_id: string): Promise<OrdRune> => {
-  const response = (await callSandshrewRPC('ord_rune', [
-    rune_id,
-  ])) as OrdResponse
+  const response = (await callSandshrewRPC('ord_rune', [rune_id])) as OrdResponse
   return response.result as OrdRune
 }
 
 export const getRuneByName = async (rune_name: string): Promise<OrdRune> => {
-  const response = (await callSandshrewRPC('ord_rune', [
-    rune_name,
-  ])) as OrdResponse
+  const response = (await callSandshrewRPC('ord_rune', [rune_name])) as OrdResponse
   return response.result as OrdRune
 }
 
-export const getBalances = async (
-  address: string
-): Promise<SandshrewBalancesResult> => {
+export const getBalances = async (address: string): Promise<SandshrewBalancesResult> => {
   const response = await callSandshrewRPC('sandshrew_balances', [{ address }])
   return response.result as SandshrewBalancesResult
 }
 
 export const getTxInfo = async (txId: string): Promise<EsploraTx> => {
   try {
-    const response = (await callSandshrewRPC('esplora_tx', [
-      txId,
-    ])) as SandshrewResponse
+    const response = (await callSandshrewRPC('esplora_tx', [txId])) as SandshrewResponse
     return response.result as EsploraTx
   } catch (e) {
     console.error(e)
@@ -94,7 +75,7 @@ export const batchOrdOutput = async ({
   const ordOutputs: OrdOutputs[] = []
   for (let i = 0; i < outpoints.length; i += MAX_OUTPOINTS_PER_CALL) {
     const batch = outpoints.slice(i, i + MAX_OUTPOINTS_PER_CALL)
-    const multiCall = batch.map((outpoint) => {
+    const multiCall = batch.map(outpoint => {
       return ['ord_output', [outpoint]]
     })
 
@@ -111,9 +92,7 @@ export const batchOrdOutput = async ({
   return ordOutputs
 }
 
-export const getAddressRunesBalances = async (
-  address: string
-): Promise<OrdRuneBalance[]> => {
+export const getAddressRunesBalances = async (address: string): Promise<OrdRuneBalance[]> => {
   try {
     const response = await getOrdAddress(address)
     const runesData = response.runes_balances
@@ -121,7 +100,7 @@ export const getAddressRunesBalances = async (
       throw new Error('No runes data found')
     }
 
-    return runesData.map((rune) => ({
+    return runesData.map(rune => ({
       name: rune[0],
       balance: rune[1],
       symbol: rune[2],
@@ -158,9 +137,7 @@ export const mapRuneBalances = async ({
 
     const [txId, txIndex] = output.split(':')
     console.log(txId, txIndex, output)
-    singleRuneOutpoint.script = Buffer.from(
-      getPublicKeyHash(address, MAINNET)
-    ).toString('hex')
+    singleRuneOutpoint.script = Buffer.from(getPublicKeyHash(address, MAINNET)).toString('hex')
     if (typeof runes === 'object' && !Array.isArray(runes)) {
       for (const rune in runes) {
         singleRuneOutpoint.balances.push(runes[rune].amount)

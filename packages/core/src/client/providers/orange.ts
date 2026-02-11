@@ -1,44 +1,38 @@
-import * as bitcoin from 'bitcoinjs-lib'
-import { fromOutputScript } from 'bitcoinjs-lib/src/address'
+import { persistentMap } from '@nanostores/persistent'
 import orange, {
   type AddressPurpose,
-  type BitcoinNetworkType as OrangeBitcoinNetworkType,
   type GetAddressOptions,
   getAddress,
-  type SendBtcTransactionOptions,
-  request,
+  type BitcoinNetworkType as OrangeBitcoinNetworkType,
   RpcErrorCode,
+  request,
+  type SendBtcTransactionOptions,
 } from '@orangecrypto/orange-connect'
-
-import { WalletProvider } from '.'
+import * as bitcoin from 'bitcoinjs-lib'
+import { fromOutputScript } from 'bitcoinjs-lib/src/address'
+import { listenKeys, type MapStore } from 'nanostores'
 import {
-  type ProviderType,
-  type NetworkType,
-  MAINNET,
-  TESTNET,
-  TESTNET4,
-  SIGNET,
   FRACTAL_TESTNET,
   type LaserEyesStoreType,
+  MAINNET,
+  type NetworkType,
   ORANGE,
+  type ProviderType,
+  SIGNET,
   type SignMessageOptions,
+  TESTNET,
+  TESTNET4,
   type WalletProviderSignPsbtOptions,
 } from '../..'
+import { getOrangeNetwork } from '../../constants/networks'
 import {
   findOrdinalsAddress,
   findPaymentAddress,
-  getBTCBalance,
   getBitcoinNetwork,
+  getBTCBalance,
 } from '../../lib/helpers'
-import { getOrangeNetwork } from '../../constants/networks'
-import { type MapStore, listenKeys } from 'nanostores'
-import { persistentMap } from '@nanostores/persistent'
-
-import {
-  handleStateChangePersistence,
-  keysToPersist,
-  type PersistedKey,
-} from '../utils'
+import { handleStateChangePersistence, keysToPersist, type PersistedKey } from '../utils'
+import { WalletProvider } from '.'
 
 const signMessageOrange = orange?.signMessage
 const sendBtcTxOrange = orange?.sendBtcTransaction
@@ -75,10 +69,7 @@ export default class OrangeProvider extends WalletProvider {
       }
       this.$store.setKey(key, vals[key])
     }
-    this.$store.setKey(
-      'accounts',
-      [vals.address, vals.paymentAddress].filter(Boolean)
-    )
+    this.$store.setKey('accounts', [vals.address, vals.paymentAddress].filter(Boolean))
   }
 
   watchStateChange(
@@ -102,7 +93,7 @@ export default class OrangeProvider extends WalletProvider {
       })
       this.observer?.observe(document, { childList: true, subtree: true })
     }
-    listenKeys(this.$store, ['provider'], (newVal) => {
+    listenKeys(this.$store, ['provider'], newVal => {
       if (newVal.provider !== ORANGE) {
         if (this.removeSubscriber) {
           this.$valueStore.set({
@@ -116,9 +107,7 @@ export default class OrangeProvider extends WalletProvider {
           this.removeSubscriber = undefined
         }
       } else {
-        this.removeSubscriber = this.$store.subscribe(
-          this.watchStateChange.bind(this)
-        )
+        this.removeSubscriber = this.$store.subscribe(this.watchStateChange.bind(this))
       }
     })
   }
@@ -131,7 +120,7 @@ export default class OrangeProvider extends WalletProvider {
     const { address, paymentAddress } = this.$valueStore.get()
     if (address) {
       this.restorePersistedValues()
-      getBTCBalance(paymentAddress, this.network).then((totalBalance) => {
+      getBTCBalance(paymentAddress, this.network).then(totalBalance => {
         this.$store.setKey('balance', totalBalance)
       })
       return
@@ -146,7 +135,7 @@ export default class OrangeProvider extends WalletProvider {
           type: orangeNetwork,
         },
       },
-      onFinish: (response) => {
+      onFinish: response => {
         const foundAddress = findOrdinalsAddress(response.addresses)
         const foundPaymentAddress = findPaymentAddress(response.addresses)
         if (!foundAddress || !foundPaymentAddress?.address) {
@@ -160,11 +149,11 @@ export default class OrangeProvider extends WalletProvider {
         }
 
         this.$store.setKey('publicKey', String(foundAddress.publicKey))
+        this.$store.setKey('paymentPublicKey', String(foundPaymentAddress.publicKey))
         this.$store.setKey(
-          'paymentPublicKey',
-          String(foundPaymentAddress.publicKey)
+          'accounts',
+          response.addresses.map(address => address.address)
         )
-        this.$store.setKey('accounts', response.addresses.map((address) => address.address))
       },
       onCancel: () => {
         throw new Error(`User canceled lasereyes to ${ORANGE} wallet`)
@@ -180,9 +169,7 @@ export default class OrangeProvider extends WalletProvider {
 
     if (
       address.slice(0, 1) === 't' &&
-      ([TESTNET, TESTNET4, SIGNET, FRACTAL_TESTNET] as string[]).includes(
-        this.network
-      )
+      ([TESTNET, TESTNET4, SIGNET, FRACTAL_TESTNET] as string[]).includes(this.network)
     ) {
       return this.network
     }
@@ -205,7 +192,7 @@ export default class OrangeProvider extends WalletProvider {
         ],
         senderAddress: this.$store.get().paymentAddress,
       },
-      onFinish: (response) => {
+      onFinish: response => {
         txId = response
       },
       onCancel: () => {
@@ -217,10 +204,7 @@ export default class OrangeProvider extends WalletProvider {
     return txId
   }
 
-  async signMessage(
-    message: string,
-    options?: SignMessageOptions
-  ): Promise<string> {
+  async signMessage(message: string, options?: SignMessageOptions): Promise<string> {
     let signature = ''
     const tempAddy = options?.toSignAddress || this.$store.get().paymentAddress
     const signMessageOptions = {
@@ -265,13 +249,10 @@ export default class OrangeProvider extends WalletProvider {
       let inputsToSign: Record<string, number[]> = {}
 
       if (inputsToSignProp) {
-        inputsToSign = inputsToSignProp.reduce(
-          (acc: Record<string, number[]>, input) => {
-            acc[input.address] = [...(acc[input.address] || []), input.index]
-            return acc
-          },
-          {}
-        )
+        inputsToSign = inputsToSignProp.reduce((acc: Record<string, number[]>, input) => {
+          acc[input.address] = [...(acc[input.address] || []), input.index]
+          return acc
+        }, {})
       } else {
         const { address, paymentAddress } = this.$store.get()
         const ordinalAddressData: Record<string, number[]> = {
@@ -287,10 +268,7 @@ export default class OrangeProvider extends WalletProvider {
             continue
           }
           const { script } = input.witnessUtxo
-          const addressFromScript = fromOutputScript(
-            script,
-            getBitcoinNetwork(this.network)
-          )
+          const addressFromScript = fromOutputScript(script, getBitcoinNetwork(this.network))
           if (addressFromScript === paymentAddress) {
             paymentsAddressData[paymentAddress].push(Number(counter))
           } else if (addressFromScript === address) {

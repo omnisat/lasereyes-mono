@@ -1,15 +1,11 @@
-import React from 'react'
+import type React from 'react'
+
 interface KeplrLogoProps extends React.SVGProps<SVGSVGElement> {
   size?: number
   variant?: 'first' | 'second'
 }
 
-const KeplrLogo: React.FC<KeplrLogoProps> = ({
-  size = 42,
-  className,
-  variant,
-  ...props
-}) => (
+const KeplrLogo: React.FC<KeplrLogoProps> = ({ size = 42, className, variant, ...props }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width={size}

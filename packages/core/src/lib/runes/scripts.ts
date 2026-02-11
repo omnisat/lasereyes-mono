@@ -1,12 +1,7 @@
-import { encodeRunestone, RunestoneSpec } from '@magiceden-oss/runestone-lib'
+import { encodeRunestone, type RunestoneSpec } from '@magiceden-oss/runestone-lib'
 import { encodeVarint } from '../utils'
 
-export const createRuneMintScript = ({
-  runeId,
-}: {
-  runeId: string
-  pointer?: number
-}) => {
+export const createRuneMintScript = ({ runeId }: { runeId: string; pointer?: number }) => {
   const [blockStr, txStr] = runeId.split(':')
   const runestone: RunestoneSpec = {
     mint: {
@@ -94,7 +89,7 @@ export const createRuneSendScript = ({
   let runeStoneLength: string = runeStone.byteLength.toString(16)
 
   if (runeStoneLength.length % 2 !== 0) {
-    runeStoneLength = '0' + runeStone.byteLength.toString(16)
+    runeStoneLength = `0${runeStone.byteLength.toString(16)}`
   }
 
   const script: Buffer = Buffer.concat([

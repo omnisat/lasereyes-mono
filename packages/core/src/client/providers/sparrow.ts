@@ -1,21 +1,17 @@
-import * as bitcoin from 'bitcoinjs-lib'
-import { WalletProvider } from '.'
-import { NetworkType, ProviderType } from '../../types'
-import { SPARROW } from '../../constants/wallets'
-import { listenKeys, MapStore } from 'nanostores'
-import {
-  createSendBtcPsbt,
-  getBTCBalance,
-  isMainnetNetwork,
-} from '../../lib/helpers'
-import {
-  handleStateChangePersistence,
-  keysToPersist,
-  PersistedKey,
-} from '../utils'
 import { persistentMap } from '@nanostores/persistent'
-import { LaserEyesStoreType, WalletProviderSignPsbtOptions, SparrowWalletProvider } from '../types'
+import * as bitcoin from 'bitcoinjs-lib'
+import { listenKeys, type MapStore } from 'nanostores'
+import { SPARROW } from '../../constants/wallets'
+import { createSendBtcPsbt, getBTCBalance, isMainnetNetwork } from '../../lib/helpers'
+import type { NetworkType, ProviderType } from '../../types'
 import { DefaultSparrowWalletProvider } from '../helpers/sparrow'
+import type {
+  LaserEyesStoreType,
+  SparrowWalletProvider,
+  WalletProviderSignPsbtOptions,
+} from '../types'
+import { handleStateChangePersistence, keysToPersist, type PersistedKey } from '../utils'
+import { WalletProvider } from '.'
 
 const SPARROW_WALLET_PERSISTENCE_KEY = 'SPARROW_CONNECTED_WALLET_STATE'
 
@@ -45,8 +41,7 @@ export default class SparrowProvider extends WalletProvider {
       this.observer = new window.MutationObserver(() => {
         if (!this.library) {
           // Create a new instance of the SparrowWalletProvider if it's not already available
-          ;(window as any).SparrowWalletProvider =
-            new DefaultSparrowWalletProvider()
+          ;(window as any).SparrowWalletProvider = new DefaultSparrowWalletProvider()
         }
         this.$store.setKey('hasProvider', {
           ...this.$store.get().hasProvider,
@@ -58,7 +53,7 @@ export default class SparrowProvider extends WalletProvider {
       this.observer.observe(document, { childList: true, subtree: true })
     }
 
-    listenKeys(this.$store, ['provider'], (newVal) => {
+    listenKeys(this.$store, ['provider'], newVal => {
       if (newVal.provider !== SPARROW) {
         if (this.removeSubscriber) {
           this.$valueStore.set({
@@ -72,9 +67,7 @@ export default class SparrowProvider extends WalletProvider {
           this.removeSubscriber = undefined
         }
       } else {
-        this.removeSubscriber = this.$store.subscribe(
-          this.watchStateChange.bind(this)
-        )
+        this.removeSubscriber = this.$store.subscribe(this.watchStateChange.bind(this))
       }
     })
   }
@@ -86,12 +79,7 @@ export default class SparrowProvider extends WalletProvider {
     _: LaserEyesStoreType | undefined,
     changedKey: keyof LaserEyesStoreType | undefined
   ) {
-    handleStateChangePersistence(
-      SPARROW,
-      newState,
-      changedKey,
-      this.$valueStore
-    )
+    handleStateChangePersistence(SPARROW, newState, changedKey, this.$valueStore)
   }
 
   restorePersistedValues() {
@@ -102,10 +90,7 @@ export default class SparrowProvider extends WalletProvider {
       }
       this.$store.setKey(key, vals[key])
     }
-    this.$store.setKey(
-      'accounts',
-      [vals.address, vals.paymentAddress].filter(Boolean)
-    )
+    this.$store.setKey('accounts', [vals.address, vals.paymentAddress].filter(Boolean))
   }
 
   dispose() {
@@ -114,8 +99,7 @@ export default class SparrowProvider extends WalletProvider {
 
   async connect(_: ProviderType): Promise<void> {
     try {
-      const { address: foundAddress, paymentAddress: foundPaymentAddress } =
-        this.$valueStore!.get()
+      const { address: foundAddress, paymentAddress: foundPaymentAddress } = this.$valueStore?.get()
       if (foundAddress && foundPaymentAddress) {
         if (foundAddress.startsWith('tb1') && isMainnetNetwork(this.network)) {
           this.disconnect()
@@ -127,7 +111,7 @@ export default class SparrowProvider extends WalletProvider {
       if (!this.library) throw new Error("Sparrow wallet isn't supported")
       const accounts = await this.library.requestAccounts()
       if (!accounts) throw new Error('No accounts found')
-      await this.getNetwork().then((network) => {
+      await this.getNetwork().then(network => {
         if (this.network !== network) {
           this.switchNetwork(this.network)
         }
@@ -152,7 +136,7 @@ export default class SparrowProvider extends WalletProvider {
   async switchNetwork(network: NetworkType) {
     if (!this.library) throw new Error("Sparrow wallet isn't supported")
     try {
-      const result = await this.library!.switchNetwork(network)
+      const result = await this.library?.switchNetwork(network)
       if (!result) throw new Error('No result returned from switchNetwork')
       const { address, paymentAddress, publicKey } = result
       this.$store.setKey('address', address)
@@ -177,7 +161,7 @@ export default class SparrowProvider extends WalletProvider {
       7
     )
 
-    const signedAndFinalizedPsbt = await this.library!.signPsbt(psbtBase64)
+    const signedAndFinalizedPsbt = await this.library?.signPsbt(psbtBase64)
     if (!signedAndFinalizedPsbt) throw new Error('No signed PSBT provided')
     const txId = await this.pushPsbt(signedAndFinalizedPsbt)
     if (!txId) throw new Error('send failed, no txid returned')
@@ -185,12 +169,10 @@ export default class SparrowProvider extends WalletProvider {
   }
 
   async signMessage(message: string): Promise<string> {
-    return await this.library!.signMessage(message)
+    return await this.library?.signMessage(message)
   }
 
-  async signPsbt(
-    { psbtBase64, broadcast, finalize }: WalletProviderSignPsbtOptions
-  ): Promise<
+  async signPsbt({ psbtBase64, broadcast, finalize }: WalletProviderSignPsbtOptions): Promise<
     | {
         signedPsbtHex: string | undefined
         signedPsbtBase64: string | undefined
@@ -199,7 +181,7 @@ export default class SparrowProvider extends WalletProvider {
     | undefined
   > {
     const preSigned = bitcoin.Psbt.fromBase64(psbtBase64)
-    const signedPsbt = await this.library!.signPsbt(psbtBase64)
+    const signedPsbt = await this.library?.signPsbt(psbtBase64)
 
     if (finalize && broadcast) {
       const txId = await this.pushPsbt(signedPsbt)
@@ -218,15 +200,12 @@ export default class SparrowProvider extends WalletProvider {
   }
 
   async getPublicKey() {
-    const publicKey = await this.library!.getPublicKey()
+    const publicKey = await this.library?.getPublicKey()
     this.$store.setKey('publicKey', publicKey)
     return publicKey
   }
   async getBalance() {
-    const bal = await getBTCBalance(
-      this.$store.get().paymentAddress,
-      this.network
-    )
+    const bal = await getBTCBalance(this.$store.get().paymentAddress, this.network)
     this.$store.setKey('balance', bal)
     return bal.toString()
   }

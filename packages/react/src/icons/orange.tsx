@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 
 interface OrangeLogoProps extends React.SVGProps<SVGSVGElement> {
   size?: number
@@ -55,14 +55,7 @@ const OrangeLogo: React.FC<OrangeLogoProps> = ({
         height={42}
         xlinkHref="data:image/png;base64,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"
       />
-      <filter
-        id="alpha"
-        filterUnits="objectBoundingBox"
-        x="0%"
-        y="0%"
-        width="100%"
-        height="100%"
-      >
+      <filter id="alpha" filterUnits="objectBoundingBox" x="0%" y="0%" width="100%" height="100%">
         <feColorMatrix
           type="matrix"
           in="SourceGraphic"

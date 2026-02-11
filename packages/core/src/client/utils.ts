@@ -1,22 +1,22 @@
-import { type MapStore, type WritableAtom, atom, map } from 'nanostores'
+import { atom, type MapStore, map, type WritableAtom } from 'nanostores'
 import { MAINNET } from '../constants/networks'
 import {
+  BINANCE,
+  KEPLR,
   LEATHER,
   MAGIC_EDEN,
   OKX,
+  OP_NET,
+  ORANGE,
   OYL,
   PHANTOM,
+  SPARROW,
+  TOKEO,
   UNISAT,
   WIZZ,
   XVERSE,
-  ORANGE,
-  OP_NET,
-  SPARROW,
-  TOKEO,
-  KEPLR,
-  BINANCE,
 } from '../constants/wallets'
-import type { NetworkType, ProviderType, Config } from '../types'
+import type { Config, NetworkType, ProviderType } from '../types'
 import type { LaserEyesStoreType } from './types'
 
 export function triggerDOMShakeHack(callback: () => void) {
@@ -99,10 +99,7 @@ export function handleStateChangePersistence(
       if (changedKey === 'balance') {
         $valueStore.setKey('balance', newState.balance?.toString() ?? '')
       } else if ((keysToPersist as readonly string[]).includes(changedKey)) {
-        $valueStore.setKey(
-          changedKey as PersistedKey,
-          newState[changedKey]?.toString() ?? ''
-        )
+        $valueStore.setKey(changedKey as PersistedKey, newState[changedKey]?.toString() ?? '')
       }
     } else {
       $valueStore.set({
@@ -121,5 +118,5 @@ export const fromHexString = (hexString: string): Uint8Array => {
   if (!matches) {
     throw new Error('Invalid hex string')
   }
-  return Uint8Array.from(matches.map((byte) => Number.parseInt(byte, 16)))
+  return Uint8Array.from(matches.map(byte => Number.parseInt(byte, 16)))
 }

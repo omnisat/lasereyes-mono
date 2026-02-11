@@ -1,10 +1,9 @@
-"use client"
+'use client'
 
-import { useEffect } from "react"
-import { Suspense } from "react"
-import Link from "next/link"
+import Link from 'next/link'
+import { Suspense, useEffect } from 'react'
 
-export default function Error({
+export default function ErrorPage({
   error,
   reset,
 }: {
@@ -38,4 +37,3 @@ export default function Error({
     </Suspense>
   )
 }
-

@@ -1,12 +1,149 @@
 {
-    "$schema": "https://biomejs.dev/schemas/2.1.4/schema.json",
-    "root": true,
-    "javascript": {
-        "formatter": {
-            "semicolons": "asNeeded",
-            "arrowParentheses": "asNeeded",
-            "indentStyle": "space",
-            "bracketSameLine": true
-        }
+  "$schema": "https://biomejs.dev/schemas/2.3.14/schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+  "files": {
+    "ignoreUnknown": true,
+    "maxSize": 10485760
+  },
+  "formatter": {
+    "enabled": true,
+    "formatWithErrors": false,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 100,
+    "lineEnding": "lf"
+  },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
     }
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "correctness": {
+        "noUnusedVariables": "warn"
+      },
+      "security": {
+        "noDangerouslySetInnerHtml": "warn",
+        "noDangerouslySetInnerHtmlWithChildren": "error"
+      },
+      "suspicious": {
+        "noExplicitAny": "warn"
+      },
+      "performance": {
+        "noDelete": "error"
+      }
+    }
+  },
+  "javascript": {
+    "formatter": {
+      "semicolons": "asNeeded",
+      "arrowParentheses": "asNeeded",
+      "indentStyle": "space",
+      "indentWidth": 2,
+      "lineWidth": 100,
+      "quoteStyle": "single",
+      "jsxQuoteStyle": "double",
+      "quoteProperties": "asNeeded",
+      "trailingCommas": "es5",
+      "bracketSameLine": false,
+      "bracketSpacing": true
+    }
+  },
+  "json": {
+    "formatter": {
+      "enabled": true,
+      "indentStyle": "space",
+      "indentWidth": 2,
+      "lineWidth": 100
+    }
+  },
+  "overrides": [
+    {
+      "includes": ["packages/client/**/*.ts"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noExplicitAny": "off"
+          },
+          "correctness": {
+            "noUnusedVariables": "error"
+          },
+          "style": {
+            "noNonNullAssertion": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["packages/core/**/*.ts"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noExplicitAny": "off"
+          },
+          "correctness": {
+            "noUnusedVariables": "error"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["packages/react/**/*.tsx", "packages/react/**/*.ts"],
+      "linter": {
+        "rules": {
+          "a11y": {
+            "useButtonType": "error",
+            "useKeyWithClickEvents": "error"
+          },
+          "suspicious": {
+            "noArrayIndexKey": "error"
+          }
+        }
+      }
+    },
+    {
+      "includes": [
+        "apps/lasereyes-docs/**/*.tsx",
+        "apps/lasereyes-docs/**/*.ts",
+        "apps/react-ui/**/*.tsx",
+        "apps/react-ui/**/*.ts"
+      ],
+      "linter": {
+        "rules": {
+          "a11y": {
+            "recommended": false,
+            "useButtonType": "off",
+            "useKeyWithClickEvents": "off",
+            "useSemanticElements": "off",
+            "useFocusableInteractive": "off",
+            "noSvgWithoutTitle": "off",
+            "noStaticElementInteractions": "off"
+          },
+          "performance": {
+            "noImgElement": "off"
+          },
+          "suspicious": {
+            "noArrayIndexKey": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["**/__tests__/**", "**/*.test.ts", "**/*.test.tsx"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noExplicitAny": "off"
+          }
+        }
+      }
+    }
+  ]
 }

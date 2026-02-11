@@ -1,11 +1,15 @@
+import * as bitcoin from 'bitcoinjs-lib'
 import type { MapStore, WritableAtom } from 'nanostores'
+import { FRACTAL_TESTNET, MAINNET, SIGNET, TESTNET, TESTNET4 } from '../../constants'
+import { ALKANES, BRC20, BTC, RUNES } from '../../constants/protocols'
+import { sendBrc20 } from '../../lib/brc-20/psbt'
+import { DataSourceManager } from '../../lib/data-sources/manager'
+import { broadcastTx } from '../../lib/helpers'
+import { inscribeContent } from '../../lib/inscribe'
+import { sendInscriptions } from '../../lib/inscriptions/psbt'
+import { sendRune } from '../../lib/runes/psbt'
 import type {
-  LaserEyesStoreType,
-  WalletProviderSignPsbtOptions,
-  WalletProviderSignPsbtsOptions,
-  SignPsbtsResponse,
-} from '../types'
-import type {
+  AlkaneSendArgs,
   Brc20SendArgs,
   BTCSendArgs,
   Config,
@@ -14,26 +18,16 @@ import type {
   Protocol,
   ProviderType,
   RuneSendArgs,
-  AlkaneSendArgs,
 } from '../../types'
-import type { LaserEyesClient } from '..'
-import { inscribeContent } from '../../lib/inscribe'
-import { broadcastTx } from '../../lib/helpers'
-import * as bitcoin from 'bitcoinjs-lib'
-import {
-  FRACTAL_TESTNET,
-  MAINNET,
-  SIGNET,
-  TESTNET,
-  TESTNET4,
-} from '../../constants'
-import { BRC20, BTC, RUNES, ALKANES } from '../../constants/protocols'
-import { sendRune } from '../../lib/runes/psbt'
-import { DataSourceManager } from '../../lib/data-sources/manager'
-import { sendBrc20 } from '../../lib/brc-20/psbt'
 import type { Inscription } from '../../types/lasereyes'
-import { sendInscriptions } from '../../lib/inscriptions/psbt'
+import type { LaserEyesClient } from '..'
 import AlkanesModule from '../modules/alkanes'
+import type {
+  LaserEyesStoreType,
+  SignPsbtsResponse,
+  WalletProviderSignPsbtOptions,
+  WalletProviderSignPsbtsOptions,
+} from '../types'
 
 export const UNSUPPORTED_PROVIDER_METHOD_ERROR = new Error(
   "The connected wallet doesn't support this method..."
@@ -73,7 +67,7 @@ export abstract class WalletProvider {
 
   abstract dispose(): void
 
-  abstract connect(defaultWallet: ProviderType): Promise<boolean | void>
+  abstract connect(defaultWallet: ProviderType): Promise<boolean | undefined>
 
   async requestAccounts(): Promise<string[]> {
     return this.$store.get().accounts
@@ -88,9 +82,7 @@ export abstract class WalletProvider {
     const { address } = this.$store.get()
     if (
       address.slice(0, 1) === 't' &&
-      ([TESTNET, TESTNET4, SIGNET, FRACTAL_TESTNET] as string[]).includes(
-        this.$network.get()
-      )
+      ([TESTNET, TESTNET4, SIGNET, FRACTAL_TESTNET] as string[]).includes(this.$network.get())
     ) {
       return this.$network.get()
     }
@@ -107,9 +99,7 @@ export abstract class WalletProvider {
       throw new Error('Method not found on data source')
     }
 
-    return await this.dataSourceManager.getAddressBtcBalance(
-      this.$store.get().paymentAddress
-    )
+    return await this.dataSourceManager.getAddressBtcBalance(this.$store.get().paymentAddress)
   }
 
   async getMetaBalances(protocol: Protocol) {
@@ -126,35 +116,26 @@ export abstract class WalletProvider {
           throw new Error('Method not found on data source')
         }
 
-        return await this.dataSourceManager.getAddressRunesBalances(
-          this.$store.get().address
-        )
+        return await this.dataSourceManager.getAddressRunesBalances(this.$store.get().address)
       }
       case BRC20:
         if (!this.dataSourceManager.getAddressBrc20Balances) {
           throw new Error('Method not found on data source')
         }
 
-        return await this.dataSourceManager.getAddressBrc20Balances(
-          this.$store.get().address
-        )
+        return await this.dataSourceManager.getAddressBrc20Balances(this.$store.get().address)
       case ALKANES:
         if (!this.dataSourceManager.getAddressAlkanesBalances) {
           throw new Error('Method not found on data source')
         }
 
-        return await this.dataSourceManager.getAddressAlkanesBalances(
-          this.$store.get().address
-        )
+        return await this.dataSourceManager.getAddressAlkanesBalances(this.$store.get().address)
       default:
         throw new Error('Unsupported protocol')
     }
   }
 
-  async getInscriptions(
-    offset?: number,
-    limit?: number
-  ): Promise<Inscription[]> {
+  async getInscriptions(offset?: number, limit?: number): Promise<Inscription[]> {
     if (!this.dataSourceManager.getAddressInscriptions) {
       throw new Error('Method not found on data source')
     }
@@ -168,10 +149,7 @@ export abstract class WalletProvider {
 
   abstract sendBTC(to: string, amount: number): Promise<string>
 
-  abstract signMessage(
-    message: string,
-    options?: { toSignAddress?: string }
-  ): Promise<string>
+  abstract signMessage(message: string, options?: { toSignAddress?: string }): Promise<string>
 
   abstract signPsbt(signPsbtOptions: WalletProviderSignPsbtOptions): Promise<
     | {
@@ -182,9 +160,7 @@ export abstract class WalletProvider {
     | undefined
   >
 
-  async signPsbts(
-    _signPsbtsOptions: WalletProviderSignPsbtsOptions
-  ): Promise<SignPsbtsResponse> {
+  async signPsbts(_signPsbtsOptions: WalletProviderSignPsbtsOptions): Promise<SignPsbtsResponse> {
     throw UNSUPPORTED_PROVIDER_METHOD_ERROR
   }
 
@@ -280,21 +256,14 @@ export abstract class WalletProvider {
 
         // Use the AlkanesModule to send the alkane
         const alkanesModule = new AlkanesModule(this.parent)
-        return await alkanesModule.send(
-          alkaneArgs.id,
-          alkaneArgs.amount,
-          alkaneArgs.toAddress
-        )
+        return await alkanesModule.send(alkaneArgs.id, alkaneArgs.amount, alkaneArgs.toAddress)
       }
       default:
         throw new Error('Unsupported protocol')
     }
   }
 
-  async sendInscriptions(
-    inscriptionIds: string[],
-    toAddress: string
-  ): Promise<string> {
+  async sendInscriptions(inscriptionIds: string[], toAddress: string): Promise<string> {
     return await sendInscriptions({
       inscriptionIds,
       ordinalAddress: this.$store.get().address,
@@ -316,15 +285,13 @@ export abstract class WalletProvider {
   } {
     const userAgent = navigator.userAgent.toLowerCase()
 
-    const mobileRegex =
-      /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i
+    const mobileRegex = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i
     const isMobile = mobileRegex.test(userAgent)
 
     const tabletRegex = /ipad|android(?!.*mobile)|tablet/i
     const isTablet = tabletRegex.test(userAgent)
 
-    const hasTouchScreen =
-      'ontouchstart' in window || navigator.maxTouchPoints > 0
+    const hasTouchScreen = 'ontouchstart' in window || navigator.maxTouchPoints > 0
     const hasSmallScreen = window.innerWidth <= 768
 
     let deviceType: 'mobile' | 'tablet' | 'desktop'
@@ -352,11 +319,7 @@ export abstract class WalletProvider {
     return this.getDeviceInfo().isDesktop
   }
 
-  getSuggestedConnectionMethod():
-    | 'qr-code'
-    | 'deep-link'
-    | 'browser-extension'
-    | 'web-wallet' {
+  getSuggestedConnectionMethod(): 'qr-code' | 'deep-link' | 'browser-extension' | 'web-wallet' {
     const deviceInfo = this.getDeviceInfo()
 
     if (deviceInfo.deviceType === 'mobile') {

@@ -1,17 +1,13 @@
 import * as bitcoin from 'bitcoinjs-lib'
-import { MAINNET, P2SH } from '../../constants'
-import { getBrc20SendJsonStr } from './utils'
-import type { MempoolUtxo, NetworkType } from '../../types'
-import { inscribeContent } from '../inscribe'
-import {
-  broadcastTx,
-  calculateValueOfUtxosGathered,
-  getBitcoinNetwork,
-} from '../helpers'
-import { getAddressType, getRedeemScript } from '../btc'
 import { toXOnly } from 'bitcoinjs-lib/src/psbt/bip371'
-import { DataSourceManager } from '../data-sources/manager'
 import type { WalletProviderSignPsbtOptions } from '../../client/types'
+import { MAINNET, P2SH } from '../../constants'
+import type { MempoolUtxo, NetworkType } from '../../types'
+import { getAddressType, getRedeemScript } from '../btc'
+import { DataSourceManager } from '../data-sources/manager'
+import { broadcastTx, calculateValueOfUtxosGathered, getBitcoinNetwork } from '../helpers'
+import { inscribeContent } from '../inscribe'
+import { getBrc20SendJsonStr } from './utils'
 
 export const sendBrc20 = async ({
   ticker,
@@ -83,7 +79,7 @@ export const sendBrc20 = async ({
   const sendInscriptionSatsNeeded = Math.floor(estimatedSize * fastFee * 1)
 
   // delay for 10 seconds
-  await new Promise((resolve) => setTimeout(resolve, 10000))
+  await new Promise(resolve => setTimeout(resolve, 10000))
 
   const utxosGathered: MempoolUtxo[] = await ds.getAddressUtxos(paymentAddress)
   const filteredUtxos = utxosGathered
@@ -98,10 +94,7 @@ export const sendBrc20 = async ({
   console.log('inscriptionTxId', inscriptionTxId)
 
   const sendPsbt = new bitcoin.Psbt({ network: getBitcoinNetwork(network) })
-  const script = bitcoin.address.toOutputScript(
-    ordinalAddress,
-    getBitcoinNetwork(network)
-  )
+  const script = bitcoin.address.toOutputScript(ordinalAddress, getBitcoinNetwork(network))
   sendPsbt.addInput({
     hash: inscriptionTxId,
     index: 0,
@@ -119,10 +112,7 @@ export const sendBrc20 = async ({
   let counter = 0
   let accSats = 0
   for await (const utxo of filteredUtxos) {
-    const paymentScript = bitcoin.address.toOutputScript(
-      paymentAddress,
-      getBitcoinNetwork(network)
-    )
+    const paymentScript = bitcoin.address.toOutputScript(paymentAddress, getBitcoinNetwork(network))
     const paymentAddressType = getAddressType(paymentAddress, network)
     sendPsbt.addInput({
       hash: utxo.txid,

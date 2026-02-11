@@ -33,10 +33,8 @@ export class DataSourceManager {
   private static instance: DataSourceManager
   private dataSources: Map<string, DataSource> = new Map()
   private network: string
-  private customNetworks: Map<
-    string,
-    Exclude<Config['customNetworks'], undefined>[string]
-  > = new Map()
+  private customNetworks: Map<string, Exclude<Config['customNetworks'], undefined>[string]> =
+    new Map()
   private constructor(config?: Config) {
     const network = config?.network || BaseNetwork.MAINNET
     this.network = network
@@ -46,9 +44,7 @@ export class DataSourceManager {
       new MempoolSpaceDataSource(network, {
         networks: {
           mainnet: {
-            apiUrl:
-              config?.dataSources?.mempool?.url ||
-              getMempoolSpaceUrl(BaseNetwork.MAINNET),
+            apiUrl: config?.dataSources?.mempool?.url || getMempoolSpaceUrl(BaseNetwork.MAINNET),
           },
           testnet: {
             apiUrl: getMempoolSpaceUrl(BaseNetwork.TESTNET),
@@ -76,13 +72,11 @@ export class DataSourceManager {
         apiKey: config?.dataSources?.sandshrew?.apiKey,
         networks: {
           mainnet: {
-            apiKey:
-              config?.dataSources?.sandshrew?.apiKey || SANDSHREW_LASEREYES_KEY,
+            apiKey: config?.dataSources?.sandshrew?.apiKey || SANDSHREW_LASEREYES_KEY,
             apiUrl: getSandshrewUrl(BaseNetwork.MAINNET),
           },
           testnet: {
-            apiKey:
-              config?.dataSources?.sandshrew?.apiKey || SANDSHREW_LASEREYES_KEY,
+            apiKey: config?.dataSources?.sandshrew?.apiKey || SANDSHREW_LASEREYES_KEY,
             apiUrl: getSandshrewUrl(BaseNetwork.TESTNET),
           },
           ...config?.dataSources?.sandshrew?.networks,
@@ -95,14 +89,11 @@ export class DataSourceManager {
       new MaestroDataSource(network, {
         networks: {
           mainnet: {
-            apiKey:
-              config?.dataSources?.maestro?.apiKey || MAESTRO_API_KEY_MAINNET,
+            apiKey: config?.dataSources?.maestro?.apiKey || MAESTRO_API_KEY_MAINNET,
             apiUrl: getMaestroUrl(BaseNetwork.MAINNET),
           },
           testnet4: {
-            apiKey:
-              config?.dataSources?.maestro?.testnetApiKey ||
-              MAESTRO_API_KEY_TESTNET4,
+            apiKey: config?.dataSources?.maestro?.testnetApiKey || MAESTRO_API_KEY_TESTNET4,
             apiUrl: getMaestroUrl(BaseNetwork.TESTNET4),
           },
           ...config?.dataSources?.maestro?.networks,
@@ -137,19 +128,14 @@ export class DataSourceManager {
     this.dataSources.set(source, dataSource)
     this.dataSources
       .get(source)
-      ?.setNetwork?.(
-        this.network,
-        this.customNetworks.get(this.network)?.baseNetwork
-      )
+      ?.setNetwork?.(this.network, this.customNetworks.get(this.network)?.baseNetwork)
   }
 
   public getSource(source: string): DataSource | undefined {
     return this.dataSources.get(source)
   }
 
-  public async getAddressAlkanesBalances(
-    address: string
-  ): Promise<AlkaneBalance[]> {
+  public async getAddressAlkanesBalances(address: string): Promise<AlkaneBalance[]> {
     const dataSource = this.findAvailableSource('getAddressAlkanesBalances')
     if (!dataSource || !dataSource.getAddressAlkanesBalances) {
       throw new Error(ERROR_METHOD_NOT_AVAILABLE)
@@ -157,9 +143,7 @@ export class DataSourceManager {
     return await dataSource.getAddressAlkanesBalances(address)
   }
 
-  public async getAlkanesByAddress(
-    address: string
-  ): Promise<AlkanesOutpoint[]> {
+  public async getAlkanesByAddress(address: string): Promise<AlkanesOutpoint[]> {
     const dataSource = this.findAvailableSource('getAlkanesByAddress')
     if (!dataSource || !dataSource.getAlkanesByAddress) {
       throw new Error(ERROR_METHOD_NOT_AVAILABLE)
@@ -173,7 +157,7 @@ export class DataSourceManager {
       throw new Error(ERROR_METHOD_NOT_AVAILABLE)
     }
 
-    const balance = await this.withFallback('sandshrew', async (ds) => {
+    const balance = await this.withFallback('sandshrew', async ds => {
       return await ds.getAddressBtcBalance?.(address)
     })
     if (balance === undefined) {
@@ -207,42 +191,34 @@ export class DataSourceManager {
 
     const network = BaseNetwork.MAINNET
 
-    const inscriptionsResult = await dataSource.getAddressInscriptions(
-      address,
-      offset,
-      limit
-    )
+    const inscriptionsResult = await dataSource.getAddressInscriptions(address, offset, limit)
     const sourceName = dataSource.getName()
 
     if (sourceName === MAESTRO && inscriptionsResult.data) {
       const inscriptionsWithDetails = await Promise.all(
-        inscriptionsResult.data.map(
-          async (inscription: MaestroAddressInscription) => {
-            try {
-              if (!dataSource.getInscriptionInfo) {
-                throw new Error(ERROR_METHOD_NOT_AVAILABLE)
-              }
-              const detailedInscription = await dataSource.getInscriptionInfo(
-                inscription.inscription_id
-              )
-              return {
-                ...inscription,
-                ...detailedInscription.data,
-              }
-            } catch (error) {
-              console.error(
-                `Failed to fetch details for inscription ${inscription.inscription_id}:`,
-                error
-              )
-              return inscription
+        inscriptionsResult.data.map(async (inscription: MaestroAddressInscription) => {
+          try {
+            if (!dataSource.getInscriptionInfo) {
+              throw new Error(ERROR_METHOD_NOT_AVAILABLE)
             }
+            const detailedInscription = await dataSource.getInscriptionInfo(
+              inscription.inscription_id
+            )
+            return {
+              ...inscription,
+              ...detailedInscription.data,
+            }
+          } catch (error) {
+            console.error(
+              `Failed to fetch details for inscription ${inscription.inscription_id}:`,
+              error
+            )
+            return inscription
           }
-        )
+        })
       )
 
-      return inscriptionsWithDetails.map((insc) =>
-        normalizeInscription(insc, sourceName, network)
-      )
+      return inscriptionsWithDetails.map(insc => normalizeInscription(insc, sourceName, network))
     }
     if (inscriptionsResult.inscriptions) {
       return inscriptionsResult.inscriptions.map((insc: unknown) =>
@@ -255,10 +231,7 @@ export class DataSourceManager {
       )
     }
 
-    console.warn(
-      'Unable to normalize inscriptions from data source',
-      sourceName
-    )
+    console.warn('Unable to normalize inscriptions from data source', sourceName)
     return []
   }
 
@@ -280,7 +253,7 @@ export class DataSourceManager {
     }
 
     console.log('getting recommended fees')
-    const fees = await this.withFallback('sandshrew', async (ds) => {
+    const fees = await this.withFallback('sandshrew', async ds => {
       return await ds.getRecommendedFees?.()
     })
     if (fees === undefined) {
@@ -297,7 +270,7 @@ export class DataSourceManager {
     if (!dataSource || !dataSource.getAddressUtxos) {
       throw new Error(ERROR_METHOD_NOT_AVAILABLE)
     }
-    const utxos = await this.withFallback('sandshrew', async (ds) => {
+    const utxos = await this.withFallback('sandshrew', async ds => {
       return await ds.getAddressUtxos?.(address)
     })
     if (utxos === undefined) {
@@ -306,15 +279,12 @@ export class DataSourceManager {
     return utxos
   }
 
-  public async getOutputValueByVOutIndex(
-    txId: string,
-    vOut: number
-  ): Promise<number | null> {
+  public async getOutputValueByVOutIndex(txId: string, vOut: number): Promise<number | null> {
     const dataSource = this.findAvailableSource('getOutputValueByVOutIndex')
     if (!dataSource || !dataSource.getOutputValueByVOutIndex) {
       throw new Error(ERROR_METHOD_NOT_AVAILABLE)
     }
-    const value = await this.withFallback('sandshrew', async (ds) => {
+    const value = await this.withFallback('sandshrew', async ds => {
       return await ds.getOutputValueByVOutIndex?.(txId, vOut)
     })
     if (value === undefined) {
@@ -332,9 +302,7 @@ export class DataSourceManager {
     return !!(await dataSource.waitForTransaction(txId))
   }
 
-  public async getAddressRunesBalances(
-    address: string
-  ): Promise<OrdRuneBalance[]> {
+  public async getAddressRunesBalances(address: string): Promise<OrdRuneBalance[]> {
     const dataSource = this.findAvailableSource('getAddressRunesBalances')
     if (!dataSource || !dataSource.getAddressRunesBalances) {
       throw new Error(ERROR_METHOD_NOT_AVAILABLE)
@@ -357,7 +325,7 @@ export class DataSourceManager {
   ): Promise<T> {
     const sources = [
       primarySource,
-      ...Array.from(this.dataSources.keys()).filter((s) => s !== primarySource),
+      ...Array.from(this.dataSources.keys()).filter(s => s !== primarySource),
     ]
     for (const source of sources) {
       try {
@@ -371,9 +339,7 @@ export class DataSourceManager {
     throw new Error('All data sources failed')
   }
 
-  private findAvailableSource(
-    method: keyof DataSource
-  ): DataSource | undefined {
+  private findAvailableSource(method: keyof DataSource): DataSource | undefined {
     const customNetwork = this.customNetworks.get(this.network)
     if (customNetwork) {
       const dataSource = this.getSource(customNetwork.preferredDataSource)
@@ -390,14 +356,10 @@ export class DataSourceManager {
     return undefined
   }
 
-  async getFormattedUTXOs(
-    address: string | string[]
-  ): Promise<FormattedUTXO[]> {
+  async getFormattedUTXOs(address: string | string[]): Promise<FormattedUTXO[]> {
     const sandshrewDS = this.getSource('sandshrew') as SandshrewDataSource
     if (!sandshrewDS || !sandshrewDS.getBalances) {
-      throw new Error(
-        'Sandshrew data source with getBalances method is required'
-      )
+      throw new Error('Sandshrew data source with getBalances method is required')
     }
 
     // Single fetch call to get all UTXOs and their data
@@ -426,7 +388,7 @@ export class DataSourceManager {
 
         formattedUTXOs.push({
           txHash,
-          txOutputIndex: parseInt(txOutputIndex),
+          txOutputIndex: parseInt(txOutputIndex, 10),
           btcValue: spendable.value,
           scriptPubKey,
           address: currentAddress,
@@ -436,9 +398,7 @@ export class DataSourceManager {
           alkanes: [],
           hasInscriptions: false,
           inscriptions: [],
-          confirmations: spendable.height
-            ? currentHeight - spendable.height
-            : undefined,
+          confirmations: spendable.height ? currentHeight - spendable.height : undefined,
         })
       }
 
@@ -447,11 +407,11 @@ export class DataSourceManager {
         const [txHash, txOutputIndex] = asset.outpoint.split(':')
 
         // Process inscriptions
-        const inscriptions: FormattedInscription[] = (
-          asset.inscriptions || []
-        ).map((inscriptionId: string) => ({
-          inscriptionId,
-        }))
+        const inscriptions: FormattedInscription[] = (asset.inscriptions || []).map(
+          (inscriptionId: string) => ({
+            inscriptionId,
+          })
+        )
 
         // Process runes (ord_runes is the actual runes data)
         const runes: FormattedRune[] = []
@@ -482,7 +442,7 @@ export class DataSourceManager {
 
         formattedUTXOs.push({
           txHash,
-          txOutputIndex: parseInt(txOutputIndex),
+          txOutputIndex: parseInt(txOutputIndex, 10),
           btcValue: asset.value,
           scriptPubKey,
           address: currentAddress,
@@ -492,9 +452,7 @@ export class DataSourceManager {
           alkanes,
           hasInscriptions: inscriptions.length > 0,
           inscriptions,
-          confirmations: asset.height
-            ? currentHeight - asset.height
-            : undefined,
+          confirmations: asset.height ? currentHeight - asset.height : undefined,
         })
       }
     }
@@ -509,4 +467,3 @@ export class DataSourceManager {
 export { MaestroDataSource } from './sources/maestro-ds'
 export { MempoolSpaceDataSource } from './sources/mempool-space-ds'
 export { SandshrewDataSource } from './sources/sandshrew-ds'
-

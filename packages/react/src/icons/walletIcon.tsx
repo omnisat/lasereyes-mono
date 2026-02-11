@@ -1,34 +1,34 @@
-import { WizzLogo } from './wizz.tsx'
-import { XverseLogo } from './xverse.tsx'
-import { LeatherLogo } from './leather.tsx'
-import { MagicEdenLogo } from './magiceden.tsx'
-import { OkxLogo } from './okx.tsx'
-import { PhantomLogo } from './phantom.tsx'
-import { UnisatLogo } from './unisat.tsx'
-import { TokeoLogo } from './tokeo.tsx'
-import { OylLogo } from './oyl.tsx'
-import OrangeLogo from './orange.tsx'
-import OpNetIcon from './op_net.tsx'
-import SparrowLogo from './sparrow.tsx'
 import {
-  ProviderType,
-  XVERSE,
+  BINANCE,
+  KEPLR,
   LEATHER,
   MAGIC_EDEN,
   OKX,
-  PHANTOM,
-  UNISAT,
-  WIZZ,
+  OP_NET,
   ORANGE,
   OYL,
-  OP_NET,
+  PHANTOM,
+  type ProviderType,
   SPARROW,
   TOKEO,
-  KEPLR,
-  BINANCE,
+  UNISAT,
+  WIZZ,
+  XVERSE,
 } from '@omnisat/lasereyes-core'
-import KeplrLogo from './keplr.tsx'
 import { BinanceLogo } from './binance.tsx'
+import KeplrLogo from './keplr.tsx'
+import { LeatherLogo } from './leather.tsx'
+import { MagicEdenLogo } from './magiceden.tsx'
+import { OkxLogo } from './okx.tsx'
+import OpNetIcon from './op_net.tsx'
+import OrangeLogo from './orange.tsx'
+import { OylLogo } from './oyl.tsx'
+import { PhantomLogo } from './phantom.tsx'
+import SparrowLogo from './sparrow.tsx'
+import { TokeoLogo } from './tokeo.tsx'
+import { UnisatLogo } from './unisat.tsx'
+import { WizzLogo } from './wizz.tsx'
+import { XverseLogo } from './xverse.tsx'
 
 const WalletIcon = ({
   size,

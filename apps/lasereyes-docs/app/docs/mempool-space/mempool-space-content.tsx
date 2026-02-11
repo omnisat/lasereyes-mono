@@ -1,8 +1,8 @@
-"use client"
+'use client'
 
-import { CodeBlock } from "@/components/code-block"
-import Link from "next/link"
-import { Heading } from "@/components/heading"
+import Link from 'next/link'
+import { CodeBlock } from '@/components/code-block'
+import { Heading } from '@/components/heading'
 
 export default function MempoolSpaceContent() {
   return (
@@ -11,14 +11,17 @@ export default function MempoolSpaceContent() {
         Mempool.space Integration
       </Heading>
       <p className="text-lg mb-4">
-        Mempool.space is an open-source explorer and API for the Bitcoin mempool and network. LaserEyes integrates with
-        Mempool.space to provide reliable access to basic Bitcoin blockchain data and real-time mempool information.
+        Mempool.space is an open-source explorer and API for the Bitcoin mempool and network.
+        LaserEyes integrates with Mempool.space to provide reliable access to basic Bitcoin
+        blockchain data and real-time mempool information.
       </p>
 
       <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
         Overview
       </Heading>
-      <p className="mb-6">Mempool.space provides a range of APIs for Bitcoin developers, including:</p>
+      <p className="mb-6">
+        Mempool.space provides a range of APIs for Bitcoin developers, including:
+      </p>
       <ul className="list-disc pl-6 mb-6 space-y-2">
         <li>Bitcoin blockchain data (transactions, blocks, addresses)</li>
         <li>Mempool statistics and visualization</li>
@@ -30,7 +33,9 @@ export default function MempoolSpaceContent() {
       <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
         Configuration
       </Heading>
-      <p className="mb-6">To use Mempool.space with LaserEyes, you need to configure it in your LaserEyes setup:</p>
+      <p className="mb-6">
+        To use Mempool.space with LaserEyes, you need to configure it in your LaserEyes setup:
+      </p>
       <CodeBlock
         language="typescript"
         code={`import { LaserEyesProvider } from '@omnisat/lasereyes-react'
@@ -57,15 +62,17 @@ function App() {
       />
 
       <p className="mt-6 mb-6">
-        Unlike Maestro and Sandshrew, Mempool.space is a free and open-source service that doesn't require an API key.
-        However, it has more limited functionality, particularly for Ordinals and tokens.
+        Unlike Maestro and Sandshrew, Mempool.space is a free and open-source service that doesn't
+        require an API key. However, it has more limited functionality, particularly for Ordinals
+        and tokens.
       </p>
 
       <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
         Supported Features
       </Heading>
       <p className="mb-6">
-        Mempool.space provides strong support for basic Bitcoin operations but lacks support for Ordinals and tokens:
+        Mempool.space provides strong support for basic Bitcoin operations but lacks support for
+        Ordinals and tokens:
       </p>
       <div className="overflow-x-auto mb-6">
         <table className="w-full border-collapse">
@@ -85,12 +92,16 @@ function App() {
             <tr>
               <td className="border p-2">Mempool Data</td>
               <td className="border p-2 text-center">✅</td>
-              <td className="border p-2">Excellent support for mempool statistics and visualization</td>
+              <td className="border p-2">
+                Excellent support for mempool statistics and visualization
+              </td>
             </tr>
             <tr>
               <td className="border p-2">Fee Estimation</td>
               <td className="border p-2 text-center">✅</td>
-              <td className="border p-2">Detailed fee estimates for different confirmation targets</td>
+              <td className="border p-2">
+                Detailed fee estimates for different confirmation targets
+              </td>
             </tr>
             <tr>
               <td className="border p-2">Ordinals & Inscriptions</td>
@@ -157,7 +168,9 @@ function BitcoinData() {
       <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
         Advanced Configuration
       </Heading>
-      <p className="mb-6">Mempool.space offers additional configuration options for advanced use cases:</p>
+      <p className="mb-6">
+        Mempool.space offers additional configuration options for advanced use cases:
+      </p>
       <CodeBlock
         language="typescript"
         code={`const config = createConfig({
@@ -187,11 +200,13 @@ function BitcoinData() {
         Self-Hosting
       </Heading>
       <p className="mb-6">
-        One of the advantages of Mempool.space is that it's open-source and can be self-hosted. This gives you complete
-        control over your Bitcoin data infrastructure and eliminates reliance on third-party services.
+        One of the advantages of Mempool.space is that it's open-source and can be self-hosted. This
+        gives you complete control over your Bitcoin data infrastructure and eliminates reliance on
+        third-party services.
       </p>
       <p className="mb-6">
-        To use a self-hosted Mempool.space instance with LaserEyes, simply configure the URL to point to your instance:
+        To use a self-hosted Mempool.space instance with LaserEyes, simply configure the URL to
+        point to your instance:
       </p>
       <CodeBlock
         language="typescript"
@@ -208,7 +223,7 @@ function BitcoinData() {
       />
 
       <p className="mb-6">
-        For instructions on setting up your own Mempool.space instance, refer to the{" "}
+        For instructions on setting up your own Mempool.space instance, refer to the{' '}
         <a
           href="https://github.com/mempool/mempool"
           target="_blank"
@@ -233,8 +248,8 @@ function BitcoinData() {
         </li>
       </ul>
       <p className="mb-6">
-        LaserEyes includes built-in rate limiting and retry logic to help manage these limits, but you should be aware
-        of them when designing your application.
+        LaserEyes includes built-in rate limiting and retry logic to help manage these limits, but
+        you should be aware of them when designing your application.
       </p>
 
       <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
@@ -260,35 +275,35 @@ function BitcoinData() {
         Next Steps
       </Heading>
       <p className="mb-6">
-        Now that you understand how to use Mempool.space with LaserEyes, you can explore related topics:
+        Now that you understand how to use Mempool.space with LaserEyes, you can explore related
+        topics:
       </p>
       <ul className="list-disc pl-6 mb-6 space-y-2">
         <li>
           <Link href="/docs/maestro" className="text-primary hover:underline">
             Maestro Integration
-          </Link>{" "}
+          </Link>{' '}
           - Learn about a data provider with Ordinals support
         </li>
         <li>
           <Link href="/docs/sandshrew" className="text-primary hover:underline">
             Sandshrew Integration
-          </Link>{" "}
+          </Link>{' '}
           - Explore another data provider option
         </li>
         <li>
           <Link href="/docs/custom-datasource" className="text-primary hover:underline">
             Custom DataSource Implementation
-          </Link>{" "}
+          </Link>{' '}
           - Create your own data source
         </li>
         <li>
           <Link href="/docs/performance" className="text-primary hover:underline">
             Performance Optimization
-          </Link>{" "}
+          </Link>{' '}
           - Learn how to optimize performance with data providers
         </li>
       </ul>
     </>
   )
 }
-

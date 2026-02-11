@@ -14,13 +14,7 @@ import {
   type SignPsbtsResponse,
 } from '@omnisat/lasereyes-core'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import {
-  type ReactNode,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react'
+import { type ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
 import { defaultMethods, LaserEyesStoreContext } from './context'
 
 const queryClient = new QueryClient()
@@ -52,22 +46,17 @@ export default function LaserEyesProvider({
   )
   const disconnect = useCallback(() => client?.disconnect(), [client])
   const getBalance = useCallback(
-    async () =>
-      (
-        await (client?.getBalance() ?? defaultMethods.getBalance())
-      )?.toString() ?? '',
+    async () => (await (client?.getBalance() ?? defaultMethods.getBalance()))?.toString() ?? '',
     [client]
   )
   const getMetaBalances = useCallback(
     async (protocol: Protocol) =>
-      (await client?.getMetaBalances(protocol)) ??
-      defaultMethods.getMetaBalances(),
+      (await client?.getMetaBalances(protocol)) ?? defaultMethods.getMetaBalances(),
     [client]
   )
   const getInscriptions = useCallback(
     async (offset?: number, limit?: number) =>
-      (await client?.getInscriptions(offset, limit)) ??
-      defaultMethods.getInscriptions(),
+      (await client?.getInscriptions(offset, limit)) ?? defaultMethods.getInscriptions(),
     [client]
   )
   const getNetwork = useCallback(
@@ -83,10 +72,7 @@ export default function LaserEyesProvider({
     [client]
   )
   const signMessage = useCallback(
-    async (
-      message: string,
-      toSignAddressOrOptions?: string | SignMessageOptions
-    ) => {
+    async (message: string, toSignAddressOrOptions?: string | SignMessageOptions) => {
       let options: SignMessageOptions = {}
       if (typeof toSignAddressOrOptions === 'string') {
         options = { toSignAddress: toSignAddressOrOptions }
@@ -94,40 +80,30 @@ export default function LaserEyesProvider({
         options = toSignAddressOrOptions
       }
 
-      return (
-        (await client?.signMessage(message, options)) ??
-        defaultMethods.signMessage()
-      )
+      return (await client?.signMessage(message, options)) ?? defaultMethods.signMessage()
     },
     [client]
   )
   const requestAccounts = useCallback(
-    async () =>
-      (await client?.requestAccounts()) ?? defaultMethods.requestAccounts(),
+    async () => (await client?.requestAccounts()) ?? defaultMethods.requestAccounts(),
     [client]
   )
   const sendBTC = useCallback(
     async (to: string, amount: number) =>
-      (await client?.sendBTC.call(client, to, amount)) ??
-      defaultMethods.sendBTC(),
+      (await client?.sendBTC.call(client, to, amount)) ?? defaultMethods.sendBTC(),
     [client]
   )
 
   const signPsbt = useCallback<LaserEyesClient['signPsbt']>(
     async (
-      ...args:
-        | [LaserEyesSignPsbtOptions]
-        | [tx: string, finalize?: boolean, broadcast?: boolean]
+      ...args: [LaserEyesSignPsbtOptions] | [tx: string, finalize?: boolean, broadcast?: boolean]
     ) => {
       if (typeof args[0] === 'string') {
         // Handle the `(tx: string, finalize: boolean, broadcast: boolean)` overload
         const [tx, finalize, broadcast] = args
         return (
-          (await client?.signPsbt?.(
-            tx,
-            finalize ?? false,
-            broadcast ?? false
-          )) ?? defaultMethods.signPsbt()
+          (await client?.signPsbt?.(tx, finalize ?? false, broadcast ?? false)) ??
+          defaultMethods.signPsbt()
         )
       }
       // Handle the `(options: LaserEyesSignPsbtOptions)` overload
@@ -145,37 +121,30 @@ export default function LaserEyesProvider({
   )
 
   const switchNetwork = useCallback(
-    async (network: NetworkType) =>
-      await client?.switchNetwork.call(client, network),
+    async (network: NetworkType) => await client?.switchNetwork.call(client, network),
     [client]
   )
   const inscribe = useCallback(
     async (content: string, mimeType: ContentType) =>
-      (await client?.inscribe.call(client, content, mimeType)) ??
-      defaultMethods.inscribe(),
+      (await client?.inscribe.call(client, content, mimeType)) ?? defaultMethods.inscribe(),
     [client]
   )
   const send: LaserEyesClient['send'] = useCallback(
     async (protocol, sendArgs) =>
-      (await client?.send.call(client, protocol, sendArgs)) ??
-      defaultMethods.send(),
+      (await client?.send.call(client, protocol, sendArgs)) ?? defaultMethods.send(),
     [client]
   )
 
   const sendInscriptions = useCallback(
     async (inscriptionIds: string[], toAddress: string) =>
-      (await client?.sendInscriptions.call(
-        client,
-        inscriptionIds,
-        toAddress
-      )) ?? defaultMethods.sendInscriptions(),
+      (await client?.sendInscriptions.call(client, inscriptionIds, toAddress)) ??
+      defaultMethods.sendInscriptions(),
     [client]
   )
 
   const getUtxos = useCallback(
     async (address: string) =>
-      (await client?.dataSourceManager.getAddressUtxos(address)) ??
-      defaultMethods.getUtxos(),
+      (await client?.dataSourceManager.getAddressUtxos(address)) ?? defaultMethods.getUtxos(),
     [client]
   )
 

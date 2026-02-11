@@ -1,17 +1,24 @@
-"use client"
+'use client'
 
-import * as React from "react"
-import { CodeBlock } from "@/components/code-block"
-import { WarningBox } from "@/components/warning-box"
-import { Heading } from "@/components/heading"
-import { ClientPageWrapper } from "@/components/client-page-wrapper"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { TestTube, Bug, Beaker, FlaskConical, Microscope, Workflow, Blocks, Gauge } from "lucide-react"
-import Link from "next/link"
-import type { LucideIcon } from "lucide-react"
-import { cn } from "@/lib/utils"
+import type { LucideIcon } from 'lucide-react'
+import {
+  Beaker,
+  Blocks,
+  Bug,
+  FlaskConical,
+  Gauge,
+  Microscope,
+  TestTube,
+  Workflow,
+} from 'lucide-react'
+import Link from 'next/link'
+import { ClientPageWrapper } from '@/components/client-page-wrapper'
+import { CodeBlock } from '@/components/code-block'
+import { Heading } from '@/components/heading'
+import { Badge } from '@/components/ui/badge'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { WarningBox } from '@/components/warning-box'
+import { cn } from '@/lib/utils'
 
 interface FeatureCardProps {
   icon: LucideIcon
@@ -54,23 +61,35 @@ function TestingContent() {
         <div className="grid gap-6 sm:grid-cols-3">
           <Card className="border-green-500/30 bg-green-500/5">
             <CardContent className="p-6">
-              <Badge variant="default" className="mb-2 bg-green-500">Unit Testing</Badge>
+              <Badge variant="default" className="mb-2 bg-green-500">
+                Unit Testing
+              </Badge>
               <h3 className="text-lg font-semibold">Component Testing</h3>
-              <p className="mt-2 text-sm text-muted-foreground">Test individual functions and components in isolation</p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Test individual functions and components in isolation
+              </p>
             </CardContent>
           </Card>
           <Card className="border-blue-500/30 bg-blue-500/5">
             <CardContent className="p-6">
-              <Badge variant="default" className="mb-2 bg-blue-500">Integration</Badge>
+              <Badge variant="default" className="mb-2 bg-blue-500">
+                Integration
+              </Badge>
               <h3 className="text-lg font-semibold">Integration Testing</h3>
-              <p className="mt-2 text-sm text-muted-foreground">Test interactions between components</p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Test interactions between components
+              </p>
             </CardContent>
           </Card>
           <Card className="border-orange-500/30 bg-orange-500/5">
             <CardContent className="p-6">
-              <Badge variant="default" className="mb-2 bg-orange-500">E2E</Badge>
+              <Badge variant="default" className="mb-2 bg-orange-500">
+                E2E
+              </Badge>
               <h3 className="text-lg font-semibold">End-to-End Testing</h3>
-              <p className="mt-2 text-sm text-muted-foreground">Test complete user flows on testnet</p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Test complete user flows on testnet
+              </p>
             </CardContent>
           </Card>
         </div>
@@ -249,7 +268,9 @@ const renderWithTestnet = (ui) => {
                 <Card className="h-full transition-all hover:border-orange-500/30 hover:shadow-lg hover:shadow-orange-500/5">
                   <CardContent className="p-6">
                     <h3 className="text-lg font-semibold mb-2">Error Handling</h3>
-                    <p className="text-sm text-muted-foreground">Learn how to handle errors effectively in your tests</p>
+                    <p className="text-sm text-muted-foreground">
+                      Learn how to handle errors effectively in your tests
+                    </p>
                   </CardContent>
                 </Card>
               </Link>
@@ -257,7 +278,9 @@ const renderWithTestnet = (ui) => {
                 <Card className="h-full transition-all hover:border-orange-500/30 hover:shadow-lg hover:shadow-orange-500/5">
                   <CardContent className="p-6">
                     <h3 className="text-lg font-semibold mb-2">Best Practices</h3>
-                    <p className="text-sm text-muted-foreground">Discover testing best practices for LaserEyes applications</p>
+                    <p className="text-sm text-muted-foreground">
+                      Discover testing best practices for LaserEyes applications
+                    </p>
                   </CardContent>
                 </Card>
               </Link>
@@ -271,10 +294,12 @@ const renderWithTestnet = (ui) => {
 
 function FeatureCard({ icon: Icon, title, description, className }: FeatureCardProps) {
   return (
-    <Card className={cn(
-      "group relative overflow-hidden transition-all duration-300 hover:border-orange-500/30 hover:shadow-lg hover:shadow-orange-500/5",
-      className
-    )}>
+    <Card
+      className={cn(
+        'group relative overflow-hidden transition-all duration-300 hover:border-orange-500/30 hover:shadow-lg hover:shadow-orange-500/5',
+        className
+      )}
+    >
       <div className="absolute right-0 top-0 h-20 w-20 translate-x-6 -translate-y-6 rounded-full bg-orange-500/10 blur-2xl filter group-hover:bg-orange-500/20" />
       <CardContent className="p-6">
         <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-orange-500/10 text-orange-500">
@@ -292,12 +317,18 @@ export default function TestingPage() {
     <div className="space-y-8">
       <div className="relative overflow-hidden rounded-lg border bg-gradient-to-br from-orange-500/10 via-background to-background p-8">
         <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-orange-500/20 rounded-full blur-3xl -z-10 translate-x-1/2 -translate-y-1/2" />
-        <Badge variant="secondary" className="mb-4">Testing</Badge>
-        <Heading level={1} className="mb-4 bg-gradient-to-br from-orange-500 to-yellow-500 bg-clip-text text-transparent">
+        <Badge variant="secondary" className="mb-4">
+          Testing
+        </Badge>
+        <Heading
+          level={1}
+          className="mb-4 bg-gradient-to-br from-orange-500 to-yellow-500 bg-clip-text text-transparent"
+        >
           Testing LaserEyes Apps
         </Heading>
         <p className="text-xl mb-6 max-w-2xl text-muted-foreground">
-          Learn how to effectively test your LaserEyes applications with comprehensive testing strategies and best practices.
+          Learn how to effectively test your LaserEyes applications with comprehensive testing
+          strategies and best practices.
         </p>
       </div>
 
@@ -307,4 +338,3 @@ export default function TestingPage() {
     </div>
   )
 }
-

@@ -1,10 +1,5 @@
-import { SingleRuneOutpoint } from '../../types/sandshrew'
-import {
-  batchOrdOutput,
-  getOrdAddress,
-  getRuneById,
-  mapRuneBalances,
-} from '../sandshrew'
+import type { SingleRuneOutpoint } from '../../types/sandshrew'
+import { batchOrdOutput, getOrdAddress, getRuneById, mapRuneBalances } from '../sandshrew'
 
 export const getRuneOutpoints = async ({
   address,

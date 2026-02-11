@@ -1,30 +1,14 @@
 import * as bitcoin from 'bitcoinjs-lib'
-import { WalletProvider } from '.'
-import { getNetworkForUnisat, getUnisatNetwork } from '../../constants/networks'
-import { Config, NetworkType, ProviderType } from '../../types'
-import { OP_NET } from '../../constants/wallets'
-import { listenKeys, MapStore, WritableAtom } from 'nanostores'
-import {
-  LaserEyesStoreType,
-  SignMessageOptions,
-  WalletProviderSignPsbtOptions,
-} from '../types'
+import { listenKeys } from 'nanostores'
 import { BIP322, BIP322_SIMPLE } from '../../constants'
-import { LaserEyesClient } from '..'
+import { getNetworkForUnisat, getUnisatNetwork } from '../../constants/networks'
+import { OP_NET } from '../../constants/wallets'
 import { omitUndefined } from '../../lib/utils'
+import type { NetworkType, ProviderType } from '../../types'
+import type { SignMessageOptions, WalletProviderSignPsbtOptions } from '../types'
+import { WalletProvider } from '.'
 
 export default class OpNetProvider extends WalletProvider {
-  constructor(
-    stores: {
-      $store: MapStore<LaserEyesStoreType>
-      $network: WritableAtom<NetworkType>
-    },
-    parent: LaserEyesClient,
-    config?: Config
-  ) {
-    super(stores, parent, config)
-  }
-
   public get library(): any | undefined {
     return (window as any)?.opnet
   }
@@ -48,7 +32,7 @@ export default class OpNetProvider extends WalletProvider {
 
       this.observer.observe(document, { childList: true, subtree: true })
     }
-    listenKeys(this.$store, ['provider'], (newStore) => {
+    listenKeys(this.$store, ['provider'], newStore => {
       if (newStore.provider !== OP_NET) {
         this.removeListeners()
         return
@@ -67,14 +51,8 @@ export default class OpNetProvider extends WalletProvider {
 
   removeListeners() {
     if (!this.library || !this.library.removeListener) return
-    this.library?.removeListener(
-      'accountsChanged',
-      this.handleAccountsChanged.bind(this)
-    )
-    this.library?.removeListener(
-      'networkChanged',
-      this.handleNetworkChanged.bind(this)
-    )
+    this.library?.removeListener('accountsChanged', this.handleAccountsChanged.bind(this))
+    this.library?.removeListener('networkChanged', this.handleNetworkChanged.bind(this))
   }
 
   dispose() {
@@ -118,7 +96,7 @@ export default class OpNetProvider extends WalletProvider {
     this.$store.setKey('paymentAddress', opNetAccounts[0])
     this.$store.setKey('publicKey', opNetPubKey)
     this.$store.setKey('paymentPublicKey', opNetPubKey)
-    await this.getNetwork().then((network) => {
+    await this.getNetwork().then(network => {
       if (this.config?.network !== network) {
         this.switchNetwork(network)
       }
@@ -143,12 +121,8 @@ export default class OpNetProvider extends WalletProvider {
     return txId
   }
 
-  async signMessage(
-    message: string,
-    options?: SignMessageOptions
-  ): Promise<string> {
-    const protocol =
-      options?.protocol === BIP322 ? BIP322_SIMPLE : options?.protocol
+  async signMessage(message: string, options?: SignMessageOptions): Promise<string> {
+    const protocol = options?.protocol === BIP322 ? BIP322_SIMPLE : options?.protocol
     return await this.library?.signMessage(message, protocol)
   }
 

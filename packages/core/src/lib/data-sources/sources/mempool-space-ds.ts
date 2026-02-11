@@ -1,52 +1,59 @@
-import axios from "axios";
-import * as bitcoin from "bitcoinjs-lib";
-import type { DataSource } from "../../../types/data-source";
-import { getMempoolSpaceUrl } from "../../urls";
-import type { MempoolUtxo, NetworkType } from "../../../types";
-import type { MempoolSpaceGetTransactionResponse } from "../../../types/mempool-space";
-import { MEMPOOL_SPACE } from "../../../constants/data-sources";
-import { MAINNET, SIGNET, TESTNET, TESTNET4, FRACTAL_MAINNET, FRACTAL_TESTNET } from "../../../constants";
-import { getBitcoinNetwork } from "../../helpers";
+import axios from 'axios'
+import * as bitcoin from 'bitcoinjs-lib'
+import {
+  FRACTAL_MAINNET,
+  FRACTAL_TESTNET,
+  MAINNET,
+  SIGNET,
+  TESTNET,
+  TESTNET4,
+} from '../../../constants'
+import { MEMPOOL_SPACE } from '../../../constants/data-sources'
+import type { MempoolUtxo, NetworkType } from '../../../types'
+import type { DataSource } from '../../../types/data-source'
+import type { MempoolSpaceGetTransactionResponse } from '../../../types/mempool-space'
+import { getBitcoinNetwork } from '../../helpers'
+import { getMempoolSpaceUrl } from '../../urls'
 
 export type MempoolSpaceConfig = {
   networks: {
     mainnet: {
-      apiUrl: string;
-    },
+      apiUrl: string
+    }
     [key: string]: {
-      apiUrl: string;
+      apiUrl: string
     }
   }
 }
 
 export class MempoolSpaceDataSource implements DataSource {
-  private apiUrl = "";
-  private networks: MempoolSpaceConfig['networks'];
-  private network: NetworkType;
+  private apiUrl = ''
+  private networks: MempoolSpaceConfig['networks']
+  private network: NetworkType
   constructor(network: NetworkType, config?: MempoolSpaceConfig) {
     this.networks = {
       [MAINNET]: {
-        apiUrl: getMempoolSpaceUrl('mainnet')
+        apiUrl: getMempoolSpaceUrl('mainnet'),
       },
       [TESTNET]: {
-        apiUrl: getMempoolSpaceUrl('testnet')
+        apiUrl: getMempoolSpaceUrl('testnet'),
       },
       [TESTNET4]: {
-        apiUrl: getMempoolSpaceUrl('testnet4')
+        apiUrl: getMempoolSpaceUrl('testnet4'),
       },
       [SIGNET]: {
-        apiUrl: getMempoolSpaceUrl('signet')
+        apiUrl: getMempoolSpaceUrl('signet'),
       },
       [FRACTAL_MAINNET]: {
-        apiUrl: getMempoolSpaceUrl('fractal-mainnet')
+        apiUrl: getMempoolSpaceUrl('fractal-mainnet'),
       },
       [FRACTAL_TESTNET]: {
-        apiUrl: getMempoolSpaceUrl('fractal-testnet')
+        apiUrl: getMempoolSpaceUrl('fractal-testnet'),
       },
       ...config?.networks,
-    };
-    this.network = network;
-    this.setNetwork(network);
+    }
+    this.network = network
+    this.setNetwork(network)
   }
 
   public getName() {
@@ -55,12 +62,12 @@ export class MempoolSpaceDataSource implements DataSource {
 
   public setNetwork(network: NetworkType) {
     if (this.networks[network]) {
-      this.apiUrl = this.networks[network].apiUrl;
+      this.apiUrl = this.networks[network].apiUrl
     } else {
       // Fallback to default URL
-      this.apiUrl = getMempoolSpaceUrl(network);
+      this.apiUrl = getMempoolSpaceUrl(network)
     }
-    this.network = network;
+    this.network = network
   }
 
   private async call(method: 'get' | 'post', endpoint: string, body?: unknown) {
@@ -73,9 +80,7 @@ export class MempoolSpaceDataSource implements DataSource {
       }
 
       const response =
-        method === 'get'
-          ? await axios.get(url, options)
-          : await axios.post(url, body, options)
+        method === 'get' ? await axios.get(url, options) : await axios.post(url, body, options)
 
       return response.data
     } catch (error) {
@@ -84,10 +89,7 @@ export class MempoolSpaceDataSource implements DataSource {
     }
   }
 
-  async getOutputValueByVOutIndex(
-    commitTxId: string,
-    vOut: number
-  ): Promise<number | null> {
+  async getOutputValueByVOutIndex(commitTxId: string, vOut: number): Promise<number | null> {
     const timeout: number = 60000
     const startTime: number = Date.now()
 
@@ -103,14 +105,14 @@ export class MempoolSpaceDataSource implements DataSource {
           return null
         }
 
-        await new Promise((resolve) => setTimeout(resolve, 5000))
+        await new Promise(resolve => setTimeout(resolve, 5000))
       } catch (error) {
         console.error('Error fetching transaction output value:', error)
         if (Date.now() - startTime > timeout) {
           return null
         }
 
-        await new Promise((resolve) => setTimeout(resolve, 5000))
+        await new Promise(resolve => setTimeout(resolve, 5000))
       }
     }
   }
@@ -130,13 +132,13 @@ export class MempoolSpaceDataSource implements DataSource {
           return false
         }
 
-        await new Promise((resolve) => setTimeout(resolve, 5000))
-      } catch (error) {
+        await new Promise(resolve => setTimeout(resolve, 5000))
+      } catch (_error) {
         if (Date.now() - startTime > timeout) {
           return false
         }
 
-        await new Promise((resolve) => setTimeout(resolve, 5000))
+        await new Promise(resolve => setTimeout(resolve, 5000))
       }
     }
   }
@@ -145,17 +147,15 @@ export class MempoolSpaceDataSource implements DataSource {
     if (address.startsWith('bcrt')) {
       return []
     }
-    const utxos = await this.call('get', `/api/address/${address}/utxo`) as Array<MempoolUtxo>
+    const utxos = (await this.call('get', `/api/address/${address}/utxo`)) as Array<MempoolUtxo>
     const scriptPk = bitcoin.address.toOutputScript(address, getBitcoinNetwork(this.network))
-    return utxos.map((utxo) => ({
+    return utxos.map(utxo => ({
       ...utxo,
       scriptPk: Buffer.from(scriptPk).toString('hex'),
     }))
   }
 
-  async getTransaction(
-    txId: string
-  ): Promise<MempoolSpaceGetTransactionResponse> {
+  async getTransaction(txId: string): Promise<MempoolSpaceGetTransactionResponse> {
     return await this.call('get', `/api/tx/${txId}`)
   }
 

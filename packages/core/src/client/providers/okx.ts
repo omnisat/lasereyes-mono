@@ -1,50 +1,34 @@
+import { persistentMap } from '@nanostores/persistent'
 import * as bitcoin from 'bitcoinjs-lib'
-import { WalletProvider } from '.'
+import { listenKeys, type MapStore } from 'nanostores'
 import {
   BIP322_SIMPLE,
-  Config,
   ECDSA,
   FRACTAL_MAINNET,
   FRACTAL_TESTNET,
-  Inscription,
-  LaserEyesClient,
-  LaserEyesStoreType,
+  type Inscription,
+  type LaserEyesStoreType,
   MAINNET,
-  NetworkType,
+  type NetworkType,
   OKX,
-  ProviderType,
+  type ProviderType,
   SIGNET,
-  SignMessageOptions,
-  WalletProviderSignPsbtOptions,
+  type SignMessageOptions,
   TESTNET,
   TESTNET4,
+  type WalletProviderSignPsbtOptions,
 } from '../..'
-import { listenKeys, MapStore, WritableAtom } from 'nanostores'
-import { persistentMap } from '@nanostores/persistent'
-import {
-  handleStateChangePersistence,
-  keysToPersist,
-  PersistedKey,
-} from '../utils'
-import { getBTCBalance, isMainnetNetwork } from '../../lib/helpers'
 import { getNetworkForOkx } from '../../constants/networks'
 import { normalizeInscription } from '../../lib/data-sources/normalizations'
-import { UnisatInscription } from './unisat'
+import { getBTCBalance, isMainnetNetwork } from '../../lib/helpers'
 import { omitUndefined } from '../../lib/utils'
+import { handleStateChangePersistence, keysToPersist, type PersistedKey } from '../utils'
+import { WalletProvider } from '.'
+import type { UnisatInscription } from './unisat'
 
 const OKX_WALLET_PERSISTENCE_KEY = 'OKX_CONNECTED_WALLET_STATE'
 
 export default class OkxProvider extends WalletProvider {
-  constructor(stores: {
-    $store: MapStore<LaserEyesStoreType>
-    $network: WritableAtom<NetworkType>
-  },
-    parent: LaserEyesClient,
-    config?: Config
-  ) {
-    super(stores, parent, config)
-  }
-
   public get library(): any | undefined {
     let foundOkx
     if (
@@ -65,16 +49,13 @@ export default class OkxProvider extends WalletProvider {
   }
 
   observer?: MutationObserver
-  $valueStore: MapStore<Record<PersistedKey, string>> = persistentMap(
-    OKX_WALLET_PERSISTENCE_KEY,
-    {
-      address: '',
-      paymentAddress: '',
-      paymentPublicKey: '',
-      publicKey: '',
-      balance: '',
-    }
-  )
+  $valueStore: MapStore<Record<PersistedKey, string>> = persistentMap(OKX_WALLET_PERSISTENCE_KEY, {
+    address: '',
+    paymentAddress: '',
+    paymentPublicKey: '',
+    publicKey: '',
+    balance: '',
+  })
 
   removeSubscriber?: () => void
 
@@ -86,10 +67,7 @@ export default class OkxProvider extends WalletProvider {
       }
       this.$store.setKey(key, vals[key])
     }
-    this.$store.setKey(
-      'accounts',
-      [vals.address, vals.paymentAddress].filter(Boolean)
-    )
+    this.$store.setKey('accounts', [vals.address, vals.paymentAddress].filter(Boolean))
   }
 
   watchStateChange(
@@ -115,7 +93,7 @@ export default class OkxProvider extends WalletProvider {
       })
       this.observer?.observe(document, { childList: true, subtree: true })
     }
-    listenKeys(this.$store, ['provider'], (newVal) => {
+    listenKeys(this.$store, ['provider'], newVal => {
       if (newVal.provider !== OKX) {
         if (this.removeSubscriber) {
           this.$valueStore.set({
@@ -129,9 +107,7 @@ export default class OkxProvider extends WalletProvider {
           this.removeSubscriber = undefined
         }
       } else {
-        this.removeSubscriber = this.$store.subscribe(
-          this.watchStateChange.bind(this)
-        )
+        this.removeSubscriber = this.$store.subscribe(this.watchStateChange.bind(this))
       }
     })
   }
@@ -141,42 +117,33 @@ export default class OkxProvider extends WalletProvider {
   }
 
   async connect(_: ProviderType): Promise<void> {
-    const { address, paymentAddress } = this.$valueStore!.get()
+    const { address, paymentAddress } = this.$valueStore?.get()
 
     if (address) {
       if (address.startsWith('tb1') && isMainnetNetwork(this.network)) {
         this.disconnect()
       } else {
         this.restorePersistedValues()
-        getBTCBalance(paymentAddress, this.network).then((totalBalance) => {
+        getBTCBalance(paymentAddress, this.network).then(totalBalance => {
           this.$store.setKey('balance', totalBalance)
         })
         return
       }
     }
+    const okxAccounts = await this.library.connect()
+    if (!okxAccounts) throw new Error('No accounts found')
 
-    try {
-      const okxAccounts = await this.library.connect()
-      if (!okxAccounts) throw new Error('No accounts found')
-
-      this.$store.setKey('address', okxAccounts.address)
-      this.$store.setKey('paymentAddress', okxAccounts.address)
-      this.$store.setKey('publicKey', okxAccounts.publicKey)
-      this.$store.setKey('paymentPublicKey', okxAccounts.publicKey)
-      this.$store.setKey('accounts', [okxAccounts.address])
-    } catch (e) {
-      throw e
-    }
+    this.$store.setKey('address', okxAccounts.address)
+    this.$store.setKey('paymentAddress', okxAccounts.address)
+    this.$store.setKey('publicKey', okxAccounts.publicKey)
+    this.$store.setKey('paymentPublicKey', okxAccounts.publicKey)
+    this.$store.setKey('accounts', [okxAccounts.address])
   }
 
   async requestAccounts(): Promise<string[]> {
     const library = this.library
     const network = this.network
-    if (
-      network === TESTNET ||
-      network === TESTNET4 ||
-      network === FRACTAL_TESTNET
-    ) {
+    if (network === TESTNET || network === TESTNET4 || network === FRACTAL_TESTNET) {
       return await library.connect()
     }
     return await library.requestAccounts()
@@ -225,31 +192,33 @@ export default class OkxProvider extends WalletProvider {
     return txId
   }
 
-  async signMessage(
-    message: string,
-    options?: SignMessageOptions
-  ): Promise<string> {
+  async signMessage(message: string, options?: SignMessageOptions): Promise<string> {
     const library = this.library
-    const protocol =
-      options?.protocol === ECDSA ? BIP322_SIMPLE : options?.protocol
+    const protocol = options?.protocol === ECDSA ? BIP322_SIMPLE : options?.protocol
     return await library?.signMessage(message, protocol)
   }
 
-  async signPsbt(
-    { psbtHex, broadcast, finalize, inputsToSign }: WalletProviderSignPsbtOptions
-  ): Promise<
+  async signPsbt({
+    psbtHex,
+    broadcast,
+    finalize,
+    inputsToSign,
+  }: WalletProviderSignPsbtOptions): Promise<
     | {
-      signedPsbtHex: string | undefined
-      signedPsbtBase64: string | undefined
-      txId?: string | undefined
-    }
+        signedPsbtHex: string | undefined
+        signedPsbtBase64: string | undefined
+        txId?: string | undefined
+      }
     | undefined
   > {
     const library = this.library
-    const signedPsbt = await library.signPsbt(psbtHex, omitUndefined({
-      autoFinalized: finalize,
-      toSignInputs: inputsToSign,
-    }))
+    const signedPsbt = await library.signPsbt(
+      psbtHex,
+      omitUndefined({
+        autoFinalized: finalize,
+        toSignInputs: inputsToSign,
+      })
+    )
 
     const psbtSignedPsbt = bitcoin.Psbt.fromHex(signedPsbt)
 

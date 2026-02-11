@@ -1,20 +1,20 @@
 export * from '@omnisat/lasereyes-core'
+export type { LaserEyesContextType } from '@omnisat/lasereyes-react'
 export {
-  useLaserEyes,
-  useBalance,
-  useBitcoinFees,
-  useAddressTokens,
-  useAlkanesList,
+  LaserEyesLogo,
   LaserEyesProvider,
-  WalletIcon,
   LeatherLogo,
   MagicEdenLogo,
   OkxLogo,
-  PhantomLogo,
   OylLogo,
+  PhantomLogo,
   UnisatLogo,
+  useAddressTokens,
+  useAlkanesList,
+  useBalance,
+  useBitcoinFees,
+  useLaserEyes,
+  WalletIcon,
   WizzLogo,
   XverseLogo,
-  LaserEyesLogo,
 } from '@omnisat/lasereyes-react'
-export type { LaserEyesContextType } from '@omnisat/lasereyes-react'

@@ -1,24 +1,18 @@
-import React, { useState, useEffect } from 'react'
-import { Button } from './ui/button'
-import { Input } from '@/components/ui/input'
-import { cn, parseFixed } from '@/lib/utils'
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from './ui/select'
-import { toast } from 'sonner'
-import { getMempoolSpaceUrl } from '@/lib/urls'
-import {
+  ALKANES,
   type AlkaneBalance,
-    ALKANES,
   type MAINNET,
-  OYLNET,
+  type OYLNET,
   type TESTNET,
   useLaserEyes,
 } from '@omnisat/lasereyes'
+import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
+import { Input } from '@/components/ui/input'
+import { getMempoolSpaceUrl } from '@/lib/urls'
+import { cn, parseFixed } from '@/lib/utils'
+import { Button } from './ui/button'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
 
 // Helper function to format alkane balance with 8 decimal places (like Bitcoin)
 const formatAlkaneBalance = (balance: bigint): string => {
@@ -34,18 +28,13 @@ const formatAlkaneBalance = (balance: bigint): string => {
   const fractionalStr = fractionalPart.toString().padStart(ALKANE_DECIMALS, '0')
   const trimmedFractional = fractionalStr.replace(/0+$/, '')
 
-  return trimmedFractional
-    ? `${integerPart}.${trimmedFractional}`
-    : integerPart.toString()
+  return trimmedFractional ? `${integerPart}.${trimmedFractional}` : integerPart.toString()
 }
 
 const AlkanesSection = () => {
-  const { provider, address, send, network, getMetaBalances, connected } =
-    useLaserEyes()
+  const { provider, address, send, network, getMetaBalances, connected } = useLaserEyes()
   const [alkanes, setAlkanes] = useState<AlkaneBalance[]>([])
-  const [selectedAlkane, setSelectedAlkane] = useState<
-    AlkaneBalance | undefined
-  >(undefined)
+  const [selectedAlkane, setSelectedAlkane] = useState<AlkaneBalance | undefined>(undefined)
   const [alkaneToAddress, setAlkaneToAddress] = useState('')
   const [alkaneAmount, setAlkaneAmount] = useState('')
 
@@ -53,7 +42,7 @@ const AlkanesSection = () => {
     if (address && network && connected) {
       // We'll need to modify the getMetaBalances function to support 'alkanes' protocol
       getMetaBalances(ALKANES)
-        .then((x) => {
+        .then(x => {
           console.log('alkanes', x)
           return x as AlkaneBalance[]
         })
@@ -82,9 +71,7 @@ const AlkanesSection = () => {
           <span className={'font-black'}>View on mempool.space</span>
           <a
             target="_blank"
-            href={`${getMempoolSpaceUrl(
-              network as typeof MAINNET | typeof TESTNET
-            )}/tx/${txid}`}
+            href={`${getMempoolSpaceUrl(network as typeof MAINNET | typeof TESTNET)}/tx/${txid}`}
             className={'underline text-blue-600 text-xs'}
             rel="noreferrer"
           >
@@ -103,7 +90,7 @@ const AlkanesSection = () => {
     <div className="flex flex-col gap-2">
       <div className="text-md text-orange-400">alkanes</div>
       <Select
-        onValueChange={(value) => {
+        onValueChange={value => {
           const alkane = alkanes?.find((a: AlkaneBalance) => a.id === value)
           setSelectedAlkane(alkane)
         }}
@@ -111,7 +98,7 @@ const AlkanesSection = () => {
       >
         <SelectTrigger
           disabled={!provider}
-          onClick={(e) => {
+          onClick={e => {
             console.log('clicked')
             e.preventDefault()
           }}
@@ -123,7 +110,7 @@ const AlkanesSection = () => {
           <SelectValue placeholder="Select an Alkane" />
         </SelectTrigger>
         <SelectContent className="h-fit">
-          {alkanes?.map((alkane) => (
+          {alkanes?.map(alkane => (
             <SelectItem key={alkane.id} value={alkane.id}>
               {alkane.name} #{alkane.id} ({formatAlkaneBalance(alkane.balance)})
             </SelectItem>
@@ -132,27 +119,21 @@ const AlkanesSection = () => {
       </Select>
       <Input
         disabled={!provider || alkanes.length === 0}
-        className={cn(
-          'w-full bg-[#232225] border-none disabled:text-[#737275] text-center'
-        )}
+        className={cn('w-full bg-[#232225] border-none disabled:text-[#737275] text-center')}
         placeholder="To Address"
         value={alkaneToAddress}
-        onChange={(e) => setAlkaneToAddress(e.target.value)}
+        onChange={e => setAlkaneToAddress(e.target.value)}
       />
       <Input
         disabled={!provider || !selectedAlkane || !alkaneToAddress}
         type="number"
-        className={cn(
-          'w-full bg-[#232225] border-none disabled:text-[#737275] text-center'
-        )}
+        className={cn('w-full bg-[#232225] border-none disabled:text-[#737275] text-center')}
         placeholder="Amount"
         value={alkaneAmount}
-        onChange={(e) => setAlkaneAmount(e.target.value)}
+        onChange={e => setAlkaneAmount(e.target.value)}
       />
       <Button
-        disabled={
-          !provider || !selectedAlkane || !alkaneToAddress || !alkaneAmount
-        }
+        disabled={!provider || !selectedAlkane || !alkaneToAddress || !alkaneAmount}
         className={'w-full bg-[#232225] disabled:text-[#737275]'}
         onClick={sendAlkane}
       >

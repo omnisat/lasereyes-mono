@@ -1,18 +1,19 @@
 // eslint-disable
+
+import * as ecc2 from '@bitcoinerlab/secp256k1'
 import * as ecc from '@cmdcode/crypto-utils'
 import { Address, Signer, Tap, Tx } from '@cmdcode/tapscript'
 import * as bitcoin from 'bitcoinjs-lib'
-import * as ecc2 from '@bitcoinerlab/secp256k1'
-import { calculateValueOfUtxosGathered, getBitcoinNetwork } from './helpers'
-import { getCmDruidNetwork } from '../constants/networks'
-import { MAINNET, P2SH, P2TR } from '../constants'
-import type { ContentType, MempoolUtxo, NetworkType } from '../types'
 import { toXOnly } from 'bitcoinjs-lib/src/psbt/bip371'
+import { toHex } from 'uint8array-tools'
+import type { WalletProviderSignPsbtOptions } from '../client/types'
+import { MAINNET, P2SH, P2TR } from '../constants'
 import { TEXT_PLAIN } from '../constants/content'
+import { getCmDruidNetwork } from '../constants/networks'
+import type { ContentType, MempoolUtxo, NetworkType } from '../types'
 import { generatePrivateKey, getAddressType, getRedeemScript } from './btc'
 import type { DataSourceManager } from './data-sources/manager'
-import type { WalletProviderSignPsbtOptions } from '../client/types'
-import { toHex } from 'uint8array-tools'
+import { calculateValueOfUtxosGathered, getBitcoinNetwork } from './helpers'
 
 bitcoin.initEccLib(ecc2)
 
@@ -95,9 +96,7 @@ export const inscribeContent = async ({
   if (!response) throw new Error('sign psbt failed')
   const psbt = bitcoin.Psbt.fromHex(response?.signedPsbtHex || '')
   const extracted = psbt.extractTransaction()
-  const commitTxId = await dataSourceManager.broadcastTransaction(
-    extracted.toHex()
-  )
+  const commitTxId = await dataSourceManager.broadcastTransaction(extracted.toHex())
   if (!commitTxId) throw new Error('commit tx failed')
   return await executeRevealTransaction({
     inscriptions: ixs,
@@ -132,12 +131,8 @@ export const getCommitPsbt = async ({
   | undefined
 > => {
   const quantity = inscriptions.length
-  const contentSize = inscriptions.reduce(
-    (a, b) => a + Buffer.from(b.content).length,
-    0
-  )
-  if (contentSize > 390000)
-    throw new Error('Content size is too large, must be less than 390kb')
+  const contentSize = inscriptions.reduce((a, b) => a + Buffer.from(b.content).length, 0)
+  if (contentSize > 390000) throw new Error('Content size is too large, must be less than 390kb')
 
   if (!dataSourceManager) {
     throw new Error('missing data source')
@@ -157,19 +152,13 @@ export const getCommitPsbt = async ({
     network: getBitcoinNetwork(network),
   })
 
-  const { inscriberAddress } = createInscriptionRevealAddressAndKeys(
-    pubKey,
-    inscriptions,
-    network
-  )
+  const { inscriberAddress } = createInscriptionRevealAddressAndKeys(pubKey, inscriptions, network)
 
   const estimatedSize = 5 * 34 * quantity
   const commitSatsNeeded = Math.floor(estimatedSize * fastFee * quantity)
-  const revealSatsNeeded =
-    Math.floor((contentSize * fastFee) / 3) + 1000 + 546 * quantity
+  const revealSatsNeeded = Math.floor((contentSize * fastFee) / 3) + 1000 + 546 * quantity
   const inscribeFees = Math.floor(commitSatsNeeded + revealSatsNeeded)
-  const utxosGathered: MempoolUtxo[] =
-    await dataSourceManager.getAddressUtxos(paymentAddress)
+  const utxosGathered: MempoolUtxo[] = await dataSourceManager.getAddressUtxos(paymentAddress)
   const filteredUtxos = utxosGathered
     .filter((utxo: MempoolUtxo) => utxo.value > 3000)
     .sort((a, b) => b.value - a.value)
@@ -184,10 +173,7 @@ export const getCommitPsbt = async ({
   }
 
   let accSats = 0
-  const addressScript = bitcoin.address.toOutputScript(
-    paymentAddress,
-    getBitcoinNetwork(network)
-  )
+  const addressScript = bitcoin.address.toOutputScript(paymentAddress, getBitcoinNetwork(network))
   let counter = 0
   for await (const utxo of filteredUtxos) {
     const paymentAddressType = getAddressType(paymentAddress, network)
@@ -277,17 +263,12 @@ export const executeRevealTransaction = async ({
     throw new Error('missing broadcastTransaction')
   }
 
-  const txResult = await dataSourceManager.waitForTransaction(
-    String(commitTxId)
-  )
+  const txResult = await dataSourceManager.waitForTransaction(String(commitTxId))
   if (!txResult) {
     throw new Error('ERROR WAITING FOR COMMIT TX')
   }
 
-  const commitTxOutputValue = await dataSourceManager.getOutputValueByVOutIndex(
-    commitTxId,
-    0
-  )
+  const commitTxOutputValue = await dataSourceManager.getOutputValueByVOutIndex(commitTxId, 0)
   if (commitTxOutputValue === 0 || !commitTxOutputValue) {
     throw new Error('ERROR GETTING FIRST INPUT VALUE')
   }
@@ -337,10 +318,7 @@ export const createInscriptionScript = (
   const ec = new TextEncoder()
   const marker = ec.encode('ord')
   const INSCRIPTION_SIZE = 546
-  const createContentChunks = (
-    contentBase64: string,
-    mimeType: ContentType
-  ) => {
+  const createContentChunks = (contentBase64: string, mimeType: ContentType) => {
     let contentBuffer: Buffer
     if (mimeType === TEXT_PLAIN) {
       const decodedText = Buffer.from(contentBase64, 'base64').toString('utf-8')
@@ -368,7 +346,7 @@ export const createInscriptionScript = (
       script.push(Buffer.from([0x02]))
       script.push(pointerBuffer)
     }
-    script.push(...contentChunks.map((chunk) => chunk), 'OP_ENDIF')
+    script.push(...contentChunks.map(chunk => chunk), 'OP_ENDIF')
   })
 
   return script
@@ -382,10 +360,7 @@ export const createInscriptionRevealAddressAndKeys = (
   const script = createInscriptionScript(pubKey, inscriptions)
   const tapleaf = Tap.encodeScript(script)
   const [tpubkey] = Tap.getPubKey(pubKey, { target: tapleaf })
-  const inscriberAddress = Address.p2tr.fromPubKey(
-    tpubkey,
-    getCmDruidNetwork(network)
-  )
+  const inscriberAddress = Address.p2tr.fromPubKey(tpubkey, getCmDruidNetwork(network))
 
   return {
     inscriberAddress,

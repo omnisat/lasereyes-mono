@@ -1,7 +1,7 @@
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import Link from "next/link"
-import { ExternalLink } from "lucide-react"
+import { ExternalLink } from 'lucide-react'
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
 interface DataSourceCardProps {
   name: string
@@ -15,8 +15,8 @@ export function DataSourceCard({ name, description, url, className }: DataSource
   return (
     <div
       className={cn(
-        "group relative overflow-hidden rounded-xl border border-border/50 bg-card p-6 transition-all duration-300 hover:border-primary/20 hover:shadow-md hover:shadow-primary/5",
-        className,
+        'group relative overflow-hidden rounded-xl border border-border/50 bg-card p-6 transition-all duration-300 hover:border-primary/20 hover:shadow-md hover:shadow-primary/5',
+        className
       )}
     >
       <div className="absolute right-0 top-0 h-20 w-20 translate-x-6 -translate-y-6 rounded-full bg-primary/10 blur-2xl filter group-hover:bg-primary/20 group-hover:blur-3xl" />
@@ -34,4 +34,3 @@ export function DataSourceCard({ name, description, url, className }: DataSource
     </div>
   )
 }
-

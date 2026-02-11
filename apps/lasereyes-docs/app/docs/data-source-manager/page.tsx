@@ -1,8 +1,8 @@
-"use client"
+'use client'
 
-import { CodeBlock } from "@/components/code-block"
-import Link from "next/link"
-import { Heading } from "@/components/heading"
+import Link from 'next/link'
+import { CodeBlock } from '@/components/code-block'
+import { Heading } from '@/components/heading'
 
 export default function DataSourceManagerPage() {
   return (
@@ -11,9 +11,9 @@ export default function DataSourceManagerPage() {
         DataSourceManager
       </Heading>
       <p className="text-lg mb-4">
-        The <code>DataSourceManager</code> is a core component of LaserEyes that abstracts away the complexities of
-        interacting with different Bitcoin data providers. It provides a unified interface for fetching blockchain data,
-        regardless of the underlying provider.
+        The <code>DataSourceManager</code> is a core component of LaserEyes that abstracts away the
+        complexities of interacting with different Bitcoin data providers. It provides a unified
+        interface for fetching blockchain data, regardless of the underlying provider.
       </p>
 
       <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
@@ -59,7 +59,9 @@ const balance = await dataSourceManager.getBalance('bc1q...')`}
       <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
         Key Methods
       </Heading>
-      <p className="mb-6">The DataSourceManager provides methods for interacting with the Bitcoin blockchain:</p>
+      <p className="mb-6">
+        The DataSourceManager provides methods for interacting with the Bitcoin blockchain:
+      </p>
 
       <Heading level={3} className="text-xl font-bold mt-6 mb-2">
         Basic Bitcoin Operations
@@ -133,7 +135,9 @@ const transfers = await dataSourceManager.getTokenTransfers('bc1q...', 'ORDI', '
       <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
         Configuration
       </Heading>
-      <p className="mb-6">You can configure the DataSourceManager through the LaserEyesClient configuration:</p>
+      <p className="mb-6">
+        You can configure the DataSourceManager through the LaserEyesClient configuration:
+      </p>
       <CodeBlock
         language="typescript"
         code={`const config = createConfig({
@@ -195,14 +199,18 @@ dataSourceManager.registerDataSource('custom', customDataSource)`}
       <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
         Provider Selection
       </Heading>
-      <p className="mb-6">The DataSourceManager automatically selects the appropriate provider based on:</p>
+      <p className="mb-6">
+        The DataSourceManager automatically selects the appropriate provider based on:
+      </p>
       <ul className="list-disc pl-6 mb-6 space-y-2">
         <li>The operation being performed</li>
         <li>Provider availability</li>
         <li>Provider capabilities</li>
         <li>Previous success/failure with each provider</li>
       </ul>
-      <p className="mb-6">You can also manually specify which provider to use for a specific operation:</p>
+      <p className="mb-6">
+        You can also manually specify which provider to use for a specific operation:
+      </p>
       <CodeBlock
         language="typescript"
         code={`// Use Maestro specifically for this operation
@@ -217,7 +225,9 @@ const utxos = await dataSourceManager.getUtxos('bc1q...', { provider: 'sandshrew
       <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
         Error Handling
       </Heading>
-      <p className="mb-6">The DataSourceManager includes built-in error handling and retry logic:</p>
+      <p className="mb-6">
+        The DataSourceManager includes built-in error handling and retry logic:
+      </p>
       <CodeBlock
         language="typescript"
         code={`try {
@@ -238,7 +248,9 @@ const utxos = await dataSourceManager.getUtxos('bc1q...', { provider: 'sandshrew
       <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
         Caching
       </Heading>
-      <p className="mb-6">The DataSourceManager includes built-in caching to improve performance:</p>
+      <p className="mb-6">
+        The DataSourceManager includes built-in caching to improve performance:
+      </p>
       <CodeBlock
         language="typescript"
         code={`// Configure cache options
@@ -322,34 +334,35 @@ const balance = await dataSourceManager.getBalance('bc1q...', { bypassCache: tru
       <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
         Next Steps
       </Heading>
-      <p className="mb-6">Now that you understand the DataSourceManager, you can explore related topics:</p>
+      <p className="mb-6">
+        Now that you understand the DataSourceManager, you can explore related topics:
+      </p>
       <ul className="list-disc pl-6 mb-6 space-y-2">
         <li>
           <Link href="/docs/maestro" className="text-primary hover:underline">
             Maestro Integration
-          </Link>{" "}
+          </Link>{' '}
           - Learn more about the Maestro data provider
         </li>
         <li>
           <Link href="/docs/sandshrew" className="text-primary hover:underline">
             Sandshrew Integration
-          </Link>{" "}
+          </Link>{' '}
           - Explore the Sandshrew data provider
         </li>
         <li>
           <Link href="/docs/mempool-space" className="text-primary hover:underline">
             Mempool.space Integration
-          </Link>{" "}
+          </Link>{' '}
           - Understand the Mempool.space data provider
         </li>
         <li>
           <Link href="/docs/custom-datasource" className="text-primary hover:underline">
             Custom DataSource Implementation
-          </Link>{" "}
+          </Link>{' '}
           - Create your own data source
         </li>
       </ul>
     </>
   )
 }
-

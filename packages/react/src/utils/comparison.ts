@@ -1,14 +1,13 @@
 function checkProperties(a: { [x: string]: any }, b: { [x: string]: any }) {
-  return Object.keys(a).every(function (p) {
-    return (
-      Object.prototype.hasOwnProperty.call(b, p) &&
+  return Object.keys(a).every(
+    p =>
+      Object.hasOwn(b, p) &&
       (b[p] === a[p] ||
-        (typeof a[p] == 'number' &&
-          typeof b[p] == 'number' &&
-          isNaN(b[p]) &&
-          isNaN(a[p])))
-    )
-  })
+        (typeof a[p] === 'number' &&
+          typeof b[p] === 'number' &&
+          Number.isNaN(b[p]) &&
+          Number.isNaN(a[p])))
+  )
 }
 
 // Compare a to b and b to a

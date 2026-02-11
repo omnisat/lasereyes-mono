@@ -1,26 +1,26 @@
-"use client"
+'use client'
 
-import * as React from "react"
-import { CodeBlock } from "@/components/code-block"
-import { Heading } from "@/components/heading"
-import { ClientPageWrapper } from "@/components/client-page-wrapper"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { 
-  Code2, 
-  GitBranch, 
-  Terminal, 
-  PackageSearch, 
-  FolderTree, 
-  Wrench,
-  Bug,
-  FileCode,
+import type { LucideIcon } from 'lucide-react'
+import {
   AlertTriangle,
-  HelpCircle
-} from "lucide-react"
-import Link from "next/link"
-import type { LucideIcon } from "lucide-react"
-import { cn } from "@/lib/utils"
+  Bug,
+  Code2,
+  FileCode,
+  FolderTree,
+  GitBranch,
+  HelpCircle,
+  PackageSearch,
+  Terminal,
+  Wrench,
+} from 'lucide-react'
+import Link from 'next/link'
+import type * as React from 'react'
+import { ClientPageWrapper } from '@/components/client-page-wrapper'
+import { CodeBlock } from '@/components/code-block'
+import { Heading } from '@/components/heading'
+import { Badge } from '@/components/ui/badge'
+import { Card, CardContent } from '@/components/ui/card'
+import { cn } from '@/lib/utils'
 
 interface SetupCardProps {
   icon: LucideIcon
@@ -32,10 +32,12 @@ interface SetupCardProps {
 
 function SetupCard({ icon: Icon, title, description, content, className }: SetupCardProps) {
   return (
-    <Card className={cn(
-      "group relative overflow-hidden transition-all duration-300 hover:border-purple-500/30 hover:shadow-lg hover:shadow-purple-500/5",
-      className
-    )}>
+    <Card
+      className={cn(
+        'group relative overflow-hidden transition-all duration-300 hover:border-purple-500/30 hover:shadow-lg hover:shadow-purple-500/5',
+        className
+      )}
+    >
       <div className="absolute right-0 top-0 h-20 w-20 translate-x-6 -translate-y-6 rounded-full bg-purple-500/10 blur-2xl filter group-hover:bg-purple-500/20" />
       <CardContent className="p-6">
         <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-purple-500/10 text-purple-500">
@@ -132,11 +134,7 @@ git remote add upstream https://github.com/omnisat/lasereyes.git`}
             title="Install Dependencies"
             content={
               <div className="space-y-4">
-                <CodeBlock
-                  language="bash"
-                  code="pnpm install"
-                  copyButton={true}
-                />
+                <CodeBlock language="bash" code="pnpm install" copyButton={true} />
                 <p className="text-sm text-muted-foreground">
                   This will install all dependencies for the monorepo packages.
                 </p>
@@ -254,11 +252,17 @@ SANDSHREW_API_KEY=test_key_456`}
                 <div className="rounded-md bg-muted p-4">
                   <p className="text-sm">Get testnet coins from:</p>
                   <div className="mt-2 space-y-1">
-                    <Link href="https://coinfaucet.eu/en/btc-testnet/" className="text-sm text-purple-500 hover:underline">
+                    <Link
+                      href="https://coinfaucet.eu/en/btc-testnet/"
+                      className="text-sm text-purple-500 hover:underline"
+                    >
                       coinfaucet.eu
                     </Link>
                     <br />
-                    <Link href="https://testnet-faucet.mempool.co/" className="text-sm text-purple-500 hover:underline">
+                    <Link
+                      href="https://testnet-faucet.mempool.co/"
+                      className="text-sm text-purple-500 hover:underline"
+                    >
                       testnet-faucet.mempool.co
                     </Link>
                   </div>
@@ -287,11 +291,7 @@ SANDSHREW_API_KEY=test_key_456`}
                   </li>
                   <li>
                     <strong>Check dependencies:</strong>
-                    <CodeBlock
-                      language="bash"
-                      code="pnpm why package-name"
-                      copyButton={true}
-                    />
+                    <CodeBlock language="bash" code="pnpm why package-name" copyButton={true} />
                   </li>
                   <li>
                     <strong>Node.js version:</strong> Use version in <code>.nvmrc</code>
@@ -315,12 +315,18 @@ export default function DevelopmentSetupClientPage() {
     <div className="space-y-8">
       <div className="relative overflow-hidden rounded-lg border bg-gradient-to-br from-purple-500/10 via-background to-background p-8">
         <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-purple-500/20 rounded-full blur-3xl -z-10 translate-x-1/2 -translate-y-1/2" />
-        <Badge variant="secondary" className="mb-4">Setup Guide</Badge>
-        <Heading level={1} className="mb-4 bg-gradient-to-br from-purple-500 to-violet-500 bg-clip-text text-transparent">
+        <Badge variant="secondary" className="mb-4">
+          Setup Guide
+        </Badge>
+        <Heading
+          level={1}
+          className="mb-4 bg-gradient-to-br from-purple-500 to-violet-500 bg-clip-text text-transparent"
+        >
           Development Setup
         </Heading>
         <p className="text-xl mb-6 max-w-2xl text-muted-foreground">
-          Get your development environment ready to contribute to LaserEyes. Follow this guide to set up your workspace and start building.
+          Get your development environment ready to contribute to LaserEyes. Follow this guide to
+          set up your workspace and start building.
         </p>
       </div>
 
@@ -329,4 +335,4 @@ export default function DevelopmentSetupClientPage() {
       </ClientPageWrapper>
     </div>
   )
-} 
+}

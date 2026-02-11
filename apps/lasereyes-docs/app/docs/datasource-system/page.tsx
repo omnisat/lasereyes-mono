@@ -1,14 +1,13 @@
-"use client"
+'use client'
 
-import * as React from "react"
-import { ClientPageWrapper } from "@/components/client-page-wrapper"
-import { CodeBlock } from "@/components/code-block"
-import { Heading } from "@/components/heading"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Database, Shield, Zap, Code2, Server, Layers, Workflow, GitFork } from "lucide-react"
-import { cn } from "@/lib/utils"
-import Link from "next/link"
+import { Database, GitFork, Shield, Workflow } from 'lucide-react'
+import type * as React from 'react'
+import { ClientPageWrapper } from '@/components/client-page-wrapper'
+import { CodeBlock } from '@/components/code-block'
+import { Heading } from '@/components/heading'
+import { Badge } from '@/components/ui/badge'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { cn } from '@/lib/utils'
 
 interface FeatureCardProps {
   icon: React.ElementType
@@ -22,12 +21,18 @@ export default function DataSourceSystemPage() {
     <div className="space-y-8">
       <div className="relative overflow-hidden rounded-lg border bg-gradient-to-br from-purple-500/10 via-background to-background p-8">
         <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-purple-500/20 rounded-full blur-3xl -z-10 translate-x-1/2 -translate-y-1/2" />
-        <Badge variant="secondary" className="mb-4">System</Badge>
-        <Heading level={1} className="mb-4 bg-gradient-to-br from-purple-500 to-violet-500 bg-clip-text text-transparent">
+        <Badge variant="secondary" className="mb-4">
+          System
+        </Badge>
+        <Heading
+          level={1}
+          className="mb-4 bg-gradient-to-br from-purple-500 to-violet-500 bg-clip-text text-transparent"
+        >
           DataSource System
         </Heading>
         <p className="text-xl mb-6 max-w-2xl text-muted-foreground">
-          A powerful abstraction layer for interacting with Bitcoin data providers, offering flexibility, reliability, and seamless integration.
+          A powerful abstraction layer for interacting with Bitcoin data providers, offering
+          flexibility, reliability, and seamless integration.
         </p>
       </div>
 
@@ -40,10 +45,12 @@ export default function DataSourceSystemPage() {
 
 function FeatureCard({ icon: Icon, title, description, className }: FeatureCardProps) {
   return (
-    <Card className={cn(
-      "group relative overflow-hidden transition-all duration-300 hover:border-purple-500/30 hover:shadow-lg hover:shadow-purple-500/5",
-      className
-    )}>
+    <Card
+      className={cn(
+        'group relative overflow-hidden transition-all duration-300 hover:border-purple-500/30 hover:shadow-lg hover:shadow-purple-500/5',
+        className
+      )}
+    >
       <div className="absolute right-0 top-0 h-20 w-20 translate-x-6 -translate-y-6 rounded-full bg-purple-500/10 blur-2xl filter group-hover:bg-purple-500/20" />
       <CardContent className="p-6">
         <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-purple-500/10 text-purple-500">
@@ -63,9 +70,10 @@ function DataSourceContent() {
         <Card className="overflow-hidden">
           <CardContent className="p-6">
             <p className="text-lg leading-relaxed">
-              The DataSource system is a core component of LaserEyes that abstracts away the complexities of interacting with
-              different Bitcoin data providers. This abstraction allows you to switch providers seamlessly, implement fallbacks,
-              and maintain consistent data access across your application.
+              The DataSource system is a core component of LaserEyes that abstracts away the
+              complexities of interacting with different Bitcoin data providers. This abstraction
+              allows you to switch providers seamlessly, implement fallbacks, and maintain
+              consistent data access across your application.
             </p>
           </CardContent>
         </Card>
@@ -102,7 +110,9 @@ function DataSourceContent() {
         <div className="grid gap-6 md:grid-cols-2">
           <Card className="border-purple-500/30 bg-purple-500/5">
             <CardContent className="p-6">
-              <Badge variant="default" className="mb-4 bg-purple-500">Primary</Badge>
+              <Badge variant="default" className="mb-4 bg-purple-500">
+                Primary
+              </Badge>
               <h3 className="text-xl font-bold mb-2">Maestro</h3>
               <p className="text-muted-foreground mb-4">
                 A comprehensive Bitcoin API with support for Ordinals, inscriptions, and more.
@@ -119,7 +129,9 @@ function DataSourceContent() {
           </Card>
           <Card className="border-violet-500/30 bg-violet-500/5">
             <CardContent className="p-6">
-              <Badge variant="default" className="mb-4 bg-violet-500">Primary</Badge>
+              <Badge variant="default" className="mb-4 bg-violet-500">
+                Primary
+              </Badge>
               <h3 className="text-xl font-bold mb-2">Sandshrew</h3>
               <p className="text-muted-foreground mb-4">
                 Fast and reliable Bitcoin data indexing with excellent developer experience.
@@ -136,7 +148,9 @@ function DataSourceContent() {
           </Card>
           <Card className="border-fuchsia-500/30 bg-fuchsia-500/5">
             <CardContent className="p-6">
-              <Badge variant="default" className="mb-4 bg-fuchsia-500">Secondary</Badge>
+              <Badge variant="default" className="mb-4 bg-fuchsia-500">
+                Secondary
+              </Badge>
               <h3 className="text-xl font-bold mb-2">Mempool.space</h3>
               <p className="text-muted-foreground mb-4">
                 Open-source explorer and API for Bitcoin mempool and network data.
@@ -153,7 +167,9 @@ function DataSourceContent() {
           </Card>
           <Card className="border-pink-500/30 bg-pink-500/5">
             <CardContent className="p-6">
-              <Badge variant="default" className="mb-4 bg-pink-500">Secondary</Badge>
+              <Badge variant="default" className="mb-4 bg-pink-500">
+                Secondary
+              </Badge>
               <h3 className="text-xl font-bold mb-2">Esplora</h3>
               <p className="text-muted-foreground mb-4">
                 Blockstream's Bitcoin block explorer and HTTP API for basic operations.
@@ -313,8 +329,8 @@ class CustomDataSource implements DataSource {
             <CardContent className="p-6">
               <h3 className="text-lg font-semibold mb-2">Multiple Providers</h3>
               <p className="text-muted-foreground">
-                Configure multiple data providers for redundancy. If one provider fails,
-                LaserEyes will automatically fall back to others.
+                Configure multiple data providers for redundancy. If one provider fails, LaserEyes
+                will automatically fall back to others.
               </p>
             </CardContent>
           </Card>
@@ -322,8 +338,8 @@ class CustomDataSource implements DataSource {
             <CardContent className="p-6">
               <h3 className="text-lg font-semibold mb-2">API Keys</h3>
               <p className="text-muted-foreground">
-                Register for your own API keys with data providers for production use.
-                Development keys are rate-limited.
+                Register for your own API keys with data providers for production use. Development
+                keys are rate-limited.
               </p>
             </CardContent>
           </Card>
@@ -331,8 +347,8 @@ class CustomDataSource implements DataSource {
             <CardContent className="p-6">
               <h3 className="text-lg font-semibold mb-2">Error Handling</h3>
               <p className="text-muted-foreground">
-                Implement proper error handling for blockchain operations.
-                Network issues or provider outages can occur.
+                Implement proper error handling for blockchain operations. Network issues or
+                provider outages can occur.
               </p>
             </CardContent>
           </Card>
@@ -340,8 +356,8 @@ class CustomDataSource implements DataSource {
             <CardContent className="p-6">
               <h3 className="text-lg font-semibold mb-2">Caching</h3>
               <p className="text-muted-foreground">
-                Cache frequently accessed data to reduce API calls and improve
-                performance. Monitor your API usage.
+                Cache frequently accessed data to reduce API calls and improve performance. Monitor
+                your API usage.
               </p>
             </CardContent>
           </Card>
@@ -350,4 +366,3 @@ class CustomDataSource implements DataSource {
     </div>
   )
 }
-

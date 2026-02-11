@@ -43,10 +43,8 @@ export const getUnisatNetwork = (network: string) => {
   if (network === BaseNetwork.TESTNET) return UnisatNetwork.TESTNET
   if (network === BaseNetwork.TESTNET4) return UnisatNetwork.TESTNET4
   if (network === BaseNetwork.SIGNET) return UnisatNetwork.SIGNET
-  if (network === BaseNetwork.FRACTAL_MAINNET)
-    return UnisatNetwork.FRACTAL_MAINNET
-  if (network === BaseNetwork.FRACTAL_TESTNET)
-    return UnisatNetwork.FRACTAL_TESTNET
+  if (network === BaseNetwork.FRACTAL_MAINNET) return UnisatNetwork.FRACTAL_MAINNET
+  if (network === BaseNetwork.FRACTAL_TESTNET) return UnisatNetwork.FRACTAL_TESTNET
   return UnisatNetwork.MAINNET
 }
 
@@ -75,14 +73,11 @@ export const getWizzNetwork = (network: string) => {
 }
 
 export const getOrangeNetwork = (network: string): BitcoinNetworkType => {
-  if (network === BaseNetwork.MAINNET)
-    return OrangeNetwork.MAINNET as unknown as BitcoinNetworkType
-  if (network === BaseNetwork.TESTNET)
-    return OrangeNetwork.TESTNET as unknown as BitcoinNetworkType
+  if (network === BaseNetwork.MAINNET) return OrangeNetwork.MAINNET as unknown as BitcoinNetworkType
+  if (network === BaseNetwork.TESTNET) return OrangeNetwork.TESTNET as unknown as BitcoinNetworkType
   if (network === BaseNetwork.TESTNET4)
     return OrangeNetwork.TESTNET as unknown as BitcoinNetworkType
-  if (network === BaseNetwork.SIGNET)
-    return OrangeNetwork.TESTNET as unknown as BitcoinNetworkType
+  if (network === BaseNetwork.SIGNET) return OrangeNetwork.TESTNET as unknown as BitcoinNetworkType
   if (network === BaseNetwork.FRACTAL_MAINNET)
     return OrangeNetwork.MAINNET as unknown as BitcoinNetworkType
   if (network === BaseNetwork.FRACTAL_TESTNET)
@@ -105,8 +100,7 @@ export const getNetworkForUnisat = (network: string) => {
   if (network === UnisatNetwork.TESTNET) return BaseNetwork.TESTNET
   if (network === UnisatNetwork.TESTNET4) return BaseNetwork.TESTNET4
   if (network === UnisatNetwork.SIGNET) return BaseNetwork.SIGNET
-  if (network === UnisatNetwork.FRACTAL_MAINNET)
-    return BaseNetwork.FRACTAL_MAINNET
+  if (network === UnisatNetwork.FRACTAL_MAINNET) return BaseNetwork.FRACTAL_MAINNET
   if (network === UnisatNetwork.FRACTAL_TESTNET) return BaseNetwork.TESTNET
   return BaseNetwork.MAINNET
 }
@@ -123,10 +117,8 @@ export const getNetworkForXverse = (network: string) => {
   if (network === XverseNetwork.TESTNET) return BaseNetwork.TESTNET
   if (network === XverseNetwork.TESTNET4) return BaseNetwork.TESTNET4
   if (network === XverseNetwork.SIGNET) return BaseNetwork.SIGNET
-  if (network === XverseNetwork.FRACTAL_MAINNET)
-    return BaseNetwork.FRACTAL_MAINNET
-  if (network === XverseNetwork.FRACTAL_TESTNET)
-    return BaseNetwork.FRACTAL_TESTNET
+  if (network === XverseNetwork.FRACTAL_MAINNET) return BaseNetwork.FRACTAL_MAINNET
+  if (network === XverseNetwork.FRACTAL_TESTNET) return BaseNetwork.FRACTAL_TESTNET
   return BaseNetwork.MAINNET
 }
 

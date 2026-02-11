@@ -1,12 +1,9 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
 import axios from 'axios'
-import { MaestroDataSource } from '../src/lib/data-sources/sources/maestro-ds'
-import type {
-  MaestroGetAddressInscriptions,
-  MaestroAddressInscription,
-} from '../src/types/maestro'
-import { getMaestroUrl, MAESTRO_API_KEY_MAINNET } from '../src/lib/urls'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { MAINNET } from '../src/constants'
+import { MaestroDataSource } from '../src/lib/data-sources/sources/maestro-ds'
+import { getMaestroUrl, MAESTRO_API_KEY_MAINNET } from '../src/lib/urls'
+import type { MaestroGetAddressInscriptions } from '../src/types/maestro'
 
 vi.mock('axios')
 const mockedAxios = axios as unknown as { get: ReturnType<typeof vi.fn> }

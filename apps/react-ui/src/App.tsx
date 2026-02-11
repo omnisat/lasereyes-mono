@@ -1,4 +1,3 @@
-import React from 'react'
 import './App.css'
 import { LaserEyesProvider, MAINNET } from '@omnisat/lasereyes'
 import UnisatCard from './unisat-card'

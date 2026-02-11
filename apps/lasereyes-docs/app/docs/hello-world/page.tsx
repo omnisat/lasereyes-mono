@@ -1,30 +1,14 @@
-"use client"
+'use client'
 
-import * as React from "react"
-import { CodeBlock } from "@/components/code-block"
-import { WarningBox } from "@/components/warning-box"
-import Link from "next/link"
-import { Heading } from "@/components/heading"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Wallet, Code2, ArrowRight, Send, Coins, FileCode } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
-import { useState } from 'react'
-import { LaserEyesProvider } from '@omnisat/lasereyes-react'
-import { useLaserEyes } from '@omnisat/lasereyes-react'
-import { 
-  MAINNET, 
-  UNISAT, 
-  XVERSE,
-  OYL,
-  LEATHER,
-  MAGIC_EDEN,
-  OKX,
-  PHANTOM,
-  WIZZ,
-  ORANGE
-} from '@omnisat/lasereyes-core'
+import { ArrowRight, Code2, Coins, FileCode, Send, Wallet } from 'lucide-react'
+import Link from 'next/link'
+import type * as React from 'react'
+import { CodeBlock } from '@/components/code-block'
+import { Heading } from '@/components/heading'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { WarningBox } from '@/components/warning-box'
 
 interface StepCardProps {
   step: number
@@ -60,8 +44,9 @@ function HelloWorldContent() {
         <Card className="overflow-hidden">
           <CardContent className="p-6">
             <p className="text-lg leading-relaxed">
-              Let's build a simple application with LaserEyes to connect a wallet, display the balance, and send a
-              transaction. This example will demonstrate the core features of LaserEyes in a practical way.
+              Let's build a simple application with LaserEyes to connect a wallet, display the
+              balance, and send a transaction. This example will demonstrate the core features of
+              LaserEyes in a practical way.
             </p>
           </CardContent>
         </Card>
@@ -77,7 +62,9 @@ function HelloWorldContent() {
                 <Wallet className="h-6 w-6" />
               </div>
               <h3 className="mb-2 text-lg font-semibold">Wallet Connection</h3>
-              <p className="text-sm text-muted-foreground">Connects to multiple Bitcoin wallets seamlessly</p>
+              <p className="text-sm text-muted-foreground">
+                Connects to multiple Bitcoin wallets seamlessly
+              </p>
             </CardContent>
           </Card>
           <Card className="overflow-hidden">
@@ -86,7 +73,9 @@ function HelloWorldContent() {
                 <Coins className="h-6 w-6" />
               </div>
               <h3 className="mb-2 text-lg font-semibold">Balance Display</h3>
-              <p className="text-sm text-muted-foreground">Shows wallet address and current BTC balance</p>
+              <p className="text-sm text-muted-foreground">
+                Shows wallet address and current BTC balance
+              </p>
             </CardContent>
           </Card>
           <Card className="overflow-hidden">
@@ -95,7 +84,9 @@ function HelloWorldContent() {
                 <Send className="h-6 w-6" />
               </div>
               <h3 className="mb-2 text-lg font-semibold">Send BTC</h3>
-              <p className="text-sm text-muted-foreground">Enables sending BTC to other addresses</p>
+              <p className="text-sm text-muted-foreground">
+                Enables sending BTC to other addresses
+              </p>
             </CardContent>
           </Card>
         </div>
@@ -387,8 +378,9 @@ const handleSendBTC = async () => {
 
         <WarningBox title="Testing Transactions" className="mt-6">
           <p>
-            When testing transactions, it's recommended to use a testnet network to avoid using real BTC. You can configure
-            LaserEyes to use testnet by setting <code>network: TESTNET</code> in the provider config.
+            When testing transactions, it's recommended to use a testnet network to avoid using real
+            BTC. You can configure LaserEyes to use testnet by setting <code>network: TESTNET</code>{' '}
+            in the provider config.
           </p>
         </WarningBox>
       </section>
@@ -404,7 +396,8 @@ const handleSendBTC = async () => {
           </CardHeader>
           <CardContent className="p-6">
             <p className="mb-6 text-muted-foreground">
-              LaserEyes also supports working with Bitcoin Ordinals and inscriptions. Here's a complete example showing how to list inscriptions and create new ones:
+              LaserEyes also supports working with Bitcoin Ordinals and inscriptions. Here's a
+              complete example showing how to list inscriptions and create new ones:
             </p>
             <CodeBlock
               language="tsx"
@@ -559,7 +552,9 @@ function InscriptionsList() {
 
         <WarningBox title="Inscription Fees" className="mt-6">
           <p>
-            Creating inscriptions requires paying Bitcoin network fees. Make sure you have enough BTC in your wallet to cover both the inscription and the network fees. The exact fee will depend on network conditions and inscription size.
+            Creating inscriptions requires paying Bitcoin network fees. Make sure you have enough
+            BTC in your wallet to cover both the inscription and the network fees. The exact fee
+            will depend on network conditions and inscription size.
           </p>
         </WarningBox>
 
@@ -587,30 +582,30 @@ function InscriptionsList() {
             <div className="grid gap-4">
               {[
                 {
-                  href: "/docs/wallet-connection",
-                  title: "Wallet Connection",
-                  description: "Learn more about connecting to different wallets",
-                  icon: Wallet
+                  href: '/docs/wallet-connection',
+                  title: 'Wallet Connection',
+                  description: 'Learn more about connecting to different wallets',
+                  icon: Wallet,
                 },
                 {
-                  href: "/docs/basic-transactions",
-                  title: "Basic Transactions",
-                  description: "Explore more transaction types",
-                  icon: Send
+                  href: '/docs/basic-transactions',
+                  title: 'Basic Transactions',
+                  description: 'Explore more transaction types',
+                  icon: Send,
                 },
                 {
-                  href: "/docs/inscriptions",
-                  title: "Working with Inscriptions",
-                  description: "Learn how to create and transfer inscriptions",
-                  icon: FileCode
+                  href: '/docs/inscriptions',
+                  title: 'Working with Inscriptions',
+                  description: 'Learn how to create and transfer inscriptions',
+                  icon: FileCode,
                 },
                 {
-                  href: "/docs/brc20",
-                  title: "BRC-20 Operations",
-                  description: "Work with BRC-20 tokens",
-                  icon: Code2
-                }
-              ].map((item) => (
+                  href: '/docs/brc20',
+                  title: 'BRC-20 Operations',
+                  description: 'Work with BRC-20 tokens',
+                  icon: Code2,
+                },
+              ].map(item => (
                 <Link key={item.href} href={item.href}>
                   <Card className="group relative overflow-hidden transition-all duration-300 hover:border-orange-500/30 hover:shadow-lg hover:shadow-orange-500/5">
                     <CardContent className="flex items-center justify-between p-4">
@@ -619,7 +614,9 @@ function InscriptionsList() {
                           <item.icon className="h-5 w-5" />
                         </div>
                         <div>
-                          <h3 className="font-semibold group-hover:text-orange-500 transition-colors">{item.title}</h3>
+                          <h3 className="font-semibold group-hover:text-orange-500 transition-colors">
+                            {item.title}
+                          </h3>
                           <p className="text-sm text-muted-foreground">{item.description}</p>
                         </div>
                       </div>
@@ -641,8 +638,13 @@ export default function HelloWorldPage() {
     <div className="space-y-8">
       <div className="relative overflow-hidden rounded-lg border bg-gradient-to-br from-orange-500/10 via-background to-background p-8">
         <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-orange-500/20 rounded-full blur-3xl -z-10 translate-x-1/2 -translate-y-1/2" />
-        <Badge variant="secondary" className="mb-4">Example</Badge>
-        <Heading level={1} className="mb-4 bg-gradient-to-br from-orange-500 to-yellow-500 bg-clip-text text-transparent">
+        <Badge variant="secondary" className="mb-4">
+          Example
+        </Badge>
+        <Heading
+          level={1}
+          className="mb-4 bg-gradient-to-br from-orange-500 to-yellow-500 bg-clip-text text-transparent"
+        >
           Hello World Example
         </Heading>
         <p className="text-xl mb-6 max-w-2xl text-muted-foreground">
@@ -674,4 +676,3 @@ export default function HelloWorldPage() {
     </div>
   )
 }
-

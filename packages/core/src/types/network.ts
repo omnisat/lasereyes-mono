@@ -1,4 +1,3 @@
-
 export enum FractalNetwork {
   MAINNET = 'fractal_mainnet',
   TESTNET = 'fractal_testnet',

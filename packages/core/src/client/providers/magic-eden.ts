@@ -1,28 +1,29 @@
+import { persistentMap } from '@nanostores/persistent'
 import * as bitcoin from 'bitcoinjs-lib'
+import { fromOutputScript } from 'bitcoinjs-lib/src/address'
+import { listenKeys, type MapStore } from 'nanostores'
 import {
   BitcoinNetworkType,
+  type GetAddressOptions,
   getAddress,
-  GetAddressOptions,
   MessageSigningProtocols,
+  type SendBtcTransactionOptions,
+  type SignTransactionOptions,
   sendBtcTransaction,
-  SendBtcTransactionOptions,
   signMessage,
   signTransaction,
-  SignTransactionOptions,
 } from 'sats-connect'
-import { WalletProvider } from '.'
 import {
-  Config,
   ECDSA,
-  LaserEyesClient,
-  LaserEyesStoreType,
+  type LaserEyesStoreType,
   MAGIC_EDEN,
   MAINNET,
-  NetworkType,
-  SignMessageOptions,
-  WalletProviderSignPsbtOptions,
-  SignPsbtResponse,
+  type NetworkType,
+  type SignMessageOptions,
+  type SignPsbtResponse,
+  type WalletProviderSignPsbtOptions,
 } from '../..'
+import { getSatsConnectNetwork } from '../../constants/networks'
 import {
   findOrdinalsAddress,
   findPaymentAddress,
@@ -31,30 +32,12 @@ import {
   isMainnetNetwork,
   isTestnetNetwork,
 } from '../../lib/helpers'
-import { getSatsConnectNetwork } from '../../constants/networks'
-import { listenKeys, MapStore, WritableAtom } from 'nanostores'
-import { persistentMap } from '@nanostores/persistent'
-import { fromOutputScript } from 'bitcoinjs-lib/src/address'
-import {
-  handleStateChangePersistence,
-  keysToPersist,
-  PersistedKey,
-} from '../utils'
+import { handleStateChangePersistence, keysToPersist, type PersistedKey } from '../utils'
+import { WalletProvider } from '.'
 
 const MAGIC_EDEN_WALLET_PERSISTENCE_KEY = 'MAGIC_EDEN_CONNECTED_WALLET_STATE'
 
 export default class MagicEdenProvider extends WalletProvider {
-  constructor(
-    stores: {
-      $store: MapStore<LaserEyesStoreType>
-      $network: WritableAtom<NetworkType>
-    },
-    parent: LaserEyesClient,
-    config?: Config
-  ) {
-    super(stores, parent, config)
-  }
-
   public get library(): any | undefined {
     return (window as any)?.magicEden?.bitcoin
   }
@@ -86,10 +69,7 @@ export default class MagicEdenProvider extends WalletProvider {
       }
       this.$store.setKey(key, vals[key])
     }
-    this.$store.setKey(
-      'accounts',
-      [vals.address, vals.paymentAddress].filter(Boolean)
-    )
+    this.$store.setKey('accounts', [vals.address, vals.paymentAddress].filter(Boolean))
   }
 
   watchStateChange(
@@ -97,12 +77,7 @@ export default class MagicEdenProvider extends WalletProvider {
     _: LaserEyesStoreType | undefined,
     changedKey: keyof LaserEyesStoreType | undefined
   ) {
-    handleStateChangePersistence(
-      MAGIC_EDEN,
-      newState,
-      changedKey,
-      this.$valueStore
-    )
+    handleStateChangePersistence(MAGIC_EDEN, newState, changedKey, this.$valueStore)
   }
 
   initialize(): void {
@@ -120,7 +95,7 @@ export default class MagicEdenProvider extends WalletProvider {
       this.observer.observe(document, { childList: true, subtree: true })
     }
 
-    listenKeys(this.$store, ['provider'], (newVal) => {
+    listenKeys(this.$store, ['provider'], newVal => {
       if (newVal.provider !== MAGIC_EDEN) {
         if (this.removeSubscriber) {
           this.$valueStore.set({
@@ -134,9 +109,7 @@ export default class MagicEdenProvider extends WalletProvider {
           this.removeSubscriber = undefined
         }
       } else {
-        this.removeSubscriber = this.$store.subscribe(
-          this.watchStateChange.bind(this)
-        )
+        this.removeSubscriber = this.$store.subscribe(this.watchStateChange.bind(this))
       }
     })
   }
@@ -146,63 +119,57 @@ export default class MagicEdenProvider extends WalletProvider {
   }
 
   async connect(): Promise<void> {
-    const { address, paymentAddress } = this.$valueStore!.get()
+    const { address, paymentAddress } = this.$valueStore?.get()
 
+    if (address) {
+      if (address.startsWith('tb1') && isMainnetNetwork(this.network)) {
+        this.disconnect()
+      } else {
+        getBTCBalance(paymentAddress, this.network).then(totalBalance => {
+          this.$store.setKey('balance', totalBalance)
+        })
+        this.restorePersistedValues()
+        return
+      }
+    }
 
-      if (address) {
-        if (address.startsWith('tb1') && isMainnetNetwork(this.network)) {
-          this.disconnect()
-        } else {
-          getBTCBalance(paymentAddress, this.network).then((totalBalance) => {
-            this.$store.setKey('balance', totalBalance)
-          })
-          this.restorePersistedValues()
-          return
+    if (isTestnetNetwork(this.network)) {
+      throw new Error(`${this.network} is not supported by ${MAGIC_EDEN}`)
+    }
+
+    const magicEdenNetwork = getSatsConnectNetwork(this.network || MAINNET)
+    const getAddressOptions = {
+      getProvider: async () => this.library,
+      payload: {
+        purposes: ['ordinals', 'payment'],
+        message: 'Connecting with lasereyes',
+        network: {
+          type: magicEdenNetwork as unknown as BitcoinNetworkType,
+        },
+      },
+      onFinish: (response: any) => {
+        const foundAddress = findOrdinalsAddress(response.addresses)
+        const foundPaymentAddress = findPaymentAddress(response.addresses)
+        if (!foundAddress || !foundPaymentAddress) throw new Error('No address found')
+        if (foundAddress && foundPaymentAddress) {
+          this.$store.setKey('address', foundAddress.address)
+          this.$store.setKey('paymentAddress', foundPaymentAddress.address)
+          this.$store.setKey(
+            'accounts',
+            response.addresses.map((address: { address: string }) => address.address)
+          )
         }
-      }
-
-      if (isTestnetNetwork(this.network)) {
-        throw new Error(`${this.network} is not supported by ${MAGIC_EDEN}`)
-      }
-
-      const magicEdenNetwork = getSatsConnectNetwork(this.network || MAINNET)
-      const getAddressOptions = {
-        getProvider: async () => this.library,
-        payload: {
-          purposes: ['ordinals', 'payment'],
-          message: 'Connecting with lasereyes',
-          network: {
-            type: magicEdenNetwork as unknown as BitcoinNetworkType,
-          },
-        },
-        onFinish: (response: any) => {
-          const foundAddress = findOrdinalsAddress(response.addresses)
-          const foundPaymentAddress = findPaymentAddress(response.addresses)
-          if (!foundAddress || !foundPaymentAddress)
-            throw new Error('No address found')
-          if (foundAddress && foundPaymentAddress) {
-            this.$store.setKey('address', foundAddress.address)
-            this.$store.setKey('paymentAddress', foundPaymentAddress.address)
-            this.$store.setKey('accounts', response.addresses.map((address: { address: string }) => address.address))
-          }
-          this.$store.setKey(
-            'publicKey',
-            String(response.addresses[0].publicKey)
-          )
-          this.$store.setKey(
-            'paymentPublicKey',
-            String(response.addresses[1].publicKey)
-          )
-        },
-        onCancel: () => {
-          throw new Error(`User canceled lasereyes to ${MAGIC_EDEN} wallet`)
-        },
-        onError: () => {
-          throw new Error(`Can't lasereyes to ${MAGIC_EDEN} wallet`)
-        },
-      }
-      await getAddress(getAddressOptions as GetAddressOptions)
-    
+        this.$store.setKey('publicKey', String(response.addresses[0].publicKey))
+        this.$store.setKey('paymentPublicKey', String(response.addresses[1].publicKey))
+      },
+      onCancel: () => {
+        throw new Error(`User canceled lasereyes to ${MAGIC_EDEN} wallet`)
+      },
+      onError: () => {
+        throw new Error(`Can't lasereyes to ${MAGIC_EDEN} wallet`)
+      },
+    }
+    await getAddress(getAddressOptions as GetAddressOptions)
   }
 
   async sendBTC(to: string, amount: number): Promise<string> {
@@ -211,9 +178,7 @@ export default class MagicEdenProvider extends WalletProvider {
       getProvider: async () => this.library,
       payload: {
         network: {
-          type: getSatsConnectNetwork(
-            this.network
-          ) as unknown as BitcoinNetworkType,
+          type: getSatsConnectNetwork(this.network) as unknown as BitcoinNetworkType,
         },
         recipients: [
           {
@@ -223,7 +188,7 @@ export default class MagicEdenProvider extends WalletProvider {
         ],
         senderAddress: this.$store.get().paymentAddress,
       },
-      onFinish: (response) => {
+      onFinish: response => {
         sendResponse = response as unknown as typeof sendResponse
       },
       onCancel: () => {
@@ -231,15 +196,11 @@ export default class MagicEdenProvider extends WalletProvider {
         throw new Error('User canceled the request')
       },
     } as SendBtcTransactionOptions)
-    if (!sendResponse || !sendResponse.txid)
-      throw new Error('Error sending BTC')
+    if (!sendResponse || !sendResponse.txid) throw new Error('Error sending BTC')
     return sendResponse.txid
   }
 
-  async signMessage(
-    message: string,
-    options?: SignMessageOptions
-  ): Promise<string> {
+  async signMessage(message: string, options?: SignMessageOptions): Promise<string> {
     const tempAddy = options?.toSignAddress || this.$store.get().paymentAddress
     let signedMessage: string = ''
 
@@ -256,7 +217,7 @@ export default class MagicEdenProvider extends WalletProvider {
             ? MessageSigningProtocols.ECDSA
             : MessageSigningProtocols.BIP322,
       },
-      onFinish: (response) => {
+      onFinish: response => {
         signedMessage = response
       },
       onCancel: () => {
@@ -295,12 +256,10 @@ export default class MagicEdenProvider extends WalletProvider {
         }),
         {}
       )
-      inputsToSign = Object.entries(tempInputsToSign).map(
-        ([address, indexes]) => ({
-          address,
-          signingIndexes: indexes,
-        })
-      )
+      inputsToSign = Object.entries(tempInputsToSign).map(([address, indexes]) => ({
+        address,
+        signingIndexes: indexes,
+      }))
     } else {
       const { address, paymentAddress } = this.$store.get()
       const ordinalAddressData: InputAddressData = {
@@ -318,10 +277,7 @@ export default class MagicEdenProvider extends WalletProvider {
           continue
         }
         const { script } = input.witnessUtxo!
-        const addressFromScript = fromOutputScript(
-          script,
-          getBitcoinNetwork(this.network)
-        )
+        const addressFromScript = fromOutputScript(script, getBitcoinNetwork(this.network))
 
         if (addressFromScript === paymentAddress) {
           paymentsAddressData.signingIndexes.push(Number(counter))

@@ -1,22 +1,18 @@
-import * as bitcoin from 'bitcoinjs-lib'
-import { ProviderType, NetworkType } from '../../types'
-import { createSendBtcPsbt } from '../../lib/helpers'
-import { TOKEO } from '../../constants/wallets'
-import { listenKeys, MapStore } from 'nanostores'
 import { persistentMap } from '@nanostores/persistent'
-import {
+import * as bitcoin from 'bitcoinjs-lib'
+import { listenKeys, type MapStore } from 'nanostores'
+import { MAINNET } from '../../constants/networks'
+import { TOKEO } from '../../constants/wallets'
+import { createSendBtcPsbt } from '../../lib/helpers'
+import { omitUndefined } from '../../lib/utils'
+import type { NetworkType, ProviderType } from '../../types'
+import type {
   LaserEyesStoreType,
   SignMessageOptions,
   WalletProviderSignPsbtOptions,
 } from '../types'
-import {
-  handleStateChangePersistence,
-  keysToPersist,
-  PersistedKey,
-} from '../utils'
-import { omitUndefined } from '../../lib/utils'
+import { handleStateChangePersistence, keysToPersist, type PersistedKey } from '../utils'
 import { WalletProvider } from '.'
-import { MAINNET } from '../../constants/networks'
 
 const TOKEO_WALLET_PERSISTENCE_KEY = 'TOKEO_CONNECTED_WALLET_STATE'
 
@@ -51,10 +47,7 @@ export default class TokeoProvider extends WalletProvider {
       }
       this.$store.setKey(key, vals[key])
     }
-    this.$store.setKey(
-      'accounts',
-      [vals.address, vals.paymentAddress].filter(Boolean)
-    )
+    this.$store.setKey('accounts', [vals.address, vals.paymentAddress].filter(Boolean))
   }
 
   watchStateChange(
@@ -78,7 +71,7 @@ export default class TokeoProvider extends WalletProvider {
       })
       this.observer.observe(document, { childList: true, subtree: true })
     }
-    listenKeys(this.$store, ['provider'], (newStore) => {
+    listenKeys(this.$store, ['provider'], newStore => {
       if (newStore.provider !== TOKEO) {
         if (this.removeSubscriber) {
           this.$valueStore.set({
@@ -92,9 +85,7 @@ export default class TokeoProvider extends WalletProvider {
           this.removeSubscriber = undefined
         }
       } else {
-        this.removeSubscriber = this.$store.subscribe(
-          this.watchStateChange.bind(this)
-        )
+        this.removeSubscriber = this.$store.subscribe(this.watchStateChange.bind(this))
       }
     })
   }
@@ -103,7 +94,7 @@ export default class TokeoProvider extends WalletProvider {
     this.observer?.disconnect()
   }
 
-  async connect(_: ProviderType): Promise<boolean | void> {
+  async connect(_: ProviderType): Promise<boolean | undefined> {
     try {
       if (!this.library) {
         if (this.isMobile()) {
@@ -126,26 +117,23 @@ export default class TokeoProvider extends WalletProvider {
         publicKey: string
       }>
 
-      if (!accounts || accounts.length === 0)
-        throw new Error('No accounts found')
-      const addressAccount = accounts.find((account) => account.type === 'p2tr')
-      const paymentAddressAccount = accounts.find(
-        (account) => account.type === 'p2wpkh'
-      )
+      if (!accounts || accounts.length === 0) throw new Error('No accounts found')
+      const addressAccount = accounts.find(account => account.type === 'p2tr')
+      const paymentAddressAccount = accounts.find(account => account.type === 'p2wpkh')
 
       if (!addressAccount) throw new Error('No p2tr address found')
 
       this.$store.setKey('address', addressAccount.address)
-      this.$store.setKey(
-        'paymentAddress',
-        paymentAddressAccount?.address ?? addressAccount.address
-      )
+      this.$store.setKey('paymentAddress', paymentAddressAccount?.address ?? addressAccount.address)
       this.$store.setKey('publicKey', addressAccount.publicKey)
       this.$store.setKey(
         'paymentPublicKey',
         paymentAddressAccount?.publicKey ?? addressAccount.publicKey
       )
-      this.$store.setKey('accounts', accounts.map((account) => account.address))
+      this.$store.setKey(
+        'accounts',
+        accounts.map(account => account.address)
+      )
     } catch (error) {
       console.error(error)
       throw error
@@ -178,10 +166,7 @@ export default class TokeoProvider extends WalletProvider {
     return psbt.txId
   }
 
-  async signMessage(
-    message: string,
-    options?: SignMessageOptions
-  ): Promise<string> {
+  async signMessage(message: string, options?: SignMessageOptions): Promise<string> {
     const signature = await this.library.signMessage(message, options?.protocol)
     return signature
   }
@@ -211,15 +196,12 @@ export default class TokeoProvider extends WalletProvider {
       }[]
     } = {
       autoFinalize: finalize,
-      inputs: inputsToSign?.map((input) => ({
+      inputs: inputsToSign?.map(input => ({
         index: input.index,
         address: input.address,
       })),
     }
-    const signedBase64Psbt = await this.library.signPsbt(
-      psbtBase64,
-      omitUndefined(options)
-    )
+    const signedBase64Psbt = await this.library.signPsbt(psbtBase64, omitUndefined(options))
     const psbtSignedPsbt = bitcoin.Psbt.fromBase64(signedBase64Psbt)
     let txid: string | undefined
     if (broadcast) {
@@ -246,6 +228,6 @@ export default class TokeoProvider extends WalletProvider {
       publicKey: string
     }>
 
-    return accounts.map((account) => account.address)
+    return accounts.map(account => account.address)
   }
 }

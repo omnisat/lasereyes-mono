@@ -1,38 +1,24 @@
-import { WALLET_NOT_INSTALLED_ERROR, WalletProvider } from '.'
+import * as bitcoin from 'bitcoinjs-lib'
+import { listenKeys } from 'nanostores'
 import {
-  NetworkType,
-  WizzBalanceResponse,
-  FRACTAL_TESTNET,
-  FRACTAL_MAINNET,
-  WIZZ,
-  SignMessageOptions,
   BIP322,
   BIP322_SIMPLE,
-  LaserEyesClient,
-  Config,
-  LaserEyesStoreType,
-  WalletProviderSignPsbtOptions,
+  FRACTAL_MAINNET,
+  FRACTAL_TESTNET,
+  type NetworkType,
+  type SignMessageOptions,
+  type WalletProviderSignPsbtOptions,
+  WIZZ,
+  type WizzBalanceResponse,
 } from '../..'
-import * as bitcoin from 'bitcoinjs-lib'
-import { listenKeys, MapStore, WritableAtom } from 'nanostores'
 import { getNetworkForWizz } from '../../constants/networks'
-import { WizzNetwork } from '../../types/network'
 import { normalizeInscription } from '../../lib/data-sources/normalizations'
-import { UnisatInscription } from './unisat'
 import { omitUndefined } from '../../lib/utils'
+import { WizzNetwork } from '../../types/network'
+import { WALLET_NOT_INSTALLED_ERROR, WalletProvider } from '.'
+import type { UnisatInscription } from './unisat'
 
 export class WizzProvider extends WalletProvider {
-  constructor(
-    stores: {
-      $store: MapStore<LaserEyesStoreType>
-      $network: WritableAtom<NetworkType>
-    },
-    parent: LaserEyesClient,
-    config?: Config
-  ) {
-    super(stores, parent, config)
-  }
-
   public get library(): any | undefined {
     return (window as any).wizz
   }
@@ -61,7 +47,7 @@ export class WizzProvider extends WalletProvider {
   }
 
   initialize(): void {
-    listenKeys(this.$store, ['provider'], (value) => {
+    listenKeys(this.$store, ['provider'], value => {
       if (value.provider === WIZZ) {
         this.addLibraryListeners()
       } else {
@@ -84,14 +70,8 @@ export class WizzProvider extends WalletProvider {
   }
   private removeLibraryListeners() {
     if (!this.library || !this.library.removeListener) return
-    this.library?.removeListener(
-      'networkChanged',
-      this.handleNetworkChanged.bind(this)
-    )
-    this.library?.removeListener(
-      'accountsChanged',
-      this.handleAccountsChanged.bind(this)
-    )
+    this.library?.removeListener('networkChanged', this.handleNetworkChanged.bind(this))
+    this.library?.removeListener('accountsChanged', this.handleAccountsChanged.bind(this))
   }
 
   private addLibraryListeners() {
@@ -114,7 +94,7 @@ export class WizzProvider extends WalletProvider {
     this.$store.setKey('paymentAddress', wizzAccounts[0])
     this.$store.setKey('publicKey', wizzPubKey)
     this.$store.setKey('paymentPublicKey', wizzPubKey)
-    await this.getNetwork().then((network) => {
+    await this.getNetwork().then(network => {
       if (network && this.config?.network !== network) {
         this.parent.switchNetwork(network)
       }
@@ -169,12 +149,8 @@ export class WizzProvider extends WalletProvider {
     }
   }
 
-  async signMessage(
-    message: string,
-    options?: SignMessageOptions
-  ): Promise<string> {
-    const protocol =
-      options?.protocol === BIP322 ? BIP322_SIMPLE : options?.protocol
+  async signMessage(message: string, options?: SignMessageOptions): Promise<string> {
+    const protocol = options?.protocol === BIP322 ? BIP322_SIMPLE : options?.protocol
     return await this.library?.signMessage(message, protocol)
   }
 

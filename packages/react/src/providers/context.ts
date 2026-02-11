@@ -1,12 +1,12 @@
 import {
   createStores,
-  LaserEyesClient,
-  LaserEyesStoreType,
-  NetworkType,
+  type LaserEyesClient,
+  type LaserEyesStoreType,
+  type NetworkType,
 } from '@omnisat/lasereyes-core'
+import type { MapStore, WritableAtom } from 'nanostores'
 import { createContext } from 'react'
-import { LaserEyesContextType } from './types'
-import { MapStore, WritableAtom } from 'nanostores'
+import type { LaserEyesContextType } from './types'
 
 const { $store, $network } = createStores()
 export const defaultMethods = {

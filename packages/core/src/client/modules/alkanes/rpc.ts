@@ -1,8 +1,8 @@
-import asyncPool from 'tiny-async-pool'
-import * as alkanes_rpc from 'alkanes/lib/rpc'
-import type { AlkaneSimulateRequest, AlkaneToken } from './types'
-import type { AlkanesOutpoint } from '../../../types'
 import type { AlkanesResponse } from '@oyl/sdk/lib/rpclient/alkanes'
+import * as alkanes_rpc from 'alkanes/lib/rpc'
+import asyncPool from 'tiny-async-pool'
+import type { AlkanesOutpoint } from '../../../types'
+import type { AlkaneSimulateRequest, AlkaneToken } from './types'
 
 export class MetashrewOverride {
   public override: any
@@ -22,8 +22,7 @@ export class MetashrewOverride {
 
 export const metashrew = new MetashrewOverride()
 
-export const stripHexPrefix = (s: string): string =>
-  s.substr(0, 2) === '0x' ? s.substr(2) : s
+export const stripHexPrefix = (s: string): string => (s.substr(0, 2) === '0x' ? s.substr(2) : s)
 
 let id = 0
 
@@ -31,11 +30,11 @@ let id = 0
 export function mapToPrimitives(v: any): any {
   switch (typeof v) {
     case 'bigint':
-      return '0x' + v.toString(16)
+      return `0x${v.toString(16)}`
     case 'object':
       if (v === null) return null
-      if (Buffer.isBuffer(v)) return '0x' + v.toString('hex')
-      if (Array.isArray(v)) return v.map((v) => mapToPrimitives(v))
+      if (Buffer.isBuffer(v)) return `0x${v.toString('hex')}`
+      if (Array.isArray(v)) return v.map(v => mapToPrimitives(v))
       return Object.fromEntries(
         Object.entries(v).map(([key, value]) => [key, mapToPrimitives(value)])
       )
@@ -48,42 +47,23 @@ export function mapToPrimitives(v: any): any {
 export function unmapFromPrimitives(v: any): any {
   switch (typeof v) {
     case 'string':
-      if (v !== '0x' && !isNaN(v as any)) return BigInt(v)
+      if (v !== '0x' && !Number.isNaN(v as any)) return BigInt(v)
       if (v.substr(0, 2) === '0x' || /^[0-9a-f]+$/.test(v))
         return Buffer.from(stripHexPrefix(v), 'hex')
       return v
     case 'object':
       if (v === null) return null
-      if (Array.isArray(v)) return v.map((item) => unmapFromPrimitives(item))
+      if (Array.isArray(v)) return v.map(item => unmapFromPrimitives(item))
       return Object.fromEntries(
-        Object.entries(v).map(([key, value]) => [
-          key,
-          unmapFromPrimitives(value),
-        ])
+        Object.entries(v).map(([key, value]) => [key, unmapFromPrimitives(value)])
       )
     default:
       return v
   }
 }
 
-const opcodes = [
-  '99',
-  '100',
-  '101',
-  '102',
-  '103',
-  '104',
-  '1000',
-]
-const opcodesHRV = [
-  'name',
-  'symbol',
-  'totalSupply',
-  'cap',
-  'minted',
-  'mintAmount',
-  'data',
-] as const
+const opcodes = ['99', '100', '101', '102', '103', '104', '1000']
+const opcodesHRV = ['name', 'symbol', 'totalSupply', 'cap', 'minted', 'mintAmount', 'data'] as const
 
 export class AlkanesRpc {
   public alkanesUrl: string
@@ -93,11 +73,7 @@ export class AlkanesRpc {
   }
   async _metashrewCall(method: string, params: any[] = []) {
     const rpc = new alkanes_rpc.AlkanesRpc({ baseUrl: metashrew.get() }) as any
-    return mapToPrimitives(
-      await rpc[method.split('_')[1]](
-        unmapFromPrimitives(params[0] || {})
-      )
-    )
+    return mapToPrimitives(await rpc[method.split('_')[1]](unmapFromPrimitives(params[0] || {})))
   }
   async _call(method: string, params: any[] = []) {
     if (metashrew.get() !== null && method.match('alkanes_')) {
@@ -141,13 +117,7 @@ export class AlkanesRpc {
     return (await this._call('metashrew_height', [])) as AlkanesResponse
   }
 
-  async getAlkanesByHeight({
-    height,
-    protocolTag = '1',
-  }: {
-    height: number
-    protocolTag: string
-  }) {
+  async getAlkanesByHeight({ height, protocolTag = '1' }: { height: number; protocolTag: string }) {
     return (await this._call('alkanes_protorunesbyheight', [
       {
         height,
@@ -165,24 +135,22 @@ export class AlkanesRpc {
     name?: string
   }): Promise<AlkanesOutpoint[]> {
     try {
-      const ret = await this._call('alkanes_protorunesbyaddress', [
+      const ret = (await this._call('alkanes_protorunesbyaddress', [
         {
           address,
           protocolTag,
         },
-      ]) as AlkanesResponse
+      ])) as AlkanesResponse
 
       const alkanesList = ret.outpoints
-        .filter((outpoint) => outpoint.runes.length > 0)
-        .map((outpoint) => ({
+        .filter(outpoint => outpoint.runes.length > 0)
+        .map(outpoint => ({
           ...outpoint,
           outpoint: {
             vout: outpoint.outpoint.vout,
-            txid: Buffer.from(outpoint.outpoint.txid, 'hex')
-              .reverse()
-              .toString('hex'),
+            txid: Buffer.from(outpoint.outpoint.txid, 'hex').reverse().toString('hex'),
           },
-          runes: outpoint.runes.map((rune) => ({
+          runes: outpoint.runes.map(rune => ({
             ...rune,
             balance: parseInt(rune.balance, 16).toString(),
             rune: {
@@ -216,9 +184,7 @@ export class AlkanesRpc {
       }
       // Ensure the input length is a multiple of 32 hex chars (128-bit each)
       if (hexString.length % 32 !== 0) {
-        throw new Error(
-          'Invalid hex length. Expected multiples of 128-bit (32 hex chars).'
-        )
+        throw new Error('Invalid hex length. Expected multiples of 128-bit (32 hex chars).')
       }
       // Function to convert a single 128-bit segment
       const convertSegment = (segment: string): bigint => {
@@ -226,12 +192,12 @@ export class AlkanesRpc {
         if (!littleEndianHex) {
           throw new Error('Failed to process hex segment.')
         }
-        return BigInt('0x' + littleEndianHex)
+        return BigInt(`0x${littleEndianHex}`)
       }
       // Split into 128-bit (32 hex character) chunks
       const chunks = hexString.match(/.{32}/g) || []
       const parsedValues = chunks.map(convertSegment)
-      return parsedValues.map((num) => num.toString())
+      return parsedValues.map(num => num.toString())
     }
     // Parse the data
     const parsedData = parseLittleEndian(hexData)
@@ -293,14 +259,14 @@ export class AlkanesRpc {
     protocolTag?: string
     height?: string
   }): Promise<any> {
-    const alkaneList = await this._call('alkanes_protorunesbyoutpoint', [
+    const alkaneList = (await this._call('alkanes_protorunesbyoutpoint', [
       {
         txid: Buffer.from(txid, 'hex').reverse().toString('hex'),
         vout,
         protocolTag,
       },
       height,
-    ]) as any
+    ])) as any
 
     return alkaneList.map((outpoint: any) => ({
       ...outpoint,
@@ -315,13 +281,7 @@ export class AlkanesRpc {
     }))
   }
 
-  async getAlkaneById({
-    block,
-    tx,
-  }: {
-    block: string
-    tx: string
-  }): Promise<AlkaneToken> {
+  async getAlkaneById({ block, tx }: { block: string; tx: string }): Promise<AlkaneToken> {
     const alkaneData: AlkaneToken = {
       id: {
         block,
@@ -355,19 +315,12 @@ export class AlkanesRpc {
         if (result.status === 0) {
           // @ts-expect-error const array can't be indexed
           alkaneData[opcodesHRV[j]] = Number(result.parsed?.le || 0)
-          if (
-            opcodesHRV[j] === 'name' ||
-            opcodesHRV[j] === 'symbol' ||
-            opcodesHRV[j] === 'data'
-          ) {
+          if (opcodesHRV[j] === 'name' || opcodesHRV[j] === 'symbol' || opcodesHRV[j] === 'data') {
             // @ts-expect-error const array can't be indexed
             alkaneData[opcodesHRV[j]] = result.parsed?.string || ''
           }
-          alkaneData.mintActive =
-            Number(alkaneData.minted) < Number(alkaneData.cap)
-          alkaneData.percentageMinted = Math.floor(
-            (alkaneData.minted / alkaneData.cap) * 100
-          )
+          alkaneData.mintActive = Number(alkaneData.minted) < Number(alkaneData.cap)
+          alkaneData.percentageMinted = Math.floor((alkaneData.minted / alkaneData.cap) * 100)
         }
       } catch (error) {
         console.log(error)
@@ -383,16 +336,12 @@ export class AlkanesRpc {
     offset?: number
   }): Promise<AlkaneToken[]> {
     if (limit > 1000) {
-      throw new Error(
-        'Max limit reached. Request fewer than 1000 alkanes per call'
-      )
+      throw new Error('Max limit reached. Request fewer than 1000 alkanes per call')
     }
 
     const indices = Array.from({ length: limit }, (_, i) => i + offset)
 
-    const processAlkane = async (
-      index: number
-    ): Promise<AlkaneToken | null> => {
+    const processAlkane = async (index: number): Promise<AlkaneToken | null> => {
       const alkaneData: any = {
         id: {
           block: '2',
@@ -401,7 +350,7 @@ export class AlkanesRpc {
       }
 
       let hasValidResult = false
-      const validOpcodes = opcodes.filter((opcode) => opcode !== undefined)
+      const validOpcodes = opcodes.filter(opcode => opcode !== undefined)
 
       try {
         const opcodeResults = await Promise.all(
@@ -430,7 +379,7 @@ export class AlkanesRpc {
                   opcodeHRV: opcodesHRV[opcodeIndex],
                 }
               }
-            } catch (error) {
+            } catch (_error) {
               return null
             }
           })
@@ -445,11 +394,7 @@ export class AlkanesRpc {
             opcodeIndex: number
             opcodeHRV: (typeof opcodesHRV)[number]
           } => {
-            return (
-              item !== null &&
-              item !== undefined &&
-              item.opcodeHRV !== undefined
-            )
+            return item !== null && item !== undefined && item.opcodeHRV !== undefined
           }
         )
 
@@ -465,8 +410,7 @@ export class AlkanesRpc {
         })
 
         if (hasValidResult) {
-          alkaneData.mintActive =
-            Number(alkaneData.minted || 0) < Number(alkaneData.cap || 0)
+          alkaneData.mintActive = Number(alkaneData.minted || 0) < Number(alkaneData.cap || 0)
           alkaneData.percentageMinted = Math.floor(
             ((alkaneData.minted || 0) / (alkaneData.cap || 1)) * 100
           )
@@ -512,7 +456,7 @@ export class AlkanesRpc {
       return undefined
     }
     const stripHexPrefix = (v: string) => (v.startsWith('0x') ? v.slice(2) : v)
-    const addHexPrefix = (v: string) => '0x' + stripHexPrefix(v)
+    const addHexPrefix = (v: string) => `0x${stripHexPrefix(v)}`
 
     let decodedString: string
     try {
@@ -520,7 +464,7 @@ export class AlkanesRpc {
       if (/[\uFFFD]/.test(decodedString)) {
         throw new Error('Invalid UTF-8 string')
       }
-    } catch (err) {
+    } catch (_err) {
       decodedString = addHexPrefix(v)
     }
 
@@ -529,9 +473,7 @@ export class AlkanesRpc {
       bytes: addHexPrefix(v),
       le: BigInt(
         addHexPrefix(
-          Buffer.from(
-            Array.from(Buffer.from(stripHexPrefix(v), 'hex')).reverse()
-          ).toString('hex')
+          Buffer.from(Array.from(Buffer.from(stripHexPrefix(v), 'hex')).reverse()).toString('hex')
         )
       ).toString(),
       be: BigInt(addHexPrefix(v)).toString(),

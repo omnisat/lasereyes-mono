@@ -1,6 +1,6 @@
-import ConnectWalletButton from "./components/connection-modal/ConnectButton"
-import ConnectWalletModal from "./components/connection-modal/ConnectModal"
-import ThemeControls from "./components/ThemeControls"
+import ConnectWalletButton from './components/connection-modal/ConnectButton'
+import ConnectWalletModal from './components/connection-modal/ConnectModal'
+import ThemeControls from './components/ThemeControls'
 import {
   Select,
   SelectContent,
@@ -12,12 +12,12 @@ import {
   SelectSeparator,
   SelectTrigger,
   SelectValue,
-} from "./components/ui/select"
-import AccountInfo from "./components/user-profile/AccountInfo"
-import { useTheme } from "./hooks"
-import { useLaserEyesModal } from "./providers/LaserEyesModalContext"
-import { LaserEyesModalProvider } from "./providers/LaserEyesModalProvider"
-import { ThemeProvider } from "./providers/ThemeProvider"
+} from './components/ui/select'
+import AccountInfo from './components/user-profile/AccountInfo'
+import { useTheme } from './hooks'
+import { useLaserEyesModal } from './providers/LaserEyesModalContext'
+import { LaserEyesModalProvider } from './providers/LaserEyesModalProvider'
+import { ThemeProvider } from './providers/ThemeProvider'
 
 export {
   ConnectWalletModal,
@@ -53,7 +53,7 @@ export {
   parseColorToHsl,
   rgbToHsl,
   setPrimaryColor,
-} from "./lib/theme-utils"
+} from './lib/theme-utils'
 // Export types for theme configuration
 export type {
   DarkModeStrategy,
@@ -62,4 +62,4 @@ export type {
   ThemeConfig,
   ThemeContextValue,
   ThemeState,
-} from "./types/theme"
+} from './types/theme'

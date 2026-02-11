@@ -14,10 +14,9 @@ const BRC20Section = () => {
   const [brc20ToAddress, setBrc20ToAddress] = useState('')
   const [brc20Amount, setBrc20Amount] = useState('')
 
-
   useEffect(() => {
     if (address && connected && network) {
-      getMetaBalances('brc20').then((v) => setBrc20s(v as Brc20Balance[]))
+      getMetaBalances('brc20').then(v => setBrc20s(v as Brc20Balance[]))
     }
   }, [address, getMetaBalances, connected, network])
 
@@ -40,11 +39,10 @@ const BRC20Section = () => {
         <span className={'flex flex-col gap-1 items-center justify-center'}>
           <span className={'font-black'}>View on mempool.space</span>
           <a
-            target='_blank'
-            href={`${getMempoolSpaceUrl(
-              network as typeof MAINNET | typeof TESTNET
-            )}/tx/${txid}`}
-            className={'underline text-blue-600 text-xs'} rel="noreferrer"
+            target="_blank"
+            href={`${getMempoolSpaceUrl(network as typeof MAINNET | typeof TESTNET)}/tx/${txid}`}
+            className={'underline text-blue-600 text-xs'}
+            rel="noreferrer"
           >
             {txid}
           </a>
@@ -61,7 +59,7 @@ const BRC20Section = () => {
     <div className="flex flex-col gap-2">
       <div className="text-md text-orange-400">brc-20</div>
       <Select
-        onValueChange={(value) => {
+        onValueChange={value => {
           const brc20 = brc20s?.find((r: Brc20Balance) => r.ticker === value)
           setSelectedBrc20(brc20)
         }}
@@ -77,7 +75,7 @@ const BRC20Section = () => {
           <SelectValue placeholder="Select a BRC-20" />
         </SelectTrigger>
         <SelectContent>
-          {brc20s?.map((token) => (
+          {brc20s?.map(token => (
             <SelectItem key={token.ticker} value={token.ticker}>
               {token.ticker} ({Number.parseFloat(token.overall)})
             </SelectItem>
@@ -86,34 +84,21 @@ const BRC20Section = () => {
       </Select>
       <Input
         disabled={!provider || brc20s.length === 0}
-        className={cn(
-          'w-full bg-[#232225] border-none disabled:text-[#737275] text-center'
-        )}
+        className={cn('w-full bg-[#232225] border-none disabled:text-[#737275] text-center')}
         placeholder="To Address"
         value={brc20ToAddress}
-        onChange={(e) => setBrc20ToAddress(e.target.value)}
+        onChange={e => setBrc20ToAddress(e.target.value)}
       />
       <Input
-        disabled={
-          !provider ||
-          !selectedBrc20 ||
-          !brc20ToAddress
-        }
+        disabled={!provider || !selectedBrc20 || !brc20ToAddress}
         type="number"
-        className={cn(
-          'w-full bg-[#232225] border-none disabled:text-[#737275] text-center'
-        )}
+        className={cn('w-full bg-[#232225] border-none disabled:text-[#737275] text-center')}
         placeholder="Amount"
         value={brc20Amount}
-        onChange={(e) => setBrc20Amount(e.target.value)}
+        onChange={e => setBrc20Amount(e.target.value)}
       />
       <Button
-        disabled={
-          !provider ||
-          !selectedBrc20 ||
-          !brc20ToAddress ||
-          !brc20Amount
-        }
+        disabled={!provider || !selectedBrc20 || !brc20ToAddress || !brc20Amount}
         className={'w-full bg-[#232225] disabled:text-[#737275]'}
         onClick={sendBrc20}
       >

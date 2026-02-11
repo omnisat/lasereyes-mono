@@ -1,17 +1,17 @@
 import * as bitcoin from 'bitcoinjs-lib'
-import { WalletProvider } from '.'
 import {
   BINANCE,
   BIP322,
   BIP322_SIMPLE,
   getBinanceNetwork,
   getNetworkForBinance,
-  NetworkType,
-  ProviderType,
-  SignMessageOptions,
-  WalletProviderSignPsbtOptions,
+  type NetworkType,
+  type ProviderType,
+  type SignMessageOptions,
+  type WalletProviderSignPsbtOptions,
 } from '../..'
 import { omitUndefined } from '../../lib/utils'
+import { WalletProvider } from '.'
 
 // Binance Bitcoin provider documentation
 // https://developers.binance.com/docs/binance-w3w/bitcoin-provider
@@ -62,14 +62,8 @@ export default class BinanceProvider extends WalletProvider {
 
   removeListeners() {
     if (!this.library || !this.library.removeListener) return
-    this.library?.removeListener(
-      'accountsChanged',
-      this.handleAccountsChanged.bind(this)
-    )
-    this.library?.removeListener(
-      'networkChanged',
-      this.handleNetworkChanged.bind(this)
-    )
+    this.library?.removeListener('accountsChanged', this.handleAccountsChanged.bind(this))
+    this.library?.removeListener('networkChanged', this.handleNetworkChanged.bind(this))
   }
 
   dispose() {
@@ -105,12 +99,8 @@ export default class BinanceProvider extends WalletProvider {
     throw new Error('Not implemented')
   }
 
-  override async signMessage(
-    message: string,
-    options?: SignMessageOptions
-  ): Promise<string> {
-    const protocol =
-      options?.protocol === BIP322 ? BIP322_SIMPLE : options?.protocol
+  override async signMessage(message: string, options?: SignMessageOptions): Promise<string> {
+    const protocol = options?.protocol === BIP322 ? BIP322_SIMPLE : options?.protocol
     return await this.library?.signMessage(message, protocol)
   }
 

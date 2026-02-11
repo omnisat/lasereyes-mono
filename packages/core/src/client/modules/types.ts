@@ -1,1 +1,1 @@
-export * from "./alkanes/types"
+export * from './alkanes/types'

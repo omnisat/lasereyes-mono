@@ -1,11 +1,17 @@
-import { useState, useEffect } from 'react'
-import { Button } from './ui/button'
-import { Input } from '@/components/ui/input'
-import { cn } from '@/lib/utils'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
+import {
+  type MAINNET,
+  type OrdRuneBalance,
+  type RuneSendArgs,
+  type TESTNET,
+  useLaserEyes,
+} from '@omnisat/lasereyes'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
+import { Input } from '@/components/ui/input'
 import { getMempoolSpaceUrl } from '@/lib/urls'
-import { type MAINNET, type RuneSendArgs, type TESTNET, useLaserEyes, type OrdRuneBalance } from '@omnisat/lasereyes'
+import { cn } from '@/lib/utils'
+import { Button } from './ui/button'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
 
 const RunesSection = () => {
   const { provider, address, send, network, getMetaBalances, connected } = useLaserEyes()
@@ -17,7 +23,7 @@ const RunesSection = () => {
 
   useEffect(() => {
     if (address && connected && network) {
-      getMetaBalances('runes').then((x) => setRunes(x as OrdRuneBalance[]))
+      getMetaBalances('runes').then(x => setRunes(x as OrdRuneBalance[]))
     }
   }, [address, getMetaBalances, connected, network])
 
@@ -39,11 +45,10 @@ const RunesSection = () => {
         <span className={'flex flex-col gap-1 items-center justify-center'}>
           <span className={'font-black'}>View on mempool.space</span>
           <a
-            target='_blank'
-            href={`${getMempoolSpaceUrl(
-              network as typeof MAINNET | typeof TESTNET
-            )}/tx/${txid}`}
-            className={'underline text-blue-600 text-xs'} rel="noreferrer"
+            target="_blank"
+            href={`${getMempoolSpaceUrl(network as typeof MAINNET | typeof TESTNET)}/tx/${txid}`}
+            className={'underline text-blue-600 text-xs'}
+            rel="noreferrer"
           >
             {txid}
           </a>
@@ -60,8 +65,8 @@ const RunesSection = () => {
     <div className="flex flex-col gap-2">
       <div className="text-md text-orange-400">runes</div>
       <Select
-        onValueChange={(value) => {
-          const rune = runes?.find((r) => r.symbol === value)
+        onValueChange={value => {
+          const rune = runes?.find(r => r.symbol === value)
           setSelectedRune(rune)
         }}
         disabled={!provider || runes.length === 0}
@@ -73,10 +78,12 @@ const RunesSection = () => {
             'min-w-[200px]'
           )}
         >
-          <SelectValue placeholder={runes.length === 0 ? "No runes found" : "Select rune to send"} />
+          <SelectValue
+            placeholder={runes.length === 0 ? 'No runes found' : 'Select rune to send'}
+          />
         </SelectTrigger>
         <SelectContent>
-          {runes?.map((rune) => (
+          {runes?.map(rune => (
             <SelectItem key={rune.symbol} value={rune.symbol}>
               {rune.name} ({rune.balance})
             </SelectItem>
@@ -85,34 +92,21 @@ const RunesSection = () => {
       </Select>
       <Input
         disabled={!provider || runes.length === 0}
-        className={cn(
-          'w-full bg-[#232225] border-none disabled:text-[#737275] text-center'
-        )}
+        className={cn('w-full bg-[#232225] border-none disabled:text-[#737275] text-center')}
         placeholder="To Address"
         value={runeToAddress}
-        onChange={(e) => setRuneToAddress(e.target.value)}
+        onChange={e => setRuneToAddress(e.target.value)}
       />
       <Input
-        disabled={
-          !provider ||
-          !selectedRune ||
-          !runeToAddress
-        }
+        disabled={!provider || !selectedRune || !runeToAddress}
         type="number"
-        className={cn(
-          'w-full bg-[#232225] border-none disabled:text-[#737275] text-center'
-        )}
+        className={cn('w-full bg-[#232225] border-none disabled:text-[#737275] text-center')}
         placeholder="Amount"
         value={runeAmount}
-        onChange={(e) => setRuneAmount(e.target.value)}
+        onChange={e => setRuneAmount(e.target.value)}
       />
       <Button
-        disabled={
-          !provider ||
-          !selectedRune ||
-          !runeToAddress ||
-          !runeAmount
-        }
+        disabled={!provider || !selectedRune || !runeToAddress || !runeAmount}
         className={'w-full bg-[#232225] disabled:text-[#737275]'}
         onClick={sendRune}
       >
