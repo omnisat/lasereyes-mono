@@ -18,7 +18,7 @@ describe('createChainDataSource', () => {
       group: 'base',
       methods: {
         getBalance: async (_address: string) => '100',
-        getUtxos: async (_address: string) => [],
+        getUtxos: async (_address: string) => ({ data: [] }),
       },
     }))
 

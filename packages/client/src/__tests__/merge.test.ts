@@ -72,7 +72,7 @@ describe('mergeDataSources', () => {
       group: 'base',
       methods: {
         getBalance: async () => '0',
-        getUtxos: async () => [],
+        getUtxos: async () => ({ data: [] }),
       },
     }))
 

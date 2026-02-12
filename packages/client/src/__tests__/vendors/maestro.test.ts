@@ -98,11 +98,11 @@ describe('maestro vendor', () => {
         }),
       })
 
-      const balances = await methods.getAddressBrc20Balances('bc1qtest')
-      expect(balances).toHaveLength(2)
-      expect(balances[0].ticker).toBe('ordi')
-      expect(balances[0].overall).toBe('1000')
-      expect(balances[0].available).toBe('800')
+      const result = await methods.getAddressBrc20Balances('bc1qtest')
+      expect(result.data).toHaveLength(2)
+      expect(result.data[0].ticker).toBe('ordi')
+      expect(result.data[0].overall).toBe('1000')
+      expect(result.data[0].available).toBe('800')
     })
   })
 

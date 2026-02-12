@@ -169,7 +169,9 @@ export default class SparrowProvider extends WalletProvider {
   }
 
   async signMessage(message: string): Promise<string> {
-    return await this.library?.signMessage(message)
+    const signed = await this.library?.signMessage(message)
+    if (!signed) throw new Error('Failed to sign message')
+    return signed
   }
 
   async signPsbt({ psbtBase64, broadcast, finalize }: WalletProviderSignPsbtOptions): Promise<
@@ -182,6 +184,7 @@ export default class SparrowProvider extends WalletProvider {
   > {
     const preSigned = bitcoin.Psbt.fromBase64(psbtBase64)
     const signedPsbt = await this.library?.signPsbt(psbtBase64)
+    if (!signedPsbt) throw new Error('Failed to sign PSBT')
 
     if (finalize && broadcast) {
       const txId = await this.pushPsbt(signedPsbt)
@@ -201,6 +204,7 @@ export default class SparrowProvider extends WalletProvider {
 
   async getPublicKey() {
     const publicKey = await this.library?.getPublicKey()
+    if (!publicKey) throw new Error('No public key found')
     this.$store.setKey('publicKey', publicKey)
     return publicKey
   }

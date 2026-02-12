@@ -5,6 +5,8 @@ import type {
   CapabilityGroup,
   DataSourceContext,
   FeeEstimate,
+  PaginatedResult,
+  PaginationParams,
   Transaction,
   UTXO,
 } from '../../types'
@@ -74,7 +76,10 @@ export function baseCapabilities(
         return (resp as { data: string }).data
       },
 
-      async getUtxos(_address: string): Promise<UTXO[]> {
+      async getUtxos(
+        _address: string,
+        _pagination?: PaginationParams
+      ): Promise<PaginatedResult<UTXO>> {
         // Maestro doesn't natively expose a mempool-compatible UTXO endpoint
         // This is a partial implementation; callers should prefer mempool for UTXOs
         throw new DataSourceError('getUtxos is not supported by Maestro data source', 'maestro')

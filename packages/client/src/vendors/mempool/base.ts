@@ -15,6 +15,8 @@ import type {
   CapabilityGroup,
   DataSourceContext,
   FeeEstimate,
+  PaginatedResult,
+  PaginationParams,
   Transaction,
   UTXO,
 } from '../../types'
@@ -74,20 +76,24 @@ export function baseCapabilities(
 
     const methods: BaseCapability = {
       async getBalance(address: string): Promise<string> {
-        const utxos = await methods.getUtxos(address)
+        const { data: utxos } = await methods.getUtxos(address)
         return utxos.reduce((acc, utxo) => acc + BigInt(utxo.value), 0n).toString()
       },
 
-      async getUtxos(address: string): Promise<UTXO[]> {
+      async getUtxos(
+        address: string,
+        _pagination?: PaginationParams
+      ): Promise<PaginatedResult<UTXO>> {
         if (address.startsWith('bcrt')) {
-          return []
+          return { data: [] }
         }
-        const data = await call('get', `/api/address/${address}/utxo`)
+        const raw = await call('get', `/api/address/${address}/utxo`)
         const scriptPk = getAddressScriptPubKey(address, ctx.network)
-        return (data as UTXO[]).map(utxo => ({
+        const mapped = (raw as UTXO[]).map(utxo => ({
           ...utxo,
           scriptPk: bytesToHex(scriptPk),
         })) as UTXO[]
+        return { data: mapped }
       },
 
       async getTransaction(txId: string): Promise<Transaction> {

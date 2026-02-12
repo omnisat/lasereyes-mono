@@ -3,7 +3,15 @@ import { Address, OutScript, Transaction as PsbtTransaction } from '@scure/btc-s
 import { InsufficientFundsError, PsbtBuildError } from '../errors'
 import { getAddressType, getRedeemScript } from '../lib/btc'
 import { estimateTxSize, getBitcoinNetwork } from '../lib/helpers'
-import type { BaseCapability, Client, FeeEstimate, PsbtResult, Transaction, UTXO } from '../types'
+import type {
+  BaseCapability,
+  Client,
+  FeeEstimate,
+  PaginatedResult,
+  PsbtResult,
+  Transaction,
+  UTXO,
+} from '../types'
 import { AddressType } from '../types/psbt'
 
 export interface SendBtcParams {
@@ -17,7 +25,7 @@ export interface SendBtcParams {
 
 export interface BtcActions {
   getBalance(address: string): Promise<string>
-  getUtxos(address: string): Promise<UTXO[]>
+  getUtxos(address: string): Promise<PaginatedResult<UTXO>>
   getRecommendedFees(): Promise<FeeEstimate>
   getTransaction(txId: string): Promise<Transaction>
   broadcastTransaction(rawTx: string): Promise<string>
@@ -55,7 +63,7 @@ export function btcActions() {
         const network = client.network
         const btcNetwork = getBitcoinNetwork(network)
 
-        const utxos = await ds.getUtxos(paymentAddress)
+        const { data: utxos } = await ds.getUtxos(paymentAddress)
         if (!utxos || utxos.length === 0) {
           throw new PsbtBuildError('No UTXOs found for payment address')
         }

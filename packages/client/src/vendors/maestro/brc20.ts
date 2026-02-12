@@ -6,6 +6,8 @@ import type {
   Brc20Info,
   CapabilityGroup,
   DataSourceContext,
+  PaginatedResult,
+  PaginationParams,
 } from '../../types'
 import { BaseNetwork } from '../../types/network'
 import type { MaestroConfig } from './config'
@@ -41,7 +43,10 @@ export function brc20Capabilities(
     const { apiUrl, apiKey } = resolveUrlAndKey(ctx.network, vendorConfig)
 
     const methods: Brc20Capability = {
-      async getAddressBrc20Balances(address: string): Promise<Brc20Balance[]> {
+      async getAddressBrc20Balances(
+        address: string,
+        _pagination?: PaginationParams
+      ): Promise<PaginatedResult<Brc20Balance>> {
         const resp = await maestroGet(apiUrl, apiKey, `/addresses/${address}/brc20`)
         const data = (
           resp as {
@@ -49,12 +54,16 @@ export function brc20Capabilities(
           }
         ).data
 
-        return Object.entries(data).map(([ticker, balance]) => ({
-          ticker,
-          overall: balance.total,
-          transferable: '0',
-          available: balance.available,
-        }))
+        return {
+          data: Object.entries(data)
+            .map(([ticker, balance]) => ({
+              ticker,
+              overall: balance.total,
+              transferable: '0',
+              available: balance.available,
+            }))
+            .slice(Number(_pagination?.cursor || 0)),
+        }
       },
 
       async getBrc20ByTicker(ticker: string): Promise<Brc20Info> {

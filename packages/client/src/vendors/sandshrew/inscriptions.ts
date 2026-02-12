@@ -5,6 +5,8 @@ import type {
   Inscription,
   InscriptionCapability,
   InscriptionInfo,
+  PaginatedResult,
+  PaginationParams,
 } from '../../types'
 import { BaseNetwork } from '../../types/network'
 import type { SandshrewConfig } from './config'
@@ -36,34 +38,31 @@ export function inscriptionCapabilities(
     const methods: InscriptionCapability = {
       async getAddressInscriptions(
         address: string,
-        offset?: number,
-        limit?: number
-      ): Promise<Inscription[]> {
+        _pagination?: PaginationParams
+      ): Promise<PaginatedResult<Inscription>> {
         const ordResp = await rpc.call('ord_address', [address])
         const result = ordResp.result as { inscriptions: string[] }
         const inscriptionIds = result.inscriptions || []
 
-        const start = offset ?? 0
-        const end = limit ? start + limit : inscriptionIds.length
-        const slice = inscriptionIds.slice(start, end)
+        if (inscriptionIds.length === 0) return { data: [] }
 
-        if (slice.length === 0) return []
-
-        const infos = await methods.batchGetInscriptionInfo(slice)
-        return infos.map(info => ({
-          id: info.data.inscription_id,
-          inscriptionId: info.data.inscription_id,
-          content: '',
-          number: info.data.inscription_number,
-          address,
-          contentType: info.data.content_type,
-          output: '',
-          location: '',
-          genesisTransaction: '',
-          height: info.last_updated.block_height,
-          preview: '',
-          outputValue: 0,
-        }))
+        const infos = await methods.batchGetInscriptionInfo(inscriptionIds)
+        return {
+          data: infos.map(info => ({
+            id: info.data.inscription_id,
+            inscriptionId: info.data.inscription_id,
+            content: '',
+            number: info.data.inscription_number,
+            address,
+            contentType: info.data.content_type,
+            output: '',
+            location: '',
+            genesisTransaction: '',
+            height: info.last_updated.block_height,
+            preview: '',
+            outputValue: 0,
+          })),
+        }
       },
 
       async getInscriptionInfo(inscriptionId: string): Promise<InscriptionInfo> {

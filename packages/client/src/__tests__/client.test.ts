@@ -9,7 +9,7 @@ function makeMockBaseDs(network = 'mainnet') {
     group: 'base',
     methods: {
       getBalance: async (_addr: string) => '50000',
-      getUtxos: async (_addr: string) => [],
+      getUtxos: async (_addr: string) => ({ data: [] }),
       getTransaction: async (_txId: string) => ({
         txid: 'abc',
         version: 2,

@@ -39,7 +39,7 @@ function makeMockDs(utxos: UTXO[] = mockUtxos) {
     methods: {
       getBalance: async (_addr: string) =>
         utxos.reduce((sum, u) => sum + BigInt(u.value), 0n).toString(),
-      getUtxos: async (_addr: string) => utxos,
+      getUtxos: async (_addr: string) => ({ data: utxos }),
       getTransaction: async (_txId: string) => ({
         txid: 'mock',
         version: 2,
@@ -81,8 +81,8 @@ describe('btcActions', () => {
   it('should delegate getUtxos to data source', async () => {
     const ds = makeMockDs()
     const client = createClient({ network: 'mainnet', dataSource: ds }).extend(btcActions())
-    const utxos = await client.getUtxos('bc1qtest')
-    expect(utxos).toHaveLength(2)
+    const result = await client.getUtxos('bc1qtest')
+    expect(result.data).toHaveLength(2)
   })
 
   it('should delegate getRecommendedFees to data source', async () => {

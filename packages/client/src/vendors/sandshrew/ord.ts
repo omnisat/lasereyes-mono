@@ -5,6 +5,8 @@ import type {
   FormattedUTXO,
   OrdAddressInfo,
   OrdCapability,
+  PaginatedResult,
+  PaginationParams,
 } from '../../types'
 import { BaseNetwork } from '../../types/network'
 import type { SandshrewConfig } from './config'
@@ -39,7 +41,10 @@ export function ordCapabilities(
         return response.result as OrdAddressInfo
       },
 
-      async getFormattedUtxos(address: string | string[]): Promise<FormattedUTXO[]> {
+      async getFormattedUtxos(
+        address: string | string[],
+        _pagination?: PaginationParams
+      ): Promise<PaginatedResult<FormattedUTXO>> {
         const addresses = Array.isArray(address) ? address : [address]
         const multiCall = addresses.map(addr => ['sandshrew_balances', [{ address: addr }]])
         const results = await rpc.multicall(multiCall)
@@ -105,7 +110,7 @@ export function ordCapabilities(
             })
           }
         }
-        return formatted
+        return { data: formatted }
       },
     }
 

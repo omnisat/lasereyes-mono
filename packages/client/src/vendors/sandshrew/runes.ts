@@ -3,6 +3,8 @@ import type {
   CapabilityGroup,
   DataSourceContext,
   OrdOutputWrapper,
+  PaginatedResult,
+  PaginationParams,
   RuneBalance,
   RuneCapability,
   RuneInfo,
@@ -36,15 +38,20 @@ export function runeCapabilities(
     const rpc = new SandshrewRpcClient(`${url}/${key}`)
 
     const methods: RuneCapability = {
-      async getAddressRunesBalances(address: string): Promise<RuneBalance[]> {
+      async getAddressRunesBalances(
+        address: string,
+        _pagination?: PaginationParams
+      ): Promise<PaginatedResult<RuneBalance>> {
         const ordResp = await rpc.call('ord_address', [address])
         const result = ordResp.result as { runes_balances?: string[][] }
-        if (!result.runes_balances) return []
-        return result.runes_balances.map((rune: string[]) => ({
-          name: rune[0],
-          balance: rune[1],
-          symbol: rune[2],
-        }))
+        if (!result.runes_balances) return { data: [] }
+        return {
+          data: result.runes_balances.map((rune: string[]) => ({
+            name: rune[0],
+            balance: rune[1],
+            symbol: rune[2],
+          })),
+        }
       },
 
       async getRuneById(runeId: string): Promise<RuneInfo> {
@@ -57,7 +64,10 @@ export function runeCapabilities(
         return response.result as RuneInfo
       },
 
-      async getRuneOutpoints(params: { address: string; runeId: string }): Promise<RuneOutpoint[]> {
+      async getRuneOutpoints(
+        params: { address: string; runeId: string },
+        _pagination?: PaginationParams
+      ): Promise<PaginatedResult<RuneOutpoint>> {
         const ordResp = await rpc.call('ord_address', [params.address])
         const addressInfo = ordResp.result as { outputs: string[] }
         const runeInfo = await methods.getRuneById(params.runeId)
@@ -94,7 +104,7 @@ export function runeCapabilities(
 
           runeOutpoints.push(outpoint)
         }
-        return runeOutpoints
+        return { data: runeOutpoints }
       },
 
       async batchGetRuneOutputs(params: {

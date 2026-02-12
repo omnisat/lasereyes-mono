@@ -1,5 +1,6 @@
 import type { AlkaneBalance, AlkaneOutpoint } from './alkane'
 import type { Brc20Balance, Brc20Info } from './brc20'
+import type { PaginatedResult, PaginationParams } from './data-source'
 import type { FeeEstimate } from './fees'
 import type { Inscription, InscriptionInfo } from './inscription'
 import type { OrdOutputWrapper, RuneBalance, RuneInfo, RuneOutpoint } from './rune'
@@ -8,7 +9,7 @@ import type { FormattedUTXO, UTXO } from './utxo'
 
 export interface BaseCapability {
   getBalance(address: string): Promise<string>
-  getUtxos(address: string): Promise<UTXO[]>
+  getUtxos(address: string, pagination?: PaginationParams): Promise<PaginatedResult<UTXO>>
   getTransaction(txId: string): Promise<Transaction>
   broadcastTransaction(rawTx: string): Promise<string>
   getRecommendedFees(): Promise<FeeEstimate>
@@ -17,16 +18,25 @@ export interface BaseCapability {
 }
 
 export interface InscriptionCapability {
-  getAddressInscriptions(address: string, offset?: number, limit?: number): Promise<Inscription[]>
+  getAddressInscriptions(
+    address: string,
+    pagination?: PaginationParams
+  ): Promise<PaginatedResult<Inscription>>
   getInscriptionInfo(inscriptionId: string): Promise<InscriptionInfo>
   batchGetInscriptionInfo(inscriptionIds: string[]): Promise<InscriptionInfo[]>
 }
 
 export interface RuneCapability {
-  getAddressRunesBalances(address: string): Promise<RuneBalance[]>
+  getAddressRunesBalances(
+    address: string,
+    pagination?: PaginationParams
+  ): Promise<PaginatedResult<RuneBalance>>
   getRuneById(runeId: string): Promise<RuneInfo>
   getRuneByName(runeName: string): Promise<RuneInfo>
-  getRuneOutpoints(params: { address: string; runeId: string }): Promise<RuneOutpoint[]>
+  getRuneOutpoints(
+    params: { address: string; runeId: string },
+    pagination?: PaginationParams
+  ): Promise<PaginatedResult<RuneOutpoint>>
   batchGetRuneOutputs(params: {
     outpoints: string[]
     runeName: string
@@ -34,18 +44,30 @@ export interface RuneCapability {
 }
 
 export interface Brc20Capability {
-  getAddressBrc20Balances(address: string): Promise<Brc20Balance[]>
+  getAddressBrc20Balances(
+    address: string,
+    pagination?: PaginationParams
+  ): Promise<PaginatedResult<Brc20Balance>>
   getBrc20ByTicker(ticker: string): Promise<Brc20Info>
 }
 
 export interface AlkaneCapability {
-  getAddressAlkanesBalances(address: string): Promise<AlkaneBalance[]>
-  getAlkanesByAddress(address: string): Promise<AlkaneOutpoint[]>
+  getAddressAlkanesBalances(
+    address: string,
+    pagination?: PaginationParams
+  ): Promise<PaginatedResult<AlkaneBalance>>
+  getAlkanesByAddress(
+    address: string,
+    pagination?: PaginationParams
+  ): Promise<PaginatedResult<AlkaneOutpoint>>
 }
 
 export interface OrdCapability {
   getOrdAddress(address: string): Promise<OrdAddressInfo>
-  getFormattedUtxos(address: string | string[]): Promise<FormattedUTXO[]>
+  getFormattedUtxos(
+    address: string | string[],
+    pagination?: PaginationParams
+  ): Promise<PaginatedResult<FormattedUTXO>>
 }
 
 export interface OrdAddressInfo {

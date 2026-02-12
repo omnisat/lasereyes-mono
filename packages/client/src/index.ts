@@ -62,6 +62,8 @@ export type {
   OrdCapability,
   OrdOutput,
   OrdOutputWrapper,
+  PaginatedResult,
+  PaginationParams,
   // PSBT
   PsbtResult,
   // Rune

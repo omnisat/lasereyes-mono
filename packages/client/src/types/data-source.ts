@@ -1,5 +1,12 @@
 import type { NetworkType } from './network'
 
+export type PaginationParams = { cursor?: string | number; limit?: number }
+
+export type PaginatedResult<T> = {
+  data: T[]
+  nextCursor?: string | number
+}
+
 export interface CapabilityGroup<T> {
   group: string
   methods: T

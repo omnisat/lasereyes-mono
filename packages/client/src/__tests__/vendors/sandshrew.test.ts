@@ -97,10 +97,10 @@ describe('sandshrew vendor', () => {
         }),
       })
 
-      const balances = await methods.getAddressRunesBalances('bc1qtest')
-      expect(balances).toHaveLength(2)
-      expect(balances[0].name).toBe('SOME•RUNE')
-      expect(balances[0].balance).toBe('1000')
+      const result = await methods.getAddressRunesBalances('bc1qtest')
+      expect(result.data).toHaveLength(2)
+      expect(result.data[0].name).toBe('SOME•RUNE')
+      expect(result.data[0].balance).toBe('1000')
     })
   })
 

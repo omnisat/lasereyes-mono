@@ -7,6 +7,8 @@ import type {
   AlkaneOutpoint,
   CapabilityGroup,
   DataSourceContext,
+  PaginatedResult,
+  PaginationParams,
 } from '../../types'
 import { BaseNetwork } from '../../types/network'
 import type { SandshrewConfig } from './config'
@@ -68,7 +70,10 @@ export function alkaneCapabilities(
     const rpcUrl = `${url}/${key}`
 
     const methods: AlkaneCapability = {
-      async getAlkanesByAddress(address: string): Promise<AlkaneOutpoint[]> {
+      async getAlkanesByAddress(
+        address: string,
+        _pagination?: PaginationParams
+      ): Promise<PaginatedResult<AlkaneOutpoint>> {
         const result = await alkaneRpcCall(rpcUrl, 'alkanes_protorunesbyaddress', [
           { address, protocolTag: '1' },
         ])
@@ -92,30 +97,35 @@ export function alkaneCapabilities(
           }>
         }
 
-        return response.outpoints
-          .filter(outpoint => outpoint.runes.length > 0)
-          .map(outpoint => ({
-            ...outpoint,
-            outpoint: {
-              vout: outpoint.outpoint.vout,
-              txid: bytesToHex(reverseBytes(hexToBytes(outpoint.outpoint.txid))),
-            },
-            runes: outpoint.runes.map(rune => ({
-              ...rune,
-              balance: Number.parseInt(rune.balance, 16).toString(),
-              rune: {
-                ...rune.rune,
-                id: {
-                  block: Number.parseInt(rune.rune.id.block, 16).toString(),
-                  tx: Number.parseInt(rune.rune.id.tx, 16).toString(),
-                },
+        return {
+          data: response.outpoints
+            .filter(outpoint => outpoint.runes.length > 0)
+            .map(outpoint => ({
+              ...outpoint,
+              outpoint: {
+                vout: outpoint.outpoint.vout,
+                txid: bytesToHex(reverseBytes(hexToBytes(outpoint.outpoint.txid))),
               },
+              runes: outpoint.runes.map(rune => ({
+                ...rune,
+                balance: Number.parseInt(rune.balance, 16).toString(),
+                rune: {
+                  ...rune.rune,
+                  id: {
+                    block: Number.parseInt(rune.rune.id.block, 16).toString(),
+                    tx: Number.parseInt(rune.rune.id.tx, 16).toString(),
+                  },
+                },
+              })),
             })),
-          }))
+        }
       },
 
-      async getAddressAlkanesBalances(address: string): Promise<AlkaneBalance[]> {
-        const outpoints = await methods.getAlkanesByAddress(address)
+      async getAddressAlkanesBalances(
+        address: string,
+        _pagination?: PaginationParams
+      ): Promise<PaginatedResult<AlkaneBalance>> {
+        const { data: outpoints } = await methods.getAlkanesByAddress(address)
         const balances: Record<string, AlkaneBalance> = {}
         for (const outpoint of outpoints) {
           for (const rune of outpoint.runes) {
@@ -132,7 +142,7 @@ export function alkaneCapabilities(
             }
           }
         }
-        return Object.values(balances)
+        return { data: Object.values(balances) }
       },
     }
 

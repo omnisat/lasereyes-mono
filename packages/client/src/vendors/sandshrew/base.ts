@@ -6,6 +6,7 @@ import type {
   CapabilityGroup,
   DataSourceContext,
   FeeEstimate,
+  PaginatedResult,
   Transaction,
   UTXO,
 } from '../../types'
@@ -56,13 +57,14 @@ export function baseCapabilities(
         ).toString()
       },
 
-      async getUtxos(address: string): Promise<UTXO[]> {
+      async getUtxos(address: string): Promise<PaginatedResult<UTXO>> {
         const response = await rpc.call('esplora_address::utxo', [address])
         const scriptPk = getAddressScriptPubKey(address, ctx.network)
-        return (response.result as UTXO[]).map(utxo => ({
+        const mapped = (response.result as UTXO[]).map(utxo => ({
           ...utxo,
           scriptPk: bytesToHex(scriptPk),
         })) as UTXO[]
+        return { data: mapped }
       },
 
       async getTransaction(txId: string): Promise<Transaction> {

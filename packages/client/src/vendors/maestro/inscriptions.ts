@@ -6,6 +6,8 @@ import type {
   Inscription,
   InscriptionCapability,
   InscriptionInfo,
+  PaginatedResult,
+  PaginationParams,
 } from '../../types'
 import { BaseNetwork } from '../../types/network'
 import type { MaestroConfig } from './config'
@@ -43,59 +45,44 @@ export function inscriptionCapabilities(
     const methods: InscriptionCapability = {
       async getAddressInscriptions(
         address: string,
-        offset = 0,
-        limit = 10
-      ): Promise<Inscription[]> {
-        let cursor: string | undefined
-        let toSkip = offset
-        const batchSize = 100
+        pagination?: PaginationParams
+      ): Promise<PaginatedResult<Inscription>> {
+        const params = new URLSearchParams()
+        if (pagination?.limit) params.set('count', pagination.limit.toString())
+        if (pagination?.cursor) params.set('cursor', String(pagination.cursor))
 
-        while (toSkip > 0) {
-          const count = Math.min(batchSize, toSkip)
-          const params = new URLSearchParams({ count: count.toString() })
-          if (cursor) params.append('cursor', cursor)
-
-          const resp = await maestroGet(
-            apiUrl,
-            apiKey,
-            `/addresses/${address}/inscriptions?${params.toString()}`
-          )
-          const data = resp as { next_cursor?: string; data: unknown[] }
-          if (!data.next_cursor && toSkip > count) return []
-          cursor = data.next_cursor
-          toSkip -= count
-        }
-
-        const params = new URLSearchParams({ count: limit.toString() })
-        if (cursor) params.append('cursor', cursor)
-
+        const qs = params.toString()
         const resp = await maestroGet(
           apiUrl,
           apiKey,
-          `/addresses/${address}/inscriptions?${params.toString()}`
+          `/addresses/${address}/inscriptions${qs ? `?${qs}` : ''}`
         )
-        const data = resp as {
+        const raw = resp as {
           data: Array<{
             inscription_id: string
             satoshis: string
             utxo_block_height: number
           }>
+          next_cursor?: string
         }
 
-        return data.data.map(insc => ({
-          id: insc.inscription_id,
-          inscriptionId: insc.inscription_id,
-          content: '',
-          number: 0,
-          address,
-          contentType: '',
-          output: '',
-          location: '',
-          genesisTransaction: '',
-          height: insc.utxo_block_height,
-          preview: '',
-          outputValue: Number(insc.satoshis),
-        }))
+        return {
+          data: raw.data.map(insc => ({
+            id: insc.inscription_id,
+            inscriptionId: insc.inscription_id,
+            content: '',
+            number: 0,
+            address,
+            contentType: '',
+            output: '',
+            location: '',
+            genesisTransaction: '',
+            height: insc.utxo_block_height,
+            preview: '',
+            outputValue: Number(insc.satoshis),
+          })),
+          nextCursor: raw.next_cursor,
+        }
       },
 
       async getInscriptionInfo(inscriptionId: string): Promise<InscriptionInfo> {
