@@ -35,12 +35,12 @@ const mockUtxos: UTXO[] = [
 
 function makeMockDs(utxos: UTXO[] = mockUtxos) {
   return createChainDataSource({ network: 'mainnet' }).extend((_ctx: DataSourceContext) => ({
-    group: 'base',
+    group: 'btc',
     methods: {
-      getBalance: async (_addr: string) =>
+      btcGetBalance: async (_addr: string) =>
         utxos.reduce((sum, u) => sum + BigInt(u.value), 0n).toString(),
-      getUtxos: async (_addr: string) => ({ data: utxos }),
-      getTransaction: async (_txId: string) => ({
+      btcGetAddressUtxos: async (_addr: string) => ({ data: utxos }),
+      btcGetTransaction: async (_txId: string) => ({
         txid: 'mock',
         version: 2,
         locktime: 0,
@@ -59,10 +59,10 @@ function makeMockDs(utxos: UTXO[] = mockUtxos) {
         fee: 300,
         status: { confirmed: true, block_height: 1, block_hash: '', block_time: 0 },
       }),
-      broadcastTransaction: async (_rawTx: string) => 'txid_broadcast',
-      getRecommendedFees: async () => ({ fastFee: 10, minFee: 1 }),
-      getOutputValue: async (_txId: string, _vout: number) => 546 as number | null,
-      waitForTransaction: async (_txId: string) => true,
+      btcBroadcastTransaction: async (_rawTx: string) => 'txid_broadcast',
+      btcGetRecommendedFees: async () => ({ fastFee: 10, minFee: 1 }),
+      btcGetOutputValue: async (_txId: string, _vout: number) => 546 as number | null,
+      btcWaitForTransaction: async (_txId: string) => true,
     } satisfies BaseCapability,
   }))
 }
@@ -71,32 +71,32 @@ const P2WPKH_ADDR = 'bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4'
 const PUBKEY = '0279BE667EF9DCBBAC55A06295CE870B07029BFCDB2DCE28D959F2815B16F81798'
 
 describe('btcActions', () => {
-  it('should delegate getBalance to data source', async () => {
+  it('should delegate btcGetBalance to data source', async () => {
     const ds = makeMockDs()
     const client = createClient({ network: 'mainnet', dataSource: ds }).extend(btcActions())
-    const balance = await client.getBalance('bc1qtest')
+    const balance = await client.btcGetBalance('bc1qtest')
     expect(balance).toBe('150000')
   })
 
-  it('should delegate getUtxos to data source', async () => {
+  it('should delegate btcGetAddressUtxos to data source', async () => {
     const ds = makeMockDs()
     const client = createClient({ network: 'mainnet', dataSource: ds }).extend(btcActions())
-    const result = await client.getUtxos('bc1qtest')
+    const result = await client.btcGetAddressUtxos('bc1qtest')
     expect(result.data).toHaveLength(2)
   })
 
-  it('should delegate getRecommendedFees to data source', async () => {
+  it('should delegate btcGetRecommendedFees to data source', async () => {
     const ds = makeMockDs()
     const client = createClient({ network: 'mainnet', dataSource: ds }).extend(btcActions())
-    const fees = await client.getRecommendedFees()
+    const fees = await client.btcGetRecommendedFees()
     expect(fees.fastFee).toBe(10)
     expect(fees.minFee).toBe(1)
   })
 
-  it('should delegate broadcastTransaction to data source', async () => {
+  it('should delegate btcBroadcastTransaction to data source', async () => {
     const ds = makeMockDs()
     const client = createClient({ network: 'mainnet', dataSource: ds }).extend(btcActions())
-    const txId = await client.broadcastTransaction('rawtx')
+    const txId = await client.btcBroadcastTransaction('rawtx')
     expect(txId).toBe('txid_broadcast')
   })
 

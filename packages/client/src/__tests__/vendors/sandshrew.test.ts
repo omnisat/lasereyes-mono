@@ -19,13 +19,13 @@ describe('sandshrew vendor', () => {
   })
 
   describe('baseCapabilities', () => {
-    it('should return base capability group', () => {
+    it('should return btc capability group', () => {
       const factory = baseCapabilities()
       const group = factory(ctx)
-      expect(group.group).toBe('base')
-      expect(group.methods.getBalance).toBeDefined()
-      expect(group.methods.getUtxos).toBeDefined()
-      expect(group.methods.getTransaction).toBeDefined()
+      expect(group.group).toBe('btc')
+      expect(group.methods.btcGetBalance).toBeDefined()
+      expect(group.methods.btcGetAddressUtxos).toBeDefined()
+      expect(group.methods.btcGetTransaction).toBeDefined()
     })
 
     it('should fetch balance via esplora RPC', async () => {
@@ -46,7 +46,7 @@ describe('sandshrew vendor', () => {
         }),
       })
 
-      const balance = await methods.getBalance('bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4')
+      const balance = await methods.btcGetBalance('bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4')
       expect(balance).toBe('150000')
     })
 
@@ -63,21 +63,21 @@ describe('sandshrew vendor', () => {
         }),
       })
 
-      const fees = await methods.getRecommendedFees()
+      const fees = await methods.btcGetRecommendedFees()
       expect(fees.fastFee).toBe(21)
       expect(fees.minFee).toBe(5)
     })
   })
 
   describe('runeCapabilities', () => {
-    it('should return rune capability group', () => {
+    it('should return runes capability group', () => {
       const factory = runeCapabilities()
       const group = factory(ctx)
-      expect(group.group).toBe('rune')
-      expect(group.methods.getAddressRunesBalances).toBeDefined()
-      expect(group.methods.getRuneById).toBeDefined()
-      expect(group.methods.getRuneByName).toBeDefined()
-      expect(group.methods.getRuneOutpoints).toBeDefined()
+      expect(group.group).toBe('runes')
+      expect(group.methods.runesGetAddressBalances).toBeDefined()
+      expect(group.methods.runesGetById).toBeDefined()
+      expect(group.methods.runesGetByName).toBeDefined()
+      expect(group.methods.runesGetOutpoints).toBeDefined()
     })
 
     it('should fetch rune balances for address', async () => {
@@ -97,7 +97,7 @@ describe('sandshrew vendor', () => {
         }),
       })
 
-      const result = await methods.getAddressRunesBalances('bc1qtest')
+      const result = await methods.runesGetAddressBalances('bc1qtest')
       expect(result.data).toHaveLength(2)
       expect(result.data[0].name).toBe('SOME•RUNE')
       expect(result.data[0].balance).toBe('1000')
@@ -105,23 +105,23 @@ describe('sandshrew vendor', () => {
   })
 
   describe('alkaneCapabilities', () => {
-    it('should return alkane capability group', () => {
+    it('should return alkanes capability group', () => {
       const factory = alkaneCapabilities()
       const group = factory(ctx)
-      expect(group.group).toBe('alkane')
-      expect(group.methods.getAddressAlkanesBalances).toBeDefined()
-      expect(group.methods.getAlkanesByAddress).toBeDefined()
+      expect(group.group).toBe('alkanes')
+      expect(group.methods.alkanesGetAddressBalances).toBeDefined()
+      expect(group.methods.alkanesGetByAddress).toBeDefined()
     })
   })
 
   describe('inscriptionCapabilities', () => {
-    it('should return inscription capability group', () => {
+    it('should return inscriptions capability group', () => {
       const factory = inscriptionCapabilities()
       const group = factory(ctx)
-      expect(group.group).toBe('inscription')
-      expect(group.methods.getAddressInscriptions).toBeDefined()
-      expect(group.methods.getInscriptionInfo).toBeDefined()
-      expect(group.methods.batchGetInscriptionInfo).toBeDefined()
+      expect(group.group).toBe('inscriptions')
+      expect(group.methods.inscriptionsGetByAddress).toBeDefined()
+      expect(group.methods.inscriptionsGetInfo).toBeDefined()
+      expect(group.methods.inscriptionsBatchGetInfo).toBeDefined()
     })
   })
 })

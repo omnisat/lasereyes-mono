@@ -29,6 +29,25 @@ import { SandshrewDataSource } from './sources/sandshrew-ds'
 
 const ERROR_METHOD_NOT_AVAILABLE = 'Method not available on any data source'
 
+/**
+ * Singleton manager for Bitcoin blockchain data sources with automatic fallback.
+ *
+ * @remarks
+ * Manages multiple data source backends (mempool, sandshrew, maestro) and provides
+ * a unified API for querying blockchain data. When a method is called, the manager
+ * finds an available data source that implements it, with fallback to other sources
+ * on failure.
+ *
+ * Must be initialized via {@link DataSourceManager.init} before use. Obtain the instance
+ * via {@link DataSourceManager.getInstance}.
+ *
+ * @example
+ * ```ts
+ * DataSourceManager.init({ network: MAINNET })
+ * const manager = DataSourceManager.getInstance()
+ * const balance = await manager.getAddressBtcBalance('bc1q...')
+ * ```
+ */
 export class DataSourceManager {
   private static instance: DataSourceManager
   private dataSources: Map<string, DataSource> = new Map()
@@ -102,12 +121,27 @@ export class DataSourceManager {
     )
   }
 
+  /**
+   * Initializes the singleton DataSourceManager instance.
+   *
+   * @remarks
+   * Can only be called once. Subsequent calls are no-ops if the instance already exists.
+   * Configures mempool, sandshrew, and maestro data sources based on the provided config.
+   *
+   * @param config - Optional configuration for network and data source endpoints/API keys.
+   */
   public static init(config?: Config) {
     if (!DataSourceManager.instance) {
       DataSourceManager.instance = new DataSourceManager(config)
     }
   }
 
+  /**
+   * Returns the singleton DataSourceManager instance.
+   *
+   * @returns The initialized DataSourceManager instance.
+   * @throws Error if {@link DataSourceManager.init} has not been called yet.
+   */
   public static getInstance(): DataSourceManager {
     if (!DataSourceManager.instance) {
       throw new Error('DataSourceManager has not been initialized')
@@ -116,6 +150,11 @@ export class DataSourceManager {
     return DataSourceManager.instance
   }
 
+  /**
+   * Updates the active network for all registered data sources.
+   *
+   * @param newNetwork - The network identifier to switch to (e.g., "mainnet", "testnet4").
+   */
   public updateNetwork(newNetwork: string) {
     this.network = newNetwork
     const baseNetwork = this.customNetworks.get(newNetwork)?.baseNetwork
@@ -124,6 +163,15 @@ export class DataSourceManager {
     }
   }
 
+  /**
+   * Registers a custom data source with the manager.
+   *
+   * @remarks
+   * The data source will have its network set to the manager's current network upon registration.
+   *
+   * @param source - A unique name for the data source (e.g., "custom-indexer").
+   * @param dataSource - The data source implementation conforming to the {@link DataSource} interface.
+   */
   public registerDataSource(source: string, dataSource: DataSource) {
     this.dataSources.set(source, dataSource)
     this.dataSources
@@ -131,10 +179,23 @@ export class DataSourceManager {
       ?.setNetwork?.(this.network, this.customNetworks.get(this.network)?.baseNetwork)
   }
 
+  /**
+   * Retrieves a registered data source by name.
+   *
+   * @param source - The name of the data source (e.g., "mempool", "sandshrew", "maestro").
+   * @returns The data source instance, or `undefined` if not found.
+   */
   public getSource(source: string): DataSource | undefined {
     return this.dataSources.get(source)
   }
 
+  /**
+   * Fetches Alkanes token balances for a given address.
+   *
+   * @param address - The Bitcoin address to query.
+   * @returns An array of Alkane token balances.
+   * @throws Error if no data source supports this method.
+   */
   public async getAddressAlkanesBalances(address: string): Promise<AlkaneBalance[]> {
     const dataSource = this.findAvailableSource('getAddressAlkanesBalances')
     if (!dataSource || !dataSource.getAddressAlkanesBalances) {
@@ -143,6 +204,13 @@ export class DataSourceManager {
     return await dataSource.getAddressAlkanesBalances(address)
   }
 
+  /**
+   * Fetches Alkanes outpoints (UTXOs containing Alkanes tokens) for a given address.
+   *
+   * @param address - The Bitcoin address to query.
+   * @returns An array of Alkanes outpoints.
+   * @throws Error if no data source supports this method.
+   */
   public async getAlkanesByAddress(address: string): Promise<AlkanesOutpoint[]> {
     const dataSource = this.findAvailableSource('getAlkanesByAddress')
     if (!dataSource || !dataSource.getAlkanesByAddress) {
@@ -151,6 +219,13 @@ export class DataSourceManager {
     return await dataSource.getAlkanesByAddress(address)
   }
 
+  /**
+   * Fetches the BTC balance for a given address with fallback across data sources.
+   *
+   * @param address - The Bitcoin address to query.
+   * @returns The balance as a string (in satoshis).
+   * @throws Error if no data source supports this method or all sources fail.
+   */
   public async getAddressBtcBalance(address: string): Promise<string> {
     const dataSource = this.findAvailableSource('getAddressBtcBalance')
     if (!dataSource || !dataSource.getAddressBtcBalance) {
@@ -166,6 +241,13 @@ export class DataSourceManager {
     return balance
   }
 
+  /**
+   * Fetches BRC-20 token balances for a given address and normalizes the response.
+   *
+   * @param address - The Bitcoin address to query.
+   * @returns An array of normalized BRC-20 token balances.
+   * @throws Error if no data source supports this method.
+   */
   public async getAddressBrc20Balances(address: string): Promise<Brc20Balance[]> {
     const dataSource = this.findAvailableSource('getAddressBrc20Balances')
     if (!dataSource || !dataSource.getAddressBrc20Balances) {
@@ -176,6 +258,20 @@ export class DataSourceManager {
     return normalizeBrc20Balances(brc20Raw)
   }
 
+  /**
+   * Fetches ordinal inscriptions for a given address with pagination support.
+   *
+   * @remarks
+   * Handles normalization of inscription data across different data source formats
+   * (maestro, sandshrew, etc.). For maestro sources, fetches detailed inscription info
+   * for each inscription.
+   *
+   * @param address - The Bitcoin address to query.
+   * @param offset - Optional pagination offset.
+   * @param limit - Optional maximum number of inscriptions to return.
+   * @returns An array of normalized inscription objects.
+   * @throws Error if no data source supports this method.
+   */
   public async getAddressInscriptions(
     address: string,
     offset?: number,
@@ -235,6 +331,13 @@ export class DataSourceManager {
     return []
   }
 
+  /**
+   * Fetches detailed information about a specific inscription.
+   *
+   * @param inscriptionId - The inscription ID to look up.
+   * @returns The raw inscription info from the data source.
+   * @throws Error if no data source supports this method.
+   */
   public async getInscriptionInfo(inscriptionId: string): Promise<unknown> {
     const dataSource = this.findAvailableSource('getInscriptionInfo')
     if (!dataSource || !dataSource.getInscriptionInfo) {
@@ -243,6 +346,12 @@ export class DataSourceManager {
     return await dataSource.getInscriptionInfo(inscriptionId)
   }
 
+  /**
+   * Fetches recommended transaction fee rates with fallback across data sources.
+   *
+   * @returns An object with `fastFee` (priority fee rate) and `minFee` (minimum fee rate) in sat/vB.
+   * @throws Error if no data source supports this method or all sources fail.
+   */
   public async getRecommendedFees(): Promise<{
     fastFee: number
     minFee: number
@@ -265,6 +374,13 @@ export class DataSourceManager {
     }
   }
 
+  /**
+   * Fetches UTXOs for a given address with fallback across data sources.
+   *
+   * @param address - The Bitcoin address to query.
+   * @returns An array of UTXOs belonging to the address.
+   * @throws Error if no data source supports this method or all sources fail.
+   */
   public async getAddressUtxos(address: string): Promise<Array<LasereyesUTXO>> {
     const dataSource = this.findAvailableSource('getAddressUtxos')
     if (!dataSource || !dataSource.getAddressUtxos) {
@@ -279,6 +395,14 @@ export class DataSourceManager {
     return utxos
   }
 
+  /**
+   * Fetches the output value (in satoshis) for a specific transaction output.
+   *
+   * @param txId - The transaction ID.
+   * @param vOut - The output index within the transaction.
+   * @returns The output value in satoshis, or `null` if not found.
+   * @throws Error if no data source supports this method or all sources fail.
+   */
   public async getOutputValueByVOutIndex(txId: string, vOut: number): Promise<number | null> {
     const dataSource = this.findAvailableSource('getOutputValueByVOutIndex')
     if (!dataSource || !dataSource.getOutputValueByVOutIndex) {
@@ -293,6 +417,13 @@ export class DataSourceManager {
     return value
   }
 
+  /**
+   * Waits for a transaction to be confirmed on the blockchain.
+   *
+   * @param txId - The transaction ID to wait for.
+   * @returns `true` once the transaction is confirmed.
+   * @throws Error if no data source supports this method.
+   */
   public async waitForTransaction(txId: string): Promise<boolean> {
     const dataSource = this.findAvailableSource('waitForTransaction')
     if (!dataSource || !dataSource.waitForTransaction) {
@@ -302,6 +433,13 @@ export class DataSourceManager {
     return !!(await dataSource.waitForTransaction(txId))
   }
 
+  /**
+   * Fetches Runes token balances for a given address.
+   *
+   * @param address - The Bitcoin address to query.
+   * @returns An array of Rune balance objects.
+   * @throws Error if no data source supports this method.
+   */
   public async getAddressRunesBalances(address: string): Promise<OrdRuneBalance[]> {
     const dataSource = this.findAvailableSource('getAddressRunesBalances')
     if (!dataSource || !dataSource.getAddressRunesBalances) {
@@ -311,6 +449,13 @@ export class DataSourceManager {
     return await dataSource.getAddressRunesBalances(address)
   }
 
+  /**
+   * Broadcasts a signed raw transaction to the Bitcoin network.
+   *
+   * @param rawTx - The raw transaction hex string.
+   * @returns The transaction ID of the broadcast transaction.
+   * @throws Error if no data source supports this method.
+   */
   public async broadcastTransaction(rawTx: string): Promise<string> {
     const dataSource = this.findAvailableSource('broadcastTransaction')
     if (!dataSource || !dataSource.broadcastTransaction) {
@@ -319,6 +464,16 @@ export class DataSourceManager {
     return await dataSource.broadcastTransaction(rawTx)
   }
 
+  /**
+   * Executes a method against a primary data source, falling back to other registered
+   * sources if the primary fails.
+   *
+   * @typeParam T - The return type of the data source method.
+   * @param primarySource - The name of the preferred data source to try first.
+   * @param method - An async function that calls a method on the provided data source.
+   * @returns The result from the first data source that succeeds.
+   * @throws Error if all data sources fail.
+   */
   public async withFallback<T>(
     primarySource: string,
     method: (ds: DataSource) => Promise<T>
@@ -356,6 +511,17 @@ export class DataSourceManager {
     return undefined
   }
 
+  /**
+   * Fetches and formats all UTXOs for one or more addresses, including rune, alkane, and inscription metadata.
+   *
+   * @remarks
+   * Uses the sandshrew data source's `getBalances` method to retrieve comprehensive UTXO data
+   * in a single call. Results are sorted by BTC value (smallest first).
+   *
+   * @param address - A single Bitcoin address or an array of addresses to query.
+   * @returns An array of formatted UTXOs with rune, alkane, and inscription annotations.
+   * @throws Error if the sandshrew data source is not available.
+   */
   async getFormattedUTXOs(address: string | string[]): Promise<FormattedUTXO[]> {
     const sandshrewDS = this.getSource('sandshrew') as SandshrewDataSource
     if (!sandshrewDS || !sandshrewDS.getBalances) {

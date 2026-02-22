@@ -38,7 +38,7 @@ export function runeCapabilities(
     const rpc = new SandshrewRpcClient(`${url}/${key}`)
 
     const methods: RuneCapability = {
-      async getAddressRunesBalances(
+      async runesGetAddressBalances(
         address: string,
         _pagination?: PaginationParams
       ): Promise<PaginatedResult<RuneBalance>> {
@@ -54,26 +54,26 @@ export function runeCapabilities(
         }
       },
 
-      async getRuneById(runeId: string): Promise<RuneInfo> {
+      async runesGetById(runeId: string): Promise<RuneInfo> {
         const response = await rpc.call('ord_rune', [runeId])
         return response.result as RuneInfo
       },
 
-      async getRuneByName(runeName: string): Promise<RuneInfo> {
+      async runesGetByName(runeName: string): Promise<RuneInfo> {
         const response = await rpc.call('ord_rune', [runeName])
         return response.result as RuneInfo
       },
 
-      async getRuneOutpoints(
+      async runesGetOutpoints(
         params: { address: string; runeId: string },
         _pagination?: PaginationParams
       ): Promise<PaginatedResult<RuneOutpoint>> {
         const ordResp = await rpc.call('ord_address', [params.address])
         const addressInfo = ordResp.result as { outputs: string[] }
-        const runeInfo = await methods.getRuneById(params.runeId)
+        const runeInfo = await methods.runesGetById(params.runeId)
         const runeName = runeInfo.entry.spaced_rune
 
-        const ordOutputs = await methods.batchGetRuneOutputs({
+        const ordOutputs = await methods.runesBatchGetOutputs({
           outpoints: addressInfo.outputs,
           runeName,
         })
@@ -97,7 +97,7 @@ export function runeCapabilities(
             for (const rune in runes) {
               outpoint.balances.push(runes[rune].amount)
               outpoint.decimals.push(runes[rune].divisibility)
-              const nameInfo = await methods.getRuneByName(rune)
+              const nameInfo = await methods.runesGetByName(rune)
               outpoint.rune_ids.push(nameInfo.id)
             }
           }
@@ -107,7 +107,7 @@ export function runeCapabilities(
         return { data: runeOutpoints }
       },
 
-      async batchGetRuneOutputs(params: {
+      async runesBatchGetOutputs(params: {
         outpoints: string[]
         runeName: string
       }): Promise<OrdOutputWrapper[]> {
@@ -132,6 +132,6 @@ export function runeCapabilities(
       },
     }
 
-    return { group: 'rune', methods }
+    return { group: 'runes', methods }
   }
 }

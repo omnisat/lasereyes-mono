@@ -43,7 +43,7 @@ export function brc20Capabilities(
     const { apiUrl, apiKey } = resolveUrlAndKey(ctx.network, vendorConfig)
 
     const methods: Brc20Capability = {
-      async getAddressBrc20Balances(
+      async brc20GetAddressBalances(
         address: string,
         _pagination?: PaginationParams
       ): Promise<PaginatedResult<Brc20Balance>> {
@@ -66,7 +66,7 @@ export function brc20Capabilities(
         }
       },
 
-      async getBrc20ByTicker(ticker: string): Promise<Brc20Info> {
+      async brc20GetByTicker(ticker: string): Promise<Brc20Info> {
         return (await maestroGet(apiUrl, apiKey, `/assets/brc20/${ticker}`)) as Brc20Info
       },
     }

@@ -1,6 +1,27 @@
 import { NetworkMismatchError } from './errors'
 import type { CapabilityGroup, ChainDataSource, DataSourceContext, NetworkType } from './types'
 
+/**
+ * Creates a new chain data source with the specified network configuration.
+ *
+ * A chain data source is a composable object that provides blockchain data access.
+ * Start with a bare data source, then use {@link ChainDataSource.extend | .extend()} to
+ * add capability groups (base, runes, inscriptions, etc.) from vendor implementations.
+ *
+ * @param config - The data source configuration
+ * @param config.network - The Bitcoin network to connect to (e.g., `MAINNET`, `TESTNET`)
+ * @returns A chain data source that can be extended with capabilities
+ *
+ * @example
+ * ```ts
+ * import { createChainDataSource } from '@omnisat/lasereyes-client'
+ * import { baseCapabilities } from '@omnisat/lasereyes-client/vendors/mempool'
+ * import { MAINNET } from '@omnisat/lasereyes-client/constants/networks'
+ *
+ * const ds = createChainDataSource({ network: MAINNET })
+ *   .extend(baseCapabilities({ networks: { mainnet: { apiUrl: 'https://mempool.space/api' } } }))
+ * ```
+ */
 export function createChainDataSource(config: { network: NetworkType }): ChainDataSource {
   const capabilities: Record<string, string[]> = {}
   const context: DataSourceContext = {
@@ -30,6 +51,30 @@ export function createChainDataSource(config: { network: NetworkType }): ChainDa
   return buildDataSource({} as object) as ChainDataSource
 }
 
+/**
+ * Merges two chain data sources into a single data source that combines their capabilities.
+ *
+ * When both data sources provide methods with the same name, the primary data source's
+ * methods take precedence. Capability group registrations are merged, combining method
+ * lists for overlapping groups.
+ *
+ * @param primary - The primary data source whose methods take precedence on overlap
+ * @param secondary - The secondary data source providing fallback methods
+ * @returns A merged data source combining capabilities from both sources
+ *
+ * @throws {@link NetworkMismatchError} If the two data sources are configured for different networks
+ *
+ * @example
+ * ```ts
+ * import { mergeDataSources } from '@omnisat/lasereyes-client'
+ * import { createDataSource as createMempool } from '@omnisat/lasereyes-client/vendors/mempool'
+ * import { createDataSource as createSandshrew } from '@omnisat/lasereyes-client/vendors/sandshrew'
+ *
+ * const mempool = createMempool({ network: MAINNET })
+ * const sandshrew = createSandshrew({ network: MAINNET, apiKey: '...' })
+ * const merged = mergeDataSources(sandshrew, mempool)
+ * ```
+ */
 export function mergeDataSources<A, B>(
   primary: ChainDataSource<A>,
   secondary: ChainDataSource<B>

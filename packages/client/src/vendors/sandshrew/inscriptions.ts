@@ -36,7 +36,7 @@ export function inscriptionCapabilities(
     const rpc = new SandshrewRpcClient(`${url}/${key}`)
 
     const methods: InscriptionCapability = {
-      async getAddressInscriptions(
+      async inscriptionsGetByAddress(
         address: string,
         _pagination?: PaginationParams
       ): Promise<PaginatedResult<Inscription>> {
@@ -46,7 +46,7 @@ export function inscriptionCapabilities(
 
         if (inscriptionIds.length === 0) return { data: [] }
 
-        const infos = await methods.batchGetInscriptionInfo(inscriptionIds)
+        const infos = await methods.inscriptionsBatchGetInfo(inscriptionIds)
         return {
           data: infos.map(info => ({
             id: info.data.inscription_id,
@@ -65,7 +65,7 @@ export function inscriptionCapabilities(
         }
       },
 
-      async getInscriptionInfo(inscriptionId: string): Promise<InscriptionInfo> {
+      async inscriptionsGetInfo(inscriptionId: string): Promise<InscriptionInfo> {
         const response = await rpc.call('ord_inscription', [inscriptionId])
         const raw = response.result as {
           id?: string
@@ -92,7 +92,7 @@ export function inscriptionCapabilities(
         }
       },
 
-      async batchGetInscriptionInfo(inscriptionIds: string[]): Promise<InscriptionInfo[]> {
+      async inscriptionsBatchGetInfo(inscriptionIds: string[]): Promise<InscriptionInfo[]> {
         const MAX_PER_CALL = 1000
         const results: InscriptionInfo[] = []
 
@@ -131,6 +131,6 @@ export function inscriptionCapabilities(
       },
     }
 
-    return { group: 'inscription', methods }
+    return { group: 'inscriptions', methods }
   }
 }

@@ -9,7 +9,51 @@ import type { LaserEyesContextType } from './types'
 
 const defaultSelector = (x: LaserEyesContextType) => ({ ...x })
 
+/**
+ * Primary React hook for accessing LaserEyes wallet state and methods.
+ *
+ * @remarks
+ * Supports a selector pattern for optimized re-renders. When a selector is
+ * provided, only the selected slice of state will trigger component re-renders
+ * when it changes, similar to Zustand's selector pattern.
+ *
+ * Without a selector, the full {@link LaserEyesContextType} is returned,
+ * including wallet addresses, connection state, provider availability flags,
+ * and all wallet interaction methods (connect, sign, send, etc.).
+ *
+ * Must be used within a {@link LaserEyesProvider}.
+ *
+ * @returns The full wallet context including state and methods
+ *
+ * @example
+ * ```tsx
+ * // Full context access
+ * const { address, connect, disconnect } = useLaserEyes()
+ * ```
+ */
 export function useLaserEyes(): LaserEyesContextType
+/**
+ * Primary React hook for accessing LaserEyes wallet state and methods.
+ *
+ * @remarks
+ * When a selector is provided, only the selected slice of state will trigger
+ * component re-renders when it changes, improving performance.
+ *
+ * @param selector - A function to pick specific values from the context
+ * @returns The selected value derived from the wallet context
+ *
+ * @example
+ * ```tsx
+ * // Select a single value (optimized re-renders)
+ * const address = useLaserEyes(s => s.address)
+ *
+ * // Select multiple values
+ * const { address, balance } = useLaserEyes(s => ({
+ *   address: s.address,
+ *   balance: s.balance,
+ * }))
+ * ```
+ */
 export function useLaserEyes<T>(selector: (x: LaserEyesContextType) => T): T
 export function useLaserEyes<T>(
   selector?: (x: LaserEyesContextType) => T

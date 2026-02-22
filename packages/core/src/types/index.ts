@@ -58,6 +58,12 @@ import type {
 } from '../constants/wallets'
 import type { BaseNetwork } from './network'
 
+/**
+ * Union of all built-in Bitcoin network types derived from {@link BaseNetwork}.
+ *
+ * @remarks
+ * Includes mainnet, testnet, testnet4, signet, fractal-mainnet, fractal-testnet, and oylnet.
+ */
 export type BaseNetworkType =
   | typeof BaseNetwork.MAINNET
   | typeof BaseNetwork.TESTNET
@@ -67,8 +73,23 @@ export type BaseNetworkType =
   | typeof BaseNetwork.FRACTAL_TESTNET
   | typeof BaseNetwork.OYLNET
 
+/**
+ * A Bitcoin network identifier. Can be a built-in {@link BaseNetworkType} or a custom network string.
+ *
+ * @remarks
+ * Custom network strings allow extending LaserEyes with networks not built into the library.
+ * Use the `customNetworks` field in {@link Config} to configure custom network behavior.
+ */
 export type NetworkType = BaseNetworkType | string
 
+/**
+ * Union of all supported Bitcoin wallet provider identifiers.
+ *
+ * @remarks
+ * Each value corresponds to a wallet extension that LaserEyes can connect to.
+ * Supported wallets: Unisat, Xverse, OYL, Magic Eden, OKX, Leather, Phantom,
+ * Wizz, Orange, OpNet, Sparrow, Tokeo, Keplr, and Binance.
+ */
 export type ProviderType =
   | typeof UNISAT
   | typeof XVERSE
@@ -85,6 +106,12 @@ export type ProviderType =
   | typeof KEPLR
   | typeof BINANCE
 
+/**
+ * Supported MIME content types for inscription data.
+ *
+ * @remarks
+ * Used when creating ordinal inscriptions to specify the content type of the inscribed data.
+ */
 export type ContentType =
   | typeof TEXT_HTML
   | typeof TEXT_CSS
@@ -117,6 +144,25 @@ export type ContentType =
   | typeof MULTIPART_FORM_DATA
   | typeof BIN
 
+/**
+ * Configuration options for the LaserEyes client.
+ *
+ * @remarks
+ * Controls the active Bitcoin network and data source endpoints. Data sources (mempool, sandshrew, maestro)
+ * can be configured with custom URLs and API keys. Custom networks can also be registered with a base
+ * network mapping and preferred data source.
+ *
+ * @example
+ * ```ts
+ * const config: Config = {
+ *   network: MAINNET,
+ *   dataSources: {
+ *     sandshrew: { apiKey: 'my-key' },
+ *     maestro: { apiKey: 'my-maestro-key' },
+ *   },
+ * }
+ * ```
+ */
 export type Config = {
   network?:
     | typeof MAINNET
@@ -179,11 +225,28 @@ export type Config = {
   }
 }
 
+/** Union of all protocol-specific send argument types. */
 export type SendArgs = BTCSendArgs | RuneSendArgs | Brc20SendArgs | AlkaneSendArgs
 
+/**
+ * Union of supported Bitcoin protocol identifiers: BTC, RUNES, BRC20, and ALKANES.
+ *
+ * @remarks
+ * Used with the {@link LaserEyesClient.send} method to dispatch protocol-specific send operations.
+ */
 export type Protocol = typeof BTC | typeof RUNES | typeof BRC20 | typeof ALKANES
+
+/** A meta-protocol is any {@link Protocol} other than native BTC (i.e., RUNES, BRC20, or ALKANES). */
 export type MetaProtocol = Exclude<Protocol, typeof BTC>
 
+/**
+ * Arguments for sending native BTC.
+ *
+ * @param fromAddress - The sender's Bitcoin address.
+ * @param toAddress - The recipient's Bitcoin address.
+ * @param amount - The amount to send in satoshis.
+ * @param network - The Bitcoin network to use for the transaction.
+ */
 export interface BTCSendArgs {
   fromAddress: string
   toAddress: string
@@ -193,6 +256,15 @@ export interface BTCSendArgs {
 
 export * from './lasereyes'
 
+/**
+ * Arguments for sending Runes tokens.
+ *
+ * @param runeId - The identifier of the rune to send (e.g., "840000:1").
+ * @param fromAddress - The sender's Bitcoin address.
+ * @param toAddress - The recipient's Bitcoin address.
+ * @param amount - The amount of the rune to send (in the rune's smallest unit).
+ * @param network - The Bitcoin network to use for the transaction.
+ */
 export interface RuneSendArgs {
   runeId: string
   fromAddress: string
@@ -201,6 +273,15 @@ export interface RuneSendArgs {
   network: NetworkType
 }
 
+/**
+ * Arguments for sending BRC-20 tokens.
+ *
+ * @param ticker - The BRC-20 token ticker symbol (e.g., "ordi").
+ * @param fromAddress - The sender's Bitcoin address.
+ * @param toAddress - The recipient's Bitcoin address.
+ * @param amount - The amount of the BRC-20 token to send.
+ * @param network - The Bitcoin network to use for the transaction.
+ */
 export interface Brc20SendArgs {
   ticker: string
   fromAddress: string
@@ -209,6 +290,15 @@ export interface Brc20SendArgs {
   network: NetworkType
 }
 
+/**
+ * Arguments for sending Alkanes tokens.
+ *
+ * @param id - The Alkane token identifier (e.g., "2:1").
+ * @param fromAddress - The sender's Bitcoin address.
+ * @param toAddress - The recipient's Bitcoin address.
+ * @param amount - The amount of the Alkane token to send as a bigint.
+ * @param network - The Bitcoin network to use for the transaction.
+ */
 export interface AlkaneSendArgs {
   id: string
   fromAddress: string
@@ -416,6 +506,7 @@ export interface MempoolTransactionResponse {
   }
 }
 
+/** Represents a Rune token with its metadata and balance on a UTXO. */
 export interface Rune {
   rune: {
     id: { block: string; tx: string }
@@ -428,6 +519,7 @@ export interface Rune {
   balance: string
 }
 
+/** An outpoint containing Alkanes (rune-like) token data along with its UTXO position. */
 export interface AlkanesOutpoint {
   runes: Rune[]
   outpoint: { txid: string; vout: number }

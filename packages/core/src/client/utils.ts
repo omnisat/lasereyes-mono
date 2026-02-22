@@ -19,6 +19,16 @@ import {
 import type { Config, NetworkType, ProviderType } from '../types'
 import type { LaserEyesStoreType } from './types'
 
+/**
+ * Triggers a DOM mutation to force wallet provider injection detection.
+ *
+ * @remarks
+ * Some wallet extensions inject their providers asynchronously after the DOM loads.
+ * This hack creates and removes a text node to trigger mutation observers, then
+ * executes the callback in a microtask. Only runs in browser environments.
+ *
+ * @param callback - Function to execute after the DOM mutation, typically to finalize initialization.
+ */
 export function triggerDOMShakeHack(callback: () => void) {
   if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
     setTimeout(() => {
@@ -30,6 +40,20 @@ export function triggerDOMShakeHack(callback: () => void) {
   }
 }
 
+/**
+ * Creates the reactive nanostore instances required by {@link LaserEyesClient}.
+ *
+ * @returns An object containing:
+ *   - `$store` - A `MapStore` holding the wallet connection state ({@link LaserEyesStoreType}).
+ *   - `$network` - A `WritableAtom` holding the current {@link NetworkType}, defaulting to `MAINNET`.
+ *   - `$library` - A `WritableAtom` reserved for internal library state.
+ *
+ * @example
+ * ```ts
+ * const stores = createStores()
+ * const client = new LaserEyesClient(stores, config)
+ * ```
+ */
 export function createStores(): {
   $store: MapStore<LaserEyesStoreType>
   $network: WritableAtom<NetworkType>
@@ -69,6 +93,17 @@ export function createStores(): {
   }
 }
 
+/**
+ * Creates a shallow copy of the provided configuration, or returns `undefined` if no config is given.
+ *
+ * @param config - Optional {@link Config} to copy.
+ * @returns A new config object with the same properties, or `undefined`.
+ *
+ * @example
+ * ```ts
+ * const config = createConfig({ network: MAINNET })
+ * ```
+ */
 export function createConfig(config?: Config) {
   if (!config) {
     return undefined
@@ -78,6 +113,7 @@ export function createConfig(config?: Config) {
   }
 }
 
+/** Keys from {@link LaserEyesStoreType} that are persisted across sessions for a given wallet provider. */
 export const keysToPersist = [
   'address',
   'paymentAddress',
@@ -86,8 +122,21 @@ export const keysToPersist = [
   'balance',
 ] as const
 
+/** A key from the store that is eligible for persistence. */
 export type PersistedKey = (typeof keysToPersist)[number]
 
+/**
+ * Persists wallet state changes to a value store for a specific wallet provider.
+ *
+ * @remarks
+ * Only persists keys listed in {@link keysToPersist}. If `changedKey` is specified,
+ * only that key is updated; otherwise all persistable keys are written at once.
+ *
+ * @param walletName - The wallet provider whose state is being persisted.
+ * @param newState - The full current store state.
+ * @param changedKey - The specific key that changed, or `undefined` to persist all keys.
+ * @param $valueStore - The target store to write persisted values into.
+ */
 export function handleStateChangePersistence(
   walletName: ProviderType,
   newState: LaserEyesStoreType,
@@ -113,6 +162,13 @@ export function handleStateChangePersistence(
   }
 }
 
+/**
+ * Converts a hex-encoded string to a `Uint8Array`.
+ *
+ * @param hexString - The hex string to convert (e.g., "deadbeef").
+ * @returns The decoded byte array.
+ * @throws Error if the hex string is invalid.
+ */
 export const fromHexString = (hexString: string): Uint8Array => {
   const matches = hexString.match(/.{1,2}/g)
   if (!matches) {

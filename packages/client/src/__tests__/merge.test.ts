@@ -6,43 +6,43 @@ import type { DataSourceContext } from '../types'
 describe('mergeDataSources', () => {
   it('should merge capabilities from both data sources', () => {
     const ds1 = createChainDataSource({ network: 'mainnet' }).extend((_ctx: DataSourceContext) => ({
-      group: 'base',
+      group: 'btc',
       methods: {
-        getBalance: async () => '100',
+        btcGetBalance: async () => '100',
       },
     }))
 
     const ds2 = createChainDataSource({ network: 'mainnet' }).extend((_ctx: DataSourceContext) => ({
-      group: 'rune',
+      group: 'runes',
       methods: {
-        getRuneById: async () => ({ id: 'test' }),
+        runesGetById: async () => ({ id: 'test' }),
       },
     }))
 
     const merged = mergeDataSources(ds1, ds2)
     const caps = merged.getCapabilities()
 
-    expect(caps.base).toEqual(['getBalance'])
-    expect(caps.rune).toEqual(['getRuneById'])
+    expect(caps.btc).toEqual(['btcGetBalance'])
+    expect(caps.runes).toEqual(['runesGetById'])
   })
 
   it('should give primary precedence on overlapping methods', async () => {
     const ds1 = createChainDataSource({ network: 'mainnet' }).extend((_ctx: DataSourceContext) => ({
-      group: 'base',
+      group: 'btc',
       methods: {
-        getBalance: async () => 'primary',
+        btcGetBalance: async () => 'primary',
       },
     }))
 
     const ds2 = createChainDataSource({ network: 'mainnet' }).extend((_ctx: DataSourceContext) => ({
-      group: 'base',
+      group: 'btc',
       methods: {
-        getBalance: async () => 'secondary',
+        btcGetBalance: async () => 'secondary',
       },
     }))
 
     const merged = mergeDataSources(ds1, ds2)
-    const result = await (merged as any).getBalance()
+    const result = await (merged as any).btcGetBalance()
     expect(result).toBe('primary')
   })
 
@@ -69,25 +69,25 @@ describe('mergeDataSources', () => {
 
   it('should merge overlapping capability groups', () => {
     const ds1 = createChainDataSource({ network: 'mainnet' }).extend(() => ({
-      group: 'base',
+      group: 'btc',
       methods: {
-        getBalance: async () => '0',
-        getUtxos: async () => ({ data: [] }),
+        btcGetBalance: async () => '0',
+        btcGetAddressUtxos: async () => ({ data: [] }),
       },
     }))
 
     const ds2 = createChainDataSource({ network: 'mainnet' }).extend(() => ({
-      group: 'base',
+      group: 'btc',
       methods: {
-        getBalance: async () => '0',
-        getTransaction: async () => ({}),
+        btcGetBalance: async () => '0',
+        btcGetTransaction: async () => ({}),
       },
     }))
 
     const merged = mergeDataSources(ds1, ds2)
     const caps = merged.getCapabilities()
-    expect(caps.base).toContain('getBalance')
-    expect(caps.base).toContain('getUtxos')
-    expect(caps.base).toContain('getTransaction')
+    expect(caps.btc).toContain('btcGetBalance')
+    expect(caps.btc).toContain('btcGetAddressUtxos')
+    expect(caps.btc).toContain('btcGetTransaction')
   })
 })

@@ -54,12 +54,12 @@ export function runeCapabilities(
   vendorConfig: MaestroConfig
 ): (
   ctx: DataSourceContext
-) => CapabilityGroup<Pick<RuneCapability, 'getRuneById' | 'getRuneByName'>> {
+) => CapabilityGroup<Pick<RuneCapability, 'runesGetById' | 'runesGetByName'>> {
   return (ctx: DataSourceContext) => {
     const { apiUrl, apiKey } = resolveUrlAndKey(ctx.network, vendorConfig)
 
-    const methods: Pick<RuneCapability, 'getRuneById' | 'getRuneByName'> = {
-      async getRuneById(runeId: string): Promise<RuneInfo> {
+    const methods: Pick<RuneCapability, 'runesGetById' | 'runesGetByName'> = {
+      async runesGetById(runeId: string): Promise<RuneInfo> {
         const resp = (await maestroGet(
           apiUrl,
           apiKey,
@@ -92,11 +92,11 @@ export function runeCapabilities(
         }
       },
 
-      async getRuneByName(runeName: string): Promise<RuneInfo> {
-        return methods.getRuneById(runeName)
+      async runesGetByName(runeName: string): Promise<RuneInfo> {
+        return methods.runesGetById(runeName)
       },
     }
 
-    return { group: 'rune', methods }
+    return { group: 'runes', methods }
   }
 }

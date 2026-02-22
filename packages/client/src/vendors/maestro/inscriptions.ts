@@ -43,7 +43,7 @@ export function inscriptionCapabilities(
     const { apiUrl, apiKey } = resolveUrlAndKey(ctx.network, vendorConfig)
 
     const methods: InscriptionCapability = {
-      async getAddressInscriptions(
+      async inscriptionsGetByAddress(
         address: string,
         pagination?: PaginationParams
       ): Promise<PaginatedResult<Inscription>> {
@@ -85,20 +85,20 @@ export function inscriptionCapabilities(
         }
       },
 
-      async getInscriptionInfo(inscriptionId: string): Promise<InscriptionInfo> {
+      async inscriptionsGetInfo(inscriptionId: string): Promise<InscriptionInfo> {
         const resp = await maestroGet(apiUrl, apiKey, `/assets/inscriptions/${inscriptionId}`)
         return resp as InscriptionInfo
       },
 
-      async batchGetInscriptionInfo(inscriptionIds: string[]): Promise<InscriptionInfo[]> {
+      async inscriptionsBatchGetInfo(inscriptionIds: string[]): Promise<InscriptionInfo[]> {
         const results: InscriptionInfo[] = []
         for (const id of inscriptionIds) {
-          results.push(await methods.getInscriptionInfo(id))
+          results.push(await methods.inscriptionsGetInfo(id))
         }
         return results
       },
     }
 
-    return { group: 'inscription', methods }
+    return { group: 'inscriptions', methods }
   }
 }

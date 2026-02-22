@@ -20,13 +20,13 @@ describe('maestro vendor', () => {
   })
 
   describe('baseCapabilities', () => {
-    it('should return base capability group', () => {
+    it('should return btc capability group', () => {
       const factory = baseCapabilities(config)
       const group = factory(ctx)
-      expect(group.group).toBe('base')
-      expect(group.methods.getBalance).toBeDefined()
-      expect(group.methods.getRecommendedFees).toBeDefined()
-      expect(group.methods.broadcastTransaction).toBeDefined()
+      expect(group.group).toBe('btc')
+      expect(group.methods.btcGetBalance).toBeDefined()
+      expect(group.methods.btcGetRecommendedFees).toBeDefined()
+      expect(group.methods.btcBroadcastTransaction).toBeDefined()
     })
 
     it('should fetch balance', async () => {
@@ -38,7 +38,7 @@ describe('maestro vendor', () => {
         json: async () => ({ data: '123456' }),
       })
 
-      const balance = await methods.getBalance('bc1qtest')
+      const balance = await methods.btcGetBalance('bc1qtest')
       expect(balance).toBe('123456')
       expect(mockFetch).toHaveBeenCalledWith(
         expect.stringContaining('/addresses/bc1qtest/balance'),
@@ -59,19 +59,19 @@ describe('maestro vendor', () => {
         }),
       })
 
-      const fees = await methods.getRecommendedFees()
+      const fees = await methods.btcGetRecommendedFees()
       expect(fees.fastFee).toBe(15)
       expect(fees.minFee).toBe(3)
     })
   })
 
   describe('inscriptionCapabilities', () => {
-    it('should return inscription capability group', () => {
+    it('should return inscriptions capability group', () => {
       const factory = inscriptionCapabilities(config)
       const group = factory(ctx)
-      expect(group.group).toBe('inscription')
-      expect(group.methods.getAddressInscriptions).toBeDefined()
-      expect(group.methods.getInscriptionInfo).toBeDefined()
+      expect(group.group).toBe('inscriptions')
+      expect(group.methods.inscriptionsGetByAddress).toBeDefined()
+      expect(group.methods.inscriptionsGetInfo).toBeDefined()
     })
   })
 
@@ -80,8 +80,8 @@ describe('maestro vendor', () => {
       const factory = brc20Capabilities(config)
       const group = factory(ctx)
       expect(group.group).toBe('brc20')
-      expect(group.methods.getAddressBrc20Balances).toBeDefined()
-      expect(group.methods.getBrc20ByTicker).toBeDefined()
+      expect(group.methods.brc20GetAddressBalances).toBeDefined()
+      expect(group.methods.brc20GetByTicker).toBeDefined()
     })
 
     it('should fetch BRC-20 balances', async () => {
@@ -98,7 +98,7 @@ describe('maestro vendor', () => {
         }),
       })
 
-      const result = await methods.getAddressBrc20Balances('bc1qtest')
+      const result = await methods.brc20GetAddressBalances('bc1qtest')
       expect(result.data).toHaveLength(2)
       expect(result.data[0].ticker).toBe('ordi')
       expect(result.data[0].overall).toBe('1000')
@@ -107,12 +107,12 @@ describe('maestro vendor', () => {
   })
 
   describe('runeCapabilities', () => {
-    it('should return rune capability group with partial methods', () => {
+    it('should return runes capability group with partial methods', () => {
       const factory = runeCapabilities(config)
       const group = factory(ctx)
-      expect(group.group).toBe('rune')
-      expect(group.methods.getRuneById).toBeDefined()
-      expect(group.methods.getRuneByName).toBeDefined()
+      expect(group.group).toBe('runes')
+      expect(group.methods.runesGetById).toBeDefined()
+      expect(group.methods.runesGetByName).toBeDefined()
     })
 
     it('should fetch rune by ID', async () => {
@@ -139,7 +139,7 @@ describe('maestro vendor', () => {
         }),
       })
 
-      const rune = await methods.getRuneById('840000:1')
+      const rune = await methods.runesGetById('840000:1')
       expect(rune.id).toBe('840000:1')
       expect(rune.entry.spaced_rune).toBe('TEST•RUNE')
     })

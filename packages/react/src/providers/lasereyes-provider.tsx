@@ -19,6 +19,34 @@ import { defaultMethods, LaserEyesStoreContext } from './context'
 
 const queryClient = new QueryClient()
 
+/**
+ * Root context provider for LaserEyes Bitcoin wallet integration.
+ *
+ * @remarks
+ * Wraps your application with wallet state management and a React Query client.
+ * Initializes the {@link LaserEyesClient} and exposes wallet methods (connect,
+ * sign, send, etc.) to all descendant components via React context.
+ *
+ * Must be placed near the top of your component tree. Only one instance should
+ * be rendered at a time.
+ *
+ * @param props.config - Optional configuration for network, data sources, and wallet providers
+ * @param props.children - Child React nodes to render within the provider
+ *
+ * @example
+ * ```tsx
+ * import { LaserEyesProvider } from '@omnisat/lasereyes-react'
+ * import { MAINNET } from '@omnisat/lasereyes-core'
+ *
+ * function App() {
+ *   return (
+ *     <LaserEyesProvider config={{ network: MAINNET }}>
+ *       <MyWalletUI />
+ *     </LaserEyesProvider>
+ *   )
+ * }
+ * ```
+ */
 export default function LaserEyesProvider({
   config,
   children,

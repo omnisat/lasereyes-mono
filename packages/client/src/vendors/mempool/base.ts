@@ -75,12 +75,12 @@ export function baseCapabilities(
     }
 
     const methods: BaseCapability = {
-      async getBalance(address: string): Promise<string> {
-        const { data: utxos } = await methods.getUtxos(address)
+      async btcGetBalance(address: string): Promise<string> {
+        const { data: utxos } = await methods.btcGetAddressUtxos(address)
         return utxos.reduce((acc, utxo) => acc + BigInt(utxo.value), 0n).toString()
       },
 
-      async getUtxos(
+      async btcGetAddressUtxos(
         address: string,
         _pagination?: PaginationParams
       ): Promise<PaginatedResult<UTXO>> {
@@ -96,15 +96,15 @@ export function baseCapabilities(
         return { data: mapped }
       },
 
-      async getTransaction(txId: string): Promise<Transaction> {
+      async btcGetTransaction(txId: string): Promise<Transaction> {
         return (await call('get', `/api/tx/${txId}`)) as Transaction
       },
 
-      async broadcastTransaction(rawTx: string): Promise<string> {
+      async btcBroadcastTransaction(rawTx: string): Promise<string> {
         return (await call('post', '/api/tx', rawTx)) as string
       },
 
-      async getRecommendedFees(): Promise<FeeEstimate> {
+      async btcGetRecommendedFees(): Promise<FeeEstimate> {
         const response = await call('get', '/api/v1/fees/recommended')
         return {
           fastFee: (response as { fastestFee: number }).fastestFee,
@@ -112,12 +112,12 @@ export function baseCapabilities(
         }
       },
 
-      async getOutputValue(txId: string, vout: number): Promise<number | null> {
+      async btcGetOutputValue(txId: string, vout: number): Promise<number | null> {
         const timeout = 60000
         const startTime = Date.now()
         while (true) {
           try {
-            const tx = await methods.getTransaction(txId)
+            const tx = await methods.btcGetTransaction(txId)
             if (tx?.vout && tx.vout.length > 0) {
               return Math.floor(tx.vout[vout].value)
             }
@@ -130,12 +130,12 @@ export function baseCapabilities(
         }
       },
 
-      async waitForTransaction(txId: string): Promise<boolean> {
+      async btcWaitForTransaction(txId: string): Promise<boolean> {
         const timeout = 60000
         const startTime = Date.now()
         while (true) {
           try {
-            const tx = await methods.getTransaction(txId)
+            const tx = await methods.btcGetTransaction(txId)
             if (tx) return true
             if (Date.now() - startTime > timeout) return false
             await new Promise(resolve => setTimeout(resolve, 5000))
@@ -148,7 +148,7 @@ export function baseCapabilities(
     }
 
     return {
-      group: 'base',
+      group: 'btc',
       methods,
     }
   }

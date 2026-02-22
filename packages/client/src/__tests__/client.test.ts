@@ -6,11 +6,11 @@ import type { BaseCapability, DataSourceContext } from '../types'
 
 function makeMockBaseDs(network = 'mainnet') {
   return createChainDataSource({ network }).extend((_ctx: DataSourceContext) => ({
-    group: 'base',
+    group: 'btc',
     methods: {
-      getBalance: async (_addr: string) => '50000',
-      getUtxos: async (_addr: string) => ({ data: [] }),
-      getTransaction: async (_txId: string) => ({
+      btcGetBalance: async (_addr: string) => '50000',
+      btcGetAddressUtxos: async (_addr: string) => ({ data: [] }),
+      btcGetTransaction: async (_txId: string) => ({
         txid: 'abc',
         version: 2,
         locktime: 0,
@@ -26,10 +26,10 @@ function makeMockBaseDs(network = 'mainnet') {
           block_time: 1000,
         },
       }),
-      broadcastTransaction: async (_rawTx: string) => 'txid123',
-      getRecommendedFees: async () => ({ fastFee: 10, minFee: 1 }),
-      getOutputValue: async (_txId: string, _vout: number) => 546 as number | null,
-      waitForTransaction: async (_txId: string) => true,
+      btcBroadcastTransaction: async (_rawTx: string) => 'txid123',
+      btcGetRecommendedFees: async () => ({ fastFee: 10, minFee: 1 }),
+      btcGetOutputValue: async (_txId: string, _vout: number) => 546 as number | null,
+      btcWaitForTransaction: async (_txId: string) => true,
     } satisfies BaseCapability,
   }))
 }
@@ -51,7 +51,7 @@ describe('createClient', () => {
     const ds = makeMockBaseDs()
     const client = createClient({ network: 'mainnet', dataSource: ds }).extend(c => ({
       myAction: async () => {
-        const balance = await c.dataSource.getBalance('addr')
+        const balance = await c.dataSource.btcGetBalance('addr')
         return `balance: ${balance}`
       },
     }))
@@ -85,6 +85,6 @@ describe('createClient', () => {
 
     const info = client.getNetworkInfo()
     expect(info.network).toBe('mainnet')
-    expect(info.caps.base).toBeDefined()
+    expect(info.caps.btc).toBeDefined()
   })
 })

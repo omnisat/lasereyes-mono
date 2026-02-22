@@ -70,7 +70,7 @@ export function alkaneCapabilities(
     const rpcUrl = `${url}/${key}`
 
     const methods: AlkaneCapability = {
-      async getAlkanesByAddress(
+      async alkanesGetByAddress(
         address: string,
         _pagination?: PaginationParams
       ): Promise<PaginatedResult<AlkaneOutpoint>> {
@@ -121,11 +121,11 @@ export function alkaneCapabilities(
         }
       },
 
-      async getAddressAlkanesBalances(
+      async alkanesGetAddressBalances(
         address: string,
         _pagination?: PaginationParams
       ): Promise<PaginatedResult<AlkaneBalance>> {
-        const { data: outpoints } = await methods.getAlkanesByAddress(address)
+        const { data: outpoints } = await methods.alkanesGetByAddress(address)
         const balances: Record<string, AlkaneBalance> = {}
         for (const outpoint of outpoints) {
           for (const rune of outpoint.runes) {
@@ -146,6 +146,6 @@ export function alkaneCapabilities(
       },
     }
 
-    return { group: 'alkane', methods }
+    return { group: 'alkanes', methods }
   }
 }

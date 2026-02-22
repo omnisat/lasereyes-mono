@@ -16,17 +16,17 @@ describe('mempool vendor - baseCapabilities', () => {
     mockFetch.mockReset()
   })
 
-  it('should return base capability group', () => {
+  it('should return btc capability group', () => {
     const factory = baseCapabilities()
     const group = factory(ctx)
-    expect(group.group).toBe('base')
-    expect(group.methods.getBalance).toBeDefined()
-    expect(group.methods.getUtxos).toBeDefined()
-    expect(group.methods.getTransaction).toBeDefined()
-    expect(group.methods.broadcastTransaction).toBeDefined()
-    expect(group.methods.getRecommendedFees).toBeDefined()
-    expect(group.methods.getOutputValue).toBeDefined()
-    expect(group.methods.waitForTransaction).toBeDefined()
+    expect(group.group).toBe('btc')
+    expect(group.methods.btcGetBalance).toBeDefined()
+    expect(group.methods.btcGetAddressUtxos).toBeDefined()
+    expect(group.methods.btcGetTransaction).toBeDefined()
+    expect(group.methods.btcBroadcastTransaction).toBeDefined()
+    expect(group.methods.btcGetRecommendedFees).toBeDefined()
+    expect(group.methods.btcGetOutputValue).toBeDefined()
+    expect(group.methods.btcWaitForTransaction).toBeDefined()
   })
 
   it('should fetch balance by summing UTXOs', async () => {
@@ -52,7 +52,7 @@ describe('mempool vendor - baseCapabilities', () => {
       ],
     })
 
-    const balance = await methods.getBalance('bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4')
+    const balance = await methods.btcGetBalance('bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4')
     expect(balance).toBe('80000')
     expect(mockFetch).toHaveBeenCalledWith(
       expect.stringContaining('/api/address/bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4/utxo'),
@@ -76,7 +76,7 @@ describe('mempool vendor - baseCapabilities', () => {
       }),
     })
 
-    const fees = await methods.getRecommendedFees()
+    const fees = await methods.btcGetRecommendedFees()
     expect(fees.fastFee).toBe(25)
     expect(fees.minFee).toBe(5)
   })
@@ -91,7 +91,7 @@ describe('mempool vendor - baseCapabilities', () => {
       text: async () => 'txid123abc',
     })
 
-    const txId = await methods.broadcastTransaction('rawhex')
+    const txId = await methods.btcBroadcastTransaction('rawhex')
     expect(txId).toBe('txid123abc')
     expect(mockFetch).toHaveBeenCalledWith(
       expect.stringContaining('/api/tx'),
@@ -121,7 +121,7 @@ describe('mempool vendor - baseCapabilities', () => {
       json: async () => mockTx,
     })
 
-    const tx = await methods.getTransaction('abc123')
+    const tx = await methods.btcGetTransaction('abc123')
     expect(tx.txid).toBe('abc123')
   })
 
@@ -133,6 +133,6 @@ describe('mempool vendor - baseCapabilities', () => {
     })
     const group = factory(ctx)
     // The factory should use the custom URL - test that it was created successfully
-    expect(group.group).toBe('base')
+    expect(group.group).toBe('btc')
   })
 })

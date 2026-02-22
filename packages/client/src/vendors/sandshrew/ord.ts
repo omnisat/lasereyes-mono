@@ -36,12 +36,12 @@ export function ordCapabilities(
     const rpc = new SandshrewRpcClient(`${url}/${key}`)
 
     const methods: OrdCapability = {
-      async getOrdAddress(address: string): Promise<OrdAddressInfo> {
+      async ordGetAddress(address: string): Promise<OrdAddressInfo> {
         const response = await rpc.call('ord_address', [address])
         return response.result as OrdAddressInfo
       },
 
-      async getFormattedUtxos(
+      async ordGetFormattedUtxos(
         address: string | string[],
         _pagination?: PaginationParams
       ): Promise<PaginatedResult<FormattedUTXO>> {

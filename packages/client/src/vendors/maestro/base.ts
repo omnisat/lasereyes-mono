@@ -71,26 +71,27 @@ export function baseCapabilities(
     const { apiUrl, apiKey } = resolveUrlAndKey(ctx.network, vendorConfig)
 
     const methods: BaseCapability = {
-      async getBalance(address: string): Promise<string> {
+      async btcGetBalance(address: string): Promise<string> {
         const resp = await maestroCall(apiUrl, apiKey, 'get', `/addresses/${address}/balance`)
         return (resp as { data: string }).data
       },
 
-      async getUtxos(
+      async btcGetAddressUtxos(
         _address: string,
         _pagination?: PaginationParams
       ): Promise<PaginatedResult<UTXO>> {
-        // Maestro doesn't natively expose a mempool-compatible UTXO endpoint
-        // This is a partial implementation; callers should prefer mempool for UTXOs
-        throw new DataSourceError('getUtxos is not supported by Maestro data source', 'maestro')
+        throw new DataSourceError(
+          'btcGetAddressUtxos is not supported by Maestro data source',
+          'maestro'
+        )
       },
 
-      async getTransaction(txId: string): Promise<Transaction> {
+      async btcGetTransaction(txId: string): Promise<Transaction> {
         const resp = await maestroCall(apiUrl, apiKey, 'get', `/rpc/transaction/${txId}`)
         return (resp as { data: Transaction }).data
       },
 
-      async broadcastTransaction(rawTx: string): Promise<string> {
+      async btcBroadcastTransaction(rawTx: string): Promise<string> {
         return (await maestroCall(
           apiUrl,
           apiKey,
@@ -100,28 +101,28 @@ export function baseCapabilities(
         )) as string
       },
 
-      async getRecommendedFees(): Promise<FeeEstimate> {
+      async btcGetRecommendedFees(): Promise<FeeEstimate> {
         const resp = await maestroCall(apiUrl, apiKey, 'get', '/mempool/fee_rates')
         const data = resp as { data: Array<{ sats_per_vb: { min: number; median: number } }> }
         const fee = data.data[0].sats_per_vb
         return { fastFee: fee.median, minFee: fee.min }
       },
 
-      async getOutputValue(_txId: string, _vout: number): Promise<number | null> {
+      async btcGetOutputValue(_txId: string, _vout: number): Promise<number | null> {
         throw new DataSourceError(
-          'getOutputValue is not supported by Maestro data source',
+          'btcGetOutputValue is not supported by Maestro data source',
           'maestro'
         )
       },
 
-      async waitForTransaction(_txId: string): Promise<boolean> {
+      async btcWaitForTransaction(_txId: string): Promise<boolean> {
         throw new DataSourceError(
-          'waitForTransaction is not supported by Maestro data source',
+          'btcWaitForTransaction is not supported by Maestro data source',
           'maestro'
         )
       },
     }
 
-    return { group: 'base', methods }
+    return { group: 'btc', methods }
   }
 }

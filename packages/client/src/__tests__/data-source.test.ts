@@ -15,48 +15,48 @@ describe('createChainDataSource', () => {
 
   it('should accumulate capabilities via extend', () => {
     const ds = createChainDataSource({ network: 'mainnet' }).extend((_ctx: DataSourceContext) => ({
-      group: 'base',
+      group: 'btc',
       methods: {
-        getBalance: async (_address: string) => '100',
-        getUtxos: async (_address: string) => ({ data: [] }),
+        btcGetBalance: async (_address: string) => '100',
+        btcGetAddressUtxos: async (_address: string) => ({ data: [] }),
       },
     }))
 
     expect(ds.getCapabilities()).toEqual({
-      base: ['getBalance', 'getUtxos'],
+      btc: ['btcGetBalance', 'btcGetAddressUtxos'],
     })
   })
 
   it('should make extended methods available on the data source', async () => {
     const ds = createChainDataSource({ network: 'mainnet' }).extend((_ctx: DataSourceContext) => ({
-      group: 'base',
+      group: 'btc',
       methods: {
-        getBalance: async (_address: string) => '12345',
+        btcGetBalance: async (_address: string) => '12345',
       },
     }))
 
-    const balance = await ds.getBalance('bc1test')
+    const balance = await ds.btcGetBalance('bc1test')
     expect(balance).toBe('12345')
   })
 
   it('should chain multiple extensions', () => {
     const ds = createChainDataSource({ network: 'mainnet' })
       .extend(_ctx => ({
-        group: 'base',
+        group: 'btc',
         methods: {
-          getBalance: async (_addr: string) => '0',
+          btcGetBalance: async (_addr: string) => '0',
         },
       }))
       .extend(_ctx => ({
-        group: 'rune',
+        group: 'runes',
         methods: {
-          getRuneById: async (_id: string) => ({ id: _id }),
+          runesGetById: async (_id: string) => ({ id: _id }),
         },
       }))
 
     const caps = ds.getCapabilities()
-    expect(caps.base).toEqual(['getBalance'])
-    expect(caps.rune).toEqual(['getRuneById'])
+    expect(caps.btc).toEqual(['btcGetBalance'])
+    expect(caps.runes).toEqual(['runesGetById'])
   })
 
   it('should pass network in context to factory', () => {

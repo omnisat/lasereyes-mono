@@ -47,7 +47,7 @@ export function baseCapabilities(
     const rpc = new SandshrewRpcClient(`${url}/${key}`)
 
     const methods: BaseCapability = {
-      async getBalance(address: string): Promise<string> {
+      async btcGetBalance(address: string): Promise<string> {
         const response = await rpc.call('esplora_address', [address])
         const result = response.result as {
           chain_stats: { funded_txo_sum: string; spent_txo_sum: string }
@@ -57,7 +57,7 @@ export function baseCapabilities(
         ).toString()
       },
 
-      async getUtxos(address: string): Promise<PaginatedResult<UTXO>> {
+      async btcGetAddressUtxos(address: string): Promise<PaginatedResult<UTXO>> {
         const response = await rpc.call('esplora_address::utxo', [address])
         const scriptPk = getAddressScriptPubKey(address, ctx.network)
         const mapped = (response.result as UTXO[]).map(utxo => ({
@@ -67,17 +67,17 @@ export function baseCapabilities(
         return { data: mapped }
       },
 
-      async getTransaction(txId: string): Promise<Transaction> {
+      async btcGetTransaction(txId: string): Promise<Transaction> {
         const response = await rpc.call('esplora_tx', [txId])
         return response.result as Transaction
       },
 
-      async broadcastTransaction(rawTx: string): Promise<string> {
+      async btcBroadcastTransaction(rawTx: string): Promise<string> {
         const response = await rpc.call('broadcast_tx', [rawTx])
         return response as unknown as string
       },
 
-      async getRecommendedFees(): Promise<FeeEstimate> {
+      async btcGetRecommendedFees(): Promise<FeeEstimate> {
         const response = await rpc.call('esplora_fee-estimates', [])
         const feeEstimates = response.result as Record<string, number>
         const fastFee = feeEstimates['1'] || 0
@@ -85,7 +85,7 @@ export function baseCapabilities(
         return { fastFee: Math.round(fastFee), minFee: Math.round(minFee) }
       },
 
-      async getOutputValue(txId: string, vout: number): Promise<number | null> {
+      async btcGetOutputValue(txId: string, vout: number): Promise<number | null> {
         const response = await rpc.call('esplora_tx', [txId])
         const result = response.result as {
           vout: { value: number }[]
@@ -93,12 +93,12 @@ export function baseCapabilities(
         return result.vout[vout]?.value ?? null
       },
 
-      async waitForTransaction(txId: string): Promise<boolean> {
+      async btcWaitForTransaction(txId: string): Promise<boolean> {
         const timeout = 60000
         const startTime = Date.now()
         while (true) {
           try {
-            const tx = await methods.getTransaction(txId)
+            const tx = await methods.btcGetTransaction(txId)
             if (tx) return true
             if (Date.now() - startTime > timeout) return false
             await new Promise(resolve => setTimeout(resolve, 5000))
@@ -110,6 +110,6 @@ export function baseCapabilities(
       },
     }
 
-    return { group: 'base', methods }
+    return { group: 'btc', methods }
   }
 }

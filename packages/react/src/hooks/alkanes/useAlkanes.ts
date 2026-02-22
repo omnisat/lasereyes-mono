@@ -12,8 +12,11 @@ import {
 import { useMemo } from 'react'
 import { useLaserEyes } from '../../providers/hooks'
 
+/** Parameters for the {@link useAlkanesList} hook. */
 type useAlkanesListParams = {
+  /** Number of tokens to fetch per page. Defaults to 10. */
   batchSize?: number
+  /** Additional React Query infinite query options (queryKey, queryFn, and getNextPageParam are managed internally) */
   queryOptions?: Omit<
     UseInfiniteQueryOptions<
       AlkaneToken[],
@@ -26,6 +29,31 @@ type useAlkanesListParams = {
   >
 }
 
+/**
+ * Fetches a paginated list of all Alkane tokens using infinite scrolling.
+ *
+ * @remarks
+ * Uses React Query's `useInfiniteQuery` to progressively load Alkane tokens.
+ * Pages are automatically keyed by the highest token ID in the previous page.
+ * On mainnet, pagination starts at offset 16 to skip reserved system tokens.
+ *
+ * The returned `data` is a flattened array of all loaded pages. Use
+ * `fetchNextPage` from the spread result to load additional pages.
+ *
+ * Refetches every 10 minutes by default.
+ *
+ * @param options - Optional configuration for batch size and React Query options
+ * @returns An object with `data` (flattened `AlkaneToken[]`) and all other React Query infinite query fields
+ *
+ * @throws Error if the LaserEyes client is not available
+ *
+ * @example
+ * ```tsx
+ * const { data: alkanes, fetchNextPage, hasNextPage } = useAlkanesList({
+ *   batchSize: 20,
+ * })
+ * ```
+ */
 export function useAlkanesList(
   options?: useAlkanesListParams
 ): Omit<UseInfiniteQueryResult, 'data'> & { data: AlkaneToken[] | undefined } {
