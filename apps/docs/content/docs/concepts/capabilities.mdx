@@ -1,0 +1,106 @@
+---
+title: Capabilities
+description: Understanding the capability system for chain data sources
+---
+
+Capabilities define groups of methods that a data source can provide. They are the building blocks of the composable data source pattern in `@omnisat/lasereyes-client`.
+
+## Capability Interfaces
+
+### BaseCapability
+
+Every data source should provide these core methods:
+
+| Method | Description |
+|--------|-------------|
+| `getAddressUtxos` | Get UTXOs for an address |
+| `getRecommendedFees` | Get current fee estimates |
+| `getTransaction` | Get transaction details by ID |
+| `broadcastTransaction` | Broadcast a raw transaction |
+| `getAddressBalance` | Get address BTC balance |
+
+### RuneCapability
+
+Methods for querying Runes protocol data:
+
+| Method | Description |
+|--------|-------------|
+| `getAddressRuneBalances` | Get rune balances for an address |
+| `getRuneById` | Look up a rune by its ID |
+| `getRuneByName` | Look up a rune by name |
+| `getRuneOutpoints` | Get outpoints containing runes |
+
+### InscriptionCapability
+
+Methods for querying Ordinals inscriptions:
+
+| Method | Description |
+|--------|-------------|
+| `getAddressInscriptions` | Get inscriptions owned by an address |
+| `getInscriptionInfo` | Get details for a specific inscription |
+
+### Brc20Capability
+
+Methods for BRC-20 token data:
+
+| Method | Description |
+|--------|-------------|
+| `getAddressBrc20Balances` | Get BRC-20 balances for an address |
+| `getBrc20Info` | Get info about a BRC-20 token |
+
+### AlkaneCapability
+
+Methods for Alkanes protocol data:
+
+| Method | Description |
+|--------|-------------|
+| `getAddressAlkaneBalances` | Get alkane balances for an address |
+| `getAlkanesByAddress` | Get alkane outpoints for an address |
+
+### OrdCapability
+
+Methods for Ord indexer data:
+
+| Method | Description |
+|--------|-------------|
+| `getOrdAddress` | Get ord info for an address |
+| `getOrdOutput` | Get ord data for a specific output |
+
+## Composing Capabilities
+
+Capabilities compose naturally through the `.extend()` chain:
+
+```ts
+const ds = createChainDataSource({ network: MAINNET })
+  .extend(baseCapabilities(config))     // adds BaseCapability methods
+  .extend(runeCapabilities(config))     // adds RuneCapability methods
+  .extend(inscriptionCapabilities(config)) // adds InscriptionCapability methods
+```
+
+The resulting data source type is the intersection of all extended capabilities, giving you full type safety.
+
+## Creating Custom Capabilities
+
+Define a capability factory that returns a function accepting `DataSourceContext`:
+
+```ts
+import type { DataSourceContext } from '@omnisat/lasereyes-client'
+
+interface MyCapability {
+  getMyData: (id: string) => Promise<MyData>
+}
+
+const myCapabilities = (config: MyConfig) =>
+  (ctx: DataSourceContext): MyCapability => ({
+    getMyData: async (id) => {
+      const res = await fetch(`${config.apiUrl}/data/${id}`)
+      return res.json()
+    },
+  })
+
+// Use it
+const ds = createChainDataSource({ network: MAINNET })
+  .extend(myCapabilities({ apiUrl: '...' }))
+
+await ds.getMyData('abc') // fully typed
+```

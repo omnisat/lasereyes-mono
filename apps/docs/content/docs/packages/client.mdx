@@ -1,0 +1,84 @@
+---
+title: "@omnisat/lasereyes-client"
+description: Low-level Bitcoin chain data primitives and vendor integrations
+---
+
+The client package provides composable chain data primitives. It follows the viem/wagmi pattern of building up functionality through composition.
+
+## Core Concepts
+
+### Data Sources
+
+Create a data source and extend it with capabilities:
+
+```ts
+import { createChainDataSource, MAINNET } from '@omnisat/lasereyes-client'
+import { baseCapabilities } from '@omnisat/lasereyes-client/vendors/mempool'
+
+const ds = createChainDataSource({ network: MAINNET })
+  .extend(baseCapabilities({ apiUrl: 'https://mempool.space/api' }))
+
+const utxos = await ds.getAddressUtxos('bc1q...')
+const fees = await ds.getRecommendedFees()
+```
+
+### Vendor Factories
+
+Pre-configured data source builders:
+
+```ts
+import { createDataSource } from '@omnisat/lasereyes-client/vendors/sandshrew'
+
+const ds = createDataSource({
+  network: 'mainnet',
+  url: 'https://sandshrew.io',
+  apiKey: 'key',
+})
+// Full capabilities: base + runes + alkanes + inscriptions + ord
+```
+
+### Client with Actions
+
+Wrap a data source with action methods:
+
+```ts
+import { createClient, btcActions } from '@omnisat/lasereyes-client'
+
+const client = createClient({ dataSource: ds })
+  .extend(btcActions())
+
+const psbt = await client.sendBtc({
+  fromAddress: 'bc1q...',
+  toAddress: 'bc1q...',
+  amount: 10000,
+  feeRate: 5,
+  signPsbt: async ({ psbtHex }) => {
+    // Sign with your wallet
+    return { signedPsbtHex: '...' }
+  },
+})
+```
+
+## Subpath Exports
+
+```ts
+import { ... } from '@omnisat/lasereyes-client'              // Core types & functions
+import { ... } from '@omnisat/lasereyes-client/vendors/mempool'    // Mempool vendor
+import { ... } from '@omnisat/lasereyes-client/vendors/sandshrew'  // Sandshrew vendor
+import { ... } from '@omnisat/lasereyes-client/vendors/maestro'    // Maestro vendor
+```
+
+## Error Classes
+
+| Error | Description |
+|-------|-------------|
+| `LaserEyesClientError` | Base error class |
+| `DataSourceError` | Chain data request failure |
+| `NetworkMismatchError` | Wrong network for operation |
+| `PsbtBuildError` | PSBT construction failure |
+| `InsufficientFundsError` | Not enough funds |
+| `CapabilityNotFoundError` | Missing data source capability |
+
+## API Reference
+
+See the [auto-generated API docs](/docs/api-reference/lasereyes-client/README) for complete type information.

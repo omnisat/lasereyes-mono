@@ -1,0 +1,52 @@
+---
+title: Working with Runes
+description: Query and transfer Runes protocol tokens
+---
+
+## Querying Rune Balances
+
+Use the `getMetaBalances` method to fetch rune balances for the connected wallet:
+
+```tsx
+const { getMetaBalances } = useLaserEyes()
+
+const balances = await getMetaBalances('runes')
+```
+
+## Sending Runes
+
+```tsx
+const { send } = useLaserEyes()
+
+await send('runes', {
+  runeId: '840000:1',
+  fromAddress: paymentAddress,
+  toAddress: 'bc1q...recipient',
+  amount: 100,
+  network: 'mainnet',
+})
+```
+
+## Rune Queries with Client Package
+
+For direct chain data queries using `@omnisat/lasereyes-client`:
+
+```ts
+import { createDataSource } from '@omnisat/lasereyes-client/vendors/sandshrew'
+
+const ds = createDataSource({ network: 'mainnet', url: '...', apiKey: '...' })
+
+// Get rune balances
+const balances = await ds.getAddressRuneBalances('bc1q...')
+
+// Look up a rune
+const rune = await ds.getRuneById('840000:1')
+const rune = await ds.getRuneByName('UNCOMMON•GOODS')
+
+// Get outpoints containing runes
+const outpoints = await ds.getRuneOutpoints('bc1q...')
+```
+
+## Data Source Requirements
+
+Rune capabilities require either **Sandshrew** (full support) or **Maestro** (partial: `getRuneById` and `getRuneByName` only). Mempool does not support Runes.

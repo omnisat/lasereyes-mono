@@ -1,0 +1,108 @@
+---
+title: Vendors
+description: Chain data providers — Mempool, Sandshrew, and Maestro
+---
+
+LaserEyes ships with three vendor integrations for chain data. Each vendor provides different capabilities and is suited to different use cases.
+
+## Mempool (mempool.space)
+
+The default data source for basic Bitcoin operations.
+
+```ts
+import { createDataSource } from '@omnisat/lasereyes-client/vendors/mempool'
+
+const ds = createDataSource({ network: 'mainnet' })
+```
+
+**Capabilities:** Base (UTXOs, fees, transactions, broadcast)
+
+**Strengths:**
+- No API key required
+- Reliable for mainnet and testnet
+- Open source infrastructure
+
+**Limitations:**
+- No Runes, Inscriptions, or BRC-20 support
+- Rate limited on public endpoints
+
+## Sandshrew
+
+Full-featured data source with support for all Bitcoin protocols.
+
+```ts
+import { createDataSource } from '@omnisat/lasereyes-client/vendors/sandshrew'
+
+const ds = createDataSource({
+  network: 'mainnet',
+  url: 'https://sandshrew.io',
+  apiKey: 'your-key',
+})
+```
+
+**Capabilities:** Base + Runes + Alkanes + Inscriptions + Ord
+
+**Strengths:**
+- Comprehensive protocol support
+- Alkanes support (unique to Sandshrew)
+- Ord indexer integration
+- `getBalances` batch endpoint for formatted UTXOs
+
+**Limitations:**
+- Requires API key
+- No BRC-20 support
+
+## Maestro
+
+Professional-grade data source with BRC-20 support.
+
+```ts
+import { createDataSource } from '@omnisat/lasereyes-client/vendors/maestro'
+
+const ds = createDataSource({
+  network: 'mainnet',
+  apiKey: 'your-key',
+})
+```
+
+**Capabilities:** Base + Inscriptions + BRC-20 + Runes (partial: `getRuneById`, `getRuneByName`)
+
+**Strengths:**
+- BRC-20 support (unique to Maestro)
+- Professional infrastructure
+- Detailed inscription data
+
+**Limitations:**
+- Requires API key
+- Partial Runes support (no balance/outpoint queries)
+- No Alkanes support
+
+## Comparison Matrix
+
+| Feature | Mempool | Sandshrew | Maestro |
+|---------|---------|-----------|---------|
+| UTXOs & Fees | Yes | Yes | Yes |
+| Broadcast | Yes | Yes | Yes |
+| Runes (full) | - | Yes | Partial |
+| Inscriptions | - | Yes | Yes |
+| BRC-20 | - | - | Yes |
+| Alkanes | - | Yes | - |
+| Ord indexer | - | Yes | - |
+| API key required | No | Yes | Yes |
+
+## Using Multiple Vendors
+
+In `@omnisat/lasereyes-core`, the `DataSourceManager` handles routing requests to the appropriate vendor with automatic fallback:
+
+```ts
+const config = {
+  network: 'mainnet',
+  dataSources: {
+    mempool: { url: 'https://mempool.space/api' },
+    sandshrew: { apiKey: 'sk_...' },
+    maestro: { apiKey: 'mk_...' },
+  },
+}
+```
+
+The manager tries the preferred source first, then falls back to alternatives if the method isn't available or the request fails.

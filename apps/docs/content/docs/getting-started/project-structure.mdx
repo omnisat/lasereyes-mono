@@ -1,0 +1,54 @@
+---
+title: Project Structure
+description: How the LaserEyes monorepo is organized
+---
+
+LaserEyes is organized as a monorepo with three main packages that layer on top of each other:
+
+```
+@omnisat/lasereyes          # Main entry point (re-exports react)
+  └── @omnisat/lasereyes-react   # React hooks & provider
+        └── @omnisat/lasereyes-core    # Wallet management & state
+              └── @omnisat/lasereyes-client  # Chain data primitives
+```
+
+## Packages
+
+### `@omnisat/lasereyes`
+
+The convenience package most users should install. Re-exports everything from `@omnisat/lasereyes-react`.
+
+### `@omnisat/lasereyes-react`
+
+React-specific integration layer:
+- `LaserEyesProvider` - Context provider with wallet state
+- `useLaserEyes` - Primary hook with selector support
+- Data fetching hooks (`useBalance`, `useBitcoinFees`, `useAccount`, etc.)
+- Wallet icon components
+
+### `@omnisat/lasereyes-core`
+
+Framework-agnostic wallet management:
+- `LaserEyesClient` - Main client class managing 14 wallet providers
+- `DataSourceManager` - Manages chain data sources with fallback
+- Reactive state via nanostores (`$store`, `$network`)
+- Wallet provider implementations (UniSat, Xverse, Leather, etc.)
+
+### `@omnisat/lasereyes-client`
+
+Low-level chain data primitives:
+- `createChainDataSource` - Composable data source builder
+- `createClient` - Client with action methods
+- Vendor integrations (Mempool, Sandshrew, Maestro)
+- Type definitions for Bitcoin primitives (UTXOs, PSBTs, Runes, etc.)
+
+## Monorepo Tooling
+
+| Tool | Purpose |
+|------|---------|
+| pnpm workspaces | Package management |
+| Turborepo | Build orchestration |
+| Vite + vite-plugin-dts | Library bundling with types |
+| Biome | Linting and formatting |
+| Vitest | Testing |
+| TypeDoc | API documentation generation |

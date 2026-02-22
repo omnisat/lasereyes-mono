@@ -1,0 +1,100 @@
+---
+title: Custom Data Sources
+description: Configure custom endpoints and data sources
+---
+
+## Configuring Data Sources
+
+Pass data source configuration through the `LaserEyesProvider` config:
+
+```tsx
+<LaserEyesProvider config={{
+  network: 'mainnet',
+  dataSources: {
+    mempool: {
+      url: 'https://mempool.space/api',
+    },
+    sandshrew: {
+      apiKey: 'your-sandshrew-key',
+    },
+    maestro: {
+      apiKey: 'your-maestro-key',
+    },
+  },
+}}>
+```
+
+## Custom Network Endpoints
+
+Override the default API endpoints for specific networks:
+
+```tsx
+<LaserEyesProvider config={{
+  network: 'mainnet',
+  dataSources: {
+    mempool: {
+      networks: {
+        mainnet: { apiUrl: 'https://my-mempool-instance.com/api' },
+      },
+    },
+    sandshrew: {
+      networks: {
+        mainnet: {
+          apiKey: 'mainnet-key',
+          apiUrl: 'https://sandshrew.io',
+        },
+        testnet: {
+          apiKey: 'testnet-key',
+          apiUrl: 'https://testnet.sandshrew.io',
+        },
+      },
+    },
+  },
+}}>
+```
+
+## Custom Networks
+
+Define entirely custom networks that map to a base network for address derivation:
+
+```tsx
+<LaserEyesProvider config={{
+  network: 'my-custom-network',
+  customNetworks: {
+    'my-custom-network': {
+      baseNetwork: 'mainnet',
+      preferredDataSource: 'sandshrew',
+    },
+  },
+  dataSources: {
+    sandshrew: {
+      networks: {
+        'my-custom-network': {
+          apiKey: 'custom-key',
+          apiUrl: 'https://custom-sandshrew.example.com',
+        },
+      },
+    },
+  },
+}}>
+```
+
+## Using the Client Package Directly
+
+For applications that don't use the React layer, build data sources directly:
+
+```ts
+import { createChainDataSource, mergeDataSources, MAINNET } from '@omnisat/lasereyes-client'
+import { createDataSource as createMempoolDS } from '@omnisat/lasereyes-client/vendors/mempool'
+import { createDataSource as createSandshrewDS } from '@omnisat/lasereyes-client/vendors/sandshrew'
+
+const mempool = createMempoolDS({ network: MAINNET })
+const sandshrew = createSandshrewDS({
+  network: MAINNET,
+  url: 'https://sandshrew.io',
+  apiKey: 'key',
+})
+
+// Merge: sandshrew methods take priority where both provide the same capability
+const ds = mergeDataSources(mempool, sandshrew)
+```

@@ -1,0 +1,69 @@
+---
+title: Data Sources
+description: How chain data sources work in LaserEyes
+---
+
+Data sources provide chain data (UTXOs, fees, balances, inscriptions, etc.) to the LaserEyes client. The `@omnisat/lasereyes-client` package uses a composable pattern for building data sources.
+
+## Creating a Data Source
+
+Use `createChainDataSource` to create a base data source, then `.extend()` to add capabilities:
+
+```ts
+import { createChainDataSource, MAINNET } from '@omnisat/lasereyes-client'
+import { baseCapabilities } from '@omnisat/lasereyes-client/vendors/mempool'
+
+const dataSource = createChainDataSource({ network: MAINNET })
+  .extend(baseCapabilities({ apiUrl: 'https://mempool.space/api' }))
+```
+
+Each `.extend()` call adds new methods to the data source while preserving existing ones.
+
+## Using Vendor Factories
+
+For convenience, each vendor provides a `createDataSource` factory that pre-configures all available capabilities:
+
+```ts
+import { createDataSource } from '@omnisat/lasereyes-client/vendors/sandshrew'
+
+const ds = createDataSource({
+  network: 'mainnet',
+  url: 'https://sandshrew.io',
+  apiKey: 'your-api-key',
+})
+// ds now has base + rune + alkane + inscription + ord capabilities
+```
+
+## Merging Data Sources
+
+Combine multiple data sources into one using `mergeDataSources`:
+
+```ts
+import { mergeDataSources } from '@omnisat/lasereyes-client'
+
+const merged = mergeDataSources(mempoolSource, sandshrewSource)
+// Methods from sandshrewSource override mempoolSource where they overlap
+```
+
+## Data Source Context
+
+Every capability function receives a `DataSourceContext` with the configured network:
+
+```ts
+const myCapability = (config: MyConfig) => (ctx: DataSourceContext) => ({
+  getMyData: async () => {
+    const url = getUrlForNetwork(ctx.network, config)
+    return fetch(url).then(r => r.json())
+  },
+})
+```
+
+## Available Vendors
+
+| Vendor | Capabilities | Networks |
+|--------|-------------|----------|
+| **Mempool** | UTXOs, fees, transactions, broadcast | All |
+| **Sandshrew** | UTXOs, fees, runes, alkanes, inscriptions, ord | Mainnet, Testnet |
+| **Maestro** | UTXOs, fees, runes (partial), BRC-20, inscriptions | Mainnet, Testnet |
+
+See [Vendors](/docs/concepts/vendors) for detailed comparison.

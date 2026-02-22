@@ -18,6 +18,20 @@
       "cache": false,
       "persistent": true
     },
+    "docs:typedoc": {
+      "dependsOn": ["^build"],
+      "inputs": ["packages/*/src/**"],
+      "outputs": ["apps/docs/.typedoc-output/**"]
+    },
+    "docs:build": {
+      "dependsOn": ["docs:typedoc"],
+      "outputs": [".next/**"]
+    },
+    "docs:dev": {
+      "dependsOn": ["docs:typedoc"],
+      "cache": false,
+      "persistent": true
+    },
     "apps/**": {
       "dependsOn": ["packages/**"]
     },

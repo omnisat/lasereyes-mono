@@ -1,0 +1,91 @@
+---
+title: Working with Alkanes
+description: Query and transfer Alkanes protocol tokens
+---
+
+## Querying Alkanes
+
+### Using React Hooks
+
+List all alkane tokens:
+
+```tsx
+import { useAlkanesList } from '@omnisat/lasereyes'
+
+function AlkanesList() {
+  const { data, fetchNextPage, hasNextPage, isPending } = useAlkanesList({
+    batchSize: 20,
+  })
+
+  if (isPending) return <p>Loading...</p>
+
+  return (
+    <div>
+      {data?.map(token => (
+        <div key={`${token.id.block}:${token.id.tx}`}>
+          {token.name} ({token.symbol})
+        </div>
+      ))}
+      {hasNextPage && <button onClick={() => fetchNextPage()}>Load More</button>}
+    </div>
+  )
+}
+```
+
+### Looking Up a Specific Token
+
+```tsx
+import { useAlkanesToken } from '@omnisat/lasereyes'
+
+function TokenDetails({ blockId, txId }: { blockId: string; txId: string }) {
+  const { data, isPending } = useAlkanesToken({ block: blockId, tx: txId })
+
+  if (isPending) return <p>Loading...</p>
+  if (!data) return <p>Token not found</p>
+
+  return (
+    <div>
+      <h2>{data.name}</h2>
+      <p>Symbol: {data.symbol}</p>
+    </div>
+  )
+}
+```
+
+### Address Token Balances
+
+```tsx
+import { useAddressTokens } from '@omnisat/lasereyes'
+
+function MyAlkanes({ address }: { address: string }) {
+  const { data } = useAddressTokens({ address, protocol: 'alkanes' })
+
+  return (
+    <ul>
+      {data?.map(outpoint => (
+        <li key={outpoint.outpoint.txid}>
+          {outpoint.runes.map(r => `${r.rune.name}: ${r.balance}`).join(', ')}
+        </li>
+      ))}
+    </ul>
+  )
+}
+```
+
+## Sending Alkanes
+
+```tsx
+const { send } = useLaserEyes()
+
+await send('alkanes', {
+  id: '2:1',
+  fromAddress: paymentAddress,
+  toAddress: 'bc1q...recipient',
+  amount: BigInt(1000),
+  network: 'mainnet',
+})
+```
+
+## Data Source Requirements
+
+Alkanes queries require **Sandshrew**. Neither Mempool nor Maestro support Alkanes.

@@ -1,0 +1,14 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPointStrategy": "packages",
+  "entryPoints": ["packages/client", "packages/core", "packages/react"],
+  "plugin": ["typedoc-plugin-markdown"],
+  "out": "apps/docs/.typedoc-output",
+  "excludeInternal": true,
+  "excludePrivate": true,
+  "excludeProtected": true,
+  "fileExtension": ".mdx",
+  "useCodeBlocks": true,
+  "expandObjects": true,
+  "disableSources": true
+}

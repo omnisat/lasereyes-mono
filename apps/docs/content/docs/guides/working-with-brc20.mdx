@@ -1,0 +1,41 @@
+---
+title: Working with BRC-20
+description: Query and transfer BRC-20 tokens
+---
+
+## Querying BRC-20 Balances
+
+```tsx
+const { getMetaBalances } = useLaserEyes()
+
+const balances = await getMetaBalances('brc20')
+```
+
+## Sending BRC-20 Tokens
+
+```tsx
+const { send } = useLaserEyes()
+
+await send('brc20', {
+  ticker: 'ordi',
+  fromAddress: paymentAddress,
+  toAddress: 'bc1q...recipient',
+  amount: 100,
+  network: 'mainnet',
+})
+```
+
+## Client Package Queries
+
+```ts
+import { createDataSource } from '@omnisat/lasereyes-client/vendors/maestro'
+
+const ds = createDataSource({ network: 'mainnet', apiKey: '...' })
+
+const balances = await ds.getAddressBrc20Balances('bc1q...')
+const tokenInfo = await ds.getBrc20Info('ordi')
+```
+
+## Data Source Requirements
+
+BRC-20 queries require **Maestro**. Neither Mempool nor Sandshrew support BRC-20.

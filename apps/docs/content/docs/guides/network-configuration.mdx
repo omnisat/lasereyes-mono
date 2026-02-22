@@ -1,0 +1,87 @@
+---
+title: Network Configuration
+description: Configure Bitcoin networks in LaserEyes
+---
+
+## Available Networks
+
+LaserEyes supports the following Bitcoin networks:
+
+| Network | Constant | Description |
+|---------|----------|-------------|
+| Mainnet | `mainnet` | Bitcoin mainnet |
+| Testnet | `testnet` | Bitcoin testnet3 |
+| Testnet4 | `testnet4` | Bitcoin testnet4 |
+| Signet | `signet` | Bitcoin signet |
+| Regtest | `regtest` | Local regtest |
+| Fractal Mainnet | `fractal_mainnet` | Fractal Bitcoin mainnet |
+| Fractal Testnet | `fractal_testnet` | Fractal Bitcoin testnet |
+| Oylnet | `oylnet` | OYL development network |
+
+## Setting the Network
+
+### At Provider Level
+
+```tsx
+import { LaserEyesProvider } from '@omnisat/lasereyes'
+
+<LaserEyesProvider config={{ network: 'mainnet' }}>
+  <App />
+</LaserEyesProvider>
+```
+
+### Switching at Runtime
+
+```tsx
+const { switchNetwork, network } = useLaserEyes()
+
+// Switch to testnet
+await switchNetwork('testnet')
+
+console.log(network) // 'testnet'
+```
+
+Note: Not all wallets support programmatic network switching. Some require the user to switch manually in the wallet UI.
+
+## Network Constants
+
+Import network constants from the client package:
+
+```ts
+import {
+  MAINNET,
+  TESTNET,
+  TESTNET4,
+  SIGNET,
+  REGTEST,
+  FRACTAL_MAINNET,
+  FRACTAL_TESTNET,
+  OYLNET,
+} from '@omnisat/lasereyes-client'
+```
+
+Or use the `BaseNetwork` enum:
+
+```ts
+import { BaseNetwork } from '@omnisat/lasereyes-client'
+
+const network = BaseNetwork.MAINNET // 'mainnet'
+```
+
+## Custom Networks
+
+You can register custom networks that derive addresses from a base network:
+
+```tsx
+<LaserEyesProvider config={{
+  network: 'my-l2',
+  customNetworks: {
+    'my-l2': {
+      baseNetwork: 'mainnet',
+      preferredDataSource: 'sandshrew',
+    },
+  },
+}}>
+```
+
+See [Custom Data Sources](/docs/guides/custom-data-sources) for configuring endpoints for custom networks.

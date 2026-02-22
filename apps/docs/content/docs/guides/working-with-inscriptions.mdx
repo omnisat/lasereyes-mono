@@ -1,0 +1,60 @@
+---
+title: Working with Inscriptions
+description: Query and transfer Ordinals inscriptions
+---
+
+## Fetching Inscriptions
+
+```tsx
+const { getInscriptions } = useLaserEyes()
+
+// Get first page
+const inscriptions = await getInscriptions(0, 20)
+
+inscriptions.forEach(insc => {
+  console.log(insc.inscriptionId, insc.contentType, insc.number)
+})
+```
+
+## Sending Inscriptions
+
+Transfer inscriptions to another address:
+
+```tsx
+const { sendInscriptions } = useLaserEyes()
+
+const txId = await sendInscriptions(
+  ['inscription-id-1', 'inscription-id-2'],
+  'bc1q...recipient'
+)
+```
+
+## Inscribing Content
+
+Create new inscriptions:
+
+```tsx
+const { inscribe } = useLaserEyes()
+
+const txId = await inscribe(
+  'Hello, Bitcoin!',
+  'text/plain'
+)
+```
+
+Supported content types include `text/plain`, `text/html`, `image/png`, `image/svg+xml`, `application/json`, and more.
+
+## Client Package Queries
+
+```ts
+import { createDataSource } from '@omnisat/lasereyes-client/vendors/sandshrew'
+
+const ds = createDataSource({ network: 'mainnet', url: '...', apiKey: '...' })
+
+const inscriptions = await ds.getAddressInscriptions('bc1q...')
+const info = await ds.getInscriptionInfo('inscription-id')
+```
+
+## Data Source Requirements
+
+Inscription queries require **Sandshrew** or **Maestro**. Mempool does not index inscriptions.

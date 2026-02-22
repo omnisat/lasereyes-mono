@@ -1,0 +1,64 @@
+---
+title: Architecture
+description: Understanding the LaserEyes package layering and design
+---
+
+LaserEyes follows a layered architecture where each package builds on the one below it. This design allows users to pick the abstraction level that fits their needs.
+
+## Package Layers
+
+```
+┌─────────────────────────────────────────┐
+│          @omnisat/lasereyes-react        │  React hooks, provider, UI
+├─────────────────────────────────────────┤
+│          @omnisat/lasereyes-core         │  Wallet providers, state, signing
+├─────────────────────────────────────────┤
+│          @omnisat/lasereyes-client       │  Chain data, PSBTs, types
+└─────────────────────────────────────────┘
+```
+
+### Client Layer
+
+The client package provides composable chain data primitives. It has no framework dependencies and uses native `fetch` for HTTP requests.
+
+Key patterns:
+- **Data Sources** are created with `createChainDataSource()` and extended with capabilities
+- **Capabilities** are groups of methods (e.g., `BaseCapability` for UTXOs/fees, `RuneCapability` for rune queries)
+- **Vendors** are pre-configured data source factories for Mempool, Sandshrew, and Maestro
+
+### Core Layer
+
+The core package manages wallet connections and operations. It depends on the client layer for chain data and adds:
+
+- **LaserEyesClient** - Manages wallet provider lifecycle
+- **WalletProvider** - Abstract base class for each of the 14 wallet implementations
+- **DataSourceManager** - Singleton that routes chain data requests with fallback
+
+State is managed via [nanostores](https://github.com/nanostores/nanostores) for framework-agnostic reactivity.
+
+### React Layer
+
+The React package wraps the core client in React primitives:
+
+- **LaserEyesProvider** - Creates the client, manages lifecycle, provides context
+- **useLaserEyes** - Primary hook with Zustand-like selector pattern
+- **Data hooks** - `useBalance`, `useBitcoinFees`, etc. backed by React Query
+
+## Data Flow
+
+```
+User Action (connect wallet)
+  → useLaserEyes().connect('unisat')
+    → LaserEyesClient.connect()
+      → UnisatProvider.connect()
+        → window.unisat.requestAccounts()
+          → Updates $store (nanostores)
+            → React re-renders via useLaserEyes
+```
+
+## Key Design Decisions
+
+1. **Composable data sources** - Inspired by viem's transport/chain pattern. Extend a base with only the capabilities you need.
+2. **Nanostores for state** - Lightweight, framework-agnostic reactivity without Redux/Zustand overhead.
+3. **Selector-based hooks** - Prevents unnecessary re-renders by letting consumers pick exactly what state they need.
+4. **Vendor abstraction** - Different chain data providers (Mempool, Sandshrew, Maestro) expose the same capability interfaces.

@@ -1,0 +1,122 @@
+---
+title: Sending BTC
+description: How to send Bitcoin transactions with LaserEyes
+---
+
+## Simple Send
+
+The simplest way to send BTC:
+
+```tsx
+import { useLaserEyes } from '@omnisat/lasereyes'
+
+function SendBTC() {
+  const { sendBTC, connected } = useLaserEyes()
+
+  const handleSend = async () => {
+    try {
+      const txId = await sendBTC('bc1q...recipient', 10000) // amount in satoshis
+      console.log('Sent! TxID:', txId)
+    } catch (err) {
+      console.error('Send failed:', err)
+    }
+  }
+
+  return (
+    <button onClick={handleSend} disabled={!connected}>
+      Send 10,000 sats
+    </button>
+  )
+}
+```
+
+## Using the Protocol-Agnostic `send`
+
+For a unified API across protocols, use the `send` method:
+
+```tsx
+const { send } = useLaserEyes()
+
+// Send BTC
+await send('btc', {
+  fromAddress: paymentAddress,
+  toAddress: 'bc1q...recipient',
+  amount: 50000,
+  network: 'mainnet',
+})
+
+// Send Runes
+await send('runes', {
+  runeId: '840000:1',
+  fromAddress: paymentAddress,
+  toAddress: 'bc1q...recipient',
+  amount: 100,
+  network: 'mainnet',
+})
+```
+
+## Signing PSBTs
+
+For more control, construct and sign PSBTs directly:
+
+```tsx
+const { signPsbt } = useLaserEyes()
+
+// Simple signature
+const result = await signPsbt(psbtBase64, true, true) // finalize, broadcast
+
+// With options
+const result = await signPsbt({
+  psbtBase64: '...',
+  finalize: true,
+  broadcast: true,
+  signInputs: { 0: ['payment'] },
+})
+
+console.log(result.signedPsbtHex)
+console.log(result.txId) // if broadcast was true
+```
+
+## Signing Multiple PSBTs
+
+```tsx
+const { signPsbts } = useLaserEyes()
+
+const results = await signPsbts({
+  psbts: [
+    { psbtBase64: '...', finalize: true },
+    { psbtBase64: '...', finalize: false },
+  ],
+})
+```
+
+## Broadcasting
+
+Push a signed PSBT to the network:
+
+```tsx
+const { pushPsbt } = useLaserEyes()
+
+const txId = await pushPsbt(signedPsbtHex)
+```
+
+## Fee Estimation
+
+Use the `useBitcoinFees` hook to get current fee rates:
+
+```tsx
+import { useBitcoinFees } from '@omnisat/lasereyes'
+
+function FeeDisplay() {
+  const { data, isPending } = useBitcoinFees()
+
+  if (isPending) return <p>Loading fees...</p>
+
+  return (
+    <div>
+      <p>Fast fee: {data?.fastFee} sat/vB</p>
+      <p>Min fee: {data?.minFee} sat/vB</p>
+    </div>
+  )
+}
+```
