@@ -56,3 +56,36 @@ jobs:
 
       - name: Run tests
         run: pnpm test
+
+  docs:
+    runs-on: ubuntu-latest
+    needs: setup
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8.6.6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build packages
+        run: pnpm run build --filter="@omnisat*"
+
+      - name: Check doc coverage
+        run: pnpm docs:check-coverage
+
+      - name: Generate docs
+        run: pnpm docs:typedoc
+
+      - name: Build docs site
+        run: pnpm docs:build

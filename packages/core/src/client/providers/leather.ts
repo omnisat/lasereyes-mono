@@ -130,8 +130,12 @@ export default class LeatherProvider extends WalletProvider {
     if (!addresses) throw new Error('No accounts found')
 
     const leatherAccountsParsed = addresses.map(address => address.address)
-    const taprootAddress = addresses.find(address => address.type === P2TR)
-    const segwitAddress = addresses.find(address => address.type === P2WPKH)
+    const taprootAddress = addresses.find(
+      address => address.symbol !== 'STX' && address.type === P2TR
+    )
+    const segwitAddress = addresses.find(
+      address => address.symbol !== 'STX' && address.type === P2WPKH
+    )
 
     if (!taprootAddress?.publicKey || !segwitAddress?.publicKey) {
       throw new Error('No accounts found')
@@ -157,8 +161,12 @@ export default class LeatherProvider extends WalletProvider {
       if (!addresses) throw new Error('Failed to get new network details')
 
       const leatherAccountsParsed = addresses.map(address => address.address)
-      const taprootAddress = addresses.find(address => address.type === P2TR)
-      const segwitAddress = addresses.find(address => address.type === P2WPKH)
+      const taprootAddress = addresses.find(
+        address => address.symbol !== 'STX' && address.type === P2TR
+      )
+      const segwitAddress = addresses.find(
+        address => address.symbol !== 'STX' && address.type === P2WPKH
+      )
 
       if (!taprootAddress?.publicKey || !segwitAddress?.publicKey) {
         throw new Error('Failed to get new network details')

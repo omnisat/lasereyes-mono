@@ -4,8 +4,8 @@
   "private": true,
   "dependencies": {
     "@omnisat/lasereyes": "workspace:*",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
+    "react": "catalog:",
+    "react-dom": "catalog:",
     "web-vitals": "^2.1.4"
   },
   "devDependencies": {
@@ -14,8 +14,8 @@
     "@testing-library/user-event": "^13.5.0",
     "@types/jest": "^27.5.2",
     "@types/node": "^16.18.113",
-    "@types/react": "^18.3.11",
-    "@types/react-dom": "^18.3.1",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
     "react-scripts": "5.0.1",
     "typescript": "5.8.3"
   },
