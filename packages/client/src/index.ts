@@ -1,6 +1,6 @@
 // Core primitives
 
-export type { BtcActions, SendBtcParams } from './actions'
+export type { BtcActions } from './actions'
 // Actions
 export { btcActions } from './actions'
 export { createClient } from './client'

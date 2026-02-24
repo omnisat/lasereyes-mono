@@ -1,2 +1,2 @@
-export type { BtcActions, SendBtcParams } from './btc'
+export type { BtcActions } from './btc'
 export { btcActions } from './btc'

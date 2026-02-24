@@ -14,6 +14,14 @@
       "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
     },
+    "./wallet": {
+      "import": "./dist/wallet.js",
+      "types": "./dist/wallet.d.ts"
+    },
+    "./utils": {
+      "import": "./dist/utils.js",
+      "types": "./dist/utils.d.ts"
+    },
     "./runes": {
       "import": "./dist/runes/index.js",
       "types": "./dist/runes/index.d.ts"
