@@ -529,6 +529,7 @@ export interface AlkanesOutpoint {
 }
 
 export * from './alkane'
+export * from './connector'
 export * from './data-source'
 export * from './esplora'
 export * from './lasereyes'
@@ -536,5 +537,14 @@ export * from './maestro'
 export * from './mempool-space'
 export * from './network'
 export * from './ord'
+export * from './provider'
 export * from './sandshrew'
 export * from './utxo'
+
+// Resolve re-export ambiguity: these types exist in both legacy modules and the
+// new provider module. Prefer the legacy definitions for backward compatibility.
+export type { AlkaneBalance } from './alkane'
+export type { Brc20Balance, Inscription } from './lasereyes'
+
+// Core types
+export type { LaserEyesCoreConfig, NetworkConfig } from '../core'

@@ -1,96 +1,88 @@
-import { BTC, type Protocol } from '@omnisat/lasereyes-core'
-import { type UseQueryOptions, type UseQueryResult, useQuery } from '@tanstack/react-query'
-import { useLaserEyes } from '../providers/hooks'
+import { useStore } from '@nanostores/react'
+import { useEffect, useState } from 'react'
+import { getBalance } from '@omnisat/lasereyes-core'
+import { useLaserEyesCore } from '../providers/lasereyes-provider'
 
 /**
- * Parameters for the {@link useBalance} hook when using the object form.
- *
- * @typeParam T - The protocol type (e.g., BTC, Runes, BRC-20)
+ * Return type for the {@link useBalance} hook.
  */
-type useBalanceParams<T extends Protocol> = {
-  /** The protocol to fetch the balance for */
-  protocol: T
-  /** Token identifier, required for non-BTC protocols (e.g., Runes or BRC-20 token ID) */
-  tokenId?: T extends typeof BTC ? never : string
-  /** Additional React Query options (queryKey and queryFn are managed internally) */
-  queryOptions?: Omit<UseQueryOptions<bigint>, 'queryKey' | 'queryFn'>
+export interface UseBalanceResult {
+  /** Balance in satoshis as a decimal string, or `undefined` if not yet loaded. */
+  balance: string | undefined
+  /** `true` while the balance fetch is in flight. */
+  loading: boolean
+  /** Non-null if the last fetch attempt failed. */
+  error: Error | null
 }
+
 /**
- * Fetches the balance for a given protocol and optional token.
+ * Fetches the Bitcoin balance for an address.
  *
  * @remarks
- * Uses React Query internally with a 5-minute stale time and 10-minute refetch
- * interval. The query is keyed by network, address, protocol, and tokenId,
- * so it automatically refetches when any of these change.
+ * Uses smart routing: tries the connected wallet's provider first, then falls
+ * back to the configured data-source client. The balance is refreshed whenever
+ * `address` or the active network changes.
  *
- * @param params - Object containing the protocol, optional tokenId, and query options
- * @returns A React Query result containing the balance as a `bigint` (in satoshis for BTC)
+ * If `address` is omitted, the payment address of the currently connected
+ * wallet is used. Returns `{ balance: undefined, loading: false, error: null }`
+ * when no address is available.
  *
- * @example
- * ```tsx
- * const { data: balance, isPending } = useBalance({ protocol: BTC })
- * ```
- */
-export function useBalance<T extends Protocol>({
-  protocol,
-  tokenId,
-  queryOptions,
-}: useBalanceParams<T>): UseQueryResult<bigint>
-/**
- * Fetches the BTC balance for the connected wallet.
+ * Does **not** use React Query internally — consumers can add their own caching
+ * layer (e.g. TanStack Query) if needed.
  *
- * @param protocol - Must be the `BTC` constant
- * @returns A React Query result containing the balance as a `bigint` in satoshis
+ * Must be used within a {@link LaserEyesProvider}.
+ *
+ * @param address - Bitcoin address to query. Defaults to the connected wallet's payment address.
+ * @returns Balance, loading state, and error.
  *
  * @example
  * ```tsx
- * import { BTC } from '@omnisat/lasereyes-core'
- *
- * const { data: balance } = useBalance(BTC)
+ * const { balance, loading, error } = useBalance()
+ * // or for an explicit address:
+ * const { balance } = useBalance('bc1q...')
  * ```
  */
-export function useBalance(protocol: typeof BTC): UseQueryResult<bigint>
-export function useBalance<T extends Protocol>(
-  arg: useBalanceParams<T> | typeof BTC
-): UseQueryResult<bigint> {
-  const { client, address, network } = useLaserEyes(({ client, address, network }) => ({
-    client,
-    address,
-    network,
-  }))
+export function useBalance(address?: string): UseBalanceResult {
+  const core = useLaserEyesCore()
+  const account = useStore(core.$account)
+  const networkId = useStore(core.$networkId)
 
-  if (typeof arg === 'string' && arg !== BTC) {
-    throw Error(`Invalid parameters. Expected \`${BTC}\`, got: \`${arg}\``)
-  }
-  const { protocol, tokenId, queryOptions }: useBalanceParams<T> = (
-    arg === BTC ? { protocol: BTC } : arg
-  ) as useBalanceParams<T>
+  const resolvedAddress =
+    address ?? account?.find((a) => a.purpose === 'payment')?.address
 
-  const fetchBalance = async () => {
-    if (address) {
-      if (protocol === 'btc') {
-        const balance = await client?.getBalance()
-        if (!balance) {
-          throw new Error('Balance not found')
-        }
-        return BigInt(balance)
-      } else {
-        if (!tokenId) {
-          throw new Error('Token ID is required')
-        }
-        // TODO: Implement balance fetching for other protocols
-      }
+  const [balance, setBalance] = useState<string | undefined>(undefined)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<Error | null>(null)
+
+  useEffect(() => {
+    if (!resolvedAddress) {
+      setBalance(undefined)
+      setError(null)
+      return
     }
-    return BigInt(0)
-  }
 
-  const result = useQuery({
-    staleTime: 1000 * 60 * 5, // 5 minutes
-    refetchInterval: 1000 * 60 * 10, // 1 minute
-    ...queryOptions,
-    queryKey: ['user-balance', network, address, protocol, tokenId],
-    queryFn: fetchBalance,
-  })
+    let cancelled = false
+    setLoading(true)
+    setError(null)
 
-  return result
+    getBalance(core, resolvedAddress)
+      .then((b) => {
+        if (!cancelled) {
+          setBalance(b)
+          setLoading(false)
+        }
+      })
+      .catch((e: unknown) => {
+        if (!cancelled) {
+          setError(e instanceof Error ? e : new Error(String(e)))
+          setLoading(false)
+        }
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [core, resolvedAddress, networkId])
+
+  return { balance, loading, error }
 }

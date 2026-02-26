@@ -1,8 +1,6 @@
-import { useLaserEyes } from './providers/hooks'
-import LaserEyesProvider from './providers/lasereyes-provider'
+import LaserEyesProvider, { useLaserEyesCore } from './providers/lasereyes-provider'
 
 export * from '@omnisat/lasereyes-core'
-export { LaserEyesProvider, useLaserEyes }
+export { LaserEyesProvider, useLaserEyesCore }
 export * from './hooks'
 export * from './icons'
-export * from './providers/types'

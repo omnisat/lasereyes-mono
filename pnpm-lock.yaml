@@ -514,6 +514,9 @@ importers:
       '@nanostores/persistent':
         specifier: ^0.10.2
         version: 0.10.2(nanostores@0.11.4)
+      '@omnisat/lasereyes-client':
+        specifier: workspace:*
+        version: link:../client
       '@orangecrypto/orange-connect':
         specifier: ^1.2.2
         version: 1.2.4(typescript@5.8.3)

@@ -40,6 +40,7 @@
     "nanostores": ">=0.11"
   },
   "dependencies": {
+    "@omnisat/lasereyes-client": "workspace:*",
     "@bitcoinerlab/secp256k1": "^1.1.1",
     "@cmdcode/crypto-utils": "^2.4.6",
     "@cmdcode/tapscript": "^1.4.6",
