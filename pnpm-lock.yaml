@@ -426,8 +426,8 @@ importers:
         specifier: ^0.0.7
         version: 0.0.7
       sats-connect:
-        specifier: ^3.3.0
-        version: 3.5.0(typescript@5.8.3)
+        specifier: ^4.2.1
+        version: 4.2.1(typescript@5.8.3)
       tiny-async-pool:
         specifier: ^2.1.0
         version: 2.1.0
@@ -6627,26 +6627,27 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@sats-connect/core@0.6.5(typescript@5.8.3):
-    resolution: {integrity: sha512-jltPdG3RzY6NPSp/ldoVTu7hOmMiuXr90osTHFPoQzprxcOs/1U4sZt/qAyGhfOM6B+ZXb7DF686BmFkUpPCJA==}
+  /@sats-connect/core@0.10.0(valibot@1.1.0):
+    resolution: {integrity: sha512-a/YvGuAC+4og1Ownp3r0OFOHEdBV1xB8EWLFasURfMPSuU3LuFhxSv8rd6PSpqixhNY28fUWamjyjXYjxvGm7w==}
+    peerDependencies:
+      valibot: 1.1.0
     dependencies:
-      axios: 1.8.4
-      bitcoin-address-validation: 2.2.3
+      axios: 1.12.0
+      bitcoin-address-validation: 3.0.0
       buffer: 6.0.3
       jsontokens: 4.0.1
-      valibot: 0.42.1(typescript@5.8.3)
+      valibot: 1.1.0(typescript@5.8.3)
     transitivePeerDependencies:
       - debug
-      - typescript
     dev: false
 
-  /@sats-connect/make-default-provider-config@0.0.10(@sats-connect/core@0.6.5)(typescript@5.8.3):
+  /@sats-connect/make-default-provider-config@0.0.10(@sats-connect/core@0.10.0)(typescript@5.8.3):
     resolution: {integrity: sha512-BBot3Ofa2J7OwXprgYPD4C8dppX4nnPxj4FXWq1H7fDsvwJmW4sAnfmnAIzwmyWZJOR2uZqtTkXAA08sVkoN5g==}
     peerDependencies:
       '@sats-connect/core': '*'
       typescript: ^5.0.0
     dependencies:
-      '@sats-connect/core': 0.6.5(typescript@5.8.3)
+      '@sats-connect/core': 0.10.0(valibot@1.1.0)
       '@sats-connect/ui': 0.0.6
       bowser: 2.11.0
       typescript: 5.8.3
@@ -9136,11 +9137,11 @@ packages:
       - debug
     dev: false
 
-  /axios@1.8.4:
-    resolution: {integrity: sha512-eBSYY4Y68NNlHbHBMdeDmKNtDgXWhQsJcGqzO3iLUM0GraQFSS9cVgPX5I9b3lbdFKyYoAEGAZF1DwhTaljNAw==}
+  /axios@1.12.0:
+    resolution: {integrity: sha512-oXTDccv8PcfjZmPGlWsPSwtOJCZ/b6W5jAMCNcfwJbCzDckwG0jrYJFaWH1yvivfCXjVzV/SPDEhMB3Q+DSurg==}
     dependencies:
       follow-redirects: 1.15.9
-      form-data: 4.0.3
+      form-data: 4.0.5
       proxy-from-env: 1.1.0
     transitivePeerDependencies:
       - debug
@@ -9476,6 +9477,11 @@ packages:
     engines: {node: '>= 8'}
     dev: false
 
+  /base58-js@3.0.3:
+    resolution: {integrity: sha512-3hf42BysHnUqmZO7mK6e5X/hs1AvyEJIhdVLbG/Mxn/fhFnhGxOO37mWbMHg1RT4TxqcPKXgqj9/bp1YG0GBXA==}
+    engines: {node: '>=16.0.0', npm: '>=7.0.0'}
+    dev: false
+
   /base62@1.2.8:
     resolution: {integrity: sha512-V6YHUbjLxN1ymqNLb1DPHoU1CpfdL7d2YTIp5W3U4hhoG4hhxNmsFDs66M9EXxBiSEke5Bt5dwdfMwwZF70iLA==}
     dev: true
@@ -9610,6 +9616,14 @@ packages:
     resolution: {integrity: sha512-1uGCGl26Ye8JG5qcExtFLQfuib6qEZWNDo1ZlLlwp/z7ygUFby3IxolgEfgMGaC+LG9csbVASLcH8fRLv7DIOg==}
     dependencies:
       base58-js: 1.0.5
+      bech32: 2.0.0
+      sha256-uint8array: 0.10.7
+    dev: false
+
+  /bitcoin-address-validation@3.0.0:
+    resolution: {integrity: sha512-R1X1c9EdgjgjTpjshjk5e16TbgF7HYasxBcu7l5ScWMxVs53845vMUg5PvnQ/R/3h8Grly6Y52DgH6/77gazLQ==}
+    dependencies:
+      base58-js: 3.0.3
       bech32: 2.0.0
       sha256-uint8array: 0.10.7
     dev: false
@@ -12885,6 +12899,17 @@ packages:
 
   /form-data@4.0.3:
     resolution: {integrity: sha512-qsITQPfmvMOSAdeyZ+12I1c+CKSstAFAwu+97zrnWAbIr5u8wfsExUzCesVLC8NgHuRUqNN4Zy6UPWUTRGslcA==}
+    engines: {node: '>= 6'}
+    dependencies:
+      asynckit: 0.4.0
+      combined-stream: 1.0.8
+      es-set-tostringtag: 2.1.0
+      hasown: 2.0.2
+      mime-types: 2.1.35
+    dev: false
+
+  /form-data@4.0.5:
+    resolution: {integrity: sha512-8RipRLol37bNs2bhoV67fiTEvdTrbMUYcFTiy3+wuuOnUog2QBHCZWXDRijWQfAkhBj2Uf5UnVaiWwA5vdd82w==}
     engines: {node: '>= 6'}
     dependencies:
       asynckit: 0.4.0
@@ -18501,12 +18526,13 @@ packages:
       util: 0.12.5
     dev: false
 
-  /sats-connect@3.5.0(typescript@5.8.3):
-    resolution: {integrity: sha512-/Czx9XcBV57ubAMrII3WaQG4kq7imdgGUOU9IRg0/8AWdjFczOq9wu1i7vCnxENm8MoRLuCfhMIHbekxUn23HA==}
+  /sats-connect@4.2.1(typescript@5.8.3):
+    resolution: {integrity: sha512-6PxLGmYIToxz/3DSb2owykcV3Qs2n+RhzE1gZp6a/6c70XYniUvImGA3Hmymf90NhyjR6J/t6OE/08Fiyjw9YA==}
     dependencies:
-      '@sats-connect/core': 0.6.5(typescript@5.8.3)
-      '@sats-connect/make-default-provider-config': 0.0.10(@sats-connect/core@0.6.5)(typescript@5.8.3)
+      '@sats-connect/core': 0.10.0(valibot@1.1.0)
+      '@sats-connect/make-default-provider-config': 0.0.10(@sats-connect/core@0.10.0)(typescript@5.8.3)
       '@sats-connect/ui': 0.0.7
+      valibot: 1.1.0(typescript@5.8.3)
     transitivePeerDependencies:
       - debug
       - typescript
@@ -20347,8 +20373,8 @@ packages:
       typescript: 5.8.3
     dev: false
 
-  /valibot@0.42.1(typescript@5.8.3):
-    resolution: {integrity: sha512-3keXV29Ar5b//Hqi4MbSdV7lfVp6zuYLZuA9V1PvQUsXqogr+u5lvLPLk3A4f74VUXDnf/JfWMN6sB+koJ/FFw==}
+  /valibot@1.1.0(typescript@5.8.3):
+    resolution: {integrity: sha512-Nk8lX30Qhu+9txPYTwM0cFlWLdPFsFr6LblzqIySfbZph9+BFsAHsNvHOymEviUepeIW6KFHzpX8TKhbptBXXw==}
     peerDependencies:
       typescript: '>=5'
     peerDependenciesMeta:
