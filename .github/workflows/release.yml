@@ -90,7 +90,8 @@ jobs:
           pnpm config set publish-branch dev
           
           # Now publish
-          pnpm publish -r --tag next --access public --provenance
+          # pnpm publish -r --tag next --access public --provenance
+          pnpm release
           
           # Re-enable git checks and push if publish was successful
           pnpm config set git-checks true
