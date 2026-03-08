@@ -57,9 +57,6 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
           cache: 'pnpm'
 
-      - name: Remove npm auth token (OIDC handles authentication)
-        run: npm config delete //registry.npmjs.org/:_authToken
-
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
