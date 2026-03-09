@@ -1,6 +1,9 @@
 {
   "name": "lasereyes-mono",
   "private": true,
+  "repository": {
+    "url": "https://github.com/omnisat/lasereyes-mono"
+  },
   "scripts": {
     "build": "turbo build",
     "build:core": "turbo build --filter @omnisat/lasereyes-core",
