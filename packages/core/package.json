@@ -60,6 +60,7 @@
     "uint8array-tools": "^0.0.9"
   },
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "provenance": true
   }
 }
