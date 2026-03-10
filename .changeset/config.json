@@ -8,6 +8,6 @@
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
   "ignore": [
-    
+    "@omnisat/lasereyes-ui"
   ]
 }
