@@ -1,6 +1,9 @@
 {
   "name": "@omnisat/lasereyes-react",
   "private": false,
+  "repository": {
+    "url": "https://github.com/omnisat/lasereyes-mono"
+  },
   "version": "0.0.79",
   "type": "module",
   "main": "./dist/index.umd.cjs",
