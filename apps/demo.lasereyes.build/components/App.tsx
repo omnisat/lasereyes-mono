@@ -18,6 +18,7 @@ import {
   MAGIC_EDEN,
   XVERSE,
   UNISAT,
+  UNIVERSAL,
   BaseNetwork,
 } from '@omnisat/lasereyes'
 import { createPsbt, satoshisToBTC } from '@/lib/btc'
@@ -104,6 +105,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
     switchNetwork,
     hasUnisat,
     signMessage,
+    hasUniversal,
     hasXverse,
     sendBTC,
     hasOyl,
@@ -169,6 +171,7 @@ const App = ({ setNetwork }: { setNetwork: (n: NetworkType) => void }) => {
 
   const hasWallet = {
     unisat: hasUnisat,
+    universal: hasUniversal,
     xverse: hasXverse,
     oyl: hasOyl,
     [MAGIC_EDEN]: hasMagicEden,

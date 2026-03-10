@@ -45,6 +45,7 @@ LaserEyes Core supports the following Bitcoin wallets:
 - **Phantom**
 - **Sparrow**
 - **UniSat**
+- **Universal**
 - **Wizz**
 - **Xverse**
 

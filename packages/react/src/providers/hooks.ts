@@ -44,6 +44,7 @@ export function useLaserEyes<T>(
         hasOpNet: store.hasProvider.op_net ?? false,
         hasPhantom: store.hasProvider.phantom ?? false,
         hasUnisat: store.hasProvider.unisat ?? false,
+        hasUniversal: store.hasProvider.universal ?? false,
         hasSparrow: store.hasProvider.sparrow ?? false,
         hasWizz: store.hasProvider.wizz ?? false,
         hasXverse: store.hasProvider.xverse ?? false,

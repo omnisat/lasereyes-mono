@@ -1,5 +1,6 @@
 export const OYL = 'oyl'
 export const UNISAT = 'unisat'
+export const UNIVERSAL = 'universal'
 export const XVERSE = 'xverse'
 export const PHANTOM = 'phantom'
 export const LEATHER = 'leather'
@@ -33,6 +34,7 @@ enum ProviderEnumMap {
   TOKEO = 'tokeo',
   PHANTOM = 'phantom',
   UNISAT = 'unisat',
+  UNIVERSAL = 'universal',
   WIZZ = 'wizz',
   XVERSE = 'xverse',
   KEPLR = 'keplr',
@@ -86,6 +88,10 @@ export const SUPPORTED_WALLETS: WalletInfo = {
   [ProviderEnumMap.UNISAT]: {
     name: ProviderEnumMap.UNISAT,
     url: 'https://unisat.io/download',
+  },
+  [ProviderEnumMap.UNIVERSAL]: {
+    name: ProviderEnumMap.UNIVERSAL,
+    url: 'https://www.universalfinance.app/download',
   },
   [ProviderEnumMap.WIZZ]: {
     name: ProviderEnumMap.WIZZ,

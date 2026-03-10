@@ -23,6 +23,7 @@ Don't trust verify [Try Out The Demo Here](https://demo.lasereyes.build)
 - Orange Wallet
 - OYL
 - Unisat
+- Universal
 - Wizz
 - Phantom
 - Xverse

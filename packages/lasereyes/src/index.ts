@@ -13,6 +13,7 @@ export {
   PhantomLogo,
   OylLogo,
   UnisatLogo,
+  UniversalLogo,
   WizzLogo,
   XverseLogo,
   LaserEyesLogo,
