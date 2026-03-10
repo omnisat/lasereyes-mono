@@ -1,7 +1,10 @@
 {
   "name": "@omnisat/lasereyes-react",
   "private": false,
-  "version": "0.0.79",
+  "repository": {
+    "url": "https://github.com/omnisat/lasereyes-mono"
+  },
+  "version": "0.0.80-next.0",
   "type": "module",
   "main": "./dist/index.umd.cjs",
   "module": "./dist/index.js",
@@ -55,6 +58,7 @@
     "vite-plugin-dts": "^4.2.1"
   },
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "provenance": true
   }
 }

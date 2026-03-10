@@ -48,18 +48,17 @@ jobs:
           fetch-depth: 0
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 8.6.6
+        uses: pnpm/action-setup@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '24'
+          registry-url: 'https://registry.npmjs.org'
           cache: 'pnpm'
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install
 
       - name: Build packages
         run: pnpm build --filter="@omnisat/*"
@@ -91,13 +90,14 @@ jobs:
           pnpm config set publish-branch dev
           
           # Now publish
-          pnpm publish -r --tag next --access public --provenance
-          
+          pnpm release
+
           # Re-enable git checks and push if publish was successful
           pnpm config set git-checks true
           git push --follow-tags
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_CONFIG_PROVENANCE: true
 
       # Main branch - Version and Publish Latest
       - name: Version and Publish Latest (main)
@@ -131,11 +131,11 @@ jobs:
           
           # Force publish with latest tag
           pnpm publish -r --tag latest --access public --no-git-checks --force --provenance
-          
+
           # Re-enable git checks and push
           pnpm config set git-checks true
           git push --follow-tags
-          
+
           # Sync changes back to dev
           echo "Syncing changes back to dev branch..."
           git fetch origin dev
@@ -144,3 +144,4 @@ jobs:
           git push origin dev
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_CONFIG_PROVENANCE: true
