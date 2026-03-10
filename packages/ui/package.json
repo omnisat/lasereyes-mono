@@ -1,5 +1,8 @@
 {
   "name": "@omnisat/lasereyes-ui",
+  "repository": {
+    "url": "https://github.com/omnisat/lasereyes-mono"
+  },
   "version": "0.0.21",
   "type": "module",
   "main": "dist/index.js",
