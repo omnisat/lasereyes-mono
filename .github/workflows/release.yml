@@ -129,8 +129,8 @@ jobs:
           fi
           git commit -m "chore: update versions [skip ci]" || echo "No changes to commit"
           
-          # Force publish with latest tag
-          pnpm publish -r --tag latest --access public --no-git-checks --force --provenance
+          # Publish with changeset
+          pnpm release
 
           # Re-enable git checks and push
           pnpm config set git-checks true
