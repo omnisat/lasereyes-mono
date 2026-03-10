@@ -3,6 +3,9 @@
   "private": false,
   "version": "0.0.84",
   "type": "module",
+  "repository": {
+    "url": "https://github.com/omnisat/lasereyes-mono"
+  },
   "main": "./dist/index.umd.cjs",
   "module": "./dist/index.js",
   "files": [
