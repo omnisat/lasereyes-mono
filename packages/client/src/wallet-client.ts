@@ -5,7 +5,7 @@
  */
 
 import { NetworkMismatchError } from './errors'
-import type { Account, WalletClient, WalletClientConfig } from './types'
+import type { Account, ActionGroup, WalletClient, WalletClientConfig } from './types'
 
 /**
  * Creates a new wallet client instance with account context.
@@ -66,32 +66,30 @@ import type { Account, WalletClient, WalletClientConfig } from './types'
  * await walletClient.sendBtc({ to: 'bc1q...', amount: 10000 })
  * ```
  */
-export function createWalletClient<TDS, TAccount extends Account>(
-  config: WalletClientConfig<TDS, TAccount>
-): WalletClient<TDS, TAccount> {
+export function createWalletClient<Config extends WalletClientConfig<TAccount>, TAccount extends Account = Account>(
+  config: Config
+): WalletClient<Config, TAccount, {}> {
   if (config.dataSource.network !== config.network) {
     throw new NetworkMismatchError(config.network, config.dataSource.network)
   }
 
-  function buildClient<TActions>(
-    config: WalletClientConfig<TDS, TAccount>,
+  function buildClient<TActions extends ActionGroup>(
+    config: Config,
     actions: TActions
-  ): WalletClient<TDS, TAccount, TActions> {
+  ): WalletClient<Config, TAccount, TActions> {
     const client = {
-      network: config.network,
-      dataSource: config.dataSource,
-      account: config.account,
+      config,
       extend<TNew>(
-        factory: (c: WalletClient<TDS, TAccount, TActions>) => TNew
-      ): WalletClient<TDS, TAccount, TActions & TNew> {
+        factory: (c: WalletClient<Config, TAccount, TActions>) => TNew
+      ): WalletClient<Config, TAccount, TActions & TNew> {
         const newActions = factory(client)
         const merged = { ...actions, ...newActions } as TActions & TNew
         return buildClient(config, merged)
       },
-      ...(actions as object),
-    } as WalletClient<TDS, TAccount, TActions>
+      ...(actions),
+    }
     return client
   }
 
-  return buildClient(config, {} as object) as WalletClient<TDS, TAccount>
+  return buildClient(config, {}) as WalletClient<Config, TAccount>
 }

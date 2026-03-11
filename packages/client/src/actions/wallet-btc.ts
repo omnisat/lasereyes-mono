@@ -5,7 +5,7 @@
  */
 
 import { buildSendBtcPsbt } from '../lib/psbt-builders'
-import type { BaseCapability, PaginatedResult, UTXO, WalletAccount, WalletClient } from '../types'
+import type { Account, BaseCapability, PaginatedResult, UTXO, WalletAccount, WalletClient, WalletClientConfig } from '../types'
 
 /**
  * Parameters for sending BTC using a wallet client.
@@ -47,26 +47,20 @@ export interface SendBtcParams {
  * })
  * ```
  */
-export async function sendBtc(
-  client: WalletClient<BaseCapability, WalletAccount> & {
-    signPsbt?: (psbt: string, options?: any) => Promise<any>
-  },
+export async function sendBtc<config extends WalletClientConfig<account, dsMethods>, account extends WalletAccount, dsMethods extends Pick<BaseCapability, 'btcBroadcastTransaction' | 'btcGetAddressUtxos'>, clientActions extends {
+    signPsbt: (psbt: string, options?: any) => Promise<any>
+  }>(
+  client: WalletClient<config, account, clientActions, dsMethods>,
   params: SendBtcParams
 ): Promise<string> {
   const { to, amount, feeRate = 7 } = params
 
-  if (!client.signPsbt) {
-    throw new Error(
-      'Wallet client does not have signing actions. Use .extend(signingActions(signer))'
-    )
-  }
-
   // Get payment address and public key from account
-  const paymentAddr = client.account.getAddress('payment')
-  const paymentPubkey = client.account.getPublicKey('payment')
+  const paymentAddr = client.config.account.getAddress('payment')
+  const paymentPubkey = client.config.account.getPublicKey('payment')
 
   // Fetch UTXOs
-  const { data: utxos } = await client.dataSource.btcGetAddressUtxos(paymentAddr)
+  const { data: utxos } = await client.config.dataSource.btcGetAddressUtxos(paymentAddr)
 
   // Build PSBT using utility function
   const { psbtHex } = buildSendBtcPsbt({
@@ -75,7 +69,7 @@ export async function sendBtc(
     amount,
     changeAddress: paymentAddr,
     feeRate,
-    network: client.network,
+    network: client.config.network,
     publicKey: paymentPubkey,
   })
 
@@ -90,7 +84,7 @@ export async function sendBtc(
   }
 
   // Broadcast transaction
-  return client.dataSource.btcBroadcastTransaction(signed.txHex)
+  return client.config.dataSource.btcBroadcastTransaction(signed.txHex)
 }
 
 /**
@@ -107,9 +101,9 @@ export async function sendBtc(
  * console.log(`Balance: ${balance} sats`)
  * ```
  */
-export async function getBalance(client: WalletClient<BaseCapability>): Promise<string> {
-  const address = client.account.getAddress('payment')
-  return client.dataSource.btcGetBalance(address)
+export async function getBalance<config extends WalletClientConfig<account, dsMethods>, account extends Account, dsMethods extends Pick<BaseCapability, 'btcGetBalance'>>(client: WalletClient<config, account, {}, dsMethods>): Promise<string> {
+  const address = client.config.account.getAddress('payment')
+  return client.config.dataSource.btcGetBalance(address)
 }
 
 /**
@@ -127,24 +121,12 @@ export async function getBalance(client: WalletClient<BaseCapability>): Promise<
  * const { data: ordinalsUtxos } = await getUtxos(walletClient, 'ordinals')
  * ```
  */
-export async function getUtxos(
-  client: WalletClient<BaseCapability>,
+export async function getUtxos<config extends WalletClientConfig<account, dsMethods>, account extends Account, dsMethods extends Pick<BaseCapability, 'btcGetAddressUtxos'>>(
+  client: WalletClient<config, account, {}, dsMethods>,
   purpose: 'payment' | 'ordinals' | 'taproot' = 'payment'
 ): Promise<PaginatedResult<UTXO>> {
-  const address = client.account.getAddress(purpose)
-  return client.dataSource.btcGetAddressUtxos(address)
-}
-
-/**
- * Wallet BTC actions interface.
- */
-export interface WalletBtcActions {
-  /** Send BTC from the wallet account */
-  sendBtc(params: SendBtcParams): Promise<string>
-  /** Get balance for the wallet account's payment address */
-  getBalance(): Promise<string>
-  /** Get UTXOs for a specific address purpose */
-  getUtxos(purpose?: 'payment' | 'ordinals' | 'taproot'): Promise<PaginatedResult<UTXO>>
+  const address = client.config.account.getAddress(purpose)
+  return client.config.dataSource.btcGetAddressUtxos(address)
 }
 
 /**
@@ -177,9 +159,11 @@ export interface WalletBtcActions {
  * ```
  */
 export function walletBtcActions() {
-  return (client: WalletClient<BaseCapability, WalletAccount>): WalletBtcActions => ({
+  return <dsMethods extends BaseCapability, config extends WalletClientConfig<WalletAccount, dsMethods>>(client: WalletClient<config, WalletAccount, {
+    signPsbt: (psbt: string, options?: any) => Promise<any>
+  }, dsMethods>) => ({
     sendBtc: (params: SendBtcParams) => sendBtc(client, params),
     getBalance: () => getBalance(client),
-    getUtxos: (purpose?) => getUtxos(client, purpose),
+    getUtxos: (purpose?: 'payment' | 'ordinals' | 'taproot') => getUtxos(client, purpose),
   })
 }

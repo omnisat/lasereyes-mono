@@ -4,7 +4,5 @@
  * @module account
  */
 
-export type { ReadOnlyAccountConfig } from './readonly-account'
-export { createReadOnlyAccount } from './readonly-account'
 export type { WalletAccountConfig } from './wallet-account'
 export { createWalletAccount } from './wallet-account'

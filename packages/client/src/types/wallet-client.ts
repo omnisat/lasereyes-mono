@@ -5,8 +5,8 @@
  */
 
 import type { Account } from './account'
-import type { ChainDataSource } from './data-source'
-import type { NetworkType } from './network'
+import { ActionGroup } from './capabilities'
+import { Client, ClientConfig } from './client'
 
 /**
  * Configuration for creating a wallet client.
@@ -14,13 +14,7 @@ import type { NetworkType } from './network'
  * @typeParam TDS - The data source capabilities
  * @typeParam TAccount - The account type
  */
-export interface WalletClientConfig<TDS, TAccount extends Account> {
-  /** The Bitcoin network this client operates on */
-  network: NetworkType
-
-  /** The chain data source providing blockchain data access */
-  dataSource: ChainDataSource<TDS>
-
+export interface WalletClientConfig<TAccount extends Account, dsMethods extends ActionGroup = {}> extends ClientConfig<dsMethods> {
   /** The account providing address and key information */
   account: TAccount
 }
@@ -60,16 +54,7 @@ export interface WalletClientConfig<TDS, TAccount extends Account> {
  * await walletClient.sendBtc({ to: 'bc1q...', amount: 10000 })
  * ```
  */
-export interface WalletClient<TDS = object, TAccount extends Account = Account, TActions = object> {
-  /** The Bitcoin network this client operates on */
-  network: NetworkType
-
-  /** The underlying chain data source providing blockchain data access */
-  dataSource: ChainDataSource<TDS>
-
-  /** The account providing address and key information */
-  account: TAccount
-
+export type WalletClient<WalletConfig extends WalletClientConfig<TAccount, dsMethods>, TAccount extends Account = Account, clientActions extends ActionGroup = {}, dsMethods extends ActionGroup = {}>  = Client<WalletConfig, dsMethods, clientActions> & {
   /**
    * Adds a new action group to this wallet client.
    *
@@ -78,6 +63,6 @@ export interface WalletClient<TDS = object, TAccount extends Account = Account, 
    * @returns A new wallet client with the additional action methods
    */
   extend<TNew>(
-    factory: (client: WalletClient<TDS, TAccount, TActions>) => TNew
-  ): WalletClient<TDS, TAccount, TActions & TNew>
+    factory: (client: WalletClient<WalletConfig, TAccount, clientActions, dsMethods>) => TNew
+  ): WalletClient<WalletConfig, TAccount, clientActions, dsMethods> & TNew
 }

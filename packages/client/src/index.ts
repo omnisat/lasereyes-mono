@@ -1,8 +1,9 @@
 // Core primitives
 
-export type { BtcActions } from './actions'
 // Actions
-export { btcActions } from './actions'
+export { walletBtcActions } from './actions/wallet-btc'
+export { signingActions } from './actions/wallet-signing'
+
 export { createClient } from './client'
 // Constants
 export {
@@ -40,7 +41,6 @@ export type {
   Brc20Balance,
   Brc20Capability,
   Brc20Info,
-  CapabilityGroup,
   // Data source
   ChainDataSource,
   // Client

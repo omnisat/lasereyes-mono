@@ -57,14 +57,13 @@
  * ```
  */
 
-export type { ReadOnlyAccountConfig, WalletAccountConfig } from './account'
+export type { WalletAccountConfig } from './account'
 // Account factories
-export { createReadOnlyAccount, createWalletAccount } from './account'
-export type { SendBtcParams as WalletSendBtcParams, WalletBtcActions } from './actions/wallet-btc'
+export { createWalletAccount } from './account'
+export type { SendBtcParams as WalletSendBtcParams } from './actions/wallet-btc'
 
 // Actions
 export { getBalance, getUtxos, sendBtc, walletBtcActions } from './actions/wallet-btc'
-export type { SigningActions } from './actions/wallet-signing'
 
 export { signingActions } from './actions/wallet-signing'
 // Re-export types for convenience

@@ -1,6 +1,5 @@
 import { getSandshrewUrl, SANDSHREW_LASEREYES_KEY } from '../../lib/urls'
 import type {
-  CapabilityGroup,
   DataSourceContext,
   FormattedUTXO,
   OrdAddressInfo,
@@ -30,7 +29,7 @@ function resolveUrl(network: string, config?: SandshrewConfig): { url: string; k
 
 export function ordCapabilities(
   vendorConfig?: SandshrewConfig
-): (ctx: DataSourceContext) => CapabilityGroup<OrdCapability> {
+): (ctx: DataSourceContext) => OrdCapability {
   return (ctx: DataSourceContext) => {
     const { url, key } = resolveUrl(ctx.network, vendorConfig)
     const rpc = new SandshrewRpcClient(`${url}/${key}`)
@@ -114,6 +113,6 @@ export function ordCapabilities(
       },
     }
 
-    return { group: 'ord', methods }
+    return methods
   }
 }

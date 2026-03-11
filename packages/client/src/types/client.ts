@@ -1,3 +1,4 @@
+import { ActionGroup } from './capabilities'
 import type { ChainDataSource } from './data-source'
 import type { NetworkType } from './network'
 
@@ -20,11 +21,8 @@ import type { NetworkType } from './network'
  * const balance = await client.btcGetBalance('bc1q...')
  * ```
  */
-export type Client<TDataSource = object, TActions = object> = {
-  /** The Bitcoin network this client operates on. */
-  network: NetworkType
-  /** The underlying chain data source providing blockchain data access. */
-  dataSource: ChainDataSource<TDataSource>
+export type Client<Config extends ClientConfig<dsMethods>, dsMethods extends ActionGroup = {}, clientActions extends ActionGroup = {}> = {
+  config: Config
   /**
    * Adds a new action group to this client.
    *
@@ -32,19 +30,19 @@ export type Client<TDataSource = object, TActions = object> = {
    * @param factory - A function that receives the current client and returns new action methods
    * @returns A new client with the additional action methods
    */
-  extend<TNew>(
-    factory: (client: Client<TDataSource, TActions>) => TNew
-  ): Client<TDataSource, TActions & TNew>
-} & TActions
+  extend<TNew extends ActionGroup>(
+    factory: (client: Client<Config, dsMethods, clientActions>) => TNew
+  ): Client<Config, dsMethods, clientActions & TNew>
+} & clientActions
 
 /**
  * Configuration for creating a new client via {@link createClient}.
  *
  * @typeParam TDS - The capabilities available on the provided data source
  */
-export interface ClientConfig<TDS> {
+export interface ClientConfig<dsMethods extends ActionGroup = {}> {
   /** The Bitcoin network this client should operate on. */
   network: NetworkType
   /** The chain data source to use. Must be configured for the same network. */
-  dataSource: ChainDataSource<TDS>
+  dataSource: ChainDataSource<dsMethods>
 }

@@ -4,7 +4,6 @@ import type {
   Brc20Balance,
   Brc20Capability,
   Brc20Info,
-  CapabilityGroup,
   DataSourceContext,
   PaginatedResult,
   PaginationParams,
@@ -38,7 +37,7 @@ async function maestroGet(apiUrl: string, apiKey: string, endpoint: string) {
 
 export function brc20Capabilities(
   vendorConfig: MaestroConfig
-): (ctx: DataSourceContext) => CapabilityGroup<Brc20Capability> {
+): (ctx: DataSourceContext) => Brc20Capability {
   return (ctx: DataSourceContext) => {
     const { apiUrl, apiKey } = resolveUrlAndKey(ctx.network, vendorConfig)
 
@@ -71,6 +70,6 @@ export function brc20Capabilities(
       },
     }
 
-    return { group: 'brc20', methods }
+    return methods
   }
 }

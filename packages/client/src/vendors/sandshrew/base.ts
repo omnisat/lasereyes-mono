@@ -3,7 +3,6 @@ import { bytesToHex } from '../../lib/bytes'
 import { getSandshrewUrl, SANDSHREW_LASEREYES_KEY } from '../../lib/urls'
 import type {
   BaseCapability,
-  CapabilityGroup,
   DataSourceContext,
   FeeEstimate,
   PaginatedResult,
@@ -41,7 +40,7 @@ function resolveUrl(network: string, config?: SandshrewConfig): { url: string; k
 
 export function baseCapabilities(
   vendorConfig?: SandshrewConfig
-): (ctx: DataSourceContext) => CapabilityGroup<BaseCapability> {
+): (ctx: DataSourceContext) => BaseCapability {
   return (ctx: DataSourceContext) => {
     const { url, key } = resolveUrl(ctx.network, vendorConfig)
     const rpc = new SandshrewRpcClient(`${url}/${key}`)
@@ -110,6 +109,6 @@ export function baseCapabilities(
       },
     }
 
-    return { group: 'btc', methods }
+    return methods
   }
 }

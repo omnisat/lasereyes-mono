@@ -9,21 +9,69 @@
  */
 
 import type {
+  Account,
+  ActionGroup,
   SignedPsbt,
   Signer,
   SignMessageOptions,
   SignPsbtOptions,
   WalletClient,
+  WalletClientConfig,
 } from '../types'
 
 /**
- * Signing actions interface.
+ * Signs a PSBT using the provided signer.
+ *
+ * @param _client - The wallet client
+ * @param signer - The signer implementation
+ * @param psbt - The PSBT to sign
+ * @param options - Signing options
+ * @returns The signed PSBT
  */
-export interface SigningActions {
-  /** Sign a PSBT */
-  signPsbt(psbt: string, options?: Omit<SignPsbtOptions, 'psbt'>): Promise<SignedPsbt>
-  /** Sign a message */
-  signMessage(message: string, options?: SignMessageOptions): Promise<string>
+export async function signPsbt<
+  config extends WalletClientConfig<account, dsMethods>,
+  account extends Account,
+  clientActions extends ActionGroup,
+  dsMethods extends ActionGroup
+>(
+  _client: WalletClient<config, account, clientActions, dsMethods>,
+  signer: Signer,
+  psbt: string,
+  options?: Omit<SignPsbtOptions, 'psbt'>
+): Promise<SignedPsbt> {
+  return signer.signPsbt({
+    psbt,
+    ...options,
+  })
+}
+
+/**
+ * Signs a message using the provided signer.
+ *
+ * @param client - The wallet client
+ * @param signer - The signer implementation
+ * @param message - The message to sign
+ * @param options - Signing options
+ * @returns The signed message
+ */
+export async function signMessage<
+  config extends WalletClientConfig<account, dsMethods>,
+  account extends Account,
+  clientActions extends ActionGroup,
+  dsMethods extends ActionGroup
+>(
+  client: WalletClient<config, account, clientActions, dsMethods>,
+  signer: Signer,
+  message: string,
+  options?: SignMessageOptions
+): Promise<string> {
+  // Use provided address or default to payment address
+  const address = options?.address ?? client.config.account.getAddress('payment')
+
+  return signer.signMessage(message, {
+    ...options,
+    address,
+  })
 }
 
 /**
@@ -58,21 +106,19 @@ export interface SigningActions {
  * ```
  */
 export function signingActions(signer: Signer) {
-  return (client: WalletClient): SigningActions => ({
+  return <
+    config extends WalletClientConfig<account, dsMethods>,
+    account extends Account,
+    clientActions extends ActionGroup,
+    dsMethods extends ActionGroup
+  >(
+    client: WalletClient<config, account, clientActions, dsMethods>
+  ) => ({
     async signPsbt(psbt: string, options?: Omit<SignPsbtOptions, 'psbt'>): Promise<SignedPsbt> {
-      return signer.signPsbt({
-        psbt,
-        ...options,
-      })
+      return signPsbt(client, signer, psbt, options)
     },
     async signMessage(message: string, options?: SignMessageOptions): Promise<string> {
-      // Use provided address or default to payment address
-      const address = options?.address ?? client.account.getAddress('payment')
-
-      return signer.signMessage(message, {
-        ...options,
-        address,
-      })
+      return signMessage(client, signer, message, options)
     },
   })
 }

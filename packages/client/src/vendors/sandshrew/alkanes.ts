@@ -5,7 +5,6 @@ import type {
   AlkaneBalance,
   AlkaneCapability,
   AlkaneOutpoint,
-  CapabilityGroup,
   DataSourceContext,
   PaginatedResult,
   PaginationParams,
@@ -64,7 +63,7 @@ async function alkaneRpcCall(baseUrl: string, method: string, params: unknown[])
 
 export function alkaneCapabilities(
   vendorConfig?: SandshrewConfig
-): (ctx: DataSourceContext) => CapabilityGroup<AlkaneCapability> {
+): (ctx: DataSourceContext) => AlkaneCapability {
   return (ctx: DataSourceContext) => {
     const { url, key } = resolveUrl(ctx.network, vendorConfig)
     const rpcUrl = `${url}/${key}`
@@ -146,6 +145,6 @@ export function alkaneCapabilities(
       },
     }
 
-    return { group: 'alkanes', methods }
+    return methods
   }
 }

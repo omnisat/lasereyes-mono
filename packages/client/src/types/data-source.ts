@@ -1,3 +1,4 @@
+import { ActionGroup } from './capabilities'
 import type { NetworkType } from './network'
 
 /**
@@ -20,23 +21,6 @@ export type PaginatedResult<T> = {
   data: T[]
   /** Cursor to pass as `PaginationParams.cursor` to fetch the next page, or `undefined` if no more pages. */
   nextCursor?: string | number
-}
-
-/**
- * Describes a named group of capability methods to be added to a data source.
- *
- * @typeParam T - The interface shape of the methods provided by this group
- *
- * @remarks
- * Capability groups are registered by name when calling
- * {@link ChainDataSource.extend | dataSource.extend()}, allowing introspection
- * via {@link ChainDataSource.getCapabilities | getCapabilities()}.
- */
-export interface CapabilityGroup<T> {
-  /** The name of this capability group (e.g., `'base'`, `'rune'`, `'inscription'`). */
-  group: string
-  /** The method implementations provided by this capability group. */
-  methods: T
 }
 
 /**
@@ -66,11 +50,11 @@ export type DataSourceContext = {
  *     .extend(runeCapabilities(config))
  * ```
  */
-export type ChainDataSource<TCapabilities = object> = {
+export type ChainDataSource<SupportedMethods extends ActionGroup = {}> = {
   /** The Bitcoin network this data source operates on. */
   network: NetworkType
   /** Returns a record mapping capability group names to their registered method names. */
-  getCapabilities(): Record<string, string[]>
+  getCapabilities(): (keyof SupportedMethods)[]
   /**
    * Adds a new capability group to this data source.
    *
@@ -79,6 +63,6 @@ export type ChainDataSource<TCapabilities = object> = {
    * @returns A new data source with the additional capability methods
    */
   extend<TNew>(
-    factory: (context: DataSourceContext) => CapabilityGroup<TNew>
-  ): ChainDataSource<TCapabilities & TNew>
-} & TCapabilities
+    factory: (context: DataSourceContext) => TNew
+  ): ChainDataSource<SupportedMethods & TNew>
+} & SupportedMethods

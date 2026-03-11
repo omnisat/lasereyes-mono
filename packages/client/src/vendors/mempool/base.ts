@@ -12,7 +12,6 @@ import { bytesToHex } from '../../lib/bytes'
 import { getMempoolSpaceUrl } from '../../lib/urls'
 import type {
   BaseCapability,
-  CapabilityGroup,
   DataSourceContext,
   FeeEstimate,
   PaginatedResult,
@@ -24,7 +23,7 @@ import type { MempoolConfig } from './config'
 
 export function baseCapabilities(
   vendorConfig?: MempoolConfig
-): (ctx: DataSourceContext) => CapabilityGroup<BaseCapability> {
+): (ctx: DataSourceContext) => BaseCapability {
   return (ctx: DataSourceContext) => {
     const networkUrls: Record<string, string> = {
       [MAINNET]: getMempoolSpaceUrl('mainnet'),
@@ -147,9 +146,6 @@ export function baseCapabilities(
       },
     }
 
-    return {
-      group: 'btc',
-      methods,
-    }
+    return methods
   }
 }

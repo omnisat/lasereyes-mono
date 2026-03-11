@@ -1,7 +1,6 @@
 import { DataSourceError } from '../../errors'
 import { getMaestroUrl } from '../../lib/urls'
 import type {
-  CapabilityGroup,
   DataSourceContext,
   Inscription,
   InscriptionCapability,
@@ -38,7 +37,7 @@ async function maestroGet(apiUrl: string, apiKey: string, endpoint: string) {
 
 export function inscriptionCapabilities(
   vendorConfig: MaestroConfig
-): (ctx: DataSourceContext) => CapabilityGroup<InscriptionCapability> {
+): (ctx: DataSourceContext) => InscriptionCapability {
   return (ctx: DataSourceContext) => {
     const { apiUrl, apiKey } = resolveUrlAndKey(ctx.network, vendorConfig)
 
@@ -99,6 +98,6 @@ export function inscriptionCapabilities(
       },
     }
 
-    return { group: 'inscriptions', methods }
+    return methods
   }
 }

@@ -19,6 +19,17 @@ export type { MaestroConfig } from './config'
 export { inscriptionCapabilities } from './inscriptions'
 export { runeCapabilities } from './runes'
 
+type Prettify<T> = {
+  [K in keyof T]: T[K];
+} & {};
+
+type MaestroDataSourceType = Prettify<
+    Pick<BaseCapability, keyof BaseCapability> &
+      Pick<InscriptionCapability, keyof InscriptionCapability> &
+      Pick<Brc20Capability, keyof Brc20Capability> &
+      Pick<RuneCapability, keyof RuneCapability>
+  >
+
 /**
  * Creates a Maestro-backed data source with base, inscription, BRC-20, and partial rune capabilities.
  *
@@ -52,10 +63,7 @@ export function createDataSource(
     network: NetworkType
   } & MaestroConfig
 ): ChainDataSource<
-  BaseCapability &
-    InscriptionCapability &
-    Brc20Capability &
-    Pick<RuneCapability, 'runesGetById' | 'runesGetByName'>
+  MaestroDataSourceType
 > {
   return createChainDataSource({ network: config.network })
     .extend(baseCapabilities(config))

@@ -1,5 +1,5 @@
 import { NetworkMismatchError } from './errors'
-import type { ChainDataSource, Client, ClientConfig, NetworkType } from './types'
+import type { ActionGroup, Client, ClientConfig } from './types'
 
 /**
  * Creates a new client instance that wraps a chain data source with action methods.
@@ -28,28 +28,28 @@ import type { ChainDataSource, Client, ClientConfig, NetworkType } from './types
  * const balance = await client.btcGetBalance('bc1q...')
  * ```
  */
-export function createClient<TDS>(config: ClientConfig<TDS>): Client<TDS> {
+export function createClient<Config extends ClientConfig<dsMethods>, dsMethods extends ActionGroup = {}, clientActions extends ActionGroup = {}>(
+  config: Config
+): Client<Config, dsMethods, clientActions> {
   if (config.dataSource.network !== config.network) {
     throw new NetworkMismatchError(config.network, config.dataSource.network)
   }
 
-  function buildClient<TActions>(
-    network: NetworkType,
-    dataSource: ChainDataSource<TDS>,
+  function buildClient<TActions extends ActionGroup>(
+    config: Config,
     actions: TActions
-  ): Client<TDS, TActions> {
+  ): Client<Config, dsMethods, TActions> {
     const client = {
-      network,
-      dataSource,
-      extend<TNew>(factory: (c: Client<TDS, TActions>) => TNew): Client<TDS, TActions & TNew> {
+      config,
+      extend<TNew>(factory: (c: Client<Config, dsMethods, TActions>) => TNew): Client<Config, dsMethods, TActions & TNew> {
         const newActions = factory(client)
         const merged = { ...actions, ...newActions } as TActions & TNew
-        return buildClient(network, dataSource, merged)
+        return buildClient(config, merged)
       },
-      ...(actions as object),
-    } as Client<TDS, TActions>
+      ...(actions as TActions),
+    } as Client<Config, dsMethods, TActions>
     return client
   }
 
-  return buildClient(config.network, config.dataSource, {} as object) as Client<TDS>
+  return buildClient<clientActions>(config, {} as clientActions)
 }

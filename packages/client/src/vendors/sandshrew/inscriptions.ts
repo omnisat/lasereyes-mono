@@ -1,6 +1,5 @@
 import { getSandshrewUrl, SANDSHREW_LASEREYES_KEY } from '../../lib/urls'
 import type {
-  CapabilityGroup,
   DataSourceContext,
   Inscription,
   InscriptionCapability,
@@ -30,7 +29,7 @@ function resolveUrl(network: string, config?: SandshrewConfig): { url: string; k
 
 export function inscriptionCapabilities(
   vendorConfig?: SandshrewConfig
-): (ctx: DataSourceContext) => CapabilityGroup<InscriptionCapability> {
+): (ctx: DataSourceContext) => InscriptionCapability {
   return (ctx: DataSourceContext) => {
     const { url, key } = resolveUrl(ctx.network, vendorConfig)
     const rpc = new SandshrewRpcClient(`${url}/${key}`)
@@ -131,6 +130,6 @@ export function inscriptionCapabilities(
       },
     }
 
-    return { group: 'inscriptions', methods }
+    return methods
   }
 }

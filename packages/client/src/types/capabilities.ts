@@ -7,6 +7,8 @@ import type { OrdOutputWrapper, RuneBalance, RuneInfo, RuneOutpoint } from './ru
 import type { Transaction } from './transaction'
 import type { FormattedUTXO, UTXO } from './utxo'
 
+export type ActionGroup = Record<string, (...args: any[]) => any>
+
 /**
  * Core Bitcoin capability providing fundamental blockchain operations.
  *
@@ -14,7 +16,7 @@ import type { FormattedUTXO, UTXO } from './utxo'
  * Every vendor data source must implement this capability. It is the foundation
  * upon which all other capabilities (runes, inscriptions, etc.) are built.
  */
-export interface BaseCapability {
+export interface BaseCapability extends ActionGroup {
   /** Retrieves the confirmed balance for an address, returned as a string of satoshis. */
   btcGetBalance(address: string): Promise<string>
   /** Lists unspent transaction outputs for an address with optional pagination. */
@@ -37,7 +39,7 @@ export interface BaseCapability {
  * @remarks
  * Available via sandshrew and maestro vendor data sources.
  */
-export interface InscriptionCapability {
+export interface InscriptionCapability extends ActionGroup {
   /** Lists inscriptions held by an address with optional pagination. */
   inscriptionsGetByAddress(
     address: string,
@@ -56,7 +58,7 @@ export interface InscriptionCapability {
  * Full support available via sandshrew; maestro provides a partial implementation
  * (only `runesGetById` and `runesGetByName`).
  */
-export interface RuneCapability {
+export interface RuneCapability extends ActionGroup {
   /** Lists rune balances held by an address with optional pagination. */
   runesGetAddressBalances(
     address: string,
@@ -84,7 +86,7 @@ export interface RuneCapability {
  * @remarks
  * Available via the maestro vendor data source.
  */
-export interface Brc20Capability {
+export interface Brc20Capability extends ActionGroup {
   /** Lists BRC-20 token balances held by an address with optional pagination. */
   brc20GetAddressBalances(
     address: string,
@@ -100,7 +102,7 @@ export interface Brc20Capability {
  * @remarks
  * Available via the sandshrew vendor data source.
  */
-export interface AlkaneCapability {
+export interface AlkaneCapability extends ActionGroup {
   /** Lists alkane token balances held by an address with optional pagination. */
   alkanesGetAddressBalances(
     address: string,
@@ -119,7 +121,7 @@ export interface AlkaneCapability {
  * @remarks
  * Available via the sandshrew vendor data source, which exposes the ord indexer.
  */
-export interface OrdCapability {
+export interface OrdCapability extends ActionGroup {
   /** Retrieves ord-indexed address information including inscriptions, outputs, and rune balances. */
   ordGetAddress(address: string): Promise<OrdAddressInfo>
   /** Lists formatted UTXOs with embedded rune, alkane, and inscription metadata. */

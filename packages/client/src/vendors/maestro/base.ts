@@ -2,7 +2,6 @@ import { DataSourceError } from '../../errors'
 import { getMaestroUrl } from '../../lib/urls'
 import type {
   BaseCapability,
-  CapabilityGroup,
   DataSourceContext,
   FeeEstimate,
   PaginatedResult,
@@ -66,7 +65,7 @@ async function maestroCall(
 
 export function baseCapabilities(
   vendorConfig: MaestroConfig
-): (ctx: DataSourceContext) => CapabilityGroup<BaseCapability> {
+): (ctx: DataSourceContext) => BaseCapability {
   return (ctx: DataSourceContext) => {
     const { apiUrl, apiKey } = resolveUrlAndKey(ctx.network, vendorConfig)
 
@@ -123,6 +122,6 @@ export function baseCapabilities(
       },
     }
 
-    return { group: 'btc', methods }
+    return methods
   }
 }

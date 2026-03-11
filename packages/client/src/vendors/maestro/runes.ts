@@ -1,6 +1,6 @@
 import { DataSourceError } from '../../errors'
 import { getMaestroUrl } from '../../lib/urls'
-import type { CapabilityGroup, DataSourceContext, RuneCapability, RuneInfo } from '../../types'
+import type { DataSourceContext, RuneCapability, RuneInfo } from '../../types'
 import { BaseNetwork } from '../../types/network'
 import type { MaestroConfig } from './config'
 
@@ -54,7 +54,7 @@ export function runeCapabilities(
   vendorConfig: MaestroConfig
 ): (
   ctx: DataSourceContext
-) => CapabilityGroup<Pick<RuneCapability, 'runesGetById' | 'runesGetByName'>> {
+) => Pick<RuneCapability, 'runesGetById' | 'runesGetByName'> {
   return (ctx: DataSourceContext) => {
     const { apiUrl, apiKey } = resolveUrlAndKey(ctx.network, vendorConfig)
 
@@ -97,6 +97,6 @@ export function runeCapabilities(
       },
     }
 
-    return { group: 'runes', methods }
+    return methods
   }
 }

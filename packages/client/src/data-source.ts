@@ -1,5 +1,5 @@
 import { NetworkMismatchError } from './errors'
-import type { CapabilityGroup, ChainDataSource, DataSourceContext, NetworkType } from './types'
+import type { ActionGroup, ChainDataSource, DataSourceContext, NetworkType } from './types'
 
 /**
  * Creates a new chain data source with the specified network configuration.
@@ -22,33 +22,31 @@ import type { CapabilityGroup, ChainDataSource, DataSourceContext, NetworkType }
  *   .extend(baseCapabilities({ networks: { mainnet: { apiUrl: 'https://mempool.space/api' } } }))
  * ```
  */
-export function createChainDataSource(config: { network: NetworkType }): ChainDataSource {
-  const capabilities: Record<string, string[]> = {}
+export function createChainDataSource(config: { network: NetworkType }): ChainDataSource<{}> {
   const context: DataSourceContext = {
     network: config.network,
     config: {},
   }
 
-  function buildDataSource<T>(methods: T): ChainDataSource<T> {
+  function buildDataSource<T extends ActionGroup>(methods: T): ChainDataSource<T> {
     const ds = {
       network: config.network,
       getCapabilities() {
-        return { ...capabilities }
+        return Object.keys(methods) as (keyof T)[]
       },
       extend<TNew>(
-        factory: (ctx: DataSourceContext) => CapabilityGroup<TNew>
+        factory: (ctx: DataSourceContext) => TNew
       ): ChainDataSource<T & TNew> {
-        const group = factory(context)
-        capabilities[group.group] = Object.keys(group.methods as object)
-        const merged = { ...methods, ...group.methods } as T & TNew
+        const newMethods = factory(context)
+        const merged = { ...methods, ...newMethods } as T & TNew
         return buildDataSource(merged)
       },
-      ...(methods as object),
-    } as ChainDataSource<T>
-    return ds
+      ...(methods),
+    }
+    return ds as ChainDataSource<T>
   }
 
-  return buildDataSource({} as object) as ChainDataSource
+  return buildDataSource({})
 }
 
 /**
@@ -75,7 +73,7 @@ export function createChainDataSource(config: { network: NetworkType }): ChainDa
  * const merged = mergeDataSources(sandshrew, mempool)
  * ```
  */
-export function mergeDataSources<A, B>(
+export function mergeDataSources<A extends ActionGroup, B extends ActionGroup>(
   primary: ChainDataSource<A>,
   secondary: ChainDataSource<B>
 ): ChainDataSource<A & B> {
@@ -83,18 +81,10 @@ export function mergeDataSources<A, B>(
     throw new NetworkMismatchError(primary.network, secondary.network)
   }
 
-  const primaryCaps = primary.getCapabilities()
-  const secondaryCaps = secondary.getCapabilities()
+  const primaryMethods = primary.getCapabilities()
+  const secondaryMethods = secondary.getCapabilities()
 
-  const mergedCapabilities: Record<string, string[]> = { ...secondaryCaps }
-  for (const [group, methods] of Object.entries(primaryCaps)) {
-    if (mergedCapabilities[group]) {
-      const combined = new Set([...mergedCapabilities[group], ...methods])
-      mergedCapabilities[group] = [...combined]
-    } else {
-      mergedCapabilities[group] = methods
-    }
-  }
+
 
   // Collect all method names from both data sources (excluding built-in props)
   const builtins = new Set(['network', 'getCapabilities', 'extend'])
@@ -121,14 +111,16 @@ export function mergeDataSources<A, B>(
   const ds = {
     network: primary.network,
     getCapabilities() {
-      return { ...mergedCapabilities }
+      return {
+        ...secondaryMethods,
+        ...primaryMethods,
+      }
     },
     extend<TNew>(
-      factory: (ctx: DataSourceContext) => CapabilityGroup<TNew>
+      factory: (ctx: DataSourceContext) => TNew
     ): ChainDataSource<A & B & TNew> {
       const group = factory(context)
-      mergedCapabilities[group.group] = Object.keys(group.methods as object)
-      Object.assign(mergedMethods, group.methods)
+      Object.assign(mergedMethods, group)
       return ds as unknown as ChainDataSource<A & B & TNew>
     },
     ...mergedMethods,
