@@ -5,8 +5,10 @@
  */
 
 import type { Account } from '../account/types'
+import type { ChainNetwork } from '../chains'
 import type { ActionGroup } from '../data-source/capabilities'
 import { NetworkMismatchError } from '../errors'
+import type { ChainDataSource } from '../types/data-source'
 import type { Prettify } from '../types/utils'
 import type { WalletClient, WalletClientConfig } from './wallet-types'
 
@@ -22,13 +24,10 @@ import type { WalletClient, WalletClientConfig } from './wallet-types'
  * Signing capability is added via the `signingActions(signer)` action
  * group.
  *
- * @typeParam Config - The wallet client configuration
- * @typeParam TAccount - The account type (Account / WalletAccount / ReadOnlyAccount)
+ * @typeParam dsMethods - The data source capabilities (inferred from `config.dataSource`)
+ * @typeParam TAccount - The account type (inferred from `config.account`)
  *
  * @param config - The wallet client configuration
- * @param config.network - The Bitcoin network this client operates on
- * @param config.dataSource - The chain data source providing blockchain data
- * @param config.account - The account providing address and key information
  *
  * @returns A wallet client instance that can be extended with action groups
  *
@@ -57,21 +56,26 @@ import type { WalletClient, WalletClientConfig } from './wallet-types'
  *   dataSource: ds,
  *   account,
  * })
- *   .extend(walletBtcActions())
  *   .extend(signingActions(mySigner))
+ *   .extend(walletBtcActions())
  *
  * const balance = await walletClient.getBalance()
  * await walletClient.sendBtc({ to: 'bc1q...', amount: 10000 })
  * ```
  */
 export function createWalletClient<
-  Config extends WalletClientConfig<TAccount, dsMethods>,
-  TAccount extends Account = Account,
-  dsMethods extends ActionGroup = {},
->(config: Config): WalletClient<Config, TAccount, {}, dsMethods> {
+  dsMethods extends ActionGroup,
+  TAccount extends Account,
+>(config: {
+  network: ChainNetwork
+  dataSource: ChainDataSource<dsMethods>
+  account: TAccount
+}): WalletClient<WalletClientConfig<TAccount, dsMethods>, TAccount, {}, dsMethods> {
   if (config.dataSource.network !== config.network) {
     throw new NetworkMismatchError(config.network.name, config.dataSource.network.name)
   }
+
+  type Config = WalletClientConfig<TAccount, dsMethods>
 
   function buildClient<TActions extends ActionGroup>(
     actions: TActions

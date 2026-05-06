@@ -4,8 +4,10 @@
  * @module client/public
  */
 
+import type { ChainNetwork } from '../chains'
 import type { ActionGroup } from '../data-source/capabilities'
 import { NetworkMismatchError } from '../errors'
+import type { ChainDataSource } from '../types/data-source'
 import type { Prettify } from '../types/utils'
 import type { Client, ClientConfig } from './types'
 
@@ -35,13 +37,15 @@ import type { Client, ClientConfig } from './types'
  * const balance = await client.getBalance('bc1q...')
  * ```
  */
-export function createClient<
-  Config extends ClientConfig<dsMethods>,
-  dsMethods extends ActionGroup = {},
->(config: Config): Client<Config, dsMethods, {}> {
+export function createClient<dsMethods extends ActionGroup>(config: {
+  network: ChainNetwork
+  dataSource: ChainDataSource<dsMethods>
+}): Client<ClientConfig<dsMethods>, dsMethods, {}> {
   if (config.dataSource.network !== config.network) {
     throw new NetworkMismatchError(config.network.name, config.dataSource.network.name)
   }
+
+  type Config = ClientConfig<dsMethods>
 
   function buildClient<TActions extends ActionGroup>(
     actions: TActions

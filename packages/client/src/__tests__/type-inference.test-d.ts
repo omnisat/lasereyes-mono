@@ -2,55 +2,35 @@
  * Type-inference contract for the client package.
  *
  * @remarks
- * This file is the type-level contract for `Client`, `WalletClient`,
- * `.extend()` accumulation, and the action factories. It contains no
- * runtime code — every check is performed by the TypeScript compiler.
- *
- * If a future change breaks a contract here, the type error surfaces in
- * CI (Phase 12 green-up) before the regression reaches users.
- *
- * Conventions:
- * - `Expect<Equal<A, B>>` asserts that two types are exactly equal.
- * - `// @ts-expect-error` asserts that the next line *must* fail to type-check.
+ * Run via `vitest typecheck`. This file contains no runtime assertions —
+ * each `it` block exists purely so its body is typechecked. If a future
+ * change breaks a contract here, `vitest typecheck` fails in CI.
  *
  * @module __tests__/type-inference
  */
 
+import { describe, expectTypeOf, it } from 'vitest'
+import { createWalletAccount } from '../account'
+import type { Account, WalletAccount } from '../account/types'
+import { walletBtcActions, type SendBtcParams } from '../actions/wallet-btc'
+import { signingActions } from '../actions/wallet-signing'
 import { MAINNET } from '../chains'
 import { createClient } from '../client'
+import type { Client, ClientConfig } from '../client/types'
 import { createWalletClient } from '../client/wallet'
-import type { Client } from '../client/types'
-import type { WalletClient } from '../client/wallet-types'
+import type { WalletClient, WalletClientConfig } from '../client/wallet-types'
 import { createChainDataSource } from '../data-source'
 import type { BaseCapability, RuneCapability } from '../data-source/capabilities'
-import { walletBtcActions } from '../actions/wallet-btc'
-import { signingActions } from '../actions/wallet-signing'
-import { createWalletAccount } from '../account'
+import type { SignedPsbt, Signer } from '../signer/types'
 import { AddressType } from '../types/psbt'
-import type { Signer, SignedPsbt } from '../signer/types'
+import type { DataSourceContext, PaginatedResult, UTXO } from '../types'
 
 // ============================================================================
-// Helpers
+// Fixtures (declared, never executed)
 // ============================================================================
 
-/** Compile-time assertion that `T` is `true`. */
-// biome-ignore lint/correctness/noUnusedVariables: type-level identity
-type Expect<T extends true> = T
-
-/** Compile-time identity-equality between two types. */
-type Equal<X, Y> =
-  (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y ? 1 : 2 ? true : false
-
-// ============================================================================
-// Test fixtures (pure type-level — no runtime calls)
-// ============================================================================
-
-declare const baseCap: (
-  ctx: import('../types').DataSourceContext
-) => BaseCapability
-declare const runeCap: (
-  ctx: import('../types').DataSourceContext
-) => RuneCapability
+declare const baseCap: (ctx: DataSourceContext) => BaseCapability
+declare const runeCap: (ctx: DataSourceContext) => RuneCapability
 declare const signer: Signer
 
 const account = createWalletAccount({
@@ -62,99 +42,116 @@ const account = createWalletAccount({
 // 1. Data source accumulates capabilities through .extend()
 // ============================================================================
 
-const dsBase = createChainDataSource({ network: MAINNET }).extend(baseCap)
-type _DSBase = Expect<Equal<typeof dsBase.btcGetBalance, BaseCapability['btcGetBalance']>>
+describe('ChainDataSource', () => {
+  it('accumulates capability methods through .extend()', () => {
+    const dsBase = createChainDataSource({ network: MAINNET }).extend(baseCap)
 
-const dsBaseRune = dsBase.extend(runeCap)
-type _DSBaseRune_HasBase = Expect<
-  Equal<typeof dsBaseRune.btcGetBalance, BaseCapability['btcGetBalance']>
->
-type _DSBaseRune_HasRune = Expect<
-  Equal<
-    typeof dsBaseRune.runesGetAddressBalances,
-    RuneCapability['runesGetAddressBalances']
-  >
->
+    expectTypeOf(dsBase.btcGetBalance).toEqualTypeOf<BaseCapability['btcGetBalance']>()
+
+    const dsBaseRune = dsBase.extend(runeCap)
+    expectTypeOf(dsBaseRune.btcGetBalance).toEqualTypeOf<BaseCapability['btcGetBalance']>()
+    expectTypeOf(dsBaseRune.runesGetAddressBalances).toEqualTypeOf<
+      RuneCapability['runesGetAddressBalances']
+    >()
+  })
+})
 
 // ============================================================================
-// 2. Client typechecks against its data source
+// 2. Client: Config and dsMethods are inferred from createClient args
 // ============================================================================
 
-const readClient = createClient({ network: MAINNET, dataSource: dsBase })
-//    ^? Client<{ network; dataSource }, BaseCapability, {}>
+describe('createClient', () => {
+  it('infers dsMethods from the data source argument', () => {
+    const ds = createChainDataSource({ network: MAINNET }).extend(baseCap)
+    const client = createClient({ network: MAINNET, dataSource: ds })
 
-// Reads the client's config types correctly.
-type _ReadConfig_Network = Expect<Equal<typeof readClient.config.network, typeof MAINNET>>
-type _ReadConfig_DS = Expect<Equal<typeof readClient.config.dataSource, typeof dsBase>>
+    expectTypeOf(client.config.network).toEqualTypeOf<typeof MAINNET>()
+    expectTypeOf(client.config.dataSource).toEqualTypeOf<typeof ds>()
+  })
 
-// `.extend(...)` accumulates clientActions.
-const readClientWithFoo = readClient.extend(_c => ({
-  foo: () => 'bar' as const,
-}))
-type _ExtendAddsMethod = Expect<Equal<typeof readClientWithFoo.foo, () => 'bar'>>
+  it('accumulates clientActions through .extend()', () => {
+    const ds = createChainDataSource({ network: MAINNET }).extend(baseCap)
+    const client = createClient({ network: MAINNET, dataSource: ds }).extend(_c => ({
+      foo: () => 'bar' as const,
+    }))
 
-// `.extend(non-action-group)` is rejected by the TNew constraint.
-// @ts-expect-error — TNew must extend ActionGroup; a number isn't a record of fns
-readClient.extend(() => 42)
+    expectTypeOf(client.foo).toEqualTypeOf<() => 'bar'>()
+  })
+
+  it('rejects non-ActionGroup .extend() callbacks', () => {
+    const ds = createChainDataSource({ network: MAINNET }).extend(baseCap)
+    const client = createClient({ network: MAINNET, dataSource: ds })
+
+    // @ts-expect-error — TNew must extend ActionGroup; a number is not a record of fns.
+    client.extend(() => 42)
+  })
+})
 
 // ============================================================================
 // 3. Wallet client + signing + wallet-btc compose in the documented order
 // ============================================================================
 
-const walletClient = createWalletClient({ network: MAINNET, dataSource: dsBase, account })
-  .extend(signingActions(signer))
-  .extend(walletBtcActions())
+describe('createWalletClient', () => {
+  it('composes signing then wallet-btc actions', () => {
+    const ds = createChainDataSource({ network: MAINNET }).extend(baseCap)
+    const wc = createWalletClient({ network: MAINNET, dataSource: ds, account })
+      .extend(signingActions(signer))
+      .extend(walletBtcActions())
 
-// `signPsbt` shape matches the Signer contract.
-type _SignPsbtShape = Expect<
-  Equal<
-    Awaited<ReturnType<typeof walletClient.signPsbt>>,
-    SignedPsbt
-  >
->
+    expectTypeOf(wc.signPsbt).returns.resolves.toEqualTypeOf<SignedPsbt>()
+    expectTypeOf(wc.sendBtc).parameter(0).toEqualTypeOf<SendBtcParams>()
+    expectTypeOf(wc.sendBtc).returns.resolves.toEqualTypeOf<string>()
+    expectTypeOf(wc.getBalance).returns.resolves.toEqualTypeOf<string>()
+    expectTypeOf(wc.getUtxos).returns.resolves.toEqualTypeOf<PaginatedResult<UTXO>>()
+  })
 
-// `sendBtc` is exposed.
-type _SendBtcExists = Expect<
-  Equal<
-    Parameters<typeof walletClient.sendBtc>[0],
-    import('../actions/wallet-btc').SendBtcParams
-  >
->
+  it('rejects walletBtcActions before signingActions', () => {
+    const ds = createChainDataSource({ network: MAINNET }).extend(baseCap)
 
-// `getBalance` is exposed and returns a string of satoshis.
-type _GetBalanceShape = Expect<Equal<ReturnType<typeof walletClient.getBalance>, Promise<string>>>
-
-// ============================================================================
-// 4. Order matters: wallet-btc requires signPsbt to already be on the client
-// ============================================================================
-
-// @ts-expect-error — extending walletBtcActions() before signingActions(signer)
-//                    fails because the client lacks signPsbt at extend time.
-createWalletClient({ network: MAINNET, dataSource: dsBase, account }).extend(walletBtcActions())
+    // @ts-expect-error — walletBtcActions requires signPsbt on the client at extend time.
+    createWalletClient({ network: MAINNET, dataSource: ds, account }).extend(walletBtcActions())
+  })
+})
 
 // ============================================================================
-// 5. Wallet client identity preserved as we add actions
+// 4. Identity: extension preserves the Client / WalletClient kind
 // ============================================================================
 
-// After both extensions, walletClient's WalletClient<...> wrapper is
-// preserved — i.e., it's still a wallet client, not a plain Client.
-declare const isWalletClient: <
-  Config extends import('../client/wallet-types').WalletClientConfig<
-    import('../account/types').WalletAccount,
-    BaseCapability
-  >,
-  Actions extends import('../data-source/capabilities').ActionGroup,
->(
-  c: WalletClient<Config, import('../account/types').WalletAccount, Actions, BaseCapability>
-) => true
-isWalletClient(walletClient)
+describe('Client identity', () => {
+  it('preserves Client kind across extension', () => {
+    const ds = createChainDataSource({ network: MAINNET }).extend(baseCap)
+    const c1 = createClient({ network: MAINNET, dataSource: ds })
+    const c2 = c1.extend(_c => ({ foo: () => 1 }))
 
-// Plain Client also preserves its base type after extension.
-declare const isClient: <
-  Config extends import('../client/types').ClientConfig<BaseCapability>,
-  Actions extends import('../data-source/capabilities').ActionGroup,
->(
-  c: Client<Config, BaseCapability, Actions>
-) => true
-isClient(readClient)
-isClient(readClientWithFoo)
+    // Bare client: clientActions is the empty record.
+    expectTypeOf(c1).toMatchTypeOf<
+      Client<ClientConfig<BaseCapability>, BaseCapability, {}>
+    >()
+
+    // Extended client: clientActions has the added method.
+    expectTypeOf(c2).toMatchTypeOf<
+      Client<ClientConfig<BaseCapability>, BaseCapability, { foo: () => number }>
+    >()
+  })
+
+  it('preserves WalletClient kind across extension', () => {
+    const ds = createChainDataSource({ network: MAINNET }).extend(baseCap)
+    const wc = createWalletClient({ network: MAINNET, dataSource: ds, account })
+      .extend(signingActions(signer))
+
+    // After signingActions extension, clientActions has signPsbt + signMessage.
+    expectTypeOf(wc).toMatchTypeOf<
+      WalletClient<
+        WalletClientConfig<WalletAccount, BaseCapability>,
+        WalletAccount,
+        { signPsbt: (...args: any[]) => Promise<SignedPsbt>; signMessage: (...args: any[]) => Promise<string> },
+        BaseCapability
+      >
+    >()
+  })
+
+  it('createWalletAccount yields a WalletAccount (which extends Account)', () => {
+    expectTypeOf(account).toMatchTypeOf<WalletAccount>()
+    expectTypeOf(account).toMatchTypeOf<Account>()
+  })
+})
