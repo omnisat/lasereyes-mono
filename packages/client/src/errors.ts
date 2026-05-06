@@ -123,3 +123,55 @@ export class InsufficientFundsError extends PsbtBuildError {
     this.name = 'InsufficientFundsError'
   }
 }
+
+/**
+ * RPC-style error thrown by {@link BitcoinProvider} adapters and forwarded by
+ * connectors.
+ *
+ * @remarks
+ * Modeled on EIP-1193's `ProviderRpcError`. Defined here (in the client
+ * package) rather than in core because errors are values, not state — and
+ * actions throughout the library may need to throw or check them without
+ * pulling in the core layer.
+ *
+ * The `code` field is a numeric RPC error code; well-known values are listed
+ * in {@link ProviderErrorCode}.
+ */
+export class ProviderRpcError extends Error {
+  /** Numeric RPC error code. */
+  code: number
+  /** Optional supplementary data (provider-specific). */
+  data?: unknown
+  constructor(code: number, message: string, data?: unknown) {
+    super(message)
+    this.name = 'ProviderRpcError'
+    this.code = code
+    this.data = data
+  }
+}
+
+/**
+ * Common RPC error codes (following EIP-1193 conventions).
+ *
+ * @remarks
+ * These are suggested codes — providers may use different numbers, so callers
+ * should treat the message as authoritative rather than the code.
+ */
+export enum ProviderErrorCode {
+  /** User rejected the request. */
+  USER_REJECTED = 4001,
+  /** Method requires authorization that has not been granted. */
+  UNAUTHORIZED = 4100,
+  /** Method is not supported by this provider. */
+  UNSUPPORTED_METHOD = 4200,
+  /** Provider is disconnected. */
+  DISCONNECTED = 4900,
+  /** JSON-RPC: invalid request. */
+  INVALID_REQUEST = -32600,
+  /** JSON-RPC: method not found. */
+  METHOD_NOT_FOUND = -32601,
+  /** JSON-RPC: invalid params. */
+  INVALID_PARAMS = -32602,
+  /** JSON-RPC: internal error. */
+  INTERNAL_ERROR = -32603,
+}

@@ -1,6 +1,6 @@
+import type { ChainNetwork } from '../chains'
 import { ActionGroup } from './capabilities'
 import type { ChainDataSource } from './data-source'
-import type { ChainNetwork } from './network'
 
 /**
  * A client instance that wraps a chain data source and exposes action methods.

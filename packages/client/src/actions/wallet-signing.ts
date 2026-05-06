@@ -8,16 +8,8 @@
  * @module actions/wallet-signing
  */
 
-import type {
-  Account,
-  ActionGroup,
-  SignedPsbt,
-  Signer,
-  SignMessageOptions,
-  SignPsbtOptions,
-  WalletClient,
-  WalletClientConfig,
-} from '../types'
+import type { SignedPsbt, Signer, SignMessageOptions, SignPsbtOptions } from '../signer'
+import type { Account, ActionGroup, WalletClient, WalletClientConfig } from '../types'
 
 /**
  * Signs a PSBT using the provided signer.

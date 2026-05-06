@@ -19,7 +19,7 @@ import type { ActionGroup, Client, ClientConfig } from './types'
  * import { createClient } from '@omnisat/lasereyes-client'
  * import { createDataSource } from '@omnisat/lasereyes-client/vendors/mempool'
  * import { btcActions } from '@omnisat/lasereyes-client/actions/btc'
- * import { MAINNET } from '@omnisat/lasereyes-client/constants/networks'
+ * import { MAINNET } from '@omnisat/lasereyes-client'
  *
  * const ds = createDataSource({ network: MAINNET })
  * const client = createClient({ network: MAINNET, dataSource: ds })

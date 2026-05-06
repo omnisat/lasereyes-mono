@@ -1,5 +1,6 @@
 import { createChainDataSource } from '../../data-source'
-import type { BaseCapability, ChainDataSource, ChainNetwork } from '../../types'
+import type { ChainNetwork } from '../../chains'
+import type { BaseCapability, ChainDataSource } from '../../types'
 import { baseCapabilities } from './base'
 import type { MempoolConfig } from './config'
 

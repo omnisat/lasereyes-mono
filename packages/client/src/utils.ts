@@ -30,7 +30,7 @@ export { buildSendBtcPsbt } from './lib/psbt-builders'
 // URL utilities
 export { getMaestroUrl, getMempoolSpaceUrl, getSandshrewUrl } from './lib/urls'
 export { encodeVarint, isBase64, isHex } from './lib/utils'
-export type { NetworkType } from './types/network'
+export type { NetworkType } from './chains'
 export { AddressType } from './types/psbt'
 // Re-export types that are useful with utils
 export type { FormattedUTXO } from './types/utxo'

@@ -1,11 +1,3 @@
-import {
-  FRACTAL_MAINNET,
-  FRACTAL_TESTNET,
-  MAINNET,
-  SIGNET,
-  TESTNET,
-  TESTNET4,
-} from '../../constants/networks'
 import { DataSourceError } from '../../errors'
 import { getAddressScriptPubKey } from '../../lib/btc'
 import { bytesToHex } from '../../lib/bytes'
@@ -26,12 +18,12 @@ export function baseCapabilities(
 ): (ctx: DataSourceContext) => BaseCapability {
   return (ctx: DataSourceContext) => {
     const networkUrls: Record<string, string> = {
-      [MAINNET]: getMempoolSpaceUrl('mainnet'),
-      [TESTNET]: getMempoolSpaceUrl('testnet'),
-      [TESTNET4]: getMempoolSpaceUrl('testnet4'),
-      [SIGNET]: getMempoolSpaceUrl('signet'),
-      [FRACTAL_MAINNET]: getMempoolSpaceUrl('fractal_mainnet'),
-      [FRACTAL_TESTNET]: getMempoolSpaceUrl('fractal_testnet'),
+      mainnet: getMempoolSpaceUrl('mainnet'),
+      testnet: getMempoolSpaceUrl('testnet'),
+      testnet4: getMempoolSpaceUrl('testnet4'),
+      signet: getMempoolSpaceUrl('signet'),
+      'fractal-mainnet': getMempoolSpaceUrl('fractal-mainnet'),
+      'fractal-testnet': getMempoolSpaceUrl('fractal-testnet'),
     }
 
     if (vendorConfig?.networks) {

@@ -4,18 +4,25 @@
 export { walletBtcActions } from './actions/wallet-btc'
 export { signingActions } from './actions/wallet-signing'
 
-export { createClient } from './client'
-// Constants
+// Chains
 export {
+  defineChain,
   FRACTAL_MAINNET,
   FRACTAL_TESTNET,
+  getNetwork,
+  getNetworkType,
   MAINNET,
+  NETWORKS,
   OYLNET,
   REGTEST,
   SIGNET,
   TESTNET,
   TESTNET4,
-} from './constants/networks'
+} from './chains'
+export type { ChainNetwork, NetworkId, NetworkType } from './chains'
+
+export { createClient } from './client'
+// Constants
 export { ALKANES, BRC20, BTC, RUNES } from './constants/protocols'
 export { createChainDataSource, mergeDataSources } from './data-source'
 // Errors
@@ -25,6 +32,8 @@ export {
   InsufficientFundsError,
   LaserEyesClientError,
   NetworkMismatchError,
+  ProviderErrorCode,
+  ProviderRpcError,
   PsbtBuildError,
 } from './errors'
 // Types
@@ -33,7 +42,6 @@ export type {
   BaseCapability,
   // Data source
   ChainDataSource,
-  ChainNetwork as Network,
   // Client
   Client,
   ClientConfig,
@@ -41,9 +49,6 @@ export type {
   // Fees
   FeeEstimate,
   FormattedUTXO,
-  // Network
-  NetworkId,
-  NetworkType,
   OrdAddressInfo,
   OrdCapability,
   PaginatedResult,

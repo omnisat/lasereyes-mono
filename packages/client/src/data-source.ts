@@ -1,5 +1,6 @@
 import { NetworkMismatchError } from './errors'
-import type { ActionGroup, ChainDataSource, DataSourceContext, ChainNetwork } from './types'
+import type { ChainNetwork } from './chains'
+import type { ActionGroup, ChainDataSource, DataSourceContext } from './types'
 
 /**
  * Creates a new chain data source with the specified network configuration.
@@ -16,7 +17,7 @@ import type { ActionGroup, ChainDataSource, DataSourceContext, ChainNetwork } fr
  * ```ts
  * import { createChainDataSource } from '@omnisat/lasereyes-client'
  * import { baseCapabilities } from '@omnisat/lasereyes-client/vendors/mempool'
- * import { MAINNET } from '@omnisat/lasereyes-client/constants/networks'
+ * import { MAINNET } from '@omnisat/lasereyes-client'
  *
  * const ds = createChainDataSource({ network: MAINNET })
  *   .extend(baseCapabilities({ networks: { mainnet: { apiUrl: 'https://mempool.space/api' } } }))

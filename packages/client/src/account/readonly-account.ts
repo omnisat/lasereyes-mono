@@ -4,7 +4,7 @@
  * @module account/readonly-account
  */
 
-import type { Account, AddressInfo, AddressPurpose } from '../types/account'
+import type { Account, AddressInfo, AddressPurpose } from './types'
 
 /**
  * Configuration for creating a read-only account.

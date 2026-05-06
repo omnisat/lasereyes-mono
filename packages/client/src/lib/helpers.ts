@@ -1,12 +1,4 @@
-import {
-  FRACTAL_MAINNET,
-  FRACTAL_TESTNET,
-  MAINNET,
-  SIGNET,
-  TESTNET,
-  TESTNET4,
-} from '../constants/networks'
-import type { NetworkId } from '../types'
+import type { NetworkId } from '../chains'
 
 export interface BitcoinNetwork {
   bech32: string
@@ -30,7 +22,7 @@ export const BITCOIN_TEST_NETWORK: BitcoinNetwork = {
 }
 
 export const getBitcoinNetwork = (network: NetworkId): BitcoinNetwork => {
-  if (network === TESTNET || network === TESTNET4 || network === SIGNET) {
+  if (network === 'testnet' || network === 'testnet4' || network === 'signet') {
     return BITCOIN_TEST_NETWORK
   }
   return BITCOIN_NETWORK
@@ -58,11 +50,11 @@ export const satoshisToBTC = (satoshis: number): string => {
 }
 
 export const isTestnetNetwork = (network: NetworkId) => {
-  return network === TESTNET || network === TESTNET4 || network === SIGNET
+  return network === 'testnet' || network === 'testnet4' || network === 'signet'
 }
 
 export const isMainnetNetwork = (network: NetworkId) => {
-  return network === MAINNET || network === FRACTAL_MAINNET || network === FRACTAL_TESTNET
+  return network === 'mainnet' || network === 'fractal-mainnet' || network === 'fractal-testnet'
 }
 
 export function delay(ms: number) {

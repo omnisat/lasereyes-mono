@@ -1,5 +1,5 @@
 import { Address, OutScript, p2sh, p2wpkh } from '@scure/btc-signer'
-import type { NetworkType } from '../types'
+import type { NetworkType } from '../chains'
 import { AddressType } from '../types/psbt'
 import { hexToBytes } from './bytes'
 import { getBitcoinNetwork } from './helpers'

@@ -8,8 +8,9 @@
 
 import { base64, hex } from '@scure/base'
 import { Address, OutScript, Transaction as PsbtTransaction } from '@scure/btc-signer'
+import type { NetworkType } from '../chains'
 import { InsufficientFundsError, PsbtBuildError } from '../errors'
-import type { NetworkType, PsbtResult, UTXO } from '../types'
+import type { PsbtResult, UTXO } from '../types'
 import { AddressType } from '../types/psbt'
 import { getAddressType, getRedeemScript } from './btc'
 import { estimateTxSize, getBitcoinNetwork } from './helpers'

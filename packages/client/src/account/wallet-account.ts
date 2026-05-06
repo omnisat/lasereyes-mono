@@ -4,7 +4,7 @@
  * @module account/wallet-account
  */
 
-import type { AddressInfo, AddressPurpose, WalletAccount } from '../types/account'
+import type { AddressInfo, AddressPurpose, WalletAccount } from './types'
 
 /**
  * Configuration for creating a wallet account.
