@@ -242,25 +242,36 @@ Stated once, applied uniformly across every action file.
 
 ### 7. Type-only sanity-check program
 
-`packages/client/src/__tests__/type-inference.test-d.ts` exercises the full
-chain end-to-end:
+`packages/client/src/__tests__/type-inference.test-d.ts` is the
+**type-level contract** for the package — chain definitions, account
+factories, data-source `.extend()` accumulation, `mergeDataSources`
+unions, vendor `createDataSource` return shapes, `createClient` and
+`createWalletClient` inference and identity, the action factory
+composition order, direct action-function call shapes, and `Signer`
+interface details. Every assertion runs at TypeScript-compile time
+(via `expectTypeOf` + `// @ts-expect-error`).
 
-```ts
-const ds = createChainDataSource({ network: MAINNET })
-  .extend(mempoolBase(...))
-  .extend(sandshrewRunes(...))
+If a future change breaks the contract, `vitest typecheck` fails.
 
-const client = createWalletClient({ network: MAINNET, dataSource: ds, account })
-  .extend(walletBtcActions())
-  .extend(signingActions(signer))
-  .extend(runeActions())          // would fail to compile if ds lacked RuneCapability
+### 8. Maintenance discipline
 
-client.sendBtc({...})              // ✓
-client.signPsbt(psbt, {...})       // ✓
-client.getRuneBalances(addr)       // ✓
-```
+**The contract file is binding.** Any change to a public type or
+signature in this package must come with a corresponding update to
+`packages/client/src/__tests__/type-inference.test-d.ts`. Specifically:
 
-This file is the contract. Future regressions trip it before runtime.
+| Change | Required test update |
+|---|---|
+| New action factory or new method on a client | Add `expectTypeOf` for parameter and return types under the relevant `describe` block |
+| Changed action signature (params / return) | Update the matching assertion |
+| New ordering constraint | Add a `// @ts-expect-error` block encoding "wrong order is a compile error" |
+| New negative case (account/capability/signer mismatch) | Add a `// @ts-expect-error` block |
+| New vendor or capability interface | Add a vendor-factory return-shape check + a method-reachability check |
+| New chain or `defineChain` change | Add a `chains` block assertion |
+| New direct-callable action | Add a `Direct action calls` block exercising `(client, …args)` |
+
+If the type system is the contract, the contract file is the
+proof-carrying form. PRs that change types without updating it should
+not land.
 
 ## Target package shapes
 

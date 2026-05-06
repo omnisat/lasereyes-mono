@@ -233,6 +233,25 @@ Size limits enforced via **size-limit** tool.
 - All public APIs must have proper type definitions
 - TSDoc comments required for all public methods, classes, interfaces
 
+### Type-inference contract (client package)
+
+`packages/client/src/__tests__/type-inference.test-d.ts` is the
+**binding type-level contract** for the client package. Any change to a
+public type or signature in `@omnisat/lasereyes-client` must come with a
+corresponding update to that file. Concretely:
+
+- New action factory or new client method → add `expectTypeOf` coverage
+- Changed action signature → update the matching assertion
+- New ordering constraint → add a `// @ts-expect-error` block
+- New negative case (capability/account/signer mismatch) → add a `// @ts-expect-error` block
+- New vendor or capability interface → add return-shape and reachability checks
+- New direct-callable action → add an entry under `Direct action calls`
+
+The full rule set lives in the file's docblock and in
+[`MENTAL-MODEL.md`](./MENTAL-MODEL.md) §8 ("Maintenance discipline").
+Run via `vitest typecheck` (or `pnpm tsc --noEmit -p packages/client`
+including `__tests__`).
+
 ### Formatting (Biome)
 
 - Semicolons: as needed
