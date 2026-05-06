@@ -127,6 +127,119 @@ Things that aren't 1:1 with the EVM playbook because Bitcoin needs them:
    `signet`, `fractal-mainnet`, `fractal-testnet`, `regtest`, plus
    `(string & {})` extension. There is no integer chain ID.
 
+## Type discipline
+
+The library is only as good as its inference. The whole `.extend()` pattern is
+wasted if `client.sendBtc(...)` doesn't autocomplete and doesn't surface
+"missing capability" errors at the right place. These rules exist to keep
+inference clean as the surface grows.
+
+### 1. Type-parameter discipline on `Client` / `WalletClient`
+
+`Config` and `dsMethods` are **fixed at construction** (`createClient` /
+`createWalletClient`) and **passed through `.extend()` unchanged**. Only
+`clientActions` accumulates.
+
+```ts
+type Client<Config, dsMethods, clientActions>
+  // dsMethods is locked at createClient()
+  // clientActions grows with each .extend()
+```
+
+Mirror viem: `Client<transport, chain, account, rpcSchema, extended>` — only
+`extended` grows.
+
+### 2. Permissive factories, strict actions
+
+The viem pattern, adopted wholesale.
+
+**Action factories accept any client of the right kind:**
+```ts
+export function walletBtcActions() {
+  return <C extends WalletClient<any, any, any, any>>(client: C) => ({
+    sendBtc: (params: SendBtcParams) => sendBtc(client, params),
+    //                                  ^^^^^^^ — strict generics live here
+  })
+}
+```
+
+**The individual action functions carry the precise constraints:**
+```ts
+export async function sendBtc<
+  C extends WalletClient<
+    WalletClientConfig<WalletAccount, DS>, WalletAccount, Actions, DS
+  >,
+  DS extends Pick<BaseCapability, 'btcGetAddressUtxos' | 'btcBroadcastTransaction'>,
+  Actions extends { signPsbt: (...) => Promise<SignedPsbt> }
+>(client: C, params: SendBtcParams): Promise<string>
+```
+
+**Why:** capability requirements check at the *action call site*, not the
+extension site. Order of `.extend()` calls becomes irrelevant. The user sees
+"this client doesn't have `signPsbt`" exactly where they wrote
+`client.sendBtc(...)`, not three lines earlier.
+
+### 3. `Prettify<T>` on every accumulated type
+
+```ts
+type Prettify<T> = { [K in keyof T]: T[K] } & {}
+```
+
+Apply at every `.extend()` return so hover types flatten. Without this, hover
+shows `{} & PublicActions & WalletBtcActions & SigningActions` — unreadable.
+With it, hover shows the merged record. Pure cosmetics, but the difference
+between a library people reach for and one they avoid.
+
+### 4. `extend`'s `TNew` is constrained
+
+`TNew extends ActionGroup` (`Record<string, AnyFn>`). Catches `.extend(() => 42)`
+at the source instead of producing a confusing client type downstream.
+
+### 5. Capability hierarchy comes before action types
+
+Capability interfaces are the contract between vendors and actions:
+
+- `BaseCapability` — universal Bitcoin reads (mempool-tier)
+- `OrdCapability` — ord indexer (sandshrew)
+- `RuneCapability`, `Brc20Capability`, `AlkaneCapability`,
+  `InscriptionCapability` — protocol-specific reads
+
+Vendors declare exactly which they implement. Actions reference them via
+`Pick<X, 'methodName'>` constraints. New protocols start with a new capability
+interface, not by widening an existing one.
+
+### 6. `Account` discipline
+
+| Action category | Account constraint |
+|---|---|
+| Read-only (`getBalance`, `getUtxos`, `getTransaction`) | `A extends Account` |
+| Build/write (`sendBtc`, anything constructing PSBTs) | `A extends WalletAccount` (needs pubkeys) |
+| Signing (`signPsbt`, `signMessage`) | `A extends Account` (signer carries the cryptography) |
+
+Stated once, applied uniformly across every action file.
+
+### 7. Type-only sanity-check program
+
+`packages/client/src/__tests__/type-inference.test-d.ts` exercises the full
+chain end-to-end:
+
+```ts
+const ds = createChainDataSource({ network: MAINNET })
+  .extend(mempoolBase(...))
+  .extend(sandshrewRunes(...))
+
+const client = createWalletClient({ network: MAINNET, dataSource: ds, account })
+  .extend(walletBtcActions())
+  .extend(signingActions(signer))
+  .extend(runeActions())          // would fail to compile if ds lacked RuneCapability
+
+client.sendBtc({...})              // ✓
+client.signPsbt(psbt, {...})       // ✓
+client.getRuneBalances(addr)       // ✓
+```
+
+This file is the contract. Future regressions trip it before runtime.
+
 ## Target package shapes
 
 ### `@omnisat/lasereyes-client` — typed primitives, no state, no wallet I/O
@@ -221,8 +334,6 @@ write is `getWalletClient(config).<action>(...)`. Every core wallet read is
 chain's transports."
 
 ## The keystone: `getWalletClient`
-
-The whole architecture hinges on one function:
 
 ```ts
 // packages/core/src/wallet-client.ts
