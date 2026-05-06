@@ -1,25 +1,28 @@
 /**
  * Wallet client factory.
  *
- * @module wallet-client
+ * @module client/wallet
  */
 
-import { NetworkMismatchError } from './errors'
-import type { Account, ActionGroup, WalletClient, WalletClientConfig } from './types'
+import type { Account } from '../account/types'
+import type { ActionGroup } from '../data-source/capabilities'
+import { NetworkMismatchError } from '../errors'
+import type { WalletClient, WalletClientConfig } from './wallet-types'
 
 /**
  * Creates a new wallet client instance with account context.
  *
  * @remarks
- * The wallet client wraps a chain data source and provides an account-aware interface.
- * Unlike the base client, it knows about the user's addresses and can provide convenience
- * methods that automatically use the appropriate address for each operation.
+ * The wallet client wraps a chain data source and provides an
+ * account-aware interface. Unlike the base client, it knows about the
+ * user's addresses and can provide convenience methods that automatically
+ * use the appropriate address for each operation.
  *
- * Signing capability is added via the `signingActions()` action group which accepts a
- * signer parameter.
+ * Signing capability is added via the `signingActions(signer)` action
+ * group.
  *
- * @typeParam TDS - The data source capabilities
- * @typeParam TAccount - The account type (Account, WalletAccount, ReadOnlyAccount, etc.)
+ * @typeParam Config - The wallet client configuration
+ * @typeParam TAccount - The account type (Account / WalletAccount / ReadOnlyAccount)
  *
  * @param config - The wallet client configuration
  * @param config.network - The Bitcoin network this client operates on
@@ -28,47 +31,42 @@ import type { Account, ActionGroup, WalletClient, WalletClientConfig } from './t
  *
  * @returns A wallet client instance that can be extended with action groups
  *
- * @throws {NetworkMismatchError} If the client network does not match the data source network
+ * @throws {@link NetworkMismatchError} If the client network does not match the data source network
  *
  * @example
  * ```ts
- * import { createWalletClient, createWalletAccount } from '@omnisat/lasereyes-client/wallet'
- * import { walletBtcActions, signingActions } from '@omnisat/lasereyes-client/wallet'
+ * import {
+ *   createWalletClient, createWalletAccount,
+ *   walletBtcActions, signingActions,
+ * } from '@omnisat/lasereyes-client/wallet'
  * import { createDataSource } from '@omnisat/lasereyes-client/vendors/mempool'
- * import { MAINNET } from '@omnisat/lasereyes-client'
+ * import { MAINNET, AddressType } from '@omnisat/lasereyes-client'
  *
- * // Create account
  * const account = createWalletAccount({
  *   addresses: [
- *     { address: 'bc1q...', purpose: 'payment', type: AddressType.P2WPKH }
+ *     { address: 'bc1q...', purpose: 'payment', type: AddressType.P2WPKH },
  *   ],
- *   publicKeys: {
- *     payment: '02...',
- *     ordinals: '03...',
- *     taproot: '03...'
- *   }
+ *   publicKeys: { payment: '02...', ordinals: '03...', taproot: '03...' },
  * })
  *
- * // Create data source
  * const ds = createDataSource({ network: MAINNET })
  *
- * // Create wallet client
  * const walletClient = createWalletClient({
  *   network: MAINNET,
  *   dataSource: ds,
- *   account
+ *   account,
  * })
  *   .extend(walletBtcActions())
  *   .extend(signingActions(mySigner))
  *
- * // Use account-aware methods
  * const balance = await walletClient.getBalance()
  * await walletClient.sendBtc({ to: 'bc1q...', amount: 10000 })
  * ```
  */
-export function createWalletClient<Config extends WalletClientConfig<TAccount>, TAccount extends Account = Account>(
-  config: Config
-): WalletClient<Config, TAccount, {}> {
+export function createWalletClient<
+  Config extends WalletClientConfig<TAccount>,
+  TAccount extends Account = Account,
+>(config: Config): WalletClient<Config, TAccount, {}> {
   if (config.dataSource.network !== config.network) {
     throw new NetworkMismatchError(config.network.name, config.dataSource.network.name)
   }
@@ -86,7 +84,7 @@ export function createWalletClient<Config extends WalletClientConfig<TAccount>, 
         const merged = { ...actions, ...newActions } as TActions & TNew
         return buildClient(config, merged)
       },
-      ...(actions),
+      ...actions,
     }
     return client
   }

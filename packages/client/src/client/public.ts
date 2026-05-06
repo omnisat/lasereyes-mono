@@ -1,11 +1,18 @@
-import { NetworkMismatchError } from './errors'
-import type { ActionGroup, Client, ClientConfig } from './types'
+/**
+ * Read-only client factory.
+ *
+ * @module client/public
+ */
+
+import type { ActionGroup } from '../data-source/capabilities'
+import { NetworkMismatchError } from '../errors'
+import type { Client, ClientConfig } from './types'
 
 /**
  * Creates a new client instance that wraps a chain data source with action methods.
  *
  * The client validates that the configured network matches the data source's network,
- * and provides an {@link Client.extend | extend} method to add action groups (e.g., BTC actions).
+ * and provides an {@link Client.extend | extend} method to add action groups.
  *
  * @param config - The client configuration
  * @param config.network - The Bitcoin network this client operates on
@@ -16,21 +23,21 @@ import type { ActionGroup, Client, ClientConfig } from './types'
  *
  * @example
  * ```ts
- * import { createClient } from '@omnisat/lasereyes-client'
+ * import { createClient, publicActions, MAINNET } from '@omnisat/lasereyes-client'
  * import { createDataSource } from '@omnisat/lasereyes-client/vendors/mempool'
- * import { btcActions } from '@omnisat/lasereyes-client/actions/btc'
- * import { MAINNET } from '@omnisat/lasereyes-client'
  *
  * const ds = createDataSource({ network: MAINNET })
  * const client = createClient({ network: MAINNET, dataSource: ds })
- *   .extend(btcActions())
+ *   .extend(publicActions())
  *
- * const balance = await client.btcGetBalance('bc1q...')
+ * const balance = await client.getBalance('bc1q...')
  * ```
  */
-export function createClient<Config extends ClientConfig<dsMethods>, dsMethods extends ActionGroup = {}, clientActions extends ActionGroup = {}>(
-  config: Config
-): Client<Config, dsMethods, clientActions> {
+export function createClient<
+  Config extends ClientConfig<dsMethods>,
+  dsMethods extends ActionGroup = {},
+  clientActions extends ActionGroup = {},
+>(config: Config): Client<Config, dsMethods, clientActions> {
   if (config.dataSource.network !== config.network) {
     throw new NetworkMismatchError(config.network.name, config.dataSource.network.name)
   }
@@ -41,7 +48,9 @@ export function createClient<Config extends ClientConfig<dsMethods>, dsMethods e
   ): Client<Config, dsMethods, TActions> {
     const client = {
       config,
-      extend<TNew>(factory: (c: Client<Config, dsMethods, TActions>) => TNew): Client<Config, dsMethods, TActions & TNew> {
+      extend<TNew>(
+        factory: (c: Client<Config, dsMethods, TActions>) => TNew
+      ): Client<Config, dsMethods, TActions & TNew> {
         const newActions = factory(client)
         const merged = { ...actions, ...newActions } as TActions & TNew
         return buildClient(config, merged)

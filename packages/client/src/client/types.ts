@@ -1,6 +1,12 @@
+/**
+ * Read-only client type definitions.
+ *
+ * @module client/types
+ */
+
 import type { ChainNetwork } from '../chains'
 import type { ActionGroup } from '../data-source/capabilities'
-import type { ChainDataSource } from './data-source'
+import type { ChainDataSource } from '../types/data-source'
 
 /**
  * A client instance that wraps a chain data source and exposes action methods.
@@ -9,19 +15,23 @@ import type { ChainDataSource } from './data-source'
  * into the client. The client is the primary interface consumers use to interact
  * with the Bitcoin blockchain.
  *
- * @typeParam TDataSource - The capabilities available on the underlying data source
- * @typeParam TActions - The action methods added via `.extend()`
+ * @typeParam Config - The client configuration including data source capabilities
+ * @typeParam dsMethods - The capabilities available on the underlying data source
+ * @typeParam clientActions - The action methods added via `.extend()`
  *
  * @example
  * ```ts
- * const client: Client<BaseCapability, BtcActions> =
- *   createClient({ network: MAINNET, dataSource: ds })
- *     .extend(btcActions())
+ * const client: Client<ClientConfig<BaseCapability>, BaseCapability, PublicActions> =
+ *   createClient({ network: MAINNET, dataSource: ds }).extend(publicActions())
  *
- * const balance = await client.btcGetBalance('bc1q...')
+ * const balance = await client.getBalance('bc1q...')
  * ```
  */
-export type Client<Config extends ClientConfig<dsMethods>, dsMethods extends ActionGroup = {}, clientActions extends ActionGroup = {}> = {
+export type Client<
+  Config extends ClientConfig<dsMethods>,
+  dsMethods extends ActionGroup = {},
+  clientActions extends ActionGroup = {},
+> = {
   config: Config
   /**
    * Adds a new action group to this client.
@@ -38,7 +48,7 @@ export type Client<Config extends ClientConfig<dsMethods>, dsMethods extends Act
 /**
  * Configuration for creating a new client via {@link createClient}.
  *
- * @typeParam TDS - The capabilities available on the provided data source
+ * @typeParam dsMethods - The capabilities available on the provided data source
  */
 export interface ClientConfig<dsMethods extends ActionGroup = {}> {
   /** The Bitcoin network this client should operate on. */

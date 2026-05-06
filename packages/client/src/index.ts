@@ -21,10 +21,16 @@ export {
 } from './chains'
 export type { ChainNetwork, NetworkId, NetworkType } from './chains'
 
+// Client (read-only) factory + types
 export { createClient } from './client'
+export type { Client, ClientConfig } from './client/types'
+
 // Constants
 export { ALKANES, BRC20, BTC, RUNES } from './constants/protocols'
+
+// Data sources
 export { createChainDataSource, mergeDataSources } from './data-source'
+
 // Errors
 export {
   CapabilityNotFoundError,
@@ -36,26 +42,22 @@ export {
   ProviderRpcError,
   PsbtBuildError,
 } from './errors'
+
 // Types
 export type {
   ActionGroup,
   // Protocol domain types — alkane
   AlkaneBalance,
-  AlkaneOutpoint,
   // Capabilities
   AlkaneCapability,
+  AlkaneOutpoint,
   BaseCapability,
   // Protocol domain types — brc20
   Brc20Balance,
   Brc20Capability,
   Brc20Info,
-  // Data source
   ChainDataSource,
-  // Client
-  Client,
-  ClientConfig,
   DataSourceContext,
-  // Fees
   FeeEstimate,
   FormattedUTXO,
   // Protocol domain types — inscription
@@ -73,8 +75,7 @@ export type {
   RuneCapability,
   RuneInfo,
   RuneOutpoint,
-  // Transaction
+  // Transaction / UTXO
   Transaction,
-  // UTXO
   UTXO,
 } from './types'

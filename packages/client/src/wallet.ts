@@ -74,14 +74,8 @@ export type {
   SignMessageOptions,
   SignPsbtOptions,
 } from './signer'
-// Account + wallet-client types
-export type {
-  Account,
-  AddressInfo,
-  AddressPurpose,
-  WalletAccount,
-  WalletClient,
-  WalletClientConfig,
-} from './types'
-// Wallet client factory
-export { createWalletClient } from './wallet-client'
+// Account types
+export type { Account, AddressInfo, AddressPurpose, WalletAccount } from './account/types'
+// Wallet client factory + types
+export { createWalletClient } from './client'
+export type { WalletClient, WalletClientConfig } from './client/wallet-types'
