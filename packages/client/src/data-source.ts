@@ -1,5 +1,5 @@
 import { NetworkMismatchError } from './errors'
-import type { ActionGroup, ChainDataSource, DataSourceContext, NetworkType } from './types'
+import type { ActionGroup, ChainDataSource, DataSourceContext, ChainNetwork } from './types'
 
 /**
  * Creates a new chain data source with the specified network configuration.
@@ -22,7 +22,7 @@ import type { ActionGroup, ChainDataSource, DataSourceContext, NetworkType } fro
  *   .extend(baseCapabilities({ networks: { mainnet: { apiUrl: 'https://mempool.space/api' } } }))
  * ```
  */
-export function createChainDataSource(config: { network: NetworkType }): ChainDataSource<{}> {
+export function createChainDataSource(config: { network: ChainNetwork }): ChainDataSource<{}> {
   const context: DataSourceContext = {
     network: config.network,
     config: {},
@@ -78,7 +78,7 @@ export function mergeDataSources<A extends ActionGroup, B extends ActionGroup>(
   secondary: ChainDataSource<B>
 ): ChainDataSource<A & B> {
   if (primary.network !== secondary.network) {
-    throw new NetworkMismatchError(primary.network, secondary.network)
+    throw new NetworkMismatchError(primary.network.name, secondary.network.name)
   }
 
   const primaryMethods = primary.getCapabilities()

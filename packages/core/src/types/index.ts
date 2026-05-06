@@ -56,31 +56,6 @@ import type {
   WIZZ,
   XVERSE,
 } from '../constants/wallets'
-import type { BaseNetwork } from './network'
-
-/**
- * Union of all built-in Bitcoin network types derived from {@link BaseNetwork}.
- *
- * @remarks
- * Includes mainnet, testnet, testnet4, signet, fractal-mainnet, fractal-testnet, and oylnet.
- */
-export type BaseNetworkType =
-  | typeof BaseNetwork.MAINNET
-  | typeof BaseNetwork.TESTNET
-  | typeof BaseNetwork.TESTNET4
-  | typeof BaseNetwork.SIGNET
-  | typeof BaseNetwork.FRACTAL_MAINNET
-  | typeof BaseNetwork.FRACTAL_TESTNET
-  | typeof BaseNetwork.OYLNET
-
-/**
- * A Bitcoin network identifier. Can be a built-in {@link BaseNetworkType} or a custom network string.
- *
- * @remarks
- * Custom network strings allow extending LaserEyes with networks not built into the library.
- * Use the `customNetworks` field in {@link Config} to configure custom network behavior.
- */
-export type NetworkType = BaseNetworkType | string
 
 /**
  * Union of all supported Bitcoin wallet provider identifiers.
@@ -217,16 +192,10 @@ export type Config = {
       }
     }
   }
-  customNetworks?: {
-    [key: string]: {
-      baseNetwork: BaseNetworkType
-      preferredDataSource: 'mempool' | 'sandshrew' | 'maestro' | string
-    }
-  }
 }
 
 /** Union of all protocol-specific send argument types. */
-export type SendArgs = BTCSendArgs | RuneSendArgs | Brc20SendArgs | AlkaneSendArgs
+export type SendArgs = BTCSendArgs
 
 /**
  * Union of supported Bitcoin protocol identifiers: BTC, RUNES, BRC20, and ALKANES.
@@ -251,61 +220,9 @@ export interface BTCSendArgs {
   fromAddress: string
   toAddress: string
   amount: number
-  network: NetworkType
 }
 
 export * from './lasereyes'
-
-/**
- * Arguments for sending Runes tokens.
- *
- * @param runeId - The identifier of the rune to send (e.g., "840000:1").
- * @param fromAddress - The sender's Bitcoin address.
- * @param toAddress - The recipient's Bitcoin address.
- * @param amount - The amount of the rune to send (in the rune's smallest unit).
- * @param network - The Bitcoin network to use for the transaction.
- */
-export interface RuneSendArgs {
-  runeId: string
-  fromAddress: string
-  toAddress: string
-  amount: number
-  network: NetworkType
-}
-
-/**
- * Arguments for sending BRC-20 tokens.
- *
- * @param ticker - The BRC-20 token ticker symbol (e.g., "ordi").
- * @param fromAddress - The sender's Bitcoin address.
- * @param toAddress - The recipient's Bitcoin address.
- * @param amount - The amount of the BRC-20 token to send.
- * @param network - The Bitcoin network to use for the transaction.
- */
-export interface Brc20SendArgs {
-  ticker: string
-  fromAddress: string
-  toAddress: string
-  amount: number
-  network: NetworkType
-}
-
-/**
- * Arguments for sending Alkanes tokens.
- *
- * @param id - The Alkane token identifier (e.g., "2:1").
- * @param fromAddress - The sender's Bitcoin address.
- * @param toAddress - The recipient's Bitcoin address.
- * @param amount - The amount of the Alkane token to send as a bigint.
- * @param network - The Bitcoin network to use for the transaction.
- */
-export interface AlkaneSendArgs {
-  id: string
-  fromAddress: string
-  toAddress: string
-  amount: bigint
-  network: NetworkType
-}
 
 export interface OYLBalanceResponse {
   brc20s: {
@@ -528,13 +445,20 @@ export interface AlkanesOutpoint {
   height: number
 }
 
+// Core types
+export type { LaserEyesCoreConfig, NetworkConfig } from '../core'
+// Resolve re-export ambiguity: these types exist in both legacy modules and the
+// new provider module. Prefer the legacy definitions for backward compatibility.
+export type { AlkaneBalance } from './alkane'
 export * from './alkane'
+export * from './connector'
 export * from './data-source'
 export * from './esplora'
+export type { Brc20Balance, Inscription } from './lasereyes'
 export * from './lasereyes'
 export * from './maestro'
 export * from './mempool-space'
-export * from './network'
 export * from './ord'
+export * from './provider'
 export * from './sandshrew'
 export * from './utxo'

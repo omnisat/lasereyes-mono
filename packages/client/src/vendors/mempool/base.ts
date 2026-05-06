@@ -40,7 +40,7 @@ export function baseCapabilities(
       }
     }
 
-    const apiUrl = networkUrls[ctx.network] || getMempoolSpaceUrl(ctx.network)
+    const apiUrl = networkUrls[ctx.network.id] || getMempoolSpaceUrl(ctx.network.id)
 
     async function call(method: 'get' | 'post', endpoint: string, body?: unknown) {
       const url = `${apiUrl}${endpoint}`
@@ -87,7 +87,7 @@ export function baseCapabilities(
           return { data: [] }
         }
         const raw = await call('get', `/api/address/${address}/utxo`)
-        const scriptPk = getAddressScriptPubKey(address, ctx.network)
+        const scriptPk = getAddressScriptPubKey(address, ctx.network.type)
         const mapped = (raw as UTXO[]).map(utxo => ({
           ...utxo,
           scriptPk: bytesToHex(scriptPk),

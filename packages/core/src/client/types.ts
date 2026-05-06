@@ -1,7 +1,5 @@
 import type { BIP322, ECDSA } from '../constants/signing-protocol'
-import type { NetworkType, ProviderType } from '../types'
-
-export * from './modules/types'
+import type { ProviderType } from '../types'
 
 /**
  * The reactive state shape for the LaserEyes client store.
@@ -34,23 +32,6 @@ export type LaserEyesStoreType = {
   accounts: string[]
   balance: bigint | undefined
   hasProvider: Record<ProviderType, boolean | undefined>
-}
-
-/** Interface for the Sparrow wallet browser extension provider. */
-export interface SparrowWalletProvider {
-  requestAccounts(network?: NetworkType): Promise<string[]>
-  getPublicKey(network?: NetworkType): Promise<string>
-  getNetwork(): Promise<NetworkType>
-  switchNetwork(network: NetworkType): Promise<
-    | undefined
-    | {
-        address: string
-        paymentAddress: string
-        publicKey: string
-      }
-  >
-  signMessage(message: string): Promise<string>
-  signPsbt(psbtBase64: string): Promise<string>
 }
 
 /**
@@ -113,7 +94,6 @@ export type WalletProviderSignPsbtOptions = {
   finalize?: boolean
   broadcast?: boolean
   inputsToSign?: InputToSign[]
-  network?: NetworkType
 }
 
 /** Internal options passed to wallet provider implementations when signing multiple PSBTs. */
@@ -122,7 +102,6 @@ export type WalletProviderSignPsbtsOptions = {
   finalize?: boolean
   broadcast?: boolean
   inputsToSign?: InputToSign[]
-  network?: NetworkType
 }
 
 /**

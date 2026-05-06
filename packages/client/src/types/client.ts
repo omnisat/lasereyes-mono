@@ -1,6 +1,6 @@
 import { ActionGroup } from './capabilities'
 import type { ChainDataSource } from './data-source'
-import type { NetworkType } from './network'
+import type { ChainNetwork } from './network'
 
 /**
  * A client instance that wraps a chain data source and exposes action methods.
@@ -42,7 +42,7 @@ export type Client<Config extends ClientConfig<dsMethods>, dsMethods extends Act
  */
 export interface ClientConfig<dsMethods extends ActionGroup = {}> {
   /** The Bitcoin network this client should operate on. */
-  network: NetworkType
+  network: ChainNetwork
   /** The chain data source to use. Must be configured for the same network. */
   dataSource: ChainDataSource<dsMethods>
 }

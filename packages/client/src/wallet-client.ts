@@ -70,7 +70,7 @@ export function createWalletClient<Config extends WalletClientConfig<TAccount>, 
   config: Config
 ): WalletClient<Config, TAccount, {}> {
   if (config.dataSource.network !== config.network) {
-    throw new NetworkMismatchError(config.network, config.dataSource.network)
+    throw new NetworkMismatchError(config.network.name, config.dataSource.network.name)
   }
 
   function buildClient<TActions extends ActionGroup>(

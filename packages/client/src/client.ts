@@ -32,7 +32,7 @@ export function createClient<Config extends ClientConfig<dsMethods>, dsMethods e
   config: Config
 ): Client<Config, dsMethods, clientActions> {
   if (config.dataSource.network !== config.network) {
-    throw new NetworkMismatchError(config.network, config.dataSource.network)
+    throw new NetworkMismatchError(config.network.name, config.dataSource.network.name)
   }
 
   function buildClient<TActions extends ActionGroup>(

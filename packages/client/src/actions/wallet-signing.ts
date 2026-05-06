@@ -37,12 +37,9 @@ export async function signPsbt<
   _client: WalletClient<config, account, clientActions, dsMethods>,
   signer: Signer,
   psbt: string,
-  options?: Omit<SignPsbtOptions, 'psbt'>
-): Promise<SignedPsbt> {
-  return signer.signPsbt({
-    psbt,
-    ...options,
-  })
+  options?: SignPsbtOptions
+) {
+  return signer.signPsbt(psbt, options)
 }
 
 /**

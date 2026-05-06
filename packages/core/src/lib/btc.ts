@@ -1,9 +1,9 @@
 import * as ecc2 from '@bitcoinerlab/secp256k1'
+import type { NetworkType } from '@omnisat/lasereyes-client'
 import { BIP32Factory } from 'bip32'
 import * as bip39 from 'bip39'
 import * as bitcoin from 'bitcoinjs-lib'
 import { P2PKH, P2SH, P2SH_P2WPKH, P2TR, P2WPKH, P2WSH } from '../constants'
-import type { NetworkType } from '../types'
 import { getBitcoinNetwork } from './helpers'
 import { getTransactionMempoolSpace } from './mempool-space'
 

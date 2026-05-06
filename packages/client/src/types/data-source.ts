@@ -1,5 +1,5 @@
 import { ActionGroup } from './capabilities'
-import type { NetworkType } from './network'
+import type { ChainNetwork } from './network'
 
 /**
  * Parameters for cursor-based pagination.
@@ -28,7 +28,7 @@ export type PaginatedResult<T> = {
  */
 export type DataSourceContext = {
   /** The Bitcoin network this data source is configured for. */
-  network: NetworkType
+  network: ChainNetwork
   /** Arbitrary configuration data shared across capability factories. */
   config: Record<string, unknown>
 }
@@ -52,7 +52,7 @@ export type DataSourceContext = {
  */
 export type ChainDataSource<SupportedMethods extends ActionGroup = {}> = {
   /** The Bitcoin network this data source operates on. */
-  network: NetworkType
+  network: ChainNetwork
   /** Returns a record mapping capability group names to their registered method names. */
   getCapabilities(): (keyof SupportedMethods)[]
   /**

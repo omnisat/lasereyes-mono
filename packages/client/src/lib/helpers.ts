@@ -6,7 +6,7 @@ import {
   TESTNET,
   TESTNET4,
 } from '../constants/networks'
-import type { NetworkType } from '../types'
+import type { NetworkId } from '../types'
 
 export interface BitcoinNetwork {
   bech32: string
@@ -29,7 +29,7 @@ export const BITCOIN_TEST_NETWORK: BitcoinNetwork = {
   wif: 239,
 }
 
-export const getBitcoinNetwork = (network: NetworkType): BitcoinNetwork => {
+export const getBitcoinNetwork = (network: NetworkId): BitcoinNetwork => {
   if (network === TESTNET || network === TESTNET4 || network === SIGNET) {
     return BITCOIN_TEST_NETWORK
   }
@@ -57,11 +57,11 @@ export const satoshisToBTC = (satoshis: number): string => {
   return btcValue.toFixed(8)
 }
 
-export const isTestnetNetwork = (network: NetworkType) => {
+export const isTestnetNetwork = (network: NetworkId) => {
   return network === TESTNET || network === TESTNET4 || network === SIGNET
 }
 
-export const isMainnetNetwork = (network: NetworkType) => {
+export const isMainnetNetwork = (network: NetworkId) => {
   return network === MAINNET || network === FRACTAL_MAINNET || network === FRACTAL_TESTNET
 }
 

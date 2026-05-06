@@ -1,5 +1,5 @@
 import { createChainDataSource } from '../../data-source'
-import type { BaseCapability, ChainDataSource, NetworkType } from '../../types'
+import type { BaseCapability, ChainDataSource, ChainNetwork } from '../../types'
 import { baseCapabilities } from './base'
 import type { MempoolConfig } from './config'
 
@@ -30,7 +30,7 @@ export type { MempoolConfig } from './config'
  */
 export function createDataSource(
   config: {
-    network: NetworkType
+    network: ChainNetwork
   } & MempoolConfig
 ): ChainDataSource<BaseCapability> {
   return createChainDataSource({ network: config.network }).extend(baseCapabilities(config))

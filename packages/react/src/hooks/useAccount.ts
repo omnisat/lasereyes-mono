@@ -1,12 +1,12 @@
+import { useStore } from '@nanostores/react'
 import { type DependencyList, type EffectCallback, useEffect } from 'react'
-import { useLaserEyes } from '../providers/hooks'
-import { compareValues } from '../utils/comparison'
+import { useLaserEyesCore } from '../providers/lasereyes-provider'
 
 /**
  * Return type for the {@link useAccount} hook.
  *
- * Returns `undefined` when no wallet is connected, otherwise provides
- * the connected wallet's address information.
+ * Returns `undefined` when no wallet is connected, otherwise provides the
+ * connected wallet's address information.
  */
 type UseAccountReturnType =
   | {
@@ -16,7 +16,7 @@ type UseAccountReturnType =
       payment: string
       /** The ordinals/taproot address */
       ordinals: string
-      /** The wallet's public key (hex-encoded) */
+      /** The wallet's public key (hex-encoded) for the payment address */
       publicKey: string
     }
   | undefined
@@ -25,10 +25,13 @@ type UseAccountReturnType =
  * Returns the connected wallet's account addresses and public key.
  *
  * @remarks
- * Returns `undefined` when no wallet is connected. Uses a selector internally
- * for optimized re-renders -- only re-renders when address-related state changes.
+ * Returns `undefined` when no wallet is connected. Subscribes directly to
+ * `core.$account` via nanostores, so the component re-renders only when
+ * the account atom changes.
  *
- * @returns The account info object, or `undefined` if no wallet is connected
+ * Must be used within a {@link LaserEyesProvider}.
+ *
+ * @returns Account info, or `undefined` if no wallet is connected.
  *
  * @example
  * ```tsx
@@ -40,36 +43,35 @@ type UseAccountReturnType =
  * ```
  */
 export function useAccount(): UseAccountReturnType {
-  const { address, paymentAddress, accounts, publicKey } = useLaserEyes(
-    ({ address, paymentAddress, accounts, publicKey }) => ({
-      address,
-      paymentAddress,
-      accounts,
-      publicKey,
-    })
-  )
+  const core = useLaserEyesCore()
+  const account = useStore(core.$account)
 
-  return !address
-    ? undefined
-    : {
-        addresses: accounts,
-        payment: paymentAddress,
-        ordinals: address,
-        publicKey,
-      }
+  if (!account || account.length === 0) return undefined
+
+  const paymentAddr = account.find((a) => a.purpose === 'payment')
+  const ordinalsAddr = account.find((a) => a.purpose === 'ordinals') ?? paymentAddr
+
+  return {
+    addresses: account.map((a) => a.address),
+    payment: paymentAddr?.address ?? '',
+    ordinals: ordinalsAddr?.address ?? '',
+    publicKey: paymentAddr?.publicKey ?? '',
+  }
 }
 
 /**
  * Runs a side effect whenever the connected wallet's accounts change.
  *
  * @remarks
- * Subscribes to the underlying nanostore and invokes the callback when the
- * `accounts` field changes. The callback follows the same semantics as
- * `useEffect` -- it may return a cleanup function that is called before
- * the next invocation or on unmount.
+ * Subscribes to `core.$account` and invokes the callback whenever the atom
+ * emits a new value. The callback follows the same semantics as `useEffect` —
+ * it may return a cleanup function that is called before the next invocation
+ * or on unmount.
  *
- * @param callback - Effect function to run when accounts change; may return a cleanup function
- * @param dependencies - Additional dependency list for the underlying `useEffect`
+ * Must be used within a {@link LaserEyesProvider}.
+ *
+ * @param callback - Effect to run on account change; may return a cleanup function.
+ * @param dependencies - Additional dependencies for the underlying `useEffect`.
  *
  * @example
  * ```tsx
@@ -80,24 +82,23 @@ export function useAccount(): UseAccountReturnType {
  * ```
  */
 export function useAccountEffect(callback: EffectCallback, dependencies: DependencyList) {
-  const store = useLaserEyes(x => x.client?.$store)
+  const core = useLaserEyesCore()
 
   useEffect(() => {
-    if (!store) return
+    let cleanup: ReturnType<EffectCallback>
 
-    let unsub: ReturnType<EffectCallback>
-    const stUnsub = store.subscribe((v, ov, ck) => {
-      if (ck === 'accounts') {
-        if (!compareValues(v.accounts, ov?.accounts)) {
-          unsub?.()
-          unsub = callback()
-        }
+    const unsub = core.$account.subscribe((account, prevAccount) => {
+      // Only fire when the value actually changes (nanostores calls on subscribe too)
+      if (account !== prevAccount) {
+        cleanup?.()
+        cleanup = callback()
       }
     })
 
     return () => {
-      stUnsub()
-      unsub?.()
+      unsub()
+      cleanup?.()
     }
-  }, [store, callback, ...dependencies])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [core, callback, ...dependencies])
 }

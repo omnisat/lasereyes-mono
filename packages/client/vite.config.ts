@@ -21,8 +21,6 @@ export default defineConfig({
         'alkanes/index': resolve(__dirname, 'src/actions/alkanes/index.ts'),
         'inscriptions/index': resolve(__dirname, 'src/actions/inscriptions/index.ts'),
         'vendors/mempool/index': resolve(__dirname, 'src/vendors/mempool/index.ts'),
-        'vendors/sandshrew/index': resolve(__dirname, 'src/vendors/sandshrew/index.ts'),
-        'vendors/maestro/index': resolve(__dirname, 'src/vendors/maestro/index.ts'),
       },
       formats: ['es'],
     },

@@ -1,3 +1,4 @@
+import type { NetworkType } from '@omnisat/lasereyes-client'
 import { atom, type MapStore, map, type WritableAtom } from 'nanostores'
 import { MAINNET } from '../constants/networks'
 import {
@@ -16,7 +17,7 @@ import {
   WIZZ,
   XVERSE,
 } from '../constants/wallets'
-import type { Config, NetworkType, ProviderType } from '../types'
+import type { Config, ProviderType } from '../types'
 import type { LaserEyesStoreType } from './types'
 
 /**

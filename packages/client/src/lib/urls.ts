@@ -6,7 +6,7 @@ import {
   TESTNET,
   TESTNET4,
 } from '../constants/networks'
-import { BaseNetwork, type NetworkType } from '../types'
+import type { NetworkId } from '../types'
 
 export const SANDSHREW_URL_MAINNET = 'https://mainnet.sandshrew.io/v2'
 export const SANDSHREW_URL_SIGNET = 'https://signet.sandshrew.io/v2'
@@ -25,7 +25,7 @@ export const MEMPOOL_SPACE_URL_SIGNET = 'https://mempool.space/signet'
 export const MEMPOOL_SPACE_URL_FRACTAL_MAINNET = 'https://mempool.fractalbitcoin.io'
 export const MEMPOOL_SPACE_URL_FRACTAL_TESTNET = 'https://mempool-testnet.fractalbitcoin.io'
 
-export const getMempoolSpaceUrl = (network: NetworkType) => {
+export const getMempoolSpaceUrl = (network: NetworkId) => {
   switch (network) {
     case TESTNET:
       return MEMPOOL_SPACE_URL_TESTNET
@@ -42,11 +42,11 @@ export const getMempoolSpaceUrl = (network: NetworkType) => {
   }
 }
 
-export const getMaestroUrl = (network: NetworkType) => {
-  return network === BaseNetwork.TESTNET4 ? MAESTRO_API_URL_TESTNET4 : MAESTRO_API_URL_MAINNET
+export const getMaestroUrl = (network: NetworkId) => {
+  return network === TESTNET4 ? MAESTRO_API_URL_TESTNET4 : MAESTRO_API_URL_MAINNET
 }
 
-export const getSandshrewUrl = (network: NetworkType) => {
+export const getSandshrewUrl = (network: NetworkId) => {
   switch (network) {
     case OYLNET:
       return SANDSHREW_URL_OYLNET

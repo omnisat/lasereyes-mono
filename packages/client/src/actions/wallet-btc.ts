@@ -69,7 +69,7 @@ export async function sendBtc<config extends WalletClientConfig<account, dsMetho
     amount,
     changeAddress: paymentAddr,
     feeRate,
-    network: client.config.network,
+    network: client.config.network.type,
     publicKey: paymentPubkey,
   })
 

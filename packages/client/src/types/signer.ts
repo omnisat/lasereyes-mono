@@ -13,12 +13,8 @@
  * Options for signing a PSBT.
  */
 export interface SignPsbtOptions {
-  /** PSBT to sign (hex or base64 encoded) */
-  psbt: string
   /** Whether to finalize the PSBT after signing */
   finalize?: boolean
-  /** Whether to broadcast the transaction after signing */
-  broadcast?: boolean
   /** Specific inputs to sign (optional, signs all by default) */
   inputsToSign?: Array<{ index: number; address: string }>
 }
@@ -26,15 +22,11 @@ export interface SignPsbtOptions {
 /**
  * Result of signing a PSBT.
  */
-export interface SignedPsbt {
-  /** Signed PSBT in hex format */
-  psbtHex?: string
+export interface SignedPsbt<finalize extends boolean = false> {
   /** Signed PSBT in base64 format */
-  psbtBase64?: string
-  /** Transaction ID if broadcast was requested */
-  txId?: string
+  psbt: string
   /** Raw transaction hex if finalized */
-  txHex?: string
+  txHex: finalize extends true ? string : never
 }
 
 /**
@@ -73,11 +65,12 @@ export interface Signer {
   /**
    * Sign a Partially Signed Bitcoin Transaction (PSBT).
    *
-   * @param options - Signing options including the PSBT and preferences
-   * @returns Signed PSBT and optionally transaction ID if broadcast
-   * @throws {Error} If signing fails or is rejected by user
+   * @param psbt - PSBT to sign (hex or base64 encoded)
+   * @param options - Signing options
+   * @returns Signed PSBT and optionally transaction hex if finalized
+   * @throws {Error} If signing/finalizing fails or is rejected by user
    */
-  signPsbt(options: SignPsbtOptions): Promise<SignedPsbt>
+  signPsbt<optionsT extends SignPsbtOptions>(psbt: string, options?: optionsT): Promise<SignedPsbt<NonNullable<optionsT['finalize']>>>
 
   /**
    * Sign an arbitrary message with a Bitcoin address.

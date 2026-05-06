@@ -29,53 +29,27 @@ export {
 } from './errors'
 // Types
 export type {
-  // Alkane
-  AlkaneBalance,
-  AlkaneCapability,
-  AlkaneOutpoint,
   // Capabilities
   BaseCapability,
-  // Network
-  BaseNetworkType,
-  // BRC-20
-  Brc20Balance,
-  Brc20Capability,
-  Brc20Info,
   // Data source
   ChainDataSource,
+  ChainNetwork as Network,
   // Client
   Client,
   ClientConfig,
   DataSourceContext,
   // Fees
   FeeEstimate,
-  FormattedAlkane,
-  FormattedInscription,
-  FormattedRune,
   FormattedUTXO,
-  // Inscription
-  Inscription,
-  InscriptionCapability,
-  InscriptionInfo,
+  // Network
+  NetworkId,
   NetworkType,
   OrdAddressInfo,
   OrdCapability,
-  OrdOutput,
-  OrdOutputWrapper,
   PaginatedResult,
   PaginationParams,
-  // PSBT
-  PsbtResult,
-  // Rune
-  RuneBalance,
-  RuneCapability,
-  RuneInfo,
-  RuneOutpoint,
-  SignPsbtCallback,
   // Transaction
   Transaction,
   // UTXO
   UTXO,
 } from './types'
-export { BaseNetwork } from './types/network'
-export { AddressType } from './types/psbt'
