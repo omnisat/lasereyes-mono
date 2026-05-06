@@ -1,68 +1,90 @@
 /**
  * Wallet-aware BTC actions for account-based operations.
  *
+ * @remarks
+ * Type pattern: **strict factory + strict action**.
+ * - Each action *function* (`sendBtc`, `getBalance`, `getUtxos`) declares
+ *   its precise requirements via generic constraints. This makes the
+ *   functions usable directly: `await sendBtc(client, params)`.
+ * - The factory `walletBtcActions()` mirrors those constraints on its
+ *   client parameter, so `client.extend(walletBtcActions())` fails at
+ *   compile time if the client doesn't already have what the actions
+ *   need.
+ *
+ * **Ordering:** `sendBtc` depends on `signPsbt`. Therefore extend
+ * `signingActions(signer)` *before* `walletBtcActions()`. The compiler
+ * enforces this:
+ *
+ * ```ts
+ * createWalletClient({...})
+ *   .extend(signingActions(signer))   // first — provides signPsbt
+ *   .extend(walletBtcActions())       // second — uses it
+ * ```
+ *
  * @module actions/wallet-btc
  */
 
+import type { Account, AddressPurpose, WalletAccount } from '../account/types'
+import type { WalletClient, WalletClientConfig } from '../client/wallet-types'
+import type { ActionGroup, BaseCapability } from '../data-source/capabilities'
 import { buildSendBtcPsbt } from '../lib/psbt-builders'
-import type { Account, BaseCapability, PaginatedResult, UTXO, WalletAccount, WalletClient, WalletClientConfig } from '../types'
+import type { SignedPsbt, SignPsbtOptions } from '../signer/types'
+import type { PaginatedResult, UTXO } from '../types'
 
 /**
  * Parameters for sending BTC using a wallet client.
  */
 export interface SendBtcParams {
-  /** Recipient's Bitcoin address */
+  /** Recipient's Bitcoin address. */
   to: string
-  /** Amount to send in satoshis */
+  /** Amount to send in satoshis. */
   amount: number
-  /** Fee rate in sat/vB (defaults to 7) */
+  /** Fee rate in sat/vB (defaults to 7). */
   feeRate?: number
 }
+
+/**
+ * The required shape of `signPsbt` on a client `sendBtc` is called against.
+ *
+ * @remarks
+ * Used both by the strict `sendBtc` action function and by the
+ * {@link walletBtcActions} factory so the constraint is stated once.
+ */
+type RequiredSigningActions = {
+  signPsbt: (psbt: string, options?: SignPsbtOptions) => Promise<SignedPsbt>
+}
+
+// ============================================================================
+// Strict actions
+// ============================================================================
 
 /**
  * Sends BTC from the wallet account to a recipient.
  *
  * @remarks
- * This function automatically uses the account's payment address for funding
- * and change. It requires a WalletAccount (for public key access) and signing
- * actions to be extended on the client.
+ * Uses the account's payment address for funding and change. Requires a
+ * {@link WalletAccount} (for public-key access) and a `signPsbt` action on
+ * the client.
  *
- * @param client - Wallet client with WalletAccount and signing actions
- * @param params - Send parameters
- * @returns Transaction ID of the broadcasted transaction
- *
- * @throws {Error} If account is missing payment address or public key
- * @throws {Error} If signing actions are not available
- * @throws {PsbtBuildError} If PSBT construction fails
- * @throws {InsufficientFundsError} If insufficient funds
- *
- * @example
- * ```ts
- * import { sendBtc } from '@omnisat/lasereyes-client/wallet'
- *
- * const txId = await sendBtc(walletClient, {
- *   to: 'bc1q...',
- *   amount: 10000,
- *   feeRate: 10
- * })
- * ```
+ * @throws {Error} If signing fails to produce a finalized transaction.
+ * @throws {PsbtBuildError} If PSBT construction fails.
+ * @throws {InsufficientFundsError} If the available UTXOs cannot cover amount + fee.
  */
-export async function sendBtc<config extends WalletClientConfig<account, dsMethods>, account extends WalletAccount, dsMethods extends Pick<BaseCapability, 'btcBroadcastTransaction' | 'btcGetAddressUtxos'>, clientActions extends {
-    signPsbt: (psbt: string, options?: any) => Promise<any>
-  }>(
-  client: WalletClient<config, account, clientActions, dsMethods>,
+export async function sendBtc<
+  Config extends WalletClientConfig<WalletAccount, DS>,
+  DS extends Pick<BaseCapability, 'btcGetAddressUtxos' | 'btcBroadcastTransaction'>,
+  Actions extends RequiredSigningActions,
+>(
+  client: WalletClient<Config, WalletAccount, Actions, DS>,
   params: SendBtcParams
 ): Promise<string> {
   const { to, amount, feeRate = 7 } = params
 
-  // Get payment address and public key from account
   const paymentAddr = client.config.account.getAddress('payment')
   const paymentPubkey = client.config.account.getPublicKey('payment')
 
-  // Fetch UTXOs
   const { data: utxos } = await client.config.dataSource.btcGetAddressUtxos(paymentAddr)
 
-  // Build PSBT using utility function
   const { psbtHex } = buildSendBtcPsbt({
     utxos,
     toAddress: to,
@@ -73,35 +95,28 @@ export async function sendBtc<config extends WalletClientConfig<account, dsMetho
     publicKey: paymentPubkey,
   })
 
-  // Sign PSBT via signing actions
-  const signed = await client.signPsbt(psbtHex, {
-    finalize: true,
-    broadcast: false,
-  })
+  const signed = await client.signPsbt(psbtHex, { finalize: true, broadcast: false })
 
   if (!signed.txHex) {
     throw new Error('Signer did not return transaction hex')
   }
 
-  // Broadcast transaction
   return client.config.dataSource.btcBroadcastTransaction(signed.txHex)
 }
 
 /**
  * Gets the BTC balance for the wallet account's payment address.
  *
- * @param client - Wallet client with any account type
- * @returns Balance in satoshis (as string)
- *
- * @example
- * ```ts
- * import { getBalance } from '@omnisat/lasereyes-client/wallet'
- *
- * const balance = await getBalance(walletClient)
- * console.log(`Balance: ${balance} sats`)
- * ```
+ * @remarks
+ * Read-only. Works with any account type. Requires `btcGetBalance` on the
+ * data source.
  */
-export async function getBalance<config extends WalletClientConfig<account, dsMethods>, account extends Account, dsMethods extends Pick<BaseCapability, 'btcGetBalance'>>(client: WalletClient<config, account, {}, dsMethods>): Promise<string> {
+export async function getBalance<
+  Config extends WalletClientConfig<A, DS>,
+  A extends Account,
+  Actions extends ActionGroup,
+  DS extends Pick<BaseCapability, 'btcGetBalance'>,
+>(client: WalletClient<Config, A, Actions, DS>): Promise<string> {
   const address = client.config.account.getAddress('payment')
   return client.config.dataSource.btcGetBalance(address)
 }
@@ -109,61 +124,62 @@ export async function getBalance<config extends WalletClientConfig<account, dsMe
 /**
  * Gets UTXOs for the wallet account's specified address purpose.
  *
- * @param client - Wallet client with any account type
- * @param purpose - Address purpose to query (defaults to 'payment')
- * @returns Paginated UTXO result
- *
- * @example
- * ```ts
- * import { getUtxos } from '@omnisat/lasereyes-client/wallet'
- *
- * const { data: utxos } = await getUtxos(walletClient, 'payment')
- * const { data: ordinalsUtxos } = await getUtxos(walletClient, 'ordinals')
- * ```
+ * @remarks
+ * Read-only. Works with any account type. Requires `btcGetAddressUtxos` on
+ * the data source.
  */
-export async function getUtxos<config extends WalletClientConfig<account, dsMethods>, account extends Account, dsMethods extends Pick<BaseCapability, 'btcGetAddressUtxos'>>(
-  client: WalletClient<config, account, {}, dsMethods>,
-  purpose: 'payment' | 'ordinals' | 'taproot' = 'payment'
+export async function getUtxos<
+  Config extends WalletClientConfig<A, DS>,
+  A extends Account,
+  Actions extends ActionGroup,
+  DS extends Pick<BaseCapability, 'btcGetAddressUtxos'>,
+>(
+  client: WalletClient<Config, A, Actions, DS>,
+  purpose: AddressPurpose = 'payment'
 ): Promise<PaginatedResult<UTXO>> {
   const address = client.config.account.getAddress(purpose)
   return client.config.dataSource.btcGetAddressUtxos(address)
 }
 
+// ============================================================================
+// Strict factory — mirrors the strict-action constraints
+// ============================================================================
+
 /**
- * Creates a wallet BTC action group factory.
+ * Action-group factory for account-aware BTC operations.
  *
  * @remarks
- * Provides account-aware BTC operations. The `sendBtc` action requires a
- * WalletAccount (for public keys) and signing actions. Query actions work with any
- * account type.
+ * Adds `sendBtc`, `getBalance`, and `getUtxos` to a wallet client. The
+ * factory's client constraint matches what the underlying actions need:
+ * a {@link WalletAccount}, base capability methods on the data source,
+ * and a `signPsbt` action already on the client (provided by
+ * {@link signingActions}).
  *
- * @returns A factory function that produces {@link WalletBtcActions}
+ * Apply *after* `signingActions(signer)`:
  *
- * @example
  * ```ts
- * import { createWalletClient } from '@omnisat/lasereyes-client/wallet'
- * import { walletBtcActions, signingActions } from '@omnisat/lasereyes-client/wallet'
- *
- * const walletClient = createWalletClient({ network, dataSource, account })
- *   .extend(walletBtcActions())
+ * createWalletClient({ network, dataSource, account })
  *   .extend(signingActions(signer))
+ *   .extend(walletBtcActions())
+ * ```
  *
- * // Send BTC (account-aware)
- * await walletClient.sendBtc({ to: 'bc1q...', amount: 10000 })
- *
- * // Get balance (account-aware)
- * const balance = await walletClient.getBalance()
- *
- * // Get UTXOs (account-aware)
- * const { data: utxos } = await walletClient.getUtxos('payment')
+ * Calling sites then look like:
+ * ```ts
+ * await client.sendBtc({ to: 'bc1q...', amount: 10000 })
+ * const balance = await client.getBalance()
+ * const { data: utxos } = await client.getUtxos('payment')
  * ```
  */
 export function walletBtcActions() {
-  return <dsMethods extends BaseCapability, config extends WalletClientConfig<WalletAccount, dsMethods>>(client: WalletClient<config, WalletAccount, {
-    signPsbt: (psbt: string, options?: any) => Promise<any>
-  }, dsMethods>) => ({
+  return <
+    Config extends WalletClientConfig<WalletAccount, DS>,
+    DS extends Pick<BaseCapability, 'btcGetAddressUtxos' | 'btcBroadcastTransaction' | 'btcGetBalance'>,
+    Actions extends RequiredSigningActions,
+  >(
+    client: WalletClient<Config, WalletAccount, Actions, DS>
+  ) => ({
     sendBtc: (params: SendBtcParams) => sendBtc(client, params),
     getBalance: () => getBalance(client),
-    getUtxos: (purpose?: 'payment' | 'ordinals' | 'taproot') => getUtxos(client, purpose),
+    getUtxos: (purpose?: AddressPurpose) => getUtxos(client, purpose),
   })
 }

@@ -145,36 +145,44 @@ extend<TNew extends ActionGroup>(...): Client<Config, dsMethods, Prettify<client
 And the same in `WalletClient.extend`. Verify hover quality on a sample
 `client.sendBtc` after composition.
 
-### 2.5.4 Switch to permissive factories, strict actions
+### 2.5.4 Strict factory + strict action
 
-The eager constraint on `walletBtcActions()` is the key bug. Rewrite as:
+Each action gets two forms — a free function and a factory method — and
+**both** carry the same generic constraints. This makes the action
+function directly callable for tests/composition, and makes the
+`.extend()` site fail at compile time if the client lacks what the
+action needs.
 
 ```ts
-// Permissive factory: accepts any wallet client.
+// Strict action: declares its real requirements.
+export async function sendBtc<
+  Config extends WalletClientConfig<WalletAccount, DS>,
+  DS extends Pick<BaseCapability, 'btcGetAddressUtxos' | 'btcBroadcastTransaction'>,
+  Actions extends { signPsbt: (psbt: string, opts?: SignPsbtOptions) => Promise<SignedPsbt> }
+>(client: WalletClient<Config, WalletAccount, Actions, DS>, params: SendBtcParams): Promise<string> { ... }
+
+// Strict factory: mirrors the action's constraints on its client parameter.
 export function walletBtcActions() {
-  return <C extends WalletClient<any, any, any, any>>(client: C) => ({
+  return <
+    Config extends WalletClientConfig<WalletAccount, DS>,
+    DS extends Pick<BaseCapability, 'btcGetAddressUtxos' | 'btcBroadcastTransaction' | 'btcGetBalance'>,
+    Actions extends { signPsbt: (psbt: string, opts?: SignPsbtOptions) => Promise<SignedPsbt> },
+  >(client: WalletClient<Config, WalletAccount, Actions, DS>) => ({
     sendBtc: (params: SendBtcParams) => sendBtc(client, params),
     getBalance: () => getBalance(client),
     getUtxos: (purpose?: AddressPurpose) => getUtxos(client, purpose),
   })
 }
-
-// Strict action: declares its real requirements.
-export async function sendBtc<
-  C extends WalletClient<
-    WalletClientConfig<WalletAccount, DS>, WalletAccount, Actions, DS
-  >,
-  DS extends Pick<BaseCapability, 'btcGetAddressUtxos' | 'btcBroadcastTransaction'>,
-  Actions extends { signPsbt: (psbt: string, opts?: SignPsbtOptions) => Promise<SignedPsbt> }
->(client: C, params: SendBtcParams): Promise<string> { ... }
 ```
 
-Apply this pattern uniformly. Result: `.extend(walletBtcActions()).extend(signingActions(signer))`
-typechecks regardless of order, and missing-capability errors surface at the
-*action call site* (where the user wrote the bug), not the extension site.
+**Ordering.** When one action group depends on another, the dependent
+factory's constraint forces the user to extend the provider first — at
+compile time. The natural order is: data → signing → BTC → protocol.
+Documented at each factory.
 
-Same treatment for `signingActions(signer)`, `publicActions()`, and the four
-protocol action factories scaffolded in Phase 3.
+Apply this pattern uniformly. Same treatment for `signingActions(signer)`,
+`publicActions()`, and the four protocol action factories scaffolded in
+Phase 3.
 
 ### 2.5.5 Define the capability hierarchy
 

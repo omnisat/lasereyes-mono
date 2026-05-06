@@ -7,6 +7,7 @@
 import type { Account } from '../account/types'
 import type { ActionGroup } from '../data-source/capabilities'
 import { NetworkMismatchError } from '../errors'
+import type { Prettify } from '../types/utils'
 import type { WalletClient, WalletClientConfig } from './wallet-types'
 
 /**
@@ -64,30 +65,30 @@ import type { WalletClient, WalletClientConfig } from './wallet-types'
  * ```
  */
 export function createWalletClient<
-  Config extends WalletClientConfig<TAccount>,
+  Config extends WalletClientConfig<TAccount, dsMethods>,
   TAccount extends Account = Account,
->(config: Config): WalletClient<Config, TAccount, {}> {
+  dsMethods extends ActionGroup = {},
+>(config: Config): WalletClient<Config, TAccount, {}, dsMethods> {
   if (config.dataSource.network !== config.network) {
     throw new NetworkMismatchError(config.network.name, config.dataSource.network.name)
   }
 
   function buildClient<TActions extends ActionGroup>(
-    config: Config,
     actions: TActions
-  ): WalletClient<Config, TAccount, TActions> {
+  ): WalletClient<Config, TAccount, TActions, dsMethods> {
     const client = {
       config,
-      extend<TNew>(
-        factory: (c: WalletClient<Config, TAccount, TActions>) => TNew
-      ): WalletClient<Config, TAccount, TActions & TNew> {
+      extend<TNew extends ActionGroup>(
+        factory: (c: WalletClient<Config, TAccount, TActions, dsMethods>) => TNew
+      ): WalletClient<Config, TAccount, Prettify<TActions & TNew>, dsMethods> {
         const newActions = factory(client)
-        const merged = { ...actions, ...newActions } as TActions & TNew
-        return buildClient(config, merged)
+        const merged = { ...actions, ...newActions } as Prettify<TActions & TNew>
+        return buildClient(merged)
       },
       ...actions,
     }
-    return client
+    return client as unknown as WalletClient<Config, TAccount, TActions, dsMethods>
   }
 
-  return buildClient(config, {}) as WalletClient<Config, TAccount>
+  return buildClient({} as {})
 }

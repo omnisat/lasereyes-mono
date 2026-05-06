@@ -1,19 +1,27 @@
 /**
  * Read-only client type definitions.
  *
+ * @remarks
+ * Type-parameter discipline:
+ * - `Config` and `dsMethods` are fixed at construction time
+ *   ({@link createClient}) and passed through `.extend()` unchanged.
+ * - Only `clientActions` accumulates. Each `.extend()` widens
+ *   `clientActions` to `Prettify<clientActions & TNew>`.
+ *
  * @module client/types
  */
 
 import type { ChainNetwork } from '../chains'
 import type { ActionGroup } from '../data-source/capabilities'
 import type { ChainDataSource } from '../types/data-source'
+import type { Prettify } from '../types/utils'
 
 /**
  * A client instance that wraps a chain data source and exposes action methods.
  *
- * Actions are added via {@link Client.extend | .extend()}, which merges new methods
- * into the client. The client is the primary interface consumers use to interact
- * with the Bitcoin blockchain.
+ * Actions are added via {@link Client.extend | .extend()}, which merges new
+ * methods into the client. The client is the primary interface consumers use
+ * to interact with the Bitcoin blockchain.
  *
  * @typeParam Config - The client configuration including data source capabilities
  * @typeParam dsMethods - The capabilities available on the underlying data source
@@ -21,8 +29,8 @@ import type { ChainDataSource } from '../types/data-source'
  *
  * @example
  * ```ts
- * const client: Client<ClientConfig<BaseCapability>, BaseCapability, PublicActions> =
- *   createClient({ network: MAINNET, dataSource: ds }).extend(publicActions())
+ * const client = createClient({ network: MAINNET, dataSource: ds })
+ *   .extend(publicActions())
  *
  * const balance = await client.getBalance('bc1q...')
  * ```
@@ -36,13 +44,13 @@ export type Client<
   /**
    * Adds a new action group to this client.
    *
-   * @typeParam TNew - The interface of the actions being added
+   * @typeParam TNew - The action group being added
    * @param factory - A function that receives the current client and returns new action methods
    * @returns A new client with the additional action methods
    */
   extend<TNew extends ActionGroup>(
     factory: (client: Client<Config, dsMethods, clientActions>) => TNew
-  ): Client<Config, dsMethods, clientActions & TNew>
+  ): Client<Config, dsMethods, Prettify<clientActions & TNew>>
 } & clientActions
 
 /**

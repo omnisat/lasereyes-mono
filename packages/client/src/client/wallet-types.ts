@@ -1,11 +1,20 @@
 /**
  * Wallet-client type definitions.
  *
+ * @remarks
+ * Type-parameter discipline:
+ * - `Config`, `TAccount`, and `dsMethods` are fixed at construction
+ *   time ({@link createWalletClient}) and passed through `.extend()`
+ *   unchanged.
+ * - Only `clientActions` accumulates. Each `.extend()` widens
+ *   `clientActions` to `Prettify<clientActions & TNew>`.
+ *
  * @module client/wallet-types
  */
 
 import type { Account } from '../account/types'
 import type { ActionGroup } from '../data-source/capabilities'
+import type { Prettify } from '../types/utils'
 import type { Client, ClientConfig } from './types'
 
 /**
@@ -59,13 +68,13 @@ export type WalletClient<
   /**
    * Adds a new action group to this wallet client.
    *
-   * @typeParam TNew - The interface of the actions being added
+   * @typeParam TNew - The action group being added
    * @param factory - A function that receives the current client and returns new action methods
    * @returns A new wallet client with the additional action methods
    */
-  extend<TNew>(
+  extend<TNew extends ActionGroup>(
     factory: (
       client: WalletClient<WalletConfig, TAccount, clientActions, dsMethods>
     ) => TNew
-  ): WalletClient<WalletConfig, TAccount, clientActions, dsMethods> & TNew
+  ): WalletClient<WalletConfig, TAccount, Prettify<clientActions & TNew>, dsMethods>
 }

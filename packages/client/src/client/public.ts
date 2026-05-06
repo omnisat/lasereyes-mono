@@ -6,13 +6,15 @@
 
 import type { ActionGroup } from '../data-source/capabilities'
 import { NetworkMismatchError } from '../errors'
+import type { Prettify } from '../types/utils'
 import type { Client, ClientConfig } from './types'
 
 /**
  * Creates a new client instance that wraps a chain data source with action methods.
  *
- * The client validates that the configured network matches the data source's network,
- * and provides an {@link Client.extend | extend} method to add action groups.
+ * The client validates that the configured network matches the data source's
+ * network, and provides an {@link Client.extend | extend} method to add
+ * action groups.
  *
  * @param config - The client configuration
  * @param config.network - The Bitcoin network this client operates on
@@ -36,29 +38,27 @@ import type { Client, ClientConfig } from './types'
 export function createClient<
   Config extends ClientConfig<dsMethods>,
   dsMethods extends ActionGroup = {},
-  clientActions extends ActionGroup = {},
->(config: Config): Client<Config, dsMethods, clientActions> {
+>(config: Config): Client<Config, dsMethods, {}> {
   if (config.dataSource.network !== config.network) {
     throw new NetworkMismatchError(config.network.name, config.dataSource.network.name)
   }
 
   function buildClient<TActions extends ActionGroup>(
-    config: Config,
     actions: TActions
   ): Client<Config, dsMethods, TActions> {
     const client = {
       config,
-      extend<TNew>(
+      extend<TNew extends ActionGroup>(
         factory: (c: Client<Config, dsMethods, TActions>) => TNew
-      ): Client<Config, dsMethods, TActions & TNew> {
+      ): Client<Config, dsMethods, Prettify<TActions & TNew>> {
         const newActions = factory(client)
-        const merged = { ...actions, ...newActions } as TActions & TNew
-        return buildClient(config, merged)
+        const merged = { ...actions, ...newActions } as Prettify<TActions & TNew>
+        return buildClient(merged)
       },
       ...(actions as TActions),
     } as Client<Config, dsMethods, TActions>
     return client
   }
 
-  return buildClient<clientActions>(config, {} as clientActions)
+  return buildClient({} as {})
 }

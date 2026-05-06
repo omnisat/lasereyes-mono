@@ -149,35 +149,57 @@ type Client<Config, dsMethods, clientActions>
 Mirror viem: `Client<transport, chain, account, rpcSchema, extended>` — only
 `extended` grows.
 
-### 2. Permissive factories, strict actions
+### 2. Strict factory + strict action
 
-The viem pattern, adopted wholesale.
+Each action exists in two forms — a free function, and a method exposed
+through a factory — and **both** carry the same precise generic
+constraints.
 
-**Action factories accept any client of the right kind:**
+**The action function declares its requirements:**
+```ts
+export async function sendBtc<
+  Config extends WalletClientConfig<WalletAccount, DS>,
+  DS extends Pick<BaseCapability, 'btcGetAddressUtxos' | 'btcBroadcastTransaction'>,
+  Actions extends { signPsbt: (...) => Promise<SignedPsbt> }
+>(client: WalletClient<Config, WalletAccount, Actions, DS>, params: SendBtcParams): Promise<string>
+```
+
+**The factory's client parameter mirrors the same constraints:**
 ```ts
 export function walletBtcActions() {
-  return <C extends WalletClient<any, any, any, any>>(client: C) => ({
-    sendBtc: (params: SendBtcParams) => sendBtc(client, params),
-    //                                  ^^^^^^^ — strict generics live here
+  return <
+    Config extends WalletClientConfig<WalletAccount, DS>,
+    DS extends Pick<BaseCapability, 'btcGetAddressUtxos' | 'btcBroadcastTransaction' | 'btcGetBalance'>,
+    Actions extends { signPsbt: (...) => Promise<SignedPsbt> },
+  >(client: WalletClient<Config, WalletAccount, Actions, DS>) => ({
+    sendBtc: (params) => sendBtc(client, params),
+    ...
   })
 }
 ```
 
-**The individual action functions carry the precise constraints:**
+**Why both forms.** The free function is the canonical implementation —
+it's the unit of testing and the unit of action authoring. The factory
+gives the same function ergonomic surface as a client method.
+
+**Ordering.** When one action group depends on another (e.g.
+`walletBtcActions`'s `sendBtc` calls `signPsbt` from
+`signingActions`), the dependent factory's constraint requires the
+provider to already be on the client at extend time. This is enforced
+at compile time: the user must extend dependencies first.
+
 ```ts
-export async function sendBtc<
-  C extends WalletClient<
-    WalletClientConfig<WalletAccount, DS>, WalletAccount, Actions, DS
-  >,
-  DS extends Pick<BaseCapability, 'btcGetAddressUtxos' | 'btcBroadcastTransaction'>,
-  Actions extends { signPsbt: (...) => Promise<SignedPsbt> }
->(client: C, params: SendBtcParams): Promise<string>
+createWalletClient({...})
+  .extend(signingActions(signer))   // provides signPsbt (compiles)
+  .extend(walletBtcActions())       // requires signPsbt — OK
+// vs
+createWalletClient({...})
+  .extend(walletBtcActions())       // ✗ compile error: signPsbt missing
+  .extend(signingActions(signer))
 ```
 
-**Why:** capability requirements check at the *action call site*, not the
-extension site. Order of `.extend()` calls becomes irrelevant. The user sees
-"this client doesn't have `signPsbt`" exactly where they wrote
-`client.sendBtc(...)`, not three lines earlier.
+This trades order-flexibility for compile-time guarantees about runtime
+correctness. Order is documented at each factory.
 
 ### 3. `Prettify<T>` on every accumulated type
 
