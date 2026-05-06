@@ -1,5 +1,5 @@
 import type { ChainNetwork } from '../chains'
-import { ActionGroup } from './capabilities'
+import type { ActionGroup } from '../data-source/capabilities'
 import type { ChainDataSource } from './data-source'
 
 /**

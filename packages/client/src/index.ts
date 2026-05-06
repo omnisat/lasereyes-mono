@@ -38,8 +38,17 @@ export {
 } from './errors'
 // Types
 export type {
+  ActionGroup,
+  // Protocol domain types — alkane
+  AlkaneBalance,
+  AlkaneOutpoint,
   // Capabilities
+  AlkaneCapability,
   BaseCapability,
+  // Protocol domain types — brc20
+  Brc20Balance,
+  Brc20Capability,
+  Brc20Info,
   // Data source
   ChainDataSource,
   // Client
@@ -49,10 +58,21 @@ export type {
   // Fees
   FeeEstimate,
   FormattedUTXO,
+  // Protocol domain types — inscription
+  Inscription,
+  InscriptionCapability,
+  InscriptionInfo,
   OrdAddressInfo,
   OrdCapability,
+  OrdOutput,
+  OrdOutputWrapper,
   PaginatedResult,
   PaginationParams,
+  // Protocol domain types — rune
+  RuneBalance,
+  RuneCapability,
+  RuneInfo,
+  RuneOutpoint,
   // Transaction
   Transaction,
   // UTXO

@@ -1,5 +1,5 @@
 import type { ChainNetwork } from '../chains'
-import { ActionGroup } from './capabilities'
+import type { ActionGroup } from '../data-source/capabilities'
 
 /**
  * Parameters for cursor-based pagination.

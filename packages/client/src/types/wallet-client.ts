@@ -4,9 +4,9 @@
  * @module types/wallet-client
  */
 
-import type { Account } from './account'
-import { ActionGroup } from './capabilities'
-import { Client, ClientConfig } from './client'
+import type { Account } from '../account/types'
+import type { ActionGroup } from '../data-source/capabilities'
+import type { Client, ClientConfig } from './client'
 
 /**
  * Configuration for creating a wallet client.
