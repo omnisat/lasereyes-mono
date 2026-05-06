@@ -37,9 +37,36 @@
 import { describe, expectTypeOf, it } from 'vitest'
 import { createReadOnlyAccount, createWalletAccount } from '../account'
 import type { Account, AddressPurpose, WalletAccount } from '../account/types'
-import { getBalance, getUtxos, sendBtc, walletBtcActions } from '../actions/wallet-btc'
-import type { SendBtcParams } from '../actions/wallet-btc'
-import { signMessage, signPsbt, signingActions } from '../actions/wallet-signing'
+import {
+  brc20Actions,
+  brc20WriteActions,
+  type DeployBrc20Params,
+  type MintBrc20Params,
+  type TransferBrc20Params,
+} from '../actions/brc20'
+import {
+  inscribe,
+  inscriptionActions,
+  inscriptionWriteActions,
+  sendInscription,
+  type InscribeParams,
+  type SendInscriptionParams,
+} from '../actions/inscriptions'
+import { publicActions } from '../actions/public'
+import {
+  runeActions,
+  runeWriteActions,
+  sendRune,
+  type SendRuneParams,
+} from '../actions/runes'
+import {
+  broadcastPsbt,
+  signMessage,
+  signPsbt,
+  signingActions,
+} from '../actions/signing'
+import { getBalance, getUtxos, sendBtc, walletBtcActions } from '../actions/wallet'
+import type { SendBtcParams } from '../actions/wallet'
 import { MAINNET, type ChainNetwork, type NetworkId, type NetworkType } from '../chains'
 import { createClient } from '../client'
 import type { Client, ClientConfig } from '../client/types'
@@ -64,7 +91,22 @@ import type {
 import { createDataSource as createMaestroDataSource } from '../vendors/maestro'
 import { createDataSource as createMempoolDataSource } from '../vendors/mempool'
 import { createDataSource as createSandshrewDataSource } from '../vendors/sandshrew'
-import type { ChainDataSource, DataSourceContext, PaginatedResult, UTXO } from '../types'
+import type {
+  Brc20Balance,
+  Brc20Info,
+  ChainDataSource,
+  DataSourceContext,
+  FeeEstimate,
+  Inscription,
+  InscriptionInfo,
+  OrdOutputWrapper,
+  PaginatedResult,
+  RuneBalance,
+  RuneInfo,
+  RuneOutpoint,
+  Transaction,
+  UTXO,
+} from '../types'
 import { AddressType } from '../types/psbt'
 
 // ============================================================================
@@ -72,6 +114,9 @@ import { AddressType } from '../types/psbt'
 // ============================================================================
 
 declare const baseCap: (ctx: DataSourceContext) => BaseCapability
+declare const partialBaseCap: (
+  ctx: DataSourceContext
+) => Pick<BaseCapability, 'btcBroadcastTransaction'>
 declare const runeCap: (ctx: DataSourceContext) => RuneCapability
 declare const ordCap: (ctx: DataSourceContext) => OrdCapability
 declare const signer: Signer
@@ -265,6 +310,9 @@ describe('createWalletClient', () => {
     expectTypeOf(wc.signMessage).parameter(1).toEqualTypeOf<SignMessageOptions | undefined>()
     expectTypeOf(wc.signMessage).returns.resolves.toEqualTypeOf<string>()
 
+    expectTypeOf(wc.broadcastPsbt).parameter(0).toEqualTypeOf<string>()
+    expectTypeOf(wc.broadcastPsbt).returns.resolves.toEqualTypeOf<string>()
+
     // wallet-btc actions
     expectTypeOf(wc.sendBtc).parameter(0).toEqualTypeOf<SendBtcParams>()
     expectTypeOf(wc.sendBtc).returns.resolves.toEqualTypeOf<string>()
@@ -293,16 +341,16 @@ describe('createWalletClient', () => {
     wc.extend(walletBtcActions())
   })
 
-  it('rejects walletBtcActions when the data source lacks BaseCapability methods', () => {
-    // Data source with only RuneCapability — no btcGetAddressUtxos / btcBroadcastTransaction.
-    const ds = createChainDataSource({ network: MAINNET }).extend(runeCap)
+  it('rejects walletBtcActions when the data source lacks btcGetAddressUtxos', () => {
+    // Use the partialBaseCap fixture (declared at top of file).
+    const ds = createChainDataSource({ network: MAINNET }).extend(partialBaseCap)
     const wc = createWalletClient({
       network: MAINNET,
       dataSource: ds,
       account: walletAccount,
     }).extend(signingActions(signer))
 
-    // @ts-expect-error — base capabilities missing on the data source.
+    // @ts-expect-error — walletBtcActions needs btcGetAddressUtxos which is not on this ds.
     wc.extend(walletBtcActions())
   })
 
@@ -419,5 +467,212 @@ describe('Signer interface', () => {
     expectTypeOf(out.psbtBase64).toEqualTypeOf<string>()
     expectTypeOf(out.txId).toEqualTypeOf<string | undefined>()
     expectTypeOf(out.txHex).toEqualTypeOf<string | undefined>()
+  })
+})
+
+// ============================================================================
+// 9. publicActions — read-only Bitcoin operations on a Client
+// ============================================================================
+
+describe('publicActions', () => {
+  it('extends a client with the full BaseCapability surface', () => {
+    const ds = createMempoolDataSource({ network: MAINNET })
+    const c = createClient({ network: MAINNET, dataSource: ds }).extend(publicActions())
+
+    expectTypeOf(c.getBalance).parameter(0).toEqualTypeOf<string>()
+    expectTypeOf(c.getBalance).returns.resolves.toEqualTypeOf<string>()
+
+    expectTypeOf(c.getUtxos).parameter(0).toEqualTypeOf<string>()
+    expectTypeOf(c.getUtxos).returns.resolves.toEqualTypeOf<PaginatedResult<UTXO>>()
+
+    expectTypeOf(c.getTransaction).returns.resolves.toEqualTypeOf<Transaction>()
+    expectTypeOf(c.broadcastTransaction).returns.resolves.toEqualTypeOf<string>()
+    expectTypeOf(c.getRecommendedFees).returns.resolves.toEqualTypeOf<FeeEstimate>()
+    expectTypeOf(c.getOutputValue).returns.resolves.toEqualTypeOf<number | null>()
+    expectTypeOf(c.waitForTransaction).returns.resolves.toEqualTypeOf<boolean>()
+  })
+
+  it('rejects publicActions when the data source lacks BaseCapability', () => {
+    const ds = createChainDataSource({ network: MAINNET }).extend(runeCap)
+    const c = createClient({ network: MAINNET, dataSource: ds })
+
+    // @ts-expect-error — publicActions requires full BaseCapability on the data source.
+    c.extend(publicActions())
+  })
+})
+
+// ============================================================================
+// 10. runeActions — read-only Runes operations
+// ============================================================================
+
+describe('runeActions', () => {
+  it('extends a client with the full RuneCapability surface', () => {
+    const ds = createSandshrewDataSource({ network: MAINNET, apiKey: 'k' })
+    const c = createClient({ network: MAINNET, dataSource: ds }).extend(runeActions())
+
+    expectTypeOf(c.getRuneBalances).returns.resolves.toEqualTypeOf<PaginatedResult<RuneBalance>>()
+    expectTypeOf(c.getRuneById).returns.resolves.toEqualTypeOf<RuneInfo>()
+    expectTypeOf(c.getRuneByName).returns.resolves.toEqualTypeOf<RuneInfo>()
+    expectTypeOf(c.getRuneOutpoints).returns.resolves.toEqualTypeOf<PaginatedResult<RuneOutpoint>>()
+    expectTypeOf(c.batchGetRuneOutputs).returns.resolves.toEqualTypeOf<OrdOutputWrapper[]>()
+  })
+
+  it('rejects runeActions when data source has only partial RuneCapability', () => {
+    // Maestro provides only runesGetById/runesGetByName — not the full RuneCapability.
+    const ds = createMaestroDataSource({ network: MAINNET, apiKey: 'k' })
+    const c = createClient({ network: MAINNET, dataSource: ds })
+
+    // @ts-expect-error — runeActions requires the full RuneCapability.
+    c.extend(runeActions())
+  })
+
+  it('runeWriteActions exposes sendRune (stubbed signature)', () => {
+    const ds = createSandshrewDataSource({ network: MAINNET, apiKey: 'k' })
+    const wc = createWalletClient({ network: MAINNET, dataSource: ds, account: walletAccount })
+      .extend(signingActions(signer))
+      .extend(runeWriteActions())
+
+    expectTypeOf(wc.sendRune).parameter(0).toEqualTypeOf<SendRuneParams>()
+    expectTypeOf(wc.sendRune).returns.resolves.toEqualTypeOf<string>()
+  })
+
+  it('rejects runeWriteActions before signingActions', () => {
+    const ds = createSandshrewDataSource({ network: MAINNET, apiKey: 'k' })
+    const wc = createWalletClient({ network: MAINNET, dataSource: ds, account: walletAccount })
+
+    // @ts-expect-error — sendRune requires signPsbt on the client.
+    wc.extend(runeWriteActions())
+  })
+
+  it('sendRune (free fn) is callable directly', () => {
+    const ds = createSandshrewDataSource({ network: MAINNET, apiKey: 'k' })
+    const wc = createWalletClient({ network: MAINNET, dataSource: ds, account: walletAccount })
+      .extend(signingActions(signer))
+
+    expectTypeOf(
+      sendRune(wc, { to: 'bc1q…', runeId: '840000:1', amount: '100' })
+    ).resolves.toEqualTypeOf<string>()
+  })
+})
+
+// ============================================================================
+// 11. brc20Actions — read + write
+// ============================================================================
+
+describe('brc20Actions', () => {
+  it('extends a client with the full Brc20Capability surface', () => {
+    const ds = createMaestroDataSource({ network: MAINNET, apiKey: 'k' })
+    const c = createClient({ network: MAINNET, dataSource: ds }).extend(brc20Actions())
+
+    expectTypeOf(c.getBrc20Balances).returns.resolves.toEqualTypeOf<PaginatedResult<Brc20Balance>>()
+    expectTypeOf(c.getBrc20ByTicker).returns.resolves.toEqualTypeOf<Brc20Info>()
+  })
+
+  it('brc20WriteActions exposes deploy/mint/transfer (stubbed)', () => {
+    const ds = createMaestroDataSource({ network: MAINNET, apiKey: 'k' })
+    // Maestro lacks btcGetAddressUtxos so writes need a merged source, but for
+    // the type-shape check we pretend mempool joined in.
+    const merged = mergeDataSources(ds, createMempoolDataSource({ network: MAINNET }))
+    const wc = createWalletClient({ network: MAINNET, dataSource: merged, account: walletAccount })
+      .extend(signingActions(signer))
+      .extend(brc20WriteActions())
+
+    expectTypeOf(wc.deployBrc20).parameter(0).toEqualTypeOf<DeployBrc20Params>()
+    expectTypeOf(wc.deployBrc20).returns.resolves.toEqualTypeOf<string>()
+
+    expectTypeOf(wc.mintBrc20).parameter(0).toEqualTypeOf<MintBrc20Params>()
+    expectTypeOf(wc.mintBrc20).returns.resolves.toEqualTypeOf<string>()
+
+    expectTypeOf(wc.transferBrc20).parameter(0).toEqualTypeOf<TransferBrc20Params>()
+    expectTypeOf(wc.transferBrc20).returns.resolves.toEqualTypeOf<string>()
+  })
+
+  it('rejects brc20WriteActions before signingActions', () => {
+    const ds = createMempoolDataSource({ network: MAINNET })
+    const wc = createWalletClient({ network: MAINNET, dataSource: ds, account: walletAccount })
+
+    // @ts-expect-error — write actions need signPsbt extended first.
+    wc.extend(brc20WriteActions())
+  })
+})
+
+// ============================================================================
+// 12. inscriptionActions — read + write
+// ============================================================================
+
+describe('inscriptionActions', () => {
+  it('extends a client with the full InscriptionCapability surface', () => {
+    const ds = createMaestroDataSource({ network: MAINNET, apiKey: 'k' })
+    const c = createClient({ network: MAINNET, dataSource: ds }).extend(inscriptionActions())
+
+    expectTypeOf(c.getInscriptionsByAddress).returns.resolves.toEqualTypeOf<
+      PaginatedResult<Inscription>
+    >()
+    expectTypeOf(c.getInscriptionInfo).returns.resolves.toEqualTypeOf<InscriptionInfo>()
+    expectTypeOf(c.batchGetInscriptionInfo).returns.resolves.toEqualTypeOf<InscriptionInfo[]>()
+  })
+
+  it('inscriptionWriteActions exposes inscribe/sendInscription (stubbed)', () => {
+    const ds = createMempoolDataSource({ network: MAINNET })
+    const wc = createWalletClient({ network: MAINNET, dataSource: ds, account: walletAccount })
+      .extend(signingActions(signer))
+      .extend(inscriptionWriteActions())
+
+    expectTypeOf(wc.inscribe).parameter(0).toEqualTypeOf<InscribeParams>()
+    expectTypeOf(wc.inscribe).returns.resolves.toEqualTypeOf<string>()
+
+    expectTypeOf(wc.sendInscription).parameter(0).toEqualTypeOf<SendInscriptionParams>()
+    expectTypeOf(wc.sendInscription).returns.resolves.toEqualTypeOf<string>()
+  })
+
+  it('inscribe + sendInscription are callable as free functions', () => {
+    const ds = createMempoolDataSource({ network: MAINNET })
+    const wc = createWalletClient({ network: MAINNET, dataSource: ds, account: walletAccount })
+      .extend(signingActions(signer))
+
+    expectTypeOf(
+      inscribe(wc, { contentType: 'text/plain', content: 'hello' })
+    ).resolves.toEqualTypeOf<string>()
+    expectTypeOf(
+      sendInscription(wc, { inscriptionId: 'abc…i0', to: 'bc1q…' })
+    ).resolves.toEqualTypeOf<string>()
+  })
+
+  it('rejects inscriptionWriteActions before signingActions', () => {
+    const ds = createMempoolDataSource({ network: MAINNET })
+    const wc = createWalletClient({ network: MAINNET, dataSource: ds, account: walletAccount })
+
+    // @ts-expect-error — write actions need signPsbt extended first.
+    wc.extend(inscriptionWriteActions())
+  })
+})
+
+// ============================================================================
+// 13. broadcastPsbt — exposed by signingActions
+// ============================================================================
+
+describe('broadcastPsbt', () => {
+  it('exposed on the client after signingActions extension', () => {
+    const ds = createMempoolDataSource({ network: MAINNET })
+    const wc = createWalletClient({ network: MAINNET, dataSource: ds, account: walletAccount })
+      .extend(signingActions(signer))
+
+    expectTypeOf(wc.broadcastPsbt).parameter(0).toEqualTypeOf<string>()
+    expectTypeOf(wc.broadcastPsbt).returns.resolves.toEqualTypeOf<string>()
+  })
+
+  it('callable as a free function', () => {
+    const ds = createMempoolDataSource({ network: MAINNET })
+    const wc = createWalletClient({ network: MAINNET, dataSource: ds, account: walletAccount })
+
+    expectTypeOf(broadcastPsbt(wc, signer, 'psbthex')).resolves.toEqualTypeOf<string>()
+  })
+
+  it('rejects broadcastPsbt when data source lacks btcBroadcastTransaction', () => {
+    const ds = createChainDataSource({ network: MAINNET }).extend(runeCap)
+    const wc = createWalletClient({ network: MAINNET, dataSource: ds, account: walletAccount })
+
+    // @ts-expect-error — signingActions's broadcastPsbt needs btcBroadcastTransaction.
+    wc.extend(signingActions(signer))
   })
 })

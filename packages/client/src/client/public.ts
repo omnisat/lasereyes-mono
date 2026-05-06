@@ -4,10 +4,8 @@
  * @module client/public
  */
 
-import type { ChainNetwork } from '../chains'
 import type { ActionGroup } from '../data-source/capabilities'
 import { NetworkMismatchError } from '../errors'
-import type { ChainDataSource } from '../types/data-source'
 import type { Prettify } from '../types/utils'
 import type { Client, ClientConfig } from './types'
 
@@ -37,12 +35,14 @@ import type { Client, ClientConfig } from './types'
  * const balance = await client.getBalance('bc1q...')
  * ```
  */
-export function createClient<dsMethods extends ActionGroup>(config: {
-  network: ChainNetwork
-  dataSource: ChainDataSource<dsMethods>
-}): Client<ClientConfig<dsMethods>, dsMethods, {}> {
+export function createClient<dsMethods extends ActionGroup>(
+  config: ClientConfig<dsMethods>
+): Client<ClientConfig<dsMethods>, dsMethods, ActionGroup> {
   if (config.dataSource.network !== config.network) {
-    throw new NetworkMismatchError(config.network.name, config.dataSource.network.name)
+    throw new NetworkMismatchError(
+      config.network.name,
+      config.dataSource.network.name
+    )
   }
 
   type Config = ClientConfig<dsMethods>
@@ -56,13 +56,19 @@ export function createClient<dsMethods extends ActionGroup>(config: {
         factory: (c: Client<Config, dsMethods, TActions>) => TNew
       ): Client<Config, dsMethods, Prettify<TActions & TNew>> {
         const newActions = factory(client)
-        const merged = { ...actions, ...newActions } as Prettify<TActions & TNew>
-        return buildClient(merged)
+        const merged = { ...actions, ...newActions } as Prettify<
+          TActions & TNew
+        >
+        return buildClient(merged) as Client<
+          Config,
+          dsMethods,
+          Prettify<TActions & TNew>
+        >
       },
       ...(actions as TActions),
     } as Client<Config, dsMethods, TActions>
     return client
   }
 
-  return buildClient({} as {})
+  return buildClient<ActionGroup>({} as ActionGroup)
 }

@@ -24,12 +24,12 @@
  * @module actions/wallet-btc
  */
 
-import type { Account, AddressPurpose, WalletAccount } from '../account/types'
-import type { WalletClient, WalletClientConfig } from '../client/wallet-types'
-import type { ActionGroup, BaseCapability } from '../data-source/capabilities'
-import { buildSendBtcPsbt } from '../lib/psbt-builders'
-import type { SignedPsbt, SignPsbtOptions } from '../signer/types'
-import type { PaginatedResult, UTXO } from '../types'
+import type { Account, AddressPurpose, WalletAccount } from '../../account/types'
+import type { WalletClient, WalletClientConfig } from '../../client/wallet-types'
+import type { ActionGroup, BaseCapability } from '../../data-source/capabilities'
+import { buildSendBtcPsbt } from '../../lib/psbt-builders'
+import type { SignedPsbt, SignPsbtOptions } from '../../signer/types'
+import type { PaginatedResult, UTXO } from '../../types'
 
 /**
  * Parameters for sending BTC using a wallet client.

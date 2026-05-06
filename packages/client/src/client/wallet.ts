@@ -70,7 +70,7 @@ export function createWalletClient<
   network: ChainNetwork
   dataSource: ChainDataSource<dsMethods>
   account: TAccount
-}): WalletClient<WalletClientConfig<TAccount, dsMethods>, TAccount, {}, dsMethods> {
+}): WalletClient<WalletClientConfig<TAccount, dsMethods>, TAccount, ActionGroup, dsMethods> {
   if (config.dataSource.network !== config.network) {
     throw new NetworkMismatchError(config.network.name, config.dataSource.network.name)
   }
@@ -94,5 +94,5 @@ export function createWalletClient<
     return client as unknown as WalletClient<Config, TAccount, TActions, dsMethods>
   }
 
-  return buildClient({} as {})
+  return buildClient<ActionGroup>({} as ActionGroup)
 }

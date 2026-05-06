@@ -1,0 +1,25 @@
+/**
+ * Runes subpath — protocol-specific actions and types.
+ *
+ * @module runes
+ */
+
+export {
+  batchGetRuneOutputs,
+  getRuneBalances,
+  getRuneById,
+  getRuneByName,
+  getRuneOutpoints,
+  runeActions,
+  runeWriteActions,
+  sendRune,
+  type SendRuneParams,
+} from './actions/runes'
+export type {
+  OrdOutput,
+  OrdOutputWrapper,
+  RuneBalance,
+  RuneInfo,
+  RuneOutpoint,
+} from './types/rune'
+export type { RuneCapability } from './data-source/capabilities'

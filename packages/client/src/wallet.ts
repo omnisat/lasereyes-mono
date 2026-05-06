@@ -1,71 +1,81 @@
 /**
- * Wallet client module - account-aware Bitcoin operations.
+ * Wallet client subpath — account-aware Bitcoin operations.
  *
  * @remarks
- * This module provides wallet-aware abstractions over the base client, including:
- * - Account types (WalletAccount, ReadOnlyAccount)
- * - Wallet client with account context
- * - Account-aware action groups
- * - Signing capabilities via action groups
+ * This module provides everything you need to talk to a wallet's signer
+ * with first-class types:
+ * - Account factories: {@link createWalletAccount},
+ *   {@link createReadOnlyAccount}.
+ * - Wallet client: {@link createWalletClient}.
+ * - Action factories: {@link signingActions}, {@link walletBtcActions}.
+ * - Free actions: {@link sendBtc}, {@link signPsbt}, {@link signMessage},
+ *   {@link broadcastPsbt}, {@link getBalance}, {@link getUtxos}.
+ *
+ * **Extension order matters.** Extend `signingActions(signer)` before
+ * `walletBtcActions()`.
  *
  * @module wallet
  *
  * @example
  * ```ts
  * import {
- *   createWalletClient,
- *   createWalletAccount,
- *   walletBtcActions,
- *   signingActions
+ *   createWalletClient, createWalletAccount,
+ *   walletBtcActions, signingActions,
  * } from '@omnisat/lasereyes-client/wallet'
  * import { createDataSource } from '@omnisat/lasereyes-client/vendors/mempool'
  * import { MAINNET, AddressType } from '@omnisat/lasereyes-client'
  *
- * // Create account
  * const account = createWalletAccount({
  *   addresses: [
  *     { address: 'bc1q...', purpose: 'payment', type: AddressType.P2WPKH },
- *     { address: 'bc1p...', purpose: 'ordinals', type: AddressType.P2TR }
+ *     { address: 'bc1p...', purpose: 'ordinals', type: AddressType.P2TR },
  *   ],
- *   publicKeys: {
- *     payment: '02...',
- *     ordinals: '03...',
- *     taproot: '03...'
- *   }
+ *   publicKeys: { payment: '02...', ordinals: '03...', taproot: '03...' },
  * })
  *
- * // Create signer
- * const signer = {
- *   signPsbt: async (opts) => window.unisat.signPsbt(opts.psbt),
- *   signMessage: async (msg, opts) => window.unisat.signMessage(msg, opts?.address)
- * }
- *
- * // Create wallet client
  * const ds = createDataSource({ network: MAINNET })
- * const walletClient = createWalletClient({
- *   network: MAINNET,
- *   dataSource: ds,
- *   account
- * })
- *   .extend(walletBtcActions())
- *   .extend(signingActions(signer))
  *
- * // Use account-aware methods
+ * const walletClient = createWalletClient({ network: MAINNET, dataSource: ds, account })
+ *   .extend(signingActions(signer))
+ *   .extend(walletBtcActions())
+ *
  * const balance = await walletClient.getBalance()
  * await walletClient.sendBtc({ to: 'bc1q...', amount: 10000 })
- * const sig = await walletClient.signMessage('Hello Bitcoin!')
  * ```
  */
 
 // Account factories + types
-export type { ReadOnlyAccountConfig, WalletAccountConfig } from './account'
 export { createReadOnlyAccount, createWalletAccount } from './account'
-export type { SendBtcParams as WalletSendBtcParams } from './actions/wallet-btc'
+export type {
+  Account,
+  AddressInfo,
+  AddressPurpose,
+  ReadOnlyAccountConfig,
+  WalletAccount,
+  WalletAccountConfig,
+} from './account'
 
-// Actions
-export { getBalance, getUtxos, sendBtc, walletBtcActions } from './actions/wallet-btc'
+// Wallet client factory + types
+export { createWalletClient } from './client'
+export type { WalletClient, WalletClientConfig } from './client/wallet-types'
 
-export { signingActions } from './actions/wallet-signing'
+// Wallet-aware BTC actions
+export type { SendBtcParams } from './actions/wallet'
+export {
+  getBalance,
+  getUtxos,
+  sendBtc,
+  walletBtcActions,
+} from './actions/wallet'
+
+// Signing actions
+export {
+  broadcastPsbt,
+  signMessage,
+  signPsbt,
+  signingActions,
+} from './actions/signing'
+
 // Signer types
 export type {
   MessageSigningProtocol,
@@ -74,8 +84,3 @@ export type {
   SignMessageOptions,
   SignPsbtOptions,
 } from './signer'
-// Account types
-export type { Account, AddressInfo, AddressPurpose, WalletAccount } from './account/types'
-// Wallet client factory + types
-export { createWalletClient } from './client'
-export type { WalletClient, WalletClientConfig } from './client/wallet-types'

@@ -15,12 +15,12 @@
       "types": "./dist/index.d.ts"
     },
     "./wallet": {
-      "import": "./dist/wallet.js",
-      "types": "./dist/wallet.d.ts"
+      "import": "./dist/wallet/index.js",
+      "types": "./dist/wallet/index.d.ts"
     },
     "./utils": {
-      "import": "./dist/utils.js",
-      "types": "./dist/utils.d.ts"
+      "import": "./dist/utils/index.js",
+      "types": "./dist/utils/index.d.ts"
     },
     "./runes": {
       "import": "./dist/runes/index.js",
@@ -29,10 +29,6 @@
     "./brc20": {
       "import": "./dist/brc20/index.js",
       "types": "./dist/brc20/index.d.ts"
-    },
-    "./alkanes": {
-      "import": "./dist/alkanes/index.js",
-      "types": "./dist/alkanes/index.d.ts"
     },
     "./inscriptions": {
       "import": "./dist/inscriptions/index.js",

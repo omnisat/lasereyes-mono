@@ -2,22 +2,21 @@
  * Signing actions for wallet clients.
  *
  * @remarks
- * Wraps an injected {@link Signer} as a pair of methods (`signPsbt`,
- * `signMessage`) on a wallet client. The signer carries the cryptographic
- * keys; the client carries the addresses.
+ * Wraps an injected {@link Signer} as methods (`signPsbt`, `signMessage`,
+ * `broadcastPsbt`) on a wallet client. The signer carries the
+ * cryptographic keys; the client carries the addresses; the data source
+ * carries broadcast capability.
  *
- * Signing actions are independent of data-source capabilities — they
- * accept a wallet client of any data-source shape and any prior actions.
- * That said, they should generally be extended **before** higher-level
- * actions like `walletBtcActions()` that depend on `signPsbt`.
+ * Extend `signingActions(signer)` *before* higher-level actions that
+ * depend on `signPsbt` (e.g. `walletBtcActions()`).
  *
- * @module actions/wallet-signing
+ * @module actions/signing
  */
 
-import type { Account } from '../account/types'
-import type { WalletClient, WalletClientConfig } from '../client/wallet-types'
-import type { ActionGroup } from '../data-source/capabilities'
-import type { SignedPsbt, Signer, SignMessageOptions, SignPsbtOptions } from '../signer/types'
+import type { Account } from '../../account/types'
+import type { WalletClient, WalletClientConfig } from '../../client/wallet-types'
+import type { ActionGroup, BaseCapability } from '../../data-source/capabilities'
+import type { SignedPsbt, Signer, SignMessageOptions, SignPsbtOptions } from '../../signer/types'
 
 // ============================================================================
 // Strict actions
@@ -67,12 +66,42 @@ export async function signMessage<
   return signer.signMessage(message, { ...options, address })
 }
 
+/**
+ * Sign a PSBT (with finalization) and broadcast the resulting transaction.
+ *
+ * @remarks
+ * Convenience for the common "sign + broadcast" flow. Requires the data
+ * source to expose `btcBroadcastTransaction` so the finalized hex can be
+ * pushed to the network.
+ *
+ * @returns The transaction ID once broadcast succeeds.
+ * @throws Error if the signer fails to produce a finalized transaction.
+ */
+export async function broadcastPsbt<
+  Config extends WalletClientConfig<A, DS>,
+  A extends Account,
+  Actions extends ActionGroup,
+  DS extends Pick<BaseCapability, 'btcBroadcastTransaction'>,
+>(
+  client: WalletClient<Config, A, Actions, DS>,
+  signer: Signer,
+  psbt: string,
+  options?: Omit<SignPsbtOptions, 'finalize' | 'broadcast'>
+): Promise<string> {
+  const signed = await signer.signPsbt(psbt, { ...options, finalize: true })
+  if (!signed.txHex) {
+    throw new Error('Signer did not return transaction hex')
+  }
+  return client.config.dataSource.btcBroadcastTransaction(signed.txHex)
+}
+
 // ============================================================================
 // Factory
 // ============================================================================
 
 /**
- * Action-group factory adding `signPsbt` and `signMessage` to a wallet client.
+ * Action-group factory adding `signPsbt`, `signMessage`, and `broadcastPsbt`
+ * to a wallet client.
  *
  * @param signer - The signer implementation carrying signing capability.
  *
@@ -88,6 +117,7 @@ export async function signMessage<
  *
  * const signed = await walletClient.signPsbt(psbtHex, { finalize: true })
  * const sig = await walletClient.signMessage('Hello Bitcoin!')
+ * const txId = await walletClient.broadcastPsbt(unsignedPsbtHex)
  * ```
  */
 export function signingActions(signer: Signer) {
@@ -95,7 +125,7 @@ export function signingActions(signer: Signer) {
     Config extends WalletClientConfig<A, DS>,
     A extends Account,
     Actions extends ActionGroup,
-    DS extends ActionGroup,
+    DS extends Pick<BaseCapability, 'btcBroadcastTransaction'>,
   >(
     client: WalletClient<Config, A, Actions, DS>
   ) => ({
@@ -103,5 +133,9 @@ export function signingActions(signer: Signer) {
       signPsbt(client, signer, psbt, options),
     signMessage: (message: string, options?: SignMessageOptions): Promise<string> =>
       signMessage(client, signer, message, options),
+    broadcastPsbt: (
+      psbt: string,
+      options?: Omit<SignPsbtOptions, 'finalize' | 'broadcast'>
+    ): Promise<string> => broadcastPsbt(client, signer, psbt, options),
   })
 }

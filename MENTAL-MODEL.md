@@ -217,6 +217,34 @@ between a library people reach for and one they avoid.
 `TNew extends ActionGroup` (`Record<string, AnyFn>`). Catches `.extend(() => 42)`
 at the source instead of producing a confusing client type downstream.
 
+### 4a. The bare-client `clientActions` slot is `ActionGroup`, not `{}`
+
+```ts
+function createClient<dsMethods>(...): Client<..., dsMethods, ActionGroup>
+function createWalletClient<dsMethods, TAccount>(...): WalletClient<..., ActionGroup, dsMethods>
+```
+
+A subtle but load-bearing detail: a freshly-built client's `clientActions`
+slot is typed as `ActionGroup`, not the literal empty `{}`.
+
+**Why this matters.** Wrapper-pattern action factories (a no-arg outer fn
+that returns a generic inner fn) need TS to bind the inner fn's `Actions`
+generic against the client's `clientActions` at extend time. With the slot
+literally `{}`, TS's contextual generic instantiation fails — `{}` doesn't
+"directly satisfy" the `Actions extends ActionGroup` constraint via the
+path TS takes for method-typed parameter unification (it works for plain
+contravariance but not the constraint-satisfaction path used during
+generic factory binding). The result was an obscure "not assignable" on
+every `.extend(publicActions())` call.
+
+With the slot typed as `ActionGroup`, TS just binds `Actions = ActionGroup`
+directly. No structural reasoning needed. The fix lives at the source so
+all factories see a well-bound type from day one.
+
+This was discovered the hard way during Phase 3. If a future refactor
+considers narrowing the bare-client slot back to `{}`, expect the wrapper
+factories to break in non-obvious ways. Keep `ActionGroup`.
+
 ### 5. Capability hierarchy comes before action types
 
 Capability interfaces are the contract between vendors and actions:

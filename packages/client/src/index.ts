@@ -1,8 +1,16 @@
-// Core primitives
+/**
+ * Main entry — read-only primitives, public actions, chains, errors, types.
+ *
+ * @remarks
+ * For account-aware operations (wallet client, signing, send-btc) import
+ * from the `/wallet` subpath. Protocol actions live at `/runes`, `/brc20`,
+ * `/inscriptions`. Vendor data sources live at `/vendors/<name>`.
+ *
+ * @module @omnisat/lasereyes-client
+ */
 
-// Actions
-export { walletBtcActions } from './actions/wallet-btc'
-export { signingActions } from './actions/wallet-signing'
+// Read-only public actions
+export { publicActions } from './actions/public'
 
 // Chains
 export {
@@ -46,10 +54,10 @@ export {
 // Types
 export type {
   ActionGroup,
-  // Protocol domain types — alkane
-  AlkaneBalance,
   // Capabilities
   AlkaneCapability,
+  // Protocol domain types — alkane
+  AlkaneBalance,
   AlkaneOutpoint,
   BaseCapability,
   // Protocol domain types — brc20
