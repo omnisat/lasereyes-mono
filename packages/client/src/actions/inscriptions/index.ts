@@ -97,6 +97,11 @@ export interface SendInscriptionParams {
  * Inscribe content on Bitcoin (commit + reveal). Stubbed.
  *
  * @returns The inscription ID once the reveal transaction is broadcast.
+ *
+ * @todo Implement: build commit transaction (P2TR taproot with reveal-script
+ * envelope), sign + broadcast commit, build reveal transaction spending the
+ * commit output to `params.to` (or account ordinals address), sign + broadcast
+ * reveal, return derived inscription ID.
  */
 export async function inscribe<
   Config extends WalletClientConfig<WalletAccount, DS>,
@@ -108,10 +113,17 @@ export async function inscribe<
   _client: WalletClient<Config, WalletAccount, Actions, DS>,
   _params: InscribeParams
 ): Promise<string> {
+  // TODO(inscribe): implementation deferred — type surface is locked.
   throw new Error('inscribe: not implemented')
 }
 
-/** Send an existing inscription to another address. Stubbed. */
+/**
+ * Send an existing inscription to another address. Stubbed.
+ *
+ * @todo Implement: locate the inscription's current outpoint, build a
+ * spending PSBT that preserves the inscription sat (postage UTXO + change),
+ * sign via `client.signPsbt({ finalize: true })`, broadcast.
+ */
 export async function sendInscription<
   Config extends WalletClientConfig<WalletAccount, DS>,
   DS extends Pick<BaseCapability, 'btcGetAddressUtxos' | 'btcBroadcastTransaction'>,
@@ -122,6 +134,7 @@ export async function sendInscription<
   _client: WalletClient<Config, WalletAccount, Actions, DS>,
   _params: SendInscriptionParams
 ): Promise<string> {
+  // TODO(sendInscription): implementation deferred — type surface is locked.
   throw new Error('sendInscription: not implemented')
 }
 

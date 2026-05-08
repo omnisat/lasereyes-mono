@@ -89,7 +89,13 @@ export interface TransferBrc20Params {
   feeRate?: number
 }
 
-/** Build, sign, and broadcast a BRC-20 deploy inscription. Stubbed. */
+/**
+ * Build, sign, and broadcast a BRC-20 deploy inscription. Stubbed.
+ *
+ * @todo Implement: build the deploy inscription content
+ *   (`{"p":"brc-20","op":"deploy","tick":…,"max":…,"lim":…}`),
+ *   commit + reveal via PSBT, broadcast.
+ */
 export async function deployBrc20<
   Config extends WalletClientConfig<WalletAccount, DS>,
   DS extends Pick<BaseCapability, 'btcGetAddressUtxos' | 'btcBroadcastTransaction'>,
@@ -100,10 +106,17 @@ export async function deployBrc20<
   _client: WalletClient<Config, WalletAccount, Actions, DS>,
   _params: DeployBrc20Params
 ): Promise<string> {
+  // TODO(deployBrc20): implementation deferred — type surface is locked.
   throw new Error('deployBrc20: not implemented')
 }
 
-/** Build, sign, and broadcast a BRC-20 mint inscription. Stubbed. */
+/**
+ * Build, sign, and broadcast a BRC-20 mint inscription. Stubbed.
+ *
+ * @todo Implement: build the mint inscription content
+ *   (`{"p":"brc-20","op":"mint","tick":…,"amt":…}`),
+ *   commit + reveal via PSBT, broadcast.
+ */
 export async function mintBrc20<
   Config extends WalletClientConfig<WalletAccount, DS>,
   DS extends Pick<BaseCapability, 'btcGetAddressUtxos' | 'btcBroadcastTransaction'>,
@@ -114,10 +127,19 @@ export async function mintBrc20<
   _client: WalletClient<Config, WalletAccount, Actions, DS>,
   _params: MintBrc20Params
 ): Promise<string> {
+  // TODO(mintBrc20): implementation deferred — type surface is locked.
   throw new Error('mintBrc20: not implemented')
 }
 
-/** Build, sign, and broadcast a BRC-20 transfer (inscribe + send). Stubbed. */
+/**
+ * Build, sign, and broadcast a BRC-20 transfer (inscribe + send). Stubbed.
+ *
+ * @todo Implement: two-step BRC-20 transfer flow —
+ *   1) Inscribe a transfer-marker (`{"p":"brc-20","op":"transfer","tick":…,"amt":…}`)
+ *      to the sender's ordinals address.
+ *   2) Spend that inscription UTXO to `params.to`.
+ *   Both steps need PSBTs signed via `client.signPsbt`, then broadcast.
+ */
 export async function transferBrc20<
   Config extends WalletClientConfig<WalletAccount, DS>,
   DS extends Pick<BaseCapability, 'btcGetAddressUtxos' | 'btcBroadcastTransaction'>,
@@ -128,6 +150,7 @@ export async function transferBrc20<
   _client: WalletClient<Config, WalletAccount, Actions, DS>,
   _params: TransferBrc20Params
 ): Promise<string> {
+  // TODO(transferBrc20): implementation deferred — type surface is locked.
   throw new Error('transferBrc20: not implemented')
 }
 

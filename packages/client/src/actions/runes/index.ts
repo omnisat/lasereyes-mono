@@ -112,6 +112,10 @@ export interface SendRuneParams {
  * — the client must be a `WalletClient<…, WalletAccount, …>` with `signPsbt`
  * already extended and a data source exposing rune-outpoint discovery and
  * BTC broadcast.
+ *
+ * @todo Implement: select rune outpoints + spending UTXOs, build PSBT with
+ * runestone OP_RETURN edict, sign via `client.signPsbt({ finalize: true })`,
+ * broadcast via `dataSource.btcBroadcastTransaction`.
  */
 export async function sendRune<
   Config extends WalletClientConfig<WalletAccount, DS>,
@@ -124,6 +128,7 @@ export async function sendRune<
   _client: WalletClient<Config, WalletAccount, Actions, DS>,
   _params: SendRuneParams
 ): Promise<string> {
+  // TODO(sendRune): implementation deferred — type surface is locked.
   throw new Error('sendRune: not implemented')
 }
 
