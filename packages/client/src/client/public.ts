@@ -37,7 +37,7 @@ import type { Client, ClientConfig } from './types'
  */
 export function createClient<dsMethods extends ActionGroup>(
   config: ClientConfig<dsMethods>
-): Client<ClientConfig<dsMethods>, dsMethods, ActionGroup> {
+): Client<ClientConfig<dsMethods>, dsMethods, {}> {
   if (config.dataSource.network !== config.network) {
     throw new NetworkMismatchError(
       config.network.name,
@@ -70,5 +70,5 @@ export function createClient<dsMethods extends ActionGroup>(
     return client
   }
 
-  return buildClient<ActionGroup>({} as ActionGroup)
+  return buildClient({} as {})
 }

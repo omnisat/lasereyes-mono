@@ -217,33 +217,110 @@ between a library people reach for and one they avoid.
 `TNew extends ActionGroup` (`Record<string, AnyFn>`). Catches `.extend(() => 42)`
 at the source instead of producing a confusing client type downstream.
 
-### 4a. The bare-client `clientActions` slot is `ActionGroup`, not `{}`
+### 4a. The bare-client `clientActions` slot is `{}`, not `ActionGroup`
 
 ```ts
-function createClient<dsMethods>(...): Client<..., dsMethods, ActionGroup>
-function createWalletClient<dsMethods, TAccount>(...): WalletClient<..., ActionGroup, dsMethods>
+function createClient<dsMethods>(...): Client<..., dsMethods, {}>
+function createWalletClient<dsMethods, TAccount>(...): WalletClient<..., {}, dsMethods>
 ```
 
-A subtle but load-bearing detail: a freshly-built client's `clientActions`
-slot is typed as `ActionGroup`, not the literal empty `{}`.
+A freshly-built client must have its `clientActions` slot typed as the
+literal empty `{}`, **not** `ActionGroup`. Reason: `Client<..., ActionGroup>`
+expands to `{ config, extend } & ActionGroup`, and `ActionGroup`'s index
+signature `[k: string]: AnyFn` flows through the intersection — meaning
+`client.frobnicate()` would silently typecheck on a bare client. That's a
+type-safety regression we explicitly guard against in the contract:
 
-**Why this matters.** Wrapper-pattern action factories (a no-arg outer fn
-that returns a generic inner fn) need TS to bind the inner fn's `Actions`
-generic against the client's `clientActions` at extend time. With the slot
-literally `{}`, TS's contextual generic instantiation fails — `{}` doesn't
-"directly satisfy" the `Actions extends ActionGroup` constraint via the
-path TS takes for method-typed parameter unification (it works for plain
-contravariance but not the constraint-satisfaction path used during
-generic factory binding). The result was an obscure "not assignable" on
-every `.extend(publicActions())` call.
+```ts
+// __tests__/type-inference.test-d.ts
+// @ts-expect-error — frobnicate was never added by any factory
+client.frobnicate()
+```
 
-With the slot typed as `ActionGroup`, TS just binds `Actions = ActionGroup`
-directly. No structural reasoning needed. The fix lives at the source so
-all factories see a well-bound type from day one.
+If a future refactor widens the slot to `ActionGroup` "to make factories
+type-check more easily," that contract assertion fires and the regression
+is caught at PR time.
 
-This was discovered the hard way during Phase 3. If a future refactor
-considers narrowing the bare-client slot back to `{}`, expect the wrapper
-factories to break in non-obvious ways. Keep `ActionGroup`.
+**The real fix for factory generic-instantiation** is in the factory
+constraint itself — see §4b.
+
+### 4b. `Client` and `WalletClient` are intersection types, not single object types
+
+Both client types are written as **intersections of separate object types**,
+not as a single `{ config, extend, …actions }` object literal:
+
+```ts
+// src/client/types.ts
+export type Client<C, M, A> =
+  & { config: C }
+  & {
+      extend<TNew extends ActionGroup>(
+        factory: (client: Client<C, M, A>) => TNew
+      ): Client<C, M, Prettify<A & TNew>>
+    }
+  & A
+
+// src/client/wallet-types.ts
+export type WalletClient<…> = Client<…> & {
+  extend<TNew extends ActionGroup>(…): WalletClient<…>
+}
+```
+
+This is **load-bearing for inner-generic factory inference**.
+
+**The single-object-type case fails.** If `Client` is declared as a single
+object type `{ config, extend } & A`, the `extend` method resolves through
+TS's *single-property method resolution* path. When you call
+`client.extend(factory)` with an inner-generic factory like:
+
+```ts
+function publicActions() {
+  return <
+    Config extends ClientConfig<DS>,
+    DS extends BaseCapability,
+    Actions extends ActionGroup,
+  >(client: Client<Config, DS, Actions>) => ({ … })
+}
+```
+
+…TS does **single-signature contextual instantiation**. The bare client's
+`clientActions = {}` must directly satisfy `Actions extends ActionGroup`.
+`{}` only satisfies `ActionGroup` *structurally* (vacuous index-sig
+satisfaction), and the single-signature path doesn't accept that. Bail.
+Error.
+
+**The intersection-type case works.** When `extend` lives in its own
+intersection arm — even if it's the only arm contributing a real `extend`
+definition — TS resolves `client.extend` through its *intersection-property
+method resolution* path, which synthesizes a call-signature merger across
+arms. That puts TS into **overload-resolution mode**, which is more
+lenient about contextual generic instantiation: `Actions = {}` binds via
+the structural-compatibility path, and the unification succeeds.
+
+**Why one arm triggers overload mode.** You don't need multiple `extend`
+signatures to flip TS into overload-resolution; you just need the property
+to live within an intersection structure. The intersection is what causes
+TS to treat `extend` as an overload set even when only one arm contributes
+a real definition. (This is a TS implementation detail, not documented
+behavior — but it's stable and consistent across versions.)
+
+**WalletClient was always fine** because `WalletClient = Client<…> & {
+extend(…) }` is already an intersection, so its `extend` always resolved
+through the lenient path. Splitting `Client` into the same shape gives it
+the same lenient resolution.
+
+**The contract guards this.** Tests under §4a in
+`__tests__/type-inference.test-d.ts` extend `publicActions()`,
+`runeActions()`, etc. on a sandshrew (broad-DS) client. If someone ever
+collapses `Client` back into a single object literal, those tests fail at
+the inner-generic factory call site.
+
+**Why this matters.** It means we can use plain `Actions extends ActionGroup`
+in every factory — no `| {}` widening, no constraint hacks. The fix lives
+at the type definition level, not the factory level, and it solves the
+issue uniformly for both `Client` and `WalletClient`.
+
+This was discovered the hard way during Phase 3.
 
 ### 5. Capability hierarchy comes before action types
 

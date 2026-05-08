@@ -41,6 +41,7 @@ export type Client<
   clientActions extends ActionGroup = {},
 > = {
   config: Config
+} & {
   /**
    * Adds a new action group to this client.
    *

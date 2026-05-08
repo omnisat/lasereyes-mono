@@ -247,6 +247,48 @@ describe('Vendor createDataSource factories', () => {
 })
 
 // ============================================================================
+// 4a. Read-side factories typecheck on a BROAD-DS client
+//
+// Regression guard: if the Client type ever gets collapsed back from
+// `{ config } & { extend } & clientActions` to a single `{ config, extend
+// } & clientActions`, single-method resolution kicks in and the factory's
+// `Actions extends ActionGroup` constraint can't bind against the bare
+// client's `clientActions = {}`. These tests fail in that scenario.
+// ============================================================================
+
+describe('Read-side factories on broad-DS clients', () => {
+  it('publicActions extends a sandshrew client (BaseCapability slice)', () => {
+    const ds = createSandshrewDataSource({ network: MAINNET, apiKey: 'k' })
+    const c = createClient({ network: MAINNET, dataSource: ds }).extend(publicActions())
+    expectTypeOf(c.getBalance).returns.resolves.toEqualTypeOf<string>()
+  })
+
+  it('runeActions extends a sandshrew client (RuneCapability slice)', () => {
+    const ds = createSandshrewDataSource({ network: MAINNET, apiKey: 'k' })
+    const c = createClient({ network: MAINNET, dataSource: ds }).extend(runeActions())
+    expectTypeOf(c.getRuneBalances).returns.resolves.toEqualTypeOf<
+      PaginatedResult<RuneBalance>
+    >()
+  })
+
+  it('inscriptionActions extends a sandshrew client (InscriptionCapability slice)', () => {
+    const ds = createSandshrewDataSource({ network: MAINNET, apiKey: 'k' })
+    const c = createClient({ network: MAINNET, dataSource: ds }).extend(inscriptionActions())
+    expectTypeOf(c.getInscriptionsByAddress).returns.resolves.toEqualTypeOf<
+      PaginatedResult<Inscription>
+    >()
+  })
+
+  it('brc20Actions extends a maestro client (Brc20Capability slice)', () => {
+    const ds = createMaestroDataSource({ network: MAINNET, apiKey: 'k' })
+    const c = createClient({ network: MAINNET, dataSource: ds }).extend(brc20Actions())
+    expectTypeOf(c.getBrc20Balances).returns.resolves.toEqualTypeOf<
+      PaginatedResult<Brc20Balance>
+    >()
+  })
+})
+
+// ============================================================================
 // 5. Client (read-only) — inference, accumulation, identity
 // ============================================================================
 
@@ -274,6 +316,21 @@ describe('createClient', () => {
 
     // @ts-expect-error — TNew must extend ActionGroup; a number is not a record of fns.
     client.extend(() => 42)
+  })
+
+  it('rejects calls to methods that no factory has added', () => {
+    // Regression guard: a freshly-built client must NOT structurally permit
+    // arbitrary method calls. If the bare client's clientActions slot is
+    // typed as `ActionGroup` (instead of `{}`), the index signature
+    // `[k: string]: AnyFn` flows through and `client.frobnicate()` would
+    // typecheck. Keep the slot at `{}` so this stays a compile error.
+    const ds = createChainDataSource({ network: MAINNET }).extend(baseCap)
+    const client = createClient({ network: MAINNET, dataSource: ds })
+
+    // @ts-expect-error — `frobnicate` was never added by any factory.
+    client.frobnicate()
+    // @ts-expect-error — same reason; no read-only public actions extended yet.
+    client.getBalance('bc1q')
   })
 
   it('preserves Client kind across extension', () => {
