@@ -125,3 +125,76 @@ direction — out of Phase 9 scope.
 ## Documentation
 
 (Add entries here as they come up.)
+
+---
+
+## Testing
+
+### Add unit and integration tests for client + core
+
+**Status:** open — high priority
+
+**Background.** During the major-refactor, the legacy runtime tests in
+`packages/client/src/__tests__/` were deleted because they were written against
+the pre-refactor API surface (old `LaserEyesClient` class, old data-source
+`{ group, methods }` envelope shape, string-typed `network` arg, old
+`Account.readOnly` discriminator, etc.). Updating each test to the new shape
+would have been mechanical busywork — many of the tests were also redundant
+with what the type-inference contract now covers more precisely.
+
+**What was kept:**
+- `packages/client/src/__tests__/type-inference.test-d.ts` — 76-assertion
+  binding contract (typechecks every public type signature)
+- `packages/client/src/__tests__/lib/{btc,bytes,psbt}.test.ts` — utility
+  unit tests (still valid; pure functions over byte/PSBT primitives)
+- `packages/core/src/__tests__/type-inference.test-d.ts` — 61-assertion
+  binding contract
+
+**What's missing — needs new tests written from scratch:**
+
+| Layer | What to cover |
+|---|---|
+| **Client — vendor data sources** | `mempool({ network, … })`, `sandshrew({ network, apiKey, … })`, `maestro({ network, apiKey, … })` integration tests against real or fixtured endpoints. Verify capability methods produce the correct response shapes. |
+| **Client — `mergeDataSources`** | Runtime priority semantics (first-arg wins on overlap), capability union behavior, error propagation from underlying sources. |
+| **Client — `createClient` / `createWalletClient`** | Network-mismatch error path, `.extend()` runtime accumulation (the type-level side is contract-locked; runtime side isn't). |
+| **Client — public actions (`getBalance`, `getTransaction`, etc.)** | Each action wired against a fake `Client` with a stubbed `dataSource`. Verify request shape and return value. |
+| **Client — wallet actions (`sendBtc`, `signPsbt`, `signMessage`)** | Stubbed `Signer` + fake account; verify PSBT construction + signing flow. |
+| **Client — protocol actions (runes, brc20, inscriptions)** | Once implementations land for the stubbed write actions; reads should already be testable. |
+| **Core — lifecycle actions (`initialize`, `connect`, `disconnect`, `switchNetwork`, `dispose`)** | State-atom transitions, announcement-listener cleanup, auto-reconnect from storage. Use fake connectors. |
+| **Core — read actions (`getBalance`, `getTransaction`, etc.)** | Provider-first / client-fallback path. Verify `tryProvider` swallows gracefully and the bare-action delegation works. Use fake config + stubbed connector. |
+| **Core — write actions (`sendBitcoin`, `signPsbt`, etc.)** | Connector dispatch through `connector.getProvider().request(...)`. |
+| **Core — `getClient(config, opts?)`** | Chain-lookup, transport fold, runtime composition with bare actions. |
+| **Adapters** | Method-by-method dispatch coverage for at least `unisat`, `xverse`, `leather`. The adapter layer translates wallet-specific APIs to the standard `BitcoinProvider` shape; each method needs its mapping verified. |
+| **Connectors** | `injected({ target })` factory: detection, `connect/disconnect/getAccount/getNetworkId` lifecycle. |
+| **Discovery** | `discoverConnectors({ explicit, onChange })` — explicit-vs-announced dedup by `rdns`, listener cleanup, multi-announcement scenarios. |
+| **Storage** | `createStorage({ key, storage? })` — localStorage path + in-memory fallback + key prefixing. |
+
+**Recommended approach:**
+1. **Use Vitest** (already the project test runner per `vitest.config.ts`).
+2. **Test fixtures over real network calls** for vendor data sources — wire
+   them through `nock` / `msw` / hand-rolled fetch stubs. Real-network
+   integration tests can live in a separate `__integration__/` directory and
+   be opt-in via env flag.
+3. **Co-locate**: `feature/foo.ts` → `feature/foo.test.ts`. Keeps test
+   discovery simple and matches the type-inference contract's location.
+4. **Don't try to reproduce the type-inference contract at runtime** — type
+   precision is verified by `vitest typecheck`. Runtime tests should
+   exercise *behavior*: did the right HTTP request go out? Did the state
+   atom transition correctly? Did the PSBT builder produce a valid hex?
+5. **Add `pnpm test` + `pnpm test:typecheck` to CI** so both the binding
+   contract and runtime tests gate PRs.
+
+**Cost:** medium-large. Could be split:
+- **Pass 1:** Critical paths — `mergeDataSources`, vendor BaseCapability methods,
+  `connect`/`disconnect`/`switchNetwork`, `getBalance` provider-first/fallback.
+  ~2 days of focused work.
+- **Pass 2:** Adapters + discovery + storage + edge cases. ~2 days.
+- **Pass 3:** Protocol actions once implementations land.
+
+**Until tests are added:** the type-inference contract (137 binding
+assertions across both packages) is the safety net. It catches every
+type-level regression, but it does NOT exercise runtime behavior. Land the
+test plan above before declaring the major-refactor production-ready.
+
+**Surfaced during:** Phase 9 cleanup, 2026-05-10. Legacy tests deleted in
+the same commit as this entry.
