@@ -86,12 +86,12 @@ export interface ChainNetwork {
  * })
  * ```
  */
-export function defineChain(chain: ChainNetwork): ChainNetwork {
+export function defineChain<const T extends ChainNetwork>(chain: T): T {
   return chain
 }
 
 /** Bitcoin mainnet. */
-export const MAINNET: ChainNetwork = defineChain({
+export const MAINNET = defineChain({
   id: 'mainnet',
   type: 'mainnet',
   name: 'Bitcoin Mainnet',
@@ -102,7 +102,7 @@ export const MAINNET: ChainNetwork = defineChain({
 })
 
 /** Bitcoin Testnet (legacy testnet3). */
-export const TESTNET: ChainNetwork = defineChain({
+export const TESTNET = defineChain({
   id: 'testnet',
   type: 'testnet',
   name: 'Bitcoin Testnet',
@@ -113,7 +113,7 @@ export const TESTNET: ChainNetwork = defineChain({
 })
 
 /** Bitcoin Testnet4. */
-export const TESTNET4: ChainNetwork = defineChain({
+export const TESTNET4 = defineChain({
   id: 'testnet4',
   type: 'testnet',
   name: 'Bitcoin Testnet4',
@@ -124,7 +124,7 @@ export const TESTNET4: ChainNetwork = defineChain({
 })
 
 /** Bitcoin Signet. */
-export const SIGNET: ChainNetwork = defineChain({
+export const SIGNET = defineChain({
   id: 'signet',
   type: 'testnet',
   name: 'Bitcoin Signet',
@@ -135,7 +135,7 @@ export const SIGNET: ChainNetwork = defineChain({
 })
 
 /** Fractal Bitcoin mainnet. */
-export const FRACTAL_MAINNET: ChainNetwork = defineChain({
+export const FRACTAL_MAINNET = defineChain({
   id: 'fractal-mainnet',
   type: 'mainnet',
   name: 'Fractal Mainnet',
@@ -146,7 +146,7 @@ export const FRACTAL_MAINNET: ChainNetwork = defineChain({
 })
 
 /** Fractal Bitcoin testnet. */
-export const FRACTAL_TESTNET: ChainNetwork = defineChain({
+export const FRACTAL_TESTNET = defineChain({
   id: 'fractal-testnet',
   type: 'testnet',
   name: 'Fractal Testnet',
@@ -157,7 +157,7 @@ export const FRACTAL_TESTNET: ChainNetwork = defineChain({
 })
 
 /** OYL Network (development network). */
-export const OYLNET: ChainNetwork = defineChain({
+export const OYLNET = defineChain({
   id: 'oylnet',
   type: 'testnet',
   name: 'OYL Network',
@@ -168,7 +168,7 @@ export const OYLNET: ChainNetwork = defineChain({
 })
 
 /** Local regtest. */
-export const REGTEST: ChainNetwork = defineChain({
+export const REGTEST = defineChain({
   id: 'regtest',
   type: 'regtest',
   name: 'Bitcoin Regtest',
@@ -205,6 +205,34 @@ export const NETWORKS: Record<string, ChainNetwork> = {
  */
 export function getNetwork(id: NetworkId): ChainNetwork | undefined {
   return NETWORKS[id]
+}
+
+/**
+ * Normalize a network argument to a {@link ChainNetwork} value object.
+ *
+ * @remarks
+ * Constructor-facing helper used by {@link createClient}, {@link createWalletClient},
+ * {@link createChainDataSource}, and the vendor `createDataSource` factories.
+ * Accepts either form so callers can write the ergonomic
+ * `{ network: 'mainnet' }` *or* the canonical `{ network: MAINNET }` and
+ * the resulting data structure always carries the full `ChainNetwork`.
+ *
+ * @param input - Either a built-in {@link NetworkId} string or a {@link ChainNetwork} value.
+ * @returns The corresponding `ChainNetwork`.
+ * @throws {Error} If `input` is a string with no entry in {@link NETWORKS}.
+ *   Custom chains should be passed as `ChainNetwork` values produced by
+ *   {@link defineChain}.
+ */
+export function resolveNetwork(input: NetworkId | ChainNetwork): ChainNetwork {
+  if (typeof input !== 'string') return input
+  const chain = NETWORKS[input]
+  if (!chain) {
+    throw new Error(
+      `resolveNetwork: unknown network id "${input}". For custom chains, ` +
+        'pass a ChainNetwork value produced by defineChain() instead of a string.'
+    )
+  }
+  return chain
 }
 
 /**

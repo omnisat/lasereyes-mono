@@ -14,7 +14,7 @@
 import type { ChainNetwork } from '../chains'
 import type { ActionGroup } from '../data-source/capabilities'
 import type { ChainDataSource } from '../types/data-source'
-import type { Prettify } from '../types/utils'
+import type { Extension, Prettify } from '../types/utils'
 
 /**
  * A client instance that wraps a chain data source and exposes action methods.
@@ -45,11 +45,16 @@ export type Client<
   /**
    * Adds a new action group to this client.
    *
+   * @remarks
+   * The `TNew extends Extension<'config' | 'extend'>` constraint protects
+   * the client's reserved members from being silently shadowed by a factory
+   * return. Any other key with any value type is permitted.
+   *
    * @typeParam TNew - The action group being added
    * @param factory - A function that receives the current client and returns new action methods
    * @returns A new client with the additional action methods
    */
-  extend<TNew extends ActionGroup>(
+  extend<TNew extends Extension<'config' | 'extend'>>(
     factory: (client: Client<Config, dsMethods, clientActions>) => TNew
   ): Client<Config, dsMethods, Prettify<clientActions & TNew>>
 } & clientActions

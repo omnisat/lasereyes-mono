@@ -13,19 +13,27 @@ import {
   request as satsConnectRequest,
   RpcErrorCode,
 } from 'sats-connect'
-import { BaseAdapter } from './base'
-import type {
-  AddressInfo,
-  AddressPurpose,
-  BitcoinProviderAdapter,
-  ProviderCapabilities,
-  RequestArguments,
-  SignedPsbt,
-} from '../types/provider'
-import type { NetworkId } from '../types/network'
-import { XverseNetwork } from '../types/network'
-import { announceWallet } from '../detection/announcements'
+import type { NetworkId } from '@omnisat/lasereyes-client'
+import { getAddressType } from '@omnisat/lasereyes-client/utils'
+import type { AddressInfo, AddressPurpose, SignedPsbt } from '@omnisat/lasereyes-client/wallet'
 import { XVERSE_ICON } from '../constants/wallet-icons'
+import { announceWallet } from '../detection/announcements'
+import type { ProviderCapabilities } from '../types/provider'
+import { BaseAdapter, type BitcoinProviderAdapter } from './base'
+
+/**
+ * Xverse's network identifiers (sats-connect uses these strings).
+ *
+ * @internal
+ */
+const XverseNetwork = {
+  MAINNET: 'Mainnet',
+  TESTNET: 'Testnet',
+  TESTNET4: 'Testnet4',
+  SIGNET: 'Signet',
+  FRACTAL_MAINNET: 'FractalMainnet',
+  FRACTAL_TESTNET: 'FractalTestnet',
+} as const
 
 /**
  * Adapter for Xverse Wallet.
@@ -39,8 +47,8 @@ export class XverseAdapter extends BaseAdapter {
   readonly walletId = 'xverse'
   readonly walletName = 'Xverse Wallet'
 
-  async request(args: RequestArguments): Promise<unknown> {
-    const { method, params = {} } = args
+  async request(method: string, params?: { [key: string]: unknown }): Promise<unknown> {
+    const p = params ?? {}
 
     switch (method) {
       case 'bitcoin_requestAccounts':
@@ -53,16 +61,16 @@ export class XverseAdapter extends BaseAdapter {
         return this.handleGetNetwork()
 
       case 'bitcoin_switchNetwork':
-        return this.handleSwitchNetwork(params.networkId as NetworkId)
+        return this.handleSwitchNetwork(p.networkId as NetworkId)
 
       case 'bitcoin_signPsbt':
-        return this.handleSignPsbt(params)
+        return this.handleSignPsbt(p)
 
       case 'bitcoin_sendBitcoin':
-        return this.handleSendBitcoin(params)
+        return this.handleSendBitcoin(p)
 
       case 'bitcoin_signMessage':
-        return this.handleSignMessage(params)
+        return this.handleSignMessage(p)
 
       case 'bitcoin_getCapabilities':
         return this.buildCapabilities()
@@ -331,11 +339,12 @@ export class XverseAdapter extends BaseAdapter {
         continue // Skip unknown purposes
       }
 
+      const addrType = getAddressType(addr.address)
+      if (!addrType) continue // Skip if we can't determine the address type
       result.push({
         address: addr.address,
         purpose,
-        type: this.detectAddressType(addr.address),
-        publicKey: addr.publicKey,
+        type: addrType,
       })
     }
 

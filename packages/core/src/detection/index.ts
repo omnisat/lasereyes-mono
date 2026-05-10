@@ -5,4 +5,5 @@
  */
 
 export * from './announcements'
+export * from './discovery'
 export * from './helpers'

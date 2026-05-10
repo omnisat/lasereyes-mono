@@ -1,5 +1,5 @@
+import type { ChainNetwork, NetworkId } from '../../chains'
 import { createChainDataSource } from '../../data-source'
-import type { ChainNetwork } from '../../chains'
 import type { BaseCapability, ChainDataSource } from '../../types'
 import { baseCapabilities } from './base'
 import type { MempoolConfig } from './config'
@@ -31,7 +31,11 @@ export type { MempoolConfig } from './config'
  */
 export function createDataSource(
   config: {
-    network: ChainNetwork
+    /**
+     * The Bitcoin network. Either a {@link NetworkId} string
+     * (e.g. `'mainnet'`) or a {@link ChainNetwork} value (e.g. `MAINNET`).
+     */
+    network: NetworkId | ChainNetwork
   } & MempoolConfig
 ): ChainDataSource<BaseCapability> {
   return createChainDataSource({ network: config.network }).extend(baseCapabilities(config))

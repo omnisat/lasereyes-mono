@@ -4,7 +4,7 @@
  * @module types/connector
  */
 
-import type { Network, NetworkId } from '@omnisat/lasereyes-client'
+import type { ChainNetwork, NetworkId } from '@omnisat/lasereyes-client'
 import type { Account } from '@omnisat/lasereyes-client/wallet'
 import type { BitcoinProvider, ProviderCapabilities } from './provider'
 
@@ -119,7 +119,7 @@ export interface Connector {
    * @param networkId - Target network ID
    * @throws {Error} If wallet doesn't support network switching
    */
-  switchNetwork?(networkId: NetworkId): Promise<Network>
+  switchNetwork?(networkId: NetworkId): Promise<ChainNetwork>
 
   // ============================================================================
   // Provider Access
@@ -211,7 +211,11 @@ export interface ConnectorConfig {
   /** App icon URL for wallet connection requests */
   appIcon?: string
 
-  networks: Network[]
+  /**
+   * The chains this app supports. Connectors typically copy this list
+   * into their authentication request to the wallet.
+   */
+  networks: readonly ChainNetwork[]
 }
 
 /**

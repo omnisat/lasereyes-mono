@@ -5,11 +5,12 @@
  */
 
 import type { Account } from '../account/types'
-import type { ChainNetwork } from '../chains'
+import type { ChainNetwork, NetworkId } from '../chains'
+import { resolveNetwork } from '../chains'
 import type { ActionGroup } from '../data-source/capabilities'
 import { NetworkMismatchError } from '../errors'
 import type { ChainDataSource } from '../types/data-source'
-import type { Prettify } from '../types/utils'
+import type { Extension, Prettify } from '../types/utils'
 import type { WalletClient, WalletClientConfig } from './wallet-types'
 
 /**
@@ -28,6 +29,12 @@ import type { WalletClient, WalletClientConfig } from './wallet-types'
  * @typeParam TAccount - The account type (inferred from `config.account`)
  *
  * @param config - The wallet client configuration
+ * @param config.network - The Bitcoin network this client operates on. Pass
+ *   either a {@link NetworkId} string (e.g. `'mainnet'`) or a
+ *   {@link ChainNetwork} value (e.g. `MAINNET`). Strings are resolved via
+ *   the built-in `NETWORKS` registry.
+ * @param config.dataSource - The chain data source providing blockchain data.
+ * @param config.account - The user's account (with addresses and optional public keys).
  *
  * @returns A wallet client instance that can be extended with action groups
  *
@@ -67,22 +74,28 @@ export function createWalletClient<
   dsMethods extends ActionGroup,
   TAccount extends Account,
 >(config: {
-  network: ChainNetwork
+  network: NetworkId | ChainNetwork
   dataSource: ChainDataSource<dsMethods>
   account: TAccount
 }): WalletClient<WalletClientConfig<TAccount, dsMethods>, TAccount, {}, dsMethods> {
-  if (config.dataSource.network !== config.network) {
-    throw new NetworkMismatchError(config.network.name, config.dataSource.network.name)
+  const network = resolveNetwork(config.network)
+  if (config.dataSource.network !== network) {
+    throw new NetworkMismatchError(network.name, config.dataSource.network.name)
   }
 
   type Config = WalletClientConfig<TAccount, dsMethods>
+  const resolvedConfig: Config = {
+    network,
+    dataSource: config.dataSource,
+    account: config.account,
+  }
 
   function buildClient<TActions extends ActionGroup>(
     actions: TActions
   ): WalletClient<Config, TAccount, TActions, dsMethods> {
     const client = {
-      config,
-      extend<TNew extends ActionGroup>(
+      config: resolvedConfig,
+      extend<TNew extends Extension<'config' | 'extend'>>(
         factory: (c: WalletClient<Config, TAccount, TActions, dsMethods>) => TNew
       ): WalletClient<Config, TAccount, Prettify<TActions & TNew>, dsMethods> {
         const newActions = factory(client)

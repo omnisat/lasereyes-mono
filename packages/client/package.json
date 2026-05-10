@@ -16,23 +16,23 @@
     },
     "./wallet": {
       "import": "./dist/wallet/index.js",
-      "types": "./dist/wallet/index.d.ts"
+      "types": "./dist/wallet.d.ts"
     },
     "./utils": {
       "import": "./dist/utils/index.js",
-      "types": "./dist/utils/index.d.ts"
+      "types": "./dist/utils.d.ts"
     },
     "./runes": {
       "import": "./dist/runes/index.js",
-      "types": "./dist/runes/index.d.ts"
+      "types": "./dist/runes.d.ts"
     },
     "./brc20": {
       "import": "./dist/brc20/index.js",
-      "types": "./dist/brc20/index.d.ts"
+      "types": "./dist/brc20.d.ts"
     },
     "./inscriptions": {
       "import": "./dist/inscriptions/index.js",
-      "types": "./dist/inscriptions/index.d.ts"
+      "types": "./dist/inscriptions.d.ts"
     },
     "./vendors/mempool": {
       "import": "./dist/vendors/mempool/index.js",

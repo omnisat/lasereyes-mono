@@ -9,8 +9,19 @@
  * @module @omnisat/lasereyes-client
  */
 
-// Read-only public actions
-export { publicActions } from './actions/public'
+// Read-only public actions — both the bare action functions (compose
+// directly with a `Client`) and the `publicActions()` factory (extend a
+// `Client` with the methods).
+export {
+  broadcastTransaction,
+  getBalance,
+  getOutputValue,
+  getRecommendedFees,
+  getTransaction,
+  getUtxos,
+  publicActions,
+  waitForTransaction,
+} from './actions/public'
 
 // Chains
 export {
@@ -23,6 +34,7 @@ export {
   NETWORKS,
   OYLNET,
   REGTEST,
+  resolveNetwork,
   SIGNET,
   TESTNET,
   TESTNET4,
@@ -38,6 +50,7 @@ export { ALKANES, BRC20, BTC, RUNES } from './constants/protocols'
 
 // Data sources
 export { createChainDataSource, mergeDataSources } from './data-source'
+export type { DsMethodsOf, MergedCapabilities } from './data-source'
 
 // Errors
 export {

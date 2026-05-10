@@ -9,7 +9,7 @@
  * @module vendors/sandshrew
  */
 
-import type { ChainNetwork } from '../../chains'
+import type { ChainNetwork, NetworkId } from '../../chains'
 import type {
   AlkaneCapability,
   BaseCapability,
@@ -62,7 +62,13 @@ export { runeCapabilities } from './runes'
  * ```
  */
 export function createDataSource(
-  config: { network: ChainNetwork } & SandshrewConfig
+  config: {
+    /**
+     * The Bitcoin network. Either a {@link NetworkId} string
+     * (e.g. `'mainnet'`) or a {@link ChainNetwork} value (e.g. `MAINNET`).
+     */
+    network: NetworkId | ChainNetwork
+  } & SandshrewConfig
 ): ChainDataSource<
   BaseCapability & RuneCapability & AlkaneCapability & InscriptionCapability & OrdCapability
 > {

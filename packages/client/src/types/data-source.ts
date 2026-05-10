@@ -1,5 +1,6 @@
 import type { ChainNetwork } from '../chains'
 import type { ActionGroup } from '../data-source/capabilities'
+import type { Extension, Prettify } from './utils'
 
 /**
  * Parameters for cursor-based pagination.
@@ -58,11 +59,17 @@ export type ChainDataSource<SupportedMethods extends ActionGroup = {}> = {
   /**
    * Adds a new capability group to this data source.
    *
+   * @remarks
+   * The `TNew extends Extension<'network' | 'getCapabilities' | 'extend'>`
+   * constraint protects the data source's reserved members from being
+   * silently shadowed by a capability factory return. Any other key with
+   * any value type is permitted.
+   *
    * @typeParam TNew - The interface of the capability being added
    * @param factory - A function that receives the data source context and returns a capability group
    * @returns A new data source with the additional capability methods
    */
-  extend<TNew>(
+  extend<TNew extends Extension<'network' | 'getCapabilities' | 'extend'>>(
     factory: (context: DataSourceContext) => TNew
-  ): ChainDataSource<SupportedMethods & TNew>
+  ): ChainDataSource<Prettify<SupportedMethods & TNew>>
 } & SupportedMethods

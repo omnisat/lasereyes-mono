@@ -4,7 +4,7 @@
  * @module detection/announcements
  */
 
-import type { BitcoinProvider } from '../types'
+import type { BitcoinProvider } from '../types/provider'
 
 /**
  * Wallet announcement detail (similar to EIP-6963).

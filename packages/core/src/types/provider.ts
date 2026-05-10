@@ -1,8 +1,24 @@
 /**
- * Bitcoin Provider Standard (BIP-XXXX proposal).
+ * Bitcoin Provider Standard.
+ *
+ * @remarks
+ * Modeled on EIP-1193 with Bitcoin-specific adaptations:
+ * - Network IDs (strings), not chain IDs (integers)
+ * - PSBT-centric signing model
+ * - Multi-address support (payment / ordinals / taproot)
+ * - Capabilities discovery with TypeScript types
+ *
+ * Wallets that conform to this interface need no adapter; otherwise an
+ * adapter (see {@link BaseAdapter}) translates the wallet's native API
+ * to this surface.
  *
  * @module types/provider
  */
+
+// `ProviderRpcError` and `ProviderErrorCode` live in the client package's
+// `errors.ts` (errors are values, not state). Re-export here for adapter
+// consumers that already import from `types/provider`.
+export { ProviderErrorCode, ProviderRpcError } from '@omnisat/lasereyes-client'
 
 // ============================================================================
 // Core Provider Interface
@@ -12,54 +28,33 @@
  * Standard Bitcoin Provider Interface.
  *
  * @remarks
- * All Bitcoin wallet providers SHOULD implement this interface.
- * Modeled after EIP-1193 with Bitcoin-specific adaptations.
- *
- * Key differences from EIP-1193:
- * - Network IDs instead of chain IDs
- * - PSBT-centric signing model
- * - Multi-address support (payment, ordinals, taproot)
- * - Capabilities discovery with TypeScript types
+ * All Bitcoin wallet providers SHOULD implement this interface. Once they
+ * do, their adapter file can be deleted; only their connector remains.
  */
 export interface BitcoinProvider {
   /**
-   * Generic RPC-style request method.
-   * ALL operations go through this single method.
+   * Generic RPC-style request method. ALL operations go through this.
    *
-   * @param args - Request arguments with method name and params
-   * @returns Promise resolving to method-specific return type
-   * @throws {ProviderRpcError} If request fails
+   * @param method - RPC method name (e.g. `'bitcoin_signPsbt'`).
+   * @param params - Optional named-parameters object.
+   * @returns Method-specific return value.
+   * @throws {ProviderRpcError} If the request fails.
    *
    * @example
    * ```ts
-   * const accounts = await provider.request({
-   *   method: 'bitcoin_requestAccounts'
-   * })
+   * const accounts = await provider.request('bitcoin_requestAccounts')
+   * const signed = await provider.request('bitcoin_signPsbt', { psbt, finalize: true })
    * ```
    */
-  request(
-    ...args: [
-      /** RPC method name (e.g., 'bitcoin_signPsbt') */
-      method: string,
-      /** Named parameters object (optional) */
-      params?: { [key: string]: unknown },
-    ]
-  ): Promise<unknown>
+  request(method: string, params?: { [key: string]: unknown }): Promise<unknown>
 
   /**
-   * Subscribe to provider events.
-   * Implements Node.js EventEmitter API.
-   *
-   * @param event - Event name
-   * @param listener - Event handler function
+   * Subscribe to provider events. Implements Node.js EventEmitter API.
    */
   on(event: string, listener: (...args: any[]) => void): void
 
   /**
    * Unsubscribe from provider events.
-   *
-   * @param event - Event name
-   * @param listener - Event handler function to remove
    */
   removeListener(event: string, listener: (...args: any[]) => void): void
 }
@@ -72,21 +67,21 @@ export interface BitcoinProvider {
  * Standard Bitcoin RPC methods.
  *
  * @remarks
- * Required methods MUST be implemented by all providers.
- * Optional methods depend on wallet capabilities.
+ * Required methods MUST be implemented by all providers. Optional methods
+ * depend on wallet capabilities surfaced via `bitcoin_getCapabilities`.
  */
 export type BitcoinRpcMethod =
-  // Required methods
+  // Required
   | 'bitcoin_requestAccounts'
   | 'bitcoin_getAccounts'
   | 'bitcoin_getNetwork'
   | 'bitcoin_getCapabilities'
   | 'bitcoin_signMessage'
-  // Optional methods
+  // Optional
   | 'bitcoin_switchNetwork'
   | 'bitcoin_signPsbt'
-  | 'bitcoin_signAndBroadcastTranaction'
   | 'bitcoin_signMultiplePsbts'
+  | 'bitcoin_signAndBroadcastTransaction'
   | 'bitcoin_signAndBroadcastMultipleTransactions'
   | 'bitcoin_sendBitcoin'
   | 'bitcoin_pushPsbt'
@@ -96,7 +91,7 @@ export type BitcoinRpcMethod =
 // ============================================================================
 
 /**
- * Standard provider events.
+ * Standard provider event names.
  */
 export type BitcoinProviderEvent =
   | 'connect'
@@ -105,168 +100,93 @@ export type BitcoinProviderEvent =
   | 'networkChanged'
   | 'message'
 
-/**
- * Connect event data.
- */
+/** Connect event data. */
 export interface ConnectInfo {
-  /** Connected network ID */
+  /** Connected network ID. */
   network: string
 }
 
-/**
- * Disconnect event data.
- */
+/** Disconnect event data. */
 export interface DisconnectInfo {
-  /** Optional error if disconnection was unexpected */
-  error?: ProviderRpcError
+  /** Optional error if disconnection was unexpected. */
+  error?: Error
 }
 
-/**
- * Provider message event data.
- */
+/** Provider message event data. */
 export interface ProviderMessage {
-  /** Message type */
   type: string
-
-  /** Message data */
   data: unknown
 }
 
 // ============================================================================
-// Errors
+// Provider Capabilities (TypeScript-typed)
 // ============================================================================
 
 /**
- * Provider RPC error.
- */
-export class ProviderRpcError extends Error {
-  constructor(
-    /** Error code */
-    public code: number,
-    /** Error message */
-    message: string,
-    /** Additional error data */
-    public data?: unknown
-  ) {
-    super(message)
-    this.name = 'ProviderRpcError'
-  }
-}
-
-/**
- * Common error codes (following EIP-1193 pattern).
+ * Provider capabilities, organized by network.
  *
  * @remarks
- * These are suggested codes. Wallets may use different codes.
- * String error messages are more important than codes.
- */
-export enum ProviderErrorCode {
-  /** User rejected the request */
-  USER_REJECTED = 4001,
-  /** Unauthorized - method requires authorization */
-  UNAUTHORIZED = 4100,
-  /** Unsupported method */
-  UNSUPPORTED_METHOD = 4200,
-  /** Disconnected from network */
-  DISCONNECTED = 4900,
-  /** Invalid request */
-  INVALID_REQUEST = -32600,
-  /** Method not found */
-  METHOD_NOT_FOUND = -32601,
-  /** Invalid params */
-  INVALID_PARAMS = -32602,
-  /** Internal error */
-  INTERNAL_ERROR = -32603,
-}
-
-// ============================================================================
-// Provider Capabilities (using TypeScript types)
-// ============================================================================
-
-/**
- * Provider capabilities for all networks.
- *
- * @remarks
- * Capabilities are organized by network ID.
- * Each network can have different method support.
+ * Each network may expose a different method set. Returned by
+ * `bitcoin_getCapabilities`.
  */
 export interface ProviderCapabilities {
   [networkId: string]: NetworkCapabilities
 }
 
-/**
- * Capabilities for a specific network.
- */
+/** Capabilities for a single network. */
 export interface NetworkCapabilities {
   [methodName: string]: MethodCapability<any, any>
 }
 
 /**
- * Method capability descriptor with TypeScript types.
+ * Method capability descriptor.
  *
- * @typeParam TParams - Parameter type
- * @typeParam TReturn - Return type
+ * @typeParam TParams - Parameter type.
+ * @typeParam TReturn - Return type.
  */
 export interface MethodCapability<TParams = any, TReturn = any> {
-  /** Whether this method is supported */
+  /** Whether this method is supported. */
   supported: boolean
-
-  /** Parameter type (for type checking and documentation) */
+  /** Parameter type descriptor (documentation/runtime introspection). */
   paramsType?: TypeDescriptor<TParams>
-
-  /** Return type (for type checking and documentation) */
+  /** Return type descriptor. */
   returnType?: TypeDescriptor<TReturn>
-
-  /** Additional metadata */
+  /** Implementation metadata. */
   metadata?: {
-    /** Implementation version */
     version?: string
-    /** Human-readable description */
     description?: string
-    /** Custom metadata */
     [key: string]: unknown
   }
 }
 
 /**
- * TypeScript type descriptor.
- *
- * @remarks
- * Used for runtime type information in capabilities.
- * Provides TypeScript type names as strings for documentation.
+ * Runtime type descriptor for capability introspection.
  */
 export interface TypeDescriptor<T = any> {
-  /** Type name (e.g., 'string', 'SignPsbtOptions', 'AddressInfo[]') */
+  /** Type name (e.g. `'string'`, `'SignPsbtOptions'`, `'AddressInfo[]'`). */
   name: string
-
-  /** Type kind */
+  /** Type kind. */
   kind: 'primitive' | 'object' | 'array' | 'union' | 'interface'
-
-  /** Human-readable description */
+  /** Human-readable description. */
   description?: string
-
-  /** For object/interface types: property descriptors */
+  /** Object/interface property descriptors. */
   properties?: Record<string, TypeDescriptor>
-
-  /** For array types: element type */
+  /** Array element type. */
   elementType?: TypeDescriptor
-
-  /** For union types: possible types */
+  /** Union member types. */
   unionTypes?: TypeDescriptor[]
-
-  /** Required properties (for object/interface types) */
+  /** Required properties for object/interface types. */
   required?: string[]
-
-  /** Example value */
+  /** Example value. */
   example?: T
 }
 
 // ============================================================================
-// Capability Type Helpers
+// Capability constructors
 // ============================================================================
 
 /**
- * Helper to create method capability with type inference.
+ * Construct a {@link MethodCapability} with type inference.
  */
 export function createMethodCapability<TParams, TReturn>(
   supported: boolean,
@@ -276,23 +196,16 @@ export function createMethodCapability<TParams, TReturn>(
     metadata?: MethodCapability<TParams, TReturn>['metadata']
   }
 ): MethodCapability<TParams, TReturn> {
-  return {
-    supported,
-    ...options,
-  }
+  return { supported, ...options }
 }
 
 /**
- * Helper to create type descriptor.
+ * Construct a {@link TypeDescriptor}.
  */
 export function describeType<T>(
   name: string,
   kind: TypeDescriptor['kind'],
   options?: Partial<Omit<TypeDescriptor<T>, 'name' | 'kind'>>
 ): TypeDescriptor<T> {
-  return {
-    name,
-    kind,
-    ...options,
-  }
+  return { name, kind, ...options }
 }

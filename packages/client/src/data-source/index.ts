@@ -23,4 +23,5 @@ export type {
   RuneCapability,
 } from './capabilities'
 export { createChainDataSource } from './create'
+export type { DsMethodsOf, MergedCapabilities } from './merged'
 export { mergeDataSources } from './merge'

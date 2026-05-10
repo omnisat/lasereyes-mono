@@ -81,6 +81,7 @@ import type {
   OrdCapability,
   RuneCapability,
 } from '../data-source/capabilities'
+import type { DsMethodsOf, MergedCapabilities } from '../data-source/merged'
 import type {
   MessageSigningProtocol,
   SignedPsbt,
@@ -135,10 +136,58 @@ const readonlyAccount = createReadOnlyAccount({
 // ============================================================================
 
 describe('chains', () => {
-  it('exposes ChainNetwork as a value object with id, type, and prefix', () => {
+  it('exposes ChainNetwork constants with literal-typed id and type fields', () => {
+    // Each chain const is structurally a `ChainNetwork`.
     expectTypeOf(MAINNET).toMatchTypeOf<ChainNetwork>()
-    expectTypeOf(MAINNET.id).toEqualTypeOf<NetworkId>()
-    expectTypeOf(MAINNET.type).toEqualTypeOf<NetworkType>()
+
+    // Literal preservation: `defineChain<const T>` keeps the `id` and `type`
+    // fields as literal types on the exported const. This is load-bearing —
+    // `createLaserEyesConfig({ chains: [MAINNET, TESTNET4] })` relies on
+    // the literal IDs to constrain `transports` keys to `'mainnet' | 'testnet4'`.
+    expectTypeOf(MAINNET.id).toEqualTypeOf<'mainnet'>()
+    expectTypeOf(MAINNET.type).toEqualTypeOf<'mainnet'>()
+
+    // The literal is a subtype of the open union.
+    expectTypeOf<typeof MAINNET.id>().toMatchTypeOf<NetworkId>()
+    expectTypeOf<typeof MAINNET.type>().toMatchTypeOf<NetworkType>()
+  })
+
+  it('createChainDataSource accepts both NetworkId string and ChainNetwork value', () => {
+    // Both forms must be accepted by the constructor and produce the same
+    // shape of data source (`network` field is canonical `ChainNetwork`).
+    const dsFromString = createChainDataSource({ network: 'mainnet' })
+    const dsFromValue = createChainDataSource({ network: MAINNET })
+    expectTypeOf(dsFromString.network).toEqualTypeOf<ChainNetwork>()
+    expectTypeOf(dsFromValue.network).toEqualTypeOf<ChainNetwork>()
+  })
+
+  it('vendor createDataSource factories accept both forms', () => {
+    const mempoolFromString = createMempoolDataSource({ network: 'mainnet' })
+    const mempoolFromValue = createMempoolDataSource({ network: MAINNET })
+    expectTypeOf(mempoolFromString.network).toEqualTypeOf<ChainNetwork>()
+    expectTypeOf(mempoolFromValue.network).toEqualTypeOf<ChainNetwork>()
+
+    const sandshrewFromString = createSandshrewDataSource({ network: 'mainnet', apiKey: 'k' })
+    expectTypeOf(sandshrewFromString.network).toEqualTypeOf<ChainNetwork>()
+
+    const maestroFromString = createMaestroDataSource({ network: 'mainnet', apiKey: 'k' })
+    expectTypeOf(maestroFromString.network).toEqualTypeOf<ChainNetwork>()
+  })
+
+  it('createClient accepts both NetworkId string and ChainNetwork value', () => {
+    const ds = createMempoolDataSource({ network: 'mainnet' })
+    const c1 = createClient({ network: 'mainnet', dataSource: ds })
+    const c2 = createClient({ network: MAINNET, dataSource: ds })
+    expectTypeOf(c1.config.network).toEqualTypeOf<ChainNetwork>()
+    expectTypeOf(c2.config.network).toEqualTypeOf<ChainNetwork>()
+  })
+
+  it('createWalletClient accepts both NetworkId string and ChainNetwork value', () => {
+    const ds = createMempoolDataSource({ network: 'mainnet' })
+    const wc1 = createWalletClient({ network: 'mainnet', dataSource: ds, account: walletAccount })
+    const wc2 = createWalletClient({ network: MAINNET, dataSource: ds, account: walletAccount })
+    expectTypeOf(wc1.config.network).toEqualTypeOf<ChainNetwork>()
+    expectTypeOf(wc2.config.network).toEqualTypeOf<ChainNetwork>()
   })
 })
 
@@ -297,7 +346,12 @@ describe('createClient', () => {
     const ds = createChainDataSource({ network: MAINNET }).extend(baseCap)
     const client = createClient({ network: MAINNET, dataSource: ds })
 
-    expectTypeOf(client.config.network).toEqualTypeOf<typeof MAINNET>()
+    // `ClientConfig.network` is typed as the broad `ChainNetwork` — chain
+    // literal types are NOT yet threaded through `createClient`. (Phase 10
+    // introduces per-chain precision via the keystone `getClient(config,
+    // { chainId })`.) `dsMethods` IS threaded through, so `dataSource`
+    // retains its precise type.
+    expectTypeOf(client.config.network).toEqualTypeOf<ChainNetwork>()
     expectTypeOf(client.config.dataSource).toEqualTypeOf<typeof ds>()
   })
 
@@ -731,5 +785,247 @@ describe('broadcastPsbt', () => {
 
     // @ts-expect-error — signingActions's broadcastPsbt needs btcBroadcastTransaction.
     wc.extend(signingActions(signer))
+  })
+})
+
+// ============================================================================
+// 14. Anti-clobber — `.extend()` rejects redeclaring reserved members
+//
+// This is the viem-style `Extension<Reserved>` constraint at work. The
+// factory's return type cannot redeclare keys that the receiver reserves
+// (e.g. `config`, `extend` on Client/WalletClient; `network`,
+// `getCapabilities`, `extend` on ChainDataSource). Other keys are permitted.
+// ============================================================================
+
+describe('Extension anti-clobber', () => {
+  it('Client.extend rejects redeclaring `config`', () => {
+    const ds = createChainDataSource({ network: MAINNET }).extend(baseCap)
+    const c = createClient({ network: MAINNET, dataSource: ds })
+
+    // @ts-expect-error — `config` is a reserved member of Client.
+    c.extend(() => ({ config: 'oops' }))
+  })
+
+  it('Client.extend rejects redeclaring `extend`', () => {
+    const ds = createChainDataSource({ network: MAINNET }).extend(baseCap)
+    const c = createClient({ network: MAINNET, dataSource: ds })
+
+    // @ts-expect-error — `extend` is a reserved member of Client.
+    c.extend(() => ({ extend: () => 'oops' }))
+  })
+
+  it('Client.extend permits adding non-reserved keys with arbitrary value types', () => {
+    const ds = createChainDataSource({ network: MAINNET }).extend(baseCap)
+    const c = createClient({ network: MAINNET, dataSource: ds }).extend(() => ({
+      foo: () => 'bar' as const,
+      lastBlock: 12345,
+      meta: { source: 'mempool' as const },
+    }))
+
+    expectTypeOf(c.foo).toEqualTypeOf<() => 'bar'>()
+    expectTypeOf(c.lastBlock).toEqualTypeOf<number>()
+    expectTypeOf(c.meta).toMatchTypeOf<{ source: 'mempool' }>()
+  })
+
+  it('WalletClient.extend rejects redeclaring `config`', () => {
+    const ds = createChainDataSource({ network: MAINNET }).extend(baseCap)
+    const wc = createWalletClient({
+      network: MAINNET,
+      dataSource: ds,
+      account: walletAccount,
+    })
+
+    // @ts-expect-error — `config` is a reserved member of WalletClient.
+    wc.extend(() => ({ config: 'oops' }))
+  })
+
+  it('WalletClient.extend rejects redeclaring `extend`', () => {
+    const ds = createChainDataSource({ network: MAINNET }).extend(baseCap)
+    const wc = createWalletClient({
+      network: MAINNET,
+      dataSource: ds,
+      account: walletAccount,
+    })
+
+    // @ts-expect-error — `extend` is a reserved member of WalletClient.
+    wc.extend(() => ({ extend: () => 'oops' }))
+  })
+
+  it('ChainDataSource.extend rejects redeclaring `network`', () => {
+    const ds = createChainDataSource({ network: MAINNET })
+
+    // @ts-expect-error — `network` is a reserved member of ChainDataSource.
+    ds.extend(() => ({ network: MAINNET }))
+  })
+
+  it('ChainDataSource.extend rejects redeclaring `getCapabilities`', () => {
+    const ds = createChainDataSource({ network: MAINNET })
+
+    // @ts-expect-error — `getCapabilities` is reserved on ChainDataSource.
+    ds.extend(() => ({ getCapabilities: () => [] }))
+  })
+
+  it('ChainDataSource.extend rejects redeclaring `extend`', () => {
+    const ds = createChainDataSource({ network: MAINNET })
+
+    // @ts-expect-error — `extend` is reserved on ChainDataSource.
+    ds.extend(() => ({ extend: () => 'oops' }))
+  })
+
+  it('ChainDataSource.extend permits adding capability methods', () => {
+    const ds = createChainDataSource({ network: MAINNET }).extend(() => ({
+      myCustomFetch: (id: string) => Promise.resolve({ id }),
+    }))
+
+    expectTypeOf(ds.myCustomFetch).parameter(0).toEqualTypeOf<string>()
+    expectTypeOf(ds.myCustomFetch).returns.resolves.toMatchTypeOf<{ id: string }>()
+  })
+
+  it('Base members survive extension on Client', () => {
+    const ds = createChainDataSource({ network: MAINNET }).extend(baseCap)
+    const extended = createClient({ network: MAINNET, dataSource: ds }).extend(() => ({
+      foo: () => 1,
+    }))
+
+    // After extension, `config` and `extend` are still reachable.
+    // (Note: `network` is `ChainNetwork`, not `typeof MAINNET` — Client doesn't
+    // thread chain precision yet; that's Phase 10's keystone work.)
+    expectTypeOf(extended.config).toMatchTypeOf<{ network: ChainNetwork }>()
+    expectTypeOf(extended.extend).toMatchTypeOf<Function>()
+  })
+
+  it('Base members survive extension on ChainDataSource', () => {
+    const ds = createChainDataSource({ network: MAINNET }).extend(() => ({
+      thing: () => 'x' as const,
+    }))
+
+    // `ds.network` is `ChainNetwork` — `createChainDataSource` doesn't thread
+    // chain precision into the data source's network field.
+    expectTypeOf(ds.network).toEqualTypeOf<ChainNetwork>()
+    expectTypeOf(ds.getCapabilities).toMatchTypeOf<Function>()
+    expectTypeOf(ds.extend).toMatchTypeOf<Function>()
+    expectTypeOf(ds.thing).toEqualTypeOf<() => 'x'>()
+  })
+})
+
+// ============================================================================
+// 15. `MergedCapabilities<T>` — fold a tuple of ChainDataSource into one
+// intersection of dsMethods, with the inherited index signature stripped.
+//
+// This is the type-level companion to `mergeDataSources` (the runtime fold).
+// Phase 10's keystone consumes it to give precisely-typed merged clients.
+// ============================================================================
+
+// Module-level fixtures (declare's must live here, not inside `it()` bodies).
+const _sandshrewForMerge = createSandshrewDataSource({ network: MAINNET, apiKey: 'k' })
+const _mempoolForMerge = createMempoolDataSource({ network: MAINNET })
+const _maestroForMerge = createMaestroDataSource({ network: MAINNET, apiKey: 'k' })
+
+// User-defined capability — must `extends ActionGroup` to satisfy
+// `ChainDataSource<dsMethods extends ActionGroup>`. (Currently a ceremony
+// requirement; revisit if/when we relax the constraint package-wide.)
+interface _MyCustom extends ActionGroupBrand {
+  myCustomFetch(id: string): Promise<{ data: number }>
+}
+type ActionGroupBrand = { [k: string]: (...args: any[]) => any }
+
+declare const _customA: ChainDataSource<_MyCustom>
+
+declare const _cap1: ChainDataSource<{ a: () => Promise<1>; [k: string]: (...args: any[]) => any }>
+declare const _cap2: ChainDataSource<{ b: () => Promise<2>; [k: string]: (...args: any[]) => any }>
+declare const _cap3: ChainDataSource<{ c: () => Promise<3>; [k: string]: (...args: any[]) => any }>
+declare const _cap4: ChainDataSource<{ d: () => Promise<4>; [k: string]: (...args: any[]) => any }>
+declare const _cap5: ChainDataSource<{ e: () => Promise<5>; [k: string]: (...args: any[]) => any }>
+
+declare const _mergedTwo: MergedCapabilities<
+  readonly [typeof _sandshrewForMerge, typeof _mempoolForMerge]
+>
+declare const _mergedTen: MergedCapabilities<
+  readonly [
+    typeof _cap1,
+    typeof _cap2,
+    typeof _cap3,
+    typeof _cap4,
+    typeof _cap5,
+    typeof _cap1,
+    typeof _cap2,
+    typeof _cap3,
+    typeof _cap4,
+    typeof _cap5,
+  ]
+>
+
+describe('DsMethodsOf', () => {
+  it('extracts dsMethods from a ChainDataSource', () => {
+    type Extracted = DsMethodsOf<typeof _sandshrewForMerge>
+    expectTypeOf<Extracted>().toMatchTypeOf<BaseCapability>()
+    expectTypeOf<Extracted>().toMatchTypeOf<RuneCapability>()
+  })
+
+  it('returns never for a non-ChainDataSource type', () => {
+    expectTypeOf<DsMethodsOf<string>>().toEqualTypeOf<never>()
+    expectTypeOf<DsMethodsOf<{ foo: 1 }>>().toEqualTypeOf<never>()
+  })
+})
+
+describe('MergedCapabilities', () => {
+  it("single-element tuple → that element's dsMethods are reachable", () => {
+    type Single = MergedCapabilities<readonly [typeof _mempoolForMerge]>
+    expectTypeOf<Single>().toMatchTypeOf<BaseCapability>()
+  })
+
+  it('two-element tuple → merged type extends each component capability', () => {
+    type Pair = MergedCapabilities<readonly [typeof _sandshrewForMerge, typeof _mempoolForMerge]>
+    expectTypeOf<Pair>().toMatchTypeOf<BaseCapability>()
+    expectTypeOf<Pair>().toMatchTypeOf<RuneCapability>()
+    expectTypeOf<Pair>().toMatchTypeOf<AlkaneCapability>()
+    expectTypeOf<Pair>().toMatchTypeOf<InscriptionCapability>()
+    expectTypeOf<Pair>().toMatchTypeOf<OrdCapability>()
+  })
+
+  it('three-element tuple — adding maestro brings Brc20Capability into the merge', () => {
+    type Triple = MergedCapabilities<
+      readonly [typeof _sandshrewForMerge, typeof _mempoolForMerge, typeof _maestroForMerge]
+    >
+    expectTypeOf<Triple>().toMatchTypeOf<Brc20Capability>()
+    expectTypeOf<Triple>().toMatchTypeOf<RuneCapability>()
+  })
+
+  it('strips the index signature from the merged type', () => {
+    // If the inherited index signature `[k: string]: AnyFn` flowed through,
+    // `string extends keyof Single` would be `true`. WithoutIndexSig strips
+    // it so only declared method keys remain.
+    type Single = MergedCapabilities<readonly [typeof _mempoolForMerge]>
+    expectTypeOf<string extends keyof Single ? true : false>().toEqualTypeOf<false>()
+  })
+
+  it('keys not present in the source array are correctly absent', () => {
+    // mempool alone is BaseCapability-shaped — no rune methods.
+    type MempoolOnly = MergedCapabilities<readonly [typeof _mempoolForMerge]>
+    expectTypeOf<'runesGetAddressBalances' extends keyof MempoolOnly ? true : false>().toEqualTypeOf<
+      false
+    >()
+  })
+
+  it('declared methods are reachable on a value of the merged type', () => {
+    expectTypeOf(_mergedTwo.btcGetBalance).toEqualTypeOf<BaseCapability['btcGetBalance']>()
+    expectTypeOf(_mergedTwo.runesGetAddressBalances).toEqualTypeOf<
+      RuneCapability['runesGetAddressBalances']
+    >()
+    expectTypeOf(_mergedTwo.alkanesGetByAddress).toEqualTypeOf<
+      AlkaneCapability['alkanesGetByAddress']
+    >()
+    expectTypeOf(_mergedTwo.ordGetAddress).toEqualTypeOf<OrdCapability['ordGetAddress']>()
+  })
+
+  it('user-defined custom capabilities flow through into the merge', () => {
+    type Mixed = MergedCapabilities<readonly [typeof _customA, typeof _mempoolForMerge]>
+    expectTypeOf<Mixed>().toMatchTypeOf<_MyCustom>()
+    expectTypeOf<Mixed>().toMatchTypeOf<BaseCapability>()
+  })
+
+  it('handles deep recursion (10-element tuple) without hitting TS limits', () => {
+    expectTypeOf(_mergedTen.a).toEqualTypeOf<() => Promise<1>>()
+    expectTypeOf(_mergedTen.e).toEqualTypeOf<() => Promise<5>>()
   })
 })

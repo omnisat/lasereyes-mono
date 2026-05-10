@@ -5,14 +5,28 @@
  * @module adapters/unisat
  */
 
-import type { NetworkId } from '@omnisat/lasereyes-client'
+import type { Inscription, NetworkId } from '@omnisat/lasereyes-client'
 import { AddressType } from '@omnisat/lasereyes-client/utils'
 import type { Account, SignedPsbt } from '@omnisat/lasereyes-client/wallet'
 import * as bitcoin from 'bitcoinjs-lib'
 import { UNISAT_ICON } from '../constants/wallet-icons'
 import { announceWallet } from '../detection/announcements'
 import type { ProviderCapabilities } from '../types/provider'
-import { BaseAdapter } from './base'
+import { BaseAdapter, type BitcoinProviderAdapter } from './base'
+
+/**
+ * Unisat's internal network enum strings (returned by `getChain().enum`).
+ *
+ * @internal
+ */
+const UnisatNetwork = {
+  MAINNET: 'BITCOIN_MAINNET',
+  TESTNET: 'BITCOIN_TESTNET',
+  TESTNET4: 'BITCOIN_TESTNET4',
+  SIGNET: 'BITCOIN_SIGNET',
+  FRACTAL_MAINNET: 'FRACTAL_BITCOIN_MAINNET',
+  FRACTAL_TESTNET: 'FRACTAL_BITCOIN_TESTNET',
+} as const
 
 /**
  * Adapter for Unisat Wallet.
@@ -25,7 +39,7 @@ export class UnisatAdapter extends BaseAdapter {
   readonly walletId = 'unisat'
   readonly walletName = 'Unisat Wallet'
 
-  request: BaseAdapter['request'] = async (method, params) => {
+  async request(method: string, params?: { [key: string]: unknown }): Promise<unknown> {
     switch (method) {
       case 'bitcoin_requestAccounts':
         return this.handleRequestAccounts()
@@ -367,8 +381,12 @@ export class UnisatAdapter extends BaseAdapter {
    * Normalize Unisat inscription to standard format
    */
   private normalizeInscription(unisatInsc: any): Inscription {
+    // Unisat's inscription shape doesn't carry every field the standard
+    // `Inscription` requires (no `output`, `height`); stub those defensively.
+    // The location string carries `txid:vout` which we surface as `output`.
     return {
       id: unisatInsc.inscriptionId,
+      inscriptionId: unisatInsc.inscriptionId,
       number: unisatInsc.inscriptionNumber,
       address: unisatInsc.address,
       contentType: unisatInsc.contentType,
@@ -376,8 +394,9 @@ export class UnisatAdapter extends BaseAdapter {
       content: unisatInsc.content,
       outputValue: unisatInsc.outputValue,
       location: unisatInsc.location,
+      output: unisatInsc.output ?? unisatInsc.location?.split(':').slice(0, 2).join(':') ?? '',
       genesisTransaction: unisatInsc.genesisTransaction,
-      timestamp: unisatInsc.timestamp,
+      height: unisatInsc.genesisHeight ?? 0,
     }
   }
 }

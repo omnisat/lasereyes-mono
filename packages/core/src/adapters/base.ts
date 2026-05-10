@@ -1,42 +1,45 @@
 /**
- * Base adapter class for normalizing wallet provider APIs.
+ * Base adapter — translates a non-conforming wallet API to the Bitcoin
+ * Provider Standard.
+ *
+ * @remarks
+ * Adapters are temporary: once a wallet implements {@link BitcoinProvider}
+ * natively, its adapter file can be deleted; only the connector remains.
  *
  * @module adapters/base
  */
 
-import type { BitcoinProvider, ProviderCapabilities, ProviderRpcError } from '../types/provider'
+import { ProviderErrorCode, ProviderRpcError } from '@omnisat/lasereyes-client'
+import type { BitcoinProvider, ProviderCapabilities } from '../types/provider'
 
 /**
- * Bitcoin Provider Adapter.
- * Wraps non-conforming wallet providers and normalizes their API.
- *
- * @remarks
- * Adapters translate wallet-specific APIs to the standard provider interface.
- * Once wallets conform to the standard, adapters can be removed.
+ * Adapter interface — a {@link BitcoinProvider} that also exposes the
+ * underlying wallet object for wallet-specific escapes.
  */
 export interface BitcoinProviderAdapter extends BitcoinProvider {
   /**
-   * Access to underlying wallet provider.
-   * Use for wallet-specific methods not in the standard.
+   * The underlying wallet provider object.
+   *
+   * @remarks
+   * Use only for wallet-specific methods not yet expressible through the
+   * standard `request()` interface. Prefer `request()` whenever possible.
    */
   readonly rawProvider: any
 
-  /** Wallet identifier (e.g., 'unisat', 'xverse') */
+  /** Wallet identifier (e.g. `'unisat'`, `'xverse'`). */
   readonly walletId: string
 
-  /** Human-readable wallet name */
+  /** Human-readable wallet name. */
   readonly walletName: string
 }
 
 /**
- * Base adapter class that wallet-specific adapters extend.
+ * Base class wallet-specific adapters extend.
  *
- * @remarks
- * Provides common functionality for normalizing wallet APIs to the
- * Bitcoin Provider Standard. Each wallet adapter translates its
- * wallet-specific API to the standard RPC methods.
- *
- * Once a wallet conforms to the standard, its adapter can be removed.
+ * Each adapter implements {@link request} to dispatch standard
+ * `bitcoin_*` method names to the wallet's native API, and
+ * {@link buildCapabilities} to describe what the wallet supports per
+ * network.
  */
 export abstract class BaseAdapter implements BitcoinProviderAdapter {
   abstract readonly walletId: string
@@ -48,20 +51,21 @@ export abstract class BaseAdapter implements BitcoinProviderAdapter {
   }
 
   /**
-   * Handle RPC requests.
-   * Subclasses implement this to translate standard methods to wallet-specific APIs.
+   * Translate a standard Bitcoin RPC call to the wallet's native API.
+   * Subclasses dispatch on `method` and call into `rawProvider`.
    */
-  abstract request: BitcoinProviderAdapter['request']
+  abstract request(method: string, params?: { [key: string]: unknown }): Promise<unknown>
 
   /**
-   * Build capabilities for this wallet.
-   * Subclasses implement this to describe what methods they support.
+   * Per-network capability matrix this wallet exposes.
+   * Subclasses return a `ProviderCapabilities` shaped to the wallet.
    */
   protected abstract buildCapabilities(): ProviderCapabilities
 
-  /**
-   * Event methods delegate to raw provider.
-   */
+  // ============================================================================
+  // Event delegation
+  // ============================================================================
+
   on(event: string, listener: (...args: any[]) => void): void {
     if (this.rawProvider.on) {
       this.rawProvider.on(event, listener)
@@ -76,21 +80,20 @@ export abstract class BaseAdapter implements BitcoinProviderAdapter {
     }
   }
 
-  /**
-   * Helper: Create ProviderRpcError
-   */
+  // ============================================================================
+  // Error helpers
+  // ============================================================================
+
+  /** Construct a {@link ProviderRpcError} for this adapter. */
   protected createError(code: number, message: string, data?: unknown): ProviderRpcError {
-    const error = new Error(message) as ProviderRpcError
-    error.name = 'ProviderRpcError'
-    error.code = code
-    error.data = data
-    return error
+    return new ProviderRpcError(code, message, data)
   }
 
-  /**
-   * Helper: Throw method not supported error
-   */
+  /** Throw "method not supported" with the standard JSON-RPC code. */
   protected throwMethodNotSupported(method: string): never {
-    throw this.createError(-32601, `Method ${method} not supported by ${this.walletName}`)
+    throw this.createError(
+      ProviderErrorCode.METHOD_NOT_FOUND,
+      `Method ${method} not supported by ${this.walletName}`
+    )
   }
 }

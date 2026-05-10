@@ -1,5 +1,4 @@
 export * from './content'
-export * from './networks'
 export * from './protocols'
 export * from './settings'
 export * from './signing-protocol'

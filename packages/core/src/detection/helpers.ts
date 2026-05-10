@@ -4,45 +4,61 @@
  * @module detection/helpers
  */
 
+import { loadKeplrWalletAdapter } from '../adapters/keplr'
+import { loadLeatherWalletAdapter } from '../adapters/leather'
+import { loadMagicEdenWalletAdapter } from '../adapters/magic-eden'
+import { loadOkxWalletAdapter } from '../adapters/okx'
+import { loadOpNetWalletAdapter } from '../adapters/op-net'
+import { loadOrangeWalletAdapter } from '../adapters/orange'
+import { loadOylWalletAdapter } from '../adapters/oyl'
+import { loadPhantomWalletAdapter } from '../adapters/phantom'
+import { loadSparrowWalletAdapter } from '../adapters/sparrow'
+import { loadTokeoWalletAdapter } from '../adapters/tokeo'
 import { loadUnisatWalletAdapter } from '../adapters/unisat'
 import { loadXverseWalletAdapter } from '../adapters/xverse'
 
 /**
- * Convenience function to load all built-in wallet adapters.
+ * Convenience: load every built-in wallet adapter.
  *
  * @remarks
- * Call this before initializing core if you want to support all wallets.
- * Each loader checks if wallet exists and announces if found.
+ * Each loader checks for the wallet's injected provider and, if found,
+ * announces it via the EIP-6963-style discovery channel
+ * ({@link announceWallet}). Wallets not installed silently no-op.
  *
- * This function imports all built-in adapters, which may increase bundle size.
- * For production apps with tree-shaking, consider importing only the adapters
- * you need explicitly.
+ * This pulls in every adapter — for production apps with tree-shaking,
+ * import only the loaders you need.
  *
  * @example
  * ```ts
  * import { createLaserEyesCore, loadAllWallets } from '@omnisat/lasereyes-core'
  *
  * const core = createLaserEyesCore()
- *
- * // Load all built-in wallets (optional convenience)
  * loadAllWallets()
- *
  * await core.initialize()
  * ```
  *
  * @example
  * ```ts
- * // Alternative: Load only specific wallets for smaller bundle
+ * // Smaller bundle: load only specific wallets.
  * import { createLaserEyesCore } from '@omnisat/lasereyes-core'
  * import { loadUnisatWalletAdapter } from '@omnisat/lasereyes-core/adapters/unisat'
  *
  * const core = createLaserEyesCore()
- * loadUnisatWalletAdapter() // Only Unisat
+ * loadUnisatWalletAdapter()
  * await core.initialize()
  * ```
  */
 export function loadAllWallets(): void {
   loadUnisatWalletAdapter()
   loadXverseWalletAdapter()
-  // Add more wallet loaders here as they are implemented
+  loadLeatherWalletAdapter()
+  loadOkxWalletAdapter()
+  loadOylWalletAdapter()
+  loadMagicEdenWalletAdapter()
+  loadPhantomWalletAdapter()
+  loadOrangeWalletAdapter()
+  loadOpNetWalletAdapter()
+  loadSparrowWalletAdapter()
+  loadTokeoWalletAdapter()
+  loadKeplrWalletAdapter()
 }

@@ -1,93 +1,37 @@
 /**
- * Xverse wallet connector.
+ * Xverse connector.
+ *
+ * @remarks
+ * Xverse uses the `sats-connect` protocol rather than a plain
+ * `window`-injected provider. Detection looks for
+ * `window.XverseProviders?.BitcoinProvider`. Mobile uses a deep link
+ * fallback.
  *
  * @module connectors/xverse
  */
 
-import { loadXverseWalletAdapter } from '../adapters/xverse'
+import { XverseAdapter } from '../adapters/xverse'
+import { XVERSE_ICON } from '../constants/wallet-icons'
 import type { CreateConnectorFn } from '../types/connector'
-import type { BitcoinProviderAdapter } from '../types/provider'
-import { BaseConnector } from './base'
+import { injected } from './injected'
 
 /**
- * Xverse Wallet connector.
- *
- * @remarks
- * Wraps the Xverse adapter and provides lifecycle management.
- * Xverse provides separate payment (P2WPKH) and ordinals (P2TR) addresses.
- */
-export class XverseConnector extends BaseConnector {
-  readonly id = 'xverse'
-  readonly name = 'Xverse Wallet'
-  readonly icon = 'https://www.xverse.app/favicon.ico'
-  readonly rdns = 'app.xverse.wallet'
-
-  /**
-   * Load Xverse adapter.
-   */
-  protected getProvider(): BitcoinProviderAdapter | null {
-    return loadXverseWalletAdapter()
-  }
-
-  /**
-   * Get download URL for Xverse extension.
-   */
-  getDownloadUrl(): string {
-    return 'https://www.xverse.app/download'
-  }
-
-  /**
-   * Handle mobile redirect for Xverse.
-   *
-   * @remarks
-   * Xverse supports mobile wallet connection via deep link.
-   */
-  connectMobile(): void {
-    if (typeof window === 'undefined') return
-
-    // Check if on mobile
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
-    if (!isMobile) return
-
-    // Redirect to Xverse mobile app
-    const url = `xverse://browser?url=${encodeURIComponent(window.location.href)}`
-    window.location.href = url
-  }
-
-  /**
-   * Override connect to handle mobile redirect.
-   */
-  async connect() {
-    // Check if adapter is available
-    if (!this.isReady() && typeof window !== 'undefined') {
-      // Check if on mobile
-      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
-      if (isMobile) {
-        this.connectMobile()
-        // Wait for app to return (or timeout)
-        throw new Error('Redirecting to Xverse mobile app...')
-      }
-    }
-
-    return super.connect()
-  }
-}
-
-/**
- * Factory function to create Xverse connector.
- *
- * @returns Connector factory function
+ * Xverse Wallet connector factory.
  *
  * @example
  * ```ts
- * import { createLaserEyesCore } from '@omnisat/lasereyes-core'
- * import { xverseConnector } from '@omnisat/lasereyes-core/connectors'
- *
- * const core = createLaserEyesCore({
- *   connectors: [xverseConnector()]
- * })
+ * import { xverse } from '@omnisat/lasereyes-core'
+ * createLaserEyesConfig({ connectors: [xverse()] })
  * ```
  */
-export function xverseConnector(): CreateConnectorFn {
-  return config => new XverseConnector(config)
+export function xverse(): CreateConnectorFn {
+  return injected({
+    id: 'xverse',
+    name: 'Xverse Wallet',
+    icon: XVERSE_ICON,
+    rdns: 'app.xverse.wallet',
+    getProvider: (w) =>
+      (w as { XverseProviders?: { BitcoinProvider?: unknown } }).XverseProviders?.BitcoinProvider,
+    adapter: XverseAdapter,
+  })
 }

@@ -15,7 +15,7 @@
  * @module vendors/maestro
  */
 
-import type { ChainNetwork } from '../../chains'
+import type { ChainNetwork, NetworkId } from '../../chains'
 import type {
   BaseCapability,
   Brc20Capability,
@@ -74,7 +74,13 @@ type MaestroCapabilities = Prettify<
  * ```
  */
 export function createDataSource(
-  config: { network: ChainNetwork } & MaestroConfig
+  config: {
+    /**
+     * The Bitcoin network. Either a {@link NetworkId} string
+     * (e.g. `'mainnet'`) or a {@link ChainNetwork} value (e.g. `MAINNET`).
+     */
+    network: NetworkId | ChainNetwork
+  } & MaestroConfig
 ): ChainDataSource<MaestroCapabilities> {
   return createChainDataSource({ network: config.network })
     .extend(baseCapabilities(config))

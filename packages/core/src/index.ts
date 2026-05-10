@@ -1,46 +1,121 @@
-import { LaserEyesClient } from './client'
-import { createConfig, createStores } from './client/utils'
+/**
+ * `@omnisat/lasereyes-core` — wagmi-shaped Bitcoin wallet integration.
+ *
+ * @remarks
+ * The core package owns:
+ * - {@link LaserEyesConfig} — the value bundle (chains, connectors, transports, state, storage)
+ * - {@link createLaserEyesConfig} — the factory
+ * - Reactive state atoms ({@link LaserEyesState})
+ * - Phase 9 free-function actions over the config
+ * - Wallet adapters and connectors (EIP-1193-shaped)
+ * - EIP-6963-style discovery
+ *
+ * Read/write data operations are typed through the client package's
+ * action layer — `getClient(config)` builds a bare `Client` for
+ * composing with bare actions imported from `@omnisat/lasereyes-client`.
+ *
+ * @module @omnisat/lasereyes-core
+ */
 
-export { LaserEyesClient, createStores, createConfig }
-export * from './client/modules'
-export * from './client/providers'
-export * from './client/types'
-export * from './constants'
-export * from './lib/data-sources/manager'
-export * from './types'
+// ============================================================================
+// Config + state
+// ============================================================================
 
-// Resolve re-export ambiguity: network constants (strings) take precedence over
-// the Network object exports in types/network (same names, different shapes).
 export {
+  createLaserEyesConfig,
+  type CreateLaserEyesConfigOptions,
+  type LaserEyesConfig,
+  type NetworkTransports,
+} from './config'
+export { createState, type LaserEyesState } from './state'
+export {
+  createStorage,
+  type CreateStorageOptions,
+  type Storage,
+} from './storage'
+
+// ============================================================================
+// Read-only typed client (used by data actions; also a public surface)
+// ============================================================================
+
+export { getClient } from './client'
+
+// ============================================================================
+// Phase 9 free-function actions over config
+// ============================================================================
+
+export * from './actions'
+
+// ============================================================================
+// Adapters + connectors + discovery
+// ============================================================================
+
+export * from './adapters'
+export * from './connectors'
+export * from './detection'
+
+// ============================================================================
+// Provider standard + connector types
+// ============================================================================
+
+export type {
+  BitcoinProvider,
+  BitcoinProviderEvent,
+  BitcoinRpcMethod,
+  ConnectInfo,
+  DisconnectInfo,
+  MethodCapability,
+  NetworkCapabilities,
+  ProviderCapabilities,
+  ProviderMessage,
+  TypeDescriptor,
+} from './types/provider'
+export {
+  createMethodCapability,
+  describeType,
+  ProviderErrorCode,
+  ProviderRpcError,
+} from './types/provider'
+
+export type {
+  ConnectionStatus,
+  Connector,
+  ConnectorConfig,
+  ConnectorMetadata,
+  ConnectResult,
+  CreateConnectorFn,
+} from './types/connector'
+
+// ============================================================================
+// Re-export commonly-used client types for convenience
+// ============================================================================
+
+export {
+  defineChain,
   FRACTAL_MAINNET,
   FRACTAL_TESTNET,
   MAINNET,
+  NETWORKS,
   OYLNET,
   REGTEST,
   SIGNET,
   TESTNET,
   TESTNET4,
-} from './constants'
-// Resolve re-export ambiguity: prefer legacy client SignMessageOptions (toSignAddress) so that
-// existing wallet providers continue to compile. The new provider type is accessed via
-// direct import from './types/provider' internally.
-export type { SignMessageOptions } from './client/types'
+} from '@omnisat/lasereyes-client'
+export type {
+  ChainNetwork,
+  NetworkId,
+  NetworkType,
+} from '@omnisat/lasereyes-client'
+export type {
+  Account,
+  AddressInfo,
+  AddressPurpose,
+  WalletAccount,
+} from '@omnisat/lasereyes-client/wallet'
 
-// Core state manager (new architecture)
-export { createLaserEyesCore, LaserEyesCore } from './core'
-export type { LaserEyesCoreConfig, NetworkConfig } from './core'
+// ============================================================================
+// Wallet constants (BINANCE, UNISAT, XVERSE, …) and other non-network constants
+// ============================================================================
 
-// Actions (new architecture)
-export * from './actions'
-
-// Detection helpers
-export { loadAllWallets } from './detection/helpers'
-
-// Connectors
-export * from './connectors'
-
-// Adapters (for advanced usage)
-export * from './adapters'
-
-// Detection
-export * from './detection'
+export * from './constants'
