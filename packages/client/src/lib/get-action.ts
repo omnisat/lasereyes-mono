@@ -59,12 +59,10 @@ export function getAction<
   name: string
 ): (...args: args) => returnType {
   const implicit = client[actionFn.name]
-  if (typeof implicit === 'function')
-    return implicit as (...args: args) => returnType
+  if (typeof implicit === 'function') return implicit as (...args: args) => returnType
 
   const explicit = client[name]
-  if (typeof explicit === 'function')
-    return explicit as (...args: args) => returnType
+  if (typeof explicit === 'function') return explicit as (...args: args) => returnType
 
   return (...args: args) => actionFn(client, ...args)
 }

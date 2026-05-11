@@ -37,10 +37,8 @@ import type { Client, ClientConfig } from './types'
  * @typeParam TAccount - The account type
  * @typeParam dsMethods - The data source capabilities
  */
-export interface WalletClientConfig<
-  TAccount extends Account,
-  dsMethods extends ActionGroup = {},
-> extends ClientConfig<dsMethods> {
+export interface WalletClientConfig<TAccount extends Account, dsMethods extends ActionGroup = {}>
+  extends ClientConfig<dsMethods> {
   /** The account providing address and key information. */
   account: TAccount
   /**
@@ -99,8 +97,6 @@ export type WalletClient<
    * @returns A new wallet client with the additional action methods
    */
   extend<TNew extends Extension<'config' | 'extend'>>(
-    factory: (
-      client: WalletClient<WalletConfig, TAccount, clientActions, dsMethods>
-    ) => TNew
+    factory: (client: WalletClient<WalletConfig, TAccount, clientActions, dsMethods>) => TNew
   ): WalletClient<WalletConfig, TAccount, Prettify<clientActions & TNew>, dsMethods>
 }

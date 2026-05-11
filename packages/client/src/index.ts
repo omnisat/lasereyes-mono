@@ -22,7 +22,7 @@ export {
   publicActions,
   waitForTransaction,
 } from './actions/public'
-
+export type { ChainNetwork, NetworkId, NetworkType } from './chains'
 // Chains
 export {
   defineChain,
@@ -39,7 +39,6 @@ export {
   TESTNET,
   TESTNET4,
 } from './chains'
-export type { ChainNetwork, NetworkId, NetworkType } from './chains'
 
 // Client (read-only) factory + types
 export { createClient } from './client'
@@ -47,10 +46,9 @@ export type { Client, ClientConfig } from './client/types'
 
 // Constants
 export { ALKANES, BRC20, BTC, RUNES } from './constants/protocols'
-
+export type { DsMethodsOf, MergedCapabilities } from './data-source'
 // Data sources
 export { createChainDataSource, mergeDataSources } from './data-source'
-export type { DsMethodsOf, MergedCapabilities } from './data-source'
 
 // Errors
 export {
@@ -64,13 +62,18 @@ export {
   PsbtBuildError,
 } from './errors'
 
+// getAction — override-aware action dispatch. Used internally by composed
+// actions; exposed for users (and the core package) doing their own
+// composition.
+export { getAction } from './lib/get-action'
+
 // Types
 export type {
   ActionGroup,
-  // Capabilities
-  AlkaneCapability,
   // Protocol domain types — alkane
   AlkaneBalance,
+  // Capabilities
+  AlkaneCapability,
   AlkaneOutpoint,
   BaseCapability,
   // Protocol domain types — brc20

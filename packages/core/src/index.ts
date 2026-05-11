@@ -22,23 +22,25 @@
 // ============================================================================
 
 export {
-  createLaserEyesConfig,
   type CreateLaserEyesConfigOptions,
+  createLaserEyesConfig,
   type LaserEyesConfig,
   type NetworkTransports,
 } from './config'
 export { createState, type LaserEyesState } from './state'
 export {
-  createStorage,
   type CreateStorageOptions,
+  createStorage,
   type Storage,
 } from './storage'
 
 // ============================================================================
-// Read-only typed client (used by data actions; also a public surface)
+// Typed clients — the bridge between core's state and the client package's
+// typed surface. Phase 10 keystones.
 // ============================================================================
 
 export { getClient } from './client'
+export { getWalletClient } from './wallet-client'
 
 // ============================================================================
 // Phase 9 free-function actions over config
@@ -59,6 +61,14 @@ export * from './detection'
 // ============================================================================
 
 export type {
+  ConnectionStatus,
+  Connector,
+  ConnectorConfig,
+  ConnectorMetadata,
+  ConnectResult,
+  CreateConnectorFn,
+} from './types/connector'
+export type {
   BitcoinProvider,
   BitcoinProviderEvent,
   BitcoinRpcMethod,
@@ -77,19 +87,15 @@ export {
   ProviderRpcError,
 } from './types/provider'
 
-export type {
-  ConnectionStatus,
-  Connector,
-  ConnectorConfig,
-  ConnectorMetadata,
-  ConnectResult,
-  CreateConnectorFn,
-} from './types/connector'
-
 // ============================================================================
 // Re-export commonly-used client types for convenience
 // ============================================================================
 
+export type {
+  ChainNetwork,
+  NetworkId,
+  NetworkType,
+} from '@omnisat/lasereyes-client'
 export {
   defineChain,
   FRACTAL_MAINNET,
@@ -101,11 +107,6 @@ export {
   SIGNET,
   TESTNET,
   TESTNET4,
-} from '@omnisat/lasereyes-client'
-export type {
-  ChainNetwork,
-  NetworkId,
-  NetworkType,
 } from '@omnisat/lasereyes-client'
 export type {
   Account,

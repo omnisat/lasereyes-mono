@@ -72,6 +72,9 @@ import {
   switchNetwork,
 } from '../actions'
 
+// — Phase 10 keystone —
+import { getWalletClient } from '../wallet-client'
+
 // — Domain types referenced in action signatures —
 import type {
   AlkaneBalance,
@@ -655,6 +658,50 @@ describe('Phase 9 — getClient', () => {
     // Imports here exercise the same paths Phase 9 actions use.
     const { getBalance: clientGetBalance } = await import('@omnisat/lasereyes-client')
     expectTypeOf(clientGetBalance(client, 'bc1q…')).resolves.toEqualTypeOf<string>()
+  })
+})
+
+// ============================================================================
+// Phase 10 — `getWalletClient` keystone
+//
+// Wagmi-faithful: returns a bare WalletClient by default (no `.extend()`
+// calls), or delegates entirely to `connector.getClient` when present.
+// Threads `<const config>` so chainId is narrowed to the config's chain
+// tuple.
+// ============================================================================
+
+describe('Phase 10 — getWalletClient', () => {
+  it('returns a Promise<WalletClient<…>> with config + extend reachable', async () => {
+    const wc = await getWalletClient(_typedConfig)
+    // Bare wallet client: `config` carries account + signer + network + dataSource.
+    expectTypeOf(wc.config.network).toMatchTypeOf<{ id: string }>()
+    expectTypeOf(wc.config.account).toMatchTypeOf<Account>()
+    expectTypeOf(wc.extend).toMatchTypeOf<Function>()
+  })
+
+  it('accepts an optional chainId narrowed to the config chains', () => {
+    getWalletClient(_typedConfig)
+    getWalletClient(_typedConfig, { chainId: 'mainnet' })
+    getWalletClient(_typedConfig, { chainId: 'testnet4' })
+
+    // @ts-expect-error — 'signet' is not in the config chain ID union.
+    getWalletClient(_typedConfig, { chainId: 'signet' })
+  })
+
+  it('default-generic config accepts any NetworkId', () => {
+    getWalletClient(_looseConfig)
+    getWalletClient(_looseConfig, { chainId: 'mainnet' })
+    getWalletClient(_looseConfig, { chainId: 'signet' })
+  })
+
+  it('returned wallet client composes with client-package action factories', async () => {
+    // Locks in the architectural pattern: bare keystone client + factories
+    // extended on top. Confirms the wallet client exposes the `.extend()`
+    // chain required by the client package's factory signatures.
+    const wc = await getWalletClient(_typedConfig)
+    const { signingActions, walletBtcActions } = await import('@omnisat/lasereyes-client/wallet')
+    const extended = wc.extend(signingActions()).extend(walletBtcActions())
+    expectTypeOf(extended.sendBtc).toMatchTypeOf<Function>()
   })
 })
 

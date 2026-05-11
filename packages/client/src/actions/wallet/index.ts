@@ -23,8 +23,8 @@
 import type { Account, AddressPurpose, WalletAccount } from '../../account/types'
 import type { WalletClient, WalletClientConfig } from '../../client/wallet-types'
 import type { ActionGroup, BaseCapability } from '../../data-source/capabilities'
-import { buildSendBtcPsbt } from '../../lib/psbt-builders'
 import { getAction } from '../../lib/get-action'
+import { buildSendBtcPsbt } from '../../lib/psbt-builders'
 import type { SignedPsbt, SignPsbtOptions } from '../../signer/types'
 import type { PaginatedResult, UTXO } from '../../types'
 import { broadcastTransaction, getUtxos as getUtxosByAddress } from '../public'
@@ -187,7 +187,10 @@ export async function getUtxos<
 export function walletBtcActions() {
   return <
     Config extends WalletClientConfig<WalletAccount, DS>,
-    DS extends Pick<BaseCapability, 'btcGetAddressUtxos' | 'btcBroadcastTransaction' | 'btcGetBalance'>,
+    DS extends Pick<
+      BaseCapability,
+      'btcGetAddressUtxos' | 'btcBroadcastTransaction' | 'btcGetBalance'
+    >,
     Actions extends RequiredSigningActions,
   >(
     client: WalletClient<Config, WalletAccount, Actions, DS>

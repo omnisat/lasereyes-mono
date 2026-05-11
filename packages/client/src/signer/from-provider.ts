@@ -40,10 +40,7 @@ import type { SignedPsbt, Signer, SignMessageOptions, SignPsbtOptions } from './
  * method satisfies this — including every `BitcoinProvider` instance.
  */
 export interface ProviderLike {
-  request(
-    method: string,
-    params?: { [key: string]: unknown }
-  ): Promise<unknown>
+  request(method: string, params?: { [key: string]: unknown }): Promise<unknown>
 }
 
 /**

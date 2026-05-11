@@ -12,7 +12,7 @@
  * @module signer
  */
 
-export { providerSigner, type ProviderLike } from './from-provider'
+export { type ProviderLike, providerSigner } from './from-provider'
 export type {
   MessageSigningProtocol,
   SignedPsbt,

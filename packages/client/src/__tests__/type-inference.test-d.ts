@@ -45,29 +45,19 @@ import {
   type TransferBrc20Params,
 } from '../actions/brc20'
 import {
+  type InscribeParams,
   inscribe,
   inscriptionActions,
   inscriptionWriteActions,
-  sendInscription,
-  type InscribeParams,
   type SendInscriptionParams,
+  sendInscription,
 } from '../actions/inscriptions'
 import { publicActions } from '../actions/public'
-import {
-  runeActions,
-  runeWriteActions,
-  sendRune,
-  type SendRuneParams,
-} from '../actions/runes'
-import {
-  broadcastPsbt,
-  signMessage,
-  signPsbt,
-  signingActions,
-} from '../actions/signing'
-import { getBalance, getUtxos, sendBtc, walletBtcActions } from '../actions/wallet'
+import { runeActions, runeWriteActions, type SendRuneParams, sendRune } from '../actions/runes'
+import { broadcastPsbt, signingActions, signMessage, signPsbt } from '../actions/signing'
 import type { SendBtcParams } from '../actions/wallet'
-import { MAINNET, type ChainNetwork, type NetworkId, type NetworkType } from '../chains'
+import { getBalance, getUtxos, sendBtc, walletBtcActions } from '../actions/wallet'
+import { type ChainNetwork, MAINNET, type NetworkId, type NetworkType } from '../chains'
 import { createClient } from '../client'
 import type { Client, ClientConfig } from '../client/types'
 import { createWalletClient } from '../client/wallet'
@@ -89,9 +79,6 @@ import type {
   SignMessageOptions,
   SignPsbtOptions,
 } from '../signer/types'
-import { createDataSource as createMaestroDataSource } from '../vendors/maestro'
-import { createDataSource as createMempoolDataSource } from '../vendors/mempool'
-import { createDataSource as createSandshrewDataSource } from '../vendors/sandshrew'
 import type {
   Brc20Balance,
   Brc20Info,
@@ -109,6 +96,9 @@ import type {
   UTXO,
 } from '../types'
 import { AddressType } from '../types/psbt'
+import { createDataSource as createMaestroDataSource } from '../vendors/maestro'
+import { createDataSource as createMempoolDataSource } from '../vendors/mempool'
+import { createDataSource as createSandshrewDataSource } from '../vendors/sandshrew'
 
 // ============================================================================
 // Fixtures (declared, never executed)
@@ -213,7 +203,9 @@ describe('Account', () => {
   })
 
   it('WalletAccount.getPublicKey accepts AddressPurpose and returns string', () => {
-    expectTypeOf(walletAccount.getPublicKey).parameter(0).toEqualTypeOf<AddressPurpose | undefined>()
+    expectTypeOf(walletAccount.getPublicKey)
+      .parameter(0)
+      .toEqualTypeOf<AddressPurpose | undefined>()
     expectTypeOf(walletAccount.getPublicKey).returns.toEqualTypeOf<string>()
   })
 })
@@ -236,9 +228,7 @@ describe('ChainDataSource', () => {
 
   it('mergeDataSources unions the capability sets of both inputs', () => {
     const dsBase = createChainDataSource({ network: MAINNET }).extend(baseCap)
-    const dsRuneOrd = createChainDataSource({ network: MAINNET })
-      .extend(runeCap)
-      .extend(ordCap)
+    const dsRuneOrd = createChainDataSource({ network: MAINNET }).extend(runeCap).extend(ordCap)
 
     const merged = mergeDataSources(dsBase, dsRuneOrd)
 
@@ -251,7 +241,9 @@ describe('ChainDataSource', () => {
     expectTypeOf(merged.ordGetAddress).toEqualTypeOf<OrdCapability['ordGetAddress']>()
 
     // The merged source is itself a ChainDataSource
-    expectTypeOf(merged).toMatchTypeOf<ChainDataSource<BaseCapability & RuneCapability & OrdCapability>>()
+    expectTypeOf(merged).toMatchTypeOf<
+      ChainDataSource<BaseCapability & RuneCapability & OrdCapability>
+    >()
   })
 })
 
@@ -288,7 +280,9 @@ describe('Vendor createDataSource factories', () => {
     const ds = createMaestroDataSource({ network: MAINNET, apiKey: 'k' })
     expectTypeOf(ds.btcGetBalance).toEqualTypeOf<BaseCapability['btcGetBalance']>()
     expectTypeOf(ds.brc20GetByTicker).toEqualTypeOf<Brc20Capability['brc20GetByTicker']>()
-    expectTypeOf(ds.inscriptionsGetInfo).toEqualTypeOf<InscriptionCapability['inscriptionsGetInfo']>()
+    expectTypeOf(ds.inscriptionsGetInfo).toEqualTypeOf<
+      InscriptionCapability['inscriptionsGetInfo']
+    >()
     // Partial rune: only id/name lookup is exposed by maestro
     expectTypeOf(ds.runesGetById).toEqualTypeOf<RuneCapability['runesGetById']>()
     expectTypeOf(ds.runesGetByName).toEqualTypeOf<RuneCapability['runesGetByName']>()
@@ -315,9 +309,7 @@ describe('Read-side factories on broad-DS clients', () => {
   it('runeActions extends a sandshrew client (RuneCapability slice)', () => {
     const ds = createSandshrewDataSource({ network: MAINNET, apiKey: 'k' })
     const c = createClient({ network: MAINNET, dataSource: ds }).extend(runeActions())
-    expectTypeOf(c.getRuneBalances).returns.resolves.toEqualTypeOf<
-      PaginatedResult<RuneBalance>
-    >()
+    expectTypeOf(c.getRuneBalances).returns.resolves.toEqualTypeOf<PaginatedResult<RuneBalance>>()
   })
 
   it('inscriptionActions extends a sandshrew client (InscriptionCapability slice)', () => {
@@ -331,9 +323,7 @@ describe('Read-side factories on broad-DS clients', () => {
   it('brc20Actions extends a maestro client (Brc20Capability slice)', () => {
     const ds = createMaestroDataSource({ network: MAINNET, apiKey: 'k' })
     const c = createClient({ network: MAINNET, dataSource: ds }).extend(brc20Actions())
-    expectTypeOf(c.getBrc20Balances).returns.resolves.toEqualTypeOf<
-      PaginatedResult<Brc20Balance>
-    >()
+    expectTypeOf(c.getBrc20Balances).returns.resolves.toEqualTypeOf<PaginatedResult<Brc20Balance>>()
   })
 })
 
@@ -392,9 +382,7 @@ describe('createClient', () => {
     const c1 = createClient({ network: MAINNET, dataSource: ds })
     const c2 = c1.extend(_c => ({ foo: () => 1 }))
 
-    expectTypeOf(c1).toMatchTypeOf<
-      Client<ClientConfig<BaseCapability>, BaseCapability, {}>
-    >()
+    expectTypeOf(c1).toMatchTypeOf<Client<ClientConfig<BaseCapability>, BaseCapability, {}>>()
     expectTypeOf(c2).toMatchTypeOf<
       Client<ClientConfig<BaseCapability>, BaseCapability, { foo: () => number }>
     >()
@@ -441,8 +429,11 @@ describe('createWalletClient', () => {
 
   it('signing actions alone (without walletBtcActions) compose fine', () => {
     const ds = createChainDataSource({ network: MAINNET }).extend(baseCap)
-    const wc = createWalletClient({ network: MAINNET, dataSource: ds, account: walletAccount })
-      .extend(signingActions())
+    const wc = createWalletClient({
+      network: MAINNET,
+      dataSource: ds,
+      account: walletAccount,
+    }).extend(signingActions())
 
     expectTypeOf(wc.signPsbt).returns.resolves.toEqualTypeOf<SignedPsbt>()
     expectTypeOf(wc.signMessage).returns.resolves.toEqualTypeOf<string>()
@@ -483,8 +474,11 @@ describe('createWalletClient', () => {
 
   it('preserves WalletClient kind across extension', () => {
     const ds = createChainDataSource({ network: MAINNET }).extend(baseCap)
-    const wc = createWalletClient({ network: MAINNET, dataSource: ds, account: walletAccount })
-      .extend(signingActions())
+    const wc = createWalletClient({
+      network: MAINNET,
+      dataSource: ds,
+      account: walletAccount,
+    }).extend(signingActions())
 
     expectTypeOf(wc).toMatchTypeOf<
       WalletClient<
@@ -510,8 +504,11 @@ describe('createWalletClient', () => {
 describe('Direct action calls', () => {
   it('sendBtc(client, params) typechecks against a properly-extended client', () => {
     const ds = createChainDataSource({ network: MAINNET }).extend(baseCap)
-    const wc = createWalletClient({ network: MAINNET, dataSource: ds, account: walletAccount })
-      .extend(signingActions())
+    const wc = createWalletClient({
+      network: MAINNET,
+      dataSource: ds,
+      account: walletAccount,
+    }).extend(signingActions())
 
     expectTypeOf(sendBtc(wc, { to: 'bc1q…', amount: 1000 })).resolves.toEqualTypeOf<string>()
   })
@@ -686,8 +683,11 @@ describe('runeActions', () => {
 
   it('sendRune (free fn) is callable directly', () => {
     const ds = createSandshrewDataSource({ network: MAINNET, apiKey: 'k' })
-    const wc = createWalletClient({ network: MAINNET, dataSource: ds, account: walletAccount })
-      .extend(signingActions())
+    const wc = createWalletClient({
+      network: MAINNET,
+      dataSource: ds,
+      account: walletAccount,
+    }).extend(signingActions())
 
     expectTypeOf(
       sendRune(wc, { to: 'bc1q…', runeId: '840000:1', amount: '100' })
@@ -767,8 +767,11 @@ describe('inscriptionActions', () => {
 
   it('inscribe + sendInscription are callable as free functions', () => {
     const ds = createMempoolDataSource({ network: MAINNET })
-    const wc = createWalletClient({ network: MAINNET, dataSource: ds, account: walletAccount })
-      .extend(signingActions())
+    const wc = createWalletClient({
+      network: MAINNET,
+      dataSource: ds,
+      account: walletAccount,
+    }).extend(signingActions())
 
     expectTypeOf(
       inscribe(wc, { contentType: 'text/plain', content: 'hello' })
@@ -794,8 +797,11 @@ describe('inscriptionActions', () => {
 describe('broadcastPsbt', () => {
   it('exposed on the client after signingActions extension', () => {
     const ds = createMempoolDataSource({ network: MAINNET })
-    const wc = createWalletClient({ network: MAINNET, dataSource: ds, account: walletAccount })
-      .extend(signingActions())
+    const wc = createWalletClient({
+      network: MAINNET,
+      dataSource: ds,
+      account: walletAccount,
+    }).extend(signingActions())
 
     expectTypeOf(wc.broadcastPsbt).parameter(0).toEqualTypeOf<string>()
     expectTypeOf(wc.broadcastPsbt).returns.resolves.toEqualTypeOf<string>()
@@ -1051,9 +1057,9 @@ describe('MergedCapabilities', () => {
   it('keys not present in the source array are correctly absent', () => {
     // mempool alone is BaseCapability-shaped — no rune methods.
     type MempoolOnly = MergedCapabilities<readonly [typeof _mempoolForMerge]>
-    expectTypeOf<'runesGetAddressBalances' extends keyof MempoolOnly ? true : false>().toEqualTypeOf<
-      false
-    >()
+    expectTypeOf<
+      'runesGetAddressBalances' extends keyof MempoolOnly ? true : false
+    >().toEqualTypeOf<false>()
   })
 
   it('declared methods are reachable on a value of the merged type', () => {

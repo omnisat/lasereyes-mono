@@ -49,8 +49,6 @@
  * ```
  */
 
-// Account factories + types
-export { createReadOnlyAccount, createWalletAccount } from './account'
 export type {
   Account,
   AddressInfo,
@@ -59,11 +57,15 @@ export type {
   WalletAccount,
   WalletAccountConfig,
 } from './account'
-
-// Wallet client factory + types
-export { createWalletClient } from './client'
-export type { WalletClient, WalletClientConfig } from './client/wallet-types'
-
+// Account factories + types
+export { createReadOnlyAccount, createWalletAccount } from './account'
+// Signing actions
+export {
+  broadcastPsbt,
+  signingActions,
+  signMessage,
+  signPsbt,
+} from './actions/signing'
 // Wallet-aware BTC actions
 export type { SendBtcParams } from './actions/wallet'
 export {
@@ -72,17 +74,12 @@ export {
   sendBtc,
   walletBtcActions,
 } from './actions/wallet'
-
-// Signing actions
-export {
-  broadcastPsbt,
-  signMessage,
-  signPsbt,
-  signingActions,
-} from './actions/signing'
-
-// Signer types + provider bridge
-export { providerSigner, type ProviderLike } from './signer'
+// Wallet client factory + types
+export { createWalletClient } from './client'
+export type { WalletClient, WalletClientConfig } from './client/wallet-types'
+// getAction — override-aware action dispatch (re-exported for ergonomic
+// composition alongside wallet actions).
+export { getAction } from './lib/get-action'
 export type {
   MessageSigningProtocol,
   SignedPsbt,
@@ -90,3 +87,5 @@ export type {
   SignMessageOptions,
   SignPsbtOptions,
 } from './signer'
+// Signer types + provider bridge
+export { type ProviderLike, providerSigner } from './signer'

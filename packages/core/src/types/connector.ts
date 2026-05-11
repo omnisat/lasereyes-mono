@@ -5,7 +5,7 @@
  */
 
 import type { ChainNetwork, NetworkId } from '@omnisat/lasereyes-client'
-import type { Account } from '@omnisat/lasereyes-client/wallet'
+import type { Account, WalletClient, WalletClientConfig } from '@omnisat/lasereyes-client/wallet'
 import type { BitcoinProvider, ProviderCapabilities } from './provider'
 
 /**
@@ -130,6 +130,39 @@ export interface Connector {
    *
    */
   getProvider(): BitcoinProvider | null
+
+  // ============================================================================
+  // Optional Client Override (wagmi-shaped — see getConnectorClient pattern)
+  // ============================================================================
+
+  /**
+   * Optional: provide a pre-composed `WalletClient` for this connector.
+   *
+   * @remarks
+   * When present, the core keystone (`getWalletClient(config, options?)`)
+   * delegates entirely to this method. Returning a client with method
+   * overrides lets a connector route specific operations to the wallet's
+   * native RPC methods (e.g. `bitcoin_sendBitcoin`, `bitcoin_pushPsbt`)
+   * instead of the default composed PSBT path.
+   *
+   * Composition rule: connectors typically build a default bare client
+   * from `(connector.getProvider(), connector.getAccount(), …config…)`,
+   * then `.extend(c => ({ … }))` the methods they want to override. The
+   * provider is captured via closure — it does not live on
+   * `WalletClientConfig`.
+   *
+   * The return type is intentionally permissive
+   * (`WalletClient<any, any, any, any>`) so connector implementations
+   * don't have to wrestle with the full generic surface. The keystone
+   * narrows on its way out where it can.
+   *
+   * @param parameters.chainId - Optional chain ID. Defaults to the active
+   *   network when omitted.
+   * @returns A fully-formed wallet client, ready to use.
+   */
+  getClient?(parameters?: {
+    chainId?: NetworkId
+  }): Promise<WalletClient<WalletClientConfig<Account, any>, Account, any, any>>
 
   // ============================================================================
   // Setup Hook
