@@ -9,7 +9,6 @@
  * @module adapters/oyl
  */
 
-import { OYL_ICON } from '../constants/wallet-icons'
 import { announceWallet } from '../detection/announcements'
 import type { ProviderCapabilities } from '../types/provider'
 import { BaseAdapter, type BitcoinProviderAdapter } from './base'
@@ -72,7 +71,6 @@ export function loadOylWalletAdapter(): BitcoinProviderAdapter | null {
   announceWallet({
     uuid: crypto.randomUUID(),
     name: 'OYL Wallet',
-    icon: OYL_ICON,
     rdns: 'app.oyl',
     provider: adapter,
   })

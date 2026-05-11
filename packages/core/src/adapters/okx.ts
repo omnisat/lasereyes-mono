@@ -9,7 +9,6 @@
  * @module adapters/okx
  */
 
-import { OKX_ICON } from '../constants/wallet-icons'
 import { announceWallet } from '../detection/announcements'
 import type { ProviderCapabilities } from '../types/provider'
 import { BaseAdapter, type BitcoinProviderAdapter } from './base'
@@ -70,7 +69,6 @@ export function loadOkxWalletAdapter(): BitcoinProviderAdapter | null {
   announceWallet({
     uuid: crypto.randomUUID(),
     name: 'OKX Wallet',
-    icon: OKX_ICON,
     rdns: 'com.okx.wallet',
     provider: adapter,
   })

@@ -8,7 +8,6 @@
  * @module adapters/tokeo
  */
 
-import { TOKEO_ICON } from '../constants/wallet-icons'
 import { announceWallet } from '../detection/announcements'
 import type { ProviderCapabilities } from '../types/provider'
 import { BaseAdapter, type BitcoinProviderAdapter } from './base'
@@ -61,7 +60,6 @@ export function loadTokeoWalletAdapter(): BitcoinProviderAdapter | null {
   announceWallet({
     uuid: crypto.randomUUID(),
     name: 'Tokeo Wallet',
-    icon: TOKEO_ICON,
     rdns: 'app.tokeo',
     provider: adapter,
   })

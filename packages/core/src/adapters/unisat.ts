@@ -9,10 +9,13 @@ import type { Inscription, NetworkId } from '@omnisat/lasereyes-client'
 import { AddressType } from '@omnisat/lasereyes-client/utils'
 import type { Account, SignedPsbt } from '@omnisat/lasereyes-client/wallet'
 import * as bitcoin from 'bitcoinjs-lib'
-import { UNISAT_ICON } from '../constants/wallet-icons'
 import { announceWallet } from '../detection/announcements'
 import type { ProviderCapabilities } from '../types/provider'
 import { BaseAdapter, type BitcoinProviderAdapter } from './base'
+
+/** Unisat Wallet icon (base64 encoded SVG). */
+export const UNISAT_ICON =
+  'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iIzE2MTYxNiIvPgo8cGF0aCBkPSJNMTYgMjRDMjAuNDE4MyAyNCAyNCAyMC40MTgzIDI0IDE2QzI0IDExLjU4MTcgMjAuNDE4MyA4IDE2IDhDMTEuNTgxNyA4IDggMTEuNTgxNyA4IDE2QzggMjAuNDE4MyAxMS41ODE3IDI0IDE2IDI0WiIgZmlsbD0iI0Y3OTMxQSIvPgo8cGF0aCBkPSJNMTYgMjBDMTguMjA5MSAyMCAyMCAxOC4yMDkxIDIwIDE2QzIwIDEzLjc5MDkgMTguMjA5MSAxMiAxNiAxMkMxMy43OTA5IDEyIDEyIDEzLjc5MDkgMTIgMTZDMTIgMTguMjA5MSAxMy43OTA5IDIwIDE2IDIwWiIgZmlsbD0iIzE2MTYxNiIvPgo8L3N2Zz4K'
 
 /**
  * Unisat's internal network enum strings (returned by `getChain().enum`).

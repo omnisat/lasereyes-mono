@@ -8,8 +8,7 @@
  * @module connectors/unisat
  */
 
-import { UnisatAdapter } from '../adapters/unisat'
-import { UNISAT_ICON } from '../constants/wallet-icons'
+import { UNISAT_ICON, UnisatAdapter } from '../adapters/unisat'
 import type { CreateConnectorFn } from '../types/connector'
 import { injected, type InjectedConnectorTarget } from './injected'
 

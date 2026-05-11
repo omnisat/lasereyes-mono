@@ -20,8 +20,8 @@ export interface WalletAnnouncement {
   /** Human-readable wallet name */
   name: string
 
-  /** Wallet icon (data URI or URL) */
-  icon: string
+  /** Wallet icon (data URI or URL). Omit if no official icon is available. */
+  icon?: string
 
   /** Optional reverse DNS (e.g., 'com.unisat.wallet') */
   rdns?: string

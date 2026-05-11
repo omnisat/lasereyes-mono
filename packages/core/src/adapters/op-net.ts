@@ -8,7 +8,6 @@
  * @module adapters/op-net
  */
 
-import { OP_NET_ICON } from '../constants/wallet-icons'
 import { announceWallet } from '../detection/announcements'
 import type { ProviderCapabilities } from '../types/provider'
 import { BaseAdapter, type BitcoinProviderAdapter } from './base'
@@ -62,7 +61,6 @@ export function loadOpNetWalletAdapter(): BitcoinProviderAdapter | null {
   announceWallet({
     uuid: crypto.randomUUID(),
     name: 'OpNet Wallet',
-    icon: OP_NET_ICON,
     rdns: 'net.op_net',
     provider: adapter,
   })

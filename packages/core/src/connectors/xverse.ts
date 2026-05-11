@@ -10,8 +10,7 @@
  * @module connectors/xverse
  */
 
-import { XverseAdapter } from '../adapters/xverse'
-import { XVERSE_ICON } from '../constants/wallet-icons'
+import { XVERSE_ICON, XverseAdapter } from '../adapters/xverse'
 import type { CreateConnectorFn } from '../types/connector'
 import { injected } from './injected'
 

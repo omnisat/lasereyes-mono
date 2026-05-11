@@ -9,7 +9,6 @@
  * @module adapters/magic-eden
  */
 
-import { MAGIC_EDEN_ICON } from '../constants/wallet-icons'
 import { announceWallet } from '../detection/announcements'
 import type { ProviderCapabilities } from '../types/provider'
 import { BaseAdapter, type BitcoinProviderAdapter } from './base'
@@ -67,7 +66,6 @@ export function loadMagicEdenWalletAdapter(): BitcoinProviderAdapter | null {
   announceWallet({
     uuid: crypto.randomUUID(),
     name: 'Magic Eden Wallet',
-    icon: MAGIC_EDEN_ICON,
     rdns: 'io.magiceden.bitcoin',
     provider: adapter,
   })

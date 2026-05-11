@@ -14,7 +14,7 @@
  * @example
  * ```ts
  * import { injected } from '@omnisat/lasereyes-core'
- * import { UnisatAdapter } from '@omnisat/lasereyes-core/adapters/unisat'
+ * import { UNISAT_ICON, UnisatAdapter } from '@omnisat/lasereyes-core/adapters/unisat'
  *
  * export const unisat = () =>
  *   injected({

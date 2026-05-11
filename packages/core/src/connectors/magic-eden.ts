@@ -4,7 +4,6 @@
  */
 
 import { MagicEdenAdapter } from '../adapters/magic-eden'
-import { MAGIC_EDEN_ICON } from '../constants/wallet-icons'
 import type { CreateConnectorFn } from '../types/connector'
 import { injected } from './injected'
 
@@ -12,7 +11,6 @@ export function magicEden(): CreateConnectorFn {
   return injected({
     id: 'magic-eden',
     name: 'Magic Eden Wallet',
-    icon: MAGIC_EDEN_ICON,
     rdns: 'io.magiceden.bitcoin',
     getProvider: (w) => (w as { magicEden?: { bitcoin?: unknown } }).magicEden?.bitcoin,
     adapter: MagicEdenAdapter,

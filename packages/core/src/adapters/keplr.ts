@@ -9,7 +9,6 @@
  * @module adapters/keplr
  */
 
-import { KEPLR_ICON } from '../constants/wallet-icons'
 import { announceWallet } from '../detection/announcements'
 import type { ProviderCapabilities } from '../types/provider'
 import { BaseAdapter, type BitcoinProviderAdapter } from './base'
@@ -62,7 +61,6 @@ export function loadKeplrWalletAdapter(): BitcoinProviderAdapter | null {
   announceWallet({
     uuid: crypto.randomUUID(),
     name: 'Keplr Wallet',
-    icon: KEPLR_ICON,
     rdns: 'app.keplr',
     provider: adapter,
   })

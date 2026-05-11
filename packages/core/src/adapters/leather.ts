@@ -9,7 +9,6 @@
  * @module adapters/leather
  */
 
-import { LEATHER_ICON } from '../constants/wallet-icons'
 import { announceWallet } from '../detection/announcements'
 import type { ProviderCapabilities } from '../types/provider'
 import { BaseAdapter, type BitcoinProviderAdapter } from './base'
@@ -71,7 +70,6 @@ export function loadLeatherWalletAdapter(): BitcoinProviderAdapter | null {
   announceWallet({
     uuid: crypto.randomUUID(),
     name: 'Leather Wallet',
-    icon: LEATHER_ICON,
     rdns: 'io.leather',
     provider: adapter,
   })

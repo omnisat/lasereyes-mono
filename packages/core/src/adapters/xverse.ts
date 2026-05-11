@@ -16,10 +16,13 @@ import {
 import type { NetworkId } from '@omnisat/lasereyes-client'
 import { getAddressType } from '@omnisat/lasereyes-client/utils'
 import type { AddressInfo, AddressPurpose, SignedPsbt } from '@omnisat/lasereyes-client/wallet'
-import { XVERSE_ICON } from '../constants/wallet-icons'
 import { announceWallet } from '../detection/announcements'
 import type { ProviderCapabilities } from '../types/provider'
 import { BaseAdapter, type BitcoinProviderAdapter } from './base'
+
+/** Xverse Wallet icon (base64 encoded SVG). */
+export const XVERSE_ICON =
+  'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iIzExMTExMSIvPgo8cGF0aCBkPSJNMTAgMTBMMTYgMTZMMjIgMTBNMjIgMjJMMTYgMTZMMTAgMjIiIHN0cm9rZT0iI0VFN0EzMCIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KPC9zdmc+Cg=='
 
 /**
  * Xverse's network identifiers (sats-connect uses these strings).

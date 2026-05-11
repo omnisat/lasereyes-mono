@@ -10,7 +10,6 @@
  * @module adapters/orange
  */
 
-import { ORANGE_ICON } from '../constants/wallet-icons'
 import { announceWallet } from '../detection/announcements'
 import type { ProviderCapabilities } from '../types/provider'
 import { BaseAdapter, type BitcoinProviderAdapter } from './base'
@@ -66,7 +65,6 @@ export function loadOrangeWalletAdapter(): BitcoinProviderAdapter | null {
   announceWallet({
     uuid: crypto.randomUUID(),
     name: 'Orange Wallet',
-    icon: ORANGE_ICON,
     rdns: 'app.orangewallet',
     provider: adapter,
   })

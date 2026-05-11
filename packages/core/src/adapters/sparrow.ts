@@ -9,7 +9,6 @@
  * @module adapters/sparrow
  */
 
-import { SPARROW_ICON } from '../constants/wallet-icons'
 import { announceWallet } from '../detection/announcements'
 import type { ProviderCapabilities } from '../types/provider'
 import { BaseAdapter, type BitcoinProviderAdapter } from './base'
@@ -62,7 +61,6 @@ export function loadSparrowWalletAdapter(): BitcoinProviderAdapter | null {
   announceWallet({
     uuid: crypto.randomUUID(),
     name: 'Sparrow Wallet',
-    icon: SPARROW_ICON,
     rdns: 'wallet.sparrow',
     provider: adapter,
   })
