@@ -12,7 +12,8 @@ export function magicEden(): CreateConnectorFn {
     id: 'magic-eden',
     name: 'Magic Eden Wallet',
     rdns: 'io.magiceden.bitcoin',
-    getProvider: (w) => (w as { magicEden?: { bitcoin?: unknown } }).magicEden?.bitcoin,
+    getProvider: w => (w as { magicEden?: { bitcoin?: unknown } }).magicEden?.bitcoin,
     adapter: MagicEdenAdapter,
+    nativeRpc: { sendBtc: true },
   })
 }

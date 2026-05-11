@@ -12,7 +12,8 @@ export function opNet(): CreateConnectorFn {
     id: 'op-net',
     name: 'OpNet Wallet',
     rdns: 'net.op_net',
-    getProvider: (w) => (w as { opnet?: unknown }).opnet,
+    getProvider: w => (w as { opnet?: unknown }).opnet,
     adapter: OpNetAdapter,
+    nativeRpc: { sendBtc: true },
   })
 }

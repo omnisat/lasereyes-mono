@@ -29,8 +29,11 @@ export function xverse(): CreateConnectorFn {
     name: 'Xverse Wallet',
     icon: XVERSE_ICON,
     rdns: 'app.xverse.wallet',
-    getProvider: (w) =>
+    getProvider: w =>
       (w as { XverseProviders?: { BitcoinProvider?: unknown } }).XverseProviders?.BitcoinProvider,
     adapter: XverseAdapter,
+    // Xverse exposes `sendBTC` natively via sats-connect. Route `sendBtc`
+    // through the one-shot RPC.
+    nativeRpc: { sendBtc: true },
   })
 }

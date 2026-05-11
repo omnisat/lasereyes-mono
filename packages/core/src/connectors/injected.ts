@@ -31,7 +31,7 @@
  */
 
 import type { ChainNetwork, NetworkId } from '@omnisat/lasereyes-client'
-import type { Account } from '@omnisat/lasereyes-client/wallet'
+import type { Account, SendBtcParams } from '@omnisat/lasereyes-client/wallet'
 import type { BaseAdapter, BitcoinProviderAdapter } from '../adapters/base'
 import type { Connector, CreateConnectorFn } from '../types/connector'
 import type { ProviderCapabilities } from '../types/provider'
@@ -58,7 +58,33 @@ export interface InjectedConnectorTarget {
    * Adapter class to wrap the injected object. Constructed with the
    * raw provider as its single argument.
    */
-  adapter: new (rawProvider: unknown) => BaseAdapter
+  adapter: new (
+    rawProvider: unknown
+  ) => BaseAdapter
+
+  /**
+   * Wallet operations the underlying provider supports natively (one-shot
+   * RPC). For each declared operation, the connector's `getClient` returns
+   * a wallet client with that method overridden to dispatch directly via
+   * `provider.request(method, params)` — short-circuiting the default
+   * composed PSBT path so the wallet handles fees, signing, and broadcast
+   * in a single user prompt.
+   *
+   * Almost every Bitcoin wallet supports `bitcoin_sendBitcoin` natively
+   * (baseline `0397a17` had explicit `sendBTC` on all 14 providers). Set
+   * `sendBtc: true` for those wallets. `bitcoin_pushPsbt` is rarer — only
+   * a handful of wallets expose broadcast separately from `signPsbt`'s
+   * `broadcast` flag.
+   *
+   * When `nativeRpc` is omitted (or all entries are false), the connector
+   * has no `getClient` override and the default composed paths run.
+   */
+  nativeRpc?: {
+    /** Wallet supports `bitcoin_sendBitcoin` natively. */
+    sendBtc?: boolean
+    /** Wallet supports `bitcoin_pushPsbt` natively. */
+    broadcastPsbt?: boolean
+  }
 }
 
 /**
@@ -68,7 +94,7 @@ export interface InjectedConnectorTarget {
  * @returns A {@link CreateConnectorFn} ready to pass into the LaserEyes config.
  */
 export function injected(target: InjectedConnectorTarget): CreateConnectorFn {
-  return createConnector((_config) => {
+  return createConnector(_config => {
     let cachedAdapter: BitcoinProviderAdapter | null = null
 
     function resolveAdapter(): BitcoinProviderAdapter | null {
@@ -87,6 +113,9 @@ export function injected(target: InjectedConnectorTarget): CreateConnectorFn {
       }
       return a
     }
+
+    const hasNativeOverrides =
+      target.nativeRpc && (target.nativeRpc.sendBtc || target.nativeRpc.broadcastPsbt)
 
     const connector: Connector = {
       id: target.id,
@@ -153,6 +182,30 @@ export function injected(target: InjectedConnectorTarget): CreateConnectorFn {
       onNetworkChanged: () => {},
       onConnect: () => {},
       onDisconnect: () => {},
+
+      // Optional `getClient` synthesized from `target.nativeRpc` declarations.
+      // When omitted, the connector has no override and the keystone's bare
+      // default path runs in full (composed PSBT for every wallet write).
+      ...(hasNativeOverrides
+        ? {
+            getClient({ client }: { client: any }) {
+              const overrides: Record<string, (...args: any[]) => any> = {}
+              if (target.nativeRpc?.sendBtc) {
+                overrides.sendBtc = async ({ to, amount }: SendBtcParams): Promise<string> => {
+                  const a = requireAdapter()
+                  return (await a.request('bitcoin_sendBitcoin', { to, amount })) as string
+                }
+              }
+              if (target.nativeRpc?.broadcastPsbt) {
+                overrides.broadcastPsbt = async (psbt: string): Promise<string> => {
+                  const a = requireAdapter()
+                  return (await a.request('bitcoin_pushPsbt', { psbt })) as string
+                }
+              }
+              return client.extend(() => overrides)
+            },
+          }
+        : {}),
     }
 
     return connector

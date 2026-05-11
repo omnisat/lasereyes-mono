@@ -31,7 +31,7 @@
  * @module wallet-client
  */
 
-import type { ChainDataSource, ChainNetwork } from '@omnisat/lasereyes-client'
+import type { ChainDataSource, ChainNetwork, NetworkId } from '@omnisat/lasereyes-client'
 import {
   type Account,
   createWalletClient,
@@ -85,12 +85,9 @@ export async function getWalletClient<const config extends LaserEyesConfig<any, 
 ): Promise<WalletClient<WalletClientConfig<Account, any>, Account, any, any>> {
   const connector = resolveConnector(config)
 
-  // Connector-shipped client takes priority.
-  if (connector.getClient) {
-    return connector.getClient({ chainId: options?.chainId as string | undefined })
-  }
-
-  // Default bare path.
+  // Build the bare default first — the connector's optional `getClient`
+  // hook receives this and decides whether to extend, replace, or pass
+  // through.
   const account = await connector.getAccount()
   const id = (options?.chainId ?? config.state.$networkId.get()) as string
   const network = (config.chains as readonly ChainNetwork[]).find(c => c.id === id)
@@ -104,10 +101,15 @@ export async function getWalletClient<const config extends LaserEyesConfig<any, 
   }
   const signer = providerSigner(provider)
 
-  return createWalletClient({
+  const bare = createWalletClient({
     network,
     dataSource,
     account: account as WalletAccount,
     signer,
   }) as WalletClient<WalletClientConfig<Account, any>, Account, any, any>
+
+  if (connector.getClient) {
+    return connector.getClient({ client: bare, chainId: id as NetworkId })
+  }
+  return bare
 }

@@ -12,7 +12,8 @@ export function tokeo(): CreateConnectorFn {
     id: 'tokeo',
     name: 'Tokeo Wallet',
     rdns: 'app.tokeo',
-    getProvider: (w) => (w as { tokeo?: unknown }).tokeo,
+    getProvider: w => (w as { tokeo?: unknown }).tokeo,
     adapter: TokeoAdapter,
+    nativeRpc: { sendBtc: true },
   })
 }

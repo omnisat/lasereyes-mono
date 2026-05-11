@@ -12,7 +12,10 @@ export function oyl(): CreateConnectorFn {
     id: 'oyl',
     name: 'OYL Wallet',
     rdns: 'app.oyl',
-    getProvider: (w) => (w as { oyl?: unknown }).oyl,
+    getProvider: w => (w as { oyl?: unknown }).oyl,
     adapter: OylAdapter,
+    // OYL is the only baseline wallet that natively exposes `pushPsbt`
+    // separately from `signPsbt`'s `broadcast` flag. Route both writes.
+    nativeRpc: { sendBtc: true, broadcastPsbt: true },
   })
 }

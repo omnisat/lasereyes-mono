@@ -12,7 +12,8 @@ export function leather(): CreateConnectorFn {
     id: 'leather',
     name: 'Leather Wallet',
     rdns: 'io.leather',
-    getProvider: (w) => (w as { LeatherProvider?: unknown }).LeatherProvider,
+    getProvider: w => (w as { LeatherProvider?: unknown }).LeatherProvider,
     adapter: LeatherAdapter,
+    nativeRpc: { sendBtc: true },
   })
 }

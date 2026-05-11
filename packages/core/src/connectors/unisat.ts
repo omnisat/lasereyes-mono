@@ -10,7 +10,7 @@
 
 import { UNISAT_ICON, UnisatAdapter } from '../adapters/unisat'
 import type { CreateConnectorFn } from '../types/connector'
-import { injected, type InjectedConnectorTarget } from './injected'
+import { type InjectedConnectorTarget, injected } from './injected'
 
 /**
  * Unisat connector factory.
@@ -27,8 +27,12 @@ export function unisat(): CreateConnectorFn {
     name: 'Unisat Wallet',
     icon: UNISAT_ICON,
     rdns: 'io.unisat.wallet',
-    getProvider: (w) => (w as { unisat?: unknown }).unisat,
+    getProvider: w => (w as { unisat?: unknown }).unisat,
     adapter: UnisatAdapter,
+    // Unisat exposes `sendBitcoin` natively. Route the wallet client's
+    // `sendBtc` method through the wallet's one-shot RPC instead of the
+    // composed PSBT path.
+    nativeRpc: { sendBtc: true },
   })
 }
 
@@ -40,8 +44,9 @@ export function binance(): CreateConnectorFn {
     id: 'binance',
     name: 'Binance Wallet',
     rdns: 'com.binance.wallet',
-    getProvider: (w) => (w as { binancew3w?: { bitcoin?: unknown } }).binancew3w?.bitcoin,
+    getProvider: w => (w as { binancew3w?: { bitcoin?: unknown } }).binancew3w?.bitcoin,
     adapter: UnisatAdapter,
+    nativeRpc: { sendBtc: true },
   })
 }
 
@@ -53,8 +58,9 @@ export function wizz(): CreateConnectorFn {
     id: 'wizz',
     name: 'Wizz Wallet',
     rdns: 'com.wizz.wallet',
-    getProvider: (w) => (w as { wizz?: unknown }).wizz,
+    getProvider: w => (w as { wizz?: unknown }).wizz,
     adapter: UnisatAdapter,
+    nativeRpc: { sendBtc: true },
   })
 }
 

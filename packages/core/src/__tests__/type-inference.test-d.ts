@@ -36,24 +36,36 @@
  * @module __tests__/type-inference
  */
 
-import type { ChainDataSource, ChainNetwork, NetworkId } from '@omnisat/lasereyes-client'
+// — Domain types referenced in action signatures —
+import type {
+  AlkaneBalance,
+  Brc20Balance,
+  ChainDataSource,
+  ChainNetwork,
+  FeeEstimate,
+  Inscription,
+  NetworkId,
+  PaginatedResult,
+  RuneBalance,
+  Transaction,
+  UTXO,
+} from '@omnisat/lasereyes-client'
 import { MAINNET, ProviderErrorCode, ProviderRpcError, TESTNET4 } from '@omnisat/lasereyes-client'
-import { createDataSource as createMempoolDataSource } from '@omnisat/lasereyes-client/vendors/mempool'
-import { createDataSource as createSandshrewDataSource } from '@omnisat/lasereyes-client/vendors/sandshrew'
-import type { Account } from '@omnisat/lasereyes-client/wallet'
+import type { createDataSource as createMempoolDataSource } from '@omnisat/lasereyes-client/vendors/mempool'
+import type { createDataSource as createSandshrewDataSource } from '@omnisat/lasereyes-client/vendors/sandshrew'
+import type {
+  Account,
+  SignedPsbt,
+  SignMessageOptions,
+  SignPsbtOptions,
+} from '@omnisat/lasereyes-client/wallet'
 import { describe, expectTypeOf, it } from 'vitest'
-
-// — Config + state —
-import { createLaserEyesConfig, type NetworkTransports } from '../config'
-import type { LaserEyesState } from '../state'
-import type { Storage } from '../storage'
-
 // — Phase 9 actions —
 import {
   broadcastPsbt,
   broadcastTransaction,
-  connect,
   type ConnectArgs,
+  connect,
   disconnect,
   dispose,
   getAddressUtxos,
@@ -71,41 +83,25 @@ import {
   signPsbt,
   switchNetwork,
 } from '../actions'
-
-// — Phase 10 keystone —
-import { getWalletClient } from '../wallet-client'
-
-// — Domain types referenced in action signatures —
-import type {
-  AlkaneBalance,
-  Brc20Balance,
-  FeeEstimate,
-  Inscription,
-  PaginatedResult,
-  RuneBalance,
-  Transaction,
-  UTXO,
-} from '@omnisat/lasereyes-client'
-import type { SignedPsbt, SignMessageOptions, SignPsbtOptions } from '@omnisat/lasereyes-client/wallet'
-
 // — Adapters (built-in) —
-import { BaseAdapter, type BitcoinProviderAdapter } from '../adapters/base'
-import { KeplrAdapter, loadKeplrWalletAdapter } from '../adapters/keplr'
-import { LeatherAdapter, loadLeatherWalletAdapter } from '../adapters/leather'
-import { MagicEdenAdapter, loadMagicEdenWalletAdapter } from '../adapters/magic-eden'
-import { OkxAdapter, loadOkxWalletAdapter } from '../adapters/okx'
-import { OpNetAdapter, loadOpNetWalletAdapter } from '../adapters/op-net'
-import { OrangeAdapter, loadOrangeWalletAdapter } from '../adapters/orange'
-import { OylAdapter, loadOylWalletAdapter } from '../adapters/oyl'
-import { PhantomAdapter, loadPhantomWalletAdapter } from '../adapters/phantom'
-import { SparrowAdapter, loadSparrowWalletAdapter } from '../adapters/sparrow'
-import { TokeoAdapter, loadTokeoWalletAdapter } from '../adapters/tokeo'
-import { loadUnisatWalletAdapter, UnisatAdapter } from '../adapters/unisat'
-import { XverseAdapter } from '../adapters/xverse'
-
+import type { BaseAdapter, BitcoinProviderAdapter } from '../adapters/base'
+import { type KeplrAdapter, loadKeplrWalletAdapter } from '../adapters/keplr'
+import { type LeatherAdapter, loadLeatherWalletAdapter } from '../adapters/leather'
+import { loadMagicEdenWalletAdapter, type MagicEdenAdapter } from '../adapters/magic-eden'
+import { loadOkxWalletAdapter, type OkxAdapter } from '../adapters/okx'
+import { loadOpNetWalletAdapter, type OpNetAdapter } from '../adapters/op-net'
+import { loadOrangeWalletAdapter, type OrangeAdapter } from '../adapters/orange'
+import { loadOylWalletAdapter, type OylAdapter } from '../adapters/oyl'
+import { loadPhantomWalletAdapter, type PhantomAdapter } from '../adapters/phantom'
+import { loadSparrowWalletAdapter, type SparrowAdapter } from '../adapters/sparrow'
+import { loadTokeoWalletAdapter, type TokeoAdapter } from '../adapters/tokeo'
+import { loadUnisatWalletAdapter, type UnisatAdapter } from '../adapters/unisat'
+import type { XverseAdapter } from '../adapters/xverse'
+// — Config + state —
+import { createLaserEyesConfig, type NetworkTransports } from '../config'
 // — Connectors —
 import { createConnector } from '../connectors/create'
-import { injected, type InjectedConnectorTarget } from '../connectors/injected'
+import { type InjectedConnectorTarget, injected } from '../connectors/injected'
 import { keplr } from '../connectors/keplr'
 import { leather } from '../connectors/leather'
 import { magicEden } from '../connectors/magic-eden'
@@ -118,7 +114,6 @@ import { sparrow } from '../connectors/sparrow'
 import { tokeo } from '../connectors/tokeo'
 import { binance, unisat, unisatLike, wizz } from '../connectors/unisat'
 import { xverse } from '../connectors/xverse'
-
 // — Detection —
 import {
   announceWallet,
@@ -126,7 +121,8 @@ import {
   type WalletAnnouncement,
 } from '../detection/announcements'
 import { connectorFromAnnouncement, discoverConnectors } from '../detection/discovery'
-
+import type { LaserEyesState } from '../state'
+import type { Storage } from '../storage'
 // — Connector + provider types —
 import type {
   ConnectionStatus,
@@ -136,6 +132,8 @@ import type {
   CreateConnectorFn,
 } from '../types/connector'
 import type { BitcoinProvider, ProviderCapabilities } from '../types/provider'
+// — Phase 10 keystone —
+import { getWalletClient } from '../wallet-client'
 
 // ============================================================================
 // Top-level fixtures (declare's must live here, not inside `it()` bodies)
@@ -282,9 +280,7 @@ describe('Connector factories', () => {
   })
 
   it('unisatLike accepts Omit<InjectedConnectorTarget, "adapter">', () => {
-    expectTypeOf(unisatLike)
-      .parameter(0)
-      .toEqualTypeOf<Omit<InjectedConnectorTarget, 'adapter'>>()
+    expectTypeOf(unisatLike).parameter(0).toEqualTypeOf<Omit<InjectedConnectorTarget, 'adapter'>>()
   })
 })
 
@@ -382,9 +378,7 @@ describe('createLaserEyesConfig', () => {
       },
     })
 
-    expectTypeOf<typeof config.chains>().toEqualTypeOf<
-      readonly [typeof MAINNET, typeof TESTNET4]
-    >()
+    expectTypeOf<typeof config.chains>().toEqualTypeOf<readonly [typeof MAINNET, typeof TESTNET4]>()
   })
 
   it("transports keys are constrained to the chains' ID literals", () => {
@@ -703,6 +697,31 @@ describe('Phase 10 — getWalletClient', () => {
     const extended = wc.extend(signingActions()).extend(walletBtcActions())
     expectTypeOf(extended.sendBtc).toMatchTypeOf<Function>()
   })
+
+  it('Connector.getClient hook shape — { client, chainId? } → WalletClient', () => {
+    // Locks the override-hook signature. If this drifts (extra args, missing
+    // client field, return-type change), the contract fails.
+    type ConnectorInterface =
+      NonNullable<ConstructorParameters<typeof Map>[0]> extends never ? never : never
+
+    // Pull the type from the live Connector interface (re-exported from core).
+    const _check: import('../types/connector').Connector['getClient'] = async ({ client }) => {
+      // The hook receives a bare wallet client; returns one (extended or
+      // not). Typecheck-only — no runtime call.
+      return client
+    }
+    expectTypeOf(_check).toMatchTypeOf<
+      | ((args: {
+          client: import('@omnisat/lasereyes-client/wallet').WalletClient<any, any, any, any>
+          chainId?: NetworkId
+        }) =>
+          | import('@omnisat/lasereyes-client/wallet').WalletClient<any, any, any, any>
+          | Promise<import('@omnisat/lasereyes-client/wallet').WalletClient<any, any, any, any>>)
+      | undefined
+    >()
+    // Reference the typedef to keep the import alive for tooling.
+    void (null as unknown as ConnectorInterface)
+  })
 })
 
 describe('Phase 9 — Read actions (provider-first, client-fallback)', () => {
@@ -725,28 +744,22 @@ describe('Phase 9 — Read actions (provider-only protocol reads)', () => {
   it('getInscriptions: (config, address, options?) => Promise<Inscription[]>', () => {
     expectTypeOf(getInscriptions).parameter(0).toMatchTypeOf<typeof _typedConfig>()
     expectTypeOf(getInscriptions).parameter(1).toEqualTypeOf<string>()
-    expectTypeOf(getInscriptions).parameter(2).toEqualTypeOf<
-      { offset?: number; limit?: number } | undefined
-    >()
-    expectTypeOf(getInscriptions(_typedConfig, 'bc1p…')).resolves.toEqualTypeOf<
-      Inscription[]
-    >()
+    expectTypeOf(getInscriptions)
+      .parameter(2)
+      .toEqualTypeOf<{ offset?: number; limit?: number } | undefined>()
+    expectTypeOf(getInscriptions(_typedConfig, 'bc1p…')).resolves.toEqualTypeOf<Inscription[]>()
   })
 
   it('getRunesBalances: (config, address) => Promise<RuneBalance[]>', () => {
     expectTypeOf(getRunesBalances).parameter(0).toMatchTypeOf<typeof _typedConfig>()
     expectTypeOf(getRunesBalances).parameter(1).toEqualTypeOf<string>()
-    expectTypeOf(getRunesBalances(_typedConfig, 'bc1p…')).resolves.toEqualTypeOf<
-      RuneBalance[]
-    >()
+    expectTypeOf(getRunesBalances(_typedConfig, 'bc1p…')).resolves.toEqualTypeOf<RuneBalance[]>()
   })
 
   it('getBrc20Balances: (config, address) => Promise<Brc20Balance[]>', () => {
     expectTypeOf(getBrc20Balances).parameter(0).toMatchTypeOf<typeof _typedConfig>()
     expectTypeOf(getBrc20Balances).parameter(1).toEqualTypeOf<string>()
-    expectTypeOf(getBrc20Balances(_typedConfig, 'bc1p…')).resolves.toEqualTypeOf<
-      Brc20Balance[]
-    >()
+    expectTypeOf(getBrc20Balances(_typedConfig, 'bc1p…')).resolves.toEqualTypeOf<Brc20Balance[]>()
   })
 
   it('getAlkanesBalances: (config, address) => Promise<AlkaneBalance[]>', () => {

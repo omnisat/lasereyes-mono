@@ -136,33 +136,57 @@ export interface Connector {
   // ============================================================================
 
   /**
-   * Optional: provide a pre-composed `WalletClient` for this connector.
+   * Optional: customize the `WalletClient` for this connector.
    *
    * @remarks
    * When present, the core keystone (`getWalletClient(config, options?)`)
-   * delegates entirely to this method. Returning a client with method
-   * overrides lets a connector route specific operations to the wallet's
-   * native RPC methods (e.g. `bitcoin_sendBitcoin`, `bitcoin_pushPsbt`)
-   * instead of the default composed PSBT path.
+   * calls this hook with the bare default `WalletClient` it just built.
+   * The connector returns either:
    *
-   * Composition rule: connectors typically build a default bare client
-   * from `(connector.getProvider(), connector.getAccount(), …config…)`,
-   * then `.extend(c => ({ … }))` the methods they want to override. The
-   * provider is captured via closure — it does not live on
-   * `WalletClientConfig`.
+   * - the same client unchanged (no-op),
+   * - the client `.extend()`ed with method overrides,
+   * - or, for fully-custom flows (Porto-style SDK clients), an entirely
+   *   different client.
+   *
+   * Typical use: route operations the wallet supports natively to its
+   * RPC namespace, short-circuiting the default composed path. The
+   * provider is captured via closure from the connector body:
+   *
+   * ```ts
+   * unisat = createConnector(config => {
+   *   const base = injected({…})(config)
+   *   return {
+   *     ...base,
+   *     async getClient({ client }) {
+   *       return client.extend(_c => ({
+   *         sendBtc: async ({ to, amount }: SendBtcParams): Promise<string> => {
+   *           const provider = base.getProvider()
+   *           if (!provider) throw new Error('not connected')
+   *           return (await provider.request('bitcoin_sendBitcoin', { to, amount })) as string
+   *         },
+   *       }))
+   *     },
+   *   }
+   * })
+   * ```
    *
    * The return type is intentionally permissive
    * (`WalletClient<any, any, any, any>`) so connector implementations
-   * don't have to wrestle with the full generic surface. The keystone
-   * narrows on its way out where it can.
+   * don't have to wrestle with the full generic surface.
    *
-   * @param parameters.chainId - Optional chain ID. Defaults to the active
-   *   network when omitted.
-   * @returns A fully-formed wallet client, ready to use.
+   * @param parameters.client - The bare wallet client built by the
+   *   keystone from `(account, chain, dataSource, signer)`. Extend or
+   *   replace as needed.
+   * @param parameters.chainId - Optional chain ID. The same one the
+   *   caller passed to `getWalletClient`.
+   * @returns The wallet client to surface to callers.
    */
-  getClient?(parameters?: {
+  getClient?(parameters: {
+    client: WalletClient<WalletClientConfig<Account, any>, Account, any, any>
     chainId?: NetworkId
-  }): Promise<WalletClient<WalletClientConfig<Account, any>, Account, any, any>>
+  }):
+    | WalletClient<WalletClientConfig<Account, any>, Account, any, any>
+    | Promise<WalletClient<WalletClientConfig<Account, any>, Account, any, any>>
 
   // ============================================================================
   // Setup Hook
