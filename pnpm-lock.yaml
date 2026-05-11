@@ -66,6 +66,22 @@ importers:
         specifier: ^2.1.2
         version: 2.1.9(@types/node@22.19.11)(jsdom@16.7.0)(lightningcss@1.30.2)(terser@5.46.0)
 
+  apps/core-showcase:
+    dependencies:
+      '@omnisat/lasereyes-client':
+        specifier: workspace:*
+        version: link:../../packages/client
+      '@omnisat/lasereyes-core':
+        specifier: workspace:*
+        version: link:../../packages/core
+    devDependencies:
+      typescript:
+        specifier: 5.8.3
+        version: 5.8.3
+      vite:
+        specifier: ^5.4.0
+        version: 5.4.21(@types/node@25.2.3)(lightningcss@1.30.2)(terser@5.46.0)
+
   apps/demo.lasereyes.build:
     dependencies:
       '@bitcoinerlab/secp256k1':

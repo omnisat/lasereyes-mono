@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LaserEyes Core Showcase</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        --bg: #f6f7f9;
+        --panel: #ffffff;
+        --ink: #0c0d10;
+        --muted: #6b7280;
+        --border: #e5e7eb;
+        --accent: #f7931a; /* bitcoin orange */
+        --ok: #16a34a;
+        --warn: #b45309;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #0c0d10;
+          --panel: #16181c;
+          --ink: #e5e7eb;
+          --muted: #94a3b8;
+          --border: #262a30;
+        }
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        padding: 32px;
+        background: var(--bg);
+        color: var(--ink);
+        font-size: 13px;
+        line-height: 1.5;
+      }
+      h1 { font-size: 18px; margin: 0 0 4px; }
+      h2 { font-size: 13px; margin: 0 0 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+      h3 { font-size: 12px; margin: 0 0 8px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+      .layout {
+        max-width: 1100px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+      .header { grid-column: 1 / -1; margin-bottom: 8px; }
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 16px;
+      }
+      .row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; flex-wrap: wrap; }
+      .row > label { min-width: 90px; color: var(--muted); }
+      button {
+        background: var(--ink);
+        color: var(--bg);
+        border: 1px solid var(--ink);
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-family: inherit;
+        font-size: 12px;
+        cursor: pointer;
+      }
+      button:hover { opacity: .9; }
+      button:disabled { opacity: .4; cursor: not-allowed; }
+      button.primary { background: var(--accent); color: #0c0d10; border-color: var(--accent); }
+      input, textarea {
+        background: transparent;
+        color: inherit;
+        border: 1px solid var(--border);
+        padding: 6px 8px;
+        border-radius: 6px;
+        font-family: inherit;
+        font-size: 12px;
+        flex: 1;
+        min-width: 0;
+      }
+      textarea { resize: vertical; min-height: 60px; width: 100%; }
+      .kv {
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .kv code {
+        color: var(--ink);
+        word-break: break-all;
+      }
+      .log {
+        font-size: 11px;
+        background: #0c0d10;
+        color: #d4d4d8;
+        border-radius: 6px;
+        padding: 12px;
+        max-height: 320px;
+        overflow: auto;
+        white-space: pre-wrap;
+        word-break: break-all;
+      }
+      .log .ts { color: #94a3b8; }
+      .log .ok { color: #4ade80; }
+      .log .warn { color: #fbbf24; }
+      .log .err { color: #f87171; }
+      .log .arrow { color: var(--accent); }
+      .pill {
+        display: inline-block;
+        padding: 1px 6px;
+        border-radius: 999px;
+        font-size: 11px;
+        background: var(--border);
+        color: var(--muted);
+      }
+      .pill.live { background: rgba(22,163,74,.16); color: var(--ok); }
+      .pill.idle { background: var(--border); color: var(--muted); }
+    </style>
+  </head>
+  <body>
+    <div class="layout">
+      <div class="header">
+        <h1>LaserEyes Core — Showcase</h1>
+        <div class="kv">
+          End-to-end exercise of <code>createLaserEyesConfig</code> →
+          <code>connect(config)</code> → <code>getWalletClient(config)</code> →
+          <code>Connector.getClient</code> override → <code>getAction</code> dispatch →
+          wallet RPC. Open your devtools console for full flow tracing.
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Connection</h2>
+        <div class="row">
+          <label>Status</label>
+          <span id="status" class="pill idle">idle</span>
+        </div>
+        <div class="row">
+          <label>Connectors</label>
+          <div id="connectors" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
+        </div>
+        <div class="row">
+          <button id="disconnect" disabled>Disconnect</button>
+        </div>
+        <h3 style="margin-top:16px;">Account</h3>
+        <div class="kv">
+          <div>Address: <code id="address">—</code></div>
+          <div>Network: <code id="network">—</code></div>
+          <div>Connector: <code id="active-connector">—</code></div>
+          <div>Has <code>getClient</code> override: <code id="has-override">—</code></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Actions</h2>
+
+        <h3>Read</h3>
+        <div class="row">
+          <button id="get-balance" disabled>Get balance</button>
+          <span class="kv">Balance: <code id="balance">—</code> sats</span>
+        </div>
+
+        <h3 style="margin-top:14px;">Write</h3>
+        <div class="row">
+          <label>Send BTC to</label>
+          <input id="send-to" placeholder="bc1q…" />
+        </div>
+        <div class="row">
+          <label>Amount (sats)</label>
+          <input id="send-amount" type="number" placeholder="1000" />
+          <button id="send" class="primary" disabled>Send</button>
+        </div>
+
+        <div class="row" style="margin-top:14px;">
+          <label>Sign message</label>
+          <input id="msg" placeholder="Hello, Bitcoin!" />
+          <button id="sign-message" class="primary" disabled>Sign</button>
+        </div>
+
+        <div class="row" style="margin-top:14px;">
+          <label>Sign PSBT (hex)</label>
+        </div>
+        <div class="row">
+          <textarea id="psbt" placeholder="70736274ff…"></textarea>
+        </div>
+        <div class="row">
+          <button id="sign-psbt" class="primary" disabled>Sign PSBT</button>
+        </div>
+      </div>
+
+      <div class="panel" style="grid-column: 1 / -1;">
+        <h2>Flow trace</h2>
+        <pre id="log" class="log"></pre>
+      </div>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
