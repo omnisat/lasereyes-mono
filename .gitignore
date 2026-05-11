@@ -43,3 +43,6 @@ package-lock.json
 **/*.tsbuildinfo
 wallet-info.txt
 .npmrc
+# local research clones, not part of the repo
+.research/
+

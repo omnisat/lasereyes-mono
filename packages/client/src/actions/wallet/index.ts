@@ -1,35 +1,34 @@
 /**
- * Wallet-aware BTC actions for account-based operations.
+ * Wallet-aware BTC actions.
  *
  * @remarks
- * Type pattern: **strict factory + strict action**.
- * - Each action *function* (`sendBtc`, `getBalance`, `getUtxos`) declares
- *   its precise requirements via generic constraints. This makes the
- *   functions usable directly: `await sendBtc(client, params)`.
- * - The factory `walletBtcActions()` mirrors those constraints on its
- *   client parameter, so `client.extend(walletBtcActions())` fails at
- *   compile time if the client doesn't already have what the actions
- *   need.
+ * **Type-level rule.** Free actions constrain only on `dsMethods` (the
+ * data-source capabilities they reach for at the leaf). Action-presence
+ * on the client is a runtime concern dispatched by {@link getAction}.
  *
- * **Ordering:** `sendBtc` depends on `signPsbt`. Therefore extend
- * `signingActions(signer)` *before* `walletBtcActions()`. The compiler
- * enforces this:
+ * **Composition rule.** Composed action bodies call other actions via
+ * {@link getAction}, never reaching `client.config.dataSource.btcXxx(...)`
+ * directly except in leaf actions. User overrides extended onto the client
+ * cascade through all composition layers automatically.
  *
- * ```ts
- * createWalletClient({...})
- *   .extend(signingActions(signer))   // first — provides signPsbt
- *   .extend(walletBtcActions())       // second — uses it
- * ```
+ * **Factory rule.** The factory {@link walletBtcActions} keeps the
+ * `Actions extends …` constraint so `.extend(walletBtcActions())` fails
+ * to compile if `signPsbt` isn't already on the client. Defense in depth:
+ * factory path enforces ordering at compile time; free-function path
+ * relies on `getAction` runtime cascade + a clear missing-signer error.
  *
- * @module actions/wallet-btc
+ * @module actions/wallet
  */
 
 import type { Account, AddressPurpose, WalletAccount } from '../../account/types'
 import type { WalletClient, WalletClientConfig } from '../../client/wallet-types'
 import type { ActionGroup, BaseCapability } from '../../data-source/capabilities'
 import { buildSendBtcPsbt } from '../../lib/psbt-builders'
+import { getAction } from '../../lib/get-action'
 import type { SignedPsbt, SignPsbtOptions } from '../../signer/types'
 import type { PaginatedResult, UTXO } from '../../types'
+import { broadcastTransaction, getUtxos as getUtxosByAddress } from '../public'
+import { signPsbt } from '../signing'
 
 /**
  * Parameters for sending BTC using a wallet client.
@@ -44,46 +43,59 @@ export interface SendBtcParams {
 }
 
 /**
- * The required shape of `signPsbt` on a client `sendBtc` is called against.
+ * The required shape of `signPsbt` on a client when composing through
+ * {@link walletBtcActions}.
  *
  * @remarks
- * Used both by the strict `sendBtc` action function and by the
- * {@link walletBtcActions} factory so the constraint is stated once.
+ * Kept here (rather than imported from signing) to keep the factory's
+ * compile-time guard local to this file.
  */
 type RequiredSigningActions = {
   signPsbt: (psbt: string, options?: SignPsbtOptions) => Promise<SignedPsbt>
 }
 
 // ============================================================================
-// Strict actions
+// Strict actions — `dsMethods` constrained, no `Actions` constraint
 // ============================================================================
 
 /**
  * Sends BTC from the wallet account to a recipient.
  *
  * @remarks
- * Uses the account's payment address for funding and change. Requires a
- * {@link WalletAccount} (for public-key access) and a `signPsbt` action on
- * the client.
+ * Composes through {@link getAction} for `getUtxos`, `signPsbt`, and
+ * `broadcastTransaction`, so user overrides on any sub-action cascade
+ * automatically.
+ *
+ * Requires a {@link WalletAccount} (needs the payment public key for PSBT
+ * construction) and that the client's data source exposes
+ * `btcGetAddressUtxos` and `btcBroadcastTransaction`. Signing-capability
+ * is enforced at runtime by the {@link signPsbt} free function reading
+ * `client.config.signer`.
  *
  * @throws {Error} If signing fails to produce a finalized transaction.
+ * @throws {Error} If `client.config.signer` is absent.
  * @throws {PsbtBuildError} If PSBT construction fails.
  * @throws {InsufficientFundsError} If the available UTXOs cannot cover amount + fee.
  */
 export async function sendBtc<
   Config extends WalletClientConfig<WalletAccount, DS>,
   DS extends Pick<BaseCapability, 'btcGetAddressUtxos' | 'btcBroadcastTransaction'>,
-  Actions extends RequiredSigningActions,
+  Actions extends ActionGroup,
 >(
   client: WalletClient<Config, WalletAccount, Actions, DS>,
   params: SendBtcParams
 ): Promise<string> {
   const { to, amount, feeRate = 7 } = params
 
-  const paymentAddr = client.config.account.getAddress('payment')
-  const paymentPubkey = client.config.account.getPublicKey('payment')
+  const account = client.config.account
+  const paymentAddr = account.getAddress('payment')
+  const paymentPubkey = account.getPublicKey('payment')
 
-  const { data: utxos } = await client.config.dataSource.btcGetAddressUtxos(paymentAddr)
+  const getUtxos_ = getAction(client, getUtxos, 'getUtxos')
+  const sign = getAction(client, signPsbt, 'signPsbt')
+  const broadcast = getAction(client, broadcastTransaction, 'broadcastTransaction')
+
+  const { data: utxos } = await getUtxos_(account, 'payment')
 
   const { psbtHex } = buildSendBtcPsbt({
     utxos,
@@ -95,38 +107,45 @@ export async function sendBtc<
     publicKey: paymentPubkey,
   })
 
-  const signed = await client.signPsbt(psbtHex, { finalize: true, broadcast: false })
+  const signed = await sign(psbtHex, { finalize: true, broadcast: false })
 
   if (!signed.txHex) {
     throw new Error('Signer did not return transaction hex')
   }
 
-  return client.config.dataSource.btcBroadcastTransaction(signed.txHex)
+  return broadcast(signed.txHex)
 }
 
 /**
- * Gets the BTC balance for the wallet account's payment address.
+ * Gets the BTC balance for an account's address (defaults to the payment
+ * address).
  *
  * @remarks
- * Read-only. Works with any account type. Requires `btcGetBalance` on the
- * data source.
+ * Read-only. Works with any account type.
  */
 export async function getBalance<
   Config extends WalletClientConfig<A, DS>,
   A extends Account,
   Actions extends ActionGroup,
   DS extends Pick<BaseCapability, 'btcGetBalance'>,
->(client: WalletClient<Config, A, Actions, DS>): Promise<string> {
-  const address = client.config.account.getAddress('payment')
+>(
+  client: WalletClient<Config, A, Actions, DS>,
+  account: A = client.config.account,
+  purpose: AddressPurpose = 'payment'
+): Promise<string> {
+  const address = account.getAddress(purpose)
   return client.config.dataSource.btcGetBalance(address)
 }
 
 /**
- * Gets UTXOs for the wallet account's specified address purpose.
+ * Gets UTXOs for an account's specified address purpose (defaults to
+ * `'payment'`).
  *
  * @remarks
- * Read-only. Works with any account type. Requires `btcGetAddressUtxos` on
- * the data source.
+ * Read-only. Works with any account type. The action takes an explicit
+ * `account` so composed actions can target arbitrary accounts (not only
+ * `client.config.account`), keeping the call-site shape uniform between
+ * free function and client method.
  */
 export async function getUtxos<
   Config extends WalletClientConfig<A, DS>,
@@ -135,14 +154,15 @@ export async function getUtxos<
   DS extends Pick<BaseCapability, 'btcGetAddressUtxos'>,
 >(
   client: WalletClient<Config, A, Actions, DS>,
+  account: A,
   purpose: AddressPurpose = 'payment'
 ): Promise<PaginatedResult<UTXO>> {
-  const address = client.config.account.getAddress(purpose)
-  return client.config.dataSource.btcGetAddressUtxos(address)
+  const address = account.getAddress(purpose)
+  return getUtxosByAddress(client, address)
 }
 
 // ============================================================================
-// Strict factory — mirrors the strict-action constraints
+// Strict factory — preserves compile-time ordering enforcement
 // ============================================================================
 
 /**
@@ -150,25 +170,19 @@ export async function getUtxos<
  *
  * @remarks
  * Adds `sendBtc`, `getBalance`, and `getUtxos` to a wallet client. The
- * factory's client constraint matches what the underlying actions need:
- * a {@link WalletAccount}, base capability methods on the data source,
- * and a `signPsbt` action already on the client (provided by
- * {@link signingActions}).
- *
- * Apply *after* `signingActions(signer)`:
+ * factory's `Actions extends RequiredSigningActions` constraint ensures
+ * `signPsbt` is already on the client at extend time — enforced at compile
+ * time. Apply *after* `signingActions()`:
  *
  * ```ts
- * createWalletClient({ network, dataSource, account })
- *   .extend(signingActions(signer))
+ * createWalletClient({ network, dataSource, account, signer })
+ *   .extend(signingActions())
  *   .extend(walletBtcActions())
  * ```
  *
- * Calling sites then look like:
- * ```ts
- * await client.sendBtc({ to: 'bc1q...', amount: 10000 })
- * const balance = await client.getBalance()
- * const { data: utxos } = await client.getUtxos('payment')
- * ```
+ * The factory-method shapes mirror the free-function shapes minus the
+ * `client` parameter — `getUtxos(account, purpose?)`, etc. — so direct
+ * free-function callers and method callers see the same call surface.
  */
 export function walletBtcActions() {
   return <
@@ -179,7 +193,9 @@ export function walletBtcActions() {
     client: WalletClient<Config, WalletAccount, Actions, DS>
   ) => ({
     sendBtc: (params: SendBtcParams) => sendBtc(client, params),
-    getBalance: () => getBalance(client),
-    getUtxos: (purpose?: AddressPurpose) => getUtxos(client, purpose),
+    getBalance: (account?: WalletAccount, purpose?: AddressPurpose) =>
+      getBalance(client, account, purpose),
+    getUtxos: (account: WalletAccount, purpose?: AddressPurpose) =>
+      getUtxos(client, account, purpose),
   })
 }

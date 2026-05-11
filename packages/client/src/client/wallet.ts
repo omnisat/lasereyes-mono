@@ -9,6 +9,7 @@ import type { ChainNetwork, NetworkId } from '../chains'
 import { resolveNetwork } from '../chains'
 import type { ActionGroup } from '../data-source/capabilities'
 import { NetworkMismatchError } from '../errors'
+import type { Signer } from '../signer/types'
 import type { ChainDataSource } from '../types/data-source'
 import type { Extension, Prettify } from '../types/utils'
 import type { WalletClient, WalletClientConfig } from './wallet-types'
@@ -35,6 +36,9 @@ import type { WalletClient, WalletClientConfig } from './wallet-types'
  *   the built-in `NETWORKS` registry.
  * @param config.dataSource - The chain data source providing blockchain data.
  * @param config.account - The user's account (with addresses and optional public keys).
+ * @param config.signer - Optional cryptographic signer. When present, signing
+ *   actions are usable directly; when absent, the wallet client is
+ *   read-only-with-account (signing actions throw at runtime).
  *
  * @returns A wallet client instance that can be extended with action groups
  *
@@ -77,6 +81,7 @@ export function createWalletClient<
   network: NetworkId | ChainNetwork
   dataSource: ChainDataSource<dsMethods>
   account: TAccount
+  signer?: Signer
 }): WalletClient<WalletClientConfig<TAccount, dsMethods>, TAccount, {}, dsMethods> {
   const network = resolveNetwork(config.network)
   if (config.dataSource.network !== network) {
@@ -88,6 +93,7 @@ export function createWalletClient<
     network,
     dataSource: config.dataSource,
     account: config.account,
+    signer: config.signer,
   }
 
   function buildClient<TActions extends ActionGroup>(

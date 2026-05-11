@@ -14,11 +14,25 @@
 
 import type { Account } from '../account/types'
 import type { ActionGroup } from '../data-source/capabilities'
+import type { Signer } from '../signer/types'
 import type { Extension, Prettify } from '../types/utils'
 import type { Client, ClientConfig } from './types'
 
 /**
  * Configuration for creating a wallet client.
+ *
+ * @remarks
+ * `signer` is optional — a wallet client may carry an account without a
+ * signing capability (read-only-with-account contexts: observation,
+ * multisig watching, signer attached later). Signing actions read the
+ * signer from `config.signer` at runtime and throw a clear error if it's
+ * absent.
+ *
+ * Type-level guard against accidentally calling signing actions on a
+ * signer-less client comes from the factory path: `signingActions()`'s
+ * factory accepts the signer at construction time, and `walletActions()`'s
+ * `Actions extends …` constraint ensures `signPsbt` is on the client
+ * before composing actions that depend on it.
  *
  * @typeParam TAccount - The account type
  * @typeParam dsMethods - The data source capabilities
@@ -29,6 +43,13 @@ export interface WalletClientConfig<
 > extends ClientConfig<dsMethods> {
   /** The account providing address and key information. */
   account: TAccount
+  /**
+   * Optional cryptographic signer. When present, signing actions
+   * (`signPsbt`, `signMessage`, etc.) and composed actions that need them
+   * can be invoked. When absent, calling a signing action surfaces a
+   * runtime error.
+   */
+  signer?: Signer
 }
 
 /**

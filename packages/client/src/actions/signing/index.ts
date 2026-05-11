@@ -2,13 +2,16 @@
  * Signing actions for wallet clients.
  *
  * @remarks
- * Wraps an injected {@link Signer} as methods (`signPsbt`, `signMessage`,
- * `broadcastPsbt`) on a wallet client. The signer carries the
- * cryptographic keys; the client carries the addresses; the data source
- * carries broadcast capability.
+ * Reads the signer from `client.config.signer`. The factory
+ * {@link signingActions} no longer takes a signer argument — provide the
+ * signer to {@link createWalletClient} via `config.signer` instead. This
+ * makes the free actions self-sufficient: any caller (factory, direct
+ * invocation, `getAction` fallback) reaches the signer the same way.
  *
- * Extend `signingActions(signer)` *before* higher-level actions that
- * depend on `signPsbt` (e.g. `walletBtcActions()`).
+ * If `client.config.signer` is `undefined`, every action here throws a
+ * clear runtime error. Type-level guards against that live on the factory
+ * path: see {@link walletActions}'s `Actions extends RequiredSigningActions`
+ * constraint, which forces `signingActions()` to be extended first.
  *
  * @module actions/signing
  */
@@ -16,19 +19,33 @@
 import type { Account } from '../../account/types'
 import type { WalletClient, WalletClientConfig } from '../../client/wallet-types'
 import type { ActionGroup, BaseCapability } from '../../data-source/capabilities'
+import { getAction } from '../../lib/get-action'
 import type { SignedPsbt, Signer, SignMessageOptions, SignPsbtOptions } from '../../signer/types'
+import { broadcastTransaction } from '../public'
+
+// ============================================================================
+// Internal helpers
+// ============================================================================
+
+function requireSigner(signer: Signer | undefined): Signer {
+  if (!signer) {
+    throw new Error(
+      'No signer configured on wallet client. Pass `signer` to ' +
+        '`createWalletClient({...})` or, in core, ensure the active ' +
+        "connector's provider is available."
+    )
+  }
+  return signer
+}
 
 // ============================================================================
 // Strict actions
 // ============================================================================
 
 /**
- * Sign a PSBT using the provided signer.
+ * Sign a PSBT using the wallet client's signer.
  *
- * @remarks
- * The client argument is unused at runtime (the signer carries everything
- * needed) but kept on the signature so signing actions read uniformly with
- * other client-bound actions.
+ * @throws {Error} If `client.config.signer` is `undefined` at runtime.
  */
 export async function signPsbt<
   Config extends WalletClientConfig<A, DS>,
@@ -36,20 +53,22 @@ export async function signPsbt<
   Actions extends ActionGroup,
   DS extends ActionGroup,
 >(
-  _client: WalletClient<Config, A, Actions, DS>,
-  signer: Signer,
+  client: WalletClient<Config, A, Actions, DS>,
   psbt: string,
   options?: SignPsbtOptions
 ): Promise<SignedPsbt> {
+  const signer = requireSigner(client.config.signer)
   return signer.signPsbt(psbt, options)
 }
 
 /**
- * Sign a message using the provided signer.
+ * Sign a message using the wallet client's signer.
  *
  * @remarks
  * If `options.address` is omitted, falls back to the account's payment
  * address.
+ *
+ * @throws {Error} If `client.config.signer` is `undefined` at runtime.
  */
 export async function signMessage<
   Config extends WalletClientConfig<A, DS>,
@@ -58,24 +77,25 @@ export async function signMessage<
   DS extends ActionGroup,
 >(
   client: WalletClient<Config, A, Actions, DS>,
-  signer: Signer,
   message: string,
   options?: SignMessageOptions
 ): Promise<string> {
+  const signer = requireSigner(client.config.signer)
   const address = options?.address ?? client.config.account.getAddress('payment')
   return signer.signMessage(message, { ...options, address })
 }
 
 /**
- * Sign a PSBT (with finalization) and broadcast the resulting transaction.
+ * Sign a PSBT (with finalization) and broadcast the resulting transaction
+ * through the configured data source.
  *
  * @remarks
- * Convenience for the common "sign + broadcast" flow. Requires the data
- * source to expose `btcBroadcastTransaction` so the finalized hex can be
- * pushed to the network.
+ * Internally composes via {@link getAction}, so overrides on `signPsbt` or
+ * `broadcastTransaction` cascade automatically.
  *
  * @returns The transaction ID once broadcast succeeds.
- * @throws Error if the signer fails to produce a finalized transaction.
+ * @throws {Error} If `client.config.signer` is `undefined`, or if the
+ *   signer fails to produce a finalized transaction.
  */
 export async function broadcastPsbt<
   Config extends WalletClientConfig<A, DS>,
@@ -84,15 +104,17 @@ export async function broadcastPsbt<
   DS extends Pick<BaseCapability, 'btcBroadcastTransaction'>,
 >(
   client: WalletClient<Config, A, Actions, DS>,
-  signer: Signer,
   psbt: string,
   options?: Omit<SignPsbtOptions, 'finalize' | 'broadcast'>
 ): Promise<string> {
-  const signed = await signer.signPsbt(psbt, { ...options, finalize: true })
+  const sign = getAction(client, signPsbt, 'signPsbt')
+  const broadcast = getAction(client, broadcastTransaction, 'broadcastTransaction')
+
+  const signed = await sign(psbt, { ...options, finalize: true })
   if (!signed.txHex) {
     throw new Error('Signer did not return transaction hex')
   }
-  return client.config.dataSource.btcBroadcastTransaction(signed.txHex)
+  return broadcast(signed.txHex)
 }
 
 // ============================================================================
@@ -103,24 +125,22 @@ export async function broadcastPsbt<
  * Action-group factory adding `signPsbt`, `signMessage`, and `broadcastPsbt`
  * to a wallet client.
  *
- * @param signer - The signer implementation carrying signing capability.
+ * @remarks
+ * The signer is read from `client.config.signer` — provide it when calling
+ * {@link createWalletClient}. The factory no longer takes a signer
+ * argument.
  *
  * @example
  * ```ts
- * const signer: Signer = {
- *   signPsbt: async (psbt, opts) => ({ psbtHex: await window.unisat.signPsbt(psbt, opts), ... }),
- *   signMessage: async (msg, opts) => window.unisat.signMessage(msg, opts?.protocol),
- * }
- *
- * const walletClient = createWalletClient({ network, dataSource, account })
- *   .extend(signingActions(signer))
+ * const walletClient = createWalletClient({ network, dataSource, account, signer })
+ *   .extend(signingActions())
  *
  * const signed = await walletClient.signPsbt(psbtHex, { finalize: true })
  * const sig = await walletClient.signMessage('Hello Bitcoin!')
  * const txId = await walletClient.broadcastPsbt(unsignedPsbtHex)
  * ```
  */
-export function signingActions(signer: Signer) {
+export function signingActions() {
   return <
     Config extends WalletClientConfig<A, DS>,
     A extends Account,
@@ -130,12 +150,12 @@ export function signingActions(signer: Signer) {
     client: WalletClient<Config, A, Actions, DS>
   ) => ({
     signPsbt: (psbt: string, options?: SignPsbtOptions): Promise<SignedPsbt> =>
-      signPsbt(client, signer, psbt, options),
+      signPsbt(client, psbt, options),
     signMessage: (message: string, options?: SignMessageOptions): Promise<string> =>
-      signMessage(client, signer, message, options),
+      signMessage(client, message, options),
     broadcastPsbt: (
       psbt: string,
       options?: Omit<SignPsbtOptions, 'finalize' | 'broadcast'>
-    ): Promise<string> => broadcastPsbt(client, signer, psbt, options),
+    ): Promise<string> => broadcastPsbt(client, psbt, options),
   })
 }

@@ -11,8 +11,10 @@
  * - Free actions: {@link sendBtc}, {@link signPsbt}, {@link signMessage},
  *   {@link broadcastPsbt}, {@link getBalance}, {@link getUtxos}.
  *
- * **Extension order matters.** Extend `signingActions(signer)` before
- * `walletBtcActions()`.
+ * **Extension order matters when going through factories.** Extend
+ * `signingActions()` before `walletBtcActions()` — the latter requires
+ * `signPsbt` on the client at compile time. The signer itself is passed
+ * to `createWalletClient` via `config.signer`, not to a factory.
  *
  * @module wallet
  *
@@ -20,7 +22,7 @@
  * ```ts
  * import {
  *   createWalletClient, createWalletAccount,
- *   walletBtcActions, signingActions,
+ *   walletBtcActions, signingActions, providerSigner,
  * } from '@omnisat/lasereyes-client/wallet'
  * import { createDataSource } from '@omnisat/lasereyes-client/vendors/mempool'
  * import { MAINNET, AddressType } from '@omnisat/lasereyes-client'
@@ -35,8 +37,11 @@
  *
  * const ds = createDataSource({ network: MAINNET })
  *
- * const walletClient = createWalletClient({ network: MAINNET, dataSource: ds, account })
- *   .extend(signingActions(signer))
+ * const walletClient = createWalletClient({
+ *   network: MAINNET, dataSource: ds, account,
+ *   signer: providerSigner(provider),
+ * })
+ *   .extend(signingActions())
  *   .extend(walletBtcActions())
  *
  * const balance = await walletClient.getBalance()
@@ -76,7 +81,8 @@ export {
   signingActions,
 } from './actions/signing'
 
-// Signer types
+// Signer types + provider bridge
+export { providerSigner, type ProviderLike } from './signer'
 export type {
   MessageSigningProtocol,
   SignedPsbt,
