@@ -7,7 +7,7 @@
 import type { ChainNetwork } from '@omnisat/lasereyes-client'
 import { UnsupportedNetworkError } from '@omnisat/lasereyes-client'
 import type { LaserEyesConfig } from '../config'
-import { resolveConnector } from '../internal'
+import { invalidateClientCache, resolveConnector } from '../internal'
 
 /**
  * Switch the active wallet to a different network.
@@ -72,6 +72,13 @@ export async function switchNetwork<
       supported.map(c => c.id)
     )
   }
+
+  // Drop any cached client for both chains — old one's wallet client is
+  // stale, new one might have a read-only client cached from before
+  // connect that needs to be replaced with a wallet client.
+  const prev = config.state.$connection.get().networkId
+  if (prev) invalidateClientCache(config, prev)
+  invalidateClientCache(config, resolvedId)
 
   config.state.$connection.setKey('networkId', resolvedId)
   connector.onNetworkChanged?.(resolvedId)

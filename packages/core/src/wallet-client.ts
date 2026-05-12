@@ -42,7 +42,12 @@ import {
   type WalletClientConfig,
 } from '@omnisat/lasereyes-client/wallet'
 import type { LaserEyesConfig } from './config'
-import { resolveConnector, resolveDataSource } from './internal'
+import {
+  readCachedClient,
+  resolveConnector,
+  resolveDataSource,
+  writeCachedClient,
+} from './internal'
 
 /**
  * Build a typed wallet client for an active connector on a configured chain.
@@ -84,13 +89,41 @@ export async function getWalletClient<const config extends LaserEyesConfig<any, 
   config: config,
   options?: { chainId?: config['chains'][number]['id'] }
 ): Promise<WalletClient<WalletClientConfig<Account, any>, Account, any, any>> {
-  const connector = resolveConnector(config)
-
-  // Build the bare default first — the connector's optional `getClient`
-  // hook receives this and decides whether to extend, replace, or pass
-  // through.
-  const account = await connector.getAccount()
   const id = (options?.chainId ?? config.state.$connection.get().networkId) as string
+
+  // If the user supplied a custom client factory, it wins
+  // unconditionally — same precedence as `getClient`. Apps that want
+  // their factory's output everywhere shouldn't get a wallet client
+  // smuggled in via this path either.
+  if (config.client) {
+    const cached = readCachedClient(config, id)
+    if (cached) {
+      return cached as WalletClient<WalletClientConfig<Account, any>, Account, any, any>
+    }
+    const network = (config.chains as readonly ChainNetwork[]).find(c => c.id === id)
+    if (!network) {
+      throw new UnsupportedNetworkError(
+        id,
+        (config.chains as readonly ChainNetwork[]).map(c => c.id)
+      )
+    }
+    const dataSource = resolveDataSource(config, id) as ChainDataSource<any>
+    const built = config.client({ chain: network, dataSource })
+    writeCachedClient(config, id, built)
+    return built as WalletClient<WalletClientConfig<Account, any>, Account, any, any>
+  }
+
+  // Cache hit (likely populated by a prior `connect()`).
+  const cached = readCachedClient(config, id)
+  if (cached) {
+    return cached as WalletClient<WalletClientConfig<Account, any>, Account, any, any>
+  }
+
+  // Build. The connector is required at this point; the resulting wallet
+  // client gets cached so subsequent `getClient` / `getWalletClient`
+  // calls hit the cache.
+  const connector = resolveConnector(config)
+  const account = await connector.getAccount()
   const network = (config.chains as readonly ChainNetwork[]).find(c => c.id === id)
   if (!network) {
     throw new UnsupportedNetworkError(
@@ -112,8 +145,10 @@ export async function getWalletClient<const config extends LaserEyesConfig<any, 
     signer,
   }) as WalletClient<WalletClientConfig<Account, any>, Account, any, any>
 
-  if (connector.getClient) {
-    return connector.getClient({ client: bare, chainId: id as NetworkId })
-  }
-  return bare
+  const final = connector.getClient
+    ? await connector.getClient({ client: bare, chainId: id as NetworkId })
+    : bare
+
+  writeCachedClient(config, id, final)
+  return final as WalletClient<WalletClientConfig<Account, any>, Account, any, any>
 }

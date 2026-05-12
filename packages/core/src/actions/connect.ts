@@ -17,8 +17,10 @@
 import type { NetworkId } from '@omnisat/lasereyes-client'
 import type { Account } from '@omnisat/lasereyes-client/wallet'
 import type { LaserEyesConfig } from '../config'
+import { invalidateClientCache } from '../internal'
 import type { Connector, ConnectResult } from '../types/connector'
 import type { BitcoinProvider } from '../types/provider'
+import { getWalletClient } from '../wallet-client'
 
 /**
  * Args for {@link connect}.
@@ -82,6 +84,11 @@ function subscribeToConnectorEvents(
   // payloads (e.g. Unisat emits a string[] of addresses; the adapter
   // re-derives a full Account before re-emitting).
   const onAccountsChanged = (account: Account) => {
+    // Account changed on the wallet's side. Drop the cached wallet
+    // client for the current chain — it was built against the previous
+    // account. The next `getWalletClient` call rebuilds and re-caches.
+    const currentChain = config.state.$connection.get().networkId
+    invalidateClientCache(config, currentChain)
     config.state.$connection.setKey('account', account)
   }
 
@@ -100,6 +107,12 @@ function subscribeToConnectorEvents(
         return
       }
     }
+    // Drop the cached wallet client for the prior chain — it's stale
+    // (signer/account were bound to that chain's context). The next
+    // `getWalletClient` rebuilds for the new chain.
+    const previous = config.state.$connection.get().networkId
+    if (previous && previous !== next) invalidateClientCache(config, previous)
+    invalidateClientCache(config, next)
     config.state.$connection.setKey('networkId', next)
   }
 
@@ -111,6 +124,10 @@ function subscribeToConnectorEvents(
       account: undefined,
       connector: undefined,
     })
+    // Drop every cached client — wallet-backed ones reference the now-
+    // gone connection. Read-only clients can be rebuilt cheaply on
+    // demand; safest to clear all and let them repopulate.
+    invalidateClientCache(config)
   }
 
   provider.on('accountsChanged', onAccountsChanged)
@@ -178,6 +195,11 @@ export async function connect<const config extends LaserEyesConfig<any, any, any
   eventCleanups.get(config)?.()
   eventCleanups.delete(config)
 
+  // Drop any cached read-only client for the connected chain (and any
+  // prior wallet client) — we're about to build a fresh wallet client
+  // for this connection.
+  invalidateClientCache(config)
+
   // Atomic update: one notification, all four fields consistent.
   config.state.$connection.set({
     status: 'connected',
@@ -193,6 +215,21 @@ export async function connect<const config extends LaserEyesConfig<any, any, any
   const provider = connector.getProvider()
   if (provider) {
     eventCleanups.set(config, subscribeToConnectorEvents(config, connector, provider))
+  }
+
+  // Eagerly build the wallet client and populate the cache so
+  // `getClient` (sync) returns it from the cache on subsequent calls.
+  // Skipped when `config.client` is set — the user's factory wins
+  // unconditionally, so caching a connector-built client would be
+  // wasted work.
+  if (!config.client) {
+    try {
+      await getWalletClient(config)
+    } catch {
+      // Cache pre-population is best-effort. Failures here don't fail
+      // the connect — the next `getClient` / `getWalletClient` call
+      // will surface the real error.
+    }
   }
 
   connector.onConnect?.(result)

@@ -5,7 +5,7 @@
  */
 
 import type { LaserEyesConfig } from '../config'
-import { tryResolveConnector } from '../internal'
+import { invalidateClientCache, tryResolveConnector } from '../internal'
 import { _clearConnectCleanup, _getConnectCleanup } from './connect'
 
 /**
@@ -48,4 +48,8 @@ export async function disconnect<const config extends LaserEyesConfig<any, any, 
     connector: undefined,
   })
   config.storage.removeItem('lasereyes.connectorId')
+
+  // Drop every cached client. Wallet-backed ones reference the now-gone
+  // connection; read-only ones can be rebuilt cheaply on the next call.
+  invalidateClientCache(config)
 }

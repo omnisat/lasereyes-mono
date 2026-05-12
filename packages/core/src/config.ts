@@ -24,10 +24,30 @@
  * @module config
  */
 
-import type { ChainDataSource, ChainNetwork } from '@omnisat/lasereyes-client'
+import type { ChainDataSource, ChainNetwork, Client } from '@omnisat/lasereyes-client'
 import { createState, type LaserEyesState } from './state'
 import { createStorage, type Storage } from './storage'
 import type { Connector, CreateConnectorFn } from './types/connector'
+
+/**
+ * Optional user-supplied client factory.
+ *
+ * @remarks
+ * When set on a {@link LaserEyesConfig}, `getClient(config, …)` calls
+ * this factory instead of the default `createClient({ network,
+ * dataSource })` construction. The factory wins unconditionally —
+ * including when a wallet is connected. Use it to inject caching
+ * wrappers, instrumentation, or a fully-custom client implementation.
+ *
+ * @param params.chain - The resolved chain for the requested chainId.
+ * @param params.dataSource - The data source the default path would have
+ *   used (the folded `config.transports[chainId]`). Use it, ignore it,
+ *   or compose with your own.
+ */
+export type ClientFactory = (params: {
+  chain: ChainNetwork
+  dataSource: ChainDataSource<any>
+}) => Client<any, any, any>
 
 /**
  * Per-network data-source configuration parameterized by the chains tuple.
@@ -81,6 +101,14 @@ export interface LaserEyesConfig<
   readonly appIcon?: string
   /** Whether to attempt auto-reconnect on initialize. Default `true`. */
   readonly autoReconnect: boolean
+  /**
+   * Optional user-supplied client factory. When set, `getClient(config, …)`
+   * uses this unconditionally — including when a wallet is connected.
+   * When unset, `getClient` defers to the connected wallet's client (if
+   * any) and falls back to the default `createClient({ network,
+   * dataSource })`.
+   */
+  readonly client?: ClientFactory
 }
 
 /**
@@ -124,6 +152,24 @@ export interface CreateLaserEyesConfigOptions<
   appIcon?: string
   /** Disable auto-reconnect on initialize. Default: enabled. */
   autoReconnect?: boolean
+  /**
+   * Custom client factory. When set, takes unconditional precedence over
+   * the default `getClient` behavior (including the connected wallet's
+   * client).
+   *
+   * @example
+   * ```ts
+   * createLaserEyesConfig({
+   *   chains: [MAINNET],
+   *   transports: { mainnet: [mempool({...})] },
+   *   client: ({ chain, dataSource }) =>
+   *     createClient({ network: chain, dataSource })
+   *       .extend(publicActions())
+   *       .extend(cacheActions()),
+   * })
+   * ```
+   */
+  client?: ClientFactory
 }
 
 /**
@@ -181,7 +227,7 @@ export function createLaserEyesConfig<
     networks: chains,
   }
   const connectorFns = (opts.connectors ?? ([] as unknown as connectorFns)) as connectorFns
-  const connectors: Connector[] = (connectorFns as readonly CreateConnectorFn[]).map((fn) =>
+  const connectors: Connector[] = (connectorFns as readonly CreateConnectorFn[]).map(fn =>
     fn(connectorConfig)
   )
 
@@ -201,5 +247,6 @@ export function createLaserEyesConfig<
     appName: opts.appName,
     appIcon: opts.appIcon,
     autoReconnect: opts.autoReconnect ?? true,
+    client: opts.client,
   }
 }
