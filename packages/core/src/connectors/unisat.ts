@@ -29,10 +29,9 @@ export function unisat(): CreateConnectorFn {
     rdns: 'io.unisat.wallet',
     getProvider: w => (w as { unisat?: unknown }).unisat,
     adapter: UnisatAdapter,
-    // Unisat exposes `sendBitcoin` natively. Route the wallet client's
-    // `sendBtc` method through the wallet's one-shot RPC instead of the
-    // composed PSBT path.
-    nativeRpc: { sendBtc: true },
+    // Unisat exposes `sendBitcoin` and `getBalance` natively. Route both
+    // through the wallet's one-shot RPCs instead of the composed paths.
+    nativeRpc: { sendBtc: true, getBalance: true },
   })
 }
 
@@ -46,7 +45,7 @@ export function binance(): CreateConnectorFn {
     rdns: 'com.binance.wallet',
     getProvider: w => (w as { binancew3w?: { bitcoin?: unknown } }).binancew3w?.bitcoin,
     adapter: UnisatAdapter,
-    nativeRpc: { sendBtc: true },
+    nativeRpc: { sendBtc: true, getBalance: true },
   })
 }
 
@@ -60,7 +59,7 @@ export function wizz(): CreateConnectorFn {
     rdns: 'com.wizz.wallet',
     getProvider: w => (w as { wizz?: unknown }).wizz,
     adapter: UnisatAdapter,
-    nativeRpc: { sendBtc: true },
+    nativeRpc: { sendBtc: true, getBalance: true },
   })
 }
 

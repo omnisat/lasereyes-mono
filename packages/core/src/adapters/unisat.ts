@@ -65,6 +65,9 @@ export class UnisatAdapter extends BaseAdapter {
       case 'bitcoin_sendBitcoin':
         return this.handleSendBitcoin(params)
 
+      case 'bitcoin_getBalance':
+        return this.handleGetBalance(params)
+
       case 'bitcoin_signMessage':
         return this.handleSignMessage(params)
 
@@ -259,6 +262,35 @@ export class UnisatAdapter extends BaseAdapter {
   }
 
   /**
+   * Handle bitcoin_getBalance.
+   *
+   * @remarks
+   * Unisat's `getBalance()` returns `{ confirmed, unconfirmed, total }`
+   * for the connected wallet's address — it doesn't accept an arbitrary
+   * address.
+   *
+   * When `params.address` is provided, we honor it only if it matches
+   * one of the connected accounts. Otherwise we throw
+   * `METHOD_NOT_FOUND` so the upstream `tryProvider` helper falls back
+   * to the configured data source.
+   */
+  private async handleGetBalance(params?: { address?: string }): Promise<string> {
+    const requested = params?.address
+    if (requested) {
+      const accounts: string[] = await this.rawProvider.getAccounts()
+      if (!accounts.includes(requested)) {
+        throw this.createError(
+          -32601,
+          'bitcoin_getBalance: wallet only tracks the connected address; ' +
+            'callers should fall back to the data source for arbitrary addresses'
+        )
+      }
+    }
+    const bal = await this.rawProvider.getBalance()
+    return String(bal.total)
+  }
+
+  /**
    * Handle bitcoin_signMessage
    */
   private async handleSignMessage(params: any): Promise<string> {
@@ -309,6 +341,7 @@ export class UnisatAdapter extends BaseAdapter {
         bitcoin_signPsbt: { supported: true },
         bitcoin_signPsbts: { supported: true },
         bitcoin_sendBitcoin: { supported: true },
+        bitcoin_getBalance: { supported: true },
         bitcoin_switchNetwork: { supported: true },
         bitcoin_pushPsbt: { supported: true },
         bitcoin_getInscriptions: { supported: true },
@@ -318,6 +351,7 @@ export class UnisatAdapter extends BaseAdapter {
         bitcoin_signPsbt: { supported: true },
         bitcoin_signPsbts: { supported: true },
         bitcoin_sendBitcoin: { supported: true },
+        bitcoin_getBalance: { supported: true },
         bitcoin_switchNetwork: { supported: true },
         bitcoin_pushPsbt: { supported: true },
         bitcoin_getInscriptions: { supported: true },
@@ -327,24 +361,28 @@ export class UnisatAdapter extends BaseAdapter {
         bitcoin_signPsbt: { supported: true },
         bitcoin_signPsbts: { supported: true },
         bitcoin_sendBitcoin: { supported: true },
+        bitcoin_getBalance: { supported: true },
         bitcoin_switchNetwork: { supported: true },
       },
       signet: {
         bitcoin_signMessage: { supported: true },
         bitcoin_signPsbt: { supported: true },
         bitcoin_sendBitcoin: { supported: true },
+        bitcoin_getBalance: { supported: true },
         bitcoin_switchNetwork: { supported: true },
       },
       'fractal-mainnet': {
         bitcoin_signMessage: { supported: true },
         bitcoin_signPsbt: { supported: true },
         bitcoin_sendBitcoin: { supported: true },
+        bitcoin_getBalance: { supported: true },
         bitcoin_switchNetwork: { supported: true },
       },
       'fractal-testnet': {
         bitcoin_signMessage: { supported: true },
         bitcoin_signPsbt: { supported: true },
         bitcoin_sendBitcoin: { supported: true },
+        bitcoin_getBalance: { supported: true },
         bitcoin_switchNetwork: { supported: true },
       },
     }

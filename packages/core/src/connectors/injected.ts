@@ -31,7 +31,12 @@
  */
 
 import type { ChainNetwork, NetworkId } from '@omnisat/lasereyes-client'
-import type { Account, SendBtcParams } from '@omnisat/lasereyes-client/wallet'
+import type {
+  Account,
+  AddressPurpose,
+  SendBtcParams,
+  WalletAccount,
+} from '@omnisat/lasereyes-client/wallet'
 import type { BaseAdapter, BitcoinProviderAdapter } from '../adapters/base'
 import type { Connector, CreateConnectorFn } from '../types/connector'
 import type { ProviderCapabilities } from '../types/provider'
@@ -84,6 +89,12 @@ export interface InjectedConnectorTarget {
     sendBtc?: boolean
     /** Wallet supports `bitcoin_pushPsbt` natively. */
     broadcastPsbt?: boolean
+    /**
+     * Wallet supports `bitcoin_getBalance` natively. Honored only when the
+     * caller asks for the connected wallet's address; otherwise the
+     * override hits the data-source-backed `getBalance` action.
+     */
+    getBalance?: boolean
   }
 }
 
@@ -115,7 +126,8 @@ export function injected(target: InjectedConnectorTarget): CreateConnectorFn {
     }
 
     const hasNativeOverrides =
-      target.nativeRpc && (target.nativeRpc.sendBtc || target.nativeRpc.broadcastPsbt)
+      target.nativeRpc &&
+      (target.nativeRpc.sendBtc || target.nativeRpc.broadcastPsbt || target.nativeRpc.getBalance)
 
     const connector: Connector = {
       id: target.id,
@@ -200,6 +212,20 @@ export function injected(target: InjectedConnectorTarget): CreateConnectorFn {
                 overrides.broadcastPsbt = async (psbt: string): Promise<string> => {
                   const a = requireAdapter()
                   return (await a.request('bitcoin_pushPsbt', { psbt })) as string
+                }
+              }
+              if (target.nativeRpc?.getBalance) {
+                overrides.getBalance = async (
+                  account?: WalletAccount,
+                  purpose: AddressPurpose = 'payment'
+                ): Promise<string> => {
+                  const resolved = (account ?? client.config.account) as WalletAccount | undefined
+                  const address = resolved?.getAddress(purpose)
+                  const a = requireAdapter()
+                  return (await a.request(
+                    'bitcoin_getBalance',
+                    address ? { address } : undefined
+                  )) as string
                 }
               }
               return client.extend(() => overrides)

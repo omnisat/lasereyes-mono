@@ -78,6 +78,7 @@ export type BitcoinRpcMethod =
   | 'bitcoin_getCapabilities'
   | 'bitcoin_signMessage'
   // Optional
+  | 'bitcoin_getBalance'
   | 'bitcoin_switchNetwork'
   | 'bitcoin_signPsbt'
   | 'bitcoin_signMultiplePsbts'
