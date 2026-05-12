@@ -51,7 +51,7 @@ import { createConnector } from './create'
 /**
  * Configuration for an injected-wallet connector.
  */
-export interface InjectedConnectorTarget {
+export interface InjectedConnectorOptions {
   /** Stable connector identifier (e.g. `'unisat'`). */
   id: string
   /** Human-readable name (e.g. `'Unisat Wallet'`). */
@@ -125,7 +125,7 @@ export interface InjectedConnectorTarget {
  * @param target - Identification, detection, and adapter wiring.
  * @returns A {@link CreateConnectorFn} ready to pass into the LaserEyes config.
  */
-export function injected(target: InjectedConnectorTarget): CreateConnectorFn {
+export function injected(target: InjectedConnectorOptions): CreateConnectorFn {
   return createConnector(_config => {
     let cachedProvider: BitcoinProvider | null = null
 

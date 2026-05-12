@@ -101,7 +101,7 @@ import type { XverseAdapter } from '../adapters/xverse'
 import { createLaserEyesConfig, type NetworkTransports } from '../config'
 // — Connectors —
 import { createConnector } from '../connectors/create'
-import { type InjectedConnectorTarget, injected } from '../connectors/injected'
+import { type InjectedConnectorOptions, injected } from '../connectors/injected'
 import { keplr } from '../connectors/keplr'
 import { leather } from '../connectors/leather'
 import { magicEden } from '../connectors/magic-eden'
@@ -154,7 +154,7 @@ declare const sp: SparrowAdapter
 declare const to: TokeoAdapter
 declare const ke: KeplrAdapter
 declare const caps: ProviderCapabilities
-declare const target: InjectedConnectorTarget
+declare const target: InjectedConnectorOptions
 declare const config: ConnectorConfig
 declare const c: Connector
 declare const announcement: WalletAnnouncement

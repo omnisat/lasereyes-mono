@@ -15,7 +15,7 @@
  */
 
 export { createConnector } from './create'
-export type { InjectedConnectorTarget } from './injected'
+export type { InjectedConnectorOptions } from './injected'
 export { injected } from './injected'
 
 // Per-wallet factories
