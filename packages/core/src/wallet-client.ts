@@ -41,6 +41,7 @@ import {
   type WalletClient,
   type WalletClientConfig,
 } from '@omnisat/lasereyes-client/wallet'
+import { getClient } from './client'
 import type { LaserEyesConfig } from './config'
 import {
   readCachedClient,
@@ -91,37 +92,23 @@ export async function getWalletClient<const config extends LaserEyesConfig<any, 
 ): Promise<WalletClient<WalletClientConfig<Account, any>, Account, any, any>> {
   const id = (options?.chainId ?? config.state.$connection.get().networkId) as string
 
-  // If the user supplied a custom client factory, it wins
-  // unconditionally — same precedence as `getClient`. Apps that want
-  // their factory's output everywhere shouldn't get a wallet client
-  // smuggled in via this path either.
-  if (config.client) {
-    const cached = readCachedClient(config, id)
-    if (cached) {
-      return cached as WalletClient<WalletClientConfig<Account, any>, Account, any, any>
-    }
-    const network = (config.chains as readonly ChainNetwork[]).find(c => c.id === id)
-    if (!network) {
-      throw new UnsupportedNetworkError(
-        id,
-        (config.chains as readonly ChainNetwork[]).map(c => c.id)
-      )
-    }
-    const dataSource = resolveDataSource(config, id) as ChainDataSource<any>
-    const built = config.client({ chain: network, dataSource })
-    writeCachedClient(config, id, built)
-    return built as WalletClient<WalletClientConfig<Account, any>, Account, any, any>
+  // Either branch — user factory set OR a wallet client is already in
+  // the cache (populated at `connect()` time) — `getClient` returns
+  // exactly what we want. The cast at this layer asserts "this is a
+  // WalletClient"; for the factory-wins branch that's the user's
+  // responsibility, for the cache branch we ensure connect populated a
+  // real wallet client.
+  if (config.client || readCachedClient(config, id)) {
+    return getClient(config, options) as unknown as WalletClient<
+      WalletClientConfig<Account, any>,
+      Account,
+      any,
+      any
+    >
   }
 
-  // Cache hit (likely populated by a prior `connect()`).
-  const cached = readCachedClient(config, id)
-  if (cached) {
-    return cached as WalletClient<WalletClientConfig<Account, any>, Account, any, any>
-  }
-
-  // Build. The connector is required at this point; the resulting wallet
-  // client gets cached so subsequent `getClient` / `getWalletClient`
-  // calls hit the cache.
+  // No cache and no factory — need to build a fresh wallet client. The
+  // connector is required at this point.
   const connector = resolveConnector(config)
   const account = await connector.getAccount()
   const network = (config.chains as readonly ChainNetwork[]).find(c => c.id === id)
