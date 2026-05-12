@@ -48,6 +48,7 @@ import type {
 } from '@omnisat/lasereyes-client'
 import {
   broadcastTransaction as clientBroadcastTransaction,
+  getAction,
   getBalance as clientGetBalance,
   getRecommendedFees as clientGetRecommendedFees,
   getTransaction as clientGetTransaction,
@@ -115,7 +116,8 @@ export async function getBalance<const config extends LaserEyesConfig<any, any, 
   address: string,
   options?: { chainId?: config['chains'][number]['id'] }
 ): Promise<string> {
-  return clientGetBalance(getClient(config, options), address)
+  const client = getClient(config, options)
+  return getAction(client, clientGetBalance, 'getBalance')(address)
 }
 
 /**
@@ -130,7 +132,8 @@ export async function getAddressUtxos<const config extends LaserEyesConfig<any, 
   address: string,
   options?: { chainId?: config['chains'][number]['id'] }
 ): Promise<PaginatedResult<UTXO>> {
-  return clientGetUtxos(getClient(config, options), address)
+  const client = getClient(config, options)
+  return getAction(client, clientGetUtxos, 'getUtxos')(address)
 }
 
 // ============================================================================
@@ -240,7 +243,8 @@ export async function getRecommendedFees<const config extends LaserEyesConfig<an
   config: config,
   options?: { chainId?: config['chains'][number]['id'] }
 ): Promise<FeeEstimate> {
-  return clientGetRecommendedFees(getClient(config, options))
+  const client = getClient(config, options)
+  return getAction(client, clientGetRecommendedFees, 'getRecommendedFees')()
 }
 
 /**
@@ -261,7 +265,8 @@ export async function getTransaction<const config extends LaserEyesConfig<any, a
   txId: string,
   options?: { chainId?: config['chains'][number]['id'] }
 ): Promise<Transaction> {
-  return clientGetTransaction(getClient(config, options), txId)
+  const client = getClient(config, options)
+  return getAction(client, clientGetTransaction, 'getTransaction')(txId)
 }
 
 /**
@@ -278,5 +283,6 @@ export async function broadcastTransaction<const config extends LaserEyesConfig<
   rawTx: string,
   options?: { chainId?: config['chains'][number]['id'] }
 ): Promise<string> {
-  return clientBroadcastTransaction(getClient(config, options), rawTx)
+  const client = getClient(config, options)
+  return getAction(client, clientBroadcastTransaction, 'broadcastTransaction')(rawTx)
 }
