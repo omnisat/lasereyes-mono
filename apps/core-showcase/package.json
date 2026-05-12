@@ -7,6 +7,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
+    "analyze": "ANALYZE=1 vite build && open dist/stats.html",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -14,6 +15,7 @@
     "@omnisat/lasereyes-core": "workspace:*"
   },
   "devDependencies": {
+    "rollup-plugin-visualizer": "^5.12.0",
     "typescript": "5.8.3",
     "vite": "^5.4.0"
   }
