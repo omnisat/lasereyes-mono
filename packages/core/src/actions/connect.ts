@@ -14,7 +14,6 @@
  * @module actions/connect
  */
 
-import type { NetworkId } from '@omnisat/lasereyes-client'
 import type { LaserEyesConfig } from '../config'
 import type { Connector, ConnectResult } from '../types/connector'
 import type { BitcoinProvider } from '../types/provider'
@@ -89,17 +88,19 @@ function subscribeToConnectorEvents(
     }
   }
 
-  const onNetworkChanged = async (payload?: NetworkId) => {
-    let next: NetworkId | undefined =
-      typeof payload === 'string' ? (payload as NetworkId) : undefined
-    if (!next) {
-      try {
-        next = await connector.getNetworkId()
-      } catch {
-        return
-      }
+  const onNetworkChanged = async () => {
+    // Always re-derive via the connector (which routes through the
+    // adapter's `bitcoin_getNetwork` handler — that normalizes
+    // wallet-specific terms like Unisat's "livenet" → "mainnet"). Raw
+    // event payloads can't be trusted: wallets often emit their native
+    // enum strings on the event but normalize on the RPC method.
+    try {
+      const next = await connector.getNetworkId()
+      config.state.$connection.setKey('networkId', next)
+    } catch {
+      // Provider unreachable or wallet just disconnected — let the
+      // disconnect listener handle teardown.
     }
-    config.state.$connection.setKey('networkId', next)
   }
 
   const onDisconnect = () => {
@@ -113,12 +114,12 @@ function subscribeToConnectorEvents(
   }
 
   provider.on('accountsChanged', onAccountsChanged)
-  provider.on('networkChanged', onNetworkChanged as (...args: any[]) => void)
+  provider.on('networkChanged', onNetworkChanged)
   provider.on('disconnect', onDisconnect)
 
   return () => {
     provider.removeListener('accountsChanged', onAccountsChanged)
-    provider.removeListener('networkChanged', onNetworkChanged as (...args: any[]) => void)
+    provider.removeListener('networkChanged', onNetworkChanged)
     provider.removeListener('disconnect', onDisconnect)
   }
 }

@@ -5,6 +5,7 @@
  */
 
 import type { ChainNetwork } from '@omnisat/lasereyes-client'
+import { UnsupportedNetworkError } from '@omnisat/lasereyes-client'
 import type { LaserEyesConfig } from '../config'
 import { resolveConnector } from '../internal'
 
@@ -51,7 +52,20 @@ export async function switchNetwork<
     throw new Error(`Connector '${connector.id}' does not support switchNetwork`)
   }
 
-  const resolved = (await connector.switchNetwork(networkId as never)) as ChainNetwork
+  // Resolve the chain from config.chains by id rather than trusting the
+  // adapter's return value — some adapters (Unisat) implement
+  // `bitcoin_switchNetwork` as a void operation and we'd otherwise read
+  // `.id` off `undefined`.
+  const supported = config.chains as readonly ChainNetwork[]
+  const resolved = supported.find(c => c.id === networkId)
+  if (!resolved) {
+    throw new UnsupportedNetworkError(
+      networkId as string,
+      supported.map(c => c.id)
+    )
+  }
+
+  await connector.switchNetwork(networkId as never)
   config.state.$connection.setKey('networkId', resolved.id)
   connector.onNetworkChanged?.(resolved.id)
 
