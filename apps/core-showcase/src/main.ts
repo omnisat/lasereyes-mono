@@ -17,7 +17,7 @@
  * Open devtools console for the full call trace.
  */
 
-import { MAINNET } from '@omnisat/lasereyes-client'
+import { MAINNET, TESTNET, UnsupportedNetworkError } from '@omnisat/lasereyes-client'
 import { createDataSource as createMempoolDataSource } from '@omnisat/lasereyes-client/vendors/mempool'
 import {
   broadcastTransaction,
@@ -31,21 +31,29 @@ import {
   sendBitcoin,
   signMessage,
   signPsbt,
+  switchNetwork,
   unisat,
   xverse,
 } from '@omnisat/lasereyes-core'
 
 // ============================================================================
 // 1. Build the LaserEyes config
+//
+// Mainnet + testnet only. If the wallet's current network is anything else,
+// the keystone throws `UnsupportedNetworkError` — the UI catches that and
+// directs the user to the Switch network buttons.
 // ============================================================================
 
 const config = createLaserEyesConfig({
-  chains: [MAINNET],
+  chains: [MAINNET, TESTNET],
   connectors: [unisat(), xverse()],
   transports: {
     mainnet: [createMempoolDataSource({ network: MAINNET })],
+    testnet: [createMempoolDataSource({ network: TESTNET })],
   },
 })
+
+const supportedNetworkIds = config.chains.map(c => c.id)
 
 // Kick off announcement-based discovery + auto-reconnect (no-op on fresh load).
 loadAllWallets()
@@ -65,9 +73,7 @@ const logEl = $('log') as HTMLPreElement
 const log = (level: 'info' | 'ok' | 'warn' | 'err', ...parts: unknown[]) => {
   const ts = new Date().toLocaleTimeString()
   const cls = level === 'info' ? '' : level
-  const line = parts
-    .map((p) => (typeof p === 'string' ? p : JSON.stringify(p, null, 2)))
-    .join(' ')
+  const line = parts.map(p => (typeof p === 'string' ? p : JSON.stringify(p, null, 2))).join(' ')
   logEl.innerHTML += `<span class="ts">${ts}</span> ${cls ? `<span class="${cls}">` : ''}${line}${
     cls ? '</span>' : ''
   }\n`
@@ -89,10 +95,33 @@ const setAccountFields = () => {
   const networkId = config.state.$networkId.get()
   const connector = config.state.$connector.get()
   $('address').textContent = account?.getAddress() ?? '—'
-  $('network').textContent = networkId ?? '—'
+  const supported = supportedNetworkIds.includes(networkId as never)
+  $('network').textContent = networkId ? `${networkId}${supported ? '' : ' (unsupported)'}` : '—'
   $('active-connector').textContent = connector?.id ?? '—'
   // The override is the visible bit of Phase 10 — surface it.
   $('has-override').textContent = connector?.getClient ? 'yes (nativeRpc)' : 'no (composed default)'
+  renderSwitchNetwork(networkId)
+}
+
+const renderSwitchNetwork = (active: string | undefined) => {
+  const host = $('switch-network')
+  host.innerHTML = ''
+  if (!config.state.$connector.get()) return
+  for (const c of config.chains) {
+    const btn = document.createElement('button')
+    btn.textContent = c.id
+    btn.disabled = c.id === active
+    btn.onclick = async () => {
+      log('info', `→ switchNetwork(config, '${c.id}')`)
+      try {
+        const result = await switchNetwork(config, c.id)
+        log('ok', `← wallet now on '${result.id}'`)
+      } catch (e) {
+        log('err', `✗ switchNetwork failed:`, (e as Error).message)
+      }
+    }
+    host.appendChild(btn)
+  }
 }
 
 // ============================================================================
@@ -114,13 +143,10 @@ const renderConnectors = () => {
     btn.onclick = async () => {
       log('info', `→ connect(config, { connectorId: '${c.id}' })`)
       try {
-        await connect(config, { connectorId: c.id })
-        const result = config.state.$account.get()
-        log('ok', `← connected. account.address=${result?.getAddress()}`)
-        setStatus(`connected (${c.id})`, true)
-        setAccountFields()
-        enableWriteButtons(true)
-        ;($('disconnect') as HTMLButtonElement).disabled = false
+        const result = await connect(config, { connectorId: c.id })
+        log('ok', `← connected on '${result.networkId}': ${result.account.getAddress()}`)
+        // UI fields update via the reactive subscriptions on $account /
+        // $networkId / $status — no imperative refresh needed here.
       } catch (e) {
         log('err', `✗ connect failed:`, (e as Error).message)
       }
@@ -132,6 +158,43 @@ const renderConnectors = () => {
 // Re-render when announcements arrive (EIP-6963-style discovery).
 config.state.$connectors.subscribe(renderConnectors)
 renderConnectors()
+
+// ============================================================================
+// 3b. Reactive subscriptions
+//
+// When the wallet emits accountsChanged or networkChanged after the user
+// switches accounts/networks in the wallet UI, core's connect()-time event
+// subscriptions push the changes into these atoms. We mirror those changes
+// to the UI here.
+// ============================================================================
+
+config.state.$account.subscribe(next => {
+  log('info', `state.$account → ${next ? next.getAddress() : 'undefined'}`)
+  setAccountFields()
+})
+
+config.state.$networkId.subscribe(next => {
+  log('info', `state.$networkId → '${next}'`)
+  const supported = supportedNetworkIds.includes(next as never)
+  if (!supported) {
+    log(
+      'warn',
+      `wallet on '${next}' which is not in config.chains [${supportedNetworkIds.join(', ')}] — actions will throw UnsupportedNetworkError`
+    )
+  }
+  setAccountFields()
+})
+
+config.state.$status.subscribe(next => {
+  setStatus(next, next === 'connected')
+  if (next === 'disconnected') {
+    enableWriteButtons(false)
+    ;($('disconnect') as HTMLButtonElement).disabled = true
+  } else if (next === 'connected') {
+    enableWriteButtons(true)
+    ;($('disconnect') as HTMLButtonElement).disabled = false
+  }
+})
 
 // ============================================================================
 // 4. Action handlers
@@ -147,10 +210,7 @@ $('disconnect').onclick = async () => {
   log('info', '→ disconnect(config)')
   await disconnect(config)
   log('ok', '← disconnected')
-  setStatus('idle', false)
-  setAccountFields()
-  enableWriteButtons(false)
-  ;($('disconnect') as HTMLButtonElement).disabled = true
+  // UI updates flow from the $status subscription.
 }
 
 $('get-balance').onclick = async () => {
@@ -186,7 +246,12 @@ $('send').onclick = async () => {
     const txId = await sendBitcoin(config, to, amount)
     log('ok', `← txId: ${txId}`)
   } catch (e) {
-    log('err', `✗ sendBitcoin failed:`, (e as Error).message)
+    if (e instanceof UnsupportedNetworkError) {
+      log('err', `✗ ${e.message}`)
+      log('info', `  → use the "Switch network" buttons to move the wallet to a supported chain.`)
+    } else {
+      log('err', `✗ sendBitcoin failed:`, (e as Error).message)
+    }
   }
 }
 
@@ -201,7 +266,11 @@ $('sign-message').onclick = async () => {
     const sig = await signMessage(config, message)
     log('ok', `← signature: ${sig}`)
   } catch (e) {
-    log('err', `✗ signMessage failed:`, (e as Error).message)
+    if (e instanceof UnsupportedNetworkError) {
+      log('err', `✗ ${e.message}`)
+    } else {
+      log('err', `✗ signMessage failed:`, (e as Error).message)
+    }
   }
 }
 
@@ -244,7 +313,4 @@ $('sign-psbt').onclick = async () => {
 
 setAccountFields()
 log('info', 'config built. chains=[mainnet], connectors=[unisat, xverse]')
-log(
-  'info',
-  'Connect a wallet to begin. Devtools window.laserEyes.* exposes the config + keystone.'
-)
+log('info', 'Connect a wallet to begin. Devtools window.laserEyes.* exposes the config + keystone.')

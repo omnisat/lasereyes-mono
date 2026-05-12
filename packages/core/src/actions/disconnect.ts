@@ -6,11 +6,14 @@
 
 import type { LaserEyesConfig } from '../config'
 import { tryResolveConnector } from '../internal'
+import { _clearConnectCleanup, _getConnectCleanup } from './connect'
 
 /**
  * Disconnect the active wallet.
  *
  * @remarks
+ * - Tears down the provider-level event subscriptions installed by
+ *   `connect` (accountsChanged, networkChanged, disconnect).
  * - If a connector is active, calls `connector.disconnect()`.
  * - Clears `$account`, `$connector`, sets `$status` to `'disconnected'`.
  * - Removes the persisted connector ID from storage.
@@ -19,6 +22,11 @@ import { tryResolveConnector } from '../internal'
 export async function disconnect<const config extends LaserEyesConfig<any, any, any>>(
   config: config
 ): Promise<void> {
+  // Tear down event subscriptions first — once we clear the connector,
+  // we lose the provider reference the cleanup needs.
+  _getConnectCleanup(config)?.()
+  _clearConnectCleanup(config)
+
   const connector = tryResolveConnector(config)
   if (connector) {
     try {

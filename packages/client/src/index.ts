@@ -60,6 +60,7 @@ export {
   ProviderErrorCode,
   ProviderRpcError,
   PsbtBuildError,
+  UnsupportedNetworkError,
 } from './errors'
 
 // getAction — override-aware action dispatch. Used internally by composed

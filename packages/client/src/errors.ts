@@ -87,6 +87,47 @@ export class NetworkMismatchError extends LaserEyesClientError {
 }
 
 /**
+ * Thrown when the active wallet's network isn't in the LaserEyes config's
+ * chains tuple.
+ *
+ * @remarks
+ * Distinct from {@link NetworkMismatchError} (which guards
+ * client-vs-data-source consistency). This one is raised by the core
+ * keystone when a wallet's runtime network falls outside the supported
+ * set — typically because the user switched chains in their wallet UI to
+ * a chain the app didn't register.
+ *
+ * Apps should catch this and either:
+ * - Surface a "wrong network" prompt and call `switchNetwork(config, …)`.
+ * - Refuse the operation with a clear message.
+ *
+ * Error code: `'UNSUPPORTED_NETWORK'`
+ */
+export class UnsupportedNetworkError extends LaserEyesClientError {
+  /** The network ID the wallet is currently on. */
+  readonly networkId: string
+  /** The set of network IDs the config supports. */
+  readonly supported: readonly string[]
+
+  /**
+   * @param networkId - The wallet's current network.
+   * @param supported - The network IDs declared in `config.chains`.
+   */
+  constructor(networkId: string, supported: readonly string[]) {
+    super(
+      `Wallet is on '${networkId}' but config.chains only supports [${supported
+        .map(s => `'${s}'`)
+        .join(', ')}]. ` +
+        `Either add '${networkId}' to your chains config, or switch the wallet's network.`,
+      'UNSUPPORTED_NETWORK'
+    )
+    this.name = 'UnsupportedNetworkError'
+    this.networkId = networkId
+    this.supported = supported
+  }
+}
+
+/**
  * Thrown when PSBT construction fails due to invalid parameters, missing data,
  * or transaction building errors.
  *

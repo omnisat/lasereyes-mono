@@ -9,8 +9,33 @@
  * @module adapters/base
  */
 
+import type { NetworkId } from '@omnisat/lasereyes-client'
 import { ProviderErrorCode, ProviderRpcError } from '@omnisat/lasereyes-client'
-import type { BitcoinProvider, ProviderCapabilities } from '../types/provider'
+import type { Account } from '@omnisat/lasereyes-client/wallet'
+import EventEmitter from 'eventemitter3'
+import type {
+  BitcoinProvider,
+  BitcoinProviderEvent,
+  ConnectInfo,
+  DisconnectInfo,
+  ProviderCapabilities,
+  ProviderMessage,
+} from '../types/provider'
+
+/**
+ * Typed event map for adapter-emitted events.
+ *
+ * @remarks
+ * Mirrors the {@link BitcoinProviderEvent} enum exactly. Listeners
+ * subscribed via `adapter.on(eventName, handler)` get the typed payload.
+ */
+export type AdapterEventMap = {
+  accountsChanged: [Account]
+  networkChanged: [NetworkId]
+  connect: [ConnectInfo]
+  disconnect: [DisconnectInfo]
+  message: [ProviderMessage]
+}
 
 /**
  * Adapter interface — a {@link BitcoinProvider} that also exposes the
@@ -46,8 +71,27 @@ export abstract class BaseAdapter implements BitcoinProviderAdapter {
   abstract readonly walletName: string
   readonly rawProvider: any
 
+  /**
+   * Internal emitter for normalized `BitcoinProviderEvent`s.
+   *
+   * @remarks
+   * Subclasses subscribe to wallet-native events on `rawProvider`
+   * (which may use different names, e.g. `accountChanged` vs the spec's
+   * `accountsChanged`) and re-emit through this emitter using the
+   * standard names. Consumers (core's `connect` action, app code)
+   * subscribe via `adapter.on(eventName, handler)` and get the
+   * spec-normalized payload.
+   *
+   * Override {@link subscribeRawEvents} to attach wallet-specific
+   * listeners on construction.
+   *
+   * @internal
+   */
+  protected readonly emitter = new EventEmitter<AdapterEventMap>()
+
   constructor(rawProvider: any) {
     this.rawProvider = rawProvider
+    this.subscribeRawEvents()
   }
 
   /**
@@ -62,21 +106,68 @@ export abstract class BaseAdapter implements BitcoinProviderAdapter {
    */
   protected abstract buildCapabilities(): ProviderCapabilities
 
-  // ============================================================================
-  // Event delegation
-  // ============================================================================
+  /**
+   * Subscribe to the wallet's native events and re-emit normalized
+   * `BitcoinProviderEvent`s on the internal {@link emitter}.
+   *
+   * @remarks
+   * Default implementation passes through `accountsChanged`,
+   * `networkChanged`, `connect`, `disconnect`, and `message` directly
+   * (suitable for wallets that already use the spec event names — most
+   * window-injected Bitcoin wallets, including Unisat). Override in
+   * subclasses that use different event names (e.g. Xverse via
+   * sats-connect; Magic Eden; Phantom) to do the mapping.
+   *
+   * Subclasses overriding this should:
+   * 1. Call `this.rawProvider.on(walletEventName, payload => { ... })`.
+   * 2. Translate the payload to the spec-shaped form.
+   * 3. Call `this.emitter.emit(specEventName, payload)`.
+   */
+  protected subscribeRawEvents(): void {
+    const raw = this.rawProvider
+    if (!raw?.on) return
 
-  on(event: string, listener: (...args: any[]) => void): void {
-    if (this.rawProvider.on) {
-      this.rawProvider.on(event, listener)
+    const passthrough = (event: BitcoinProviderEvent) => {
+      raw.on(event, (...args: unknown[]) => {
+        // eventemitter3's `emit` is variadic; cast through unknown to
+        // accommodate the union event map without per-event narrowing.
+        ;(this.emitter.emit as (e: string, ...args: unknown[]) => boolean)(event, ...args)
+      })
     }
+    passthrough('accountsChanged')
+    passthrough('networkChanged')
+    passthrough('connect')
+    passthrough('disconnect')
+    passthrough('message')
   }
 
+  // ============================================================================
+  // BitcoinProvider event surface (spec-shaped)
+  // ============================================================================
+
+  /** Subscribe to a normalized `BitcoinProviderEvent`. */
+  on(event: string, listener: (...args: any[]) => void): void {
+    this.emitter.on(event as keyof AdapterEventMap, listener as never)
+  }
+
+  /** Unsubscribe a previously-registered listener. */
   removeListener(event: string, listener: (...args: any[]) => void): void {
-    if (this.rawProvider.removeListener) {
-      this.rawProvider.removeListener(event, listener)
-    } else if (this.rawProvider.off) {
-      this.rawProvider.off(event, listener)
+    this.emitter.removeListener(event as keyof AdapterEventMap, listener as never)
+  }
+
+  /**
+   * Remove all listeners (for one event, or all if no event given).
+   *
+   * @remarks
+   * Useful for disconnect-time cleanup. Not part of the
+   * EIP-1193-style {@link BitcoinProvider} surface; available as a
+   * convenience on the adapter.
+   */
+  removeAllListeners(event?: string): void {
+    if (event) {
+      this.emitter.removeAllListeners(event as keyof AdapterEventMap)
+    } else {
+      this.emitter.removeAllListeners()
     }
   }
 

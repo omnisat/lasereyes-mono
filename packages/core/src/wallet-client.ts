@@ -32,6 +32,7 @@
  */
 
 import type { ChainDataSource, ChainNetwork, NetworkId } from '@omnisat/lasereyes-client'
+import { UnsupportedNetworkError } from '@omnisat/lasereyes-client'
 import {
   type Account,
   createWalletClient,
@@ -92,7 +93,10 @@ export async function getWalletClient<const config extends LaserEyesConfig<any, 
   const id = (options?.chainId ?? config.state.$networkId.get()) as string
   const network = (config.chains as readonly ChainNetwork[]).find(c => c.id === id)
   if (!network) {
-    throw new Error(`Chain '${id}' not in config.chains`)
+    throw new UnsupportedNetworkError(
+      id,
+      (config.chains as readonly ChainNetwork[]).map(c => c.id)
+    )
   }
   const dataSource = resolveDataSource(config, id) as ChainDataSource<any>
   const provider = connector.getProvider()
