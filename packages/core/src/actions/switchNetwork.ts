@@ -58,9 +58,12 @@ export async function switchNetwork<
   // chain than requested if the requested one isn't available; the
   // adapter reports what actually happened.
   const resolvedId = await connector.switchNetwork(networkId as never)
-  config.state.$connection.setKey('networkId', resolvedId)
-  connector.onNetworkChanged?.(resolvedId)
 
+  // Verify the wallet landed on a chain we support BEFORE committing
+  // the change to state. If it didn't, throw — the wallet has moved off
+  // its previous chain regardless, but the `networkChanged` event
+  // handler will pick that up on its own; state stays consistent with
+  // what the action promises to return.
   const supported = config.chains as readonly ChainNetwork[]
   const resolved = supported.find(c => c.id === resolvedId)
   if (!resolved) {
@@ -69,6 +72,9 @@ export async function switchNetwork<
       supported.map(c => c.id)
     )
   }
+
+  config.state.$connection.setKey('networkId', resolvedId)
+  connector.onNetworkChanged?.(resolvedId)
 
   return resolved as Extract<config['chains'][number], { id: id }>
 }
