@@ -38,11 +38,15 @@
  */
 
 import type { NetworkId } from '@omnisat/lasereyes-client'
-import type {
-  Account,
-  AddressPurpose,
-  SendBtcParams,
-  WalletAccount,
+import { getAction } from '@omnisat/lasereyes-client'
+import {
+  type Account,
+  type AddressPurpose,
+  broadcastPsbt as baseBroadcastPsbt,
+  getBalance as baseGetBalance,
+  sendBtc as baseSendBtc,
+  type SendBtcParams,
+  type WalletAccount,
 } from '@omnisat/lasereyes-client/wallet'
 import type { Connector, CreateConnectorFn } from '../types/connector'
 import type { BitcoinProvider, ProviderCapabilities } from '../types/provider'
@@ -215,22 +219,47 @@ export function injected(target: InjectedConnectorOptions): CreateConnectorFn {
       onDisconnect: () => {},
 
       // Optional `getClient` synthesized from `target.nativeRpc` declarations.
-      // When omitted, the connector has no override and the keystone's bare
-      // default path runs in full (composed PSBT for every wallet write).
+      //
+      // Each override is "try the wallet RPC first; on any failure, fall
+      // back to the base action via `getAction`." The bare client passed
+      // to `getClient({ client })` doesn't carry the method we're about
+      // to add, so `getAction(client, baseFn, 'name')` falls through to
+      // calling the free function — no recursion, no self-substitution.
+      //
+      // The fallback path lets the wallet-fast-path optimization fail
+      // gracefully (e.g. Unisat's `bitcoin_getBalance` throws -32601 for
+      // addresses outside the wallet's accounts; that catch + base
+      // action delivers the data-source answer instead).
+      //
+      // When `target.nativeRpc` is omitted, the connector has no
+      // override and the keystone's bare default path runs in full
+      // (composed PSBT writes, data-source reads).
       ...(hasNativeOverrides
         ? {
             getClient({ client }: { client: any }) {
               const overrides: Record<string, (...args: any[]) => any> = {}
               if (target.nativeRpc?.sendBtc) {
-                overrides.sendBtc = async ({ to, amount }: SendBtcParams): Promise<string> => {
-                  const a = requireProvider()
-                  return (await a.request('bitcoin_sendBitcoin', { to, amount })) as string
+                overrides.sendBtc = async (params: SendBtcParams): Promise<string> => {
+                  try {
+                    const { to, amount } = params
+                    return (await requireProvider().request('bitcoin_sendBitcoin', {
+                      to,
+                      amount,
+                    })) as string
+                  } catch {
+                    return getAction(client, baseSendBtc, 'sendBtc')(params)
+                  }
                 }
               }
               if (target.nativeRpc?.broadcastPsbt) {
                 overrides.broadcastPsbt = async (psbt: string): Promise<string> => {
-                  const a = requireProvider()
-                  return (await a.request('bitcoin_pushPsbt', { psbt })) as string
+                  try {
+                    return (await requireProvider().request('bitcoin_pushPsbt', {
+                      psbt,
+                    })) as string
+                  } catch {
+                    return getAction(client, baseBroadcastPsbt, 'broadcastPsbt')(psbt)
+                  }
                 }
               }
               if (target.nativeRpc?.getBalance) {
@@ -240,11 +269,14 @@ export function injected(target: InjectedConnectorOptions): CreateConnectorFn {
                 ): Promise<string> => {
                   const resolved = (account ?? client.config.account) as WalletAccount | undefined
                   const address = resolved?.getAddress(purpose)
-                  const a = requireProvider()
-                  return (await a.request(
-                    'bitcoin_getBalance',
-                    address ? { address } : undefined
-                  )) as string
+                  try {
+                    return (await requireProvider().request(
+                      'bitcoin_getBalance',
+                      address ? { address } : undefined
+                    )) as string
+                  } catch {
+                    return getAction(client, baseGetBalance, 'getBalance')(account, purpose)
+                  }
                 }
               }
               return client.extend(() => overrides)

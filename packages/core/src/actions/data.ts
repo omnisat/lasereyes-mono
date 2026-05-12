@@ -2,35 +2,33 @@
  * Data (read) actions over `LaserEyesConfig`.
  *
  * @remarks
- * Three patterns:
+ * Two patterns:
  *
- * - **Provider-first / client-fallback** (`getBalance`, `getAddressUtxos`):
- *   try the active connector's `request(method, params)` first. If no
- *   connector or the request fails, fall back to the bare action from the
- *   client package, composed with {@link getClient}.
+ * - **Client (data-source) reads** (`getBalance`, `getAddressUtxos`,
+ *   `getRecommendedFees`, `getTransaction`, `broadcastTransaction`):
+ *   delegate to the bare action from the client package, composed with
+ *   `getClient(config, opts)`. The action layer never talks to the
+ *   wallet provider directly. The wallet-fast-path optimization
+ *   (avoiding an indexer round-trip when the wallet already has the
+ *   answer) lives in the *connector's* `getClient` override — apps that
+ *   want it call through `getWalletClient(config)` and the override
+ *   wires "try wallet, fall back to base via `getAction`." Action-layer
+ *   reads stay wagmi-shaped: transport-only, no wallet involvement.
  *
- * - **Provider-only** (`getInscriptions`, `getRunesBalances`,
- *   `getBrc20Balances`, `getAlkanesBalances`): try the active connector;
- *   throw if it can't satisfy the request. No data-source fallback in
- *   Phase 9 — that requires Phase 10's typed wallet keystone.
- *
- * - **Client-only** (`getRecommendedFees`, `getTransaction`,
- *   `broadcastTransaction`): delegate to the bare action from the client
- *   package: `clientAction(getClient(config, opts))`. Optional `{ chainId }`
- *   to query a chain other than the active one.
+ * - **Provider-only protocol reads** (`getInscriptions`,
+ *   `getRunesBalances`, `getBrc20Balances`, `getAlkanesBalances`): no
+ *   data-source path yet — the client package's protocol actions are
+ *   stubbed. Until those land, these hit the wallet's provider
+ *   directly. To be migrated to the client-read pattern once the
+ *   underlying actions ship.
  *
  * **Architectural pattern: bare action + bare client.**
  *
- * Each fallback / client-only path goes through the *bare action functions*
- * exported from `@omnisat/lasereyes-client` (e.g. `getBalance(client, addr)`),
+ * Each client read goes through the *bare action functions* exported
+ * from `@omnisat/lasereyes-client` (e.g. `getBalance(client, addr)`),
  * NOT through the extended-method form (`client.getBalance(addr)`). The
  * client returned by `getClient(config)` is bare — no action groups
- * pre-extended. This keeps the typed client surface composable: callers
- * who want methods can do `getClient(config).extend(publicActions())`
- * themselves; Phase 9 actions just use the underlying free functions.
- *
- * Why? Tree-shake friendliness, explicit imports per call, and zero
- * coupling between `getClient` and any specific action factory.
+ * pre-extended. Tree-shake friendly, explicit imports per call.
  *
  * All actions thread `<const config extends LaserEyesConfig<any, any,
  * any>>` so a precisely-typed config flows through.
@@ -38,13 +36,6 @@
  * @module actions/data
  */
 
-import {
-  broadcastTransaction as clientBroadcastTransaction,
-  getBalance as clientGetBalance,
-  getRecommendedFees as clientGetRecommendedFees,
-  getTransaction as clientGetTransaction,
-  getUtxos as clientGetUtxos,
-} from '@omnisat/lasereyes-client'
 import type {
   AlkaneBalance,
   Brc20Balance,
@@ -55,21 +46,35 @@ import type {
   Transaction,
   UTXO,
 } from '@omnisat/lasereyes-client'
+import {
+  broadcastTransaction as clientBroadcastTransaction,
+  getBalance as clientGetBalance,
+  getRecommendedFees as clientGetRecommendedFees,
+  getTransaction as clientGetTransaction,
+  getUtxos as clientGetUtxos,
+} from '@omnisat/lasereyes-client'
 import { getClient } from '../client'
 import type { LaserEyesConfig } from '../config'
 import { tryResolveConnector } from '../internal'
 
 // ============================================================================
-// Internal helper — provider-first attempt.
+// Internal helper — provider-only attempt for protocol reads.
 // ============================================================================
 
 /**
- * Try to call a method on the currently-active connector's provider.
+ * Call a method on the currently-active connector's provider, returning
+ * `undefined` on any failure mode.
+ *
+ * @remarks
+ * Used only by the provider-only protocol reads — those have no
+ * data-source equivalent yet and can't fall back. Client reads
+ * (`getBalance`, etc.) don't use this; they go straight through
+ * {@link getClient}.
  *
  * @returns The result, or `undefined` if no connector is active OR the
  *   provider doesn't support the method OR the request throws.
  */
-async function tryProvider<T>(
+async function callProvider<T>(
   config: LaserEyesConfig<any, any, any>,
   method: string,
   params?: Record<string, unknown>
@@ -86,46 +91,53 @@ async function tryProvider<T>(
 }
 
 // ============================================================================
-// Provider-first / client-fallback
+// Client (data-source) reads
 // ============================================================================
 
 /**
  * Get the BTC balance for an address (in satoshis, as a string).
  *
  * @remarks
- * Provider-first. Falls back to `getBalance` from the client package,
- * composed with {@link getClient}.
+ * Goes through the configured data source for the active chain (or the
+ * chain explicitly named in `options.chainId`). The wallet-fast-path
+ * variant lives on the wallet client — `getWalletClient(config).getBalance(account)`
+ * — and is supplied by the active connector's `getClient` override
+ * when it declares native support.
  *
- * @throws {Error} If neither provider nor data source can satisfy the request.
+ * @example
+ * ```ts
+ * const balance = await getBalance(config, 'bc1q…')                    // active chain
+ * const t4Bal = await getBalance(config, 'bc1q…', { chainId: 'testnet4' })
+ * ```
  */
 export async function getBalance<const config extends LaserEyesConfig<any, any, any>>(
   config: config,
-  address: string
+  address: string,
+  options?: { chainId?: config['chains'][number]['id'] }
 ): Promise<string> {
-  const fromProvider = await tryProvider<string>(config, 'bitcoin_getBalance', { address })
-  if (fromProvider !== undefined) return fromProvider
-  return clientGetBalance(getClient(config), address)
+  return clientGetBalance(getClient(config, options), address)
 }
 
 /**
  * Get unspent transaction outputs for an address.
  *
  * @remarks
- * Provider-first. Falls back to `getUtxos` from the client package.
+ * Data-source path. See {@link getBalance} for the wallet-fast-path
+ * alternative.
  */
 export async function getAddressUtxos<const config extends LaserEyesConfig<any, any, any>>(
   config: config,
-  address: string
+  address: string,
+  options?: { chainId?: config['chains'][number]['id'] }
 ): Promise<PaginatedResult<UTXO>> {
-  const fromProvider = await tryProvider<PaginatedResult<UTXO>>(config, 'bitcoin_getUtxos', {
-    address,
-  })
-  if (fromProvider !== undefined) return fromProvider
-  return clientGetUtxos(getClient(config), address)
+  return clientGetUtxos(getClient(config, options), address)
 }
 
 // ============================================================================
 // Provider-only protocol reads
+//
+// No data-source path yet — the client package's protocol actions are
+// stubbed. Once those land, migrate these to the client-read pattern.
 // ============================================================================
 
 /**
@@ -146,7 +158,7 @@ export async function getInscriptions<const config extends LaserEyesConfig<any, 
   const params: Record<string, unknown> = { address }
   if (options?.offset !== undefined) params.offset = options.offset
   if (options?.limit !== undefined) params.limit = options.limit
-  const result = await tryProvider<Inscription[]>(config, 'bitcoin_getInscriptions', params)
+  const result = await callProvider<Inscription[]>(config, 'bitcoin_getInscriptions', params)
   if (result !== undefined) return result
   throw new Error(
     'getInscriptions: provider unavailable. Connect a wallet that supports `bitcoin_getInscriptions`, or use the typed `inscriptionActions()` once Phase 10 keystone lands.'
@@ -163,7 +175,7 @@ export async function getRunesBalances<const config extends LaserEyesConfig<any,
   config: config,
   address: string
 ): Promise<RuneBalance[]> {
-  const result = await tryProvider<RuneBalance[]>(config, 'bitcoin_getRunesBalances', { address })
+  const result = await callProvider<RuneBalance[]>(config, 'bitcoin_getRunesBalances', { address })
   if (result !== undefined) return result
   throw new Error(
     'getRunesBalances: provider unavailable. Use the typed `runeActions()` once Phase 10 keystone lands.'
@@ -180,7 +192,7 @@ export async function getBrc20Balances<const config extends LaserEyesConfig<any,
   config: config,
   address: string
 ): Promise<Brc20Balance[]> {
-  const result = await tryProvider<Brc20Balance[]>(config, 'bitcoin_getBrc20Balances', {
+  const result = await callProvider<Brc20Balance[]>(config, 'bitcoin_getBrc20Balances', {
     address,
   })
   if (result !== undefined) return result
@@ -199,7 +211,7 @@ export async function getAlkanesBalances<const config extends LaserEyesConfig<an
   config: config,
   address: string
 ): Promise<AlkaneBalance[]> {
-  const result = await tryProvider<AlkaneBalance[]>(config, 'bitcoin_getAlkanesBalances', {
+  const result = await callProvider<AlkaneBalance[]>(config, 'bitcoin_getAlkanesBalances', {
     address,
   })
   if (result !== undefined) return result
