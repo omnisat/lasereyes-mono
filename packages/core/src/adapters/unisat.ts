@@ -10,7 +10,12 @@ import { AddressType } from '@omnisat/lasereyes-client/utils'
 import type { Account, SignedPsbt } from '@omnisat/lasereyes-client/wallet'
 import * as bitcoin from 'bitcoinjs-lib'
 import { announceWallet } from '../detection/announcements'
-import type { ProviderCapabilities } from '../types/provider'
+import type {
+  ConnectInfo,
+  DisconnectInfo,
+  ProviderCapabilities,
+  ProviderMessage,
+} from '../types/provider'
 import { BaseAdapter, type BitcoinProviderAdapter } from './base'
 
 /** Unisat Wallet icon (base64 encoded SVG). */
@@ -41,6 +46,52 @@ const UnisatNetwork = {
 export class UnisatAdapter extends BaseAdapter {
   readonly walletId = 'unisat'
   readonly walletName = 'Unisat Wallet'
+
+  /**
+   * Subscribe to Unisat's raw events and re-emit normalized
+   * {@link BitcoinProviderEvent}s.
+   *
+   * @remarks
+   * Unisat emits `accountsChanged(addresses: string[])` and
+   * `networkChanged(network: string)` where `network` is the legacy
+   * value (`'livenet' | 'testnet'`) — not the new-style enum returned by
+   * `getChain().enum`. We normalize through {@link normalizeUnisatNetwork}
+   * before re-emitting so downstream listeners only see canonical
+   * {@link NetworkId} values.
+   *
+   * The base class's pass-through default would surface `'livenet'` to
+   * consumers — which is fine for Unisat-aware code but breaks
+   * spec-following consumers like `connect`'s state updater.
+   */
+  protected override subscribeRawEvents(): void {
+    const raw = this.rawProvider
+    if (!raw?.on) return
+
+    raw.on('accountsChanged', async (_addresses: string[]) => {
+      // Unisat's event only carries the address list; the spec wants a
+      // full {@link Account} (addresses + purposes + types + public key).
+      // Re-derive via the existing handler — same normalization path as
+      // `bitcoin_getAccounts`.
+      try {
+        const account = await this.handleGetAccounts()
+        this.emitter.emit('accountsChanged', account)
+      } catch {
+        // Wallet likely disconnected mid-event; the `disconnect` event
+        // listener will clean up.
+      }
+    })
+
+    raw.on('networkChanged', (network: string) => {
+      const normalized = this.normalizeUnisatNetwork(network)
+      this.emitter.emit('networkChanged', normalized)
+    })
+
+    // Pass-through for the remaining standard events. Payload shapes
+    // match the spec on the Unisat side, so no remapping needed.
+    raw.on('connect', (info: ConnectInfo) => this.emitter.emit('connect', info))
+    raw.on('disconnect', (info: DisconnectInfo) => this.emitter.emit('disconnect', info))
+    raw.on('message', (msg: ProviderMessage) => this.emitter.emit('message', msg))
+  }
 
   async request(method: string, params?: { [key: string]: unknown }): Promise<unknown> {
     switch (method) {
@@ -137,11 +188,21 @@ export class UnisatAdapter extends BaseAdapter {
   }
 
   /**
-   * Handle bitcoin_switchNetwork
+   * Handle bitcoin_switchNetwork.
+   *
+   * @remarks
+   * Returns the wallet's now-current network as a normalized
+   * {@link NetworkId}. The action layer trusts this value directly —
+   * no config.chains re-derivation needed.
    */
-  private async handleSwitchNetwork(networkId: NetworkId): Promise<void> {
+  private async handleSwitchNetwork(networkId: NetworkId): Promise<NetworkId> {
     const unisatNetwork = this.toUnisatNetwork(networkId)
     await this.rawProvider.switchChain(unisatNetwork)
+    // Re-query the wallet to confirm what we actually landed on — some
+    // wallets silently substitute a fallback if the requested network
+    // isn't available.
+    const chain = await this.rawProvider.getChain()
+    return this.normalizeUnisatNetwork(chain.enum)
   }
 
   /**
@@ -389,18 +450,33 @@ export class UnisatAdapter extends BaseAdapter {
   }
 
   /**
-   * Normalize Unisat network enum to standard NetworkId
+   * Normalize a Unisat-side network identifier to standard {@link NetworkId}.
+   *
+   * @remarks
+   * Handles both Unisat APIs:
+   *
+   * - **New-style** (`getChain().enum`): `BITCOIN_MAINNET`,
+   *   `BITCOIN_TESTNET`, etc. Returned by `bitcoin_getNetwork` request.
+   * - **Legacy** (`getNetwork()` / `networkChanged` event payload):
+   *   `'livenet'`, `'testnet'`. Still emitted on the event channel even
+   *   when the response API uses the new enum.
    */
-  private normalizeUnisatNetwork(unisatEnum: string): NetworkId {
+  private normalizeUnisatNetwork(unisatValue: string): NetworkId {
     const map: Record<string, NetworkId> = {
+      // New-style enum
       [UnisatNetwork.MAINNET]: 'mainnet',
       [UnisatNetwork.TESTNET]: 'testnet',
       [UnisatNetwork.TESTNET4]: 'testnet4',
       [UnisatNetwork.SIGNET]: 'signet',
       [UnisatNetwork.FRACTAL_MAINNET]: 'fractal-mainnet',
       [UnisatNetwork.FRACTAL_TESTNET]: 'fractal-testnet',
+      // Legacy strings (emitted on `networkChanged` event)
+      livenet: 'mainnet',
+      testnet: 'testnet',
+      testnet4: 'testnet4',
+      signet: 'signet',
     }
-    return map[unisatEnum] || 'mainnet'
+    return map[unisatValue] || 'mainnet'
   }
 
   /**

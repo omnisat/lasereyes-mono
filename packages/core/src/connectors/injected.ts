@@ -30,7 +30,7 @@
  * @module connectors/injected
  */
 
-import type { ChainNetwork, NetworkId } from '@omnisat/lasereyes-client'
+import type { NetworkId } from '@omnisat/lasereyes-client'
 import type {
   Account,
   AddressPurpose,
@@ -179,9 +179,9 @@ export function injected(target: InjectedConnectorTarget): CreateConnectorFn {
         return (await a.request('bitcoin_getCapabilities')) as ProviderCapabilities
       },
 
-      async switchNetwork(networkId: NetworkId): Promise<ChainNetwork> {
+      async switchNetwork(networkId: NetworkId): Promise<NetworkId> {
         const a = requireAdapter()
-        return (await a.request('bitcoin_switchNetwork', { networkId })) as ChainNetwork
+        return (await a.request('bitcoin_switchNetwork', { networkId })) as NetworkId
       },
 
       getProvider() {

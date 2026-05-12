@@ -14,6 +14,8 @@
  * @module actions/connect
  */
 
+import type { NetworkId } from '@omnisat/lasereyes-client'
+import type { Account } from '@omnisat/lasereyes-client/wallet'
 import type { LaserEyesConfig } from '../config'
 import type { Connector, ConnectResult } from '../types/connector'
 import type { BitcoinProvider } from '../types/provider'
@@ -75,32 +77,30 @@ function subscribeToConnectorEvents(
   connector: Connector,
   provider: BitcoinProvider
 ): () => void {
-  // Refresh the account from the connector; the event payload is
-  // wallet-specific (sometimes just an address[]), so we re-derive from
-  // the source of truth rather than trusting the payload shape.
-  const onAccountsChanged = async () => {
-    try {
-      const account = await connector.getAccount()
-      config.state.$connection.setKey('account', account)
-    } catch {
-      // Wallet may have just disconnected; the disconnect listener will
-      // tidy state up.
-    }
+  // Trust the adapter's normalized payload. The adapter's
+  // `subscribeRawEvents` is the right place to normalize wallet-native
+  // payloads (e.g. Unisat emits a string[] of addresses; the adapter
+  // re-derives a full Account before re-emitting).
+  const onAccountsChanged = (account: Account) => {
+    config.state.$connection.setKey('account', account)
   }
 
-  const onNetworkChanged = async () => {
-    // Always re-derive via the connector (which routes through the
-    // adapter's `bitcoin_getNetwork` handler — that normalizes
-    // wallet-specific terms like Unisat's "livenet" → "mainnet"). Raw
-    // event payloads can't be trusted: wallets often emit their native
-    // enum strings on the event but normalize on the RPC method.
-    try {
-      const next = await connector.getNetworkId()
-      config.state.$connection.setKey('networkId', next)
-    } catch {
-      // Provider unreachable or wallet just disconnected — let the
-      // disconnect listener handle teardown.
+  const onNetworkChanged = async (payload?: NetworkId) => {
+    // The adapter is responsible for normalizing the wallet's native
+    // network identifier into a spec {@link NetworkId} before re-emitting
+    // (each wallet has its own naming — Unisat fires `livenet`, etc.;
+    // the adapter's `subscribeRawEvents` translates). Trust the payload
+    // when it's a string; fall back to a re-query otherwise.
+    let next: NetworkId | undefined =
+      typeof payload === 'string' ? (payload as NetworkId) : undefined
+    if (!next) {
+      try {
+        next = await connector.getNetworkId()
+      } catch {
+        return
+      }
     }
+    config.state.$connection.setKey('networkId', next)
   }
 
   const onDisconnect = () => {

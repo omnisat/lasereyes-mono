@@ -119,7 +119,7 @@ export interface Connector {
    * @param networkId - Target network ID
    * @throws {Error} If wallet doesn't support network switching
    */
-  switchNetwork?(networkId: NetworkId): Promise<ChainNetwork>
+  switchNetwork?(networkId: NetworkId): Promise<NetworkId>
 
   // ============================================================================
   // Provider Access

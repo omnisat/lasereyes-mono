@@ -158,7 +158,7 @@ declare const target: InjectedConnectorTarget
 declare const config: ConnectorConfig
 declare const c: Connector
 declare const announcement: WalletAnnouncement
-declare const switchNetworkFn: (networkId: NetworkId) => Promise<ChainNetwork>
+declare const switchNetworkFn: (networkId: NetworkId) => Promise<NetworkId>
 
 // ============================================================================
 // 1. BitcoinProvider standard
@@ -303,9 +303,10 @@ describe('Connector interface', () => {
     expectTypeOf(c.getProvider).returns.toEqualTypeOf<BitcoinProvider | null>()
   })
 
-  it('switchNetwork (optional) returns Promise<ChainNetwork>', () => {
-    // The method is optional, so its type is `(...) => Promise<ChainNetwork> | undefined`.
-    // We assert structural compatibility: a non-undefined switchNetwork has the right signature.
+  it('switchNetwork (optional) returns Promise<NetworkId>', () => {
+    // The adapter normalizes the wallet's native chain identifier into a
+    // spec NetworkId — the action layer trusts that value rather than
+    // looking up by the originally-requested id.
     expectTypeOf<NonNullable<typeof c.switchNetwork>>().toMatchTypeOf<typeof switchNetworkFn>()
   })
 

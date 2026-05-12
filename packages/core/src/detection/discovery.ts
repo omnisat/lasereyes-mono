@@ -15,8 +15,8 @@
  * @module detection/discovery
  */
 
+import type { NetworkId } from '@omnisat/lasereyes-client'
 import type { Account } from '@omnisat/lasereyes-client/wallet'
-import type { ChainNetwork, NetworkId } from '@omnisat/lasereyes-client'
 import type { Connector } from '../types/connector'
 import type { ProviderCapabilities } from '../types/provider'
 import { listenForWalletAnnouncements, type WalletAnnouncement } from './announcements'
@@ -43,7 +43,7 @@ export function connectorFromAnnouncement(announcement: WalletAnnouncement): Con
     async isAuthorized() {
       try {
         const account = (await provider.request('bitcoin_getAccounts')) as Account | undefined
-        return !!(account?.addresses?.length)
+        return !!account?.addresses?.length
       } catch {
         return false
       }
@@ -71,8 +71,8 @@ export function connectorFromAnnouncement(announcement: WalletAnnouncement): Con
       return (await provider.request('bitcoin_getCapabilities')) as ProviderCapabilities
     },
 
-    async switchNetwork(networkId: NetworkId): Promise<ChainNetwork> {
-      return (await provider.request('bitcoin_switchNetwork', { networkId })) as ChainNetwork
+    async switchNetwork(networkId: NetworkId): Promise<NetworkId> {
+      return (await provider.request('bitcoin_switchNetwork', { networkId })) as NetworkId
     },
 
     getProvider: () => provider,
@@ -122,7 +122,7 @@ export function discoverConnectors(opts: DiscoverConnectorsOptions): () => void 
 
   // Listen for announced wallets.
   const seen = new Set<string>()
-  const cleanup = listenForWalletAnnouncements((announcement) => {
+  const cleanup = listenForWalletAnnouncements(announcement => {
     if (seen.has(announcement.uuid)) return
     seen.add(announcement.uuid)
 
