@@ -13,7 +13,6 @@
  */
 
 import type { ChainNetwork, Client, NetworkId } from '@omnisat/lasereyes-client'
-import { UnsupportedNetworkError } from '@omnisat/lasereyes-client'
 import {
   type Account,
   createWalletClient,
@@ -104,24 +103,9 @@ export async function getWalletClient<const config extends LaserEyesConfig<any, 
   config: config,
   options?: { chainId?: config['chains'][number]['id'] }
 ): Promise<WalletClient<WalletClientConfig<Account, any>, Account, any, any>> {
-  // `getClient` validates the chain is in `config.chains` (throws on
-  // miss) and resolves cache / factory / bare-client cases uniformly.
-  // For unsupported networks, it currently throws a generic Error;
-  // re-throw as the typed `UnsupportedNetworkError` so the wallet-side
-  // entrypoint gives apps the structured error they expect.
-  let client: Client<any, any, any>
-  try {
-    client = getClient(config, options)
-  } catch (e) {
-    if (e instanceof Error && /not in config\.chains/.test(e.message)) {
-      const id = (options?.chainId ?? config.state.$connection.get().networkId) as string
-      throw new UnsupportedNetworkError(
-        id,
-        (config.chains as readonly ChainNetwork[]).map(c => c.id)
-      )
-    }
-    throw e
-  }
+  // Lookup phase: cache hit / user factory / freshly-built bare. Throws
+  // `UnsupportedNetworkError` if the chain isn't in `config.chains`.
+  const client = getClient(config, options)
 
   // Factory wins unconditionally; whatever it produced is what we
   // return. Cached wallet clients pass through too — they came from a
