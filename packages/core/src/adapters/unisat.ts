@@ -478,7 +478,7 @@ export class UnisatAdapter extends BaseAdapter {
   private normalizeUnisatNetwork(unisatValue: string): NetworkId {
     // Only the new-style enum needs mapping — both `getChain().enum` and
     // `chainChanged` emit these. Unknown values pass through verbatim so
-    // downstream `UnsupportedNetworkError` detection can fire on chains
+    // downstream `NetworkNotConfiguredError` detection can fire on chains
     // we haven't catalogued.
     const map: Record<string, NetworkId> = {
       [UnisatNetwork.MAINNET]: 'mainnet',

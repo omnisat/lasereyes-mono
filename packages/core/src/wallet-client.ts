@@ -97,14 +97,14 @@ async function buildConnectorClient(
  *
  * @throws {Error} If no connector is connected and we need to build.
  * @throws {Error} If the active connector has no provider.
- * @throws {UnsupportedNetworkError} If `chainId` is not in `config.chains`.
+ * @throws {NetworkNotConfiguredError} If `chainId` is not in `config.chains`.
  */
 export async function getWalletClient<const config extends LaserEyesConfig<any, any, any>>(
   config: config,
   options?: { chainId?: config['chains'][number]['id'] }
 ): Promise<WalletClient<WalletClientConfig<Account, any>, Account, any, any>> {
   // Lookup phase: cache hit / user factory / freshly-built bare. Throws
-  // `UnsupportedNetworkError` if the chain isn't in `config.chains`.
+  // `NetworkNotConfiguredError` if the chain isn't in `config.chains`.
   const client = getClient(config, options)
 
   // Factory wins unconditionally; whatever it produced is what we

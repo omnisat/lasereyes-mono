@@ -36,7 +36,7 @@ import {
   type ChainNetwork,
   type Client,
   createClient,
-  UnsupportedNetworkError,
+  NetworkNotConfiguredError,
 } from '@omnisat/lasereyes-client'
 import type { LaserEyesConfig } from './config'
 import { readCachedClient, resolveDataSource, writeCachedClient } from './internal'
@@ -65,7 +65,7 @@ export function getClient<const config extends LaserEyesConfig<any, any, any>>(
   const chains = config.chains as readonly ChainNetwork[]
   const network = chains.find(c => c.id === id)
   if (!network) {
-    throw new UnsupportedNetworkError(
+    throw new NetworkNotConfiguredError(
       id,
       chains.map(c => c.id)
     )

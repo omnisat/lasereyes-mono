@@ -103,7 +103,7 @@ export class NetworkMismatchError extends LaserEyesClientError {
  *
  * Error code: `'UNSUPPORTED_NETWORK'`
  */
-export class UnsupportedNetworkError extends LaserEyesClientError {
+export class NetworkNotConfiguredError extends LaserEyesClientError {
   /** The network ID the wallet is currently on. */
   readonly networkId: string
   /** The set of network IDs the config supports. */
@@ -121,7 +121,7 @@ export class UnsupportedNetworkError extends LaserEyesClientError {
         `Either add '${networkId}' to your chains config, or switch the wallet's network.`,
       'UNSUPPORTED_NETWORK'
     )
-    this.name = 'UnsupportedNetworkError'
+    this.name = 'NetworkNotConfiguredError'
     this.networkId = networkId
     this.supported = supported
   }

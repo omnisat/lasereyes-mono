@@ -5,7 +5,7 @@
  */
 
 import type { ChainNetwork } from '@omnisat/lasereyes-client'
-import { UnsupportedNetworkError } from '@omnisat/lasereyes-client'
+import { NetworkNotConfiguredError } from '@omnisat/lasereyes-client'
 import type { LaserEyesConfig } from '../config'
 import { invalidateClientCache, resolveConnector } from '../internal'
 
@@ -67,7 +67,7 @@ export async function switchNetwork<
   const supported = config.chains as readonly ChainNetwork[]
   const resolved = supported.find(c => c.id === resolvedId)
   if (!resolved) {
-    throw new UnsupportedNetworkError(
+    throw new NetworkNotConfiguredError(
       resolvedId,
       supported.map(c => c.id)
     )

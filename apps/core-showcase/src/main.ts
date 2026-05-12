@@ -17,7 +17,7 @@
  * Open devtools console for the full call trace.
  */
 
-import { MAINNET, TESTNET, UnsupportedNetworkError } from '@omnisat/lasereyes-client'
+import { MAINNET, NetworkNotConfiguredError, TESTNET } from '@omnisat/lasereyes-client'
 import { createDataSource as createMempoolDataSource } from '@omnisat/lasereyes-client/vendors/mempool'
 import {
   broadcastTransaction,
@@ -40,7 +40,7 @@ import {
 // 1. Build the LaserEyes config
 //
 // Mainnet + testnet only. If the wallet's current network is anything else,
-// the keystone throws `UnsupportedNetworkError` — the UI catches that and
+// the keystone throws `NetworkNotConfiguredError` — the UI catches that and
 // directs the user to the Switch network buttons.
 // ============================================================================
 
@@ -196,7 +196,7 @@ config.state.$connection.subscribe(({ status, account, networkId, connector }) =
     if (!supported) {
       log(
         'warn',
-        `wallet on '${networkId}' which is not in config.chains [${supportedNetworkIds.join(', ')}] — actions will throw UnsupportedNetworkError`
+        `wallet on '${networkId}' which is not in config.chains [${supportedNetworkIds.join(', ')}] — actions will throw NetworkNotConfiguredError`
       )
     }
     lastLoggedNetwork = networkId
@@ -249,7 +249,7 @@ $('send').onclick = async () => {
     const txId = await sendBitcoin(config, to, amount)
     log('ok', `← txId: ${txId}`)
   } catch (e) {
-    if (e instanceof UnsupportedNetworkError) {
+    if (e instanceof NetworkNotConfiguredError) {
       log('err', `✗ ${e.message}`)
       log('info', `  → use the "Switch network" buttons to move the wallet to a supported chain.`)
     } else {
@@ -269,7 +269,7 @@ $('sign-message').onclick = async () => {
     const sig = await signMessage(config, message)
     log('ok', `← signature: ${sig}`)
   } catch (e) {
-    if (e instanceof UnsupportedNetworkError) {
+    if (e instanceof NetworkNotConfiguredError) {
       log('err', `✗ ${e.message}`)
     } else {
       log('err', `✗ signMessage failed:`, (e as Error).message)
