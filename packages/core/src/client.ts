@@ -44,11 +44,8 @@
  * @module client
  */
 
-import {
-  type ChainDataSource,
-  createClient,
-} from '@omnisat/lasereyes-client'
 import type { BaseCapability, ChainNetwork } from '@omnisat/lasereyes-client'
+import { type ChainDataSource, createClient } from '@omnisat/lasereyes-client'
 import type { LaserEyesConfig } from './config'
 import { resolveDataSource } from './internal'
 
@@ -80,8 +77,8 @@ export function getClient<const config extends LaserEyesConfig<any, any, any>>(
   config: config,
   options?: { chainId?: config['chains'][number]['id'] }
 ) {
-  const id = (options?.chainId ?? config.state.$networkId.get()) as string
-  const network = (config.chains as readonly ChainNetwork[]).find((c) => c.id === id)
+  const id = (options?.chainId ?? config.state.$connection.get().networkId) as string
+  const network = (config.chains as readonly ChainNetwork[]).find(c => c.id === id)
   if (!network) {
     throw new Error(`Chain '${id}' not in config.chains`)
   }

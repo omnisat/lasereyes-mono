@@ -90,7 +90,7 @@ export async function getWalletClient<const config extends LaserEyesConfig<any, 
   // hook receives this and decides whether to extend, replace, or pass
   // through.
   const account = await connector.getAccount()
-  const id = (options?.chainId ?? config.state.$networkId.get()) as string
+  const id = (options?.chainId ?? config.state.$connection.get().networkId) as string
   const network = (config.chains as readonly ChainNetwork[]).find(c => c.id === id)
   if (!network) {
     throw new UnsupportedNetworkError(

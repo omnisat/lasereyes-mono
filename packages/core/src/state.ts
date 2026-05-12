@@ -1,34 +1,73 @@
 /**
- * LaserEyes reactive state — five nanostore atoms.
+ * LaserEyes reactive state.
  *
  * @remarks
- * State is split per concern. Subscribers subscribe to whichever atom
- * they care about and only re-render on that atom's changes.
+ * Two stores:
+ *
+ * - **`$connection`** — a single nanostore `MapStore` carrying the four
+ *   tightly-coupled fields that describe the active connection
+ *   (`status`, `account`, `networkId`, `connector`). Bundled so updates
+ *   are atomic: `connect()` calls `$connection.set({...all four})` in one
+ *   shot, subscribers fire once, no listener ever observes a partial
+ *   transition. Per-key reactivity via nanostores' `listenKeys` if you
+ *   only care about, say, `status`.
+ *
+ * - **`$connectors`** — registry of available connector instances keyed
+ *   by `id`. Separate from `$connection` because it changes for a
+ *   different reason (EIP-6963 announcements arrive over time;
+ *   reconnects don't touch it).
+ *
+ * **Why one map instead of four atoms.** Earlier iterations had
+ * `$status`, `$account`, `$networkId`, `$connector` as four separate
+ * atoms. Connect/disconnect set them sequentially, and any subscriber
+ * that read a *different* atom inside its handler saw stale values
+ * mid-transition (e.g. a `$account` listener reading `$networkId` before
+ * `$networkId.set()` had run). The atomic MapStore eliminates that whole
+ * class of bug — there is no "in between" any more.
  *
  * @module state
  */
 
 import type { NetworkId } from '@omnisat/lasereyes-client'
 import type { Account } from '@omnisat/lasereyes-client/wallet'
-import { atom, map, type MapStore, type WritableAtom } from 'nanostores'
+import { type MapStore, map } from 'nanostores'
 import type { ConnectionStatus, Connector } from './types/connector'
 
 /**
- * The full reactive state surface of a LaserEyes config.
+ * The four fields that together describe the active connection.
  *
  * @remarks
- * Each field is a separate atom so subscribers re-render on per-atom
- * changes only.
+ * Invariant: when `status === 'connected'`, `account`, `connector`, and
+ * `networkId` are all populated. When `status === 'disconnected'`,
+ * `account` and `connector` are `undefined` and `networkId` holds the
+ * last-known value (or the seeded default).
+ */
+export interface ConnectionState {
+  /** Connection lifecycle status. */
+  status: ConnectionStatus
+  /** The currently connected account, or `undefined` when disconnected. */
+  account: Account | undefined
+  /** The current network ID. */
+  networkId: NetworkId
+  /** The currently active connector, or `undefined` when disconnected. */
+  connector: Connector | undefined
+}
+
+/**
+ * The full reactive state surface of a LaserEyes config.
  */
 export interface LaserEyesState {
-  /** Connection lifecycle status. */
-  $status: WritableAtom<ConnectionStatus>
-  /** The currently connected account, or `undefined` when disconnected. */
-  $account: WritableAtom<Account | undefined>
-  /** The current network ID. */
-  $networkId: WritableAtom<NetworkId>
-  /** The currently active connector, or `undefined` when disconnected. */
-  $connector: WritableAtom<Connector | undefined>
+  /**
+   * Connection state — atomic.
+   *
+   * @remarks
+   * - Read everything: `state.$connection.get()`.
+   * - Set everything atomically: `state.$connection.set({...})`.
+   * - Set one key: `state.$connection.setKey('status', 'connected')`.
+   * - Subscribe to all changes: `state.$connection.subscribe(state => ...)`.
+   * - Subscribe to specific keys: `listenKeys(state.$connection, ['status'], cb)`.
+   */
+  $connection: MapStore<ConnectionState>
   /** Registry of available connectors keyed by connector ID. */
   $connectors: MapStore<Record<string, Connector>>
 }
@@ -40,10 +79,12 @@ export interface LaserEyesState {
  */
 export function createState(initialNetworkId: NetworkId = 'mainnet'): LaserEyesState {
   return {
-    $status: atom<ConnectionStatus>('disconnected'),
-    $account: atom<Account | undefined>(undefined),
-    $networkId: atom<NetworkId>(initialNetworkId),
-    $connector: atom<Connector | undefined>(undefined),
+    $connection: map<ConnectionState>({
+      status: 'disconnected',
+      account: undefined,
+      networkId: initialNetworkId,
+      connector: undefined,
+    }),
     $connectors: map<Record<string, Connector>>({}),
   }
 }

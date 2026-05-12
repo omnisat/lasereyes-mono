@@ -48,15 +48,11 @@ export async function switchNetwork<
 > {
   const connector = resolveConnector(config)
   if (!connector.switchNetwork) {
-    throw new Error(
-      `Connector '${connector.id}' does not support switchNetwork`
-    )
+    throw new Error(`Connector '${connector.id}' does not support switchNetwork`)
   }
 
-  const resolved = (await connector.switchNetwork(
-    networkId as never
-  )) as ChainNetwork
-  config.state.$networkId.set(resolved.id)
+  const resolved = (await connector.switchNetwork(networkId as never)) as ChainNetwork
+  config.state.$connection.setKey('networkId', resolved.id)
   connector.onNetworkChanged?.(resolved.id)
 
   return resolved as Extract<config['chains'][number], { id: id }>

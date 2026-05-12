@@ -2,9 +2,12 @@
  * Lifecycle: connect a wallet by connector ID.
  *
  * @remarks
- * After a successful connect, subscribes to the connector's
+ * Updates `config.state.$connection` atomically — all four fields
+ * (`status`, `account`, `networkId`, `connector`) flip in a single
+ * `.set({...})` call, so subscribers never observe a partial
+ * transition. After a successful connect, subscribes to the connector's
  * provider-level events (`accountsChanged`, `networkChanged`,
- * `disconnect`) and propagates them into `config.state`. Subscriptions
+ * `disconnect`) and propagates them into `$connection`. Subscriptions
  * persist for the lifetime of the connection and are torn down by
  * {@link disconnect}.
  *
@@ -12,7 +15,6 @@
  */
 
 import type { NetworkId } from '@omnisat/lasereyes-client'
-import type { Account } from '@omnisat/lasereyes-client/wallet'
 import type { LaserEyesConfig } from '../config'
 import type { Connector, ConnectResult } from '../types/connector'
 import type { BitcoinProvider } from '../types/provider'
@@ -27,7 +29,7 @@ export interface ConnectArgs {
    * @remarks
    * Connectors are registered in `state.$connectors` under their `id`. The
    * registry includes both factories from `config.connectorFns` and any
-   * announced wallets discovered after {@link initialize}.
+   * announced wallets discovered after `initialize`.
    */
   connectorId: string
 }
@@ -62,6 +64,11 @@ export function _clearConnectCleanup(config: object): void {
  * Subscribe to provider events on a freshly-connected connector and
  * propagate them into config state.
  *
+ * @remarks
+ * Each handler writes through `$connection.setKey(...)` — only the
+ * affected field changes, but the MapStore's listeners still see a
+ * consistent snapshot (all other fields stay at their committed values).
+ *
  * @internal
  */
 function subscribeToConnectorEvents(
@@ -72,10 +79,10 @@ function subscribeToConnectorEvents(
   // Refresh the account from the connector; the event payload is
   // wallet-specific (sometimes just an address[]), so we re-derive from
   // the source of truth rather than trusting the payload shape.
-  const onAccountsChanged = async (_payload?: Account) => {
+  const onAccountsChanged = async () => {
     try {
       const account = await connector.getAccount()
-      config.state.$account.set(account)
+      config.state.$connection.setKey('account', account)
     } catch {
       // Wallet may have just disconnected; the disconnect listener will
       // tidy state up.
@@ -83,9 +90,6 @@ function subscribeToConnectorEvents(
   }
 
   const onNetworkChanged = async (payload?: NetworkId) => {
-    // Some adapters forward the new network id in the payload; others
-    // only signal "the network changed" and we re-query. Try the payload
-    // first, fall back to a fresh call.
     let next: NetworkId | undefined =
       typeof payload === 'string' ? (payload as NetworkId) : undefined
     if (!next) {
@@ -95,23 +99,25 @@ function subscribeToConnectorEvents(
         return
       }
     }
-    config.state.$networkId.set(next)
+    config.state.$connection.setKey('networkId', next)
   }
 
   const onDisconnect = () => {
-    config.state.$status.set('disconnected')
-    config.state.$account.set(undefined)
-    config.state.$connector.set(undefined)
-    // Network id stays on the last-known value; the next connect
-    // will overwrite it.
+    // Atomic clear — one notification, consistent observation.
+    config.state.$connection.set({
+      ...config.state.$connection.get(),
+      status: 'disconnected',
+      account: undefined,
+      connector: undefined,
+    })
   }
 
-  provider.on('accountsChanged', onAccountsChanged as (...args: any[]) => void)
+  provider.on('accountsChanged', onAccountsChanged)
   provider.on('networkChanged', onNetworkChanged as (...args: any[]) => void)
   provider.on('disconnect', onDisconnect)
 
   return () => {
-    provider.removeListener('accountsChanged', onAccountsChanged as (...args: any[]) => void)
+    provider.removeListener('accountsChanged', onAccountsChanged)
     provider.removeListener('networkChanged', onNetworkChanged as (...args: any[]) => void)
     provider.removeListener('disconnect', onDisconnect)
   }
@@ -122,15 +128,19 @@ function subscribeToConnectorEvents(
  *
  * @remarks
  * Looks up the connector from `state.$connectors` by `connectorId`, sets
- * `state.$status` to `'connecting'`, and calls `connector.connect()`. On
- * success, populates `$account`, `$networkId`, `$connector`, sets
- * `$status` to `'connected'`, and (if `autoReconnect` is enabled)
- * persists the ID to storage. On failure, restores `$status` to
- * `'disconnected'` and re-throws.
+ * `status` to `'connecting'`, and calls `connector.connect()`.
  *
- * Subscribes to the connector's provider-level events
- * (`accountsChanged`, `networkChanged`, `disconnect`) so state stays in
- * sync with the wallet UI. Cleanup is invoked by {@link disconnect}.
+ * **On success.** Atomically writes the new `{ status, account,
+ * networkId, connector }` to `$connection` in one `.set()` call, so any
+ * subscriber that fires sees the whole new connection consistently. If
+ * `autoReconnect` is enabled, persists the ID to storage. Subscribes to
+ * provider events so subsequent wallet-side changes (user switches
+ * network or account in the wallet UI) propagate into state.
+ *
+ * **On failure.** Restores `status` to whatever it was before — the
+ * attempt is a no-op for everything except `status`. wagmi behaves the
+ * same way: clicking "Connect Y" while connected to X doesn't disconnect
+ * from X if Y rejects.
  *
  * @returns The connection result `{ account, networkId }`.
  *
@@ -146,41 +156,39 @@ export async function connect<const config extends LaserEyesConfig<any, any, any
     throw new Error(`Connector '${args.connectorId}' is not registered`)
   }
 
-  // Snapshot prior state so a failed attempt restores it verbatim.
-  // wagmi behaves the same way: clicking "Connect Y" while connected to X
-  // doesn't disconnect from X if Y rejects.
-  const priorStatus = config.state.$status.get()
+  const prior = config.state.$connection.get()
 
-  config.state.$status.set('connecting')
+  config.state.$connection.setKey('status', 'connecting')
 
   let result: ConnectResult
   try {
     result = await connector.connect()
   } catch (error) {
-    // Failed connect is a no-op for everything except $status. Account /
+    // No-op for everything except `status` — restore it. Account /
     // networkId / connector / event subscriptions all stay exactly as
-    // they were before the attempt.
-    config.state.$status.set(priorStatus)
+    // they were.
+    config.state.$connection.setKey('status', prior.status)
     throw error
   }
 
-  // Success path. Tear down any stale subscription from a prior connection
-  // ONLY now — if we'd torn it down before the attempt and the new connect
-  // rejected, we'd have lost the previous connection's event flow.
+  // Tear down any stale subscription from a prior connection only now —
+  // doing it before the attempt would have stranded the previous
+  // connection's event flow if the new attempt rejected.
   eventCleanups.get(config)?.()
   eventCleanups.delete(config)
 
-  config.state.$account.set(result.account)
-  config.state.$networkId.set(result.networkId)
-  config.state.$connector.set(connector)
-  config.state.$status.set('connected')
+  // Atomic update: one notification, all four fields consistent.
+  config.state.$connection.set({
+    status: 'connected',
+    account: result.account,
+    networkId: result.networkId,
+    connector,
+  })
 
   if (config.autoReconnect) {
     config.storage.setItem('lasereyes.connectorId', connector.id)
   }
 
-  // Subscribe to provider events so subsequent wallet-side changes (user
-  // switches network or account in the wallet UI) propagate into state.
   const provider = connector.getProvider()
   if (provider) {
     eventCleanups.set(config, subscribeToConnectorEvents(config, connector, provider))

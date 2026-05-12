@@ -30,7 +30,7 @@ export function resolveDataSource(
   config: LaserEyesConfig<any, any, any>,
   chainId?: string
 ): ChainDataSource<any> {
-  const id = chainId ?? config.state.$networkId.get()
+  const id = chainId ?? config.state.$connection.get().networkId
   const sources = (config.transports as Record<string, readonly ChainDataSource<any>[]>)[id]
   if (!sources || sources.length === 0) {
     throw new Error(`No data sources configured for chain '${id}'`)

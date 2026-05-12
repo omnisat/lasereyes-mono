@@ -90,23 +90,10 @@ const setStatus = (text: string, live = false) => {
   el.classList.toggle('idle', !live)
 }
 
-const setAccountFields = () => {
-  const account = config.state.$account.get()
-  const networkId = config.state.$networkId.get()
-  const connector = config.state.$connector.get()
-  $('address').textContent = account?.getAddress() ?? '—'
-  const supported = supportedNetworkIds.includes(networkId as never)
-  $('network').textContent = networkId ? `${networkId}${supported ? '' : ' (unsupported)'}` : '—'
-  $('active-connector').textContent = connector?.id ?? '—'
-  // The override is the visible bit of Phase 10 — surface it.
-  $('has-override').textContent = connector?.getClient ? 'yes (nativeRpc)' : 'no (composed default)'
-  renderSwitchNetwork(networkId)
-}
-
-const renderSwitchNetwork = (active: string | undefined) => {
+const renderSwitchNetwork = (active: string | undefined, hasConnector: boolean) => {
   const host = $('switch-network')
   host.innerHTML = ''
-  if (!config.state.$connector.get()) return
+  if (!hasConnector) return
   for (const c of config.chains) {
     const btn = document.createElement('button')
     btn.textContent = c.id
@@ -145,8 +132,8 @@ const renderConnectors = () => {
       try {
         const result = await connect(config, { connectorId: c.id })
         log('ok', `← connected on '${result.networkId}': ${result.account.getAddress()}`)
-        // UI fields update via the reactive subscriptions on $account /
-        // $networkId / $status — no imperative refresh needed here.
+        // UI fields update via the $connection subscription — no
+        // imperative refresh needed here.
       } catch (e) {
         log('err', `✗ connect failed:`, (e as Error).message)
       }
@@ -160,18 +147,15 @@ config.state.$connectors.subscribe(renderConnectors)
 renderConnectors()
 
 // ============================================================================
-// 3b. Reactive subscriptions
+// 3b. Connection state — single atomic subscription
 //
-// `enableWriteButtons` MUST be declared before the subscriptions below —
-// nanostores' `subscribe` invokes the listener synchronously with the
-// current value, and the $status listener references this helper. Wiring
-// it after would TDZ-throw on the initial fire AND on every subsequent
-// status transition (during connect/disconnect).
+// `$connection` is a nanostore MapStore carrying `{status, account,
+// networkId, connector}` together. Every write goes through
+// `MapStore.set({...})` or `setKey(k, v)` which notifies subscribers once
+// with the new whole map. No partial-transition observation possible.
 //
-// When the wallet emits accountsChanged or networkChanged after the user
-// switches accounts/networks in the wallet UI, core's connect()-time event
-// subscriptions push the changes into these atoms. We mirror those changes
-// to the UI here.
+// Subscribing once here means every UI field that depends on connection
+// state re-renders from a consistent snapshot.
 // ============================================================================
 
 const enableWriteButtons = (on: boolean) => {
@@ -180,31 +164,42 @@ const enableWriteButtons = (on: boolean) => {
   }
 }
 
-config.state.$account.subscribe(next => {
-  log('info', `state.$account → ${next ? next.getAddress() : 'undefined'}`)
-  setAccountFields()
-})
+let lastLoggedAccount: string | undefined
+let lastLoggedNetwork: string | undefined
 
-config.state.$networkId.subscribe(next => {
-  log('info', `state.$networkId → '${next}'`)
-  const supported = supportedNetworkIds.includes(next as never)
-  if (!supported) {
-    log(
-      'warn',
-      `wallet on '${next}' which is not in config.chains [${supportedNetworkIds.join(', ')}] — actions will throw UnsupportedNetworkError`
-    )
+config.state.$connection.subscribe(({ status, account, networkId, connector }) => {
+  // Address / network / connector / override — consistent snapshot.
+  $('address').textContent = account?.getAddress() ?? '—'
+  const supported = supportedNetworkIds.includes(networkId as never)
+  $('network').textContent = networkId ? `${networkId}${supported ? '' : ' (unsupported)'}` : '—'
+  $('active-connector').textContent = connector?.id ?? '—'
+  $('has-override').textContent = connector?.getClient ? 'yes (nativeRpc)' : 'no (composed default)'
+
+  // Status pill + button enable.
+  setStatus(status, status === 'connected')
+  enableWriteButtons(status === 'connected')
+  ;($('disconnect') as HTMLButtonElement).disabled = status !== 'connected'
+
+  // Switch-network buttons.
+  renderSwitchNetwork(networkId, connector !== undefined)
+
+  // Log diffs (not on every set — only when account or network actually
+  // changed, since we'd otherwise spam the trace on connecting/connected
+  // status flips that don't touch the other fields).
+  const acctAddr = account?.getAddress()
+  if (acctAddr !== lastLoggedAccount) {
+    log('info', `state.account → ${acctAddr ?? 'undefined'}`)
+    lastLoggedAccount = acctAddr
   }
-  setAccountFields()
-})
-
-config.state.$status.subscribe(next => {
-  setStatus(next, next === 'connected')
-  if (next === 'disconnected') {
-    enableWriteButtons(false)
-    ;($('disconnect') as HTMLButtonElement).disabled = true
-  } else if (next === 'connected') {
-    enableWriteButtons(true)
-    ;($('disconnect') as HTMLButtonElement).disabled = false
+  if (networkId !== lastLoggedNetwork) {
+    log('info', `state.networkId → '${networkId}'`)
+    if (!supported) {
+      log(
+        'warn',
+        `wallet on '${networkId}' which is not in config.chains [${supportedNetworkIds.join(', ')}] — actions will throw UnsupportedNetworkError`
+      )
+    }
+    lastLoggedNetwork = networkId
   }
 })
 
@@ -216,11 +211,11 @@ $('disconnect').onclick = async () => {
   log('info', '→ disconnect(config)')
   await disconnect(config)
   log('ok', '← disconnected')
-  // UI updates flow from the $status subscription.
+  // UI updates flow from the $connection subscription.
 }
 
 $('get-balance').onclick = async () => {
-  const account = config.state.$account.get()
+  const account = config.state.$connection.get().account
   if (!account) return
   const address = account.getAddress()
   log('info', `→ getBalance(config, '${address}')`)
@@ -244,7 +239,9 @@ $('send').onclick = async () => {
   log(
     'info',
     `  ├─ getWalletClient(config) → connector.getClient(${
-      config.state.$connector.get()?.getClient ? 'override applied' : 'no override; bare client'
+      config.state.$connection.get().connector?.getClient
+        ? 'override applied'
+        : 'no override; bare client'
     })`
   )
   log('info', `  └─ getAction(client, sendBtc, 'sendBtc') → dispatching…`)
@@ -317,6 +314,7 @@ $('sign-psbt').onclick = async () => {
   //   wc.config.account?.getAddress()
 }
 
-setAccountFields()
-log('info', 'config built. chains=[mainnet], connectors=[unisat, xverse]')
+// Initial render flows from the $connection subscription's immediate
+// sync fire — no imperative call needed.
+log('info', `config built. chains=[${supportedNetworkIds.join(', ')}], connectors=[unisat, xverse]`)
 log('info', 'Connect a wallet to begin. Devtools window.laserEyes.* exposes the config + keystone.')

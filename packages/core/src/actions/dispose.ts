@@ -18,16 +18,17 @@ import { _clearInitializeCleanup, _getInitializeCleanup } from './initialize'
  *
  * Safe to call without a prior `initialize` (no-op for the listener).
  */
-export function dispose<const config extends LaserEyesConfig<any, any, any>>(
-  config: config
-): void {
+export function dispose<const config extends LaserEyesConfig<any, any, any>>(config: config): void {
   const cleanup = _getInitializeCleanup(config)
   if (cleanup) {
     cleanup()
     _clearInitializeCleanup(config)
   }
 
-  config.state.$account.set(undefined)
-  config.state.$connector.set(undefined)
-  config.state.$status.set('disconnected')
+  config.state.$connection.set({
+    ...config.state.$connection.get(),
+    status: 'disconnected',
+    account: undefined,
+    connector: undefined,
+  })
 }

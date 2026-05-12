@@ -13,7 +13,7 @@ import type { LaserEyesConfig } from '../config'
 import type { Connector } from '../types/connector'
 
 /**
- * Resolve the currently-active connector from `config.state.$connector`.
+ * Resolve the currently-active connector from `config.state.$connection`.
  *
  * @param config - The LaserEyes config.
  * @returns The active connector.
@@ -21,7 +21,7 @@ import type { Connector } from '../types/connector'
  * @throws {Error} If no wallet is connected.
  */
 export function resolveConnector(config: LaserEyesConfig<any, any, any>): Connector {
-  const connector = config.state.$connector.get()
+  const connector = config.state.$connection.get().connector
   if (!connector) {
     throw new Error('No wallet connected')
   }
@@ -37,8 +37,6 @@ export function resolveConnector(config: LaserEyesConfig<any, any, any>): Connec
  *
  * @internal
  */
-export function tryResolveConnector(
-  config: LaserEyesConfig<any, any, any>
-): Connector | undefined {
-  return config.state.$connector.get()
+export function tryResolveConnector(config: LaserEyesConfig<any, any, any>): Connector | undefined {
+  return config.state.$connection.get().connector
 }
