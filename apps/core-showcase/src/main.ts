@@ -162,11 +162,23 @@ renderConnectors()
 // ============================================================================
 // 3b. Reactive subscriptions
 //
+// `enableWriteButtons` MUST be declared before the subscriptions below —
+// nanostores' `subscribe` invokes the listener synchronously with the
+// current value, and the $status listener references this helper. Wiring
+// it after would TDZ-throw on the initial fire AND on every subsequent
+// status transition (during connect/disconnect).
+//
 // When the wallet emits accountsChanged or networkChanged after the user
 // switches accounts/networks in the wallet UI, core's connect()-time event
 // subscriptions push the changes into these atoms. We mirror those changes
 // to the UI here.
 // ============================================================================
+
+const enableWriteButtons = (on: boolean) => {
+  for (const id of ['get-balance', 'send', 'sign-message', 'sign-psbt']) {
+    ;($(id) as HTMLButtonElement).disabled = !on
+  }
+}
 
 config.state.$account.subscribe(next => {
   log('info', `state.$account → ${next ? next.getAddress() : 'undefined'}`)
@@ -199,12 +211,6 @@ config.state.$status.subscribe(next => {
 // ============================================================================
 // 4. Action handlers
 // ============================================================================
-
-const enableWriteButtons = (on: boolean) => {
-  for (const id of ['get-balance', 'send', 'sign-message', 'sign-psbt']) {
-    ;($(id) as HTMLButtonElement).disabled = !on
-  }
-}
 
 $('disconnect').onclick = async () => {
   log('info', '→ disconnect(config)')
