@@ -101,9 +101,26 @@ something belongs in the public API.
 
 ### nanostores — the state model
 
-Atom-per-concern instead of one bag. Subscribers select one atom rather than
-slicing a record. Five atoms in core: `$status`, `$account`, `$networkId`,
-`$connector`, `$connectors`.
+Two stores in core, by different ownership:
+
+- **`$connection`** — a single `MapStore<{ status, account, networkId, connector }>`.
+  These four fields change together during connect / disconnect /
+  network-switch, and a previous design with four separate atoms allowed
+  subscribers to observe partial transitions (e.g. an `$account`
+  subscriber reading `$networkId` before its `.set()` ran). Bundling
+  them into one MapStore makes every connection update atomic — one
+  `.set({...})` call, one subscriber notification, no in-between
+  observation possible.
+- **`$connectors`** — a `MapStore<Record<string, Connector>>` registry,
+  keyed by connector `id`. Separate store because it changes for
+  unrelated reasons (EIP-6963 announcements arrive over time; connect/
+  disconnect doesn't touch it).
+
+Mirrors wagmi's split: wagmi bundles `{chainId, connections, current,
+status}` into one zustand store while keeping its connector registry as
+a separate `createStore(...)`. Same architectural reasoning — atomicity
+where fields share an update-time invariant; separate stores where
+writers and subscriber granularity differ.
 
 ## Bitcoin-specific concessions
 
@@ -471,35 +488,114 @@ write is `getWalletClient(config).<action>(...)`. Every core wallet read is
 "try `connector.request(...)` first, fall back to a `Client` built from the
 chain's transports."
 
-## The keystone: `getWalletClient`
+## The keystone: `getClient` and `getWalletClient`
+
+Two sibling functions in `packages/core/src/`. Both consult the same
+per-config cache (`WeakMap<config, Map<chainId, Client>>`) and resolve
+chain + data source the same way. They differ in what they *guarantee*:
+`getClient` returns whatever's appropriate for the chain (read-only,
+wallet-backed, or user-supplied); `getWalletClient` insists on a wallet
+client and constructs one if the cache doesn't already hold it.
+
+### Precedence — `getClient(config, options?)`
+
+1. **Cache hit.** Return the cached client for the chainId.
+2. **User-supplied `config.client` factory.** If set on
+   `createLaserEyesConfig`, call it with `{ chain, dataSource }`, cache,
+   return. Wins unconditionally — including when a wallet is connected
+   (apps that explicitly supply a factory get exactly what they
+   configured).
+3. **Connector wallet client.** Populated at `connect()` time. When a
+   wallet is connected on the active chain, `getClient` returns the
+   wallet client (with connector overrides applied). For chains other
+   than the wallet's current one, falls through to (4).
+4. **Default bare client.** `createClient({ network, dataSource })`.
+
+Synchronous. The wallet client gets pre-built asynchronously during
+`connect()` and stored in the cache, so subsequent `getClient` calls
+are cache hits.
+
+### `getWalletClient(config, options?)`
+
+Structurally `getClient + (maybe) buildConnectorClient`:
 
 ```ts
-// packages/core/src/wallet-client.ts
-export async function getWalletClient(
-  config: LaserEyesConfig,
-  options?: { chainId?: NetworkId }
-): Promise<WalletClient<...>> {
-  const connector = config.state.$connector.get()
-  if (!connector) throw new Error('not connected')
-
-  const account    = await connector.getAccount()
-  const chainId    = options?.chainId ?? config.state.$networkId.get()
-  const chain      = config.chains.find(c => c.id === chainId)
-  const dataSource = config.transports[chainId].reduceRight(
-    (acc, t) => mergeDataSources(t, acc)
-  )
-  const signer     = providerSigner(connector.getProvider())
-
-  return createWalletClient({ network: chain, dataSource, account })
-    .extend(walletBtcActions())
-    .extend(signingActions(signer))
+async function getWalletClient(config, options?) {
+  const client = getClient(config, options)   // cache / factory / bare
+  if (config.client || isWalletClientShape(client)) return client
+  return buildConnectorClient(config, client) // adds account, signer, override
 }
 ```
 
-Once this exists, **every core wallet write reduces to a one-liner**, and the
-dual signing model (client's `Signer`-based vs core's direct
-`adapter.request`) collapses into one. Provider-first reads remain a separate
-optimization: they can short-circuit before constructing the wallet client.
+`buildConnectorClient` takes a bare client, adds account + signer +
+optional connector `getClient` override, replaces the cache entry, and
+returns the wallet client.
+
+### Action layer ↔ override cascade
+
+Every action — read or write — dispatches via `getAction`:
+
+```ts
+const client = getClient(config, options)
+return getAction(client, baseFn, 'methodName')(...args)
+```
+
+- If a wallet is connected, the cache returns the wallet client, the
+  connector's `getClient` overrides cascade through `getAction`, and
+  the call hits the wallet's one-shot RPC (e.g. `bitcoin_sendBitcoin`).
+- If not connected (or for a non-wallet chain), the cache returns the
+  bare client, `getAction` falls through to the base action, and the
+  call hits the data source.
+
+Same call site, different runtime behavior — selected by what's in the
+cache, not by branching at the action layer.
+
+### Cache invalidation
+
+- `connect()`: clear all entries, build new wallet client, cache.
+- `disconnect()`: clear all entries.
+- `switchNetwork`: clear the prior chain and the new chain.
+- `networkChanged` event: clear prior + new chain entries.
+- `accountsChanged` event: clear the current chain (account-bound client
+  is now stale).
+
+### Connector overrides via `injected({ nativeRpc })`
+
+The `injected()` factory accepts a `nativeRpc` declaration listing which
+methods in the proposed RPC spec the wallet supports natively:
+
+```ts
+unisat = () => injected({
+  id: 'unisat',
+  name: 'Unisat Wallet',
+  getProvider: (w) => {
+    const raw = (w as { unisat?: unknown }).unisat
+    return raw ? new UnisatAdapter(raw) : null
+  },
+  nativeRpc: { sendBtc: true, getBalance: true },
+})
+```
+
+For each declared method, the synthesized `getClient` adds an override
+that:
+1. Tries `provider.request('bitcoin_*', params)`.
+2. On any failure, falls back to the base action via `getAction(client,
+   baseFn, 'name')` — which resolves to the free function against the
+   bare client closure (no recursion, no self-substitution).
+
+The set of methods in `nativeRpc` (currently `sendBtc`, `broadcastPsbt`,
+`getBalance`) corresponds to the entries in `BitcoinRpcMethod` for which
+we expect wallets to provide native support. Until a formal Bitcoin RPC
+spec exists, this set is our proposal — empirically chosen from what
+wallets in the wild actually implement.
+
+### Error model
+
+`NetworkNotConfiguredError` (from `@omnisat/lasereyes-client`) is thrown
+by `getClient` when the requested chain isn't in `config.chains`. It
+propagates naturally through `getWalletClient` and every Phase 9
+action. Apps catch it to prompt the user to switch chains or to surface
+an "unsupported network" UI. Matches wagmi's `ChainNotConfiguredError`.
 
 ## Decisions
 

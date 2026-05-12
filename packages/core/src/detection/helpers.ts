@@ -14,7 +14,11 @@ import { loadOylWalletAdapter } from '../adapters/oyl'
 import { loadPhantomWalletAdapter } from '../adapters/phantom'
 import { loadSparrowWalletAdapter } from '../adapters/sparrow'
 import { loadTokeoWalletAdapter } from '../adapters/tokeo'
-import { loadUnisatWalletAdapter } from '../adapters/unisat'
+import {
+  loadBinanceWalletAdapter,
+  loadUnisatWalletAdapter,
+  loadWizzWalletAdapter,
+} from '../adapters/unisat'
 import { loadXverseWalletAdapter } from '../adapters/xverse'
 
 /**
@@ -50,6 +54,8 @@ import { loadXverseWalletAdapter } from '../adapters/xverse'
  */
 export function loadAllWallets(): void {
   loadUnisatWalletAdapter()
+  loadBinanceWalletAdapter()
+  loadWizzWalletAdapter()
   loadXverseWalletAdapter()
   loadLeatherWalletAdapter()
   loadOkxWalletAdapter()

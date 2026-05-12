@@ -444,6 +444,31 @@ describe('createLaserEyesConfig', () => {
     expectTypeOf<typeof config.autoReconnect>().toEqualTypeOf<boolean>()
   })
 
+  it('accepts an optional `client` factory of shape ({chain, dataSource}) => Client', async () => {
+    const { createClient } = await import('@omnisat/lasereyes-client')
+    const config = createLaserEyesConfig({
+      chains: [MAINNET],
+      transports: { mainnet: [memMainnet] },
+      client: ({ chain, dataSource }) => createClient({ network: chain, dataSource }),
+    })
+    expectTypeOf<NonNullable<typeof config.client>>().parameter(0).toMatchTypeOf<{
+      chain: ChainNetwork
+      dataSource: ChainDataSource<any>
+    }>()
+  })
+
+  it('omitting `client` is legal — it defaults to undefined', () => {
+    const config = createLaserEyesConfig({
+      chains: [MAINNET],
+      transports: { mainnet: [memMainnet] },
+    })
+    expectTypeOf<typeof config.client>().toEqualTypeOf<
+      typeof config.client extends infer T ? T : never
+    >()
+    // The field is optional; the type allows undefined.
+    expectTypeOf<undefined extends typeof config.client ? true : false>().toEqualTypeOf<true>()
+  })
+
   it('connectors arg is optional (defaults to empty tuple)', () => {
     const config = createLaserEyesConfig({
       chains: [MAINNET],

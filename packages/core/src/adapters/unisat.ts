@@ -566,3 +566,49 @@ export function loadUnisatWalletAdapter(): BitcoinProviderAdapter | null {
 
   return adapter
 }
+
+/**
+ * Detect and announce Binance Web3 Wallet.
+ *
+ * @remarks
+ * Binance exposes a Unisat-compatible API under
+ * `window.binancew3w.bitcoin`, so we reuse {@link UnisatAdapter} with a
+ * different window-key check and identity. Mirrors the pattern of
+ * {@link loadUnisatWalletAdapter}.
+ */
+export function loadBinanceWalletAdapter(): BitcoinProviderAdapter | null {
+  if (typeof window === 'undefined') return null
+  const raw = (window as any).binancew3w?.bitcoin
+  if (!raw) return null
+
+  const adapter = new UnisatAdapter(raw)
+  announceWallet({
+    uuid: crypto.randomUUID(),
+    name: 'Binance Wallet',
+    rdns: 'com.binance.wallet',
+    provider: adapter,
+  })
+  return adapter
+}
+
+/**
+ * Detect and announce Wizz Wallet.
+ *
+ * @remarks
+ * Wizz exposes a Unisat-compatible API under `window.wizz`. Same pattern
+ * as {@link loadUnisatWalletAdapter}.
+ */
+export function loadWizzWalletAdapter(): BitcoinProviderAdapter | null {
+  if (typeof window === 'undefined') return null
+  const raw = (window as any).wizz
+  if (!raw) return null
+
+  const adapter = new UnisatAdapter(raw)
+  announceWallet({
+    uuid: crypto.randomUUID(),
+    name: 'Wizz Wallet',
+    rdns: 'com.wizz.wallet',
+    provider: adapter,
+  })
+  return adapter
+}
