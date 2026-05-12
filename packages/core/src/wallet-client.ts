@@ -3,35 +3,16 @@
  * stateful config with the client package's typed wallet client.
  *
  * @remarks
- * The keystone is intentionally minimal:
- *
- * 1. Resolve the active connector from state.
- * 2. If the connector ships its own `getClient` method, delegate to it
- *    entirely. (Connectors override here when their wallet has native
- *    RPC support for operations the default would compose — e.g.
- *    `bitcoin_sendBitcoin` instead of build-PSBT-then-sign-then-broadcast.)
- * 3. Otherwise, return a **bare** `WalletClient` built from
- *    `(account, chain, dataSource, signer)`. No `.extend(...)` calls.
- *    Callers compose whatever actions they want. The Phase 9 free-function
- *    actions (`sendBitcoin`, `signPsbt`, etc.) consume the bare client via
- *    `getAction` with free-function fallback, so they work end-to-end
- *    without needing the client to be pre-extended.
- *
- * The bare-by-default rule matches wagmi's `getConnectorClient` philosophy
- * (`@wagmi/core/actions/getConnectorClient.ts:132-134`):
- *
- * ```ts
- * if (connector.getClient) return connector.getClient({ chainId })
- * // …default client construction…
- * ```
- *
- * Pairs with the sibling {@link getClient} (read-only path) in
- * `client.ts`.
+ * Built as `getClient` + (when needed) wallet-client construction.
+ * `getClient` handles cache lookup and the user-supplied factory; what
+ * remains for the wallet client is just adding the connector-side bits
+ * (account, signer, connector overrides). That step is
+ * {@link buildConnectorClient}.
  *
  * @module wallet-client
  */
 
-import type { ChainDataSource, ChainNetwork, NetworkId } from '@omnisat/lasereyes-client'
+import type { ChainNetwork, Client, NetworkId } from '@omnisat/lasereyes-client'
 import { UnsupportedNetworkError } from '@omnisat/lasereyes-client'
 import {
   type Account,
@@ -43,12 +24,59 @@ import {
 } from '@omnisat/lasereyes-client/wallet'
 import { getClient } from './client'
 import type { LaserEyesConfig } from './config'
-import {
-  readCachedClient,
-  resolveConnector,
-  resolveDataSource,
-  writeCachedClient,
-} from './internal'
+import { resolveConnector, writeCachedClient } from './internal'
+
+/**
+ * Runtime test for whether a `Client` is actually a `WalletClient`.
+ *
+ * @remarks
+ * `WalletClientConfig` carries `account`; `ClientConfig` doesn't. That's
+ * the structural difference we rely on. The cast at call sites is what
+ * gives callers the wallet-client typing.
+ */
+function isWalletClientShape(
+  client: Client<any, any, any>
+): client is WalletClient<WalletClientConfig<Account, any>, Account, any, any> {
+  return client?.config !== undefined && 'account' in client.config
+}
+
+/**
+ * Add the connector-side bits — account, signer, optional connector
+ * `getClient` override — to a bare client. Replaces the cached entry
+ * for this chain with the resulting wallet client.
+ *
+ * @internal
+ */
+async function buildConnectorClient(
+  config: LaserEyesConfig<any, any, any>,
+  bare: Client<any, any, any>
+): Promise<WalletClient<WalletClientConfig<Account, any>, Account, any, any>> {
+  const connector = resolveConnector(config)
+  const provider = connector.getProvider()
+  if (!provider) {
+    throw new Error('Active connector has no provider')
+  }
+  const account = await connector.getAccount()
+  const network = bare.config.network as ChainNetwork
+  const dataSource = bare.config.dataSource
+
+  const walletClient = createWalletClient({
+    network,
+    dataSource,
+    account: account as WalletAccount,
+    signer: providerSigner(provider),
+  }) as WalletClient<WalletClientConfig<Account, any>, Account, any, any>
+
+  const final = connector.getClient
+    ? ((await connector.getClient({
+        client: walletClient,
+        chainId: network.id as NetworkId,
+      })) as WalletClient<WalletClientConfig<Account, any>, Account, any, any>)
+    : walletClient
+
+  writeCachedClient(config, network.id, final)
+  return final
+}
 
 /**
  * Build a typed wallet client for an active connector on a configured chain.
@@ -58,84 +86,51 @@ import {
  * chains in the config tuple. Out-of-config chain IDs are rejected at
  * compile time.
  *
- * @param config - The LaserEyes config.
- * @param options - Optional chain narrowing.
- * @returns A wallet client. Bare by default; pre-composed if the active
- *   connector ships its own `getClient`.
+ * Flow:
+ *   1. `getClient(config, options)` — returns the cached client, the
+ *      user-supplied factory's output, or a freshly-built bare client.
+ *   2. If the result is already a wallet client (cached at `connect()`
+ *      time, or the user's factory returned one) → return as-is.
+ *   3. If the user supplied `config.client` → factory wins, return as-is
+ *      even if it's not a wallet client (caller's responsibility).
+ *   4. Otherwise build the wallet client via {@link buildConnectorClient}
+ *      and replace the cached bare client.
  *
- * @throws {Error} If no connector is connected.
+ * @throws {Error} If no connector is connected and we need to build.
  * @throws {Error} If the active connector has no provider.
- * @throws {Error} If `chainId` is not in `config.chains` or has no
- *   configured transports.
- *
- * @example Bare default + compose actions on demand
- * ```ts
- * import { getWalletClient } from '@omnisat/lasereyes-core'
- * import { signingActions, walletBtcActions } from '@omnisat/lasereyes-client/wallet'
- *
- * const client = await getWalletClient(config)
- * const extended = client.extend(signingActions()).extend(walletBtcActions())
- * await extended.sendBtc({ to: 'bc1q…', amount: 1000 })
- * ```
- *
- * @example Connector-shipped client takes priority
- * ```ts
- * // If `config.state.$connector` points to a unisat connector whose
- * // `getClient` overrides `sendBitcoin` to use the native RPC method,
- * // the returned client will already have that override baked in.
- * const client = await getWalletClient(config)
- * ```
+ * @throws {UnsupportedNetworkError} If `chainId` is not in `config.chains`.
  */
 export async function getWalletClient<const config extends LaserEyesConfig<any, any, any>>(
   config: config,
   options?: { chainId?: config['chains'][number]['id'] }
 ): Promise<WalletClient<WalletClientConfig<Account, any>, Account, any, any>> {
-  const id = (options?.chainId ?? config.state.$connection.get().networkId) as string
-
-  // Either branch — user factory set OR a wallet client is already in
-  // the cache (populated at `connect()` time) — `getClient` returns
-  // exactly what we want. The cast at this layer asserts "this is a
-  // WalletClient"; for the factory-wins branch that's the user's
-  // responsibility, for the cache branch we ensure connect populated a
-  // real wallet client.
-  if (config.client || readCachedClient(config, id)) {
-    return getClient(config, options) as unknown as WalletClient<
-      WalletClientConfig<Account, any>,
-      Account,
-      any,
-      any
-    >
+  // `getClient` validates the chain is in `config.chains` (throws on
+  // miss) and resolves cache / factory / bare-client cases uniformly.
+  // For unsupported networks, it currently throws a generic Error;
+  // re-throw as the typed `UnsupportedNetworkError` so the wallet-side
+  // entrypoint gives apps the structured error they expect.
+  let client: Client<any, any, any>
+  try {
+    client = getClient(config, options)
+  } catch (e) {
+    if (e instanceof Error && /not in config\.chains/.test(e.message)) {
+      const id = (options?.chainId ?? config.state.$connection.get().networkId) as string
+      throw new UnsupportedNetworkError(
+        id,
+        (config.chains as readonly ChainNetwork[]).map(c => c.id)
+      )
+    }
+    throw e
   }
 
-  // No cache and no factory — need to build a fresh wallet client. The
-  // connector is required at this point.
-  const connector = resolveConnector(config)
-  const account = await connector.getAccount()
-  const network = (config.chains as readonly ChainNetwork[]).find(c => c.id === id)
-  if (!network) {
-    throw new UnsupportedNetworkError(
-      id,
-      (config.chains as readonly ChainNetwork[]).map(c => c.id)
-    )
+  // Factory wins unconditionally; whatever it produced is what we
+  // return. Cached wallet clients pass through too — they came from a
+  // prior `connect()` and already have connector overrides applied.
+  if (config.client || isWalletClientShape(client)) {
+    return client as WalletClient<WalletClientConfig<Account, any>, Account, any, any>
   }
-  const dataSource = resolveDataSource(config, id) as ChainDataSource<any>
-  const provider = connector.getProvider()
-  if (!provider) {
-    throw new Error('Active connector has no provider')
-  }
-  const signer = providerSigner(provider)
 
-  const bare = createWalletClient({
-    network,
-    dataSource,
-    account: account as WalletAccount,
-    signer,
-  }) as WalletClient<WalletClientConfig<Account, any>, Account, any, any>
-
-  const final = connector.getClient
-    ? await connector.getClient({ client: bare, chainId: id as NetworkId })
-    : bare
-
-  writeCachedClient(config, id, final)
-  return final as WalletClient<WalletClientConfig<Account, any>, Account, any, any>
+  // Bare client cached from a non-wallet path. Upgrade to a wallet
+  // client by adding connector-side bits.
+  return buildConnectorClient(config, client)
 }
