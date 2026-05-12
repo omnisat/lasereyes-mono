@@ -81,26 +81,18 @@ export class UnisatAdapter extends BaseAdapter {
       }
     })
 
-    // Unisat fires TWO network-related events:
+    // Unisat fires two network events on every chain switch:
     //
-    // - `networkChanged(network: 'livenet' | 'testnet')` — legacy, only
-    //   meaningful for livenet ↔ testnet. For chains outside that pair
-    //   (testnet4 / signet / fractal-*) it fires with the string
-    //   `'unknown'` because the legacy enum can't represent them.
-    // - `chainChanged({ enum: 'BITCOIN_*' })` — modern, the authoritative
-    //   source for every chain.
+    // - `networkChanged(network: 'livenet' | 'testnet')` — legacy. Only
+    //   represents livenet/testnet; emits `'unknown'` for chains the
+    //   legacy enum can't carry (testnet4, signet, fractal-*).
+    // - `chainChanged({ enum: 'BITCOIN_*' })` — modern, fires for *every*
+    //   chain with the full enum value.
     //
-    // Both fire on a single user-initiated switch. We:
-    //   1. Always honor `chainChanged`.
-    //   2. Honor `networkChanged` only when the value is one the legacy
-    //      event is spec'd to emit. Otherwise the 'unknown' payload would
-    //      overwrite the correct `chainChanged` value (whichever order
-    //      they arrived in).
-    raw.on('networkChanged', (network: string) => {
-      if (network !== 'livenet' && network !== 'testnet') return
-      const normalized = this.normalizeUnisatNetwork(network)
-      this.emitter.emit('networkChanged', normalized)
-    })
+    // Verified empirically that both fire on every switch, so we only
+    // subscribe to `chainChanged` — it's authoritative on its own and
+    // listening to both creates a clobber race where the legacy event's
+    // `'unknown'` overwrites the correct value.
     raw.on('chainChanged', (chain: { enum?: string } | string) => {
       const value = typeof chain === 'string' ? chain : (chain?.enum ?? '')
       if (!value) return
@@ -484,24 +476,18 @@ export class UnisatAdapter extends BaseAdapter {
    *   when the response API uses the new enum.
    */
   private normalizeUnisatNetwork(unisatValue: string): NetworkId {
+    // Only the new-style enum needs mapping — both `getChain().enum` and
+    // `chainChanged` emit these. Unknown values pass through verbatim so
+    // downstream `UnsupportedNetworkError` detection can fire on chains
+    // we haven't catalogued.
     const map: Record<string, NetworkId> = {
-      // New-style enum (from `getChain().enum` and `chainChanged` event)
       [UnisatNetwork.MAINNET]: 'mainnet',
       [UnisatNetwork.TESTNET]: 'testnet',
       [UnisatNetwork.TESTNET4]: 'testnet4',
       [UnisatNetwork.SIGNET]: 'signet',
       [UnisatNetwork.FRACTAL_MAINNET]: 'fractal-mainnet',
       [UnisatNetwork.FRACTAL_TESTNET]: 'fractal-testnet',
-      // Legacy strings (from `networkChanged` event)
-      livenet: 'mainnet',
-      testnet: 'testnet',
-      testnet4: 'testnet4',
-      signet: 'signet',
     }
-    // Preserve unknown values verbatim instead of silently coercing to
-    // mainnet — downstream code distinguishes supported from unsupported
-    // networks via `config.chains`, and that check only fires correctly
-    // when we surface the actual value.
     return map[unisatValue] ?? (unisatValue as NetworkId)
   }
 
