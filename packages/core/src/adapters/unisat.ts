@@ -8,7 +8,8 @@
 import type { Inscription, NetworkId } from '@omnisat/lasereyes-client'
 import { AddressType } from '@omnisat/lasereyes-client/utils'
 import type { Account, SignedPsbt } from '@omnisat/lasereyes-client/wallet'
-import * as bitcoin from 'bitcoinjs-lib'
+import { base64, hex } from '@scure/base'
+import { Transaction } from '@scure/btc-signer'
 import { announceWallet } from '../detection/announcements'
 import type {
   ConnectInfo,
@@ -240,7 +241,7 @@ export class UnisatAdapter extends BaseAdapter {
 
     // Sign with Unisat
     const signedHex = await this.rawProvider.signPsbt(psbt, options)
-    const psbtObj = bitcoin.Psbt.fromHex(signedHex)
+    const tx = Transaction.fromPSBT(hex.decode(signedHex))
 
     let txId: string | undefined
     let txHex: string | undefined
@@ -253,7 +254,11 @@ export class UnisatAdapter extends BaseAdapter {
     // Extract tx hex if finalized
     if (finalize) {
       try {
-        txHex = psbtObj.extractTransaction().toHex()
+        // `extract()` throws on unfinalized inputs; Unisat's
+        // `autoFinalized: true` should have finalized everything, but
+        // partial PSBTs (multi-sig flows, foreign inputs) won't be —
+        // swallow and leave `txHex` undefined.
+        txHex = hex.encode(tx.extract())
       } catch {
         // PSBT might not be fully signed yet
       }
@@ -261,7 +266,7 @@ export class UnisatAdapter extends BaseAdapter {
 
     return {
       psbtHex: signedHex,
-      psbtBase64: psbtObj.toBase64(),
+      psbtBase64: base64.encode(tx.toPSBT()),
       txId,
       txHex,
     }
@@ -292,7 +297,7 @@ export class UnisatAdapter extends BaseAdapter {
     // Process each signed PSBT
     return Promise.all(
       signedPsbts.map(async (signedHex: string) => {
-        const psbtObj = bitcoin.Psbt.fromHex(signedHex)
+        const tx = Transaction.fromPSBT(hex.decode(signedHex))
 
         let txId: string | undefined
         let txHex: string | undefined
@@ -303,7 +308,7 @@ export class UnisatAdapter extends BaseAdapter {
 
         if (finalize) {
           try {
-            txHex = psbtObj.extractTransaction().toHex()
+            txHex = hex.encode(tx.extract())
           } catch {
             // PSBT might not be fully signed
           }
@@ -311,7 +316,7 @@ export class UnisatAdapter extends BaseAdapter {
 
         return {
           psbtHex: signedHex,
-          psbtBase64: psbtObj.toBase64(),
+          psbtBase64: base64.encode(tx.toPSBT()),
           txId,
           txHex,
         }

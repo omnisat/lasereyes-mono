@@ -4,8 +4,10 @@
   "version": "0.0.84",
   "type": "module",
   "sideEffects": false,
-  "main": "./dist/index.umd.cjs",
+  "main": "./dist/index.js",
   "module": "./dist/index.js",
+  "unpkg": "./dist/lasereyes.umd.js",
+  "jsdelivr": "./dist/lasereyes.umd.js",
   "files": [
     "dist"
   ],
@@ -13,12 +15,122 @@
   "exports": {
     ".": {
       "import": "./dist/index.js",
-      "require": "./dist/index.umd.cjs"
+      "types": "./dist/index.d.ts"
+    },
+    "./actions": {
+      "import": "./dist/actions.js",
+      "types": "./dist/actions/index.d.ts"
+    },
+    "./detection": {
+      "import": "./dist/detection.js",
+      "types": "./dist/detection/index.d.ts"
+    },
+    "./connectors": {
+      "import": "./dist/connectors.js",
+      "types": "./dist/connectors/index.d.ts"
+    },
+    "./connectors/unisat": {
+      "import": "./dist/connectors/unisat.js",
+      "types": "./dist/connectors/unisat.d.ts"
+    },
+    "./connectors/xverse": {
+      "import": "./dist/connectors/xverse.js",
+      "types": "./dist/connectors/xverse.d.ts"
+    },
+    "./connectors/leather": {
+      "import": "./dist/connectors/leather.js",
+      "types": "./dist/connectors/leather.d.ts"
+    },
+    "./connectors/okx": {
+      "import": "./dist/connectors/okx.js",
+      "types": "./dist/connectors/okx.d.ts"
+    },
+    "./connectors/magic-eden": {
+      "import": "./dist/connectors/magic-eden.js",
+      "types": "./dist/connectors/magic-eden.d.ts"
+    },
+    "./connectors/oyl": {
+      "import": "./dist/connectors/oyl.js",
+      "types": "./dist/connectors/oyl.d.ts"
+    },
+    "./connectors/phantom": {
+      "import": "./dist/connectors/phantom.js",
+      "types": "./dist/connectors/phantom.d.ts"
+    },
+    "./connectors/orange": {
+      "import": "./dist/connectors/orange.js",
+      "types": "./dist/connectors/orange.d.ts"
+    },
+    "./connectors/op-net": {
+      "import": "./dist/connectors/op-net.js",
+      "types": "./dist/connectors/op-net.d.ts"
+    },
+    "./connectors/sparrow": {
+      "import": "./dist/connectors/sparrow.js",
+      "types": "./dist/connectors/sparrow.d.ts"
+    },
+    "./connectors/tokeo": {
+      "import": "./dist/connectors/tokeo.js",
+      "types": "./dist/connectors/tokeo.d.ts"
+    },
+    "./connectors/keplr": {
+      "import": "./dist/connectors/keplr.js",
+      "types": "./dist/connectors/keplr.d.ts"
+    },
+    "./adapters/unisat": {
+      "import": "./dist/adapters/unisat.js",
+      "types": "./dist/adapters/unisat.d.ts"
+    },
+    "./adapters/xverse": {
+      "import": "./dist/adapters/xverse.js",
+      "types": "./dist/adapters/xverse.d.ts"
+    },
+    "./adapters/leather": {
+      "import": "./dist/adapters/leather.js",
+      "types": "./dist/adapters/leather.d.ts"
+    },
+    "./adapters/okx": {
+      "import": "./dist/adapters/okx.js",
+      "types": "./dist/adapters/okx.d.ts"
+    },
+    "./adapters/magic-eden": {
+      "import": "./dist/adapters/magic-eden.js",
+      "types": "./dist/adapters/magic-eden.d.ts"
+    },
+    "./adapters/oyl": {
+      "import": "./dist/adapters/oyl.js",
+      "types": "./dist/adapters/oyl.d.ts"
+    },
+    "./adapters/phantom": {
+      "import": "./dist/adapters/phantom.js",
+      "types": "./dist/adapters/phantom.d.ts"
+    },
+    "./adapters/orange": {
+      "import": "./dist/adapters/orange.js",
+      "types": "./dist/adapters/orange.d.ts"
+    },
+    "./adapters/op-net": {
+      "import": "./dist/adapters/op-net.js",
+      "types": "./dist/adapters/op-net.d.ts"
+    },
+    "./adapters/sparrow": {
+      "import": "./dist/adapters/sparrow.js",
+      "types": "./dist/adapters/sparrow.d.ts"
+    },
+    "./adapters/tokeo": {
+      "import": "./dist/adapters/tokeo.js",
+      "types": "./dist/adapters/tokeo.d.ts"
+    },
+    "./adapters/keplr": {
+      "import": "./dist/adapters/keplr.js",
+      "types": "./dist/adapters/keplr.d.ts"
     }
   },
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "pnpm build:esm && pnpm build:umd",
+    "build:esm": "tsc && vite build",
+    "build:umd": "vite build --config vite.umd.config.js",
     "preview": "vite preview",
     "prepublishOnly": "npm run build",
     "lint": "eslint ."
@@ -30,6 +142,7 @@
     "eslint": "^9.30.0",
     "globals": "^15.9.0",
     "nanostores": "^0.11.3",
+    "rollup-plugin-visualizer": "^5.12.0",
     "sonda": "^0.7.1",
     "typescript": "5.8.3",
     "vite": "^5.4.1",
@@ -47,10 +160,11 @@
     "@magiceden-oss/runestone-lib": "^1.0.2",
     "@nanostores/persistent": "^0.10.2",
     "@orangecrypto/orange-connect": "^1.2.2",
+    "@scure/base": "^1.2.0",
+    "@scure/btc-signer": "^1.5.0",
     "axios": "^1.7.7",
     "bip32": "5.0.0-rc.0",
     "bip39": "^3.1.0",
-    "bitcoinjs-lib": "^7.0.0-rc.0",
     "buffer": "^6.0.3",
     "crypto-browserify": "^3.12.1",
     "eventemitter3": "^5.0.1",

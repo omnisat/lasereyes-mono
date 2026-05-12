@@ -5,20 +5,54 @@
  * @module adapters/xverse
  */
 
-import * as bitcoin from 'bitcoinjs-lib'
-import {
-  AddressPurpose as SatsConnectAddressPurpose,
-  BitcoinNetworkType,
-  MessageSigningProtocols,
-  request as satsConnectRequest,
-  RpcErrorCode,
-} from 'sats-connect'
 import type { NetworkId } from '@omnisat/lasereyes-client'
 import { getAddressType } from '@omnisat/lasereyes-client/utils'
 import type { AddressInfo, AddressPurpose, SignedPsbt } from '@omnisat/lasereyes-client/wallet'
+import { base64, hex } from '@scure/base'
+import { Transaction } from '@scure/btc-signer'
+// Types-only — pulling the runtime barrel statically drags in
+// @sats-connect/core + jsontokens + elliptic + bn.js + the whole
+// browserify chain (~600 kB). Runtime is dynamically imported on first
+// use; see `loadSatsConnect` below.
+import type {
+  AddressPurpose as SatsConnectAddressPurpose,
+  BitcoinNetworkType,
+  MessageSigningProtocols,
+} from 'sats-connect'
 import { announceWallet } from '../detection/announcements'
 import type { ProviderCapabilities } from '../types/provider'
 import { BaseAdapter, type BitcoinProviderAdapter } from './base'
+
+/**
+ * Lazy-loader for the `sats-connect` runtime.
+ *
+ * @remarks
+ * Loading sats-connect eagerly costs ~600 kB (it bundles
+ * `@sats-connect/core`, `jsontokens`, `elliptic`, `bn.js`, and the
+ * browserify polyfill chain). We defer the import until the first RPC
+ * call, so apps that never reach an Xverse-flavored method don't pay
+ * for it. The promise is memoized so subsequent calls reuse the same
+ * module record.
+ */
+let satsConnectPromise: Promise<typeof import('sats-connect')> | null = null
+function loadSatsConnect(): Promise<typeof import('sats-connect')> {
+  satsConnectPromise ??= import('sats-connect')
+  return satsConnectPromise
+}
+
+// String-enum values inlined so the sync code paths (network mapping,
+// purpose comparison) don't need to await the dynamic import. These
+// match the upstream enum definitions exactly — see
+// node_modules/@sats-connect/core/dist/index.d.ts.
+const SC_PURPOSE_PAYMENT: SatsConnectAddressPurpose = 'payment' as SatsConnectAddressPurpose
+const SC_PURPOSE_ORDINALS: SatsConnectAddressPurpose = 'ordinals' as SatsConnectAddressPurpose
+const SC_RPC_USER_REJECTION = -32000
+const SC_PROTOCOL_BIP322: MessageSigningProtocols = 'BIP322' as MessageSigningProtocols
+const SC_PROTOCOL_ECDSA: MessageSigningProtocols = 'ECDSA' as MessageSigningProtocols
+const SC_NETWORK_MAINNET: BitcoinNetworkType = 'Mainnet' as BitcoinNetworkType
+const SC_NETWORK_TESTNET: BitcoinNetworkType = 'Testnet' as BitcoinNetworkType
+const SC_NETWORK_TESTNET4: BitcoinNetworkType = 'Testnet4' as BitcoinNetworkType
+const SC_NETWORK_SIGNET: BitcoinNetworkType = 'Signet' as BitcoinNetworkType
 
 /** Xverse Wallet icon (base64 encoded SVG). */
 export const XVERSE_ICON =
@@ -87,9 +121,10 @@ export class XverseAdapter extends BaseAdapter {
    * Handle bitcoin_requestAccounts
    */
   private async handleRequestAccounts(): Promise<AddressInfo[]> {
+    const { request } = await loadSatsConnect()
     try {
       // Try to get existing account first
-      const getAccountResponse = await satsConnectRequest('wallet_getAccount', null)
+      const getAccountResponse = await request('wallet_getAccount', null)
       if (getAccountResponse.status === 'success') {
         return this.normalizeAddresses(getAccountResponse.result.addresses)
       }
@@ -98,8 +133,8 @@ export class XverseAdapter extends BaseAdapter {
     }
 
     // Request connection with both payment and ordinals addresses
-    const response = await satsConnectRequest('wallet_connect', {
-      addresses: [SatsConnectAddressPurpose.Payment, SatsConnectAddressPurpose.Ordinals],
+    const response = await request('wallet_connect', {
+      addresses: [SC_PURPOSE_PAYMENT, SC_PURPOSE_ORDINALS],
       message: 'Connecting with LaserEyes',
     })
 
@@ -107,7 +142,7 @@ export class XverseAdapter extends BaseAdapter {
       return this.normalizeAddresses(response.result.addresses)
     }
 
-    if (response.error.code === RpcErrorCode.USER_REJECTION) {
+    if (response.error.code === SC_RPC_USER_REJECTION) {
       throw this.createError(4001, 'User rejected account access')
     }
 
@@ -118,7 +153,8 @@ export class XverseAdapter extends BaseAdapter {
    * Handle bitcoin_getAccounts
    */
   private async handleGetAccounts(): Promise<AddressInfo[]> {
-    const response = await satsConnectRequest('wallet_getAccount', null)
+    const { request } = await loadSatsConnect()
+    const response = await request('wallet_getAccount', null)
 
     if (response.status === 'success') {
       return this.normalizeAddresses(response.result.addresses)
@@ -131,7 +167,8 @@ export class XverseAdapter extends BaseAdapter {
    * Handle bitcoin_getNetwork
    */
   private async handleGetNetwork(): Promise<NetworkId> {
-    const response = await satsConnectRequest('wallet_getNetwork', null)
+    const { request } = await loadSatsConnect()
+    const response = await request('wallet_getNetwork', null)
 
     if (response.status === 'success') {
       return this.normalizeXverseNetwork(response.result.bitcoin.name)
@@ -145,7 +182,8 @@ export class XverseAdapter extends BaseAdapter {
    */
   private async handleSwitchNetwork(networkId: NetworkId): Promise<void> {
     const xverseNetwork = this.toSatsConnectNetwork(networkId)
-    const response = await satsConnectRequest('wallet_changeNetwork', {
+    const { request } = await loadSatsConnect()
+    const response = await request('wallet_changeNetwork', {
       name: xverseNetwork,
     })
 
@@ -169,8 +207,9 @@ export class XverseAdapter extends BaseAdapter {
     // Convert hex to base64 if needed
     let psbtBase64 = psbt
     if (!this.isBase64(psbt)) {
-      const psbtObj = bitcoin.Psbt.fromHex(psbt)
-      psbtBase64 = psbtObj.toBase64()
+      // Round-trip via @scure/btc-signer so we re-encode the same PSBT
+      // bytes — no signing happens here, just a format change.
+      psbtBase64 = base64.encode(Transaction.fromPSBT(hex.decode(psbt)).toPSBT())
     }
 
     // Build signInputs map
@@ -188,28 +227,31 @@ export class XverseAdapter extends BaseAdapter {
     // If no inputs specified, Xverse will auto-detect
 
     // Sign with Xverse
-    const response = await satsConnectRequest('signPsbt', {
+    const { request } = await loadSatsConnect()
+    const response = await request('signPsbt', {
       psbt: psbtBase64,
       broadcast: !!broadcast,
       signInputs: Object.keys(signInputs).length > 0 ? signInputs : undefined,
     })
 
     if (response.status === 'error') {
-      if (response.error.code === RpcErrorCode.USER_REJECTION) {
+      if (response.error.code === SC_RPC_USER_REJECTION) {
         throw this.createError(4001, 'User rejected the request')
       }
       throw this.createError(-32603, `Error signing PSBT: ${response.error.message}`)
     }
 
     const signedPsbtBase64 = response.result.psbt
-    const signedPsbt = bitcoin.Psbt.fromBase64(signedPsbtBase64)
-    const signedPsbtHex = signedPsbt.toHex()
+    const signedPsbt = Transaction.fromPSBT(base64.decode(signedPsbtBase64))
+    const signedPsbtHex = hex.encode(signedPsbt.toPSBT())
 
     let txHex: string | undefined
     if (finalize && !response.result.txid) {
-      // Finalize if requested and not already broadcast
-      signedPsbt.finalizeAllInputs()
-      txHex = signedPsbt.extractTransaction().toHex()
+      // Finalize if requested and not already broadcast.
+      // `Transaction.finalize()` is the @scure/btc-signer analog of
+      // bitcoinjs-lib's `finalizeAllInputs()` — finalizes every input.
+      signedPsbt.finalize()
+      txHex = hex.encode(signedPsbt.extract())
     }
 
     return {
@@ -234,7 +276,8 @@ export class XverseAdapter extends BaseAdapter {
       throw this.createError(-32602, 'Invalid parameter: amount must be positive number')
     }
 
-    const response = await satsConnectRequest('sendTransfer', {
+    const { request } = await loadSatsConnect()
+    const response = await request('sendTransfer', {
       recipients: [
         {
           address: to,
@@ -247,7 +290,7 @@ export class XverseAdapter extends BaseAdapter {
       return response.result.txid
     }
 
-    if (response.error.code === RpcErrorCode.USER_REJECTION) {
+    if (response.error.code === SC_RPC_USER_REJECTION) {
       throw this.createError(4001, 'User rejected the request')
     }
 
@@ -265,17 +308,18 @@ export class XverseAdapter extends BaseAdapter {
     }
 
     // If no address specified, Xverse will use default payment address
-    const response = await satsConnectRequest('signMessage', {
+    const { request } = await loadSatsConnect()
+    const response = await request('signMessage', {
       address: address,
       message,
-      protocol: protocol === 'bip322' ? MessageSigningProtocols.BIP322 : MessageSigningProtocols.ECDSA,
+      protocol: protocol === 'bip322' ? SC_PROTOCOL_BIP322 : SC_PROTOCOL_ECDSA,
     })
 
     if (response.status === 'success') {
       return response.result.signature as string
     }
 
-    if (response.error.code === RpcErrorCode.USER_REJECTION) {
+    if (response.error.code === SC_RPC_USER_REJECTION) {
       throw this.createError(4001, 'User rejected the request')
     }
 
@@ -334,9 +378,9 @@ export class XverseAdapter extends BaseAdapter {
 
     for (const addr of addresses) {
       let purpose: AddressPurpose
-      if (addr.purpose === SatsConnectAddressPurpose.Payment) {
+      if (addr.purpose === SC_PURPOSE_PAYMENT) {
         purpose = 'payment'
-      } else if (addr.purpose === SatsConnectAddressPurpose.Ordinals) {
+      } else if (addr.purpose === SC_PURPOSE_ORDINALS) {
         purpose = 'ordinals'
       } else {
         continue // Skip unknown purposes
@@ -383,15 +427,15 @@ export class XverseAdapter extends BaseAdapter {
    */
   private toSatsConnectNetwork(networkId: NetworkId): BitcoinNetworkType {
     const map: Partial<Record<NetworkId, BitcoinNetworkType>> = {
-      mainnet: BitcoinNetworkType.Mainnet,
-      testnet: BitcoinNetworkType.Testnet,
-      testnet4: BitcoinNetworkType.Testnet4,
-      signet: BitcoinNetworkType.Signet,
-      'fractal-mainnet': BitcoinNetworkType.Mainnet,
-      'fractal-testnet': BitcoinNetworkType.Testnet,
+      mainnet: SC_NETWORK_MAINNET,
+      testnet: SC_NETWORK_TESTNET,
+      testnet4: SC_NETWORK_TESTNET4,
+      signet: SC_NETWORK_SIGNET,
+      'fractal-mainnet': SC_NETWORK_MAINNET,
+      'fractal-testnet': SC_NETWORK_TESTNET,
     }
 
-    return map[networkId] || BitcoinNetworkType.Mainnet
+    return map[networkId] || SC_NETWORK_MAINNET
   }
 
   /**

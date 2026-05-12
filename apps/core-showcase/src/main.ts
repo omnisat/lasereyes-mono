@@ -19,22 +19,22 @@
 
 import { MAINNET, NetworkNotConfiguredError, TESTNET } from '@omnisat/lasereyes-client'
 import { createDataSource as createMempoolDataSource } from '@omnisat/lasereyes-client/vendors/mempool'
+import { createLaserEyesConfig, getWalletClient } from '@omnisat/lasereyes-core'
 import {
   broadcastTransaction,
   connect,
-  createLaserEyesConfig,
   disconnect,
   getBalance,
-  getWalletClient,
   initialize,
-  loadAllWallets,
   sendBitcoin,
   signMessage,
   signPsbt,
   switchNetwork,
-  unisat,
-  xverse,
-} from '@omnisat/lasereyes-core'
+} from '@omnisat/lasereyes-core/actions'
+import { loadUnisatWalletAdapter } from '@omnisat/lasereyes-core/adapters/unisat'
+import { loadXverseWalletAdapter } from '@omnisat/lasereyes-core/adapters/xverse'
+import { unisat } from '@omnisat/lasereyes-core/connectors/unisat'
+import { xverse } from '@omnisat/lasereyes-core/connectors/xverse'
 
 // ============================================================================
 // 1. Build the LaserEyes config
@@ -56,7 +56,12 @@ const config = createLaserEyesConfig({
 const supportedNetworkIds = config.chains.map(c => c.id)
 
 // Kick off announcement-based discovery + auto-reconnect (no-op on fresh load).
-loadAllWallets()
+// Per-wallet adapter loaders. Calling `loadAllWallets()` from
+// `@omnisat/lasereyes-core/detection` would also work, but pulls in
+// every adapter chain. Using only the wallets we care about keeps the
+// bundle small.
+loadUnisatWalletAdapter()
+loadXverseWalletAdapter()
 initialize(config)
 
 // ============================================================================

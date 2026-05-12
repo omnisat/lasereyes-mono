@@ -43,18 +43,18 @@ export { getClient } from './client'
 export { getWalletClient } from './wallet-client'
 
 // ============================================================================
-// Phase 9 free-function actions over config
+// Phase 9 actions live at `@omnisat/lasereyes-core/actions`.
+// Adapters / connectors / detection live at their own subpaths:
+//   - `@omnisat/lasereyes-core/connectors/<wallet>` for connector factories.
+//   - `@omnisat/lasereyes-core/adapters/<wallet>` for adapter classes
+//     and per-wallet `loadXxxWalletAdapter()` loaders.
+//   - `@omnisat/lasereyes-core/detection` for `announceWallet`,
+//     `listenForWalletAnnouncements`, `discoverConnectors`, and
+//     `loadAllWallets`.
+// Importing per-subpath lets consumers' bundlers drop wallets they
+// don't use, instead of pulling all 12 wallet integrations in via a
+// single top-level barrel.
 // ============================================================================
-
-export * from './actions'
-
-// ============================================================================
-// Adapters + connectors + discovery
-// ============================================================================
-
-export * from './adapters'
-export * from './connectors'
-export * from './detection'
 
 // ============================================================================
 // Provider standard + connector types
