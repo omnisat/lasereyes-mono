@@ -83,18 +83,27 @@ export class UnisatAdapter extends BaseAdapter {
 
     // Unisat fires TWO network-related events:
     //
-    // - `networkChanged(network: 'livenet' | 'testnet')` — legacy,
-    //   only fires when toggling between livenet and testnet.
-    // - `chainChanged({ enum: 'BITCOIN_*' })` — modern, fires for every
-    //   chain switch including testnet4 / signet / fractal-*.
+    // - `networkChanged(network: 'livenet' | 'testnet')` — legacy, only
+    //   meaningful for livenet ↔ testnet. For chains outside that pair
+    //   (testnet4 / signet / fractal-*) it fires with the string
+    //   `'unknown'` because the legacy enum can't represent them.
+    // - `chainChanged({ enum: 'BITCOIN_*' })` — modern, the authoritative
+    //   source for every chain.
     //
-    // Subscribe to both and normalize through the same map.
+    // Both fire on a single user-initiated switch. We:
+    //   1. Always honor `chainChanged`.
+    //   2. Honor `networkChanged` only when the value is one the legacy
+    //      event is spec'd to emit. Otherwise the 'unknown' payload would
+    //      overwrite the correct `chainChanged` value (whichever order
+    //      they arrived in).
     raw.on('networkChanged', (network: string) => {
+      if (network !== 'livenet' && network !== 'testnet') return
       const normalized = this.normalizeUnisatNetwork(network)
       this.emitter.emit('networkChanged', normalized)
     })
     raw.on('chainChanged', (chain: { enum?: string } | string) => {
       const value = typeof chain === 'string' ? chain : (chain?.enum ?? '')
+      if (!value) return
       const normalized = this.normalizeUnisatNetwork(value)
       this.emitter.emit('networkChanged', normalized)
     })
