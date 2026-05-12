@@ -81,8 +81,21 @@ export class UnisatAdapter extends BaseAdapter {
       }
     })
 
+    // Unisat fires TWO network-related events:
+    //
+    // - `networkChanged(network: 'livenet' | 'testnet')` — legacy,
+    //   only fires when toggling between livenet and testnet.
+    // - `chainChanged({ enum: 'BITCOIN_*' })` — modern, fires for every
+    //   chain switch including testnet4 / signet / fractal-*.
+    //
+    // Subscribe to both and normalize through the same map.
     raw.on('networkChanged', (network: string) => {
       const normalized = this.normalizeUnisatNetwork(network)
+      this.emitter.emit('networkChanged', normalized)
+    })
+    raw.on('chainChanged', (chain: { enum?: string } | string) => {
+      const value = typeof chain === 'string' ? chain : (chain?.enum ?? '')
+      const normalized = this.normalizeUnisatNetwork(value)
       this.emitter.emit('networkChanged', normalized)
     })
 
@@ -463,20 +476,24 @@ export class UnisatAdapter extends BaseAdapter {
    */
   private normalizeUnisatNetwork(unisatValue: string): NetworkId {
     const map: Record<string, NetworkId> = {
-      // New-style enum
+      // New-style enum (from `getChain().enum` and `chainChanged` event)
       [UnisatNetwork.MAINNET]: 'mainnet',
       [UnisatNetwork.TESTNET]: 'testnet',
       [UnisatNetwork.TESTNET4]: 'testnet4',
       [UnisatNetwork.SIGNET]: 'signet',
       [UnisatNetwork.FRACTAL_MAINNET]: 'fractal-mainnet',
       [UnisatNetwork.FRACTAL_TESTNET]: 'fractal-testnet',
-      // Legacy strings (emitted on `networkChanged` event)
+      // Legacy strings (from `networkChanged` event)
       livenet: 'mainnet',
       testnet: 'testnet',
       testnet4: 'testnet4',
       signet: 'signet',
     }
-    return map[unisatValue] || 'mainnet'
+    // Preserve unknown values verbatim instead of silently coercing to
+    // mainnet — downstream code distinguishes supported from unsupported
+    // networks via `config.chains`, and that check only fires correctly
+    // when we surface the actual value.
+    return map[unisatValue] ?? (unisatValue as NetworkId)
   }
 
   /**
