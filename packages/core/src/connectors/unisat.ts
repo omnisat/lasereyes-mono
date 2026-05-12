@@ -10,7 +10,7 @@
 
 import { UNISAT_ICON, UnisatAdapter } from '../adapters/unisat'
 import type { CreateConnectorFn } from '../types/connector'
-import { type InjectedConnectorTarget, injected } from './injected'
+import { injected } from './injected'
 
 /**
  * Unisat connector factory.
@@ -27,8 +27,10 @@ export function unisat(): CreateConnectorFn {
     name: 'Unisat Wallet',
     icon: UNISAT_ICON,
     rdns: 'io.unisat.wallet',
-    getProvider: w => (w as { unisat?: unknown }).unisat,
-    adapter: UnisatAdapter,
+    getProvider: w => {
+      const raw = (w as { unisat?: unknown }).unisat
+      return raw ? new UnisatAdapter(raw) : null
+    },
     // Unisat exposes `sendBitcoin` and `getBalance` natively. Route both
     // through the wallet's one-shot RPCs instead of the composed paths.
     nativeRpc: { sendBtc: true, getBalance: true },
@@ -43,8 +45,10 @@ export function binance(): CreateConnectorFn {
     id: 'binance',
     name: 'Binance Wallet',
     rdns: 'com.binance.wallet',
-    getProvider: w => (w as { binancew3w?: { bitcoin?: unknown } }).binancew3w?.bitcoin,
-    adapter: UnisatAdapter,
+    getProvider: w => {
+      const raw = (w as { binancew3w?: { bitcoin?: unknown } }).binancew3w?.bitcoin
+      return raw ? new UnisatAdapter(raw) : null
+    },
     nativeRpc: { sendBtc: true, getBalance: true },
   })
 }
@@ -57,17 +61,36 @@ export function wizz(): CreateConnectorFn {
     id: 'wizz',
     name: 'Wizz Wallet',
     rdns: 'com.wizz.wallet',
-    getProvider: w => (w as { wizz?: unknown }).wizz,
-    adapter: UnisatAdapter,
+    getProvider: w => {
+      const raw = (w as { wizz?: unknown }).wizz
+      return raw ? new UnisatAdapter(raw) : null
+    },
     nativeRpc: { sendBtc: true, getBalance: true },
   })
 }
 
 /**
- * Build a Unisat-style connector for any wallet that mirrors Unisat's API.
- *
- * @param target - Override identification, detection, or icon.
+ * Build a Unisat-style connector for any wallet that mirrors Unisat's
+ * raw window API. Pass an `extract` function that returns the raw
+ * wallet object off `window`; the helper wraps it in {@link UnisatAdapter}.
  */
-export function unisatLike(target: Omit<InjectedConnectorTarget, 'adapter'>): CreateConnectorFn {
-  return injected({ ...target, adapter: UnisatAdapter })
+export function unisatLike(target: {
+  id: string
+  name: string
+  icon?: string
+  rdns?: string
+  extract: (window: Window & typeof globalThis) => unknown | null | undefined
+  nativeRpc?: Parameters<typeof injected>[0]['nativeRpc']
+}): CreateConnectorFn {
+  return injected({
+    id: target.id,
+    name: target.name,
+    icon: target.icon,
+    rdns: target.rdns,
+    getProvider: w => {
+      const raw = target.extract(w)
+      return raw ? new UnisatAdapter(raw) : null
+    },
+    nativeRpc: target.nativeRpc,
+  })
 }

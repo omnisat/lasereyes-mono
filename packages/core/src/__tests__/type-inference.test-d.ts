@@ -279,8 +279,15 @@ describe('Connector factories', () => {
     expectTypeOf(built).toEqualTypeOf<Connector>()
   })
 
-  it('unisatLike accepts Omit<InjectedConnectorTarget, "adapter">', () => {
-    expectTypeOf(unisatLike).parameter(0).toEqualTypeOf<Omit<InjectedConnectorTarget, 'adapter'>>()
+  it('unisatLike accepts an identity + raw-window extractor', () => {
+    // unisatLike wraps the raw window object in `UnisatAdapter` for you,
+    // so callers pass an `extract` (raw fetcher) rather than the full
+    // `getProvider` (which would already need to know about adapters).
+    expectTypeOf(unisatLike).parameter(0).toMatchTypeOf<{
+      id: string
+      name: string
+      extract: (window: Window & typeof globalThis) => unknown | null | undefined
+    }>()
   })
 })
 

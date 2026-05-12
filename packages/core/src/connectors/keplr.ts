@@ -12,8 +12,10 @@ export function keplr(): CreateConnectorFn {
     id: 'keplr',
     name: 'Keplr Wallet',
     rdns: 'app.keplr',
-    getProvider: w => (w as { keplr?: unknown }).keplr,
-    adapter: KeplrAdapter,
+    getProvider: w => {
+      const raw = (w as { keplr?: unknown }).keplr
+      return raw ? new KeplrAdapter(raw) : null
+    },
     nativeRpc: { sendBtc: true },
   })
 }

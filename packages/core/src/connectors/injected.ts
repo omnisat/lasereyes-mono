@@ -2,13 +2,18 @@
  * `injected` — generic connector for window-injected wallets.
  *
  * @remarks
- * Most browser-extension Bitcoin wallets work the same way: they inject
- * an object onto `window` (e.g. `window.unisat`, `window.LeatherProvider`)
- * that the page wraps in an adapter. `injected` packages that pattern as
- * a one-liner.
+ * Most browser-extension Bitcoin wallets inject an object onto `window`.
+ * `injected` packages the "find it, wrap it as a {@link BitcoinProvider},
+ * adopt the standard lifecycle" pattern as a one-liner.
  *
- * For wallets with non-standard discovery (e.g. sats-connect, mobile deep
- * links, hardware bridges) write the connector directly using
+ * The connector body only ever deals with a `BitcoinProvider` — it
+ * doesn't know whether the value came from a wallet that natively
+ * conforms to the spec or from an adapter wrapping a non-conforming
+ * wallet. That wrapping (if any) lives in the wallet-specific factory's
+ * `getProvider` body.
+ *
+ * For wallets with non-standard discovery (e.g. sats-connect, mobile
+ * deep links, hardware bridges) write the connector directly using
  * {@link createConnector} instead.
  *
  * @example
@@ -22,8 +27,10 @@
  *     name: 'Unisat',
  *     icon: UNISAT_ICON,
  *     rdns: 'io.unisat.wallet',
- *     getProvider: (window) => window.unisat,
- *     adapter: UnisatAdapter,
+ *     getProvider: (window) => {
+ *       const raw = (window as { unisat?: unknown }).unisat
+ *       return raw ? new UnisatAdapter(raw) : null
+ *     },
  *   })
  * ```
  *
@@ -37,9 +44,8 @@ import type {
   SendBtcParams,
   WalletAccount,
 } from '@omnisat/lasereyes-client/wallet'
-import type { BaseAdapter, BitcoinProviderAdapter } from '../adapters/base'
 import type { Connector, CreateConnectorFn } from '../types/connector'
-import type { ProviderCapabilities } from '../types/provider'
+import type { BitcoinProvider, ProviderCapabilities } from '../types/provider'
 import { createConnector } from './create'
 
 /**
@@ -55,17 +61,32 @@ export interface InjectedConnectorTarget {
   /** Reverse DNS identifier (e.g. `'io.unisat.wallet'`). */
   rdns?: string
   /**
-   * Read the wallet's injected object off the global `window`. Returns
-   * `null`/`undefined` if not installed.
+   * Resolve a spec-conforming {@link BitcoinProvider} from the global
+   * `window`. Returns `null`/`undefined` if the wallet isn't installed.
+   *
+   * @remarks
+   * The connector only ever sees a `BitcoinProvider` — it doesn't know
+   * (and shouldn't know) whether the value came from a wallet that
+   * natively conforms to the spec or from an adapter wrapping a
+   * non-conforming wallet. The wallet-specific factory is responsible
+   * for the wrapping:
+   *
+   * ```ts
+   * // Non-conforming wallet → adapter wraps the raw injection.
+   * getProvider: (w) => {
+   *   const raw = (w as { unisat?: unknown }).unisat
+   *   return raw ? new UnisatAdapter(raw) : null
+   * }
+   *
+   * // Spec-conforming wallet (the future end state) → return directly.
+   * getProvider: (w) => (w as { bitcoin?: BitcoinProvider }).bitcoin ?? null
+   * ```
+   *
+   * Once a wallet ships native `BitcoinProvider` support, its adapter
+   * file can be deleted and only this factory's `getProvider` body
+   * needs to change.
    */
-  getProvider: (window: Window & typeof globalThis) => unknown | null | undefined
-  /**
-   * Adapter class to wrap the injected object. Constructed with the
-   * raw provider as its single argument.
-   */
-  adapter: new (
-    rawProvider: unknown
-  ) => BaseAdapter
+  getProvider: (window: Window & typeof globalThis) => BitcoinProvider | null | undefined
 
   /**
    * Wallet operations the underlying provider supports natively (one-shot
@@ -106,23 +127,21 @@ export interface InjectedConnectorTarget {
  */
 export function injected(target: InjectedConnectorTarget): CreateConnectorFn {
   return createConnector(_config => {
-    let cachedAdapter: BitcoinProviderAdapter | null = null
+    let cachedProvider: BitcoinProvider | null = null
 
-    function resolveAdapter(): BitcoinProviderAdapter | null {
-      if (cachedAdapter) return cachedAdapter
+    function resolveProvider(): BitcoinProvider | null {
+      if (cachedProvider) return cachedProvider
       if (typeof window === 'undefined') return null
-      const raw = target.getProvider(window)
-      if (!raw) return null
-      cachedAdapter = new target.adapter(raw)
-      return cachedAdapter
+      cachedProvider = target.getProvider(window) ?? null
+      return cachedProvider
     }
 
-    function requireAdapter(): BitcoinProviderAdapter {
-      const a = resolveAdapter()
-      if (!a) {
+    function requireProvider(): BitcoinProvider {
+      const p = resolveProvider()
+      if (!p) {
         throw new Error(`${target.name} not installed. Please install the extension.`)
       }
-      return a
+      return p
     }
 
     const hasNativeOverrides =
@@ -136,11 +155,11 @@ export function injected(target: InjectedConnectorTarget): CreateConnectorFn {
       rdns: target.rdns,
 
       isReady() {
-        return resolveAdapter() !== null
+        return resolveProvider() !== null
       },
 
       async isAuthorized() {
-        const a = resolveAdapter()
+        const a = resolveProvider()
         if (!a) return false
         try {
           const account = (await a.request('bitcoin_getAccounts')) as Account | undefined
@@ -151,7 +170,7 @@ export function injected(target: InjectedConnectorTarget): CreateConnectorFn {
       },
 
       async connect() {
-        const a = requireAdapter()
+        const a = requireProvider()
         const account = (await a.request('bitcoin_requestAccounts')) as Account
         if (!account) throw new Error('No account returned from wallet')
         const networkId = (await a.request('bitcoin_getNetwork')) as NetworkId
@@ -161,31 +180,31 @@ export function injected(target: InjectedConnectorTarget): CreateConnectorFn {
       async disconnect() {
         // Most browser-extension wallets don't support disconnect.
         // Lifecycle cleanup is handled by the connector's caller.
-        cachedAdapter = null
+        cachedProvider = null
       },
 
       async getAccount() {
-        const a = requireAdapter()
+        const a = requireProvider()
         return (await a.request('bitcoin_getAccounts')) as Account
       },
 
       async getNetworkId() {
-        const a = requireAdapter()
+        const a = requireProvider()
         return (await a.request('bitcoin_getNetwork')) as NetworkId
       },
 
       async getCapabilities() {
-        const a = requireAdapter()
+        const a = requireProvider()
         return (await a.request('bitcoin_getCapabilities')) as ProviderCapabilities
       },
 
       async switchNetwork(networkId: NetworkId): Promise<NetworkId> {
-        const a = requireAdapter()
+        const a = requireProvider()
         return (await a.request('bitcoin_switchNetwork', { networkId })) as NetworkId
       },
 
       getProvider() {
-        return resolveAdapter()
+        return resolveProvider()
       },
 
       // Default no-op event handlers; overridden by core when it sets up
@@ -204,13 +223,13 @@ export function injected(target: InjectedConnectorTarget): CreateConnectorFn {
               const overrides: Record<string, (...args: any[]) => any> = {}
               if (target.nativeRpc?.sendBtc) {
                 overrides.sendBtc = async ({ to, amount }: SendBtcParams): Promise<string> => {
-                  const a = requireAdapter()
+                  const a = requireProvider()
                   return (await a.request('bitcoin_sendBitcoin', { to, amount })) as string
                 }
               }
               if (target.nativeRpc?.broadcastPsbt) {
                 overrides.broadcastPsbt = async (psbt: string): Promise<string> => {
-                  const a = requireAdapter()
+                  const a = requireProvider()
                   return (await a.request('bitcoin_pushPsbt', { psbt })) as string
                 }
               }
@@ -221,7 +240,7 @@ export function injected(target: InjectedConnectorTarget): CreateConnectorFn {
                 ): Promise<string> => {
                   const resolved = (account ?? client.config.account) as WalletAccount | undefined
                   const address = resolved?.getAddress(purpose)
-                  const a = requireAdapter()
+                  const a = requireProvider()
                   return (await a.request(
                     'bitcoin_getBalance',
                     address ? { address } : undefined

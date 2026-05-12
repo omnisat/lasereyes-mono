@@ -12,8 +12,10 @@ export function phantom(): CreateConnectorFn {
     id: 'phantom',
     name: 'Phantom Wallet',
     rdns: 'app.phantom',
-    getProvider: w => (w as { phantom?: { bitcoin?: unknown } }).phantom?.bitcoin,
-    adapter: PhantomAdapter,
+    getProvider: w => {
+      const raw = (w as { phantom?: { bitcoin?: unknown } }).phantom?.bitcoin
+      return raw ? new PhantomAdapter(raw) : null
+    },
     nativeRpc: { sendBtc: true },
   })
 }

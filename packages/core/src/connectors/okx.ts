@@ -12,8 +12,10 @@ export function okx(): CreateConnectorFn {
     id: 'okx',
     name: 'OKX Wallet',
     rdns: 'com.okx.wallet',
-    getProvider: w => (w as { okxwallet?: { bitcoin?: unknown } }).okxwallet?.bitcoin,
-    adapter: OkxAdapter,
+    getProvider: w => {
+      const raw = (w as { okxwallet?: { bitcoin?: unknown } }).okxwallet?.bitcoin
+      return raw ? new OkxAdapter(raw) : null
+    },
     nativeRpc: { sendBtc: true },
   })
 }

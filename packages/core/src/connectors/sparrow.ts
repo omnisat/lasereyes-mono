@@ -12,8 +12,10 @@ export function sparrow(): CreateConnectorFn {
     id: 'sparrow',
     name: 'Sparrow Wallet',
     rdns: 'wallet.sparrow',
-    getProvider: w => (w as { sparrow?: unknown }).sparrow,
-    adapter: SparrowAdapter,
+    getProvider: w => {
+      const raw = (w as { sparrow?: unknown }).sparrow
+      return raw ? new SparrowAdapter(raw) : null
+    },
     nativeRpc: { sendBtc: true },
   })
 }

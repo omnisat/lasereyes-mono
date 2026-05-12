@@ -12,8 +12,10 @@ export function orange(): CreateConnectorFn {
     id: 'orange',
     name: 'Orange Wallet',
     rdns: 'app.orangewallet',
-    getProvider: w => (w as { OrangeProvider?: unknown }).OrangeProvider,
-    adapter: OrangeAdapter,
+    getProvider: w => {
+      const raw = (w as { OrangeProvider?: unknown }).OrangeProvider
+      return raw ? new OrangeAdapter(raw) : null
+    },
     nativeRpc: { sendBtc: true },
   })
 }
