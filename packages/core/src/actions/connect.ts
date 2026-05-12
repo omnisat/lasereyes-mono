@@ -146,34 +146,46 @@ export async function connect<const config extends LaserEyesConfig<any, any, any
     throw new Error(`Connector '${args.connectorId}' is not registered`)
   }
 
-  // Tear down any stale subscription from a previous connection.
+  // Snapshot prior state so a failed attempt restores it verbatim.
+  // wagmi behaves the same way: clicking "Connect Y" while connected to X
+  // doesn't disconnect from X if Y rejects.
+  const priorStatus = config.state.$status.get()
+
+  config.state.$status.set('connecting')
+
+  let result: ConnectResult
+  try {
+    result = await connector.connect()
+  } catch (error) {
+    // Failed connect is a no-op for everything except $status. Account /
+    // networkId / connector / event subscriptions all stay exactly as
+    // they were before the attempt.
+    config.state.$status.set(priorStatus)
+    throw error
+  }
+
+  // Success path. Tear down any stale subscription from a prior connection
+  // ONLY now — if we'd torn it down before the attempt and the new connect
+  // rejected, we'd have lost the previous connection's event flow.
   eventCleanups.get(config)?.()
   eventCleanups.delete(config)
 
-  config.state.$status.set('connecting')
-  try {
-    const result = await connector.connect()
-    config.state.$account.set(result.account)
-    config.state.$networkId.set(result.networkId)
-    config.state.$connector.set(connector)
-    config.state.$status.set('connected')
+  config.state.$account.set(result.account)
+  config.state.$networkId.set(result.networkId)
+  config.state.$connector.set(connector)
+  config.state.$status.set('connected')
 
-    if (config.autoReconnect) {
-      config.storage.setItem('lasereyes.connectorId', connector.id)
-    }
-
-    // Subscribe to provider events so subsequent wallet-side changes
-    // (user switches network or account in the wallet UI) propagate
-    // into state automatically.
-    const provider = connector.getProvider()
-    if (provider) {
-      eventCleanups.set(config, subscribeToConnectorEvents(config, connector, provider))
-    }
-
-    connector.onConnect?.(result)
-    return result
-  } catch (error) {
-    config.state.$status.set('disconnected')
-    throw error
+  if (config.autoReconnect) {
+    config.storage.setItem('lasereyes.connectorId', connector.id)
   }
+
+  // Subscribe to provider events so subsequent wallet-side changes (user
+  // switches network or account in the wallet UI) propagate into state.
+  const provider = connector.getProvider()
+  if (provider) {
+    eventCleanups.set(config, subscribeToConnectorEvents(config, connector, provider))
+  }
+
+  connector.onConnect?.(result)
+  return result
 }
