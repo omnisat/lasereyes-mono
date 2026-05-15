@@ -33,7 +33,7 @@ export function unisat(): CreateConnectorFn {
     },
     // Unisat exposes `sendBitcoin` and `getBalance` natively. Route both
     // through the wallet's one-shot RPCs instead of the composed paths.
-    nativeRpc: { sendBtc: true, getBalance: true },
+    nativeRpc: { sendBtc: true, getAddressBalance: true },
   })
 }
 
@@ -49,7 +49,7 @@ export function binance(): CreateConnectorFn {
       const raw = (w as { binancew3w?: { bitcoin?: unknown } }).binancew3w?.bitcoin
       return raw ? new UnisatAdapter(raw) : null
     },
-    nativeRpc: { sendBtc: true, getBalance: true },
+    nativeRpc: { sendBtc: true, getAddressBalance: true },
   })
 }
 
@@ -65,7 +65,7 @@ export function wizz(): CreateConnectorFn {
       const raw = (w as { wizz?: unknown }).wizz
       return raw ? new UnisatAdapter(raw) : null
     },
-    nativeRpc: { sendBtc: true, getBalance: true },
+    nativeRpc: { sendBtc: true, getAddressBalance: true },
   })
 }
 

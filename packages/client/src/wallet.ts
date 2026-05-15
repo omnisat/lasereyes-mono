@@ -7,14 +7,15 @@
  * - Account factories: {@link createWalletAccount},
  *   {@link createReadOnlyAccount}.
  * - Wallet client: {@link createWalletClient}.
- * - Action factories: {@link signingActions}, {@link walletBtcActions}.
- * - Free actions: {@link sendBtc}, {@link signPsbt}, {@link signMessage},
- *   {@link broadcastPsbt}, {@link getBalance}, {@link getUtxos}.
+ * - Action factory: {@link walletBtcActions} — installs signing primitives
+ *   *and* account-aware BTC operations in a single extend pass.
+ * - Free actions: {@link signPsbt}, {@link signMessage},
+ *   {@link broadcastPsbt}, {@link sendBtc}, {@link getAccountBalance},
+ *   {@link getAccountUtxos}.
  *
- * **Extension order matters when going through factories.** Extend
- * `signingActions()` before `walletBtcActions()` — the latter requires
- * `signPsbt` on the client at compile time. The signer itself is passed
- * to `createWalletClient` via `config.signer`, not to a factory.
+ * The signer is passed to `createWalletClient` via `config.signer`, not to
+ * a factory. No extend-order footgun: signing and BTC actions ship in the
+ * same factory.
  *
  * @module wallet
  *
@@ -22,7 +23,7 @@
  * ```ts
  * import {
  *   createWalletClient, createWalletAccount,
- *   walletBtcActions, signingActions, providerSigner,
+ *   walletBtcActions, providerSigner,
  * } from '@omnisat/lasereyes-client/wallet'
  * import { createDataSource } from '@omnisat/lasereyes-client/vendors/mempool'
  * import { MAINNET, AddressType } from '@omnisat/lasereyes-client'
@@ -41,10 +42,9 @@
  *   network: MAINNET, dataSource: ds, account,
  *   signer: providerSigner(provider),
  * })
- *   .extend(signingActions())
  *   .extend(walletBtcActions())
  *
- * const balance = await walletClient.getBalance()
+ * const balance = await walletClient.getAccountBalance()
  * await walletClient.sendBtc({ to: 'bc1q...', amount: 10000 })
  * ```
  */
@@ -59,20 +59,17 @@ export type {
 } from './account'
 // Account factories + types
 export { createReadOnlyAccount, createWalletAccount } from './account'
-// Signing actions
-export {
-  broadcastPsbt,
-  signingActions,
-  signMessage,
-  signPsbt,
-} from './actions/signing'
-// Wallet-aware BTC actions
+// Wallet-aware BTC actions (signing primitives + account-aware BTC ops)
 export type { SendBtcParams } from './actions/wallet'
 export {
-  getBalance,
-  getUtxos,
+  broadcastPsbt,
+  getAccountBalance,
+  getAccountUtxos,
   sendBtc,
+  signMessage,
+  signPsbt,
   walletBtcActions,
+  type WalletBtcActions,
 } from './actions/wallet'
 // Wallet client factory + types
 export { createWalletClient } from './client'

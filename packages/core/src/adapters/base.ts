@@ -11,7 +11,7 @@
 
 import type { NetworkId } from '@omnisat/lasereyes-client'
 import { ProviderErrorCode, ProviderRpcError } from '@omnisat/lasereyes-client'
-import type { Account } from '@omnisat/lasereyes-client/wallet'
+import type { WalletAccountConfig } from '@omnisat/lasereyes-client/wallet'
 import EventEmitter from 'eventemitter3'
 import type {
   BitcoinProvider,
@@ -30,7 +30,13 @@ import type {
  * subscribed via `adapter.on(eventName, handler)` get the typed payload.
  */
 export type AdapterEventMap = {
-  accountsChanged: [Account]
+  /**
+   * Account changed. Payload is wire-data ({@link WalletAccountConfig})
+   * — the consumer constructs a `WalletAccount` via `createWalletAccount`
+   * before storing on state. Mirrors the JSON-serializable contract on
+   * `bitcoin_(get|request)Accounts`.
+   */
+  accountsChanged: [WalletAccountConfig]
   networkChanged: [NetworkId]
   connect: [ConnectInfo]
   disconnect: [DisconnectInfo]

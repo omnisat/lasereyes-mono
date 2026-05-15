@@ -16,7 +16,11 @@
  */
 
 import type { NetworkId } from '@omnisat/lasereyes-client'
-import type { Account } from '@omnisat/lasereyes-client/wallet'
+import {
+  createWalletAccount,
+  type WalletAccount,
+  type WalletAccountConfig,
+} from '@omnisat/lasereyes-client/wallet'
 import type { Connector } from '../types/connector'
 import type { ProviderCapabilities } from '../types/provider'
 import { listenForWalletAnnouncements, type WalletAnnouncement } from './announcements'
@@ -42,15 +46,18 @@ export function connectorFromAnnouncement(announcement: WalletAnnouncement): Con
 
     async isAuthorized() {
       try {
-        const account = (await provider.request('bitcoin_getAccounts')) as Account | undefined
-        return !!account?.addresses?.length
+        const data = (await provider.request('bitcoin_getAccounts')) as
+          | WalletAccountConfig
+          | undefined
+        return !!data?.addresses?.length
       } catch {
         return false
       }
     },
 
     async connect() {
-      const account = (await provider.request('bitcoin_requestAccounts')) as Account
+      const data = (await provider.request('bitcoin_requestAccounts')) as WalletAccountConfig
+      const account: WalletAccount = createWalletAccount(data)
       const networkId = (await provider.request('bitcoin_getNetwork')) as NetworkId
       return { account, networkId }
     },
@@ -59,8 +66,9 @@ export function connectorFromAnnouncement(announcement: WalletAnnouncement): Con
       // Announced providers don't have an explicit disconnect.
     },
 
-    async getAccount() {
-      return (await provider.request('bitcoin_getAccounts')) as Account
+    async getAccount(): Promise<WalletAccount> {
+      const data = (await provider.request('bitcoin_getAccounts')) as WalletAccountConfig
+      return createWalletAccount(data)
     },
 
     async getNetworkId() {

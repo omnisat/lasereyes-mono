@@ -139,6 +139,33 @@ export async function sendInscription<
 }
 
 // ============================================================================
+// Named action surfaces — method shapes installed by the factories below.
+// ============================================================================
+
+/**
+ * The method surface added to a client by {@link inscriptionActions}.
+ */
+export type PublicInscriptionActions = {
+  getInscriptionsByAddress: (
+    address: string,
+    pagination?: PaginationParams
+  ) => Promise<PaginatedResult<Inscription>>
+  getInscriptionInfo: (inscriptionId: string) => Promise<InscriptionInfo>
+  batchGetInscriptionInfo: (inscriptionIds: string[]) => Promise<InscriptionInfo[]>
+}
+
+/**
+ * The method surface added to a wallet client by {@link inscriptionWriteActions}.
+ *
+ * @remarks
+ * Implementation is stubbed; type surface is final.
+ */
+export type WalletInscriptionActions = {
+  inscribe: (params: InscribeParams) => Promise<string>
+  sendInscription: (params: SendInscriptionParams) => Promise<string>
+}
+
+// ============================================================================
 // Factories
 // ============================================================================
 
@@ -160,7 +187,7 @@ export function inscriptionActions() {
     Actions extends ActionGroup,
   >(
     client: Client<Config, DS, Actions>
-  ) => ({
+  ): PublicInscriptionActions => ({
     getInscriptionsByAddress: (address: string, pagination?: PaginationParams) =>
       getInscriptionsByAddress(client, address, pagination),
     getInscriptionInfo: (inscriptionId: string) => getInscriptionInfo(client, inscriptionId),
@@ -181,7 +208,7 @@ export function inscriptionWriteActions() {
     },
   >(
     client: WalletClient<Config, WalletAccount, Actions, DS>
-  ) => ({
+  ): WalletInscriptionActions => ({
     inscribe: (params: InscribeParams) => inscribe(client, params),
     sendInscription: (params: SendInscriptionParams) => sendInscription(client, params),
   })

@@ -14,11 +14,12 @@
 // `Client` with the methods).
 export {
   broadcastTransaction,
-  getBalance,
+  getAddressBalance,
+  getAddressUtxos,
   getOutputValue,
   getRecommendedFees,
   getTransaction,
-  getUtxos,
+  type PublicBtcActions,
   publicActions,
   waitForTransaction,
 } from './actions/public'

@@ -23,8 +23,8 @@ import type { WalletClient, WalletClientConfig } from './wallet-types'
  * user's addresses and can provide convenience methods that automatically
  * use the appropriate address for each operation.
  *
- * Signing capability is added via the `signingActions(signer)` action
- * group.
+ * Signing capability is reached through the actions installed by
+ * `walletBtcActions()`, which reads `config.signer` at call time.
  *
  * @typeParam dsMethods - The data source capabilities (inferred from `config.dataSource`)
  * @typeParam TAccount - The account type (inferred from `config.account`)
@@ -47,8 +47,7 @@ import type { WalletClient, WalletClientConfig } from './wallet-types'
  * @example
  * ```ts
  * import {
- *   createWalletClient, createWalletAccount,
- *   walletBtcActions, signingActions,
+ *   createWalletClient, createWalletAccount, walletBtcActions,
  * } from '@omnisat/lasereyes-client/wallet'
  * import { createDataSource } from '@omnisat/lasereyes-client/vendors/mempool'
  * import { MAINNET, AddressType } from '@omnisat/lasereyes-client'
@@ -67,10 +66,9 @@ import type { WalletClient, WalletClientConfig } from './wallet-types'
  *   dataSource: ds,
  *   account,
  * })
- *   .extend(signingActions(mySigner))
  *   .extend(walletBtcActions())
  *
- * const balance = await walletClient.getBalance()
+ * const balance = await walletClient.getAccountBalance()
  * await walletClient.sendBtc({ to: 'bc1q...', amount: 10000 })
  * ```
  */

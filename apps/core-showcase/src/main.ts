@@ -24,9 +24,9 @@ import {
   broadcastTransaction,
   connect,
   disconnect,
-  getBalance,
+  getAddressBalance,
   initialize,
-  sendBitcoin,
+  sendBtc,
   signMessage,
   signPsbt,
   switchNetwork,
@@ -223,13 +223,13 @@ $('get-balance').onclick = async () => {
   const account = config.state.$connection.get().account
   if (!account) return
   const address = account.getAddress()
-  log('info', `→ getBalance(config, '${address}')`)
+  log('info', `→ getAddressBalance(config, '${address}')`)
   try {
-    const sats = await getBalance(config, address)
+    const sats = await getAddressBalance(config, address)
     log('ok', `← balance: ${sats} sats`)
     $('balance').textContent = sats
   } catch (e) {
-    log('err', `✗ getBalance failed:`, (e as Error).message)
+    log('err', `✗ getAddressBalance failed:`, (e as Error).message)
   }
 }
 
@@ -240,7 +240,7 @@ $('send').onclick = async () => {
     log('warn', 'fill in `to` and `amount`')
     return
   }
-  log('info', `→ sendBitcoin(config, '${to}', ${amount})`)
+  log('info', `→ sendBtc(config, '${to}', ${amount})`)
   log(
     'info',
     `  ├─ getWalletClient(config) → connector.getClient(${
@@ -251,14 +251,14 @@ $('send').onclick = async () => {
   )
   log('info', `  └─ getAction(client, sendBtc, 'sendBtc') → dispatching…`)
   try {
-    const txId = await sendBitcoin(config, to, amount)
+    const txId = await sendBtc(config, to, amount)
     log('ok', `← txId: ${txId}`)
   } catch (e) {
     if (e instanceof NetworkNotConfiguredError) {
       log('err', `✗ ${e.message}`)
       log('info', `  → use the "Switch network" buttons to move the wallet to a supported chain.`)
     } else {
-      log('err', `✗ sendBitcoin failed:`, (e as Error).message)
+      log('err', `✗ sendBtc failed:`, (e as Error).message)
     }
   }
 }

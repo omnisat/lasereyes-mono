@@ -9,7 +9,7 @@ Minimal vanilla-TS app that exercises `@omnisat/lasereyes-core` end-to-end.
 - **EIP-6963-style discovery** via `loadAllWallets()` + the `$connectors`
   reactive store.
 - **Phase 9 lifecycle actions** — `initialize`, `connect`, `disconnect`.
-- **Phase 9 data actions** — `getBalance` (which provider-first-falls-back
+- **Phase 9 data actions** — `getAddressBalance` (which provider-first-falls-back
   through `getClient`).
 - **Phase 9 wallet actions** — `sendBitcoin`, `signMessage`, `signPsbt`,
   `broadcastTransaction` — all routed through:
@@ -48,6 +48,6 @@ exercise the wallet paths.
    wallet prompt, wallet picks fees, wallet broadcasts. If you remove
    `nativeRpc` from the unisat connector and rebuild, the default composed
    path runs instead (build PSBT → sign → broadcast — two prompts).
-4. **Sign message** and **Sign PSBT** route through `signingActions`'
+4. **Sign message** and **Sign PSBT** route through `walletBtcActions`'
    `signer.signPsbt`/`signMessage` via the `providerSigner(provider)`
    bridge in the keystone.

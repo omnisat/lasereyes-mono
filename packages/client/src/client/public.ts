@@ -39,7 +39,7 @@ import type { Client, ClientConfig } from './types'
  * const client = createClient({ network: 'mainnet', dataSource: ds })
  *   .extend(publicActions())
  *
- * const balance = await client.getBalance('bc1q...')
+ * const balance = await client.getAddressBalance('bc1q...')
  * ```
  */
 export function createClient<dsMethods extends ActionGroup>(config: {

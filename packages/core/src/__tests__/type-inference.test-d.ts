@@ -58,6 +58,7 @@ import type {
   SignedPsbt,
   SignMessageOptions,
   SignPsbtOptions,
+  WalletAccount,
 } from '@omnisat/lasereyes-client/wallet'
 import { describe, expectTypeOf, it } from 'vitest'
 // — Phase 9 actions —
@@ -68,9 +69,9 @@ import {
   connect,
   disconnect,
   dispose,
+  getAddressBalance,
   getAddressUtxos,
   getAlkanesBalances,
-  getBalance,
   getBrc20Balances,
   getClient,
   getInscriptions,
@@ -78,7 +79,7 @@ import {
   getRunesBalances,
   getTransaction,
   initialize,
-  sendBitcoin,
+  sendBtc,
   signMessage,
   signPsbt,
   switchNetwork,
@@ -296,14 +297,14 @@ describe('Connector factories', () => {
 // ============================================================================
 
 describe('Connector interface', () => {
-  it('connect() resolves to ConnectResult { account: Account, networkId: NetworkId }', () => {
+  it('connect() resolves to ConnectResult { account: WalletAccount, networkId: NetworkId }', () => {
     expectTypeOf(c.connect).returns.resolves.toEqualTypeOf<ConnectResult>()
-    expectTypeOf<ConnectResult['account']>().toEqualTypeOf<Account>()
+    expectTypeOf<ConnectResult['account']>().toEqualTypeOf<WalletAccount>()
     expectTypeOf<ConnectResult['networkId']>().toEqualTypeOf<NetworkId>()
   })
 
-  it('getAccount returns Account (singular, not AddressInfo[])', () => {
-    expectTypeOf(c.getAccount).returns.toEqualTypeOf<Promise<Account>>()
+  it('getAccount returns WalletAccount (with getAddress/getPublicKey methods)', () => {
+    expectTypeOf(c.getAccount).returns.toEqualTypeOf<Promise<WalletAccount>>()
   })
 
   it('getProvider returns BitcoinProvider | null', () => {
@@ -683,8 +684,10 @@ describe('Phase 9 — getClient', () => {
     const client = getClient(_typedConfig)
 
     // Imports here exercise the same paths Phase 9 actions use.
-    const { getBalance: clientGetBalance } = await import('@omnisat/lasereyes-client')
-    expectTypeOf(clientGetBalance(client, 'bc1q…')).resolves.toEqualTypeOf<string>()
+    const { getAddressBalance: clientGetAddressBalance } = await import(
+      '@omnisat/lasereyes-client'
+    )
+    expectTypeOf(clientGetAddressBalance(client, 'bc1q…')).resolves.toEqualTypeOf<string>()
   })
 })
 
@@ -726,8 +729,8 @@ describe('Phase 10 — getWalletClient', () => {
     // extended on top. Confirms the wallet client exposes the `.extend()`
     // chain required by the client package's factory signatures.
     const wc = await getWalletClient(_typedConfig)
-    const { signingActions, walletBtcActions } = await import('@omnisat/lasereyes-client/wallet')
-    const extended = wc.extend(signingActions()).extend(walletBtcActions())
+    const { walletBtcActions } = await import('@omnisat/lasereyes-client/wallet')
+    const extended = wc.extend(walletBtcActions())
     expectTypeOf(extended.sendBtc).toMatchTypeOf<Function>()
   })
 
@@ -758,10 +761,10 @@ describe('Phase 10 — getWalletClient', () => {
 })
 
 describe('Phase 9 — Read actions (provider-first, client-fallback)', () => {
-  it('getBalance: (config, address) => Promise<string>', () => {
-    expectTypeOf(getBalance).parameter(0).toMatchTypeOf<typeof _typedConfig>()
-    expectTypeOf(getBalance).parameter(1).toEqualTypeOf<string>()
-    expectTypeOf(getBalance(_typedConfig, 'bc1q…')).resolves.toEqualTypeOf<string>()
+  it('getAddressBalance: (config, address) => Promise<string>', () => {
+    expectTypeOf(getAddressBalance).parameter(0).toMatchTypeOf<typeof _typedConfig>()
+    expectTypeOf(getAddressBalance).parameter(1).toEqualTypeOf<string>()
+    expectTypeOf(getAddressBalance(_typedConfig, 'bc1q…')).resolves.toEqualTypeOf<string>()
   })
 
   it('getAddressUtxos: (config, address) => Promise<PaginatedResult<UTXO>>', () => {
@@ -864,11 +867,11 @@ describe('Phase 9 — Read actions (client-only)', () => {
 })
 
 describe('Phase 9 — Wallet (write) actions', () => {
-  it('sendBitcoin: (config, to, amount) => Promise<string>', () => {
-    expectTypeOf(sendBitcoin).parameter(0).toMatchTypeOf<typeof _typedConfig>()
-    expectTypeOf(sendBitcoin).parameter(1).toEqualTypeOf<string>()
-    expectTypeOf(sendBitcoin).parameter(2).toEqualTypeOf<number>()
-    expectTypeOf(sendBitcoin(_typedConfig, 'bc1q…', 10000)).resolves.toEqualTypeOf<string>()
+  it('sendBtc: (config, to, amount) => Promise<string>', () => {
+    expectTypeOf(sendBtc).parameter(0).toMatchTypeOf<typeof _typedConfig>()
+    expectTypeOf(sendBtc).parameter(1).toEqualTypeOf<string>()
+    expectTypeOf(sendBtc).parameter(2).toEqualTypeOf<number>()
+    expectTypeOf(sendBtc(_typedConfig, 'bc1q…', 10000)).resolves.toEqualTypeOf<string>()
   })
 
   it('signPsbt: (config, psbt, options?) => Promise<SignedPsbt>', () => {
@@ -901,7 +904,7 @@ describe('Phase 9 — Threading discipline (regression guards)', () => {
     connect(_typedConfig, { connectorId: 'x' })
     disconnect(_typedConfig)
     switchNetwork(_typedConfig, 'mainnet')
-    getBalance(_typedConfig, 'bc1q…')
+    getAddressBalance(_typedConfig, 'bc1q…')
     getAddressUtxos(_typedConfig, 'bc1q…')
     getInscriptions(_typedConfig, 'bc1p…')
     getRunesBalances(_typedConfig, 'bc1p…')
@@ -910,7 +913,7 @@ describe('Phase 9 — Threading discipline (regression guards)', () => {
     getRecommendedFees(_typedConfig)
     getTransaction(_typedConfig, 'tx')
     broadcastTransaction(_typedConfig, '02…')
-    sendBitcoin(_typedConfig, 'bc1q…', 1000)
+    sendBtc(_typedConfig, 'bc1q…', 1000)
     signPsbt(_typedConfig, 'psbt')
     signMessage(_typedConfig, 'hello')
     broadcastPsbt(_typedConfig, 'psbt')
@@ -922,7 +925,7 @@ describe('Phase 9 — Threading discipline (regression guards)', () => {
     connect(_looseConfig, { connectorId: 'x' })
     disconnect(_looseConfig)
     switchNetwork(_looseConfig, 'mainnet')
-    getBalance(_looseConfig, 'bc1q…')
+    getAddressBalance(_looseConfig, 'bc1q…')
     getAddressUtxos(_looseConfig, 'bc1q…')
     getInscriptions(_looseConfig, 'bc1p…')
     getRunesBalances(_looseConfig, 'bc1p…')
@@ -931,7 +934,7 @@ describe('Phase 9 — Threading discipline (regression guards)', () => {
     getRecommendedFees(_looseConfig)
     getTransaction(_looseConfig, 'tx')
     broadcastTransaction(_looseConfig, '02…')
-    sendBitcoin(_looseConfig, 'bc1q…', 1000)
+    sendBtc(_looseConfig, 'bc1q…', 1000)
     signPsbt(_looseConfig, 'psbt')
     signMessage(_looseConfig, 'hello')
     broadcastPsbt(_looseConfig, 'psbt')

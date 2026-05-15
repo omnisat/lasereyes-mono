@@ -10,10 +10,12 @@ export {
   getRuneById,
   getRuneByName,
   getRuneOutpoints,
+  type PublicRuneActions,
   runeActions,
   runeWriteActions,
   sendRune,
   type SendRuneParams,
+  type WalletRuneActions,
 } from './actions/runes'
 export type {
   OrdOutput,

@@ -5,7 +5,12 @@
  */
 
 import type { ChainNetwork, NetworkId } from '@omnisat/lasereyes-client'
-import type { Account, WalletClient, WalletClientConfig } from '@omnisat/lasereyes-client/wallet'
+import type {
+  Account,
+  WalletAccount,
+  WalletClient,
+  WalletClientConfig,
+} from '@omnisat/lasereyes-client/wallet'
 import type { BitcoinProvider, ProviderCapabilities } from './provider'
 
 /**
@@ -13,7 +18,7 @@ import type { BitcoinProvider, ProviderCapabilities } from './provider'
  */
 export interface ConnectResult {
   /** Connected addresses with purpose and public keys */
-  account: Account
+  account: WalletAccount
 
   /** Current network ID */
   networkId: NetworkId
@@ -91,9 +96,12 @@ export interface Connector {
   /**
    * Get current account.
    *
-   * @returns The connected account, with the associated addresses
+   * @returns The connected account — a {@link WalletAccount} with
+   *   `addresses`, `publicKeys`, `getAddress()`, and `getPublicKey()`.
+   *   Implementations construct it from the adapter's wire-data RPC
+   *   reply (`WalletAccountConfig`) via `createWalletAccount(...)`.
    */
-  getAccount(): Promise<Account>
+  getAccount(): Promise<WalletAccount>
 
   /**
    * Get current network.

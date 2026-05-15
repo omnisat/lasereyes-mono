@@ -1,6 +1,6 @@
 import { useStore } from '@nanostores/react'
 import { useEffect, useState } from 'react'
-import { getBalance } from '@omnisat/lasereyes-core'
+import { getAddressBalance } from '@omnisat/lasereyes-core'
 import { useLaserEyesCore } from '../providers/lasereyes-provider'
 
 /**
@@ -65,7 +65,7 @@ export function useBalance(address?: string): UseBalanceResult {
     setLoading(true)
     setError(null)
 
-    getBalance(core, resolvedAddress)
+    getAddressBalance(core, resolvedAddress)
       .then((b) => {
         if (!cancelled) {
           setBalance(b)

@@ -5,8 +5,8 @@
  * Accounts represent the addresses (and optionally public keys) controlled by
  * a wallet. They are pure data containers — accounts know nothing about
  * signing. Signing capability is layered on separately via the
- * {@link Signer} interface and injected into a wallet client through
- * {@link signingActions}.
+ * {@link Signer} interface and reached through the actions installed by
+ * {@link walletBtcActions}.
  *
  * @module account/types
  */

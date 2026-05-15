@@ -9,7 +9,7 @@
  *   `RuneCapability` (full or partial).
  * - {@link runeWriteActions} — write. Adds rune-sending capability. Requires
  *   the data source to expose `RuneCapability` *and* the client to already
- *   carry `signPsbt` (extended via {@link signingActions} first). Bodies
+ *   carry `signPsbt` (extended via {@link walletBtcActions} first). Bodies
  *   are stubbed pending implementation; the type surface is final.
  *
  * @module actions/runes
@@ -136,6 +136,45 @@ export async function sendRune<
 // Factories
 // ============================================================================
 
+// ============================================================================
+// Named action surfaces — method shapes installed by the factories below.
+// ============================================================================
+
+/**
+ * The method surface added to a client by {@link runeActions}.
+ *
+ * @remarks
+ * Method shapes — `client` already removed. Free-function counterparts
+ * live alongside in this module.
+ */
+export type PublicRuneActions = {
+  getRuneBalances: (
+    address: string,
+    pagination?: PaginationParams
+  ) => Promise<PaginatedResult<RuneBalance>>
+  getRuneById: (runeId: string) => Promise<RuneInfo>
+  getRuneByName: (runeName: string) => Promise<RuneInfo>
+  getRuneOutpoints: (
+    params: { address: string; runeId: string },
+    pagination?: PaginationParams
+  ) => Promise<PaginatedResult<RuneOutpoint>>
+  batchGetRuneOutputs: (params: {
+    outpoints: string[]
+    runeName: string
+  }) => Promise<OrdOutputWrapper[]>
+}
+
+/**
+ * The method surface added to a wallet client by {@link runeWriteActions}.
+ *
+ * @remarks
+ * Method shapes — `client` already removed. Implementation is stubbed;
+ * type surface is final.
+ */
+export type WalletRuneActions = {
+  sendRune: (params: SendRuneParams) => Promise<string>
+}
+
 /**
  * Action-group factory bundling read-only Runes operations.
  *
@@ -156,7 +195,7 @@ export function runeActions() {
     Actions extends ActionGroup,
   >(
     client: Client<Config, DS, Actions>
-  ) => ({
+  ): PublicRuneActions => ({
     getRuneBalances: (address: string, pagination?: PaginationParams) =>
       getRuneBalances(client, address, pagination),
     getRuneById: (runeId: string) => getRuneById(client, runeId),
@@ -174,7 +213,7 @@ export function runeActions() {
  * Action-group factory bundling write Runes operations.
  *
  * @remarks
- * Requires the client to already carry `signPsbt` (extend `signingActions`
+ * Requires the client to already carry `signPsbt` (extend `walletBtcActions`
  * before this) and the data source to expose rune-outpoint discovery and
  * BTC broadcast.
  *
@@ -190,7 +229,7 @@ export function runeWriteActions() {
     },
   >(
     client: WalletClient<Config, WalletAccount, Actions, DS>
-  ) => ({
+  ): WalletRuneActions => ({
     sendRune: (params: SendRuneParams) => sendRune(client, params),
   })
 }

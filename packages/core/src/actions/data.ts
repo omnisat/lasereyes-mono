@@ -4,7 +4,7 @@
  * @remarks
  * Two patterns:
  *
- * - **Client (data-source) reads** (`getBalance`, `getAddressUtxos`,
+ * - **Client (data-source) reads** (`getAddressBalance`, `getAddressUtxos`,
  *   `getRecommendedFees`, `getTransaction`, `broadcastTransaction`):
  *   delegate to the bare action from the client package, composed with
  *   `getClient(config, opts)`. The action layer never talks to the
@@ -25,8 +25,8 @@
  * **Architectural pattern: bare action + bare client.**
  *
  * Each client read goes through the *bare action functions* exported
- * from `@omnisat/lasereyes-client` (e.g. `getBalance(client, addr)`),
- * NOT through the extended-method form (`client.getBalance(addr)`). The
+ * from `@omnisat/lasereyes-client` (e.g. `getAddressBalance(client, addr)`),
+ * NOT through the extended-method form (`client.getAddressBalance(addr)`). The
  * client returned by `getClient(config)` is bare — no action groups
  * pre-extended. Tree-shake friendly, explicit imports per call.
  *
@@ -49,10 +49,10 @@ import type {
 import {
   broadcastTransaction as clientBroadcastTransaction,
   getAction,
-  getBalance as clientGetBalance,
+  getAddressBalance as clientGetAddressBalance,
+  getAddressUtxos as clientGetAddressUtxos,
   getRecommendedFees as clientGetRecommendedFees,
   getTransaction as clientGetTransaction,
-  getUtxos as clientGetUtxos,
 } from '@omnisat/lasereyes-client'
 import { getClient } from '../client'
 import type { LaserEyesConfig } from '../config'
@@ -69,7 +69,7 @@ import { tryResolveConnector } from '../internal'
  * @remarks
  * Used only by the provider-only protocol reads — those have no
  * data-source equivalent yet and can't fall back. Client reads
- * (`getBalance`, etc.) don't use this; they go straight through
+ * (`getAddressBalance`, etc.) don't use this; they go straight through
  * {@link getClient}.
  *
  * @returns The result, or `undefined` if no connector is active OR the
@@ -101,30 +101,31 @@ async function callProvider<T>(
  * @remarks
  * Goes through the configured data source for the active chain (or the
  * chain explicitly named in `options.chainId`). The wallet-fast-path
- * variant lives on the wallet client — `getWalletClient(config).getBalance(account)`
- * — and is supplied by the active connector's `getClient` override
- * when it declares native support.
+ * variant lives on the wallet client —
+ * `getWalletClient(config).getAccountBalance(account)` — and is supplied
+ * by the active connector's `getClient` override when it declares
+ * native support.
  *
  * @example
  * ```ts
- * const balance = await getBalance(config, 'bc1q…')                    // active chain
- * const t4Bal = await getBalance(config, 'bc1q…', { chainId: 'testnet4' })
+ * const balance = await getAddressBalance(config, 'bc1q…')                    // active chain
+ * const t4Bal = await getAddressBalance(config, 'bc1q…', { chainId: 'testnet4' })
  * ```
  */
-export async function getBalance<const config extends LaserEyesConfig<any, any, any>>(
+export async function getAddressBalance<const config extends LaserEyesConfig<any, any, any>>(
   config: config,
   address: string,
   options?: { chainId?: config['chains'][number]['id'] }
 ): Promise<string> {
   const client = getClient(config, options)
-  return getAction(client, clientGetBalance, 'getBalance')(address)
+  return getAction(client, clientGetAddressBalance, 'getAddressBalance')(address)
 }
 
 /**
  * Get unspent transaction outputs for an address.
  *
  * @remarks
- * Data-source path. See {@link getBalance} for the wallet-fast-path
+ * Data-source path. See {@link getAddressBalance} for the wallet-fast-path
  * alternative.
  */
 export async function getAddressUtxos<const config extends LaserEyesConfig<any, any, any>>(
@@ -133,7 +134,7 @@ export async function getAddressUtxos<const config extends LaserEyesConfig<any, 
   options?: { chainId?: config['chains'][number]['id'] }
 ): Promise<PaginatedResult<UTXO>> {
   const client = getClient(config, options)
-  return getAction(client, clientGetUtxos, 'getUtxos')(address)
+  return getAction(client, clientGetAddressUtxos, 'getAddressUtxos')(address)
 }
 
 // ============================================================================

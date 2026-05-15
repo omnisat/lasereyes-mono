@@ -7,7 +7,7 @@
 
 import type { Inscription, NetworkId } from '@omnisat/lasereyes-client'
 import { AddressType } from '@omnisat/lasereyes-client/utils'
-import type { Account, SignedPsbt } from '@omnisat/lasereyes-client/wallet'
+import type { SignedPsbt, WalletAccountConfig } from '@omnisat/lasereyes-client/wallet'
 import { base64, hex } from '@scure/base'
 import { Transaction } from '@scure/btc-signer'
 import { announceWallet } from '../detection/announcements'
@@ -154,43 +154,51 @@ export class UnisatAdapter extends BaseAdapter {
   /**
    * Handle bitcoin_requestAccounts
    */
-  private async handleRequestAccounts(): Promise<Account> {
+  private async handleRequestAccounts(): Promise<WalletAccountConfig> {
     const accounts: string[] = await this.rawProvider.requestAccounts()
     if (!accounts || accounts.length === 0) {
       throw this.createError(4001, 'User rejected account access')
     }
-
     const publicKey = await this.rawProvider.getPublicKey()
-
-    // Unisat returns a single address that serves as both payment and ordinals
-    return {
-      addresses: accounts.map((address: string) => ({
-        address,
-        purpose: 'payment' as const,
-        // TODO: detect address type
-        type: AddressType.P2TR,
-        publicKey,
-      })),
-      getAddress: () => accounts[0],
-    }
+    return this.buildAccountData(accounts, publicKey)
   }
 
   /**
    * Handle bitcoin_getAccounts
    */
-  private async handleGetAccounts(): Promise<Account> {
+  private async handleGetAccounts(): Promise<WalletAccountConfig> {
     const accounts: string[] = await this.rawProvider.getAccounts()
     const publicKey: string = await this.rawProvider.getPublicKey()
+    return this.buildAccountData(accounts, publicKey)
+  }
 
+  /**
+   * Plain-data shape of a Unisat-flavored account reply.
+   *
+   * @remarks
+   * RPC method returns are JSON-serializable wire data, not class
+   * instances — the connector layer constructs the `WalletAccount`
+   * (with `getAddress` / `getPublicKey` methods) from this shape via
+   * `createWalletAccount(...)`.
+   *
+   * Unisat exposes one address that serves as both `'payment'` and
+   * `'ordinals'` (taproot); both purposes get the same address and
+   * pubkey so account-aware callers (signMessage default, account
+   * balance, composed PSBT) all reach a coherent payment public key.
+   */
+  private buildAccountData(accounts: string[], publicKey: string): WalletAccountConfig {
+    const primary = accounts[0]
     return {
-      addresses: accounts.map((address: string) => ({
-        address,
-        purpose: 'payment' as const,
-        // TODO: detect address type
-        type: AddressType.P2TR,
-        publicKey,
-      })),
-      getAddress: () => accounts[0],
+      addresses: [
+        // TODO: detect address type via getAddressType once Unisat exposes it.
+        { address: primary, purpose: 'payment', type: AddressType.P2TR },
+        { address: primary, purpose: 'ordinals', type: AddressType.P2TR },
+      ],
+      publicKeys: {
+        payment: publicKey,
+        ordinals: publicKey,
+        taproot: publicKey,
+      },
     }
   }
 

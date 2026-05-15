@@ -158,6 +158,33 @@ export async function transferBrc20<
 // Factories
 // ============================================================================
 
+// ============================================================================
+// Named action surfaces — method shapes installed by the factories below.
+// ============================================================================
+
+/**
+ * The method surface added to a client by {@link brc20Actions}.
+ */
+export type PublicBrc20Actions = {
+  getBrc20Balances: (
+    address: string,
+    pagination?: PaginationParams
+  ) => Promise<PaginatedResult<Brc20Balance>>
+  getBrc20ByTicker: (ticker: string) => Promise<Brc20Info>
+}
+
+/**
+ * The method surface added to a wallet client by {@link brc20WriteActions}.
+ *
+ * @remarks
+ * Implementation is stubbed; type surface is final.
+ */
+export type WalletBrc20Actions = {
+  deployBrc20: (params: DeployBrc20Params) => Promise<string>
+  mintBrc20: (params: MintBrc20Params) => Promise<string>
+  transferBrc20: (params: TransferBrc20Params) => Promise<string>
+}
+
 /**
  * Action-group factory bundling read-only BRC-20 operations.
  *
@@ -176,7 +203,7 @@ export function brc20Actions() {
     Actions extends ActionGroup,
   >(
     client: Client<Config, DS, Actions>
-  ) => ({
+  ): PublicBrc20Actions => ({
     getBrc20Balances: (address: string, pagination?: PaginationParams) =>
       getBrc20Balances(client, address, pagination),
     getBrc20ByTicker: (ticker: string) => getBrc20ByTicker(client, ticker),
@@ -198,7 +225,7 @@ export function brc20WriteActions() {
     },
   >(
     client: WalletClient<Config, WalletAccount, Actions, DS>
-  ) => ({
+  ): WalletBrc20Actions => ({
     deployBrc20: (params: DeployBrc20Params) => deployBrc20(client, params),
     mintBrc20: (params: MintBrc20Params) => mintBrc20(client, params),
     transferBrc20: (params: TransferBrc20Params) => transferBrc20(client, params),

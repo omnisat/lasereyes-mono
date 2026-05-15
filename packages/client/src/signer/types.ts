@@ -78,7 +78,8 @@ export interface SignMessageOptions {
  * @remarks
  * Implementations handle the cryptographic operations, typically by delegating
  * to a wallet provider, hardware device, or local key. The signer is
- * dependency-injected into the wallet client via {@link signingActions}.
+ * passed to {@link createWalletClient} via `config.signer` and reached by
+ * the actions installed by {@link walletBtcActions}.
  *
  * @example
  * ```ts

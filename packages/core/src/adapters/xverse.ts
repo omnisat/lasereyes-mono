@@ -7,7 +7,12 @@
 
 import type { NetworkId } from '@omnisat/lasereyes-client'
 import { getAddressType } from '@omnisat/lasereyes-client/utils'
-import type { AddressInfo, AddressPurpose, SignedPsbt } from '@omnisat/lasereyes-client/wallet'
+import type {
+  AddressInfo,
+  AddressPurpose,
+  SignedPsbt,
+  WalletAccountConfig,
+} from '@omnisat/lasereyes-client/wallet'
 import { base64, hex } from '@scure/base'
 import { Transaction } from '@scure/btc-signer'
 // Types-only — pulling the runtime barrel statically drags in
@@ -120,13 +125,13 @@ export class XverseAdapter extends BaseAdapter {
   /**
    * Handle bitcoin_requestAccounts
    */
-  private async handleRequestAccounts(): Promise<AddressInfo[]> {
+  private async handleRequestAccounts(): Promise<WalletAccountConfig> {
     const { request } = await loadSatsConnect()
     try {
       // Try to get existing account first
       const getAccountResponse = await request('wallet_getAccount', null)
       if (getAccountResponse.status === 'success') {
-        return this.normalizeAddresses(getAccountResponse.result.addresses)
+        return this.buildAccountData(getAccountResponse.result.addresses)
       }
     } catch (e) {
       // Account not available, need to connect
@@ -139,7 +144,7 @@ export class XverseAdapter extends BaseAdapter {
     })
 
     if (response.status === 'success') {
-      return this.normalizeAddresses(response.result.addresses)
+      return this.buildAccountData(response.result.addresses)
     }
 
     if (response.error.code === SC_RPC_USER_REJECTION) {
@@ -152,12 +157,12 @@ export class XverseAdapter extends BaseAdapter {
   /**
    * Handle bitcoin_getAccounts
    */
-  private async handleGetAccounts(): Promise<AddressInfo[]> {
+  private async handleGetAccounts(): Promise<WalletAccountConfig> {
     const { request } = await loadSatsConnect()
     const response = await request('wallet_getAccount', null)
 
     if (response.status === 'success') {
-      return this.normalizeAddresses(response.result.addresses)
+      return this.buildAccountData(response.result.addresses)
     }
 
     throw this.createError(-32603, `Error getting accounts: ${response.error.message}`)
@@ -371,10 +376,21 @@ export class XverseAdapter extends BaseAdapter {
   }
 
   /**
-   * Normalize Xverse addresses to standard format
+   * Plain-data shape of an Xverse-flavored account reply.
+   *
+   * @remarks
+   * RPC methods return JSON-serializable wire data, not class instances —
+   * the connector layer constructs the `WalletAccount` (with method
+   * surface) from this shape.
+   *
+   * sats-connect returns `{ address, purpose, publicKey, addressType }`
+   * per entry. We map `purpose` to the standard {@link AddressPurpose},
+   * capture each pubkey into the top-level `publicKeys` lookup, and
+   * drop the rest (Stacks addresses, unrecognized types).
    */
-  private normalizeAddresses(addresses: any[]): AddressInfo[] {
-    const result: AddressInfo[] = []
+  private buildAccountData(addresses: any[]): WalletAccountConfig {
+    const infos: AddressInfo[] = []
+    const publicKeys: Partial<Record<AddressPurpose, string>> = {}
 
     for (const addr of addresses) {
       let purpose: AddressPurpose
@@ -383,19 +399,19 @@ export class XverseAdapter extends BaseAdapter {
       } else if (addr.purpose === SC_PURPOSE_ORDINALS) {
         purpose = 'ordinals'
       } else {
-        continue // Skip unknown purposes
+        continue // Skip unknown purposes (Stacks, etc.)
       }
 
       const addrType = getAddressType(addr.address)
-      if (!addrType) continue // Skip if we can't determine the address type
-      result.push({
-        address: addr.address,
-        purpose,
-        type: addrType,
-      })
+      if (!addrType) continue
+      infos.push({ address: addr.address, purpose, type: addrType })
+      if (typeof addr.publicKey === 'string') publicKeys[purpose] = addr.publicKey
     }
 
-    return result
+    return {
+      addresses: infos,
+      publicKeys: publicKeys as Record<AddressPurpose, string>,
+    }
   }
 
   /**

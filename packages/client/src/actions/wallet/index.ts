@@ -2,6 +2,13 @@
  * Wallet-aware BTC actions.
  *
  * @remarks
+ * **Scope.** Bundles the primitive wallet operations: signing
+ * (`signPsbt`, `signMessage`, `broadcastPsbt`) and base BTC operations
+ * (`sendBtc`, `getAccountBalance`, `getAccountUtxos`). Signing primitives are
+ * cross-cutting (also used by `runeWriteActions`, `brc20WriteActions`,
+ * `inscriptionWriteActions`) but live here as part of the "base wallet"
+ * surface — there's no separate `signingActions` factory anymore.
+ *
  * **Type-level rule.** Free actions constrain only on `dsMethods` (the
  * data-source capabilities they reach for at the leaf). Action-presence
  * on the client is a runtime concern dispatched by {@link getAction}.
@@ -11,11 +18,10 @@
  * directly except in leaf actions. User overrides extended onto the client
  * cascade through all composition layers automatically.
  *
- * **Factory rule.** The factory {@link walletBtcActions} keeps the
- * `Actions extends …` constraint so `.extend(walletBtcActions())` fails
- * to compile if `signPsbt` isn't already on the client. Defense in depth:
- * factory path enforces ordering at compile time; free-function path
- * relies on `getAction` runtime cascade + a clear missing-signer error.
+ * **Signer runtime contract.** `signPsbt` / `signMessage` /
+ * `broadcastPsbt` read the signer from `client.config.signer` — pass it
+ * to {@link createWalletClient} via `config.signer`. They throw a clear
+ * runtime error if the signer is absent.
  *
  * @module actions/wallet
  */
@@ -25,10 +31,14 @@ import type { WalletClient, WalletClientConfig } from '../../client/wallet-types
 import type { ActionGroup, BaseCapability } from '../../data-source/capabilities'
 import { getAction } from '../../lib/get-action'
 import { buildSendBtcPsbt } from '../../lib/psbt-builders'
-import type { SignedPsbt, SignPsbtOptions } from '../../signer/types'
+import type {
+  SignedPsbt,
+  Signer,
+  SignMessageOptions,
+  SignPsbtOptions,
+} from '../../signer/types'
 import type { PaginatedResult, UTXO } from '../../types'
-import { broadcastTransaction, getUtxos as getUtxosByAddress } from '../public'
-import { signPsbt } from '../signing'
+import { broadcastTransaction, getAddressBalance, getAddressUtxos } from '../public'
 
 /**
  * Parameters for sending BTC using a wallet client.
@@ -42,16 +52,19 @@ export interface SendBtcParams {
   feeRate?: number
 }
 
-/**
- * The required shape of `signPsbt` on a client when composing through
- * {@link walletBtcActions}.
- *
- * @remarks
- * Kept here (rather than imported from signing) to keep the factory's
- * compile-time guard local to this file.
- */
-type RequiredSigningActions = {
-  signPsbt: (psbt: string, options?: SignPsbtOptions) => Promise<SignedPsbt>
+// ============================================================================
+// Signer helper
+// ============================================================================
+
+function requireSigner(signer: Signer | undefined): Signer {
+  if (!signer) {
+    throw new Error(
+      'No signer configured on wallet client. Pass `signer` to ' +
+        '`createWalletClient({...})` or, in core, ensure the active ' +
+        "connector's provider is available."
+    )
+  }
+  return signer
 }
 
 // ============================================================================
@@ -59,10 +72,85 @@ type RequiredSigningActions = {
 // ============================================================================
 
 /**
+ * Sign a PSBT using the wallet client's signer.
+ *
+ * @throws {Error} If `client.config.signer` is `undefined` at runtime.
+ */
+export async function signPsbt<
+  Config extends WalletClientConfig<A, DS>,
+  A extends Account,
+  Actions extends ActionGroup,
+  DS extends ActionGroup,
+>(
+  client: WalletClient<Config, A, Actions, DS>,
+  psbt: string,
+  options?: SignPsbtOptions
+): Promise<SignedPsbt> {
+  const signer = requireSigner(client.config.signer)
+  return signer.signPsbt(psbt, options)
+}
+
+/**
+ * Sign a message using the wallet client's signer.
+ *
+ * @remarks
+ * If `options.address` is omitted, falls back to the account's payment
+ * address.
+ *
+ * @throws {Error} If `client.config.signer` is `undefined` at runtime.
+ */
+export async function signMessage<
+  Config extends WalletClientConfig<A, DS>,
+  A extends Account,
+  Actions extends ActionGroup,
+  DS extends ActionGroup,
+>(
+  client: WalletClient<Config, A, Actions, DS>,
+  message: string,
+  options?: SignMessageOptions
+): Promise<string> {
+  const signer = requireSigner(client.config.signer)
+  const address = options?.address ?? client.config.account.getAddress('payment')
+  return signer.signMessage(message, { ...options, address })
+}
+
+/**
+ * Sign a PSBT (with finalization) and broadcast the resulting transaction
+ * through the configured data source.
+ *
+ * @remarks
+ * Internally composes via {@link getAction}, so overrides on `signPsbt` or
+ * `broadcastTransaction` cascade automatically.
+ *
+ * @returns The transaction ID once broadcast succeeds.
+ * @throws {Error} If `client.config.signer` is `undefined`, or if the
+ *   signer fails to produce a finalized transaction.
+ */
+export async function broadcastPsbt<
+  Config extends WalletClientConfig<A, DS>,
+  A extends Account,
+  Actions extends ActionGroup,
+  DS extends Pick<BaseCapability, 'btcBroadcastTransaction'>,
+>(
+  client: WalletClient<Config, A, Actions, DS>,
+  psbt: string,
+  options?: Omit<SignPsbtOptions, 'finalize' | 'broadcast'>
+): Promise<string> {
+  const sign = getAction(client, signPsbt, 'signPsbt')
+  const broadcast = getAction(client, broadcastTransaction, 'broadcastTransaction')
+
+  const signed = await sign(psbt, { ...options, finalize: true })
+  if (!signed.txHex) {
+    throw new Error('Signer did not return transaction hex')
+  }
+  return broadcast(signed.txHex)
+}
+
+/**
  * Sends BTC from the wallet account to a recipient.
  *
  * @remarks
- * Composes through {@link getAction} for `getUtxos`, `signPsbt`, and
+ * Composes through {@link getAction} for `getAccountUtxos`, `signPsbt`, and
  * `broadcastTransaction`, so user overrides on any sub-action cascade
  * automatically.
  *
@@ -91,7 +179,7 @@ export async function sendBtc<
   const paymentAddr = account.getAddress('payment')
   const paymentPubkey = account.getPublicKey('payment')
 
-  const getUtxos_ = getAction(client, getUtxos, 'getUtxos')
+  const getUtxos_ = getAction(client, getAccountUtxos, 'getAccountUtxos')
   const sign = getAction(client, signPsbt, 'signPsbt')
   const broadcast = getAction(client, broadcastTransaction, 'broadcastTransaction')
 
@@ -121,9 +209,11 @@ export async function sendBtc<
  * address).
  *
  * @remarks
- * Read-only. Works with any account type.
+ * Read-only. Works with any account type. Resolves the address from
+ * `account.getAddress(purpose)` and delegates to {@link getAddressBalance}
+ * — mirrors `getAccountUtxos` → {@link getAddressUtxos}.
  */
-export async function getBalance<
+export async function getAccountBalance<
   Config extends WalletClientConfig<A, DS>,
   A extends Account,
   Actions extends ActionGroup,
@@ -134,7 +224,7 @@ export async function getBalance<
   purpose: AddressPurpose = 'payment'
 ): Promise<string> {
   const address = account.getAddress(purpose)
-  return client.config.dataSource.btcGetBalance(address)
+  return getAddressBalance(client, address)
 }
 
 /**
@@ -145,9 +235,10 @@ export async function getBalance<
  * Read-only. Works with any account type. The action takes an explicit
  * `account` so composed actions can target arbitrary accounts (not only
  * `client.config.account`), keeping the call-site shape uniform between
- * free function and client method.
+ * free function and client method. Resolves the address and delegates to
+ * {@link getAddressUtxos}.
  */
-export async function getUtxos<
+export async function getAccountUtxos<
   Config extends WalletClientConfig<A, DS>,
   A extends Account,
   Actions extends ActionGroup,
@@ -158,31 +249,65 @@ export async function getUtxos<
   purpose: AddressPurpose = 'payment'
 ): Promise<PaginatedResult<UTXO>> {
   const address = account.getAddress(purpose)
-  return getUtxosByAddress(client, address)
+  return getAddressUtxos(client, address)
 }
 
 // ============================================================================
-// Strict factory — preserves compile-time ordering enforcement
+// Named action surface — the canonical method shapes that `walletBtcActions()`
+// installs on a wallet client. Declared as a type alias so it can be `Pick`'d
+// from when constraining `.extend()` (viem-style `ExtendableProtectedActions`).
 // ============================================================================
 
 /**
- * Action-group factory for account-aware BTC operations.
+ * The method surface added to a wallet client by {@link walletBtcActions}.
  *
  * @remarks
- * Adds `sendBtc`, `getBalance`, and `getUtxos` to a wallet client. The
- * factory's `Actions extends RequiredSigningActions` constraint ensures
- * `signPsbt` is already on the client at extend time — enforced at compile
- * time. Apply *after* `signingActions()`:
+ * Method shapes — `client` already removed. Free-function counterparts in
+ * this module take `client` as the first argument.
+ */
+export type WalletBtcActions = {
+  signPsbt: (psbt: string, options?: SignPsbtOptions) => Promise<SignedPsbt>
+  signMessage: (message: string, options?: SignMessageOptions) => Promise<string>
+  broadcastPsbt: (
+    psbt: string,
+    options?: Omit<SignPsbtOptions, 'finalize' | 'broadcast'>
+  ) => Promise<string>
+  sendBtc: (params: SendBtcParams) => Promise<string>
+  getAccountBalance: (account?: WalletAccount, purpose?: AddressPurpose) => Promise<string>
+  getAccountUtxos: (
+    account: WalletAccount,
+    purpose?: AddressPurpose
+  ) => Promise<PaginatedResult<UTXO>>
+}
+
+// ============================================================================
+// Strict factory
+// ============================================================================
+
+/**
+ * Action-group factory bundling all base wallet operations: signing
+ * primitives + account-aware BTC reads/writes.
  *
+ * @remarks
+ * Installs `signPsbt`, `signMessage`, `broadcastPsbt`, `sendBtc`,
+ * `getAccountBalance`, and `getAccountUtxos` in a single extend pass. No ordering
+ * footgun — the signing actions ship with the same factory as the BTC
+ * ones, so protocol-write factories (`runeWriteActions`, `brc20WriteActions`,
+ * `inscriptionWriteActions`) that require `signPsbt` to be present on the
+ * client are satisfied by extending this factory.
+ *
+ * @example
  * ```ts
  * createWalletClient({ network, dataSource, account, signer })
- *   .extend(signingActions())
  *   .extend(walletBtcActions())
+ *
+ * await walletClient.signPsbt(psbtHex, { finalize: true })
+ * await walletClient.sendBtc({ to: 'bc1q…', amount: 10000 })
  * ```
  *
  * The factory-method shapes mirror the free-function shapes minus the
- * `client` parameter — `getUtxos(account, purpose?)`, etc. — so direct
- * free-function callers and method callers see the same call surface.
+ * `client` parameter, so direct free-function callers and method callers
+ * see the same call surface.
  */
 export function walletBtcActions() {
   return <
@@ -191,14 +316,15 @@ export function walletBtcActions() {
       BaseCapability,
       'btcGetAddressUtxos' | 'btcBroadcastTransaction' | 'btcGetBalance'
     >,
-    Actions extends RequiredSigningActions,
+    Actions extends ActionGroup,
   >(
     client: WalletClient<Config, WalletAccount, Actions, DS>
-  ) => ({
-    sendBtc: (params: SendBtcParams) => sendBtc(client, params),
-    getBalance: (account?: WalletAccount, purpose?: AddressPurpose) =>
-      getBalance(client, account, purpose),
-    getUtxos: (account: WalletAccount, purpose?: AddressPurpose) =>
-      getUtxos(client, account, purpose),
+  ): WalletBtcActions => ({
+    signPsbt: (psbt, options) => signPsbt(client, psbt, options),
+    signMessage: (message, options) => signMessage(client, message, options),
+    broadcastPsbt: (psbt, options) => broadcastPsbt(client, psbt, options),
+    sendBtc: (params) => sendBtc(client, params),
+    getAccountBalance: (account, purpose) => getAccountBalance(client, account, purpose),
+    getAccountUtxos: (account, purpose) => getAccountUtxos(client, account, purpose),
   })
 }

@@ -32,7 +32,7 @@ import type {
 /**
  * Get the confirmed balance for an address (in satoshis, as a string).
  */
-export async function getBalance<
+export async function getAddressBalance<
   Config extends ClientConfig<DS>,
   Actions extends ActionGroup,
   DS extends Pick<BaseCapability, 'btcGetBalance'>,
@@ -43,7 +43,7 @@ export async function getBalance<
 /**
  * List unspent transaction outputs for an address.
  */
-export async function getUtxos<
+export async function getAddressUtxos<
   Config extends ClientConfig<DS>,
   Actions extends ActionGroup,
   DS extends Pick<BaseCapability, 'btcGetAddressUtxos'>,
@@ -111,6 +111,34 @@ export async function waitForTransaction<
 }
 
 // ============================================================================
+// Named action surface — the canonical method shapes that `publicActions()`
+// installs on a client. Declared as an interface so it can be `Pick`'d from
+// when constraining `.extend()` (viem-style `ExtendableProtectedActions`).
+// ============================================================================
+
+/**
+ * The method surface added to a client by {@link publicActions}.
+ *
+ * @remarks
+ * Each entry is the **method shape** — the client-bound form, with the
+ * `client` parameter already removed. The free-function counterparts live
+ * alongside in this module (`getAddressBalance`, `getAddressUtxos`, …)
+ * and accept `client` as their first argument.
+ */
+export type PublicBtcActions = {
+  getAddressBalance: (address: string) => Promise<string>
+  getAddressUtxos: (
+    address: string,
+    pagination?: PaginationParams
+  ) => Promise<PaginatedResult<UTXO>>
+  getTransaction: (txId: string) => Promise<Transaction>
+  broadcastTransaction: (rawTx: string) => Promise<string>
+  getRecommendedFees: () => Promise<FeeEstimate>
+  getOutputValue: (txId: string, vout: number) => Promise<number | null>
+  waitForTransaction: (txId: string) => Promise<boolean>
+}
+
+// ============================================================================
 // Strict factory — accepts a client whose data source has full BaseCapability
 // ============================================================================
 
@@ -129,7 +157,7 @@ export async function waitForTransaction<
  * const client = createClient({ network: MAINNET, dataSource: ds })
  *   .extend(publicActions())
  *
- * const balance = await client.getBalance('bc1q...')
+ * const balance = await client.getAddressBalance('bc1q...')
  * const fees = await client.getRecommendedFees()
  * ```
  */
@@ -140,10 +168,10 @@ export function publicActions() {
     Actions extends ActionGroup,
   >(
     client: Client<Config, DS, Actions>
-  ) => ({
-    getBalance: (address: string) => getBalance(client, address),
-    getUtxos: (address: string, pagination?: PaginationParams) =>
-      getUtxos(client, address, pagination),
+  ): PublicBtcActions => ({
+    getAddressBalance: (address: string) => getAddressBalance(client, address),
+    getAddressUtxos: (address: string, pagination?: PaginationParams) =>
+      getAddressUtxos(client, address, pagination),
     getTransaction: (txId: string) => getTransaction(client, txId),
     broadcastTransaction: (rawTx: string) => broadcastTransaction(client, rawTx),
     getRecommendedFees: () => getRecommendedFees(client),

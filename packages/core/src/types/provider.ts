@@ -69,6 +69,15 @@ export interface BitcoinProvider {
  * @remarks
  * Required methods MUST be implemented by all providers. Optional methods
  * depend on wallet capabilities surfaced via `bitcoin_getCapabilities`.
+ *
+ * **Return shapes are JSON-serializable wire data.** Account-flavored
+ * methods (`bitcoin_requestAccounts`, `bitcoin_getAccounts`) return the
+ * plain `WalletAccountConfig` shape (`{ addresses, publicKeys }`) — NOT
+ * a `WalletAccount` with `getAddress` / `getPublicKey` methods. The
+ * connector layer constructs the `WalletAccount` from the wire data
+ * via `createWalletAccount(...)`. This keeps `request()` consistent
+ * with JSON-RPC semantics and makes the boundary survivable across
+ * postMessage, iframe-rpc bridges, devtools serialization, etc.
  */
 export type BitcoinRpcMethod =
   // Required

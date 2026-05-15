@@ -54,9 +54,16 @@ import {
 } from '../actions/inscriptions'
 import { publicActions } from '../actions/public'
 import { runeActions, runeWriteActions, type SendRuneParams, sendRune } from '../actions/runes'
-import { broadcastPsbt, signingActions, signMessage, signPsbt } from '../actions/signing'
 import type { SendBtcParams } from '../actions/wallet'
-import { getBalance, getUtxos, sendBtc, walletBtcActions } from '../actions/wallet'
+import {
+  broadcastPsbt,
+  getAccountBalance,
+  getAccountUtxos,
+  sendBtc,
+  signMessage,
+  signPsbt,
+  walletBtcActions,
+} from '../actions/wallet'
 import { type ChainNetwork, MAINNET, type NetworkId, type NetworkType } from '../chains'
 import { createClient } from '../client'
 import type { Client, ClientConfig } from '../client/types'
@@ -303,7 +310,7 @@ describe('Read-side factories on broad-DS clients', () => {
   it('publicActions extends a sandshrew client (BaseCapability slice)', () => {
     const ds = createSandshrewDataSource({ network: MAINNET, apiKey: 'k' })
     const c = createClient({ network: MAINNET, dataSource: ds }).extend(publicActions())
-    expectTypeOf(c.getBalance).returns.resolves.toEqualTypeOf<string>()
+    expectTypeOf(c.getAddressBalance).returns.resolves.toEqualTypeOf<string>()
   })
 
   it('runeActions extends a sandshrew client (RuneCapability slice)', () => {
@@ -374,7 +381,7 @@ describe('createClient', () => {
     // @ts-expect-error — `frobnicate` was never added by any factory.
     client.frobnicate()
     // @ts-expect-error — same reason; no read-only public actions extended yet.
-    client.getBalance('bc1q')
+    client.getAddressBalance('bc1q')
   })
 
   it('preserves Client kind across extension', () => {
@@ -390,17 +397,19 @@ describe('createClient', () => {
 })
 
 // ============================================================================
-// 6. Wallet client — composition, ordering, exposed methods
+// 6. Wallet client — composition, exposed methods
+//
+// signingActions was folded into walletBtcActions — one extend installs the
+// full base wallet surface (signing primitives + BTC ops).
 // ============================================================================
 
 describe('createWalletClient', () => {
-  it('composes signing then wallet-btc actions, exposing all expected methods', () => {
+  it('walletBtcActions exposes the full base wallet surface', () => {
     const ds = createChainDataSource({ network: MAINNET }).extend(baseCap)
     const wc = createWalletClient({ network: MAINNET, dataSource: ds, account: walletAccount })
-      .extend(signingActions())
       .extend(walletBtcActions())
 
-    // signing actions
+    // signing primitives
     expectTypeOf(wc.signPsbt).parameter(0).toEqualTypeOf<string>()
     expectTypeOf(wc.signPsbt).parameter(1).toEqualTypeOf<SignPsbtOptions | undefined>()
     expectTypeOf(wc.signPsbt).returns.resolves.toEqualTypeOf<SignedPsbt>()
@@ -412,49 +421,25 @@ describe('createWalletClient', () => {
     expectTypeOf(wc.broadcastPsbt).parameter(0).toEqualTypeOf<string>()
     expectTypeOf(wc.broadcastPsbt).returns.resolves.toEqualTypeOf<string>()
 
-    // wallet-btc actions
+    // BTC ops
     expectTypeOf(wc.sendBtc).parameter(0).toEqualTypeOf<SendBtcParams>()
     expectTypeOf(wc.sendBtc).returns.resolves.toEqualTypeOf<string>()
 
-    // getBalance(account?, purpose?) — both optional; defaults to client.config.account and 'payment'.
-    expectTypeOf(wc.getBalance).parameter(0).toEqualTypeOf<WalletAccount | undefined>()
-    expectTypeOf(wc.getBalance).parameter(1).toEqualTypeOf<AddressPurpose | undefined>()
-    expectTypeOf(wc.getBalance).returns.resolves.toEqualTypeOf<string>()
+    // getAccountBalance(account?, purpose?) — both optional; defaults to client.config.account and 'payment'.
+    expectTypeOf(wc.getAccountBalance).parameter(0).toEqualTypeOf<WalletAccount | undefined>()
+    expectTypeOf(wc.getAccountBalance).parameter(1).toEqualTypeOf<AddressPurpose | undefined>()
+    expectTypeOf(wc.getAccountBalance).returns.resolves.toEqualTypeOf<string>()
 
-    // getUtxos(account, purpose?) — account required, purpose defaults to 'payment'.
-    expectTypeOf(wc.getUtxos).parameter(0).toEqualTypeOf<WalletAccount>()
-    expectTypeOf(wc.getUtxos).parameter(1).toEqualTypeOf<AddressPurpose | undefined>()
-    expectTypeOf(wc.getUtxos).returns.resolves.toEqualTypeOf<PaginatedResult<UTXO>>()
-  })
-
-  it('signing actions alone (without walletBtcActions) compose fine', () => {
-    const ds = createChainDataSource({ network: MAINNET }).extend(baseCap)
-    const wc = createWalletClient({
-      network: MAINNET,
-      dataSource: ds,
-      account: walletAccount,
-    }).extend(signingActions())
-
-    expectTypeOf(wc.signPsbt).returns.resolves.toEqualTypeOf<SignedPsbt>()
-    expectTypeOf(wc.signMessage).returns.resolves.toEqualTypeOf<string>()
-  })
-
-  it('rejects walletBtcActions before signingActions', () => {
-    const ds = createChainDataSource({ network: MAINNET }).extend(baseCap)
-    const wc = createWalletClient({ network: MAINNET, dataSource: ds, account: walletAccount })
-
-    // @ts-expect-error — walletBtcActions requires signPsbt on the client at extend time.
-    wc.extend(walletBtcActions())
+    // getAccountUtxos(account, purpose?) — account required, purpose defaults to 'payment'.
+    expectTypeOf(wc.getAccountUtxos).parameter(0).toEqualTypeOf<WalletAccount>()
+    expectTypeOf(wc.getAccountUtxos).parameter(1).toEqualTypeOf<AddressPurpose | undefined>()
+    expectTypeOf(wc.getAccountUtxos).returns.resolves.toEqualTypeOf<PaginatedResult<UTXO>>()
   })
 
   it('rejects walletBtcActions when the data source lacks btcGetAddressUtxos', () => {
     // Use the partialBaseCap fixture (declared at top of file).
     const ds = createChainDataSource({ network: MAINNET }).extend(partialBaseCap)
-    const wc = createWalletClient({
-      network: MAINNET,
-      dataSource: ds,
-      account: walletAccount,
-    }).extend(signingActions())
+    const wc = createWalletClient({ network: MAINNET, dataSource: ds, account: walletAccount })
 
     // @ts-expect-error — walletBtcActions needs btcGetAddressUtxos which is not on this ds.
     wc.extend(walletBtcActions())
@@ -466,7 +451,7 @@ describe('createWalletClient', () => {
       network: MAINNET,
       dataSource: ds,
       account: readonlyAccount,
-    }).extend(signingActions())
+    })
 
     // @ts-expect-error — sendBtc needs WalletAccount (for getPublicKey); ReadOnlyAccount has none.
     wc.extend(walletBtcActions())
@@ -478,7 +463,7 @@ describe('createWalletClient', () => {
       network: MAINNET,
       dataSource: ds,
       account: walletAccount,
-    }).extend(signingActions())
+    }).extend(walletBtcActions())
 
     expectTypeOf(wc).toMatchTypeOf<
       WalletClient<
@@ -487,6 +472,10 @@ describe('createWalletClient', () => {
         {
           signPsbt: (...args: any[]) => Promise<SignedPsbt>
           signMessage: (...args: any[]) => Promise<string>
+          broadcastPsbt: (...args: any[]) => Promise<string>
+          sendBtc: (...args: any[]) => Promise<string>
+          getAccountBalance: (...args: any[]) => Promise<string>
+          getAccountUtxos: (...args: any[]) => Promise<PaginatedResult<UTXO>>
         },
         BaseCapability
       >
@@ -508,29 +497,31 @@ describe('Direct action calls', () => {
       network: MAINNET,
       dataSource: ds,
       account: walletAccount,
-    }).extend(signingActions())
+    }).extend(walletBtcActions())
 
     expectTypeOf(sendBtc(wc, { to: 'bc1q…', amount: 1000 })).resolves.toEqualTypeOf<string>()
   })
 
-  it('getBalance(client) defaults to client.config.account + payment purpose', () => {
+  it('getAccountBalance(client) defaults to client.config.account + payment purpose', () => {
     const ds = createChainDataSource({ network: MAINNET }).extend(baseCap)
     const wc = createWalletClient({ network: MAINNET, dataSource: ds, account: walletAccount })
 
     // Both account and purpose optional — defaults to client.config.account + 'payment'.
-    expectTypeOf(getBalance(wc)).resolves.toEqualTypeOf<string>()
-    expectTypeOf(getBalance(wc, walletAccount)).resolves.toEqualTypeOf<string>()
-    expectTypeOf(getBalance(wc, walletAccount, 'ordinals')).resolves.toEqualTypeOf<string>()
+    expectTypeOf(getAccountBalance(wc)).resolves.toEqualTypeOf<string>()
+    expectTypeOf(getAccountBalance(wc, walletAccount)).resolves.toEqualTypeOf<string>()
+    expectTypeOf(getAccountBalance(wc, walletAccount, 'ordinals')).resolves.toEqualTypeOf<string>()
   })
 
-  it('getUtxos(client, account, purpose?) — account required, purpose defaults to payment', () => {
+  it('getAccountUtxos(client, account, purpose?) — account required, purpose defaults to payment', () => {
     const ds = createChainDataSource({ network: MAINNET }).extend(baseCap)
     const wc = createWalletClient({ network: MAINNET, dataSource: ds, account: walletAccount })
 
-    expectTypeOf(getUtxos(wc, walletAccount, 'ordinals')).resolves.toEqualTypeOf<
+    expectTypeOf(getAccountUtxos(wc, walletAccount, 'ordinals')).resolves.toEqualTypeOf<
       PaginatedResult<UTXO>
     >()
-    expectTypeOf(getUtxos(wc, walletAccount)).resolves.toEqualTypeOf<PaginatedResult<UTXO>>()
+    expectTypeOf(getAccountUtxos(wc, walletAccount)).resolves.toEqualTypeOf<
+      PaginatedResult<UTXO>
+    >()
   })
 
   it('signPsbt(client, psbt, options) reads signer from client.config.signer', () => {
@@ -616,11 +607,11 @@ describe('publicActions', () => {
     const ds = createMempoolDataSource({ network: MAINNET })
     const c = createClient({ network: MAINNET, dataSource: ds }).extend(publicActions())
 
-    expectTypeOf(c.getBalance).parameter(0).toEqualTypeOf<string>()
-    expectTypeOf(c.getBalance).returns.resolves.toEqualTypeOf<string>()
+    expectTypeOf(c.getAddressBalance).parameter(0).toEqualTypeOf<string>()
+    expectTypeOf(c.getAddressBalance).returns.resolves.toEqualTypeOf<string>()
 
-    expectTypeOf(c.getUtxos).parameter(0).toEqualTypeOf<string>()
-    expectTypeOf(c.getUtxos).returns.resolves.toEqualTypeOf<PaginatedResult<UTXO>>()
+    expectTypeOf(c.getAddressUtxos).parameter(0).toEqualTypeOf<string>()
+    expectTypeOf(c.getAddressUtxos).returns.resolves.toEqualTypeOf<PaginatedResult<UTXO>>()
 
     expectTypeOf(c.getTransaction).returns.resolves.toEqualTypeOf<Transaction>()
     expectTypeOf(c.broadcastTransaction).returns.resolves.toEqualTypeOf<string>()
@@ -666,14 +657,14 @@ describe('runeActions', () => {
   it('runeWriteActions exposes sendRune (stubbed signature)', () => {
     const ds = createSandshrewDataSource({ network: MAINNET, apiKey: 'k' })
     const wc = createWalletClient({ network: MAINNET, dataSource: ds, account: walletAccount })
-      .extend(signingActions())
+      .extend(walletBtcActions())
       .extend(runeWriteActions())
 
     expectTypeOf(wc.sendRune).parameter(0).toEqualTypeOf<SendRuneParams>()
     expectTypeOf(wc.sendRune).returns.resolves.toEqualTypeOf<string>()
   })
 
-  it('rejects runeWriteActions before signingActions', () => {
+  it('rejects runeWriteActions before walletBtcActions', () => {
     const ds = createSandshrewDataSource({ network: MAINNET, apiKey: 'k' })
     const wc = createWalletClient({ network: MAINNET, dataSource: ds, account: walletAccount })
 
@@ -687,7 +678,7 @@ describe('runeActions', () => {
       network: MAINNET,
       dataSource: ds,
       account: walletAccount,
-    }).extend(signingActions())
+    }).extend(walletBtcActions())
 
     expectTypeOf(
       sendRune(wc, { to: 'bc1q…', runeId: '840000:1', amount: '100' })
@@ -714,7 +705,7 @@ describe('brc20Actions', () => {
     // the type-shape check we pretend mempool joined in.
     const merged = mergeDataSources(ds, createMempoolDataSource({ network: MAINNET }))
     const wc = createWalletClient({ network: MAINNET, dataSource: merged, account: walletAccount })
-      .extend(signingActions())
+      .extend(walletBtcActions())
       .extend(brc20WriteActions())
 
     expectTypeOf(wc.deployBrc20).parameter(0).toEqualTypeOf<DeployBrc20Params>()
@@ -727,7 +718,7 @@ describe('brc20Actions', () => {
     expectTypeOf(wc.transferBrc20).returns.resolves.toEqualTypeOf<string>()
   })
 
-  it('rejects brc20WriteActions before signingActions', () => {
+  it('rejects brc20WriteActions before walletBtcActions', () => {
     const ds = createMempoolDataSource({ network: MAINNET })
     const wc = createWalletClient({ network: MAINNET, dataSource: ds, account: walletAccount })
 
@@ -755,7 +746,7 @@ describe('inscriptionActions', () => {
   it('inscriptionWriteActions exposes inscribe/sendInscription (stubbed)', () => {
     const ds = createMempoolDataSource({ network: MAINNET })
     const wc = createWalletClient({ network: MAINNET, dataSource: ds, account: walletAccount })
-      .extend(signingActions())
+      .extend(walletBtcActions())
       .extend(inscriptionWriteActions())
 
     expectTypeOf(wc.inscribe).parameter(0).toEqualTypeOf<InscribeParams>()
@@ -771,7 +762,7 @@ describe('inscriptionActions', () => {
       network: MAINNET,
       dataSource: ds,
       account: walletAccount,
-    }).extend(signingActions())
+    }).extend(walletBtcActions())
 
     expectTypeOf(
       inscribe(wc, { contentType: 'text/plain', content: 'hello' })
@@ -781,7 +772,7 @@ describe('inscriptionActions', () => {
     ).resolves.toEqualTypeOf<string>()
   })
 
-  it('rejects inscriptionWriteActions before signingActions', () => {
+  it('rejects inscriptionWriteActions before walletBtcActions', () => {
     const ds = createMempoolDataSource({ network: MAINNET })
     const wc = createWalletClient({ network: MAINNET, dataSource: ds, account: walletAccount })
 
@@ -791,17 +782,17 @@ describe('inscriptionActions', () => {
 })
 
 // ============================================================================
-// 13. broadcastPsbt — exposed by signingActions
+// 13. broadcastPsbt — exposed by walletBtcActions
 // ============================================================================
 
 describe('broadcastPsbt', () => {
-  it('exposed on the client after signingActions extension', () => {
+  it('exposed on the client after walletBtcActions extension', () => {
     const ds = createMempoolDataSource({ network: MAINNET })
     const wc = createWalletClient({
       network: MAINNET,
       dataSource: ds,
       account: walletAccount,
-    }).extend(signingActions())
+    }).extend(walletBtcActions())
 
     expectTypeOf(wc.broadcastPsbt).parameter(0).toEqualTypeOf<string>()
     expectTypeOf(wc.broadcastPsbt).returns.resolves.toEqualTypeOf<string>()
@@ -819,26 +810,26 @@ describe('broadcastPsbt', () => {
     expectTypeOf(broadcastPsbt(wc, 'psbthex')).resolves.toEqualTypeOf<string>()
   })
 
-  it('rejects broadcastPsbt when data source lacks btcBroadcastTransaction', () => {
+  it('rejects walletBtcActions when data source lacks btcBroadcastTransaction', () => {
     const ds = createChainDataSource({ network: MAINNET }).extend(runeCap)
     const wc = createWalletClient({ network: MAINNET, dataSource: ds, account: walletAccount })
 
-    // @ts-expect-error — signingActions's broadcastPsbt needs btcBroadcastTransaction.
-    wc.extend(signingActions())
+    // @ts-expect-error — walletBtcActions needs btcGetAddressUtxos | btcBroadcastTransaction | btcGetBalance.
+    wc.extend(walletBtcActions())
   })
 
-  it('signingActions reads signer from client.config.signer', () => {
+  it('walletBtcActions reads signer from client.config.signer', () => {
     const ds = createMempoolDataSource({ network: MAINNET })
     const wc = createWalletClient({
       network: MAINNET,
       dataSource: ds,
       account: walletAccount,
       signer,
-    }).extend(signingActions())
+    }).extend(walletBtcActions())
 
-    // Type-only: confirms the factory shape doesn't require a signer argument
-    // anymore. Runtime behavior (read from config, throw if absent) lives in
-    // the action bodies; not asserted here.
+    // Type-only: confirms the factory shape doesn't require a signer argument.
+    // Runtime behavior (read from config, throw if absent) lives in the
+    // action bodies; not asserted here.
     expectTypeOf(wc.signPsbt).parameter(0).toEqualTypeOf<string>()
   })
 })
@@ -904,6 +895,63 @@ describe('Extension anti-clobber', () => {
 
     // @ts-expect-error — `extend` is a reserved member of WalletClient.
     wc.extend(() => ({ extend: () => 'oops' }))
+  })
+
+  // ============================================================================
+  // ExtendableProtectedActions shape-validation — overrides of registered
+  // action names must match their canonical signature. Mirrors viem's
+  // `ExactPartial<ExtendableProtectedActions>` constraint on `.extend()`.
+  // ============================================================================
+
+  it('Client.extend accepts a correctly-shaped getAddressBalance override', () => {
+    const ds = createMempoolDataSource({ network: MAINNET })
+    const c = createClient({ network: MAINNET, dataSource: ds })
+
+    // Matches the canonical signature (string → Promise<string>).
+    const cx = c.extend(() => ({
+      getAddressBalance: async (_address: string) => '0',
+    }))
+    expectTypeOf(cx.getAddressBalance).parameter(0).toEqualTypeOf<string>()
+    expectTypeOf(cx.getAddressBalance).returns.resolves.toEqualTypeOf<string>()
+  })
+
+  it('Client.extend rejects a mis-shaped getAddressBalance override', () => {
+    const ds = createMempoolDataSource({ network: MAINNET })
+    const c = createClient({ network: MAINNET, dataSource: ds })
+
+    // @ts-expect-error — canonical shape is `(address: string) => Promise<string>`.
+    // Returning `'oops'` (literal, not a Promise) or accepting `number` violates the registry.
+    c.extend(() => ({ getAddressBalance: (_address: number) => 'oops' }))
+  })
+
+  it('WalletClient.extend rejects a mis-shaped getAccountBalance override', () => {
+    const ds = createChainDataSource({ network: MAINNET }).extend(baseCap)
+    const wc = createWalletClient({ network: MAINNET, dataSource: ds, account: walletAccount })
+
+    // @ts-expect-error — canonical shape takes (WalletAccount?, AddressPurpose?), not (string).
+    wc.extend(() => ({ getAccountBalance: async (_address: string) => '0' }))
+  })
+
+  it('WalletClient.extend rejects a mis-shaped signPsbt override', () => {
+    const ds = createChainDataSource({ network: MAINNET }).extend(baseCap)
+    const wc = createWalletClient({ network: MAINNET, dataSource: ds, account: walletAccount })
+
+    // @ts-expect-error — canonical signPsbt returns Promise<SignedPsbt>, not Promise<string>.
+    wc.extend(() => ({ signPsbt: async (_psbt: string) => 'just-a-string' }))
+  })
+
+  it('Client.extend permits novel (non-registered) keys with any shape', () => {
+    const ds = createChainDataSource({ network: MAINNET }).extend(baseCap)
+    const c = createClient({ network: MAINNET, dataSource: ds }).extend(() => ({
+      lastSeenBlock: 850000,
+      cache: new Map<string, unknown>(),
+      ping: async () => true,
+    }))
+
+    // Novel keys land on the client unchanged — only registry-overlapping
+    // keys are constrained.
+    expectTypeOf(c.lastSeenBlock).toEqualTypeOf<number>()
+    expectTypeOf(c.ping).returns.resolves.toEqualTypeOf<boolean>()
   })
 
   it('ChainDataSource.extend rejects redeclaring `network`', () => {

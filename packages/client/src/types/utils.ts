@@ -80,3 +80,17 @@ export type WithoutIndexSig<T> = {
   [K in keyof T as string extends K ? never : number extends K ? never : K]: T[K]
 }
 
+/**
+ * Every key of `T` made optional, including `undefined` in the value
+ * type so the shape passes under `exactOptionalPropertyTypes`.
+ *
+ * @remarks
+ * Mirrors viem's `ExactPartial`. Use to compose a "you may include any
+ * of these keys, but if you do, the value must match" constraint —
+ * the construction behind {@link Client.extend}'s shape validation
+ * against {@link ExtendableProtectedActions}.
+ */
+export type ExactPartial<T> = {
+  [K in keyof T]?: T[K] | undefined
+}
+

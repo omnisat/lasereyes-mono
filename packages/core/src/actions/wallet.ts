@@ -14,7 +14,7 @@
  *
  * Net effect: the override-cascade pattern is preserved across the
  * core/client seam. A user (or a connector) overriding any composed
- * sub-action — `signPsbt`, `getUtxos`, `broadcastTransaction` — is
+ * sub-action — `signPsbt`, `getAccountUtxos`, `broadcastTransaction` — is
  * honored uniformly whether the entry point is core's free function
  * or a method on the wallet client.
  *
@@ -53,7 +53,7 @@ import { getWalletClient } from '../wallet-client'
  *
  * @throws {Error} If no wallet is connected or the user rejects.
  */
-export async function sendBitcoin<const config extends LaserEyesConfig<any, any, any>>(
+export async function sendBtc<const config extends LaserEyesConfig<any, any, any>>(
   config: config,
   to: string,
   amount: number,

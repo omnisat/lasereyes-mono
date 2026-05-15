@@ -38,15 +38,14 @@
  */
 
 import type { NetworkId } from '@omnisat/lasereyes-client'
-import { getAction } from '@omnisat/lasereyes-client'
+import { getAddressBalance as baseGetAddressBalance, getAction } from '@omnisat/lasereyes-client'
 import {
-  type Account,
-  type AddressPurpose,
   broadcastPsbt as baseBroadcastPsbt,
-  getBalance as baseGetBalance,
+  createWalletAccount,
   sendBtc as baseSendBtc,
   type SendBtcParams,
   type WalletAccount,
+  type WalletAccountConfig,
 } from '@omnisat/lasereyes-client/wallet'
 import type { Connector, CreateConnectorFn } from '../types/connector'
 import type { BitcoinProvider, ProviderCapabilities } from '../types/provider'
@@ -115,12 +114,41 @@ export interface InjectedConnectorOptions {
     /** Wallet supports `bitcoin_pushPsbt` natively. */
     broadcastPsbt?: boolean
     /**
-     * Wallet supports `bitcoin_getBalance` natively. Honored only when the
-     * caller asks for the connected wallet's address; otherwise the
-     * override hits the data-source-backed `getBalance` action.
+     * Wallet supports `bitcoin_getBalance` natively. The override is
+     * installed at the `getAddressBalance` (leaf) action so the
+     * data-action path (`getAddressBalance(config, addr)` → `getAction`
+     * → client method) short-circuits to the wallet's one-shot RPC when
+     * the requested address is one the wallet recognizes.
+     *
+     * The wallet adapter is expected to throw on addresses outside the
+     * wallet's accounts; the override's `catch` falls back to the
+     * data-source-backed `getAddressBalance` via `getAction`.
+     *
+     * Flag name mirrors the action it installs (`getAddressBalance`),
+     * not the underlying RPC (`bitcoin_getBalance`).
      */
-    getBalance?: boolean
+    getAddressBalance?: boolean
   }
+}
+
+/**
+ * `true` when the error is the wallet adapter signalling "this method
+ * isn't something I handle" (JSON-RPC `METHOD_NOT_FOUND`, code -32601).
+ *
+ * @remarks
+ * The native-RPC overrides fall back to the composed/data-source path
+ * **only** on this error. User rejections (4001), network errors, and
+ * adapter-internal errors re-throw — the caller asked the wallet to do
+ * something, the wallet refused for a reason, and silently re-routing
+ * into a different code path would hide that.
+ */
+function isMethodNotFound(e: unknown): boolean {
+  return (
+    typeof e === 'object' &&
+    e !== null &&
+    'code' in e &&
+    (e as { code: unknown }).code === -32601
+  )
 }
 
 /**
@@ -150,7 +178,9 @@ export function injected(target: InjectedConnectorOptions): CreateConnectorFn {
 
     const hasNativeOverrides =
       target.nativeRpc &&
-      (target.nativeRpc.sendBtc || target.nativeRpc.broadcastPsbt || target.nativeRpc.getBalance)
+      (target.nativeRpc.sendBtc ||
+        target.nativeRpc.broadcastPsbt ||
+        target.nativeRpc.getAddressBalance)
 
     const connector: Connector = {
       id: target.id,
@@ -166,8 +196,10 @@ export function injected(target: InjectedConnectorOptions): CreateConnectorFn {
         const a = resolveProvider()
         if (!a) return false
         try {
-          const account = (await a.request('bitcoin_getAccounts')) as Account | undefined
-          return !!(account && account.addresses && account.addresses.length > 0)
+          const data = (await a.request('bitcoin_getAccounts')) as
+            | WalletAccountConfig
+            | undefined
+          return !!(data && data.addresses && data.addresses.length > 0)
         } catch {
           return false
         }
@@ -175,8 +207,9 @@ export function injected(target: InjectedConnectorOptions): CreateConnectorFn {
 
       async connect() {
         const a = requireProvider()
-        const account = (await a.request('bitcoin_requestAccounts')) as Account
-        if (!account) throw new Error('No account returned from wallet')
+        const data = (await a.request('bitcoin_requestAccounts')) as WalletAccountConfig
+        if (!data || !data.addresses?.length) throw new Error('No account returned from wallet')
+        const account: WalletAccount = createWalletAccount(data)
         const networkId = (await a.request('bitcoin_getNetwork')) as NetworkId
         return { account, networkId }
       },
@@ -187,9 +220,10 @@ export function injected(target: InjectedConnectorOptions): CreateConnectorFn {
         cachedProvider = null
       },
 
-      async getAccount() {
+      async getAccount(): Promise<WalletAccount> {
         const a = requireProvider()
-        return (await a.request('bitcoin_getAccounts')) as Account
+        const data = (await a.request('bitcoin_getAccounts')) as WalletAccountConfig
+        return createWalletAccount(data)
       },
 
       async getNetworkId() {
@@ -227,9 +261,16 @@ export function injected(target: InjectedConnectorOptions): CreateConnectorFn {
       // calling the free function — no recursion, no self-substitution.
       //
       // The fallback path lets the wallet-fast-path optimization fail
-      // gracefully (e.g. Unisat's `bitcoin_getBalance` throws -32601 for
-      // addresses outside the wallet's accounts; that catch + base
-      // action delivers the data-source answer instead).
+      // gracefully ONLY for "this method isn't supported by the wallet"
+      // failures — e.g. Unisat's `bitcoin_getBalance` adapter throws
+      // -32601 for addresses outside the wallet's accounts; that
+      // catch + base action delivers the data-source answer instead.
+      //
+      // Every other failure — user rejection (4001), network error,
+      // wallet internal error — re-throws so the caller sees what the
+      // wallet actually said. Silently falling back on rejection would
+      // re-enter the composed PSBT path and re-prompt (or fail
+      // confusingly), neither of which the user asked for.
       //
       // When `target.nativeRpc` is omitted, the connector has no
       // override and the keystone's bare default path runs in full
@@ -246,7 +287,8 @@ export function injected(target: InjectedConnectorOptions): CreateConnectorFn {
                       to,
                       amount,
                     })) as string
-                  } catch {
+                  } catch (e) {
+                    if (!isMethodNotFound(e)) throw e
                     return getAction(client, baseSendBtc, 'sendBtc')(params)
                   }
                 }
@@ -257,25 +299,26 @@ export function injected(target: InjectedConnectorOptions): CreateConnectorFn {
                     return (await requireProvider().request('bitcoin_pushPsbt', {
                       psbt,
                     })) as string
-                  } catch {
+                  } catch (e) {
+                    if (!isMethodNotFound(e)) throw e
                     return getAction(client, baseBroadcastPsbt, 'broadcastPsbt')(psbt)
                   }
                 }
               }
-              if (target.nativeRpc?.getBalance) {
-                overrides.getBalance = async (
-                  account?: WalletAccount,
-                  purpose: AddressPurpose = 'payment'
-                ): Promise<string> => {
-                  const resolved = (account ?? client.config.account) as WalletAccount | undefined
-                  const address = resolved?.getAddress(purpose)
+              if (target.nativeRpc?.getAddressBalance) {
+                overrides.getAddressBalance = async (address: string): Promise<string> => {
                   try {
                     return (await requireProvider().request(
                       'bitcoin_getBalance',
                       address ? { address } : undefined
                     )) as string
-                  } catch {
-                    return getAction(client, baseGetBalance, 'getBalance')(account, purpose)
+                  } catch (e) {
+                    if (!isMethodNotFound(e)) throw e
+                    return getAction(
+                      client,
+                      baseGetAddressBalance,
+                      'getAddressBalance'
+                    )(address)
                   }
                 }
               }

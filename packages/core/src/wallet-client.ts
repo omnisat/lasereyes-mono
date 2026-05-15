@@ -17,7 +17,6 @@ import {
   type Account,
   createWalletClient,
   providerSigner,
-  type WalletAccount,
   type WalletClient,
   type WalletClientConfig,
 } from '@omnisat/lasereyes-client/wallet'
@@ -62,7 +61,7 @@ async function buildConnectorClient(
   const walletClient = createWalletClient({
     network,
     dataSource,
-    account: account as WalletAccount,
+    account,
     signer: providerSigner(provider),
   }) as WalletClient<WalletClientConfig<Account, any>, Account, any, any>
 

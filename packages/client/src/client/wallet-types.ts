@@ -15,7 +15,8 @@
 import type { Account } from '../account/types'
 import type { ActionGroup } from '../data-source/capabilities'
 import type { Signer } from '../signer/types'
-import type { Extension, Prettify } from '../types/utils'
+import type { ExactPartial, Extension, Prettify } from '../types/utils'
+import type { ExtendableProtectedActions } from './extendable-actions'
 import type { Client, ClientConfig } from './types'
 
 /**
@@ -28,11 +29,13 @@ import type { Client, ClientConfig } from './types'
  * signer from `config.signer` at runtime and throw a clear error if it's
  * absent.
  *
- * Type-level guard against accidentally calling signing actions on a
- * signer-less client comes from the factory path: `signingActions()`'s
- * factory accepts the signer at construction time, and `walletActions()`'s
- * `Actions extends …` constraint ensures `signPsbt` is on the client
- * before composing actions that depend on it.
+ * No compile-time guard against extending a signer-less client with
+ * `walletBtcActions()` — the factory installs `signPsbt` / `signMessage`
+ * / `broadcastPsbt` whether or not a signer is configured, and the
+ * action bodies throw a clear runtime error if `config.signer` is
+ * absent at call time. Signer-less wallet clients are useful for
+ * read-only-with-account contexts (observation, multisig watching,
+ * deferring signer attachment).
  *
  * @typeParam TAccount - The account type
  * @typeParam dsMethods - The data source capabilities
@@ -57,7 +60,8 @@ export interface WalletClientConfig<TAccount extends Account, dsMethods extends 
  * The wallet client extends the base client concept with account awareness.
  * It knows about the user's addresses and can provide account-aware
  * convenience methods. Signing capability is added via the
- * {@link signingActions} action group.
+ * {@link walletBtcActions} action group (which installs both BTC ops
+ * and signing primitives).
  *
  * @typeParam WalletConfig - The wallet client configuration
  * @typeParam TAccount - The account type (Account / WalletAccount / ReadOnlyAccount)
@@ -72,9 +76,8 @@ export interface WalletClientConfig<TAccount extends Account, dsMethods extends 
  *   account,
  * })
  *   .extend(walletBtcActions())
- *   .extend(signingActions(mySigner))
  *
- * const balance = await walletClient.getBalance()
+ * const balance = await walletClient.getAccountBalance()
  * await walletClient.sendBtc({ to: 'bc1q...', amount: 10000 })
  * ```
  */
@@ -88,15 +91,17 @@ export type WalletClient<
    * Adds a new action group to this wallet client.
    *
    * @remarks
-   * The `TNew extends Extension<'config' | 'extend'>` constraint protects
-   * the wallet client's reserved members from being silently shadowed by a
-   * factory return. Any other key with any value type is permitted.
+   * Same two-part constraint as {@link Client.extend}: reserved-member
+   * protection + canonical-shape protection against
+   * {@link ExtendableProtectedActions}.
    *
    * @typeParam TNew - The action group being added
    * @param factory - A function that receives the current client and returns new action methods
    * @returns A new wallet client with the additional action methods
    */
-  extend<TNew extends Extension<'config' | 'extend'>>(
+  extend<
+    TNew extends Extension<'config' | 'extend'> & ExactPartial<ExtendableProtectedActions>,
+  >(
     factory: (client: WalletClient<WalletConfig, TAccount, clientActions, dsMethods>) => TNew
   ): WalletClient<WalletConfig, TAccount, Prettify<clientActions & TNew>, dsMethods>
 }

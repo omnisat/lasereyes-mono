@@ -6,10 +6,10 @@
  *
  * - **Lifecycle**: `initialize`, `connect`, `disconnect`, `switchNetwork`,
  *   `dispose`.
- * - **Read** (data): `getBalance`, `getAddressUtxos`, `getInscriptions`,
+ * - **Read** (data): `getAddressBalance`, `getAddressUtxos`, `getInscriptions`,
  *   `getRunesBalances`, `getBrc20Balances`, `getAlkanesBalances`,
  *   `getRecommendedFees`, `getTransaction`, `broadcastTransaction`.
- * - **Write** (wallet): `sendBitcoin`, `signPsbt`, `signMessage`,
+ * - **Write** (wallet): `sendBtc`, `signPsbt`, `signMessage`,
  *   `broadcastPsbt`.
  *
  * All actions thread `<const config extends LaserEyesConfig<any, any,
@@ -34,9 +34,9 @@ export { switchNetwork } from './switchNetwork'
 // Data (read)
 export {
   broadcastTransaction,
+  getAddressBalance,
   getAddressUtxos,
   getAlkanesBalances,
-  getBalance,
   getBrc20Balances,
   getInscriptions,
   getRecommendedFees,
@@ -45,4 +45,4 @@ export {
 } from './data'
 
 // Wallet (write)
-export { broadcastPsbt, sendBitcoin, signMessage, signPsbt } from './wallet'
+export { broadcastPsbt, sendBtc, signMessage, signPsbt } from './wallet'

@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import { sendBitcoin } from '@omnisat/lasereyes-core'
+import { sendBtc } from '@omnisat/lasereyes-core'
 import { useLaserEyesCore } from '../providers/lasereyes-provider'
 
 /**
@@ -28,5 +28,5 @@ import { useLaserEyesCore } from '../providers/lasereyes-provider'
  */
 export function useSendBitcoin() {
   const core = useLaserEyesCore()
-  return useCallback((to: string, amount: number) => sendBitcoin(core, to, amount), [core])
+  return useCallback((to: string, amount: number) => sendBtc(core, to, amount), [core])
 }

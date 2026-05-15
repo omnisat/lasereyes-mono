@@ -6,12 +6,10 @@
  * (`@omnisat/lasereyes-client`, `/wallet`, `/runes`, `/brc20`,
  * `/inscriptions`) — they're tree-shake-friendly and document intent.
  *
- * Notable: `getBalance` and `getUtxos` exist in both `actions/public/`
- * (address-keyed reads) and `actions/wallet/` (account-aware reads).
- * To avoid name collisions, this barrel re-exports only the factory
- * functions and the action functions whose names are unique. For the
- * collision-prone `getBalance`/`getUtxos`, import from the specific
- * subpath.
+ * Every dispatched action has a globally unique name: address-keyed
+ * reads are `getAddressBalance` / `getAddressUtxos`; account-aware reads
+ * are `getAccountBalance` / `getAccountUtxos`. The aggregate barrel can
+ * re-export them all without collision.
  *
  * @module actions
  */
@@ -42,6 +40,8 @@ export {
 export type { InscribeParams, SendInscriptionParams } from './inscriptions'
 export {
   broadcastTransaction,
+  getAddressBalance,
+  getAddressUtxos,
   getOutputValue,
   getRecommendedFees,
   getTransaction,
@@ -61,9 +61,11 @@ export {
 export type { SendRuneParams } from './runes'
 export {
   broadcastPsbt,
+  getAccountBalance,
+  getAccountUtxos,
+  sendBtc,
   signMessage,
   signPsbt,
-  signingActions,
-} from './signing'
-export { sendBtc, walletBtcActions } from './wallet'
+  walletBtcActions,
+} from './wallet'
 export type { SendBtcParams } from './wallet'

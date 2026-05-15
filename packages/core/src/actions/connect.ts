@@ -15,7 +15,10 @@
  */
 
 import type { NetworkId } from '@omnisat/lasereyes-client'
-import type { Account } from '@omnisat/lasereyes-client/wallet'
+import {
+  createWalletAccount,
+  type WalletAccountConfig,
+} from '@omnisat/lasereyes-client/wallet'
 import type { LaserEyesConfig } from '../config'
 import { invalidateClientCache } from '../internal'
 import type { Connector, ConnectResult } from '../types/connector'
@@ -82,14 +85,16 @@ function subscribeToConnectorEvents(
   // Trust the adapter's normalized payload. The adapter's
   // `subscribeRawEvents` is the right place to normalize wallet-native
   // payloads (e.g. Unisat emits a string[] of addresses; the adapter
-  // re-derives a full Account before re-emitting).
-  const onAccountsChanged = (account: Account) => {
+  // re-derives the standard wire shape — `WalletAccountConfig` — before
+  // re-emitting). Construct the method-bearing `WalletAccount` here so
+  // it lands on state ready to use.
+  const onAccountsChanged = (data: WalletAccountConfig) => {
     // Account changed on the wallet's side. Drop the cached wallet
     // client for the current chain — it was built against the previous
     // account. The next `getWalletClient` call rebuilds and re-caches.
     const currentChain = config.state.$connection.get().networkId
     invalidateClientCache(config, currentChain)
-    config.state.$connection.setKey('account', account)
+    config.state.$connection.setKey('account', createWalletAccount(data))
   }
 
   const onNetworkChanged = async (payload?: NetworkId) => {
@@ -114,6 +119,20 @@ function subscribeToConnectorEvents(
     if (previous && previous !== next) invalidateClientCache(config, previous)
     invalidateClientCache(config, next)
     config.state.$connection.setKey('networkId', next)
+
+    // Eagerly rebuild + cache the wallet client for the new chain so
+    // the next sync `getClient(config)` returns a wallet client
+    // (carrying the connector's `getClient` overrides) instead of
+    // falling through to a bare client. Mirrors the post-connect
+    // pre-build in `connect()` — without this, the data-action path
+    // bypasses connector overrides after every network switch.
+    if (!config.client) {
+      try {
+        await getWalletClient(config)
+      } catch {
+        // Best-effort; failures surface on the next explicit call.
+      }
+    }
   }
 
   const onDisconnect = () => {
