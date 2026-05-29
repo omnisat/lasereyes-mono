@@ -7,8 +7,14 @@
 
 import type { NetworkId } from '../../chains'
 import { DataSourceError } from '../../errors'
-import { getMaestroUrl } from '../../lib/urls'
 import type { MaestroConfig } from './config'
+
+const MAESTRO_API_URL_MAINNET = 'https://xbt-mainnet.gomaestro-api.org/v0'
+const MAESTRO_API_URL_TESTNET4 = 'https://xbt-testnet.gomaestro-api.org/v0'
+
+const getMaestroUrl = (network: NetworkId) => {
+  return network === 'testnet4' ? MAESTRO_API_URL_TESTNET4 : MAESTRO_API_URL_MAINNET
+}
 
 /**
  * Resolve the (apiUrl, apiKey) pair for a given network.
@@ -45,12 +51,7 @@ export async function maestroGet(apiUrl: string, apiKey: string, endpoint: strin
 /**
  * Issue a POST against the maestro API.
  */
-export async function maestroPost(
-  apiUrl: string,
-  apiKey: string,
-  endpoint: string,
-  body: unknown
-) {
+export async function maestroPost(apiUrl: string, apiKey: string, endpoint: string, body: unknown) {
   const response = await fetch(`${apiUrl}${endpoint}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'api-key': apiKey },

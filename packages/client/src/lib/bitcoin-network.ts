@@ -7,14 +7,14 @@ export interface BitcoinNetwork {
   wif: number
 }
 
-export const BITCOIN_NETWORK: BitcoinNetwork = {
+const BITCOIN_NETWORK: BitcoinNetwork = {
   bech32: 'bc',
   pubKeyHash: 0,
   scriptHash: 5,
   wif: 128,
 }
 
-export const BITCOIN_TEST_NETWORK: BitcoinNetwork = {
+const BITCOIN_TEST_NETWORK: BitcoinNetwork = {
   bech32: 'tb',
   pubKeyHash: 111,
   scriptHash: 196,

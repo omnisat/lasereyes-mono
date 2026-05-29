@@ -6,8 +6,27 @@
  */
 
 import type { NetworkId } from '../../chains'
-import { getSandshrewUrl, SANDSHREW_LASEREYES_KEY } from '../../lib/urls'
 import type { SandshrewConfig } from './config'
+
+const SANDSHREW_URL_MAINNET = 'https://mainnet.sandshrew.io/v2'
+const SANDSHREW_URL_SIGNET = 'https://signet.sandshrew.io/v2'
+const SANDSHREW_URL_TESTNET = 'https://testnet.sandshrew.io/v2'
+const SANDSHREW_URL_OYLNET = 'https://oylnet.oyl.gg/v2'
+
+const SANDSHREW_LASEREYES_KEY = 'lasereyes'
+
+const getSandshrewUrl = (network: NetworkId) => {
+  switch (network) {
+    case 'oylnet':
+      return SANDSHREW_URL_OYLNET
+    case 'testnet':
+      return SANDSHREW_URL_TESTNET
+    case 'signet':
+      return SANDSHREW_URL_SIGNET
+    default:
+      return SANDSHREW_URL_MAINNET
+  }
+}
 
 /**
  * Resolve the (url, key) pair to use for a given network.

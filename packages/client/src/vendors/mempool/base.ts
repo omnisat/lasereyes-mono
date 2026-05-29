@@ -1,7 +1,7 @@
+import type { NetworkId } from '../../chains'
 import { DataSourceError } from '../../errors'
 import { bytesToHex } from '../../lib/bytes'
 import { getAddressScriptPubKey } from '../../lib/get-address-script-pub-key'
-import { getMempoolSpaceUrl } from '../../lib/urls'
 import type {
   BaseCapability,
   DataSourceContext,
@@ -12,6 +12,30 @@ import type {
   UTXO,
 } from '../../types'
 import type { MempoolConfig } from './config'
+
+const MEMPOOL_SPACE_URL = 'https://mempool.space'
+const MEMPOOL_SPACE_URL_TESTNET = 'https://mempool.space/testnet'
+const MEMPOOL_SPACE_URL_TESTNET4 = 'https://mempool.space/testnet4'
+const MEMPOOL_SPACE_URL_SIGNET = 'https://mempool.space/signet'
+const MEMPOOL_SPACE_URL_FRACTAL_MAINNET = 'https://mempool.fractalbitcoin.io'
+const MEMPOOL_SPACE_URL_FRACTAL_TESTNET = 'https://mempool-testnet.fractalbitcoin.io'
+
+const getMempoolSpaceUrl = (network: NetworkId) => {
+  switch (network) {
+    case 'testnet':
+      return MEMPOOL_SPACE_URL_TESTNET
+    case 'testnet4':
+      return MEMPOOL_SPACE_URL_TESTNET4
+    case 'signet':
+      return MEMPOOL_SPACE_URL_SIGNET
+    case 'fractal-mainnet':
+      return MEMPOOL_SPACE_URL_FRACTAL_MAINNET
+    case 'fractal-testnet':
+      return MEMPOOL_SPACE_URL_FRACTAL_TESTNET
+    default:
+      return MEMPOOL_SPACE_URL
+  }
+}
 
 export function baseCapabilities(
   vendorConfig?: MempoolConfig
