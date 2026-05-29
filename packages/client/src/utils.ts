@@ -17,7 +17,6 @@ export { bytesToBase64, bytesToHex, hexToBytes } from './lib/bytes'
 export { getAddressScriptPubKey } from './lib/get-address-script-pub-key'
 export { getAddressType } from './lib/get-address-type'
 export { getRedeemScript } from './lib/get-redeem-script'
-export { reverseBytes } from './lib/reverse-bytes'
 export { calculateTaprootTxSize, estimateTxSize } from './lib/tx-size'
 export { AddressType } from './types/psbt'
 // Re-export types that are useful with utils

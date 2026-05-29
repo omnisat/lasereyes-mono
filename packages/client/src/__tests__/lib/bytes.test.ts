@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest'
 import { bytesToBase64, bytesToHex, hexToBytes } from '../../lib/bytes'
-import { reverseBytes } from '../../lib/reverse-bytes'
 
 describe('bytes utilities', () => {
   it('hexToBytes converts hex string to Uint8Array', () => {
@@ -19,17 +18,6 @@ describe('bytes utilities', () => {
     expect(bytesToHex(hexToBytes(original))).toBe(original)
   })
 
-  it('reverseBytes reverses byte order', () => {
-    const bytes = new Uint8Array([1, 2, 3, 4])
-    expect(reverseBytes(bytes)).toEqual(new Uint8Array([4, 3, 2, 1]))
-  })
-
-  it('reverseBytes does not mutate original', () => {
-    const bytes = new Uint8Array([1, 2, 3])
-    reverseBytes(bytes)
-    expect(bytes).toEqual(new Uint8Array([1, 2, 3]))
-  })
-
   it('bytesToBase64 encodes Uint8Array to base64', () => {
     // "Hello" in bytes
     const bytes = new Uint8Array([72, 101, 108, 108, 111])
@@ -39,6 +27,5 @@ describe('bytes utilities', () => {
   it('handles empty input', () => {
     expect(bytesToHex(new Uint8Array([]))).toBe('')
     expect(hexToBytes('')).toEqual(new Uint8Array([]))
-    expect(reverseBytes(new Uint8Array([]))).toEqual(new Uint8Array([]))
   })
 })

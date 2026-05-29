@@ -7,7 +7,6 @@
 import type { AlkaneCapability } from '../../data-source/capabilities'
 import { DataSourceError } from '../../errors'
 import { bytesToHex, hexToBytes } from '../../lib/bytes'
-import { reverseBytes } from '../../lib/reverse-bytes'
 import type {
   AlkaneBalance,
   AlkaneOutpoint,
@@ -93,7 +92,7 @@ export function alkaneCapabilities(
               ...outpoint,
               outpoint: {
                 vout: outpoint.outpoint.vout,
-                txid: bytesToHex(reverseBytes(hexToBytes(outpoint.outpoint.txid))),
+                txid: bytesToHex(hexToBytes(outpoint.outpoint.txid)),
               },
               runes: outpoint.runes.map(rune => ({
                 ...rune,
