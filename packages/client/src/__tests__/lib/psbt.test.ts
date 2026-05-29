@@ -1,7 +1,9 @@
 import { Transaction } from '@scure/btc-signer'
 import { describe, expect, it } from 'vitest'
+import { addInputForUtxo } from '../../lib/add-input-for-utxo'
 import { hexToBytes } from '../../lib/bytes'
-import { addInputForUtxo, calculateTaprootTxSize, findXAmountOfSats } from '../../lib/psbt'
+import { findXAmountOfSats } from '../../lib/find-x-amount-of-sats'
+import { calculateTaprootTxSize } from '../../lib/tx-size'
 import type { FormattedUTXO } from '../../types/utxo'
 
 const MOCK_TXID = 'aaaa'.repeat(16)

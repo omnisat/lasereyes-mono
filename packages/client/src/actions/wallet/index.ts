@@ -29,14 +29,9 @@
 import type { Account, AddressPurpose, WalletAccount } from '../../account/types'
 import type { WalletClient, WalletClientConfig } from '../../client/wallet-types'
 import type { ActionGroup, BaseCapability } from '../../data-source/capabilities'
+import { buildSendBtcPsbt } from '../../lib/build-send-btc-psbt'
 import { getAction } from '../../lib/get-action'
-import { buildSendBtcPsbt } from '../../lib/psbt-builders'
-import type {
-  SignedPsbt,
-  Signer,
-  SignMessageOptions,
-  SignPsbtOptions,
-} from '../../signer/types'
+import type { SignedPsbt, Signer, SignMessageOptions, SignPsbtOptions } from '../../signer/types'
 import type { PaginatedResult, UTXO } from '../../types'
 import { broadcastTransaction, getAddressBalance, getAddressUtxos } from '../public'
 
@@ -323,7 +318,7 @@ export function walletBtcActions() {
     signPsbt: (psbt, options) => signPsbt(client, psbt, options),
     signMessage: (message, options) => signMessage(client, message, options),
     broadcastPsbt: (psbt, options) => broadcastPsbt(client, psbt, options),
-    sendBtc: (params) => sendBtc(client, params),
+    sendBtc: params => sendBtc(client, params),
     getAccountBalance: (account, purpose) => getAccountBalance(client, account, purpose),
     getAccountUtxos: (account, purpose) => getAccountUtxos(client, account, purpose),
   })

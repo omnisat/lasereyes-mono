@@ -1,6 +1,6 @@
 import { DataSourceError } from '../../errors'
-import { getAddressScriptPubKey } from '../../lib/btc'
 import { bytesToHex } from '../../lib/bytes'
+import { getAddressScriptPubKey } from '../../lib/get-address-script-pub-key'
 import { getMempoolSpaceUrl } from '../../lib/urls'
 import type {
   BaseCapability,

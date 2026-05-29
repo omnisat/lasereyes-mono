@@ -1,8 +1,8 @@
 /**
- * PSBT construction utilities for Bitcoin transactions.
- * These are pure functions that build PSBTs given inputs - they don't perform I/O.
+ * PSBT construction for sending BTC. Pure (no I/O), but pulls
+ * `@scure/btc-signer` — keep out of crypto-free paths.
  *
- * @module lib/psbt-builders
+ * @module lib/build-send-btc-psbt
  * @internal
  */
 
@@ -12,8 +12,10 @@ import type { NetworkType } from '../chains'
 import { InsufficientFundsError, PsbtBuildError } from '../errors'
 import type { PsbtResult, UTXO } from '../types'
 import { AddressType } from '../types/psbt'
-import { getAddressType, getRedeemScript } from './btc'
-import { estimateTxSize, getBitcoinNetwork } from './helpers'
+import { getBitcoinNetwork } from './bitcoin-network'
+import { getAddressType } from './get-address-type'
+import { getRedeemScript } from './get-redeem-script'
+import { estimateTxSize } from './tx-size'
 
 /**
  * Parameters for building a BTC send PSBT.
@@ -48,7 +50,7 @@ export interface BuildSendBtcPsbtParams {
  *
  * @example
  * ```ts
- * import { buildSendBtcPsbt } from './lib/psbt-builders'
+ * import { buildSendBtcPsbt } from './lib/build-send-btc-psbt'
  *
  * const psbt = buildSendBtcPsbt({
  *   utxos: myUtxos,

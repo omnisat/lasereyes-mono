@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import { getAddressScriptPubKey, getAddressType, getRedeemScript } from '../../lib/btc'
 import { bytesToHex } from '../../lib/bytes'
+import { getAddressScriptPubKey } from '../../lib/get-address-script-pub-key'
+import { getAddressType } from '../../lib/get-address-type'
+import { getRedeemScript } from '../../lib/get-redeem-script'
 import { AddressType } from '../../types/psbt'
 
 describe('getAddressType', () => {

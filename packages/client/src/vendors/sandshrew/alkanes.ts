@@ -6,7 +6,8 @@
 
 import type { AlkaneCapability } from '../../data-source/capabilities'
 import { DataSourceError } from '../../errors'
-import { bytesToHex, hexToBytes, reverseBytes } from '../../lib/bytes'
+import { bytesToHex, hexToBytes } from '../../lib/bytes'
+import { reverseBytes } from '../../lib/reverse-bytes'
 import type {
   AlkaneBalance,
   AlkaneOutpoint,

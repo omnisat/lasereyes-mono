@@ -5,8 +5,8 @@
  */
 
 import type { BaseCapability } from '../../data-source/capabilities'
-import { getAddressScriptPubKey } from '../../lib/btc'
 import { bytesToHex } from '../../lib/bytes'
+import { getAddressScriptPubKey } from '../../lib/get-address-script-pub-key'
 import type {
   DataSourceContext,
   FeeEstimate,

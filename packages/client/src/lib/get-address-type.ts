@@ -1,9 +1,12 @@
-import { Address, OutScript, p2sh, p2wpkh } from '@scure/btc-signer'
-import type { NetworkType } from '../chains'
 import { AddressType } from '../types/psbt'
-import { hexToBytes } from './bytes'
-import { getBitcoinNetwork } from './helpers'
 
+/**
+ * Classify a Bitcoin address by its script type using prefix/format heuristics.
+ *
+ * Pure: regex-only, no crypto dependencies.
+ *
+ * @returns the {@link AddressType}, or `null` if the address is unrecognized.
+ */
 export const getAddressType = (address: string): AddressType | null => {
   // P2PKH: starts with 1 (mainnet) or m/n (testnet)
   if (
@@ -34,20 +37,4 @@ export const getAddressType = (address: string): AddressType | null => {
     return AddressType.P2WPKH
   }
   return null
-}
-
-export const getAddressScriptPubKey = (address: string, network: NetworkType): Uint8Array => {
-  const net = getBitcoinNetwork(network)
-  return OutScript.encode(Address(net).decode(address))
-}
-
-export function getRedeemScript(
-  paymentPublicKey: string,
-  network: NetworkType
-): Uint8Array | undefined {
-  const net = getBitcoinNetwork(network)
-  const pubkey = hexToBytes(paymentPublicKey)
-  const p2wpkhPayment = p2wpkh(pubkey, net)
-  const p2shPayment = p2sh(p2wpkhPayment, net)
-  return p2shPayment.redeemScript
 }

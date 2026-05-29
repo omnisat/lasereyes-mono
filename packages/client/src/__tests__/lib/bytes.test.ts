@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { bytesToBase64, bytesToHex, hexToBytes, reverseBytes } from '../../lib/bytes'
+import { bytesToBase64, bytesToHex, hexToBytes } from '../../lib/bytes'
+import { reverseBytes } from '../../lib/reverse-bytes'
 
 describe('bytes utilities', () => {
   it('hexToBytes converts hex string to Uint8Array', () => {
