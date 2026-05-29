@@ -48,14 +48,6 @@ const ACCOUNT_WIRE = {
   publicKeys: { payment: PUBKEY, ordinals: PUBKEY, taproot: PUBKEY } as Record<string, string>,
 }
 
-const CAPABILITIES: ProviderCapabilities = {
-  mainnet: {
-    bitcoin_sendBitcoin: { supported: true },
-    bitcoin_pushPsbt: { supported: true },
-    bitcoin_getBalance: { supported: true },
-  },
-}
-
 /**
  * Build a mock `BitcoinProvider` whose `request()` dispatches by
  * method name. Test cases pass per-method handlers.

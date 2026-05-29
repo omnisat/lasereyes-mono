@@ -112,11 +112,7 @@ function makeFakeConnector(opts?: {
   const networkId = opts?.networkId ?? 'mainnet'
 
   return createConnector(() => {
-    const conn: Connector & {
-      onConnect?: ReturnType<typeof vi.fn>
-      onDisconnect?: ReturnType<typeof vi.fn>
-      onNetworkChanged?: ReturnType<typeof vi.fn>
-    } = {
+    const conn: Connector = {
       id,
       name: id,
       isReady: () => true,
@@ -127,12 +123,14 @@ function makeFakeConnector(opts?: {
       getNetworkId: async () => networkId,
       getCapabilities: async () => ({}) as any,
       getProvider: () => opts?.provider ?? null,
-      onConnect: opts?.onConnect,
-      onDisconnect: opts?.onDisconnect,
-      onNetworkChanged: opts?.onNetworkChanged,
-      ...(opts?.switchNetwork
-        ? { switchNetwork: opts.switchNetwork as any }
-        : { switchNetwork: (async (id: string) => id) as any }),
+      // All four lifecycle hooks are required on the `Connector`
+      // interface. Default to no-ops; tests override by passing
+      // explicit spies in `opts`.
+      onAccountChanged: () => {},
+      onConnect: opts?.onConnect ?? (() => {}),
+      onDisconnect: opts?.onDisconnect ?? (() => {}),
+      onNetworkChanged: opts?.onNetworkChanged ?? (() => {}),
+      switchNetwork: opts?.switchNetwork ?? (async (id: string) => id as any),
     }
     return conn
   })

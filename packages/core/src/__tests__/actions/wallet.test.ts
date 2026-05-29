@@ -102,6 +102,10 @@ function makeConfigWithWalletClient(opts: {
     getNetworkId: async () => 'mainnet' as const,
     getCapabilities: async () => ({}) as any,
     getProvider: () => null,
+    onAccountChanged: () => {},
+    onConnect: () => {},
+    onDisconnect: () => {},
+    onNetworkChanged: () => {},
   }))
 
   const config = createLaserEyesConfig({
