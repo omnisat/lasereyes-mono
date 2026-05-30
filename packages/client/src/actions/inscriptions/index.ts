@@ -22,12 +22,7 @@ import type {
   InscriptionCapability,
 } from '../../data-source/capabilities'
 import type { SignedPsbt, SignPsbtOptions } from '../../signer/types'
-import type {
-  Inscription,
-  InscriptionInfo,
-  PaginatedResult,
-  PaginationParams,
-} from '../../types'
+import type { Inscription, InscriptionInfo, PaginatedResult, PaginationParams } from '../../types'
 
 // ============================================================================
 // Read action signatures
@@ -49,10 +44,7 @@ export async function getInscriptionInfo<
   Config extends ClientConfig<DS>,
   Actions extends ActionGroup,
   DS extends Pick<InscriptionCapability, 'inscriptionsGetInfo'>,
->(
-  client: Client<Config, DS, Actions>,
-  inscriptionId: string
-): Promise<InscriptionInfo> {
+>(client: Client<Config, DS, Actions>, inscriptionId: string): Promise<InscriptionInfo> {
   return client.config.dataSource.inscriptionsGetInfo(inscriptionId)
 }
 
@@ -60,10 +52,7 @@ export async function batchGetInscriptionInfo<
   Config extends ClientConfig<DS>,
   Actions extends ActionGroup,
   DS extends Pick<InscriptionCapability, 'inscriptionsBatchGetInfo'>,
->(
-  client: Client<Config, DS, Actions>,
-  inscriptionIds: string[]
-): Promise<InscriptionInfo[]> {
+>(client: Client<Config, DS, Actions>, inscriptionIds: string[]): Promise<InscriptionInfo[]> {
   return client.config.dataSource.inscriptionsBatchGetInfo(inscriptionIds)
 }
 

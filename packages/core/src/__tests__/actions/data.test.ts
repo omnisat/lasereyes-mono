@@ -25,10 +25,7 @@ import {
 } from '../../actions/data'
 import { createLaserEyesConfig } from '../../config'
 
-function makeConfig(opts: {
-  mainnetDS: Record<string, any>
-  testnetDS?: Record<string, any>
-}) {
+function makeConfig(opts: { mainnetDS: Record<string, any>; testnetDS?: Record<string, any> }) {
   const mainnet = createChainDataSource({ network: MAINNET }).extend(() => opts.mainnetDS as any)
   const testnet = createChainDataSource({ network: TESTNET }).extend(
     () => (opts.testnetDS ?? {}) as any
@@ -62,9 +59,9 @@ describe('getAddressBalance (core)', () => {
       testnetDS: { btcGetBalance: testnetBalance },
     })
 
-    await expect(
-      getAddressBalance(config, 'bc1qaddr', { chainId: 'testnet' })
-    ).resolves.toBe('testnet')
+    await expect(getAddressBalance(config, 'bc1qaddr', { chainId: 'testnet' })).resolves.toBe(
+      'testnet'
+    )
     expect(testnetBalance).toHaveBeenCalledWith('bc1qaddr')
     expect(mainnetBalance).not.toHaveBeenCalled()
   })

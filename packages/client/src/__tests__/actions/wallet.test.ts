@@ -283,9 +283,9 @@ describe('sendBtc', () => {
       dataSource: { btcGetAddressUtxos, btcBroadcastTransaction },
     })
 
-    await expect(sendBtc(client, { to: 'bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4', amount: 1000 })).resolves.toBe(
-      'final-txid'
-    )
+    await expect(
+      sendBtc(client, { to: 'bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4', amount: 1000 })
+    ).resolves.toBe('final-txid')
 
     // UTXOs for payment address.
     expect(btcGetAddressUtxos).toHaveBeenCalledWith(

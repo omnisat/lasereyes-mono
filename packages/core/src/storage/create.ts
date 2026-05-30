@@ -46,11 +46,11 @@ export interface CreateStorageOptions {
 function createMemoryStorage(): Storage {
   const data = new Map<string, string>()
   return {
-    getItem: (k) => data.get(k) ?? null,
+    getItem: k => data.get(k) ?? null,
     setItem: (k, v) => {
       data.set(k, v)
     },
-    removeItem: (k) => {
+    removeItem: k => {
       data.delete(k)
     },
   }
@@ -75,8 +75,8 @@ export function createStorage(options: CreateStorageOptions = {}): Storage {
       : createMemoryStorage())
 
   return {
-    getItem: (k) => inner.getItem(prefix + k),
+    getItem: k => inner.getItem(prefix + k),
     setItem: (k, v) => inner.setItem(prefix + k, v),
-    removeItem: (k) => inner.removeItem(prefix + k),
+    removeItem: k => inner.removeItem(prefix + k),
   }
 }

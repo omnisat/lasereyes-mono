@@ -57,7 +57,7 @@ export function createReadOnlyAccount(config: ReadOnlyAccountConfig): Account {
     throw new Error('ReadOnlyAccount must have at least one address')
   }
 
-  const hasPayment = addresses.some((a) => a.purpose === 'payment')
+  const hasPayment = addresses.some(a => a.purpose === 'payment')
   if (!hasPayment) {
     throw new Error('ReadOnlyAccount must have a payment address')
   }

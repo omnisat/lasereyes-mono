@@ -42,7 +42,7 @@ export async function initialize<const config extends LaserEyesConfig<any, any, 
   const explicit = [...config.connectors]
   const cleanup = discoverConnectors({
     explicit,
-    onChange: (registry) => {
+    onChange: registry => {
       const next: Record<string, (typeof explicit)[number]> = {}
       for (const [id, connector] of registry) next[id] = connector
       config.state.$connectors.set(next)

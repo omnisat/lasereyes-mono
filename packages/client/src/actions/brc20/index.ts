@@ -15,18 +15,9 @@
 import type { WalletAccount } from '../../account/types'
 import type { Client, ClientConfig } from '../../client/types'
 import type { WalletClient, WalletClientConfig } from '../../client/wallet-types'
-import type {
-  ActionGroup,
-  BaseCapability,
-  Brc20Capability,
-} from '../../data-source/capabilities'
+import type { ActionGroup, BaseCapability, Brc20Capability } from '../../data-source/capabilities'
 import type { SignedPsbt, SignPsbtOptions } from '../../signer/types'
-import type {
-  Brc20Balance,
-  Brc20Info,
-  PaginatedResult,
-  PaginationParams,
-} from '../../types'
+import type { Brc20Balance, Brc20Info, PaginatedResult, PaginationParams } from '../../types'
 
 // ============================================================================
 // Read action signatures
@@ -197,11 +188,7 @@ export type WalletBrc20Actions = {
  * ```
  */
 export function brc20Actions() {
-  return <
-    Config extends ClientConfig<DS>,
-    DS extends Brc20Capability,
-    Actions extends ActionGroup,
-  >(
+  return <Config extends ClientConfig<DS>, DS extends Brc20Capability, Actions extends ActionGroup>(
     client: Client<Config, DS, Actions>
   ): PublicBrc20Actions => ({
     getBrc20Balances: (address: string, pagination?: PaginationParams) =>

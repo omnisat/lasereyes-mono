@@ -684,9 +684,7 @@ describe('Phase 9 — getClient', () => {
     const client = getClient(_typedConfig)
 
     // Imports here exercise the same paths Phase 9 actions use.
-    const { getAddressBalance: clientGetAddressBalance } = await import(
-      '@omnisat/lasereyes-client'
-    )
+    const { getAddressBalance: clientGetAddressBalance } = await import('@omnisat/lasereyes-client')
     expectTypeOf(clientGetAddressBalance(client, 'bc1q…')).resolves.toEqualTypeOf<string>()
   })
 })

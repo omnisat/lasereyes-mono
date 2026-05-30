@@ -63,9 +63,7 @@ export type Client<
    * @param factory - A function that receives the current client and returns new action methods
    * @returns A new client with the additional action methods
    */
-  extend<
-    TNew extends Extension<'config' | 'extend'> & ExactPartial<ExtendableProtectedActions>,
-  >(
+  extend<TNew extends Extension<'config' | 'extend'> & ExactPartial<ExtendableProtectedActions>>(
     factory: (client: Client<Config, dsMethods, clientActions>) => TNew
   ): Client<Config, dsMethods, Prettify<clientActions & TNew>>
 } & clientActions

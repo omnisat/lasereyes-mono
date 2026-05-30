@@ -15,10 +15,7 @@
  */
 
 import type { NetworkId } from '@omnisat/lasereyes-client'
-import {
-  createWalletAccount,
-  type WalletAccountConfig,
-} from '@omnisat/lasereyes-client/wallet'
+import { createWalletAccount, type WalletAccountConfig } from '@omnisat/lasereyes-client/wallet'
 import type { LaserEyesConfig } from '../config'
 import { invalidateClientCache } from '../internal'
 import type { Connector, ConnectResult } from '../types/connector'

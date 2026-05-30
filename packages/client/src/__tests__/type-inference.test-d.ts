@@ -406,8 +406,11 @@ describe('createClient', () => {
 describe('createWalletClient', () => {
   it('walletBtcActions exposes the full base wallet surface', () => {
     const ds = createChainDataSource({ network: MAINNET }).extend(baseCap)
-    const wc = createWalletClient({ network: MAINNET, dataSource: ds, account: walletAccount })
-      .extend(walletBtcActions())
+    const wc = createWalletClient({
+      network: MAINNET,
+      dataSource: ds,
+      account: walletAccount,
+    }).extend(walletBtcActions())
 
     // signing primitives
     expectTypeOf(wc.signPsbt).parameter(0).toEqualTypeOf<string>()
@@ -519,9 +522,7 @@ describe('Direct action calls', () => {
     expectTypeOf(getAccountUtxos(wc, walletAccount, 'ordinals')).resolves.toEqualTypeOf<
       PaginatedResult<UTXO>
     >()
-    expectTypeOf(getAccountUtxos(wc, walletAccount)).resolves.toEqualTypeOf<
-      PaginatedResult<UTXO>
-    >()
+    expectTypeOf(getAccountUtxos(wc, walletAccount)).resolves.toEqualTypeOf<PaginatedResult<UTXO>>()
   })
 
   it('signPsbt(client, psbt, options) reads signer from client.config.signer', () => {

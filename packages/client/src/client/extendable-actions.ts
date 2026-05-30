@@ -31,10 +31,7 @@
  */
 
 import type { PublicBrc20Actions, WalletBrc20Actions } from '../actions/brc20'
-import type {
-  PublicInscriptionActions,
-  WalletInscriptionActions,
-} from '../actions/inscriptions'
+import type { PublicInscriptionActions, WalletInscriptionActions } from '../actions/inscriptions'
 import type { PublicBtcActions } from '../actions/public'
 import type { PublicRuneActions, WalletRuneActions } from '../actions/runes'
 import type { WalletBtcActions } from '../actions/wallet'

@@ -15,11 +15,13 @@
  *     "mempool again after switching networks" bug
  */
 
-import { createChainDataSource, MAINNET, NetworkNotConfiguredError, TESTNET } from '@omnisat/lasereyes-client'
 import {
-  createWalletAccount,
-  type WalletAccount,
-} from '@omnisat/lasereyes-client/wallet'
+  createChainDataSource,
+  MAINNET,
+  NetworkNotConfiguredError,
+  TESTNET,
+} from '@omnisat/lasereyes-client'
+import { createWalletAccount, type WalletAccount } from '@omnisat/lasereyes-client/wallet'
 import { AddressType } from '@omnisat/lasereyes-client/utils'
 import { beforeAll, describe, expect, it, vi } from 'vitest'
 import { connect } from '../../actions/connect'

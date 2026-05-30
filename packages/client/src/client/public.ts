@@ -63,14 +63,8 @@ export function createClient<dsMethods extends ActionGroup>(config: {
         factory: (c: Client<Config, dsMethods, TActions>) => TNew
       ): Client<Config, dsMethods, Prettify<TActions & TNew>> {
         const newActions = factory(client)
-        const merged = { ...actions, ...newActions } as Prettify<
-          TActions & TNew
-        >
-        return buildClient(merged) as Client<
-          Config,
-          dsMethods,
-          Prettify<TActions & TNew>
-        >
+        const merged = { ...actions, ...newActions } as Prettify<TActions & TNew>
+        return buildClient(merged) as Client<Config, dsMethods, Prettify<TActions & TNew>>
       },
       ...(actions as TActions),
     } as Client<Config, dsMethods, TActions>

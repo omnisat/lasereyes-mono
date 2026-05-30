@@ -37,14 +37,16 @@ export type DsMethodsOf<T> = T extends ChainDataSource<infer M> ? M : never
  *
  * @internal
  */
-export type MergedCapabilitiesRaw<T extends readonly ChainDataSource<any>[]> =
-  T extends readonly [infer H, ...infer R]
-    ? R extends readonly ChainDataSource<any>[]
-      ? (H extends ChainDataSource<any> ? DsMethodsOf<H> : {}) & MergedCapabilitiesRaw<R>
-      : H extends ChainDataSource<any>
-        ? DsMethodsOf<H>
-        : {}
-    : {}
+export type MergedCapabilitiesRaw<T extends readonly ChainDataSource<any>[]> = T extends readonly [
+  infer H,
+  ...infer R,
+]
+  ? R extends readonly ChainDataSource<any>[]
+    ? (H extends ChainDataSource<any> ? DsMethodsOf<H> : {}) & MergedCapabilitiesRaw<R>
+    : H extends ChainDataSource<any>
+      ? DsMethodsOf<H>
+      : {}
+  : {}
 
 /**
  * Fold a tuple of {@link ChainDataSource}s into a single, precise

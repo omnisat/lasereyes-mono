@@ -18,11 +18,7 @@
 import type { WalletAccount } from '../../account/types'
 import type { Client, ClientConfig } from '../../client/types'
 import type { WalletClient, WalletClientConfig } from '../../client/wallet-types'
-import type {
-  ActionGroup,
-  BaseCapability,
-  RuneCapability,
-} from '../../data-source/capabilities'
+import type { ActionGroup, BaseCapability, RuneCapability } from '../../data-source/capabilities'
 import type { SignedPsbt, SignPsbtOptions } from '../../signer/types'
 import type {
   OrdOutputWrapper,
@@ -189,11 +185,7 @@ export type WalletRuneActions = {
  * ```
  */
 export function runeActions() {
-  return <
-    Config extends ClientConfig<DS>,
-    DS extends RuneCapability,
-    Actions extends ActionGroup,
-  >(
+  return <Config extends ClientConfig<DS>, DS extends RuneCapability, Actions extends ActionGroup>(
     client: Client<Config, DS, Actions>
   ): PublicRuneActions => ({
     getRuneBalances: (address: string, pagination?: PaginationParams) =>

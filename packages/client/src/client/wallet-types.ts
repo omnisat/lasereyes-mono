@@ -99,9 +99,7 @@ export type WalletClient<
    * @param factory - A function that receives the current client and returns new action methods
    * @returns A new wallet client with the additional action methods
    */
-  extend<
-    TNew extends Extension<'config' | 'extend'> & ExactPartial<ExtendableProtectedActions>,
-  >(
+  extend<TNew extends Extension<'config' | 'extend'> & ExactPartial<ExtendableProtectedActions>>(
     factory: (client: WalletClient<WalletConfig, TAccount, clientActions, dsMethods>) => TNew
   ): WalletClient<WalletConfig, TAccount, Prettify<clientActions & TNew>, dsMethods>
 }

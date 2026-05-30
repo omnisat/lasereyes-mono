@@ -144,10 +144,7 @@ export interface InjectedConnectorOptions {
  */
 function isMethodNotFound(e: unknown): boolean {
   return (
-    typeof e === 'object' &&
-    e !== null &&
-    'code' in e &&
-    (e as { code: unknown }).code === -32601
+    typeof e === 'object' && e !== null && 'code' in e && (e as { code: unknown }).code === -32601
   )
 }
 
@@ -196,9 +193,7 @@ export function injected(target: InjectedConnectorOptions): CreateConnectorFn {
         const a = resolveProvider()
         if (!a) return false
         try {
-          const data = (await a.request('bitcoin_getAccounts')) as
-            | WalletAccountConfig
-            | undefined
+          const data = (await a.request('bitcoin_getAccounts')) as WalletAccountConfig | undefined
           return !!(data && data.addresses && data.addresses.length > 0)
         } catch {
           return false
@@ -314,11 +309,7 @@ export function injected(target: InjectedConnectorOptions): CreateConnectorFn {
                     )) as string
                   } catch (e) {
                     if (!isMethodNotFound(e)) throw e
-                    return getAction(
-                      client,
-                      baseGetAddressBalance,
-                      'getAddressBalance'
-                    )(address)
+                    return getAction(client, baseGetAddressBalance, 'getAddressBalance')(address)
                   }
                 }
               }

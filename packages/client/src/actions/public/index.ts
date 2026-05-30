@@ -17,13 +17,7 @@
 
 import type { Client, ClientConfig } from '../../client/types'
 import type { ActionGroup, BaseCapability } from '../../data-source/capabilities'
-import type {
-  FeeEstimate,
-  PaginatedResult,
-  PaginationParams,
-  Transaction,
-  UTXO,
-} from '../../types'
+import type { FeeEstimate, PaginatedResult, PaginationParams, Transaction, UTXO } from '../../types'
 
 // ============================================================================
 // Strict actions
@@ -162,11 +156,7 @@ export type PublicBtcActions = {
  * ```
  */
 export function publicActions() {
-  return <
-    Config extends ClientConfig<DS>,
-    DS extends BaseCapability,
-    Actions extends ActionGroup,
-  >(
+  return <Config extends ClientConfig<DS>, DS extends BaseCapability, Actions extends ActionGroup>(
     client: Client<Config, DS, Actions>
   ): PublicBtcActions => ({
     getAddressBalance: (address: string) => getAddressBalance(client, address),
