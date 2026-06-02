@@ -18,7 +18,7 @@ import { _clearInitializeCleanup, _getInitializeCleanup } from './initialize'
  *
  * Safe to call without a prior `initialize` (no-op for the listener).
  */
-export function dispose<const config extends LaserEyesConfig<any, any, any>>(config: config): void {
+export function dispose<const config extends LaserEyesConfig>(config: config): void {
   const cleanup = _getInitializeCleanup(config)
   if (cleanup) {
     cleanup()

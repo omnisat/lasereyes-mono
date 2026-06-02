@@ -36,7 +36,7 @@ const cleanups = new WeakMap<object, () => void>()
  * @returns A promise that resolves when initialization completes
  *   (auto-reconnect either succeeded, failed silently, or was skipped).
  */
-export async function initialize<const config extends LaserEyesConfig<any, any, any>>(
+export async function initialize<const config extends LaserEyesConfig>(
   config: config
 ): Promise<void> {
   const explicit = [...config.connectors]

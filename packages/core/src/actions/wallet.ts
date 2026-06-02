@@ -53,7 +53,7 @@ import { getWalletClient } from '../wallet-client'
  *
  * @throws {Error} If no wallet is connected or the user rejects.
  */
-export async function sendBtc<const config extends LaserEyesConfig<any, any, any>>(
+export async function sendBtc<const config extends LaserEyesConfig>(
   config: config,
   to: string,
   amount: number,
@@ -74,7 +74,7 @@ export async function sendBtc<const config extends LaserEyesConfig<any, any, any
  *
  * @throws {Error} If no wallet is connected or the user rejects signing.
  */
-export async function signPsbt<const config extends LaserEyesConfig<any, any, any>>(
+export async function signPsbt<const config extends LaserEyesConfig>(
   config: config,
   psbt: string,
   options?: SignPsbtOptions
@@ -94,7 +94,7 @@ export async function signPsbt<const config extends LaserEyesConfig<any, any, an
  *
  * @throws {Error} If no wallet is connected or the user rejects signing.
  */
-export async function signMessage<const config extends LaserEyesConfig<any, any, any>>(
+export async function signMessage<const config extends LaserEyesConfig>(
   config: config,
   message: string,
   options?: SignMessageOptions
@@ -116,7 +116,7 @@ export async function signMessage<const config extends LaserEyesConfig<any, any,
  *
  * @returns Transaction ID.
  */
-export async function broadcastPsbt<const config extends LaserEyesConfig<any, any, any>>(
+export async function broadcastPsbt<const config extends LaserEyesConfig>(
   config: config,
   psbt: string
 ): Promise<string> {

@@ -50,7 +50,7 @@ import { readCachedClient, resolveChainBackend, writeCachedClient } from './inte
  * @throws {Error} If `chainId` is not in `config.chains`.
  * @throws {Error} If no backend is configured for `chainId`.
  */
-export function getClient<const config extends LaserEyesConfig<any, any, any>>(
+export function getClient<const config extends LaserEyesConfig>(
   config: config,
   options?: { chainId?: config['chains'][number]['id'] }
 ) {

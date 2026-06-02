@@ -75,7 +75,7 @@ export function _clearConnectCleanup(config: object): void {
  * @internal
  */
 function subscribeToConnectorEvents(
-  config: LaserEyesConfig<any, any, any>,
+  config: LaserEyesConfig,
   connector: Connector,
   provider: BitcoinProvider
 ): () => void {
@@ -181,7 +181,7 @@ function subscribeToConnectorEvents(
  * @throws {Error} If `connectorId` is not registered in `state.$connectors`,
  *   or if `connector.connect()` rejects.
  */
-export async function connect<const config extends LaserEyesConfig<any, any, any>>(
+export async function connect<const config extends LaserEyesConfig>(
   config: config,
   args: ConnectArgs
 ): Promise<ConnectResult> {

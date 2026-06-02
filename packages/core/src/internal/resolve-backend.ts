@@ -26,6 +26,12 @@ import type { LaserEyesConfig } from '../config'
  *
  * @throws {Error} If no backend is configured for `chainId`.
  */
+// NOTE: returns `ChainBackend<any>` (not the loose `ChainBackend`). This is
+// the dynamic runtime-routing boundary: the chain is chosen at call time, so
+// the precise capability set isn't known statically here, and `getClient`'s
+// default path feeds this straight into `createClient` (whose result it then
+// casts to `Client<any,…>`). Precisely typing this is the deferred keystone
+// work; it is NOT one of the config-bound `any`s removed in this pass.
 export function resolveChainBackend(config: LaserEyesConfig, chainId?: string): ChainBackend<any> {
   const id = chainId ?? config.state.$connection.get().networkId
   const backend = config.backends[id]

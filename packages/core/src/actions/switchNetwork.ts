@@ -37,7 +37,7 @@ import { invalidateClientCache, resolveConnector } from '../internal'
  *   `switchNetwork` support.
  */
 export async function switchNetwork<
-  const config extends LaserEyesConfig<any, any, any>,
+  const config extends LaserEyesConfig,
   const id extends config['chains'][number]['id'],
 >(
   config: config,

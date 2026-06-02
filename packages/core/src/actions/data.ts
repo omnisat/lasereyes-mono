@@ -76,7 +76,7 @@ import { tryResolveConnector } from '../internal'
  *   provider doesn't support the method OR the request throws.
  */
 async function callProvider<T>(
-  config: LaserEyesConfig<any, any, any>,
+  config: LaserEyesConfig,
   method: string,
   params?: Record<string, unknown>
 ): Promise<T | undefined> {
@@ -112,7 +112,7 @@ async function callProvider<T>(
  * const t4Bal = await getAddressBalance(config, 'bc1q…', { chainId: 'testnet4' })
  * ```
  */
-export async function getAddressBalance<const config extends LaserEyesConfig<any, any, any>>(
+export async function getAddressBalance<const config extends LaserEyesConfig>(
   config: config,
   address: string,
   options?: { chainId?: config['chains'][number]['id'] }
@@ -128,7 +128,7 @@ export async function getAddressBalance<const config extends LaserEyesConfig<any
  * Data-source path. See {@link getAddressBalance} for the wallet-fast-path
  * alternative.
  */
-export async function getAddressUtxos<const config extends LaserEyesConfig<any, any, any>>(
+export async function getAddressUtxos<const config extends LaserEyesConfig>(
   config: config,
   address: string,
   options?: { chainId?: config['chains'][number]['id'] }
@@ -154,7 +154,7 @@ export async function getAddressUtxos<const config extends LaserEyesConfig<any, 
  *   the method. (Once Phase 10's typed wallet keystone lands, the
  *   `inscriptionActions()` factory provides a backend path.)
  */
-export async function getInscriptions<const config extends LaserEyesConfig<any, any, any>>(
+export async function getInscriptions<const config extends LaserEyesConfig>(
   config: config,
   address: string,
   options?: { offset?: number; limit?: number }
@@ -175,7 +175,7 @@ export async function getInscriptions<const config extends LaserEyesConfig<any, 
  * @remarks
  * Provider-only. See {@link getInscriptions} for the rationale.
  */
-export async function getRunesBalances<const config extends LaserEyesConfig<any, any, any>>(
+export async function getRunesBalances<const config extends LaserEyesConfig>(
   config: config,
   address: string
 ): Promise<RuneBalance[]> {
@@ -192,7 +192,7 @@ export async function getRunesBalances<const config extends LaserEyesConfig<any,
  * @remarks
  * Provider-only.
  */
-export async function getBrc20Balances<const config extends LaserEyesConfig<any, any, any>>(
+export async function getBrc20Balances<const config extends LaserEyesConfig>(
   config: config,
   address: string
 ): Promise<Brc20Balance[]> {
@@ -211,7 +211,7 @@ export async function getBrc20Balances<const config extends LaserEyesConfig<any,
  * @remarks
  * Provider-only.
  */
-export async function getAlkanesBalances<const config extends LaserEyesConfig<any, any, any>>(
+export async function getAlkanesBalances<const config extends LaserEyesConfig>(
   config: config,
   address: string
 ): Promise<AlkaneBalance[]> {
@@ -240,7 +240,7 @@ export async function getAlkanesBalances<const config extends LaserEyesConfig<an
  * const t4Fees = await getRecommendedFees(config, { chainId: 'testnet4' })
  * ```
  */
-export async function getRecommendedFees<const config extends LaserEyesConfig<any, any, any>>(
+export async function getRecommendedFees<const config extends LaserEyesConfig>(
   config: config,
   options?: { chainId?: config['chains'][number]['id'] }
 ): Promise<FeeEstimate> {
@@ -261,7 +261,7 @@ export async function getRecommendedFees<const config extends LaserEyesConfig<an
  * const t4Tx = await getTransaction(config, txId, { chainId: 'testnet4' })
  * ```
  */
-export async function getTransaction<const config extends LaserEyesConfig<any, any, any>>(
+export async function getTransaction<const config extends LaserEyesConfig>(
   config: config,
   txId: string,
   options?: { chainId?: config['chains'][number]['id'] }
@@ -279,7 +279,7 @@ export async function getTransaction<const config extends LaserEyesConfig<any, a
  * Optionally pass `{ chainId }` to broadcast on a chain other than the active
  * one. Useful for cross-chain helper flows.
  */
-export async function broadcastTransaction<const config extends LaserEyesConfig<any, any, any>>(
+export async function broadcastTransaction<const config extends LaserEyesConfig>(
   config: config,
   rawTx: string,
   options?: { chainId?: config['chains'][number]['id'] }

@@ -46,7 +46,7 @@ function isWalletClientShape(
  * @internal
  */
 async function buildConnectorClient(
-  config: LaserEyesConfig<any, any, any>,
+  config: LaserEyesConfig,
   bare: Client<any, any, any>
 ): Promise<WalletClient<WalletClientConfig<Account, any>, Account, any, any>> {
   const connector = resolveConnector(config)
@@ -98,7 +98,7 @@ async function buildConnectorClient(
  * @throws {Error} If the active connector has no provider.
  * @throws {NetworkNotConfiguredError} If `chainId` is not in `config.chains`.
  */
-export async function getWalletClient<const config extends LaserEyesConfig<any, any, any>>(
+export async function getWalletClient<const config extends LaserEyesConfig>(
   config: config,
   options?: { chainId?: config['chains'][number]['id'] }
 ): Promise<WalletClient<WalletClientConfig<Account, any>, Account, any, any>> {

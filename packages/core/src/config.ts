@@ -51,6 +51,10 @@ import type { Connector, CreateConnectorFn } from './types/connector'
  */
 export type ClientFactory = (params: {
   chain: ChainNetwork
+  // `<any>` is load-bearing here: this is the user escape hatch, and the
+  // supplied factory typically forwards `backend` into `createClient` /
+  // `createWalletClient`, which infer the capability set from it. A narrower
+  // type would erase those caps. Separate concern from the keystone returns.
   backend: ChainBackend<any>
 }) => Client<any, any, any>
 
@@ -94,8 +98,14 @@ export type NetworkBackends<
  * The fully-resolved config produced by {@link createLaserEyesConfig}.
  *
  * @typeParam chains - The tuple of chains this config knows about.
- * @typeParam backends - The per-chain backend map. Each chain ID maps to a
- *   single `ChainBackend` (compose several via `combineBackends`).
+ * @typeParam backends - The **resolved** per-chain backend map (`{ [id]:
+ *   ChainBackend }`). This is the value the config holds, not the factory
+ *   inputs — those live on {@link CreateLaserEyesConfigOptions}. It defaults
+ *   to the loose `Record<string, ChainBackend>` (the widest backend — every
+ *   `ChainBackend<caps>` is assignable to it) so that bare `LaserEyesConfig`
+ *   (no type args) is a permissive supertype usable as a generic bound; a
+ *   concrete config from {@link createLaserEyesConfig} instantiates it with
+ *   the precise, chain-id-keyed map.
  * @typeParam connectorFns - The connector factory identities, preserved so
  *   downstream consumers can refer back to specific connectors.
  */
@@ -104,7 +114,7 @@ export interface LaserEyesConfig<
     ChainNetwork,
     ...ChainNetwork[],
   ],
-  backends extends NetworkBackendsParams<chains> = NetworkBackendsParams<chains>,
+  backends extends Readonly<Record<string, ChainBackend>> = Readonly<Record<string, ChainBackend>>,
   connectorFns extends readonly CreateConnectorFn[] = readonly CreateConnectorFn[],
 > {
   /** Bitcoin chains this config knows about, in declaration order. */
@@ -113,8 +123,8 @@ export interface LaserEyesConfig<
   readonly connectorFns: connectorFns
   /** Connectors instantiated from `connectorFns`, indexed in declaration order. */
   readonly connectors: readonly Connector[]
-  /** Per-network backend — the resolved backend for each chain. */
-  readonly backends: NetworkBackends<chains, backends>
+  /** Per-network resolved backend, keyed by chain ID. */
+  readonly backends: backends
   /** Reactive state atoms. */
   readonly state: LaserEyesState
   /** Persisted-state storage. */
@@ -241,7 +251,7 @@ export function createLaserEyesConfig<
   const connectorFns extends readonly CreateConnectorFn[] = readonly [],
 >(
   opts: CreateLaserEyesConfigOptions<chains, backends, connectorFns>
-): LaserEyesConfig<chains, backends, connectorFns> {
+): LaserEyesConfig<chains, NetworkBackends<chains, backends>, connectorFns> {
   const chains = opts.chains
   const defaultChain = chains[0]
   const state = createState(defaultChain.id)

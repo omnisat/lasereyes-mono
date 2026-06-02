@@ -105,7 +105,7 @@ import { loadTokeoWalletAdapter, type TokeoAdapter } from '../adapters/tokeo'
 import { loadUnisatWalletAdapter, type UnisatAdapter } from '../adapters/unisat'
 import type { XverseAdapter } from '../adapters/xverse'
 // — Config + state —
-import { createLaserEyesConfig, type NetworkBackendsParams } from '../config'
+import { createLaserEyesConfig, type LaserEyesConfig, type NetworkBackendsParams } from '../config'
 // — Connectors —
 import { createConnector } from '../connectors/create'
 import { type InjectedConnectorOptions, injected } from '../connectors/injected'
@@ -517,21 +517,38 @@ describe('createLaserEyesConfig', () => {
     expectTypeOf<EmptyChains extends ValidChains ? true : false>().toEqualTypeOf<false>()
   })
 
-  // NOTE on the default-generic form:
-  //
-  // Earlier drafts of this contract included a test asserting that a typed
-  // `LaserEyesConfig<chains, backends, connectorFns>` is assignable to
-  // the default-generic `LaserEyesConfig` (no type args). That test failed
-  // — and correctly so. The default-generic `backends` resolves to
-  // `Record<NetworkId, readonly ChainBackend<any>[]>` which requires
-  // ALL 8 chain IDs as keys; a typed config with just `mainnet` + `testnet4`
-  // doesn't satisfy that.
-  //
-  // wagmi has the same shape and handles it the same way: Phase 9 actions
-  // are generic over the config (`<config extends LaserEyesConfig<any, any,
-  // any>>(args: { config: config; ... })`) rather than taking the default-
-  // generic form. The default-generic `LaserEyesConfig` is for hover /
-  // documentation; it's not a parameter type that accepts arbitrary configs.
+  it('a typed config is assignable to bare `LaserEyesConfig` (the action bound)', () => {
+    const config = createLaserEyesConfig({
+      chains: [MAINNET, TESTNET4],
+      backends: { mainnet: memMainnet, testnet4: memTestnet4 },
+    })
+
+    // `LaserEyesConfig` is parameterized by the RESOLVED backend map with a
+    // loose `Record<string, ChainBackend>` default, so bare `LaserEyesConfig`
+    // is a permissive supertype that accepts a subset-chain config. This is
+    // what lets every action use `<const config extends LaserEyesConfig>` —
+    // no `LaserEyesConfig<any, any, any>` needed.
+    //
+    // (Pre-fix this failed: the default `backends` field was an all-NetworkId
+    // -keys map, so a config with only mainnet + testnet4 wasn't assignable.)
+    expectTypeOf(config).toMatchTypeOf<LaserEyesConfig>()
+
+    function actionBound<const C extends LaserEyesConfig>(c: C): C {
+      return c
+    }
+    actionBound(config)
+  })
+
+  it('keeps precise per-chain backend caps on the resolved config', () => {
+    const config = createLaserEyesConfig({
+      chains: [MAINNET],
+      backends: { mainnet: memMainnet },
+    })
+    // The loose default applies only to bare `LaserEyesConfig`; a concrete
+    // config keeps each backend's precise capability set, so the
+    // BaseCapability method is reachable.
+    expectTypeOf(config.backends.mainnet.btcGetBalance).toBeFunction()
+  })
 })
 
 describe('NetworkBackends', () => {
@@ -583,17 +600,17 @@ declare const _looseConfig: ReturnType<typeof createLaserEyesConfig>
 
 describe('Phase 9 — Lifecycle actions', () => {
   it('initialize: (config) => Promise<void>', () => {
-    expectTypeOf(initialize).parameter(0).toMatchTypeOf<typeof _typedConfig>()
+    expectTypeOf(_typedConfig).toMatchTypeOf<Parameters<typeof initialize>[0]>()
     expectTypeOf(initialize(_typedConfig)).resolves.toEqualTypeOf<void>()
   })
 
   it('dispose: (config) => void (sync)', () => {
-    expectTypeOf(dispose).parameter(0).toMatchTypeOf<typeof _typedConfig>()
+    expectTypeOf(_typedConfig).toMatchTypeOf<Parameters<typeof dispose>[0]>()
     expectTypeOf(dispose(_typedConfig)).toEqualTypeOf<void>()
   })
 
   it('connect: (config, { connectorId }) => Promise<ConnectResult>', () => {
-    expectTypeOf(connect).parameter(0).toMatchTypeOf<typeof _typedConfig>()
+    expectTypeOf(_typedConfig).toMatchTypeOf<Parameters<typeof connect>[0]>()
     expectTypeOf(connect).parameter(1).toEqualTypeOf<ConnectArgs>()
     expectTypeOf<ConnectArgs>().toEqualTypeOf<{ connectorId: string }>()
     expectTypeOf(connect(_typedConfig, { connectorId: 'unisat' })).resolves.toMatchTypeOf<{
@@ -603,7 +620,7 @@ describe('Phase 9 — Lifecycle actions', () => {
   })
 
   it('disconnect: (config) => Promise<void>', () => {
-    expectTypeOf(disconnect).parameter(0).toMatchTypeOf<typeof _typedConfig>()
+    expectTypeOf(_typedConfig).toMatchTypeOf<Parameters<typeof disconnect>[0]>()
     expectTypeOf(disconnect(_typedConfig)).resolves.toEqualTypeOf<void>()
   })
 
@@ -772,13 +789,13 @@ describe('Phase 10 — getWalletClient', () => {
 
 describe('Phase 9 — Read actions (provider-first, client-fallback)', () => {
   it('getAddressBalance: (config, address) => Promise<string>', () => {
-    expectTypeOf(getAddressBalance).parameter(0).toMatchTypeOf<typeof _typedConfig>()
+    expectTypeOf(_typedConfig).toMatchTypeOf<Parameters<typeof getAddressBalance>[0]>()
     expectTypeOf(getAddressBalance).parameter(1).toEqualTypeOf<string>()
     expectTypeOf(getAddressBalance(_typedConfig, 'bc1q…')).resolves.toEqualTypeOf<string>()
   })
 
   it('getAddressUtxos: (config, address) => Promise<PaginatedResult<UTXO>>', () => {
-    expectTypeOf(getAddressUtxos).parameter(0).toMatchTypeOf<typeof _typedConfig>()
+    expectTypeOf(_typedConfig).toMatchTypeOf<Parameters<typeof getAddressUtxos>[0]>()
     expectTypeOf(getAddressUtxos).parameter(1).toEqualTypeOf<string>()
     expectTypeOf(getAddressUtxos(_typedConfig, 'bc1q…')).resolves.toEqualTypeOf<
       PaginatedResult<UTXO>
@@ -788,7 +805,7 @@ describe('Phase 9 — Read actions (provider-first, client-fallback)', () => {
 
 describe('Phase 9 — Read actions (provider-only protocol reads)', () => {
   it('getInscriptions: (config, address, options?) => Promise<Inscription[]>', () => {
-    expectTypeOf(getInscriptions).parameter(0).toMatchTypeOf<typeof _typedConfig>()
+    expectTypeOf(_typedConfig).toMatchTypeOf<Parameters<typeof getInscriptions>[0]>()
     expectTypeOf(getInscriptions).parameter(1).toEqualTypeOf<string>()
     expectTypeOf(getInscriptions)
       .parameter(2)
@@ -797,19 +814,19 @@ describe('Phase 9 — Read actions (provider-only protocol reads)', () => {
   })
 
   it('getRunesBalances: (config, address) => Promise<RuneBalance[]>', () => {
-    expectTypeOf(getRunesBalances).parameter(0).toMatchTypeOf<typeof _typedConfig>()
+    expectTypeOf(_typedConfig).toMatchTypeOf<Parameters<typeof getRunesBalances>[0]>()
     expectTypeOf(getRunesBalances).parameter(1).toEqualTypeOf<string>()
     expectTypeOf(getRunesBalances(_typedConfig, 'bc1p…')).resolves.toEqualTypeOf<RuneBalance[]>()
   })
 
   it('getBrc20Balances: (config, address) => Promise<Brc20Balance[]>', () => {
-    expectTypeOf(getBrc20Balances).parameter(0).toMatchTypeOf<typeof _typedConfig>()
+    expectTypeOf(_typedConfig).toMatchTypeOf<Parameters<typeof getBrc20Balances>[0]>()
     expectTypeOf(getBrc20Balances).parameter(1).toEqualTypeOf<string>()
     expectTypeOf(getBrc20Balances(_typedConfig, 'bc1p…')).resolves.toEqualTypeOf<Brc20Balance[]>()
   })
 
   it('getAlkanesBalances: (config, address) => Promise<AlkaneBalance[]>', () => {
-    expectTypeOf(getAlkanesBalances).parameter(0).toMatchTypeOf<typeof _typedConfig>()
+    expectTypeOf(_typedConfig).toMatchTypeOf<Parameters<typeof getAlkanesBalances>[0]>()
     expectTypeOf(getAlkanesBalances).parameter(1).toEqualTypeOf<string>()
     expectTypeOf(getAlkanesBalances(_typedConfig, 'bc1p…')).resolves.toEqualTypeOf<
       AlkaneBalance[]
@@ -819,7 +836,7 @@ describe('Phase 9 — Read actions (provider-only protocol reads)', () => {
 
 describe('Phase 9 — Read actions (client-only)', () => {
   it('getRecommendedFees: (config, options?) => Promise<FeeEstimate>', () => {
-    expectTypeOf(getRecommendedFees).parameter(0).toMatchTypeOf<typeof _typedConfig>()
+    expectTypeOf(_typedConfig).toMatchTypeOf<Parameters<typeof getRecommendedFees>[0]>()
     expectTypeOf(getRecommendedFees(_typedConfig)).resolves.toEqualTypeOf<FeeEstimate>()
     // Optional chainId, narrowed to config chains
     expectTypeOf(
@@ -828,7 +845,7 @@ describe('Phase 9 — Read actions (client-only)', () => {
   })
 
   it('getTransaction: (config, txId, options?) => Promise<Transaction>', () => {
-    expectTypeOf(getTransaction).parameter(0).toMatchTypeOf<typeof _typedConfig>()
+    expectTypeOf(_typedConfig).toMatchTypeOf<Parameters<typeof getTransaction>[0]>()
     expectTypeOf(getTransaction).parameter(1).toEqualTypeOf<string>()
     expectTypeOf(getTransaction(_typedConfig, 'abc…')).resolves.toEqualTypeOf<Transaction>()
     expectTypeOf(
@@ -837,7 +854,7 @@ describe('Phase 9 — Read actions (client-only)', () => {
   })
 
   it('broadcastTransaction: (config, rawTx, options?) => Promise<string>', () => {
-    expectTypeOf(broadcastTransaction).parameter(0).toMatchTypeOf<typeof _typedConfig>()
+    expectTypeOf(_typedConfig).toMatchTypeOf<Parameters<typeof broadcastTransaction>[0]>()
     expectTypeOf(broadcastTransaction).parameter(1).toEqualTypeOf<string>()
     expectTypeOf(broadcastTransaction(_typedConfig, '02…')).resolves.toEqualTypeOf<string>()
     expectTypeOf(
@@ -878,28 +895,28 @@ describe('Phase 9 — Read actions (client-only)', () => {
 
 describe('Phase 9 — Wallet (write) actions', () => {
   it('sendBtc: (config, to, amount) => Promise<string>', () => {
-    expectTypeOf(sendBtc).parameter(0).toMatchTypeOf<typeof _typedConfig>()
+    expectTypeOf(_typedConfig).toMatchTypeOf<Parameters<typeof sendBtc>[0]>()
     expectTypeOf(sendBtc).parameter(1).toEqualTypeOf<string>()
     expectTypeOf(sendBtc).parameter(2).toEqualTypeOf<number>()
     expectTypeOf(sendBtc(_typedConfig, 'bc1q…', 10000)).resolves.toEqualTypeOf<string>()
   })
 
   it('signPsbt: (config, psbt, options?) => Promise<SignedPsbt>', () => {
-    expectTypeOf(signPsbt).parameter(0).toMatchTypeOf<typeof _typedConfig>()
+    expectTypeOf(_typedConfig).toMatchTypeOf<Parameters<typeof signPsbt>[0]>()
     expectTypeOf(signPsbt).parameter(1).toEqualTypeOf<string>()
     expectTypeOf(signPsbt).parameter(2).toEqualTypeOf<SignPsbtOptions | undefined>()
     expectTypeOf(signPsbt(_typedConfig, 'psbthex')).resolves.toEqualTypeOf<SignedPsbt>()
   })
 
   it('signMessage: (config, message, options?) => Promise<string>', () => {
-    expectTypeOf(signMessage).parameter(0).toMatchTypeOf<typeof _typedConfig>()
+    expectTypeOf(_typedConfig).toMatchTypeOf<Parameters<typeof signMessage>[0]>()
     expectTypeOf(signMessage).parameter(1).toEqualTypeOf<string>()
     expectTypeOf(signMessage).parameter(2).toEqualTypeOf<SignMessageOptions | undefined>()
     expectTypeOf(signMessage(_typedConfig, 'hello')).resolves.toEqualTypeOf<string>()
   })
 
   it('broadcastPsbt: (config, psbt) => Promise<string>', () => {
-    expectTypeOf(broadcastPsbt).parameter(0).toMatchTypeOf<typeof _typedConfig>()
+    expectTypeOf(_typedConfig).toMatchTypeOf<Parameters<typeof broadcastPsbt>[0]>()
     expectTypeOf(broadcastPsbt).parameter(1).toEqualTypeOf<string>()
     expectTypeOf(broadcastPsbt(_typedConfig, 'psbthex')).resolves.toEqualTypeOf<string>()
   })

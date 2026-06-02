@@ -20,7 +20,7 @@ import { _clearConnectCleanup, _getConnectCleanup } from './connect'
  * - Removes the persisted connector ID from storage.
  * - Idempotent — calling on an already-disconnected config is a no-op.
  */
-export async function disconnect<const config extends LaserEyesConfig<any, any, any>>(
+export async function disconnect<const config extends LaserEyesConfig>(
   config: config
 ): Promise<void> {
   // Tear down event subscriptions first — once we clear the connector,
