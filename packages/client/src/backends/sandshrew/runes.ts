@@ -1,10 +1,10 @@
 /**
  * Sandshrew {@link RuneCapability} implementation.
  *
- * @module vendors/sandshrew/runes
+ * @module backends/sandshrew/runes
  */
 
-import type { RuneCapability } from '../../backend/capabilities'
+import type { RuneCapability } from '../../backends/capabilities'
 import type {
   ChainBackendContext,
   OrdOutputWrapper,

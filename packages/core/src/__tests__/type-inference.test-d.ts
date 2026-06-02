@@ -57,8 +57,8 @@ import {
   ProviderRpcError,
   TESTNET4,
 } from '@omnisat/lasereyes-client'
-import type { mempool } from '@omnisat/lasereyes-client/vendors/mempool'
-import type { sandshrew } from '@omnisat/lasereyes-client/vendors/sandshrew'
+import type { mempool } from '@omnisat/lasereyes-client/backends/mempool'
+import type { sandshrew } from '@omnisat/lasereyes-client/backends/sandshrew'
 import type {
   Account,
   SignedPsbt,

@@ -85,8 +85,8 @@ For applications that don't use the React layer, build data sources directly:
 
 ```ts
 import { createChainDataSource, mergeDataSources, MAINNET } from '@omnisat/lasereyes-client'
-import { createDataSource as createMempoolDS } from '@omnisat/lasereyes-client/vendors/mempool'
-import { createDataSource as createSandshrewDS } from '@omnisat/lasereyes-client/vendors/sandshrew'
+import { createDataSource as createMempoolDS } from '@omnisat/lasereyes-client/backends/mempool'
+import { createDataSource as createSandshrewDS } from '@omnisat/lasereyes-client/backends/sandshrew'
 
 const mempool = createMempoolDS({ network: MAINNET })
 const sandshrew = createSandshrewDS({

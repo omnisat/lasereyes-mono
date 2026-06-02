@@ -1,7 +1,7 @@
 /**
  * Maestro vendor configuration.
  *
- * @module vendors/maestro/config
+ * @module backends/maestro/config
  */
 
 /**

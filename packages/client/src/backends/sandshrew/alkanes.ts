@@ -1,10 +1,10 @@
 /**
  * Sandshrew {@link AlkaneCapability} implementation.
  *
- * @module vendors/sandshrew/alkanes
+ * @module backends/sandshrew/alkanes
  */
 
-import type { AlkaneCapability } from '../../backend/capabilities'
+import type { AlkaneCapability } from '../../backends/capabilities'
 import { ChainBackendError } from '../../errors'
 import { bytesToHex, hexToBytes } from '../../lib/bytes'
 import type {

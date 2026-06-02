@@ -11,7 +11,7 @@ Use `createChainDataSource` to create a base data source, then `.extend()` to ad
 
 ```ts
 import { createChainDataSource, MAINNET } from '@omnisat/lasereyes-client'
-import { baseCapabilities } from '@omnisat/lasereyes-client/vendors/mempool'
+import { baseCapabilities } from '@omnisat/lasereyes-client/backends/mempool'
 
 const dataSource = createChainDataSource({ network: MAINNET })
   .extend(baseCapabilities({ apiUrl: 'https://mempool.space/api' }))
@@ -24,7 +24,7 @@ Each `.extend()` call adds new methods to the data source while preserving exist
 For convenience, each vendor provides a `createDataSource` factory that pre-configures all available capabilities:
 
 ```ts
-import { createDataSource } from '@omnisat/lasereyes-client/vendors/sandshrew'
+import { createDataSource } from '@omnisat/lasereyes-client/backends/sandshrew'
 
 const ds = createDataSource({
   network: 'mainnet',

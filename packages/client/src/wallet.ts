@@ -25,7 +25,7 @@
  *   createWalletClient, createWalletAccount,
  *   walletBtcActions, providerSigner,
  * } from '@omnisat/lasereyes-client/wallet'
- * import { createBackend } from '@omnisat/lasereyes-client/vendors/mempool'
+ * import { createBackend } from '@omnisat/lasereyes-client/backends/mempool'
  * import { MAINNET, AddressType } from '@omnisat/lasereyes-client'
  *
  * const account = createWalletAccount({

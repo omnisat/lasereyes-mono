@@ -18,5 +18,5 @@ export {
   transferBrc20,
   type WalletBrc20Actions,
 } from './actions/brc20'
-export type { Brc20Capability } from './backend/capabilities'
+export type { Brc20Capability } from './backends/capabilities'
 export type { Brc20Balance, Brc20Info } from './types/brc20'

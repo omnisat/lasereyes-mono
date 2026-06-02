@@ -1,10 +1,10 @@
 /**
  * Sandshrew {@link InscriptionCapability} implementation.
  *
- * @module vendors/sandshrew/inscriptions
+ * @module backends/sandshrew/inscriptions
  */
 
-import type { InscriptionCapability } from '../../backend/capabilities'
+import type { InscriptionCapability } from '../../backends/capabilities'
 import type {
   ChainBackendContext,
   Inscription,

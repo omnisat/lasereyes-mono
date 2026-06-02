@@ -1,10 +1,10 @@
 /**
  * Sandshrew {@link OrdCapability} implementation.
  *
- * @module vendors/sandshrew/ord
+ * @module backends/sandshrew/ord
  */
 
-import type { OrdAddressInfo, OrdCapability } from '../../backend/capabilities'
+import type { OrdAddressInfo, OrdCapability } from '../../backends/capabilities'
 import type {
   ChainBackendContext,
   FormattedUTXO,

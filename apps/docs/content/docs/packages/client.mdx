@@ -13,7 +13,7 @@ Create a data source and extend it with capabilities:
 
 ```ts
 import { createChainDataSource, MAINNET } from '@omnisat/lasereyes-client'
-import { baseCapabilities } from '@omnisat/lasereyes-client/vendors/mempool'
+import { baseCapabilities } from '@omnisat/lasereyes-client/backends/mempool'
 
 const ds = createChainDataSource({ network: MAINNET })
   .extend(baseCapabilities({ apiUrl: 'https://mempool.space/api' }))
@@ -27,7 +27,7 @@ const fees = await ds.getRecommendedFees()
 Pre-configured data source builders:
 
 ```ts
-import { createDataSource } from '@omnisat/lasereyes-client/vendors/sandshrew'
+import { createDataSource } from '@omnisat/lasereyes-client/backends/sandshrew'
 
 const ds = createDataSource({
   network: 'mainnet',
@@ -63,9 +63,9 @@ const psbt = await client.sendBtc({
 
 ```ts
 import { ... } from '@omnisat/lasereyes-client'              // Core types & functions
-import { ... } from '@omnisat/lasereyes-client/vendors/mempool'    // Mempool vendor
-import { ... } from '@omnisat/lasereyes-client/vendors/sandshrew'  // Sandshrew vendor
-import { ... } from '@omnisat/lasereyes-client/vendors/maestro'    // Maestro vendor
+import { ... } from '@omnisat/lasereyes-client/backends/mempool'    // Mempool vendor
+import { ... } from '@omnisat/lasereyes-client/backends/sandshrew'  // Sandshrew vendor
+import { ... } from '@omnisat/lasereyes-client/backends/maestro'    // Maestro vendor
 ```
 
 ## Error Classes

@@ -12,19 +12,19 @@
  * For comprehensive coverage, merge with sandshrew via
  * {@link mergeChainBackends}.
  *
- * @module vendors/maestro
+ * @module backends/maestro
  */
 
-import type { ChainBackendFactory } from '../../backend'
+import type { ChainNetwork, NetworkId } from '../../chains'
+import type { ChainBackend } from '../../types/backend'
 import type {
   BaseCapability,
   Brc20Capability,
   InscriptionCapability,
   RuneCapability,
-} from '../../backend/capabilities'
-import { createChainBackend } from '../../backend/create'
-import type { ChainNetwork, NetworkId } from '../../chains'
-import type { ChainBackend } from '../../types/backend'
+} from '../capabilities'
+import { createChainBackend } from '../create'
+import type { ChainBackendFactory } from '../factory'
 import { baseCapabilities } from './base'
 import { brc20Capabilities } from './brc20'
 import type { MaestroConfig } from './config'
@@ -62,7 +62,7 @@ type MaestroCapabilities = Prettify<
  *
  * @example
  * ```ts
- * import { createBackend } from '@omnisat/lasereyes-client/vendors/maestro'
+ * import { createBackend } from '@omnisat/lasereyes-client/backends/maestro'
  * import { MAINNET } from '@omnisat/lasereyes-client'
  *
  * const ds = createBackend({
@@ -106,7 +106,7 @@ export function createBackend(
  *
  * @example
  * ```ts
- * import { maestro } from '@omnisat/lasereyes-client/vendors/maestro'
+ * import { maestro } from '@omnisat/lasereyes-client/backends/maestro'
  *
  * createLaserEyesConfig({
  *   chains: [MAINNET],

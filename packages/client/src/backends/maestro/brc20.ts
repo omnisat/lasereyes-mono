@@ -1,10 +1,10 @@
 /**
  * Maestro {@link Brc20Capability} implementation.
  *
- * @module vendors/maestro/brc20
+ * @module backends/maestro/brc20
  */
 
-import type { Brc20Capability } from '../../backend/capabilities'
+import type { Brc20Capability } from '../../backends/capabilities'
 import type {
   Brc20Balance,
   Brc20Info,

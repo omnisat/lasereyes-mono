@@ -11,7 +11,7 @@
  *   ({@link BaseCapability}, {@link OrdCapability}, {@link InscriptionCapability},
  *   {@link RuneCapability}, {@link Brc20Capability}, {@link AlkaneCapability}).
  *
- * @module backend
+ * @module backends/primitives
  */
 
 export type {

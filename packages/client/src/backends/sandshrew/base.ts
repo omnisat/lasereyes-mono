@@ -1,10 +1,10 @@
 /**
  * Sandshrew {@link BaseCapability} implementation.
  *
- * @module vendors/sandshrew/base
+ * @module backends/sandshrew/base
  */
 
-import type { BaseCapability } from '../../backend/capabilities'
+import type { BaseCapability } from '../../backends/capabilities'
 import { bytesToHex } from '../../lib/bytes'
 import { getAddressScriptPubKey } from '../../lib/get-address-script-pub-key'
 import type {

@@ -1,7 +1,7 @@
 /**
  * Shared internal helpers for the maestro vendor.
  *
- * @module vendors/maestro/shared
+ * @module backends/maestro/shared
  * @internal
  */
 

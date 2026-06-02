@@ -17,7 +17,7 @@ export {
   sendRune,
   type WalletRuneActions,
 } from './actions/runes'
-export type { RuneCapability } from './backend/capabilities'
+export type { RuneCapability } from './backends/capabilities'
 export type {
   OrdOutput,
   OrdOutputWrapper,

@@ -64,12 +64,6 @@ import {
   signPsbt,
   walletBtcActions,
 } from '../actions/wallet'
-import {
-  type ChainBackendFactory,
-  combineBackends,
-  createChainBackend,
-  mergeChainBackends,
-} from '../backend'
 import type {
   AlkaneCapability,
   BaseCapability,
@@ -77,8 +71,17 @@ import type {
   InscriptionCapability,
   OrdCapability,
   RuneCapability,
-} from '../backend/capabilities'
-import type { ChainBackendMethodsOf, MergedCapabilities } from '../backend/merged'
+} from '../backends/capabilities'
+import { createBackend as createMaestroBackend, maestro } from '../backends/maestro'
+import { createBackend as createMempoolBackend, mempool } from '../backends/mempool'
+import type { ChainBackendMethodsOf, MergedCapabilities } from '../backends/merged'
+import {
+  type ChainBackendFactory,
+  combineBackends,
+  createChainBackend,
+  mergeChainBackends,
+} from '../backends/primitives'
+import { createBackend as createSandshrewBackend, sandshrew } from '../backends/sandshrew'
 import { type ChainNetwork, MAINNET, type NetworkId, type NetworkType } from '../chains'
 import { createClient } from '../client'
 import type { Client, ClientConfig } from '../client/types'
@@ -108,9 +111,6 @@ import type {
   UTXO,
 } from '../types'
 import { AddressType } from '../types/psbt'
-import { createBackend as createMaestroBackend, maestro } from '../vendors/maestro'
-import { createBackend as createMempoolBackend, mempool } from '../vendors/mempool'
-import { createBackend as createSandshrewBackend, sandshrew } from '../vendors/sandshrew'
 
 // ============================================================================
 // Fixtures (declared, never executed)

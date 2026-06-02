@@ -4,7 +4,7 @@
  * @remarks
  * For account-aware operations (wallet client, signing, send-btc) import
  * from the `/wallet` subpath. Protocol actions live at `/runes`, `/brc20`,
- * `/inscriptions`. Vendor backends live at `/vendors/<name>`.
+ * `/inscriptions`. Vendor backends live at `/backends/<name>`.
  *
  * @module @omnisat/lasereyes-client
  */
@@ -27,13 +27,13 @@ export type {
   ChainBackendFactory,
   ChainBackendMethodsOf,
   MergedCapabilities,
-} from './backend'
+} from './backends/primitives'
 // Backends
 export {
   combineBackends,
   createChainBackend,
   mergeChainBackends,
-} from './backend'
+} from './backends/primitives'
 export type { ChainNetwork, NetworkId, NetworkType } from './chains'
 // Chains
 export {

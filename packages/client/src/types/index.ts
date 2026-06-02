@@ -2,7 +2,7 @@
 // convenience: most action code imports `Account` / `WalletAccount` /
 // `AddressInfo` together with `WalletClient` and friends.
 export type { Account, AddressInfo, AddressPurpose, WalletAccount } from '../account/types'
-// Capability interfaces and ActionGroup live in `../backend/capabilities`
+// Capability interfaces and ActionGroup live in `../backends/capabilities`
 // but are re-exported here for action-code convenience.
 export type {
   ActionGroup,
@@ -13,7 +13,7 @@ export type {
   OrdAddressInfo,
   OrdCapability,
   RuneCapability,
-} from '../backend/capabilities'
+} from '../backends/capabilities'
 // Client and wallet-client types live in `../client/{types,wallet-types}` and
 // are re-exported here for action-code convenience.
 export type { Client, ClientConfig } from '../client/types'

@@ -1,7 +1,7 @@
-import type { ChainBackendFactory } from '../../backend'
-import { createChainBackend } from '../../backend'
 import type { ChainNetwork, NetworkId } from '../../chains'
 import type { BaseCapability, ChainBackend } from '../../types'
+import { createChainBackend } from '../create'
+import type { ChainBackendFactory } from '../factory'
 import { baseCapabilities } from './base'
 import type { MempoolConfig } from './config'
 
@@ -24,7 +24,7 @@ export type { MempoolConfig } from './config'
  *
  * @example
  * ```ts
- * import { createBackend } from '@omnisat/lasereyes-client/vendors/mempool'
+ * import { createBackend } from '@omnisat/lasereyes-client/backends/mempool'
  *
  * const ds = createBackend({ network: 'mainnet' })
  * const balance = await ds.btcGetBalance('bc1q...')
@@ -57,7 +57,7 @@ export function createBackend(
  *
  * @example
  * ```ts
- * import { mempool } from '@omnisat/lasereyes-client/vendors/mempool'
+ * import { mempool } from '@omnisat/lasereyes-client/backends/mempool'
  *
  * createLaserEyesConfig({
  *   chains: [MAINNET],

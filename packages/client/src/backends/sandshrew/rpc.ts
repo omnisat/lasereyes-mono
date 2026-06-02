@@ -1,7 +1,7 @@
 /**
  * Sandshrew JSON-RPC client (internal).
  *
- * @module vendors/sandshrew/rpc
+ * @module backends/sandshrew/rpc
  * @internal
  */
 

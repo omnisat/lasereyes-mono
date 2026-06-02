@@ -21,17 +21,18 @@ export default defineConfig({
         'runes/index': resolve(__dirname, 'src/runes.ts'),
         'brc20/index': resolve(__dirname, 'src/brc20.ts'),
         'inscriptions/index': resolve(__dirname, 'src/inscriptions.ts'),
-        'vendors/mempool/index': resolve(
+        'backends/index': resolve(__dirname, 'src/backends/index.ts'),
+        'backends/mempool/index': resolve(
           __dirname,
-          'src/vendors/mempool/index.ts'
+          'src/backends/mempool/index.ts'
         ),
-        'vendors/sandshrew/index': resolve(
+        'backends/sandshrew/index': resolve(
           __dirname,
-          'src/vendors/sandshrew/index.ts'
+          'src/backends/sandshrew/index.ts'
         ),
-        'vendors/maestro/index': resolve(
+        'backends/maestro/index': resolve(
           __dirname,
-          'src/vendors/maestro/index.ts'
+          'src/backends/maestro/index.ts'
         ),
       },
       formats: ['es'],

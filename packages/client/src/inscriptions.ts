@@ -17,5 +17,5 @@ export {
   sendInscription,
   type WalletInscriptionActions,
 } from './actions/inscriptions'
-export type { InscriptionCapability } from './backend/capabilities'
+export type { InscriptionCapability } from './backends/capabilities'
 export type { Inscription, InscriptionInfo } from './types/inscription'

@@ -1,7 +1,7 @@
 /**
  * Shared internal helpers for the sandshrew vendor.
  *
- * @module vendors/sandshrew/shared
+ * @module backends/sandshrew/shared
  * @internal
  */
 

@@ -5,7 +5,7 @@
  */
 
 import { describe, expect, it } from 'vitest'
-import { createChainBackend } from '../../backend'
+import { createChainBackend } from '../../backends/primitives'
 import { MAINNET } from '../../chains'
 import { CapabilityNotFoundError } from '../../errors'
 

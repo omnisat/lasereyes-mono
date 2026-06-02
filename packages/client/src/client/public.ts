@@ -4,7 +4,7 @@
  * @module client/public
  */
 
-import type { ActionGroup } from '../backend/capabilities'
+import type { ActionGroup } from '../backends/capabilities'
 import type { ChainNetwork, NetworkId } from '../chains'
 import { resolveNetwork } from '../chains'
 import { NetworkMismatchError } from '../errors'
@@ -33,7 +33,7 @@ import type { Client, ClientConfig } from './types'
  * @example
  * ```ts
  * import { createClient, publicActions, MAINNET } from '@omnisat/lasereyes-client'
- * import { createBackend } from '@omnisat/lasereyes-client/vendors/mempool'
+ * import { createBackend } from '@omnisat/lasereyes-client/backends/mempool'
  *
  * const ds = createBackend({ network: 'mainnet' })
  * const client = createClient({ network: 'mainnet', backend: ds })

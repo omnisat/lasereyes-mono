@@ -1,10 +1,10 @@
 /**
  * Maestro {@link InscriptionCapability} implementation.
  *
- * @module vendors/maestro/inscriptions
+ * @module backends/maestro/inscriptions
  */
 
-import type { InscriptionCapability } from '../../backend/capabilities'
+import type { InscriptionCapability } from '../../backends/capabilities'
 import type {
   ChainBackendContext,
   Inscription,

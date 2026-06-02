@@ -35,17 +35,21 @@
       "import": "./dist/inscriptions/index.js",
       "types": "./dist/inscriptions.d.ts"
     },
-    "./vendors/mempool": {
-      "import": "./dist/vendors/mempool/index.js",
-      "types": "./dist/vendors/mempool/index.d.ts"
+    "./backends": {
+      "import": "./dist/backends/index.js",
+      "types": "./dist/backends/index.d.ts"
     },
-    "./vendors/sandshrew": {
-      "import": "./dist/vendors/sandshrew/index.js",
-      "types": "./dist/vendors/sandshrew/index.d.ts"
+    "./backends/mempool": {
+      "import": "./dist/backends/mempool/index.js",
+      "types": "./dist/backends/mempool/index.d.ts"
     },
-    "./vendors/maestro": {
-      "import": "./dist/vendors/maestro/index.js",
-      "types": "./dist/vendors/maestro/index.d.ts"
+    "./backends/sandshrew": {
+      "import": "./dist/backends/sandshrew/index.js",
+      "types": "./dist/backends/sandshrew/index.d.ts"
+    },
+    "./backends/maestro": {
+      "import": "./dist/backends/maestro/index.js",
+      "types": "./dist/backends/maestro/index.d.ts"
     }
   },
   "scripts": {
@@ -77,11 +81,15 @@
       "limit": "35 kB"
     },
     {
-      "path": "dist/vendors/mempool/index.js",
-      "limit": "25 kB"
+      "path": "dist/backends/index.js",
+      "limit": "30 kB"
     },
     {
-      "path": "dist/vendors/sandshrew/index.js",
+      "path": "dist/backends/mempool/index.js",
+      "limit": "26 kB"
+    },
+    {
+      "path": "dist/backends/sandshrew/index.js",
       "limit": "27 kB"
     }
   ],

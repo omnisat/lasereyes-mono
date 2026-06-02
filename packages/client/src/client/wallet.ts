@@ -5,7 +5,7 @@
  */
 
 import type { Account } from '../account/types'
-import type { ActionGroup } from '../backend/capabilities'
+import type { ActionGroup } from '../backends/capabilities'
 import type { ChainNetwork, NetworkId } from '../chains'
 import { resolveNetwork } from '../chains'
 import { NetworkMismatchError } from '../errors'
@@ -49,7 +49,7 @@ import type { WalletClient, WalletClientConfig } from './wallet-types'
  * import {
  *   createWalletClient, createWalletAccount, walletBtcActions,
  * } from '@omnisat/lasereyes-client/wallet'
- * import { createBackend } from '@omnisat/lasereyes-client/vendors/mempool'
+ * import { createBackend } from '@omnisat/lasereyes-client/backends/mempool'
  * import { MAINNET, AddressType } from '@omnisat/lasereyes-client'
  *
  * const account = createWalletAccount({

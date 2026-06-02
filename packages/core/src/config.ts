@@ -229,8 +229,8 @@ export interface CreateLaserEyesConfigOptions<
  * ```ts
  * import { createLaserEyesConfig, unisat, xverse } from '@omnisat/lasereyes-core'
  * import { MAINNET, TESTNET4 } from '@omnisat/lasereyes-client'
- * import { mempool } from '@omnisat/lasereyes-client/vendors/mempool'
- * import { sandshrew } from '@omnisat/lasereyes-client/vendors/sandshrew'
+ * import { mempool } from '@omnisat/lasereyes-client/backends/mempool'
+ * import { sandshrew } from '@omnisat/lasereyes-client/backends/sandshrew'
  * import { combineBackends } from '@omnisat/lasereyes-client'
  *
  * const config = createLaserEyesConfig({

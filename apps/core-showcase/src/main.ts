@@ -18,7 +18,7 @@
  */
 
 import { MAINNET, NetworkNotConfiguredError, TESTNET } from '@omnisat/lasereyes-client'
-import { mempool } from '@omnisat/lasereyes-client/vendors/mempool'
+import { mempool } from '@omnisat/lasereyes-client/backends/mempool'
 import { createLaserEyesConfig, getWalletClient } from '@omnisat/lasereyes-core'
 import {
   broadcastTransaction,

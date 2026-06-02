@@ -1,4 +1,4 @@
-import type { ActionGroup } from '../backend/capabilities'
+import type { ActionGroup } from '../backends/capabilities'
 import type { ChainNetwork } from '../chains'
 import type { Extension, Prettify } from './utils'
 

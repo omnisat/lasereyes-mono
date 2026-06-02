@@ -7,10 +7,10 @@
  * `btcWaitForTransaction` — those throw {@link ChainBackendError} so the
  * caller can fall back to another backend via {@link mergeChainBackends}.
  *
- * @module vendors/maestro/base
+ * @module backends/maestro/base
  */
 
-import type { BaseCapability } from '../../backend/capabilities'
+import type { BaseCapability } from '../../backends/capabilities'
 import { ChainBackendError } from '../../errors'
 import type {
   ChainBackendContext,

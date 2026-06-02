@@ -268,7 +268,7 @@ Restore actions in the structure described in MENTAL-MODEL.md.
 - `@omnisat/lasereyes-client` (main): chains, errors, `createClient`, `createChainDataSource`, `mergeDataSources`, public types, `publicActions`
 - `@omnisat/lasereyes-client/wallet`: account factories, `createWalletClient`, `walletBtcActions`, `signingActions`, plus signer/account types
 - `@omnisat/lasereyes-client/runes` (and brc20/alkanes/inscriptions): the protocol action factories
-- `@omnisat/lasereyes-client/vendors/mempool` (and sandshrew/maestro): vendor entrypoints
+- `@omnisat/lasereyes-client/backends/mempool` (and sandshrew/maestro): vendor entrypoints
 - `@omnisat/lasereyes-client/utils`: PSBT builders, address utilities
 
 **Commit:** `refactor(client): introduce public/wallet/signing/protocol action groups`

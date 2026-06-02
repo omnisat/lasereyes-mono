@@ -6,20 +6,20 @@
  * operations, runes, alkanes, inscriptions, and the ord indexer.
  * Authentication via API key.
  *
- * @module vendors/sandshrew
+ * @module backends/sandshrew
  */
 
-import type { ChainBackendFactory } from '../../backend'
+import type { ChainNetwork, NetworkId } from '../../chains'
+import type { ChainBackend } from '../../types/backend'
 import type {
   AlkaneCapability,
   BaseCapability,
   InscriptionCapability,
   OrdCapability,
   RuneCapability,
-} from '../../backend/capabilities'
-import { createChainBackend } from '../../backend/create'
-import type { ChainNetwork, NetworkId } from '../../chains'
-import type { ChainBackend } from '../../types/backend'
+} from '../capabilities'
+import { createChainBackend } from '../create'
+import type { ChainBackendFactory } from '../factory'
 import { alkaneCapabilities } from './alkanes'
 import { baseCapabilities } from './base'
 import type { SandshrewConfig } from './config'
@@ -50,7 +50,7 @@ export { runeCapabilities } from './runes'
  *
  * @example
  * ```ts
- * import { createBackend } from '@omnisat/lasereyes-client/vendors/sandshrew'
+ * import { createBackend } from '@omnisat/lasereyes-client/backends/sandshrew'
  * import { MAINNET } from '@omnisat/lasereyes-client'
  *
  * const ds = createBackend({
@@ -97,7 +97,7 @@ export function createBackend(
  *
  * @example
  * ```ts
- * import { sandshrew } from '@omnisat/lasereyes-client/vendors/sandshrew'
+ * import { sandshrew } from '@omnisat/lasereyes-client/backends/sandshrew'
  *
  * createLaserEyesConfig({
  *   chains: [MAINNET],

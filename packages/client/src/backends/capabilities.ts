@@ -10,7 +10,7 @@
  * new protocol — new methods are added here, then vendor implementations
  * provide them, then actions reference them.
  *
- * @module backend/capabilities
+ * @module backends/capabilities
  */
 
 import type { AlkaneBalance, AlkaneOutpoint } from '../types/alkane'

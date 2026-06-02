@@ -15,7 +15,7 @@
  * @module actions/public
  */
 
-import type { ActionGroup, BaseCapability } from '../../backend/capabilities'
+import type { ActionGroup, BaseCapability } from '../../backends/capabilities'
 import type { Client, ClientConfig } from '../../client/types'
 import type { FeeEstimate, PaginatedResult, PaginationParams, Transaction, UTXO } from '../../types'
 
@@ -145,7 +145,7 @@ export type PublicBtcActions = {
  * @example
  * ```ts
  * import { createClient, publicActions, MAINNET } from '@omnisat/lasereyes-client'
- * import { createBackend } from '@omnisat/lasereyes-client/vendors/mempool'
+ * import { createBackend } from '@omnisat/lasereyes-client/backends/mempool'
  *
  * const ds = createBackend({ network: MAINNET })
  * const client = createClient({ network: MAINNET, backend: ds })

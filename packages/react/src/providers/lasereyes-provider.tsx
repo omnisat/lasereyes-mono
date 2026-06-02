@@ -30,7 +30,7 @@ const CoreContext = createContext<LaserEyesCore | null>(null)
  * @example
  * ```tsx
  * import { LaserEyesProvider } from '@omnisat/lasereyes-react'
- * import { createDataSource } from '@omnisat/lasereyes-client/vendors/mempool'
+ * import { createDataSource } from '@omnisat/lasereyes-client/backends/mempool'
  * import { MAINNET } from '@omnisat/lasereyes-client'
  *
  * const ds = createDataSource({ network: MAINNET })

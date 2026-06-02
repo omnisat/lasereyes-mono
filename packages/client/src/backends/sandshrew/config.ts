@@ -1,7 +1,7 @@
 /**
  * Sandshrew vendor configuration.
  *
- * @module vendors/sandshrew/config
+ * @module backends/sandshrew/config
  */
 
 /**

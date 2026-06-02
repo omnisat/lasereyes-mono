@@ -13,7 +13,7 @@
  */
 
 import type { Account } from '../account/types'
-import type { ActionGroup } from '../backend/capabilities'
+import type { ActionGroup } from '../backends/capabilities'
 import type { Signer } from '../signer/types'
 import type { ExactPartial, Extension, Prettify } from '../types/utils'
 import type { ExtendableProtectedActions } from './extendable-actions'

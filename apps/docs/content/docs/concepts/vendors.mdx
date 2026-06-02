@@ -10,7 +10,7 @@ LaserEyes ships with three vendor integrations for chain data. Each vendor provi
 The default data source for basic Bitcoin operations.
 
 ```ts
-import { createDataSource } from '@omnisat/lasereyes-client/vendors/mempool'
+import { createDataSource } from '@omnisat/lasereyes-client/backends/mempool'
 
 const ds = createDataSource({ network: 'mainnet' })
 ```
@@ -31,7 +31,7 @@ const ds = createDataSource({ network: 'mainnet' })
 Full-featured data source with support for all Bitcoin protocols.
 
 ```ts
-import { createDataSource } from '@omnisat/lasereyes-client/vendors/sandshrew'
+import { createDataSource } from '@omnisat/lasereyes-client/backends/sandshrew'
 
 const ds = createDataSource({
   network: 'mainnet',
@@ -57,7 +57,7 @@ const ds = createDataSource({
 Professional-grade data source with BRC-20 support.
 
 ```ts
-import { createDataSource } from '@omnisat/lasereyes-client/vendors/maestro'
+import { createDataSource } from '@omnisat/lasereyes-client/backends/maestro'
 
 const ds = createDataSource({
   network: 'mainnet',

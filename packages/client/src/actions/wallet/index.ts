@@ -27,7 +27,7 @@
  */
 
 import type { Account, AddressPurpose, WalletAccount } from '../../account/types'
-import type { ActionGroup, BaseCapability } from '../../backend/capabilities'
+import type { ActionGroup, BaseCapability } from '../../backends/capabilities'
 import type { WalletClient, WalletClientConfig } from '../../client/wallet-types'
 import { buildSendBtcPsbt } from '../../lib/build-send-btc-psbt'
 import { getAction } from '../../lib/get-action'

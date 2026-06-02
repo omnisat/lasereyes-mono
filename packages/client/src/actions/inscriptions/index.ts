@@ -14,7 +14,7 @@
  */
 
 import type { WalletAccount } from '../../account/types'
-import type { ActionGroup, BaseCapability, InscriptionCapability } from '../../backend/capabilities'
+import type { ActionGroup, BaseCapability, InscriptionCapability } from '../../backends/capabilities'
 import type { Client, ClientConfig } from '../../client/types'
 import type { WalletClient, WalletClientConfig } from '../../client/wallet-types'
 import type { SignedPsbt, SignPsbtOptions } from '../../signer/types'

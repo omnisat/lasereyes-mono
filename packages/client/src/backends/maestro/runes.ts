@@ -6,10 +6,10 @@
  * coverage (balances, outpoints, batch outputs) merge with the sandshrew
  * backend via {@link mergeChainBackends}.
  *
- * @module vendors/maestro/runes
+ * @module backends/maestro/runes
  */
 
-import type { RuneCapability } from '../../backend/capabilities'
+import type { RuneCapability } from '../../backends/capabilities'
 import type { ChainBackendContext, RuneInfo } from '../../types'
 import type { MaestroConfig } from './config'
 import { maestroGet, resolveUrlAndKey } from './shared'
