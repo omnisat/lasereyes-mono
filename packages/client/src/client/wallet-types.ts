@@ -13,7 +13,7 @@
  */
 
 import type { Account } from '../account/types'
-import type { ActionGroup } from '../data-source/capabilities'
+import type { ActionGroup } from '../backend/capabilities'
 import type { Signer } from '../signer/types'
 import type { ExactPartial, Extension, Prettify } from '../types/utils'
 import type { ExtendableProtectedActions } from './extendable-actions'
@@ -38,7 +38,7 @@ import type { Client, ClientConfig } from './types'
  * deferring signer attachment).
  *
  * @typeParam TAccount - The account type
- * @typeParam dsMethods - The data source capabilities
+ * @typeParam dsMethods - The backend capabilities
  */
 export interface WalletClientConfig<TAccount extends Account, dsMethods extends ActionGroup = {}>
   extends ClientConfig<dsMethods> {
@@ -66,13 +66,13 @@ export interface WalletClientConfig<TAccount extends Account, dsMethods extends 
  * @typeParam WalletConfig - The wallet client configuration
  * @typeParam TAccount - The account type (Account / WalletAccount / ReadOnlyAccount)
  * @typeParam clientActions - The action methods added via `.extend()`
- * @typeParam dsMethods - The data source capabilities
+ * @typeParam dsMethods - The backend capabilities
  *
  * @example
  * ```ts
  * const walletClient = createWalletClient({
  *   network: MAINNET,
- *   dataSource: ds,
+ *   backend: ds,
  *   account,
  * })
  *   .extend(walletBtcActions())

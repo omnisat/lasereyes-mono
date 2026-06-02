@@ -1,10 +1,10 @@
 import type { NetworkId } from '../../chains'
-import { DataSourceError } from '../../errors'
+import { ChainBackendError } from '../../errors'
 import { bytesToHex } from '../../lib/bytes'
 import { getAddressScriptPubKey } from '../../lib/get-address-script-pub-key'
 import type {
   BaseCapability,
-  DataSourceContext,
+  ChainBackendContext,
   FeeEstimate,
   PaginatedResult,
   PaginationParams,
@@ -39,8 +39,8 @@ const getMempoolSpaceUrl = (network: NetworkId) => {
 
 export function baseCapabilities(
   vendorConfig?: MempoolConfig
-): (ctx: DataSourceContext) => BaseCapability {
-  return (ctx: DataSourceContext) => {
+): (ctx: ChainBackendContext) => BaseCapability {
+  return (ctx: ChainBackendContext) => {
     const networkUrls: Record<string, string> = {
       mainnet: getMempoolSpaceUrl('mainnet'),
       testnet: getMempoolSpaceUrl('testnet'),
@@ -81,7 +81,7 @@ export function baseCapabilities(
         }
         return await response.text()
       } catch (error) {
-        throw new DataSourceError(
+        throw new ChainBackendError(
           `Mempool API error: ${error instanceof Error ? error.message : String(error)}`,
           'mempool',
           error instanceof Error ? error : undefined

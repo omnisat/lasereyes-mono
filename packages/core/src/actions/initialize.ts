@@ -12,8 +12,8 @@
  * @module actions/initialize
  */
 
-import { discoverConnectors } from '../detection/discovery'
 import type { LaserEyesConfig } from '../config'
+import { discoverConnectors } from '../detection/discovery'
 import { connect } from './connect'
 
 /**

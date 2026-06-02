@@ -25,18 +25,25 @@
  * @module umd
  */
 
-export * from './index'
 export * from './actions'
-
-// Detection primitives — but NOT `loadAllWallets`, which would pull in
-// the xverse adapter through `detection/helpers.ts`. We define a
-// UMD-safe replacement below.
+// Adapter classes + loader functions. Xverse omitted.
+export { KeplrAdapter, loadKeplrWalletAdapter } from './adapters/keplr'
+export { LeatherAdapter, loadLeatherWalletAdapter } from './adapters/leather'
+export { loadMagicEdenWalletAdapter, MagicEdenAdapter } from './adapters/magic-eden'
+export { loadOkxWalletAdapter, OkxAdapter } from './adapters/okx'
+export { loadOpNetWalletAdapter, OpNetAdapter } from './adapters/op-net'
+export { loadOrangeWalletAdapter, OrangeAdapter } from './adapters/orange'
+export { loadOylWalletAdapter, OylAdapter } from './adapters/oyl'
+export { loadPhantomWalletAdapter, PhantomAdapter } from './adapters/phantom'
+export { loadSparrowWalletAdapter, SparrowAdapter } from './adapters/sparrow'
+export { loadTokeoWalletAdapter, TokeoAdapter } from './adapters/tokeo'
 export {
-  announceWallet,
-  discoverConnectors,
-  listenForWalletAnnouncements,
-} from './detection'
-
+  loadBinanceWalletAdapter,
+  loadUnisatWalletAdapter,
+  loadWizzWalletAdapter,
+  UnisatAdapter,
+} from './adapters/unisat'
+export type { InjectedConnectorOptions } from './connectors'
 // All connector factories except `xverse`.
 export {
   binance,
@@ -56,25 +63,15 @@ export {
   unisatLike,
   wizz,
 } from './connectors'
-export type { InjectedConnectorOptions } from './connectors'
-
-// Adapter classes + loader functions. Xverse omitted.
-export { KeplrAdapter, loadKeplrWalletAdapter } from './adapters/keplr'
-export { LeatherAdapter, loadLeatherWalletAdapter } from './adapters/leather'
-export { loadMagicEdenWalletAdapter, MagicEdenAdapter } from './adapters/magic-eden'
-export { loadOkxWalletAdapter, OkxAdapter } from './adapters/okx'
-export { loadOpNetWalletAdapter, OpNetAdapter } from './adapters/op-net'
-export { loadOrangeWalletAdapter, OrangeAdapter } from './adapters/orange'
-export { loadOylWalletAdapter, OylAdapter } from './adapters/oyl'
-export { loadPhantomWalletAdapter, PhantomAdapter } from './adapters/phantom'
-export { loadSparrowWalletAdapter, SparrowAdapter } from './adapters/sparrow'
-export { loadTokeoWalletAdapter, TokeoAdapter } from './adapters/tokeo'
+// Detection primitives — but NOT `loadAllWallets`, which would pull in
+// the xverse adapter through `detection/helpers.ts`. We define a
+// UMD-safe replacement below.
 export {
-  loadBinanceWalletAdapter,
-  loadUnisatWalletAdapter,
-  loadWizzWalletAdapter,
-  UnisatAdapter,
-} from './adapters/unisat'
+  announceWallet,
+  discoverConnectors,
+  listenForWalletAnnouncements,
+} from './detection'
+export * from './index'
 
 import { loadKeplrWalletAdapter } from './adapters/keplr'
 import { loadLeatherWalletAdapter } from './adapters/leather'

@@ -17,7 +17,7 @@
  *    dispatch automatically pick up connector overrides — the wallet
  *    client carries them.
  * 4. **Default bare client.** Otherwise build `createClient({ network,
- *    dataSource })` against the chain's data source. Build → cache →
+ *    backend })` against the chain's backend. Build → cache →
  *    return.
  *
  * Cache lifetime is tied to the config (`WeakMap<config, …>` internally).
@@ -31,15 +31,13 @@
  */
 
 import {
-  type BaseCapability,
-  type ChainDataSource,
   type ChainNetwork,
   type Client,
   createClient,
   NetworkNotConfiguredError,
 } from '@omnisat/lasereyes-client'
 import type { LaserEyesConfig } from './config'
-import { readCachedClient, resolveDataSource, writeCachedClient } from './internal'
+import { readCachedClient, resolveChainBackend, writeCachedClient } from './internal'
 
 /**
  * Build a typed `Client` for one of the chains in the config.
@@ -50,7 +48,7 @@ import { readCachedClient, resolveDataSource, writeCachedClient } from './intern
  * by the time you call `getClient`, the result is ready.
  *
  * @throws {Error} If `chainId` is not in `config.chains`.
- * @throws {Error} If no transports are configured for `chainId`.
+ * @throws {Error} If no backend is configured for `chainId`.
  */
 export function getClient<const config extends LaserEyesConfig<any, any, any>>(
   config: config,
@@ -70,11 +68,11 @@ export function getClient<const config extends LaserEyesConfig<any, any, any>>(
       chains.map(c => c.id)
     )
   }
-  const dataSource = resolveDataSource(config, id) as ChainDataSource<BaseCapability>
+  const backend = resolveChainBackend(config, id)
 
   // 2. User-supplied factory wins unconditionally.
   if (config.client) {
-    const built = config.client({ chain: network, dataSource })
+    const built = config.client({ chain: network, backend })
     writeCachedClient(config, id, built)
     return built
   }
@@ -87,7 +85,7 @@ export function getClient<const config extends LaserEyesConfig<any, any, any>>(
   // the default bare client.
 
   // 4. Default bare client.
-  const built = createClient({ network, dataSource })
+  const built = createClient({ network, backend })
   writeCachedClient(config, id, built)
   return built as Client<any, any, any>
 }

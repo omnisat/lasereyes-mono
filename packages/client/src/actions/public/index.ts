@@ -4,19 +4,19 @@
  * @remarks
  * These actions wrap the {@link BaseCapability} methods of a chain data
  * source. They require no account and no signer; just a {@link Client}
- * configured with a data source that exposes the relevant base methods.
+ * configured with a backend that exposes the relevant base methods.
  *
  * Each action is a free function `(client, …args) => Promise<T>` with
  * generic constraints declaring exactly which `BaseCapability` methods
- * the data source must expose.
+ * the backend must expose.
  *
  * Use the {@link publicActions} factory to bundle them onto a client.
  *
  * @module actions/public
  */
 
+import type { ActionGroup, BaseCapability } from '../../backend/capabilities'
 import type { Client, ClientConfig } from '../../client/types'
-import type { ActionGroup, BaseCapability } from '../../data-source/capabilities'
 import type { FeeEstimate, PaginatedResult, PaginationParams, Transaction, UTXO } from '../../types'
 
 // ============================================================================
@@ -31,7 +31,7 @@ export async function getAddressBalance<
   Actions extends ActionGroup,
   DS extends Pick<BaseCapability, 'btcGetBalance'>,
 >(client: Client<Config, DS, Actions>, address: string): Promise<string> {
-  return client.config.dataSource.btcGetBalance(address)
+  return client.config.backend.btcGetBalance(address)
 }
 
 /**
@@ -46,7 +46,7 @@ export async function getAddressUtxos<
   address: string,
   pagination?: PaginationParams
 ): Promise<PaginatedResult<UTXO>> {
-  return client.config.dataSource.btcGetAddressUtxos(address, pagination)
+  return client.config.backend.btcGetAddressUtxos(address, pagination)
 }
 
 /**
@@ -57,7 +57,7 @@ export async function getTransaction<
   Actions extends ActionGroup,
   DS extends Pick<BaseCapability, 'btcGetTransaction'>,
 >(client: Client<Config, DS, Actions>, txId: string): Promise<Transaction> {
-  return client.config.dataSource.btcGetTransaction(txId)
+  return client.config.backend.btcGetTransaction(txId)
 }
 
 /**
@@ -68,7 +68,7 @@ export async function broadcastTransaction<
   Actions extends ActionGroup,
   DS extends Pick<BaseCapability, 'btcBroadcastTransaction'>,
 >(client: Client<Config, DS, Actions>, rawTx: string): Promise<string> {
-  return client.config.dataSource.btcBroadcastTransaction(rawTx)
+  return client.config.backend.btcBroadcastTransaction(rawTx)
 }
 
 /**
@@ -79,7 +79,7 @@ export async function getRecommendedFees<
   Actions extends ActionGroup,
   DS extends Pick<BaseCapability, 'btcGetRecommendedFees'>,
 >(client: Client<Config, DS, Actions>): Promise<FeeEstimate> {
-  return client.config.dataSource.btcGetRecommendedFees()
+  return client.config.backend.btcGetRecommendedFees()
 }
 
 /**
@@ -90,7 +90,7 @@ export async function getOutputValue<
   Actions extends ActionGroup,
   DS extends Pick<BaseCapability, 'btcGetOutputValue'>,
 >(client: Client<Config, DS, Actions>, txId: string, vout: number): Promise<number | null> {
-  return client.config.dataSource.btcGetOutputValue(txId, vout)
+  return client.config.backend.btcGetOutputValue(txId, vout)
 }
 
 /**
@@ -101,7 +101,7 @@ export async function waitForTransaction<
   Actions extends ActionGroup,
   DS extends Pick<BaseCapability, 'btcWaitForTransaction'>,
 >(client: Client<Config, DS, Actions>, txId: string): Promise<boolean> {
-  return client.config.dataSource.btcWaitForTransaction(txId)
+  return client.config.backend.btcWaitForTransaction(txId)
 }
 
 // ============================================================================
@@ -133,22 +133,22 @@ export type PublicBtcActions = {
 }
 
 // ============================================================================
-// Strict factory — accepts a client whose data source has full BaseCapability
+// Strict factory — accepts a client whose backend has full BaseCapability
 // ============================================================================
 
 /**
  * Action-group factory bundling all read-only Bitcoin operations onto a client.
  *
  * @remarks
- * Requires a data source implementing the full {@link BaseCapability}.
+ * Requires a backend implementing the full {@link BaseCapability}.
  *
  * @example
  * ```ts
  * import { createClient, publicActions, MAINNET } from '@omnisat/lasereyes-client'
- * import { createDataSource } from '@omnisat/lasereyes-client/vendors/mempool'
+ * import { createBackend } from '@omnisat/lasereyes-client/vendors/mempool'
  *
- * const ds = createDataSource({ network: MAINNET })
- * const client = createClient({ network: MAINNET, dataSource: ds })
+ * const ds = createBackend({ network: MAINNET })
+ * const client = createClient({ network: MAINNET, backend: ds })
  *   .extend(publicActions())
  *
  * const balance = await client.getAddressBalance('bc1q...')

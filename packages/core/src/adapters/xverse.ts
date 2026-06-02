@@ -20,9 +20,9 @@ import { Transaction } from '@scure/btc-signer'
 // browserify chain (~600 kB). Runtime is dynamically imported on first
 // use; see `loadSatsConnect` below.
 import type {
-  AddressPurpose as SatsConnectAddressPurpose,
   BitcoinNetworkType,
   MessageSigningProtocols,
+  AddressPurpose as SatsConnectAddressPurpose,
 } from 'sats-connect'
 import { announceWallet } from '../detection/announcements'
 import type { ProviderCapabilities } from '../types/provider'

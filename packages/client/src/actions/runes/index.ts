@@ -5,10 +5,10 @@
  * Two factories:
  *
  * - {@link runeActions} — read-only. Wraps {@link RuneCapability} methods
- *   on a {@link Client}. Requires the data source to expose
+ *   on a {@link Client}. Requires the backend to expose
  *   `RuneCapability` (full or partial).
  * - {@link runeWriteActions} — write. Adds rune-sending capability. Requires
- *   the data source to expose `RuneCapability` *and* the client to already
+ *   the backend to expose `RuneCapability` *and* the client to already
  *   carry `signPsbt` (extended via {@link walletBtcActions} first). Bodies
  *   are stubbed pending implementation; the type surface is final.
  *
@@ -16,9 +16,9 @@
  */
 
 import type { WalletAccount } from '../../account/types'
+import type { ActionGroup, BaseCapability, RuneCapability } from '../../backend/capabilities'
 import type { Client, ClientConfig } from '../../client/types'
 import type { WalletClient, WalletClientConfig } from '../../client/wallet-types'
-import type { ActionGroup, BaseCapability, RuneCapability } from '../../data-source/capabilities'
 import type { SignedPsbt, SignPsbtOptions } from '../../signer/types'
 import type {
   OrdOutputWrapper,
@@ -42,7 +42,7 @@ export async function getRuneBalances<
   address: string,
   pagination?: PaginationParams
 ): Promise<PaginatedResult<RuneBalance>> {
-  return client.config.dataSource.runesGetAddressBalances(address, pagination)
+  return client.config.backend.runesGetAddressBalances(address, pagination)
 }
 
 export async function getRuneById<
@@ -50,7 +50,7 @@ export async function getRuneById<
   Actions extends ActionGroup,
   DS extends Pick<RuneCapability, 'runesGetById'>,
 >(client: Client<Config, DS, Actions>, runeId: string): Promise<RuneInfo> {
-  return client.config.dataSource.runesGetById(runeId)
+  return client.config.backend.runesGetById(runeId)
 }
 
 export async function getRuneByName<
@@ -58,7 +58,7 @@ export async function getRuneByName<
   Actions extends ActionGroup,
   DS extends Pick<RuneCapability, 'runesGetByName'>,
 >(client: Client<Config, DS, Actions>, runeName: string): Promise<RuneInfo> {
-  return client.config.dataSource.runesGetByName(runeName)
+  return client.config.backend.runesGetByName(runeName)
 }
 
 export async function getRuneOutpoints<
@@ -70,7 +70,7 @@ export async function getRuneOutpoints<
   params: { address: string; runeId: string },
   pagination?: PaginationParams
 ): Promise<PaginatedResult<RuneOutpoint>> {
-  return client.config.dataSource.runesGetOutpoints(params, pagination)
+  return client.config.backend.runesGetOutpoints(params, pagination)
 }
 
 export async function batchGetRuneOutputs<
@@ -81,7 +81,7 @@ export async function batchGetRuneOutputs<
   client: Client<Config, DS, Actions>,
   params: { outpoints: string[]; runeName: string }
 ): Promise<OrdOutputWrapper[]> {
-  return client.config.dataSource.runesBatchGetOutputs(params)
+  return client.config.backend.runesBatchGetOutputs(params)
 }
 
 // ============================================================================
@@ -106,12 +106,12 @@ export interface SendRuneParams {
  * @remarks
  * Implementation is stubbed pending a follow-up. The type surface is final
  * — the client must be a `WalletClient<…, WalletAccount, …>` with `signPsbt`
- * already extended and a data source exposing rune-outpoint discovery and
+ * already extended and a backend exposing rune-outpoint discovery and
  * BTC broadcast.
  *
  * @todo Implement: select rune outpoints + spending UTXOs, build PSBT with
  * runestone OP_RETURN edict, sign via `client.signPsbt({ finalize: true })`,
- * broadcast via `dataSource.btcBroadcastTransaction`.
+ * broadcast via `backend.btcBroadcastTransaction`.
  */
 export async function sendRune<
   Config extends WalletClientConfig<WalletAccount, DS>,
@@ -174,13 +174,13 @@ export type WalletRuneActions = {
 /**
  * Action-group factory bundling read-only Runes operations.
  *
- * Requires a data source implementing the full {@link RuneCapability}.
+ * Requires a backend implementing the full {@link RuneCapability}.
  *
  * @example
  * ```ts
  * import { runeActions } from '@omnisat/lasereyes-client/runes'
  *
- * const client = createClient({ network, dataSource }).extend(runeActions())
+ * const client = createClient({ network, backend }).extend(runeActions())
  * const balances = await client.getRuneBalances('bc1q...')
  * ```
  */
@@ -206,7 +206,7 @@ export function runeActions() {
  *
  * @remarks
  * Requires the client to already carry `signPsbt` (extend `walletBtcActions`
- * before this) and the data source to expose rune-outpoint discovery and
+ * before this) and the backend to expose rune-outpoint discovery and
  * BTC broadcast.
  *
  * Implementation is stubbed; the type surface is final.

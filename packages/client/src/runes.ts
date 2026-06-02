@@ -13,10 +13,11 @@ export {
   type PublicRuneActions,
   runeActions,
   runeWriteActions,
-  sendRune,
   type SendRuneParams,
+  sendRune,
   type WalletRuneActions,
 } from './actions/runes'
+export type { RuneCapability } from './backend/capabilities'
 export type {
   OrdOutput,
   OrdOutputWrapper,
@@ -24,4 +25,3 @@ export type {
   RuneInfo,
   RuneOutpoint,
 } from './types/rune'
-export type { RuneCapability } from './data-source/capabilities'

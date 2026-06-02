@@ -8,14 +8,14 @@ export {
   batchGetInscriptionInfo,
   getInscriptionInfo,
   getInscriptionsByAddress,
+  type InscribeParams,
   inscribe,
   inscriptionActions,
   inscriptionWriteActions,
   type PublicInscriptionActions,
-  sendInscription,
-  type InscribeParams,
   type SendInscriptionParams,
+  sendInscription,
   type WalletInscriptionActions,
 } from './actions/inscriptions'
+export type { InscriptionCapability } from './backend/capabilities'
 export type { Inscription, InscriptionInfo } from './types/inscription'
-export type { InscriptionCapability } from './data-source/capabilities'

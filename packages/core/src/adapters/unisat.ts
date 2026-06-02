@@ -360,7 +360,7 @@ export class UnisatAdapter extends BaseAdapter {
    * When `params.address` is provided, we honor it only if it matches
    * one of the connected accounts. Otherwise we throw
    * `METHOD_NOT_FOUND` so the upstream `tryProvider` helper falls back
-   * to the configured data source.
+   * to the configured backend.
    */
   private async handleGetBalance(params?: { address?: string }): Promise<string> {
     const requested = params?.address
@@ -370,7 +370,7 @@ export class UnisatAdapter extends BaseAdapter {
         throw this.createError(
           -32601,
           'bitcoin_getBalance: wallet only tracks the connected address; ' +
-            'callers should fall back to the data source for arbitrary addresses'
+            'callers should fall back to the backend for arbitrary addresses'
         )
       }
     }

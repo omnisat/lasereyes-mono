@@ -109,7 +109,7 @@ export async function signMessage<const config extends LaserEyesConfig<any, any,
  *
  * @remarks
  * Composes through the wallet client's `broadcastPsbt` action. Default
- * composition: `signPsbt({ finalize: true })` + the data source's
+ * composition: `signPsbt({ finalize: true })` + the backend's
  * `btcBroadcastTransaction`. Connectors with native `bitcoin_pushPsbt`
  * support can override via `getClient` to route through one wallet call
  * instead of two.

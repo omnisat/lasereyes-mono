@@ -5,7 +5,7 @@
  * @internal
  */
 
-import { DataSourceError } from '../../errors'
+import { ChainBackendError } from '../../errors'
 
 export interface RpcResponse {
   jsonrpc: string
@@ -39,7 +39,7 @@ export class SandshrewRpcClient {
 
       return (await response.json()) as RpcResponse
     } catch (error) {
-      throw new DataSourceError(
+      throw new ChainBackendError(
         `Sandshrew RPC error: ${error instanceof Error ? error.message : String(error)}`,
         'sandshrew',
         error instanceof Error ? error : undefined

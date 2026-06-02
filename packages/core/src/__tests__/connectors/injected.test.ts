@@ -16,8 +16,7 @@
  * to end against this mock without any real wallet extension.
  */
 
-import { createClient, MAINNET } from '@omnisat/lasereyes-client'
-import { createChainDataSource } from '@omnisat/lasereyes-client'
+import { createChainBackend, createClient, MAINNET } from '@omnisat/lasereyes-client'
 import { AddressType } from '@omnisat/lasereyes-client/utils'
 import { beforeAll, describe, expect, it, vi } from 'vitest'
 import { injected } from '../../connectors/injected'
@@ -156,7 +155,7 @@ describe('injected().getClient — override installation', () => {
     const connector = buildConnector(provider, { sendBtc: true })
     const bare = createClient({
       network: MAINNET,
-      dataSource: createChainDataSource({ network: MAINNET }) as any,
+      backend: createChainBackend({ network: MAINNET }) as any,
     })
     const extended = await connector.getClient!({ client: bare as any, chainId: 'mainnet' })
 
@@ -180,7 +179,7 @@ describe('injected().getClient — override installation', () => {
     const connector = buildConnector(provider, { getAddressBalance: true })
     const bare = createClient({
       network: MAINNET,
-      dataSource: createChainDataSource({ network: MAINNET }) as any,
+      backend: createChainBackend({ network: MAINNET }) as any,
     })
     const extended = await connector.getClient!({ client: bare as any, chainId: 'mainnet' })
 
@@ -200,7 +199,7 @@ describe('injected().getClient — override installation', () => {
     const connector = buildConnector(provider, { broadcastPsbt: true })
     const bare = createClient({
       network: MAINNET,
-      dataSource: createChainDataSource({ network: MAINNET }) as any,
+      backend: createChainBackend({ network: MAINNET }) as any,
     })
     const extended = await connector.getClient!({ client: bare as any, chainId: 'mainnet' })
 
@@ -232,7 +231,7 @@ describe('injected().getClient — selective fallback semantics', () => {
     // free-fn runs and we can detect that by replacing it.
     const fallbackResult = 'fallback-via-getAction'
     const bare = {
-      config: { network: MAINNET, dataSource: {} },
+      config: { network: MAINNET, backend: {} },
       sendBtc: vi.fn(async () => fallbackResult),
       extend(fn: any) {
         const overrides = fn(this)
@@ -257,7 +256,7 @@ describe('injected().getClient — selective fallback semantics', () => {
     const connector = buildConnector(provider, { sendBtc: true })
     const fallback = vi.fn(async () => 'should-not-run')
     const bare = {
-      config: { network: MAINNET, dataSource: {} },
+      config: { network: MAINNET, backend: {} },
       sendBtc: fallback,
       extend(fn: any) {
         return { ...this, ...fn(this) }
@@ -280,7 +279,7 @@ describe('injected().getClient — selective fallback semantics', () => {
     const connector = buildConnector(provider, { broadcastPsbt: true })
     const fallback = vi.fn(async () => 'should-not-run')
     const bare = {
-      config: { network: MAINNET, dataSource: {} },
+      config: { network: MAINNET, backend: {} },
       broadcastPsbt: fallback,
       extend(fn: any) {
         return { ...this, ...fn(this) }
@@ -292,10 +291,10 @@ describe('injected().getClient — selective fallback semantics', () => {
     expect(fallback).not.toHaveBeenCalled()
   })
 
-  it('getAddressBalance falls back to data-source path when wallet rejects with -32601 (foreign address)', async () => {
+  it('getAddressBalance falls back to backend path when wallet rejects with -32601 (foreign address)', async () => {
     // Mirrors Unisat's adapter behavior: throws -32601 for addresses
     // outside the wallet's accounts. The override should defer to the
-    // composed path, which hits the data source.
+    // composed path, which hits the backend.
     const provider = makeProvider({
       bitcoin_getBalance: () => {
         const err = new Error('not my address') as any
@@ -304,9 +303,9 @@ describe('injected().getClient — selective fallback semantics', () => {
       },
     })
     const connector = buildConnector(provider, { getAddressBalance: true })
-    const dsResult = 'from-data-source'
+    const dsResult = 'from-backend'
     const bare = {
-      config: { network: MAINNET, dataSource: {} },
+      config: { network: MAINNET, backend: {} },
       getAddressBalance: vi.fn(async () => dsResult),
       extend(fn: any) {
         return { ...this, ...fn(this) }

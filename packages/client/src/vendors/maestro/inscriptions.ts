@@ -4,9 +4,9 @@
  * @module vendors/maestro/inscriptions
  */
 
-import type { InscriptionCapability } from '../../data-source/capabilities'
+import type { InscriptionCapability } from '../../backend/capabilities'
 import type {
-  DataSourceContext,
+  ChainBackendContext,
   Inscription,
   InscriptionInfo,
   PaginatedResult,
@@ -17,8 +17,8 @@ import { maestroGet, resolveUrlAndKey } from './shared'
 
 export function inscriptionCapabilities(
   vendorConfig: MaestroConfig
-): (ctx: DataSourceContext) => InscriptionCapability {
-  return (ctx: DataSourceContext) => {
+): (ctx: ChainBackendContext) => InscriptionCapability {
+  return (ctx: ChainBackendContext) => {
     const { apiUrl, apiKey } = resolveUrlAndKey(ctx.network.id, vendorConfig)
 
     const methods: InscriptionCapability = {

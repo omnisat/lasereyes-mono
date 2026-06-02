@@ -183,7 +183,7 @@ export interface Connector {
    * don't have to wrestle with the full generic surface.
    *
    * @param parameters.client - The bare wallet client built by the
-   *   keystone from `(account, chain, dataSource, signer)`. Extend or
+   *   keystone from `(account, chain, backend, signer)`. Extend or
    *   replace as needed.
    * @param parameters.chainId - Optional chain ID. The same one the
    *   caller passed to `getWalletClient`.

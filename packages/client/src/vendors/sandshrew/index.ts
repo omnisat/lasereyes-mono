@@ -9,16 +9,17 @@
  * @module vendors/sandshrew
  */
 
-import type { ChainNetwork, NetworkId } from '../../chains'
+import type { ChainBackendFactory } from '../../backend'
 import type {
   AlkaneCapability,
   BaseCapability,
   InscriptionCapability,
   OrdCapability,
   RuneCapability,
-} from '../../data-source/capabilities'
-import { createChainDataSource } from '../../data-source/create'
-import type { ChainDataSource } from '../../types/data-source'
+} from '../../backend/capabilities'
+import { createChainBackend } from '../../backend/create'
+import type { ChainNetwork, NetworkId } from '../../chains'
+import type { ChainBackend } from '../../types/backend'
 import { alkaneCapabilities } from './alkanes'
 import { baseCapabilities } from './base'
 import type { SandshrewConfig } from './config'
@@ -34,7 +35,7 @@ export { ordCapabilities } from './ord'
 export { runeCapabilities } from './runes'
 
 /**
- * Creates a Sandshrew-backed data source with full protocol capabilities.
+ * Creates a Sandshrew-backed backend with full protocol capabilities.
  *
  * @remarks
  * Sandshrew provides the most comprehensive set of capabilities, including
@@ -45,14 +46,14 @@ export { runeCapabilities } from './runes'
  * @param config.network - The Bitcoin chain to connect to
  * @param config.apiKey - The Sandshrew API key (can also be set per-network)
  * @param config.networks - Optional mapping of network names to custom API URLs and keys
- * @returns A chain data source with base, rune, alkane, inscription, and ord capabilities
+ * @returns A chain backend with base, rune, alkane, inscription, and ord capabilities
  *
  * @example
  * ```ts
- * import { createDataSource } from '@omnisat/lasereyes-client/vendors/sandshrew'
+ * import { createBackend } from '@omnisat/lasereyes-client/vendors/sandshrew'
  * import { MAINNET } from '@omnisat/lasereyes-client'
  *
- * const ds = createDataSource({
+ * const ds = createBackend({
  *   network: MAINNET,
  *   apiKey: 'your-sandshrew-api-key',
  * })
@@ -61,7 +62,7 @@ export { runeCapabilities } from './runes'
  * const utxos = await ds.ordGetFormattedUtxos('bc1q...')
  * ```
  */
-export function createDataSource(
+export function createBackend(
   config: {
     /**
      * The Bitcoin network. Either a {@link NetworkId} string
@@ -69,13 +70,45 @@ export function createDataSource(
      */
     network: NetworkId | ChainNetwork
   } & SandshrewConfig
-): ChainDataSource<
+): ChainBackend<
   BaseCapability & RuneCapability & AlkaneCapability & InscriptionCapability & OrdCapability
 > {
-  return createChainDataSource({ network: config.network })
+  return createChainBackend({ network: config.network })
     .extend(baseCapabilities(config))
     .extend(runeCapabilities(config))
     .extend(alkaneCapabilities(config))
     .extend(inscriptionCapabilities(config))
     .extend(ordCapabilities(config))
+}
+
+/**
+ * Sandshrew chain backend — a lazy {@link ChainBackendFactory} for use in
+ * `createLaserEyesConfig({ backends })`.
+ *
+ * @remarks
+ * The network is injected from the `backends` map key at config-build time,
+ * so a single `sandshrew()` declaration is reused across every chain it's
+ * listed under. Exposes the full capability set (base, runes, alkanes,
+ * inscriptions, ord); pair it with {@link combineBackends} to add fallbacks
+ * for the base BTC methods.
+ *
+ * @param config - Optional Sandshrew configuration (API key, per-network overrides).
+ * @returns A {@link ChainBackendFactory} producing the full Sandshrew backend.
+ *
+ * @example
+ * ```ts
+ * import { sandshrew } from '@omnisat/lasereyes-client/vendors/sandshrew'
+ *
+ * createLaserEyesConfig({
+ *   chains: [MAINNET],
+ *   backends: { mainnet: sandshrew({ apiKey: '…' }) },
+ * })
+ * ```
+ */
+export function sandshrew(
+  config?: SandshrewConfig
+): ChainBackendFactory<
+  BaseCapability & RuneCapability & AlkaneCapability & InscriptionCapability & OrdCapability
+> {
+  return network => createBackend({ network, ...config })
 }

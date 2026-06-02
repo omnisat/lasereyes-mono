@@ -56,11 +56,11 @@ async function buildConnectorClient(
   }
   const account = await connector.getAccount()
   const network = bare.config.network as ChainNetwork
-  const dataSource = bare.config.dataSource
+  const backend = bare.config.backend
 
   const walletClient = createWalletClient({
     network,
-    dataSource,
+    backend,
     account,
     signer: providerSigner(provider),
   }) as WalletClient<WalletClientConfig<Account, any>, Account, any, any>

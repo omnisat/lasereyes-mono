@@ -2,12 +2,12 @@
  * Tests for `actions/public` — the address-keyed leaf actions.
  *
  * @remarks
- * These actions are pure data-source pass-throughs. Each test verifies
+ * These actions are pure backend pass-throughs. Each test verifies
  * that the action calls the correct `BaseCapability` method with the
  * correct args and returns its result unchanged. No composition, no
  * `getAction` cascade — that's tested separately.
  *
- * Mock client + mock data source. No real bitcoin libs touched.
+ * Mock client + mock backend. No real bitcoin libs touched.
  */
 
 import { describe, expect, it, vi } from 'vitest'
@@ -24,19 +24,19 @@ import {
 import type { Client } from '../../client/types'
 
 /**
- * Build a mock client whose `config.dataSource` is the supplied stubs.
+ * Build a mock client whose `config.backend` is the supplied stubs.
  *
  * @remarks
- * All actions only touch `client.config.dataSource.btc*` — everything
+ * All actions only touch `client.config.backend.btc*` — everything
  * else can stay unset. The cast is fine because we never reach for
  * anything the stubs don't provide.
  */
-function makeClient(dataSource: Record<string, any>): Client<any, any, any> {
-  return { config: { network: { id: 'mainnet' }, dataSource } } as any
+function makeClient(backend: Record<string, any>): Client<any, any, any> {
+  return { config: { network: { id: 'mainnet' }, backend } } as any
 }
 
 describe('getAddressBalance', () => {
-  it('forwards the address to dataSource.btcGetBalance and returns its result', async () => {
+  it('forwards the address to backend.btcGetBalance and returns its result', async () => {
     const btcGetBalance = vi.fn(async () => '12345')
     const client = makeClient({ btcGetBalance })
 
@@ -45,7 +45,7 @@ describe('getAddressBalance', () => {
     expect(btcGetBalance).toHaveBeenCalledWith('bc1qaddr')
   })
 
-  it('propagates data-source errors verbatim', async () => {
+  it('propagates backend errors verbatim', async () => {
     const btcGetBalance = vi.fn(async () => {
       throw new Error('indexer 502')
     })
@@ -56,7 +56,7 @@ describe('getAddressBalance', () => {
 })
 
 describe('getAddressUtxos', () => {
-  it('forwards address and pagination to dataSource.btcGetAddressUtxos', async () => {
+  it('forwards address and pagination to backend.btcGetAddressUtxos', async () => {
     const result = { data: [], pagination: { offset: 0, limit: 50, total: 0 } }
     const btcGetAddressUtxos = vi.fn(async () => result)
     const client = makeClient({ btcGetAddressUtxos })
@@ -76,7 +76,7 @@ describe('getAddressUtxos', () => {
 })
 
 describe('getTransaction', () => {
-  it('forwards the txId to dataSource.btcGetTransaction', async () => {
+  it('forwards the txId to backend.btcGetTransaction', async () => {
     const tx = { txid: 'abc', confirmations: 2 }
     const btcGetTransaction = vi.fn(async () => tx)
     const client = makeClient({ btcGetTransaction })
@@ -87,7 +87,7 @@ describe('getTransaction', () => {
 })
 
 describe('broadcastTransaction', () => {
-  it('forwards the raw hex to dataSource.btcBroadcastTransaction and returns the txid', async () => {
+  it('forwards the raw hex to backend.btcBroadcastTransaction and returns the txid', async () => {
     const btcBroadcastTransaction = vi.fn(async () => 'txid_returned')
     const client = makeClient({ btcBroadcastTransaction })
 
@@ -97,7 +97,7 @@ describe('broadcastTransaction', () => {
 })
 
 describe('getRecommendedFees', () => {
-  it('takes no args and returns the data source result', async () => {
+  it('takes no args and returns the backend result', async () => {
     const fees = { fastestFee: 50, halfHourFee: 30, hourFee: 10 }
     const btcGetRecommendedFees = vi.fn(async () => fees)
     const client = makeClient({ btcGetRecommendedFees })
@@ -108,7 +108,7 @@ describe('getRecommendedFees', () => {
 })
 
 describe('getOutputValue', () => {
-  it('forwards (txId, vout) to dataSource.btcGetOutputValue', async () => {
+  it('forwards (txId, vout) to backend.btcGetOutputValue', async () => {
     const btcGetOutputValue = vi.fn(async () => 100000)
     const client = makeClient({ btcGetOutputValue })
 
@@ -116,7 +116,7 @@ describe('getOutputValue', () => {
     expect(btcGetOutputValue).toHaveBeenCalledWith('abc123', 0)
   })
 
-  it('returns null when the data source reports the output is unspent / missing', async () => {
+  it('returns null when the backend reports the output is unspent / missing', async () => {
     const btcGetOutputValue = vi.fn(async () => null)
     const client = makeClient({ btcGetOutputValue })
 
@@ -125,7 +125,7 @@ describe('getOutputValue', () => {
 })
 
 describe('waitForTransaction', () => {
-  it('forwards the txId to dataSource.btcWaitForTransaction', async () => {
+  it('forwards the txId to backend.btcWaitForTransaction', async () => {
     const btcWaitForTransaction = vi.fn(async () => true)
     const client = makeClient({ btcWaitForTransaction })
 

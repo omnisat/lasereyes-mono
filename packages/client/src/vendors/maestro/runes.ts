@@ -4,13 +4,13 @@
  * @remarks
  * Maestro only supports `runesGetById` and `runesGetByName`. For full rune
  * coverage (balances, outpoints, batch outputs) merge with the sandshrew
- * data source via {@link mergeDataSources}.
+ * backend via {@link mergeChainBackends}.
  *
  * @module vendors/maestro/runes
  */
 
-import type { RuneCapability } from '../../data-source/capabilities'
-import type { DataSourceContext, RuneInfo } from '../../types'
+import type { RuneCapability } from '../../backend/capabilities'
+import type { ChainBackendContext, RuneInfo } from '../../types'
 import type { MaestroConfig } from './config'
 import { maestroGet, resolveUrlAndKey } from './shared'
 
@@ -38,8 +38,8 @@ type MaestroRuneResponse = {
 
 export function runeCapabilities(
   vendorConfig: MaestroConfig
-): (ctx: DataSourceContext) => Pick<RuneCapability, 'runesGetById' | 'runesGetByName'> {
-  return (ctx: DataSourceContext) => {
+): (ctx: ChainBackendContext) => Pick<RuneCapability, 'runesGetById' | 'runesGetByName'> {
+  return (ctx: ChainBackendContext) => {
     const { apiUrl, apiKey } = resolveUrlAndKey(ctx.network.id, vendorConfig)
 
     const methods: Pick<RuneCapability, 'runesGetById' | 'runesGetByName'> = {

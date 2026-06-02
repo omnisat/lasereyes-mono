@@ -5,12 +5,12 @@
  */
 
 import type { Account } from '../account/types'
+import type { ActionGroup } from '../backend/capabilities'
 import type { ChainNetwork, NetworkId } from '../chains'
 import { resolveNetwork } from '../chains'
-import type { ActionGroup } from '../data-source/capabilities'
 import { NetworkMismatchError } from '../errors'
 import type { Signer } from '../signer/types'
-import type { ChainDataSource } from '../types/data-source'
+import type { ChainBackend } from '../types/backend'
 import type { Extension, Prettify } from '../types/utils'
 import type { WalletClient, WalletClientConfig } from './wallet-types'
 
@@ -18,7 +18,7 @@ import type { WalletClient, WalletClientConfig } from './wallet-types'
  * Creates a new wallet client instance with account context.
  *
  * @remarks
- * The wallet client wraps a chain data source and provides an
+ * The wallet client wraps a chain backend and provides an
  * account-aware interface. Unlike the base client, it knows about the
  * user's addresses and can provide convenience methods that automatically
  * use the appropriate address for each operation.
@@ -26,7 +26,7 @@ import type { WalletClient, WalletClientConfig } from './wallet-types'
  * Signing capability is reached through the actions installed by
  * `walletBtcActions()`, which reads `config.signer` at call time.
  *
- * @typeParam dsMethods - The data source capabilities (inferred from `config.dataSource`)
+ * @typeParam dsMethods - The backend capabilities (inferred from `config.backend`)
  * @typeParam TAccount - The account type (inferred from `config.account`)
  *
  * @param config - The wallet client configuration
@@ -34,7 +34,7 @@ import type { WalletClient, WalletClientConfig } from './wallet-types'
  *   either a {@link NetworkId} string (e.g. `'mainnet'`) or a
  *   {@link ChainNetwork} value (e.g. `MAINNET`). Strings are resolved via
  *   the built-in `NETWORKS` registry.
- * @param config.dataSource - The chain data source providing blockchain data.
+ * @param config.backend - The chain backend providing blockchain data.
  * @param config.account - The user's account (with addresses and optional public keys).
  * @param config.signer - Optional cryptographic signer. When present, signing
  *   actions are usable directly; when absent, the wallet client is
@@ -42,14 +42,14 @@ import type { WalletClient, WalletClientConfig } from './wallet-types'
  *
  * @returns A wallet client instance that can be extended with action groups
  *
- * @throws {@link NetworkMismatchError} If the client network does not match the data source network
+ * @throws {@link NetworkMismatchError} If the client network does not match the backend network
  *
  * @example
  * ```ts
  * import {
  *   createWalletClient, createWalletAccount, walletBtcActions,
  * } from '@omnisat/lasereyes-client/wallet'
- * import { createDataSource } from '@omnisat/lasereyes-client/vendors/mempool'
+ * import { createBackend } from '@omnisat/lasereyes-client/vendors/mempool'
  * import { MAINNET, AddressType } from '@omnisat/lasereyes-client'
  *
  * const account = createWalletAccount({
@@ -59,11 +59,11 @@ import type { WalletClient, WalletClientConfig } from './wallet-types'
  *   publicKeys: { payment: '02...', ordinals: '03...', taproot: '03...' },
  * })
  *
- * const ds = createDataSource({ network: MAINNET })
+ * const ds = createBackend({ network: MAINNET })
  *
  * const walletClient = createWalletClient({
  *   network: MAINNET,
- *   dataSource: ds,
+ *   backend: ds,
  *   account,
  * })
  *   .extend(walletBtcActions())
@@ -77,19 +77,19 @@ export function createWalletClient<
   TAccount extends Account,
 >(config: {
   network: NetworkId | ChainNetwork
-  dataSource: ChainDataSource<dsMethods>
+  backend: ChainBackend<dsMethods>
   account: TAccount
   signer?: Signer
 }): WalletClient<WalletClientConfig<TAccount, dsMethods>, TAccount, {}, dsMethods> {
   const network = resolveNetwork(config.network)
-  if (config.dataSource.network !== network) {
-    throw new NetworkMismatchError(network.name, config.dataSource.network.name)
+  if (config.backend.network !== network) {
+    throw new NetworkMismatchError(network.name, config.backend.network.name)
   }
 
   type Config = WalletClientConfig<TAccount, dsMethods>
   const resolvedConfig: Config = {
     network,
-    dataSource: config.dataSource,
+    backend: config.backend,
     account: config.account,
     signer: config.signer,
   }

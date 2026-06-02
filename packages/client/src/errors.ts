@@ -18,7 +18,7 @@ export class LaserEyesClientError extends Error {
 }
 
 /**
- * Thrown when a requested method is not available on the data source because
+ * Thrown when a requested method is not available on the backend because
  * the required capability group has not been added via `.extend()`.
  *
  * @remarks
@@ -31,7 +31,7 @@ export class CapabilityNotFoundError extends LaserEyesClientError {
    */
   constructor(group: string, method: string) {
     super(
-      `Method "${method}" not available. Data source missing "${group}" capability.`,
+      `Method "${method}" not available. Backend missing "${group}" capability.`,
       'CAPABILITY_NOT_FOUND'
     )
     this.name = 'CapabilityNotFoundError'
@@ -39,27 +39,27 @@ export class CapabilityNotFoundError extends LaserEyesClientError {
 }
 
 /**
- * Thrown when a vendor data source encounters an error during an API call.
+ * Thrown when a vendor backend encounters an error during an API call.
  *
  * @remarks
  * Error code: `'DATA_SOURCE_ERROR'`
  *
- * The {@link DataSourceError.source | source} property identifies which vendor produced the error,
- * and {@link DataSourceError.originalCause | originalCause} preserves the underlying exception.
+ * The {@link ChainBackendError.source | source} property identifies which vendor produced the error,
+ * and {@link ChainBackendError.originalCause | originalCause} preserves the underlying exception.
  */
-export class DataSourceError extends LaserEyesClientError {
+export class ChainBackendError extends LaserEyesClientError {
   /** The vendor name that produced this error (e.g., `'mempool'`, `'sandshrew'`, `'maestro'`). */
   source: string
-  /** The original error that caused this data source error, if available. */
+  /** The original error that caused this backend error, if available. */
   readonly originalCause?: Error
   /**
    * @param message - Human-readable error description
-   * @param source - The vendor or data source name that produced the error
+   * @param source - The vendor or backend name that produced the error
    * @param cause - The original underlying error, if any
    */
   constructor(message: string, source: string, cause?: Error) {
     super(message, 'DATA_SOURCE_ERROR')
-    this.name = 'DataSourceError'
+    this.name = 'ChainBackendError'
     this.source = source
     this.originalCause = cause
   }
@@ -78,10 +78,7 @@ export class NetworkMismatchError extends LaserEyesClientError {
    * @param got - The actual network identifier that was found
    */
   constructor(expected: string, got: string) {
-    super(
-      `Network mismatch: client is "${expected}" but data source is "${got}"`,
-      'NETWORK_MISMATCH'
-    )
+    super(`Network mismatch: client is "${expected}" but backend is "${got}"`, 'NETWORK_MISMATCH')
     this.name = 'NetworkMismatchError'
   }
 }
@@ -92,7 +89,7 @@ export class NetworkMismatchError extends LaserEyesClientError {
  *
  * @remarks
  * Distinct from {@link NetworkMismatchError} (which guards
- * client-vs-data-source consistency). This one is raised by the core
+ * client-vs-backend consistency). This one is raised by the core
  * keystone when a wallet's runtime network falls outside the supported
  * set — typically because the user switched chains in their wallet UI to
  * a chain the app didn't register.

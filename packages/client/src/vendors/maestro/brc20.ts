@@ -4,11 +4,11 @@
  * @module vendors/maestro/brc20
  */
 
-import type { Brc20Capability } from '../../data-source/capabilities'
+import type { Brc20Capability } from '../../backend/capabilities'
 import type {
   Brc20Balance,
   Brc20Info,
-  DataSourceContext,
+  ChainBackendContext,
   PaginatedResult,
   PaginationParams,
 } from '../../types'
@@ -17,8 +17,8 @@ import { maestroGet, resolveUrlAndKey } from './shared'
 
 export function brc20Capabilities(
   vendorConfig: MaestroConfig
-): (ctx: DataSourceContext) => Brc20Capability {
-  return (ctx: DataSourceContext) => {
+): (ctx: ChainBackendContext) => Brc20Capability {
+  return (ctx: ChainBackendContext) => {
     const { apiUrl, apiKey } = resolveUrlAndKey(ctx.network.id, vendorConfig)
 
     const methods: Brc20Capability = {

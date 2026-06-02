@@ -3,7 +3,7 @@
  *
  * @remarks
  * The core package owns:
- * - {@link LaserEyesConfig} — the value bundle (chains, connectors, transports, state, storage)
+ * - {@link LaserEyesConfig} — the value bundle (chains, connectors, backends, state, storage)
  * - {@link createLaserEyesConfig} — the factory
  * - Reactive state atoms ({@link LaserEyesState})
  * - Phase 9 free-function actions over the config
@@ -25,7 +25,8 @@ export {
   type CreateLaserEyesConfigOptions,
   createLaserEyesConfig,
   type LaserEyesConfig,
-  type NetworkTransports,
+  type NetworkBackends,
+  type NetworkBackendsParams,
 } from './config'
 export { createState, type LaserEyesState } from './state'
 export {
@@ -92,21 +93,32 @@ export {
 // ============================================================================
 
 export type {
+  ChainBackendFactory,
   ChainNetwork,
   NetworkId,
   NetworkType,
 } from '@omnisat/lasereyes-client'
 export {
+  combineBackends,
   defineChain,
   FRACTAL_MAINNET,
   FRACTAL_TESTNET,
+  fractalMainnet,
+  fractalTestnet,
+  localnet,
   MAINNET,
+  mainnet,
   NETWORKS,
   OYLNET,
+  oylnet,
   REGTEST,
+  regtest,
   SIGNET,
+  signet,
   TESTNET,
   TESTNET4,
+  testnet,
+  testnet4,
 } from '@omnisat/lasereyes-client'
 export type {
   Account,

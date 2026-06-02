@@ -6,14 +6,14 @@
  * A LaserEyes config is a value, not a class. It bundles:
  * - the chains your app supports (as a typed tuple)
  * - the connectors users can connect with (each retains its factory identity)
- * - the per-chain transports (data sources, in priority order)
+ * - the per-chain backends (one resolved backend per network)
  * - the reactive state atoms
  * - the storage layer for persisted state (auto-reconnect, etc.)
  *
  * Operations are free functions in `actions/*` that take a config and any
  * necessary args.
  *
- * Three threaded generics — `chains`, `transports`, `connectorFns` —
+ * Three threaded generics — `chains`, `backends`, `connectorFns` —
  * preserve literal-typed information (chain IDs, per-chain capability
  * sets, per-connector identity) so the keystone {@link getWalletClient}
  * (Phase 10) can hand callers a precisely-typed wallet client without
@@ -24,7 +24,12 @@
  * @module config
  */
 
-import type { ChainDataSource, ChainNetwork, Client } from '@omnisat/lasereyes-client'
+import type {
+  ChainBackend,
+  ChainBackendFactory,
+  ChainNetwork,
+  Client,
+} from '@omnisat/lasereyes-client'
 import { createState, type LaserEyesState } from './state'
 import { createStorage, type Storage } from './storage'
 import type { Connector, CreateConnectorFn } from './types/connector'
@@ -35,43 +40,62 @@ import type { Connector, CreateConnectorFn } from './types/connector'
  * @remarks
  * When set on a {@link LaserEyesConfig}, `getClient(config, …)` calls
  * this factory instead of the default `createClient({ network,
- * dataSource })` construction. The factory wins unconditionally —
+ * backend })` construction. The factory wins unconditionally —
  * including when a wallet is connected. Use it to inject caching
  * wrappers, instrumentation, or a fully-custom client implementation.
  *
  * @param params.chain - The resolved chain for the requested chainId.
- * @param params.dataSource - The data source the default path would have
- *   used (the folded `config.transports[chainId]`). Use it, ignore it,
+ * @param params.backend - The backend the default path would have
+ *   used (`config.backends[chainId]`). Use it, ignore it,
  *   or compose with your own.
  */
 export type ClientFactory = (params: {
   chain: ChainNetwork
-  dataSource: ChainDataSource<any>
+  backend: ChainBackend<any>
 }) => Client<any, any, any>
 
 /**
- * Per-network data-source configuration parameterized by the chains tuple.
+ * Per-network backend configuration parameterized by the chains tuple.
  *
  * @remarks
- * Each chain ID maps to an array of {@link ChainDataSource}s in priority
- * order: index 0 is highest priority, later entries are fallbacks. The
- * runtime fold is performed by `mergeDataSources`; the type-level fold
- * (intersection of capabilities) is `MergedCapabilities` in the client
- * package.
+ * Each chain ID maps to a single {@link ChainBackendFactory} — the external
+ * service backing that chain's reads. To use several services for one chain
+ * (with fallback), compose them into one backend via `combineBackends(…)`
+ * from `@omnisat/lasereyes-client`. The network is injected from the map key
+ * when `createLaserEyesConfig` builds the config, so a backend declaration
+ * (`mempool()`) carries no network of its own.
  */
-export type NetworkTransports<
+export type NetworkBackendsParams<
   chains extends readonly [ChainNetwork, ...ChainNetwork[]] = readonly [
     ChainNetwork,
     ...ChainNetwork[],
   ],
-> = Record<chains[number]['id'], readonly ChainDataSource<any>[]>
+> = {
+  // `<any>` is the *constraint* (ChainBackend is invariant in its
+  // capability set, so a concrete `ChainBackendFactory<BaseCapability>`
+  // wouldn't satisfy a `ChainBackendFactory<ActionGroup>` gate). The precise
+  // capability set is recovered from the concrete factory in
+  // {@link NetworkBackends} via `ReturnType`.
+  [K in chains[number]['id']]: ChainBackendFactory<any>
+}
+
+/**
+ * The resolved form of {@link NetworkBackendsParams}: each chain ID maps to
+ * the concrete {@link ChainBackend} its backend factory produced.
+ */
+export type NetworkBackends<
+  chains extends readonly [ChainNetwork, ...ChainNetwork[]],
+  params extends NetworkBackendsParams<chains>,
+> = {
+  [K in chains[number]['id']]: ReturnType<params[K]>
+}
 
 /**
  * The fully-resolved config produced by {@link createLaserEyesConfig}.
  *
  * @typeParam chains - The tuple of chains this config knows about.
- * @typeParam transports - The per-chain data-source map. Each chain ID maps
- *   to an array of `ChainDataSource`s in priority order.
+ * @typeParam backends - The per-chain backend map. Each chain ID maps to a
+ *   single `ChainBackend` (compose several via `combineBackends`).
  * @typeParam connectorFns - The connector factory identities, preserved so
  *   downstream consumers can refer back to specific connectors.
  */
@@ -80,7 +104,7 @@ export interface LaserEyesConfig<
     ChainNetwork,
     ...ChainNetwork[],
   ],
-  transports extends NetworkTransports<chains> = NetworkTransports<chains>,
+  backends extends NetworkBackendsParams<chains> = NetworkBackendsParams<chains>,
   connectorFns extends readonly CreateConnectorFn[] = readonly CreateConnectorFn[],
 > {
   /** Bitcoin chains this config knows about, in declaration order. */
@@ -89,8 +113,8 @@ export interface LaserEyesConfig<
   readonly connectorFns: connectorFns
   /** Connectors instantiated from `connectorFns`, indexed in declaration order. */
   readonly connectors: readonly Connector[]
-  /** Per-network data sources, in priority order. */
-  readonly transports: transports
+  /** Per-network backend — the resolved backend for each chain. */
+  readonly backends: NetworkBackends<chains, backends>
   /** Reactive state atoms. */
   readonly state: LaserEyesState
   /** Persisted-state storage. */
@@ -106,7 +130,7 @@ export interface LaserEyesConfig<
    * uses this unconditionally — including when a wallet is connected.
    * When unset, `getClient` defers to the connected wallet's client (if
    * any) and falls back to the default `createClient({ network,
-   * dataSource })`.
+   * backend })`.
    */
   readonly client?: ClientFactory
 }
@@ -116,7 +140,7 @@ export interface LaserEyesConfig<
  */
 export interface CreateLaserEyesConfigOptions<
   chains extends readonly [ChainNetwork, ...ChainNetwork[]],
-  transports extends NetworkTransports<chains>,
+  backends extends NetworkBackendsParams<chains>,
   connectorFns extends readonly CreateConnectorFn[],
 > {
   /**
@@ -137,10 +161,11 @@ export interface CreateLaserEyesConfigOptions<
    */
   connectors?: connectorFns
   /**
-   * Per-network data sources. Each network can have multiple data sources;
-   * index 0 is highest priority, later entries are fallbacks.
+   * Per-network backend — one {@link ChainBackendFactory} per chain. Use
+   * `combineBackends(a, b, …)` to compose several services into a single
+   * backend (first wins on overlap, the rest are fallbacks).
    */
-  transports: transports
+  backends: backends
   /**
    * Custom storage. Defaults to a `localStorage`-backed key-prefixed
    * storage when available, in-memory otherwise.
@@ -161,9 +186,9 @@ export interface CreateLaserEyesConfigOptions<
    * ```ts
    * createLaserEyesConfig({
    *   chains: [MAINNET],
-   *   transports: { mainnet: [mempool({...})] },
-   *   client: ({ chain, dataSource }) =>
-   *     createClient({ network: chain, dataSource })
+   *   backends: { mainnet: mempool() },
+   *   client: ({ chain, backend }) =>
+   *     createClient({ network: chain, backend })
    *       .extend(publicActions())
    *       .extend(cacheActions()),
    * })
@@ -186,7 +211,7 @@ export interface CreateLaserEyesConfigOptions<
  * up by the `initialize(config)` action, not at construction.
  *
  * The `const` modifier on each generic preserves literal types — chain
- * IDs stay a string-literal union, the transports map keys stay typed
+ * IDs stay a string-literal union, the backends map keys stay typed
  * to those literals, and per-connector factory identity is preserved
  * across the readonly tuple.
  *
@@ -194,31 +219,42 @@ export interface CreateLaserEyesConfigOptions<
  * ```ts
  * import { createLaserEyesConfig, unisat, xverse } from '@omnisat/lasereyes-core'
  * import { MAINNET, TESTNET4 } from '@omnisat/lasereyes-client'
- * import { createDataSource as mempool } from '@omnisat/lasereyes-client/vendors/mempool'
+ * import { mempool } from '@omnisat/lasereyes-client/vendors/mempool'
+ * import { sandshrew } from '@omnisat/lasereyes-client/vendors/sandshrew'
+ * import { combineBackends } from '@omnisat/lasereyes-client'
  *
  * const config = createLaserEyesConfig({
  *   chains: [MAINNET, TESTNET4],
  *   connectors: [unisat(), xverse()],
- *   transports: {
- *     mainnet: [mempool({ network: MAINNET })],
- *     testnet4: [mempool({ network: TESTNET4 })],
+ *   backends: {
+ *     mainnet: combineBackends(sandshrew({ apiKey: '…' }), mempool()),
+ *     testnet4: mempool(),
  *   },
  * })
  * // `config.chains` typed as `readonly [typeof MAINNET, typeof TESTNET4]`
- * // `config.transports` keys typed as `'mainnet' | 'testnet4'`
+ * // `config.backends` keys typed as `'mainnet' | 'testnet4'`
  * ```
  */
 export function createLaserEyesConfig<
   const chains extends readonly [ChainNetwork, ...ChainNetwork[]],
-  const transports extends NetworkTransports<chains>,
+  const backends extends NetworkBackendsParams<chains>,
   const connectorFns extends readonly CreateConnectorFn[] = readonly [],
 >(
-  opts: CreateLaserEyesConfigOptions<chains, transports, connectorFns>
-): LaserEyesConfig<chains, transports, connectorFns> {
+  opts: CreateLaserEyesConfigOptions<chains, backends, connectorFns>
+): LaserEyesConfig<chains, backends, connectorFns> {
   const chains = opts.chains
   const defaultChain = chains[0]
   const state = createState(defaultChain.id)
   const storage = opts.storage ?? createStorage()
+  // Resolve each backend factory against its chain. We pass the full chain
+  // object (not just the id) so custom `defineChain()` networks that aren't
+  // in the built-in registry resolve correctly.
+  const backends = Object.fromEntries(
+    Object.entries(opts.backends).map(([key, factory]) => {
+      const chain = chains.find(c => c.id === key) ?? (key as ChainNetwork['id'])
+      return [key, (factory as ChainBackendFactory)(chain)]
+    })
+  ) as unknown as NetworkBackends<chains, backends>
 
   // Connector factories receive a config bag describing the app + chains.
   const connectorConfig = {
@@ -241,7 +277,7 @@ export function createLaserEyesConfig<
     chains,
     connectorFns,
     connectors,
-    transports: opts.transports,
+    backends,
     state,
     storage,
     appName: opts.appName,

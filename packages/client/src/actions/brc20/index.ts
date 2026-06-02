@@ -6,16 +6,16 @@
  *
  * - {@link brc20Actions} — read-only. Wraps {@link Brc20Capability} methods.
  * - {@link brc20WriteActions} — write. Adds deploy / mint / transfer.
- *   Requires the data source to expose `Brc20Capability` *and* the client
+ *   Requires the backend to expose `Brc20Capability` *and* the client
  *   to already carry `signPsbt`. Bodies are stubbed; type surface is final.
  *
  * @module actions/brc20
  */
 
 import type { WalletAccount } from '../../account/types'
+import type { ActionGroup, BaseCapability, Brc20Capability } from '../../backend/capabilities'
 import type { Client, ClientConfig } from '../../client/types'
 import type { WalletClient, WalletClientConfig } from '../../client/wallet-types'
-import type { ActionGroup, BaseCapability, Brc20Capability } from '../../data-source/capabilities'
 import type { SignedPsbt, SignPsbtOptions } from '../../signer/types'
 import type { Brc20Balance, Brc20Info, PaginatedResult, PaginationParams } from '../../types'
 
@@ -32,7 +32,7 @@ export async function getBrc20Balances<
   address: string,
   pagination?: PaginationParams
 ): Promise<PaginatedResult<Brc20Balance>> {
-  return client.config.dataSource.brc20GetAddressBalances(address, pagination)
+  return client.config.backend.brc20GetAddressBalances(address, pagination)
 }
 
 export async function getBrc20ByTicker<
@@ -40,7 +40,7 @@ export async function getBrc20ByTicker<
   Actions extends ActionGroup,
   DS extends Pick<Brc20Capability, 'brc20GetByTicker'>,
 >(client: Client<Config, DS, Actions>, ticker: string): Promise<Brc20Info> {
-  return client.config.dataSource.brc20GetByTicker(ticker)
+  return client.config.backend.brc20GetByTicker(ticker)
 }
 
 // ============================================================================
@@ -183,7 +183,7 @@ export type WalletBrc20Actions = {
  * ```ts
  * import { brc20Actions } from '@omnisat/lasereyes-client/brc20'
  *
- * const client = createClient({ network, dataSource }).extend(brc20Actions())
+ * const client = createClient({ network, backend }).extend(brc20Actions())
  * const balances = await client.getBrc20Balances('bc1q...')
  * ```
  */

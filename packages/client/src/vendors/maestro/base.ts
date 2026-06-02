@@ -4,16 +4,16 @@
  * @remarks
  * Maestro covers balance, transaction lookup, broadcast, and fees but does
  * NOT support `btcGetAddressUtxos`, `btcGetOutputValue`, or
- * `btcWaitForTransaction` — those throw {@link DataSourceError} so the
- * caller can fall back to another data source via {@link mergeDataSources}.
+ * `btcWaitForTransaction` — those throw {@link ChainBackendError} so the
+ * caller can fall back to another backend via {@link mergeChainBackends}.
  *
  * @module vendors/maestro/base
  */
 
-import type { BaseCapability } from '../../data-source/capabilities'
-import { DataSourceError } from '../../errors'
+import type { BaseCapability } from '../../backend/capabilities'
+import { ChainBackendError } from '../../errors'
 import type {
-  DataSourceContext,
+  ChainBackendContext,
   FeeEstimate,
   PaginatedResult,
   PaginationParams,
@@ -25,8 +25,8 @@ import { maestroGet, maestroPost, resolveUrlAndKey } from './shared'
 
 export function baseCapabilities(
   vendorConfig: MaestroConfig
-): (ctx: DataSourceContext) => BaseCapability {
-  return (ctx: DataSourceContext) => {
+): (ctx: ChainBackendContext) => BaseCapability {
+  return (ctx: ChainBackendContext) => {
     const { apiUrl, apiKey } = resolveUrlAndKey(ctx.network.id, vendorConfig)
 
     const methods: BaseCapability = {
@@ -39,8 +39,8 @@ export function baseCapabilities(
         _address: string,
         _pagination?: PaginationParams
       ): Promise<PaginatedResult<UTXO>> {
-        throw new DataSourceError(
-          'btcGetAddressUtxos is not supported by Maestro data source',
+        throw new ChainBackendError(
+          'btcGetAddressUtxos is not supported by Maestro backend',
           'maestro'
         )
       },
@@ -62,15 +62,15 @@ export function baseCapabilities(
       },
 
       async btcGetOutputValue(_txId: string, _vout: number): Promise<number | null> {
-        throw new DataSourceError(
-          'btcGetOutputValue is not supported by Maestro data source',
+        throw new ChainBackendError(
+          'btcGetOutputValue is not supported by Maestro backend',
           'maestro'
         )
       },
 
       async btcWaitForTransaction(_txId: string): Promise<boolean> {
-        throw new DataSourceError(
-          'btcWaitForTransaction is not supported by Maestro data source',
+        throw new ChainBackendError(
+          'btcWaitForTransaction is not supported by Maestro backend',
           'maestro'
         )
       },

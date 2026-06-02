@@ -4,9 +4,9 @@
  * @module vendors/sandshrew/inscriptions
  */
 
-import type { InscriptionCapability } from '../../data-source/capabilities'
+import type { InscriptionCapability } from '../../backend/capabilities'
 import type {
-  DataSourceContext,
+  ChainBackendContext,
   Inscription,
   InscriptionInfo,
   PaginatedResult,
@@ -18,8 +18,8 @@ import { resolveUrl } from './shared'
 
 export function inscriptionCapabilities(
   vendorConfig?: SandshrewConfig
-): (ctx: DataSourceContext) => InscriptionCapability {
-  return (ctx: DataSourceContext) => {
+): (ctx: ChainBackendContext) => InscriptionCapability {
+  return (ctx: ChainBackendContext) => {
     const { url, key } = resolveUrl(ctx.network.id, vendorConfig)
     const rpc = new SandshrewRpcClient(`${url}/${key}`)
 

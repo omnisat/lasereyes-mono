@@ -4,7 +4,7 @@
  * @remarks
  * Two patterns:
  *
- * - **Client (data-source) reads** (`getAddressBalance`, `getAddressUtxos`,
+ * - **Client (backend) reads** (`getAddressBalance`, `getAddressUtxos`,
  *   `getRecommendedFees`, `getTransaction`, `broadcastTransaction`):
  *   delegate to the bare action from the client package, composed with
  *   `getClient(config, opts)`. The action layer never talks to the
@@ -13,11 +13,11 @@
  *   answer) lives in the *connector's* `getClient` override — apps that
  *   want it call through `getWalletClient(config)` and the override
  *   wires "try wallet, fall back to base via `getAction`." Action-layer
- *   reads stay wagmi-shaped: transport-only, no wallet involvement.
+ *   reads stay wagmi-shaped: backend-only, no wallet involvement.
  *
  * - **Provider-only protocol reads** (`getInscriptions`,
  *   `getRunesBalances`, `getBrc20Balances`, `getAlkanesBalances`): no
- *   data-source path yet — the client package's protocol actions are
+ *   backend path yet — the client package's protocol actions are
  *   stubbed. Until those land, these hit the wallet's provider
  *   directly. To be migrated to the client-read pattern once the
  *   underlying actions ship.
@@ -48,11 +48,11 @@ import type {
 } from '@omnisat/lasereyes-client'
 import {
   broadcastTransaction as clientBroadcastTransaction,
-  getAction,
   getAddressBalance as clientGetAddressBalance,
   getAddressUtxos as clientGetAddressUtxos,
   getRecommendedFees as clientGetRecommendedFees,
   getTransaction as clientGetTransaction,
+  getAction,
 } from '@omnisat/lasereyes-client'
 import { getClient } from '../client'
 import type { LaserEyesConfig } from '../config'
@@ -68,7 +68,7 @@ import { tryResolveConnector } from '../internal'
  *
  * @remarks
  * Used only by the provider-only protocol reads — those have no
- * data-source equivalent yet and can't fall back. Client reads
+ * backend equivalent yet and can't fall back. Client reads
  * (`getAddressBalance`, etc.) don't use this; they go straight through
  * {@link getClient}.
  *
@@ -92,14 +92,14 @@ async function callProvider<T>(
 }
 
 // ============================================================================
-// Client (data-source) reads
+// Client (backend) reads
 // ============================================================================
 
 /**
  * Get the BTC balance for an address (in satoshis, as a string).
  *
  * @remarks
- * Goes through the configured data source for the active chain (or the
+ * Goes through the configured backend for the active chain (or the
  * chain explicitly named in `options.chainId`). The wallet-fast-path
  * variant lives on the wallet client —
  * `getWalletClient(config).getAccountBalance(account)` — and is supplied
@@ -140,7 +140,7 @@ export async function getAddressUtxos<const config extends LaserEyesConfig<any, 
 // ============================================================================
 // Provider-only protocol reads
 //
-// No data-source path yet — the client package's protocol actions are
+// No backend path yet — the client package's protocol actions are
 // stubbed. Once those land, migrate these to the client-read pattern.
 // ============================================================================
 
@@ -152,7 +152,7 @@ export async function getAddressUtxos<const config extends LaserEyesConfig<any, 
  *
  * @throws {Error} If no wallet is connected or the provider doesn't support
  *   the method. (Once Phase 10's typed wallet keystone lands, the
- *   `inscriptionActions()` factory provides a data-source path.)
+ *   `inscriptionActions()` factory provides a backend path.)
  */
 export async function getInscriptions<const config extends LaserEyesConfig<any, any, any>>(
   config: config,
@@ -228,7 +228,7 @@ export async function getAlkanesBalances<const config extends LaserEyesConfig<an
 // ============================================================================
 
 /**
- * Get the recommended fee rates from the configured data source.
+ * Get the recommended fee rates from the configured backend.
  *
  * @remarks
  * Client-only. Delegates to the client package's bare `getRecommendedFees`

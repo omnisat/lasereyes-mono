@@ -17,7 +17,12 @@
  * pre-built wallet client. No real bitcoin libs touched.
  */
 
-import { createChainDataSource, MAINNET } from '@omnisat/lasereyes-client'
+import {
+  type ChainNetwork,
+  createChainBackend,
+  MAINNET,
+  type NetworkId,
+} from '@omnisat/lasereyes-client'
 import { AddressType } from '@omnisat/lasereyes-client/utils'
 import {
   createWalletAccount,
@@ -56,25 +61,26 @@ function makeConfigWithWalletClient(opts: {
   overrides?: Record<string, any>
   signer?: { signPsbt?: any; signMessage?: any }
 }) {
-  const ds = createChainDataSource({ network: MAINNET }).extend(() => ({
-    btcGetAddressUtxos: vi.fn(async () => ({
-      data: [
-        {
-          txid: 'a'.repeat(64),
-          vout: 0,
-          value: 100000,
-          status: {
-            confirmed: true,
-            block_height: 800000,
-            block_hash: 'c'.repeat(64),
-            block_time: 1700000000,
+  const ds = (network: NetworkId | ChainNetwork) =>
+    createChainBackend({ network }).extend(() => ({
+      btcGetAddressUtxos: vi.fn(async () => ({
+        data: [
+          {
+            txid: 'a'.repeat(64),
+            vout: 0,
+            value: 100000,
+            status: {
+              confirmed: true,
+              block_height: 800000,
+              block_hash: 'c'.repeat(64),
+              block_time: 1700000000,
+            },
           },
-        },
-      ],
-      pagination: { offset: 0, limit: 50, total: 1 },
-    })),
-    btcBroadcastTransaction: vi.fn(async () => 'broadcasted-txid'),
-  })) as any
+        ],
+        pagination: { offset: 0, limit: 50, total: 1 },
+      })),
+      btcBroadcastTransaction: vi.fn(async () => 'broadcasted-txid'),
+    }))
 
   const account = makeAccount()
   const signer = {
@@ -86,7 +92,7 @@ function makeConfigWithWalletClient(opts: {
         txHex: 'finalized-tx-hex',
       })),
     signMessage: opts.signer?.signMessage ?? vi.fn(async () => 'signature'),
-  } as any
+  }
 
   // Pretend connector that the config holds. `getAccount` is invoked
   // only inside `buildConnectorClient`, which we sidestep by using
@@ -110,17 +116,17 @@ function makeConfigWithWalletClient(opts: {
 
   const config = createLaserEyesConfig({
     chains: [MAINNET],
-    transports: { mainnet: [ds] },
+    backends: { mainnet: ds },
     connectors: [connector],
     // User-factory wins. Returns a pre-built wallet client with the
     // requested overrides merged on top.
-    client: ({ chain, dataSource }) => {
+    client: ({ chain, backend }) => {
       const wc = createWalletClient({
         network: chain,
-        dataSource,
+        backend,
         account,
         signer,
-      }) as any
+      })
       return Object.assign(wc, opts.overrides ?? {})
     },
   })
@@ -131,7 +137,7 @@ function makeConfigWithWalletClient(opts: {
     networkId: 'mainnet',
     account,
     connector: connector(config as any),
-  } as any)
+  })
 
   return { config, ds, signer }
 }
@@ -246,6 +252,9 @@ describe('sendBtc (core)', () => {
 
     await expect(sendBtc(config, recipient, 1000)).resolves.toBe('broadcasted-txid')
     expect(signer.signPsbt).toHaveBeenCalledTimes(1)
-    expect(signer.signPsbt.mock.calls[0][1]).toEqual({ finalize: true, broadcast: false })
+    expect(signer.signPsbt.mock.calls[0][1]).toEqual({
+      finalize: true,
+      broadcast: false,
+    })
   })
 })

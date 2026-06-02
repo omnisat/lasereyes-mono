@@ -15,5 +15,5 @@ export {
   readCachedClient,
   writeCachedClient,
 } from './client-cache'
+export { resolveChainBackend } from './resolve-backend'
 export { resolveConnector, tryResolveConnector } from './resolve-connector'
-export { resolveDataSource } from './resolve-data-source'

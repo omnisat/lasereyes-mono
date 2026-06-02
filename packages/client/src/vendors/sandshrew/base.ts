@@ -4,11 +4,11 @@
  * @module vendors/sandshrew/base
  */
 
-import type { BaseCapability } from '../../data-source/capabilities'
+import type { BaseCapability } from '../../backend/capabilities'
 import { bytesToHex } from '../../lib/bytes'
 import { getAddressScriptPubKey } from '../../lib/get-address-script-pub-key'
 import type {
-  DataSourceContext,
+  ChainBackendContext,
   FeeEstimate,
   PaginatedResult,
   Transaction,
@@ -20,8 +20,8 @@ import { resolveUrl } from './shared'
 
 export function baseCapabilities(
   vendorConfig?: SandshrewConfig
-): (ctx: DataSourceContext) => BaseCapability {
-  return (ctx: DataSourceContext) => {
+): (ctx: ChainBackendContext) => BaseCapability {
+  return (ctx: ChainBackendContext) => {
     const { url, key } = resolveUrl(ctx.network.id, vendorConfig)
     const rpc = new SandshrewRpcClient(`${url}/${key}`)
 

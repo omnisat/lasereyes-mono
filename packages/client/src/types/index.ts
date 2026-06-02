@@ -2,13 +2,7 @@
 // convenience: most action code imports `Account` / `WalletAccount` /
 // `AddressInfo` together with `WalletClient` and friends.
 export type { Account, AddressInfo, AddressPurpose, WalletAccount } from '../account/types'
-
-// Client and wallet-client types live in `../client/{types,wallet-types}` and
-// are re-exported here for action-code convenience.
-export type { Client, ClientConfig } from '../client/types'
-export type { WalletClient, WalletClientConfig } from '../client/wallet-types'
-
-// Capability interfaces and ActionGroup live in `../data-source/capabilities`
+// Capability interfaces and ActionGroup live in `../backend/capabilities`
 // but are re-exported here for action-code convenience.
 export type {
   ActionGroup,
@@ -19,12 +13,16 @@ export type {
   OrdAddressInfo,
   OrdCapability,
   RuneCapability,
-} from '../data-source/capabilities'
+} from '../backend/capabilities'
+// Client and wallet-client types live in `../client/{types,wallet-types}` and
+// are re-exported here for action-code convenience.
+export type { Client, ClientConfig } from '../client/types'
+export type { WalletClient, WalletClientConfig } from '../client/wallet-types'
 
 // Domain types — protocol payloads returned by capabilities and consumed by actions.
 export * from './alkane'
+export * from './backend'
 export * from './brc20'
-export * from './data-source'
 export * from './fees'
 export * from './inscription'
 export * from './psbt'

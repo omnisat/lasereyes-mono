@@ -12,13 +12,6 @@ export type {
   ConnectResult,
   CreateConnectorFn,
 } from './connector'
-
-export {
-  createMethodCapability,
-  describeType,
-  ProviderErrorCode,
-  ProviderRpcError,
-} from './provider'
 export type {
   BitcoinProvider,
   BitcoinProviderEvent,
@@ -30,4 +23,10 @@ export type {
   ProviderCapabilities,
   ProviderMessage,
   TypeDescriptor,
+} from './provider'
+export {
+  createMethodCapability,
+  describeType,
+  ProviderErrorCode,
+  ProviderRpcError,
 } from './provider'

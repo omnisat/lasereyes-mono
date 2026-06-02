@@ -16,13 +16,15 @@
  */
 
 import {
-  createChainDataSource,
+  type ChainNetwork,
+  createChainBackend,
   MAINNET,
+  type NetworkId,
   NetworkNotConfiguredError,
   TESTNET,
 } from '@omnisat/lasereyes-client'
-import { createWalletAccount, type WalletAccount } from '@omnisat/lasereyes-client/wallet'
 import { AddressType } from '@omnisat/lasereyes-client/utils'
+import { createWalletAccount, type WalletAccount } from '@omnisat/lasereyes-client/wallet'
 import { beforeAll, describe, expect, it, vi } from 'vitest'
 import { connect } from '../../actions/connect'
 import { disconnect } from '../../actions/disconnect'
@@ -139,12 +141,12 @@ function makeFakeConnector(opts?: {
 }
 
 function makeConfig(opts?: { connectors?: ReturnType<typeof makeFakeConnector>[] }) {
-  const mainnet = createChainDataSource({ network: MAINNET }).extend(() => ({}) as any)
-  const testnet = createChainDataSource({ network: TESTNET }).extend(() => ({}) as any)
+  const dsFactory = (network: NetworkId | ChainNetwork) =>
+    createChainBackend({ network: network }).extend(() => ({}) as any)
 
   return createLaserEyesConfig({
     chains: [MAINNET, TESTNET],
-    transports: { mainnet: [mainnet], testnet: [testnet] },
+    backends: { mainnet: dsFactory, testnet: dsFactory },
     connectors: opts?.connectors ?? [],
   })
 }
@@ -163,7 +165,11 @@ describe('connect', () => {
   it('transitions $connection to connected with {account, networkId, connector} atomically', async () => {
     const { provider } = makeProvider()
     const account = makeAccount()
-    const connector = makeFakeConnector({ provider, account, networkId: 'mainnet' })
+    const connector = makeFakeConnector({
+      provider,
+      account,
+      networkId: 'mainnet',
+    })
     const config = makeConfig({ connectors: [connector] })
 
     const result = await connect(config, { connectorId: 'mock' })
@@ -228,7 +234,10 @@ describe('connect', () => {
 
     await connect(config, { connectorId: 'mock' })
     expect(onConnect).toHaveBeenCalledOnce()
-    expect(onConnect.mock.calls[0][0]).toMatchObject({ account, networkId: 'mainnet' })
+    expect(onConnect.mock.calls[0][0]).toMatchObject({
+      account,
+      networkId: 'mainnet',
+    })
   })
 
   it('propagates a wallet-emitted networkChanged into $connection.networkId', async () => {

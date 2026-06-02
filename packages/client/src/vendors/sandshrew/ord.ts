@@ -4,9 +4,9 @@
  * @module vendors/sandshrew/ord
  */
 
-import type { OrdAddressInfo, OrdCapability } from '../../data-source/capabilities'
+import type { OrdAddressInfo, OrdCapability } from '../../backend/capabilities'
 import type {
-  DataSourceContext,
+  ChainBackendContext,
   FormattedUTXO,
   PaginatedResult,
   PaginationParams,
@@ -17,8 +17,8 @@ import { resolveUrl } from './shared'
 
 export function ordCapabilities(
   vendorConfig?: SandshrewConfig
-): (ctx: DataSourceContext) => OrdCapability {
-  return (ctx: DataSourceContext) => {
+): (ctx: ChainBackendContext) => OrdCapability {
+  return (ctx: ChainBackendContext) => {
     const { url, key } = resolveUrl(ctx.network.id, vendorConfig)
     const rpc = new SandshrewRpcClient(`${url}/${key}`)
 

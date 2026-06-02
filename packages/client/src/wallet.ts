@@ -25,7 +25,7 @@
  *   createWalletClient, createWalletAccount,
  *   walletBtcActions, providerSigner,
  * } from '@omnisat/lasereyes-client/wallet'
- * import { createDataSource } from '@omnisat/lasereyes-client/vendors/mempool'
+ * import { createBackend } from '@omnisat/lasereyes-client/vendors/mempool'
  * import { MAINNET, AddressType } from '@omnisat/lasereyes-client'
  *
  * const account = createWalletAccount({
@@ -36,10 +36,10 @@
  *   publicKeys: { payment: '02...', ordinals: '03...', taproot: '03...' },
  * })
  *
- * const ds = createDataSource({ network: MAINNET })
+ * const ds = createBackend({ network: MAINNET })
  *
  * const walletClient = createWalletClient({
- *   network: MAINNET, dataSource: ds, account,
+ *   network: MAINNET, backend: ds, account,
  *   signer: providerSigner(provider),
  * })
  *   .extend(walletBtcActions())
@@ -68,8 +68,8 @@ export {
   sendBtc,
   signMessage,
   signPsbt,
-  walletBtcActions,
   type WalletBtcActions,
+  walletBtcActions,
 } from './actions/wallet'
 // Wallet client factory + types
 export { createWalletClient } from './client'

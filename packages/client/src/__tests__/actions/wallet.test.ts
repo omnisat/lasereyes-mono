@@ -5,7 +5,7 @@
  *   - composed write (sendBtc)
  *
  * @remarks
- * Mock client, mock signer, mock data source. The composition tests
+ * Mock client, mock signer, mock backend. The composition tests
  * (sendBtc, broadcastPsbt) exercise the `getAction` cascade — they
  * pin the override-respecting behavior we wired through `.extend()`.
  *
@@ -16,7 +16,6 @@
 
 import { describe, expect, it, vi } from 'vitest'
 import { createWalletAccount } from '../../account/wallet-account'
-import { AddressType } from '../../types/psbt'
 import {
   broadcastPsbt,
   getAccountBalance,
@@ -26,6 +25,7 @@ import {
   signPsbt,
   walletBtcActions,
 } from '../../actions/wallet'
+import { AddressType } from '../../types/psbt'
 
 /** A WalletAccount with payment + ordinals on the same key (Unisat-style). */
 function makeAccount() {
@@ -59,7 +59,7 @@ function makeAccount() {
  * lookup. This is how we simulate ".extend() installed an override."
  */
 function makeWalletClient(opts: {
-  dataSource?: Record<string, any>
+  backend?: Record<string, any>
   signer?: any
   overrides?: Record<string, any>
 }): any {
@@ -67,7 +67,7 @@ function makeWalletClient(opts: {
   return {
     config: {
       network: { id: 'mainnet', type: 'mainnet' },
-      dataSource: opts.dataSource ?? {},
+      backend: opts.backend ?? {},
       account,
       signer: opts.signer,
     },
@@ -126,9 +126,9 @@ describe('signMessage', () => {
 // ============================================================================
 
 describe('getAccountBalance', () => {
-  it('resolves the payment address from the account and delegates to getAddressBalance (via data source)', async () => {
+  it('resolves the payment address from the account and delegates to getAddressBalance (via backend)', async () => {
     const btcGetBalance = vi.fn(async () => '99999')
-    const client = makeWalletClient({ dataSource: { btcGetBalance } })
+    const client = makeWalletClient({ backend: { btcGetBalance } })
 
     await expect(getAccountBalance(client)).resolves.toBe('99999')
     expect(btcGetBalance).toHaveBeenCalledWith(client.config.account.getAddress('payment'))
@@ -136,7 +136,7 @@ describe('getAccountBalance', () => {
 
   it('uses the explicit `purpose` arg when provided', async () => {
     const btcGetBalance = vi.fn(async () => '0')
-    const client = makeWalletClient({ dataSource: { btcGetBalance } })
+    const client = makeWalletClient({ backend: { btcGetBalance } })
 
     await getAccountBalance(client, undefined, 'ordinals')
     expect(btcGetBalance).toHaveBeenCalledWith(client.config.account.getAddress('ordinals'))
@@ -144,7 +144,7 @@ describe('getAccountBalance', () => {
 
   it('uses the explicit `account` arg when provided (not client.config.account)', async () => {
     const btcGetBalance = vi.fn(async () => '0')
-    const client = makeWalletClient({ dataSource: { btcGetBalance } })
+    const client = makeWalletClient({ backend: { btcGetBalance } })
 
     const otherAccount = createWalletAccount({
       addresses: [
@@ -172,7 +172,7 @@ describe('getAccountUtxos', () => {
   it('resolves address from (account, purpose) and delegates to btcGetAddressUtxos', async () => {
     const result = { data: [], pagination: { offset: 0, limit: 50, total: 0 } }
     const btcGetAddressUtxos = vi.fn(async () => result)
-    const client = makeWalletClient({ dataSource: { btcGetAddressUtxos } })
+    const client = makeWalletClient({ backend: { btcGetAddressUtxos } })
 
     await expect(getAccountUtxos(client, client.config.account)).resolves.toBe(result)
     expect(btcGetAddressUtxos).toHaveBeenCalledWith(
@@ -183,7 +183,7 @@ describe('getAccountUtxos', () => {
 
   it('threads the explicit purpose through', async () => {
     const btcGetAddressUtxos = vi.fn(async () => ({ data: [], pagination: {} }))
-    const client = makeWalletClient({ dataSource: { btcGetAddressUtxos } })
+    const client = makeWalletClient({ backend: { btcGetAddressUtxos } })
 
     await getAccountUtxos(client, client.config.account, 'ordinals')
     expect(btcGetAddressUtxos).toHaveBeenCalledWith(
@@ -207,7 +207,7 @@ describe('broadcastPsbt', () => {
       })),
     }
     const btcBroadcastTransaction = vi.fn(async () => 'broadcast-txid')
-    const client = makeWalletClient({ signer, dataSource: { btcBroadcastTransaction } })
+    const client = makeWalletClient({ signer, backend: { btcBroadcastTransaction } })
 
     await expect(broadcastPsbt(client, 'unsigned-psbt')).resolves.toBe('broadcast-txid')
     expect(signer.signPsbt).toHaveBeenCalledWith('unsigned-psbt', { finalize: true })
@@ -220,7 +220,7 @@ describe('broadcastPsbt', () => {
     }
     const client = makeWalletClient({
       signer,
-      dataSource: { btcBroadcastTransaction: vi.fn() },
+      backend: { btcBroadcastTransaction: vi.fn() },
     })
 
     await expect(broadcastPsbt(client, 'unsigned-psbt')).rejects.toThrow(
@@ -236,7 +236,7 @@ describe('broadcastPsbt', () => {
     }))
     const btcBroadcastTransaction = vi.fn(async () => 'broadcast-txid')
     const client = makeWalletClient({
-      dataSource: { btcBroadcastTransaction },
+      backend: { btcBroadcastTransaction },
       overrides: { signPsbt: signOverride },
     })
 
@@ -280,7 +280,7 @@ describe('sendBtc', () => {
     }
     const client = makeWalletClient({
       signer,
-      dataSource: { btcGetAddressUtxos, btcBroadcastTransaction },
+      backend: { btcGetAddressUtxos, btcBroadcastTransaction },
     })
 
     await expect(
@@ -321,7 +321,7 @@ describe('sendBtc', () => {
     const realSigner = { signPsbt: vi.fn() } // should NOT be called.
     const client = makeWalletClient({
       signer: realSigner,
-      dataSource: { btcGetAddressUtxos, btcBroadcastTransaction },
+      backend: { btcGetAddressUtxos, btcBroadcastTransaction },
       overrides: { signPsbt: signPsbtOverride },
     })
 

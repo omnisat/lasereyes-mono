@@ -3,7 +3,7 @@
  *
  * The page demonstrates the Phase 10 keystone composition end-to-end:
  *
- *   createLaserEyesConfig({ chains, connectors, transports })
+ *   createLaserEyesConfig({ chains, connectors, backends })
  *     ↓
  *   connect(config, { connectorId })           // lifecycle
  *     ↓
@@ -18,7 +18,7 @@
  */
 
 import { MAINNET, NetworkNotConfiguredError, TESTNET } from '@omnisat/lasereyes-client'
-import { createDataSource as createMempoolDataSource } from '@omnisat/lasereyes-client/vendors/mempool'
+import { mempool } from '@omnisat/lasereyes-client/vendors/mempool'
 import { createLaserEyesConfig, getWalletClient } from '@omnisat/lasereyes-core'
 import {
   broadcastTransaction,
@@ -47,9 +47,9 @@ import { xverse } from '@omnisat/lasereyes-core/connectors/xverse'
 const config = createLaserEyesConfig({
   chains: [MAINNET, TESTNET],
   connectors: [unisat(), xverse()],
-  transports: {
-    mainnet: [createMempoolDataSource({ network: MAINNET })],
-    testnet: [createMempoolDataSource({ network: TESTNET })],
+  backends: {
+    mainnet: mempool(),
+    testnet: mempool(),
   },
 })
 

@@ -2,7 +2,7 @@
  * Capability interfaces — the contracts between vendors and actions.
  *
  * @remarks
- * A *capability* is a typed bundle of data-source methods. Vendors expose
+ * A *capability* is a typed bundle of backend methods. Vendors expose
  * (subsets of) capabilities by implementing them; actions consume them by
  * declaring `dsMethods extends Pick<X, '...'>` constraints.
  *
@@ -10,12 +10,12 @@
  * new protocol — new methods are added here, then vendor implementations
  * provide them, then actions reference them.
  *
- * @module data-source/capabilities
+ * @module backend/capabilities
  */
 
 import type { AlkaneBalance, AlkaneOutpoint } from '../types/alkane'
+import type { PaginatedResult, PaginationParams } from '../types/backend'
 import type { Brc20Balance, Brc20Info } from '../types/brc20'
-import type { PaginatedResult, PaginationParams } from '../types/data-source'
 import type { FeeEstimate } from '../types/fees'
 import type { Inscription, InscriptionInfo } from '../types/inscription'
 import type { OrdOutputWrapper, RuneBalance, RuneInfo, RuneOutpoint } from '../types/rune'
@@ -23,20 +23,20 @@ import type { Transaction } from '../types/transaction'
 import type { FormattedUTXO, UTXO } from '../types/utxo'
 
 /**
- * Action group — any record of async functions, the unit that data-source
+ * Action group — any record of async functions, the unit that backend
  * capabilities and client actions are expressed as.
  */
 export type ActionGroup = Record<string, (...args: any[]) => any>
 
 // ============================================================================
-// Base capability — required for every data source
+// Base capability — required for every backend
 // ============================================================================
 
 /**
  * Core Bitcoin capability providing fundamental blockchain operations.
  *
  * @remarks
- * Every vendor data source must implement this capability. It is the
+ * Every vendor backend must implement this capability. It is the
  * foundation upon which all other capabilities (runes, inscriptions, …) are
  * built.
  */
@@ -77,7 +77,7 @@ export interface OrdAddressInfo {
  * Capability for querying the ord indexer for address and UTXO details.
  *
  * @remarks
- * Available via the sandshrew vendor data source.
+ * Available via the sandshrew vendor backend.
  */
 export interface OrdCapability extends ActionGroup {
   /** Retrieves ord-indexed address information including inscriptions, outputs, and rune balances. */
@@ -97,7 +97,7 @@ export interface OrdCapability extends ActionGroup {
  * Capability for querying Bitcoin Ordinal inscriptions.
  *
  * @remarks
- * Available via sandshrew and maestro vendor data sources.
+ * Available via sandshrew and maestro vendor backends.
  */
 export interface InscriptionCapability extends ActionGroup {
   /** Lists inscriptions held by an address. */
@@ -144,7 +144,7 @@ export interface RuneCapability extends ActionGroup {
  * Capability for querying BRC-20 fungible token data.
  *
  * @remarks
- * Available via the maestro vendor data source.
+ * Available via the maestro vendor backend.
  */
 export interface Brc20Capability extends ActionGroup {
   /** Lists BRC-20 token balances held by an address. */
@@ -160,7 +160,7 @@ export interface Brc20Capability extends ActionGroup {
  * Capability for querying Alkanes protocol data.
  *
  * @remarks
- * Available via the sandshrew vendor data source.
+ * Available via the sandshrew vendor backend.
  */
 export interface AlkaneCapability extends ActionGroup {
   /** Lists alkane token balances held by an address. */

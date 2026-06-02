@@ -6,7 +6,7 @@
  */
 
 import type { NetworkId } from '../../chains'
-import { DataSourceError } from '../../errors'
+import { ChainBackendError } from '../../errors'
 import type { MaestroConfig } from './config'
 
 const MAESTRO_API_URL_MAINNET = 'https://xbt-mainnet.gomaestro-api.org/v0'
@@ -43,7 +43,7 @@ export async function maestroGet(apiUrl: string, apiKey: string, endpoint: strin
     headers: { 'Content-Type': 'application/json', 'api-key': apiKey },
   })
   if (!response.ok) {
-    throw new DataSourceError(`Maestro API error: HTTP ${response.status}`, 'maestro')
+    throw new ChainBackendError(`Maestro API error: HTTP ${response.status}`, 'maestro')
   }
   return response.json()
 }
@@ -58,7 +58,7 @@ export async function maestroPost(apiUrl: string, apiKey: string, endpoint: stri
     body: JSON.stringify(body),
   })
   if (!response.ok) {
-    throw new DataSourceError(`Maestro API error: HTTP ${response.status}`, 'maestro')
+    throw new ChainBackendError(`Maestro API error: HTTP ${response.status}`, 'maestro')
   }
   return response.json()
 }

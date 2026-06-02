@@ -11,26 +11,26 @@
  * @module client/types
  */
 
+import type { ActionGroup } from '../backend/capabilities'
 import type { ChainNetwork } from '../chains'
-import type { ActionGroup } from '../data-source/capabilities'
-import type { ChainDataSource } from '../types/data-source'
+import type { ChainBackend } from '../types/backend'
 import type { ExactPartial, Extension, Prettify } from '../types/utils'
 import type { ExtendableProtectedActions } from './extendable-actions'
 
 /**
- * A client instance that wraps a chain data source and exposes action methods.
+ * A client instance that wraps a chain backend and exposes action methods.
  *
  * Actions are added via {@link Client.extend | .extend()}, which merges new
  * methods into the client. The client is the primary interface consumers use
  * to interact with the Bitcoin blockchain.
  *
- * @typeParam Config - The client configuration including data source capabilities
- * @typeParam dsMethods - The capabilities available on the underlying data source
+ * @typeParam Config - The client configuration including backend capabilities
+ * @typeParam dsMethods - The capabilities available on the underlying backend
  * @typeParam clientActions - The action methods added via `.extend()`
  *
  * @example
  * ```ts
- * const client = createClient({ network: MAINNET, dataSource: ds })
+ * const client = createClient({ network: MAINNET, backend: ds })
  *   .extend(publicActions())
  *
  * const balance = await client.getAddressBalance('bc1q...')
@@ -71,11 +71,11 @@ export type Client<
 /**
  * Configuration for creating a new client via {@link createClient}.
  *
- * @typeParam dsMethods - The capabilities available on the provided data source
+ * @typeParam dsMethods - The capabilities available on the provided backend
  */
 export interface ClientConfig<dsMethods extends ActionGroup = {}> {
   /** The Bitcoin network this client should operate on. */
   network: ChainNetwork
-  /** The chain data source to use. Must be configured for the same network. */
-  dataSource: ChainDataSource<dsMethods>
+  /** The chain backend to use. Must be configured for the same network. */
+  backend: ChainBackend<dsMethods>
 }

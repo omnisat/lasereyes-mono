@@ -4,7 +4,7 @@
  * @remarks
  * For account-aware operations (wallet client, signing, send-btc) import
  * from the `/wallet` subpath. Protocol actions live at `/runes`, `/brc20`,
- * `/inscriptions`. Vendor data sources live at `/vendors/<name>`.
+ * `/inscriptions`. Vendor backends live at `/vendors/<name>`.
  *
  * @module @omnisat/lasereyes-client
  */
@@ -23,38 +23,53 @@ export {
   publicActions,
   waitForTransaction,
 } from './actions/public'
+export type {
+  ChainBackendFactory,
+  ChainBackendMethodsOf,
+  MergedCapabilities,
+} from './backend'
+// Backends
+export {
+  combineBackends,
+  createChainBackend,
+  mergeChainBackends,
+} from './backend'
 export type { ChainNetwork, NetworkId, NetworkType } from './chains'
 // Chains
 export {
   defineChain,
   FRACTAL_MAINNET,
   FRACTAL_TESTNET,
+  fractalMainnet,
+  fractalTestnet,
   getNetwork,
   getNetworkType,
+  localnet,
   MAINNET,
+  mainnet,
   NETWORKS,
   OYLNET,
+  oylnet,
   REGTEST,
+  regtest,
   resolveNetwork,
   SIGNET,
+  signet,
   TESTNET,
   TESTNET4,
+  testnet,
+  testnet4,
 } from './chains'
-
 // Client (read-only) factory + types
 export { createClient } from './client'
 export type { Client, ClientConfig } from './client/types'
-
 // Constants
 export { ALKANES, BRC20, BTC, RUNES } from './constants/protocols'
-export type { DsMethodsOf, MergedCapabilities } from './data-source'
-// Data sources
-export { createChainDataSource, mergeDataSources } from './data-source'
 
 // Errors
 export {
   CapabilityNotFoundError,
-  DataSourceError,
+  ChainBackendError,
   InsufficientFundsError,
   LaserEyesClientError,
   NetworkMismatchError,
@@ -82,8 +97,8 @@ export type {
   Brc20Balance,
   Brc20Capability,
   Brc20Info,
-  ChainDataSource,
-  DataSourceContext,
+  ChainBackend,
+  ChainBackendContext,
   FeeEstimate,
   FormattedUTXO,
   // Protocol domain types — inscription

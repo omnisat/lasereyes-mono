@@ -4,5 +4,5 @@
  * @module storage
  */
 
-export { createStorage } from './create'
 export type { CreateStorageOptions, Storage } from './create'
+export { createStorage } from './create'

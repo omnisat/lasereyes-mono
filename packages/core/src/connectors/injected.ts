@@ -41,8 +41,8 @@ import type { NetworkId } from '@omnisat/lasereyes-client'
 import { getAddressBalance as baseGetAddressBalance, getAction } from '@omnisat/lasereyes-client'
 import {
   broadcastPsbt as baseBroadcastPsbt,
-  createWalletAccount,
   sendBtc as baseSendBtc,
+  createWalletAccount,
   type SendBtcParams,
   type WalletAccount,
   type WalletAccountConfig,
@@ -122,7 +122,7 @@ export interface InjectedConnectorOptions {
      *
      * The wallet adapter is expected to throw on addresses outside the
      * wallet's accounts; the override's `catch` falls back to the
-     * data-source-backed `getAddressBalance` via `getAction`.
+     * backend-backed `getAddressBalance` via `getAction`.
      *
      * Flag name mirrors the action it installs (`getAddressBalance`),
      * not the underlying RPC (`bitcoin_getBalance`).
@@ -136,7 +136,7 @@ export interface InjectedConnectorOptions {
  * isn't something I handle" (JSON-RPC `METHOD_NOT_FOUND`, code -32601).
  *
  * @remarks
- * The native-RPC overrides fall back to the composed/data-source path
+ * The native-RPC overrides fall back to the composed/backend path
  * **only** on this error. User rejections (4001), network errors, and
  * adapter-internal errors re-throw — the caller asked the wallet to do
  * something, the wallet refused for a reason, and silently re-routing
@@ -259,7 +259,7 @@ export function injected(target: InjectedConnectorOptions): CreateConnectorFn {
       // gracefully ONLY for "this method isn't supported by the wallet"
       // failures — e.g. Unisat's `bitcoin_getBalance` adapter throws
       // -32601 for addresses outside the wallet's accounts; that
-      // catch + base action delivers the data-source answer instead.
+      // catch + base action delivers the backend answer instead.
       //
       // Every other failure — user rejection (4001), network error,
       // wallet internal error — re-throws so the caller sees what the
@@ -269,7 +269,7 @@ export function injected(target: InjectedConnectorOptions): CreateConnectorFn {
       //
       // When `target.nativeRpc` is omitted, the connector has no
       // override and the keystone's bare default path runs in full
-      // (composed PSBT writes, data-source reads).
+      // (composed PSBT writes, backend reads).
       ...(hasNativeOverrides
         ? {
             getClient({ client }: { client: any }) {

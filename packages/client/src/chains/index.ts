@@ -46,7 +46,7 @@ export type NetworkId =
  *
  * @remarks
  * Pass by value to {@link createClient}, {@link createWalletClient}, and
- * {@link createChainDataSource}. Construct custom chains via
+ * {@link createChainBackend}. Construct custom chains via
  * {@link defineChain}.
  */
 export interface ChainNetwork {
@@ -178,6 +178,18 @@ export const REGTEST = defineChain({
   wif: 0xef,
 })
 
+export {
+  MAINNET as mainnet,
+  TESTNET as testnet,
+  TESTNET4 as testnet4,
+  SIGNET as signet,
+  FRACTAL_MAINNET as fractalMainnet,
+  FRACTAL_TESTNET as fractalTestnet,
+  OYLNET as oylnet,
+  REGTEST as regtest,
+  REGTEST as localnet,
+}
+
 /**
  * Registry of built-in chains by ID.
  *
@@ -212,7 +224,7 @@ export function getNetwork(id: NetworkId): ChainNetwork | undefined {
  *
  * @remarks
  * Constructor-facing helper used by {@link createClient}, {@link createWalletClient},
- * {@link createChainDataSource}, and the vendor `createDataSource` factories.
+ * {@link createChainBackend}, and the vendor `createBackend` factories.
  * Accepts either form so callers can write the ergonomic
  * `{ network: 'mainnet' }` *or* the canonical `{ network: MAINNET }` and
  * the resulting data structure always carries the full `ChainNetwork`.

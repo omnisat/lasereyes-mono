@@ -4,13 +4,13 @@
  * @module vendors/sandshrew/alkanes
  */
 
-import type { AlkaneCapability } from '../../data-source/capabilities'
-import { DataSourceError } from '../../errors'
+import type { AlkaneCapability } from '../../backend/capabilities'
+import { ChainBackendError } from '../../errors'
 import { bytesToHex, hexToBytes } from '../../lib/bytes'
 import type {
   AlkaneBalance,
   AlkaneOutpoint,
-  DataSourceContext,
+  ChainBackendContext,
   PaginatedResult,
   PaginationParams,
 } from '../../types'
@@ -42,7 +42,7 @@ async function alkaneRpcCall(baseUrl: string, method: string, params: unknown[])
     }
     return (data as { result: unknown }).result
   } catch (error) {
-    throw new DataSourceError(
+    throw new ChainBackendError(
       `Alkane RPC error: ${error instanceof Error ? error.message : String(error)}`,
       'sandshrew',
       error instanceof Error ? error : undefined
@@ -52,8 +52,8 @@ async function alkaneRpcCall(baseUrl: string, method: string, params: unknown[])
 
 export function alkaneCapabilities(
   vendorConfig?: SandshrewConfig
-): (ctx: DataSourceContext) => AlkaneCapability {
-  return (ctx: DataSourceContext) => {
+): (ctx: ChainBackendContext) => AlkaneCapability {
+  return (ctx: ChainBackendContext) => {
     const { url, key } = resolveUrl(ctx.network.id, vendorConfig)
     const rpcUrl = `${url}/${key}`
 

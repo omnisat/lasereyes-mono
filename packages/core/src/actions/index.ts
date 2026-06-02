@@ -22,15 +22,9 @@
 
 // Read-only typed client (used internally by data actions, also a public surface)
 export { getClient } from '../client'
-
+export type { ConnectArgs } from './connect'
 // Lifecycle
 export { connect } from './connect'
-export type { ConnectArgs } from './connect'
-export { disconnect } from './disconnect'
-export { dispose } from './dispose'
-export { initialize } from './initialize'
-export { switchNetwork } from './switchNetwork'
-
 // Data (read)
 export {
   broadcastTransaction,
@@ -43,6 +37,10 @@ export {
   getRunesBalances,
   getTransaction,
 } from './data'
+export { disconnect } from './disconnect'
+export { dispose } from './dispose'
+export { initialize } from './initialize'
+export { switchNetwork } from './switchNetwork'
 
 // Wallet (write)
 export { broadcastPsbt, sendBtc, signMessage, signPsbt } from './wallet'

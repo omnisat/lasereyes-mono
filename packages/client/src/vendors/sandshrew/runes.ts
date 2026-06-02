@@ -4,9 +4,9 @@
  * @module vendors/sandshrew/runes
  */
 
-import type { RuneCapability } from '../../data-source/capabilities'
+import type { RuneCapability } from '../../backend/capabilities'
 import type {
-  DataSourceContext,
+  ChainBackendContext,
   OrdOutputWrapper,
   PaginatedResult,
   PaginationParams,
@@ -18,8 +18,8 @@ import { resolveUrl } from './shared'
 
 export function runeCapabilities(
   vendorConfig?: SandshrewConfig
-): (ctx: DataSourceContext) => RuneCapability {
-  return (ctx: DataSourceContext) => {
+): (ctx: ChainBackendContext) => RuneCapability {
+  return (ctx: ChainBackendContext) => {
     const { url, key } = resolveUrl(ctx.network.id, vendorConfig)
     const rpc = new SandshrewRpcClient(`${url}/${key}`)
 

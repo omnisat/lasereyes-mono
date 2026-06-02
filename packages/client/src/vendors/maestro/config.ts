@@ -5,7 +5,7 @@
  */
 
 /**
- * Configuration for the maestro data source.
+ * Configuration for the maestro backend.
  *
  * @remarks
  * Maestro requires an API key. Mainnet and testnet keys are typically

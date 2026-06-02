@@ -10,11 +10,11 @@
  * surface — there's no separate `signingActions` factory anymore.
  *
  * **Type-level rule.** Free actions constrain only on `dsMethods` (the
- * data-source capabilities they reach for at the leaf). Action-presence
+ * backend capabilities they reach for at the leaf). Action-presence
  * on the client is a runtime concern dispatched by {@link getAction}.
  *
  * **Composition rule.** Composed action bodies call other actions via
- * {@link getAction}, never reaching `client.config.dataSource.btcXxx(...)`
+ * {@link getAction}, never reaching `client.config.backend.btcXxx(...)`
  * directly except in leaf actions. User overrides extended onto the client
  * cascade through all composition layers automatically.
  *
@@ -27,8 +27,8 @@
  */
 
 import type { Account, AddressPurpose, WalletAccount } from '../../account/types'
+import type { ActionGroup, BaseCapability } from '../../backend/capabilities'
 import type { WalletClient, WalletClientConfig } from '../../client/wallet-types'
-import type { ActionGroup, BaseCapability } from '../../data-source/capabilities'
 import { buildSendBtcPsbt } from '../../lib/build-send-btc-psbt'
 import { getAction } from '../../lib/get-action'
 import type { SignedPsbt, Signer, SignMessageOptions, SignPsbtOptions } from '../../signer/types'
@@ -111,7 +111,7 @@ export async function signMessage<
 
 /**
  * Sign a PSBT (with finalization) and broadcast the resulting transaction
- * through the configured data source.
+ * through the configured backend.
  *
  * @remarks
  * Internally composes via {@link getAction}, so overrides on `signPsbt` or
@@ -150,7 +150,7 @@ export async function broadcastPsbt<
  * automatically.
  *
  * Requires a {@link WalletAccount} (needs the payment public key for PSBT
- * construction) and that the client's data source exposes
+ * construction) and that the client's backend exposes
  * `btcGetAddressUtxos` and `btcBroadcastTransaction`. Signing-capability
  * is enforced at runtime by the {@link signPsbt} free function reading
  * `client.config.signer`.
@@ -293,7 +293,7 @@ export type WalletBtcActions = {
  *
  * @example
  * ```ts
- * createWalletClient({ network, dataSource, account, signer })
+ * createWalletClient({ network, backend, account, signer })
  *   .extend(walletBtcActions())
  *
  * await walletClient.signPsbt(psbtHex, { finalize: true })

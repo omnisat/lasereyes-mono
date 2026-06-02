@@ -26,7 +26,7 @@
  *    the discovery section.
  * 6. **Changed `LaserEyesConfig` / `createLaserEyesConfig` signature** —
  *    update the `LaserEyesConfig` section: literal preservation, chain-ID
- *    union, transports record shape, and connectorFns tuple identity.
+ *    union, backends record shape, and connectorFns tuple identity.
  * 7. **New action or changed action signature** — update §7 (Phase 9
  *    actions). Each action assertion captures: `<const config>` threading,
  *    parameter types, return type. `switchNetwork` is the showcase for
@@ -40,7 +40,7 @@
 import type {
   AlkaneBalance,
   Brc20Balance,
-  ChainDataSource,
+  ChainBackend,
   ChainNetwork,
   FeeEstimate,
   Inscription,
@@ -50,9 +50,15 @@ import type {
   Transaction,
   UTXO,
 } from '@omnisat/lasereyes-client'
-import { MAINNET, ProviderErrorCode, ProviderRpcError, TESTNET4 } from '@omnisat/lasereyes-client'
-import type { createDataSource as createMempoolDataSource } from '@omnisat/lasereyes-client/vendors/mempool'
-import type { createDataSource as createSandshrewDataSource } from '@omnisat/lasereyes-client/vendors/sandshrew'
+import {
+  combineBackends,
+  MAINNET,
+  ProviderErrorCode,
+  ProviderRpcError,
+  TESTNET4,
+} from '@omnisat/lasereyes-client'
+import type { mempool } from '@omnisat/lasereyes-client/vendors/mempool'
+import type { sandshrew } from '@omnisat/lasereyes-client/vendors/sandshrew'
 import type {
   Account,
   SignedPsbt,
@@ -99,7 +105,7 @@ import { loadTokeoWalletAdapter, type TokeoAdapter } from '../adapters/tokeo'
 import { loadUnisatWalletAdapter, type UnisatAdapter } from '../adapters/unisat'
 import type { XverseAdapter } from '../adapters/xverse'
 // — Config + state —
-import { createLaserEyesConfig, type NetworkTransports } from '../config'
+import { createLaserEyesConfig, type NetworkBackendsParams } from '../config'
 // — Connectors —
 import { createConnector } from '../connectors/create'
 import { type InjectedConnectorOptions, injected } from '../connectors/injected'
@@ -238,7 +244,9 @@ describe('Adapters', () => {
   })
 
   it('ProviderCapabilities is a per-network method matrix', () => {
-    expectTypeOf(caps).toMatchTypeOf<{ [networkId: string]: { [methodName: string]: unknown } }>()
+    expectTypeOf(caps).toMatchTypeOf<{
+      [networkId: string]: { [methodName: string]: unknown }
+    }>()
   })
 })
 
@@ -365,7 +373,7 @@ describe('Discovery', () => {
 // ============================================================================
 // 6. createLaserEyesConfig — wagmi-shaped generic registry
 //
-// Three threaded generics — `chains`, `transports`, `connectorFns` — preserve
+// Three threaded generics — `chains`, `backends`, `connectorFns` — preserve
 // literal-typed information so Phase 10's keystone (`getWalletClient` /
 // `getClient`) can hand callers a precisely-typed result on a per-chain
 // basis. The default-generic case lets call sites that don't need precision
@@ -373,56 +381,57 @@ describe('Discovery', () => {
 // ============================================================================
 
 // Module-level fixtures (declare's must live here, not inside `it()` bodies).
-declare const memMainnet: ReturnType<typeof createMempoolDataSource>
-declare const memTestnet4: ReturnType<typeof createMempoolDataSource>
-declare const sandshrewMainnet: ReturnType<typeof createSandshrewDataSource>
+declare const memMainnet: ReturnType<typeof mempool>
+declare const memTestnet4: ReturnType<typeof mempool>
+declare const sandshrewMainnet: ReturnType<typeof sandshrew>
 
 describe('createLaserEyesConfig', () => {
   it('preserves the chains tuple as a literal-typed readonly tuple', () => {
     const config = createLaserEyesConfig({
       chains: [MAINNET, TESTNET4],
-      transports: {
-        mainnet: [memMainnet],
-        testnet4: [memTestnet4],
+      backends: {
+        mainnet: memMainnet,
+        testnet4: memTestnet4,
       },
     })
 
     expectTypeOf<typeof config.chains>().toEqualTypeOf<readonly [typeof MAINNET, typeof TESTNET4]>()
   })
 
-  it("transports keys are constrained to the chains' ID literals", () => {
+  it("backends keys are constrained to the chains' ID literals", () => {
     const config = createLaserEyesConfig({
       chains: [MAINNET, TESTNET4],
-      transports: {
-        mainnet: [memMainnet],
-        testnet4: [memTestnet4],
+      backends: {
+        mainnet: memMainnet,
+        testnet4: memTestnet4,
       },
     })
 
-    type TransportKeys = keyof typeof config.transports
-    expectTypeOf<TransportKeys>().toEqualTypeOf<'mainnet' | 'testnet4'>()
+    type BackendKeys = keyof typeof config.backends
+    expectTypeOf<BackendKeys>().toEqualTypeOf<'mainnet' | 'testnet4'>()
   })
 
-  it('per-chain transport tuples preserve element identity', () => {
+  it('a chain backend resolves to the backend its factory produces', () => {
     const config = createLaserEyesConfig({
       chains: [MAINNET],
-      transports: {
-        mainnet: [sandshrewMainnet, memMainnet],
+      backends: {
+        // sandshrew (full caps) primary, mempool (base) fallback — folded
+        // into one backend by combineBackends.
+        mainnet: combineBackends(sandshrewMainnet, memMainnet),
       },
     })
 
-    // The mainnet transports retain their element types in declared order.
-    expectTypeOf<typeof config.transports.mainnet>().toEqualTypeOf<
-      readonly [typeof sandshrewMainnet, typeof memMainnet]
-    >()
+    // The resolved backend is a single ChainBackend, not an array, and it
+    // carries sandshrew's full capability surface.
+    expectTypeOf<typeof config.backends.mainnet>().toMatchTypeOf<ChainBackend<any>>()
   })
 
   it('connectorFns tuple preserves identity (each factory typed individually)', () => {
     const config = createLaserEyesConfig({
       chains: [MAINNET],
       connectors: [unisat(), xverse()],
-      transports: {
-        mainnet: [memMainnet],
+      backends: {
+        mainnet: memMainnet,
       },
     })
 
@@ -436,7 +445,7 @@ describe('createLaserEyesConfig', () => {
   it('returns a config exposing state, storage, and the resolved connectors', () => {
     const config = createLaserEyesConfig({
       chains: [MAINNET],
-      transports: { mainnet: [memMainnet] },
+      backends: { mainnet: memMainnet },
     })
 
     expectTypeOf<typeof config.state>().toMatchTypeOf<LaserEyesState>()
@@ -445,23 +454,23 @@ describe('createLaserEyesConfig', () => {
     expectTypeOf<typeof config.autoReconnect>().toEqualTypeOf<boolean>()
   })
 
-  it('accepts an optional `client` factory of shape ({chain, dataSource}) => Client', async () => {
+  it('accepts an optional `client` factory of shape ({chain, backend}) => Client', async () => {
     const { createClient } = await import('@omnisat/lasereyes-client')
     const config = createLaserEyesConfig({
       chains: [MAINNET],
-      transports: { mainnet: [memMainnet] },
-      client: ({ chain, dataSource }) => createClient({ network: chain, dataSource }),
+      backends: { mainnet: memMainnet },
+      client: ({ chain, backend }) => createClient({ network: chain, backend }),
     })
     expectTypeOf<NonNullable<typeof config.client>>().parameter(0).toMatchTypeOf<{
       chain: ChainNetwork
-      dataSource: ChainDataSource<any>
+      backend: ChainBackend<any>
     }>()
   })
 
   it('omitting `client` is legal — it defaults to undefined', () => {
     const config = createLaserEyesConfig({
       chains: [MAINNET],
-      transports: { mainnet: [memMainnet] },
+      backends: { mainnet: memMainnet },
     })
     expectTypeOf<typeof config.client>().toEqualTypeOf<
       typeof config.client extends infer T ? T : never
@@ -473,27 +482,27 @@ describe('createLaserEyesConfig', () => {
   it('connectors arg is optional (defaults to empty tuple)', () => {
     const config = createLaserEyesConfig({
       chains: [MAINNET],
-      transports: { mainnet: [memMainnet] },
+      backends: { mainnet: memMainnet },
     })
 
     // The tuple is empty when no connectors are passed.
     expectTypeOf<typeof config.connectorFns>().toMatchTypeOf<readonly []>()
   })
 
-  // NOTE: TS structural subtyping permits *extra* keys in `transports`
-  // when inferred from a generic constraint position (`transports extends
-  // NetworkTransports<chains>`). Only fresh-literal-to-named-type
-  // assignment triggers excess-property checks. Extra transport keys are
+  // NOTE: TS structural subtyping permits *extra* keys in `backends`
+  // when inferred from a generic constraint position (`backends extends
+  // NetworkBackends<chains>`). Only fresh-literal-to-named-type
+  // assignment triggers excess-property checks. Extra backend keys are
   // harmless at runtime — `getClient(config, { chainId })` only reads the
   // key matching `chainId`. We don't test for a rejection that TS won't
   // produce.
 
-  it('rejects transports missing a chain ID present in `chains`', () => {
+  it('rejects backends missing a chain ID present in `chains`', () => {
     createLaserEyesConfig({
       chains: [MAINNET, TESTNET4],
-      // @ts-expect-error — `transports` must include both 'mainnet' and 'testnet4'.
-      transports: {
-        mainnet: [memMainnet],
+      // @ts-expect-error — `backends` must include both 'mainnet' and 'testnet4'.
+      backends: {
+        mainnet: memMainnet,
       },
     })
   })
@@ -501,7 +510,7 @@ describe('createLaserEyesConfig', () => {
   it('rejects an empty chains tuple at the type level', () => {
     // `chains` requires a non-empty readonly tuple. Verified via direct
     // assignability check (testing this at the call site is brittle —
-    // TS reports the missing-transports error first and masks the chains
+    // TS reports the missing-backends error first and masks the chains
     // check).
     type EmptyChains = readonly []
     type ValidChains = readonly [ChainNetwork, ...ChainNetwork[]]
@@ -511,10 +520,10 @@ describe('createLaserEyesConfig', () => {
   // NOTE on the default-generic form:
   //
   // Earlier drafts of this contract included a test asserting that a typed
-  // `LaserEyesConfig<chains, transports, connectorFns>` is assignable to
+  // `LaserEyesConfig<chains, backends, connectorFns>` is assignable to
   // the default-generic `LaserEyesConfig` (no type args). That test failed
-  // — and correctly so. The default-generic `transports` resolves to
-  // `Record<NetworkId, readonly ChainDataSource<any>[]>` which requires
+  // — and correctly so. The default-generic `backends` resolves to
+  // `Record<NetworkId, readonly ChainBackend<any>[]>` which requires
   // ALL 8 chain IDs as keys; a typed config with just `mainnet` + `testnet4`
   // doesn't satisfy that.
   //
@@ -525,22 +534,25 @@ describe('createLaserEyesConfig', () => {
   // documentation; it's not a parameter type that accepts arbitrary configs.
 })
 
-describe('NetworkTransports', () => {
+describe('NetworkBackends', () => {
   it('keys constrained by the chains tuple', () => {
-    type T = NetworkTransports<readonly [typeof MAINNET, typeof TESTNET4]>
+    type T = NetworkBackendsParams<readonly [typeof MAINNET, typeof TESTNET4]>
     expectTypeOf<keyof T>().toEqualTypeOf<'mainnet' | 'testnet4'>()
   })
 
-  it('values are readonly arrays of ChainDataSource', () => {
-    type T = NetworkTransports<readonly [typeof MAINNET]>
-    expectTypeOf<T['mainnet']>().toMatchTypeOf<readonly ChainDataSource<any>[]>()
+  it('values are a single backend factory (network) => ChainBackend', () => {
+    type T = NetworkBackendsParams<readonly [typeof MAINNET]>
+    // One backend per chain — a factory, not an array (compose several with
+    // combineBackends).
+    expectTypeOf<T['mainnet']>().toMatchTypeOf<(network: any) => ChainBackend<any>>()
+    expectTypeOf<T['mainnet']>().toBeFunction()
   })
 
   it('default generic permits any chain ID', () => {
     // The default param `readonly [ChainNetwork, ...ChainNetwork[]]` makes
     // keys typed as `NetworkId` (the open string union), so a permissive
     // call site doesn't need to thread chains through.
-    type Default = NetworkTransports
+    type Default = NetworkBackendsParams
     expectTypeOf<keyof Default>().toEqualTypeOf<NetworkId>()
   })
 })
@@ -553,15 +565,15 @@ describe('NetworkTransports', () => {
 // ============================================================================
 
 // Module-level fixtures for the action tests.
-declare const memMain: ReturnType<typeof createMempoolDataSource>
-declare const memT4: ReturnType<typeof createMempoolDataSource>
+declare const memMain: ReturnType<typeof mempool>
+declare const memT4: ReturnType<typeof mempool>
 
 // A precisely-typed config used for narrowing tests.
 const _typedConfig = createLaserEyesConfig({
   chains: [MAINNET, TESTNET4],
-  transports: {
-    mainnet: [memMain],
-    testnet4: [memT4],
+  backends: {
+    mainnet: memMain,
+    testnet4: memT4,
   },
 })
 
@@ -701,7 +713,7 @@ describe('Phase 9 — getClient', () => {
 describe('Phase 10 — getWalletClient', () => {
   it('returns a Promise<WalletClient<…>> with config + extend reachable', async () => {
     const wc = await getWalletClient(_typedConfig)
-    // Bare wallet client: `config` carries account + signer + network + dataSource.
+    // Bare wallet client: `config` carries account + signer + network + backend.
     expectTypeOf(wc.config.network).toMatchTypeOf<{ id: string }>()
     expectTypeOf(wc.config.account).toMatchTypeOf<Account>()
     expectTypeOf(wc.extend).toMatchTypeOf<Function>()

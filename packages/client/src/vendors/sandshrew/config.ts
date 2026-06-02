@@ -5,7 +5,7 @@
  */
 
 /**
- * Configuration for the sandshrew data source.
+ * Configuration for the sandshrew backend.
  *
  * @remarks
  * Provide an `apiKey` for the default Sandshrew endpoints, or override per

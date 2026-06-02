@@ -21,7 +21,7 @@ import { invalidateClientCache, resolveConnector } from '../internal'
  * ```ts
  * const config = createLaserEyesConfig({
  *   chains: [MAINNET, TESTNET4],
- *   transports: { mainnet: [...], testnet4: [...] },
+ *   backends: { mainnet: mempool(), testnet4: mempool() },
  * })
  *
  * const resolved = await switchNetwork(config, 'mainnet')

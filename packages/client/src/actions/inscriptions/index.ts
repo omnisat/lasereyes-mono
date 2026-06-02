@@ -7,20 +7,16 @@
  * - {@link inscriptionActions} — read-only. Wraps
  *   {@link InscriptionCapability} methods.
  * - {@link inscriptionWriteActions} — write. Adds inscribe + send.
- *   Requires `signPsbt` and base data source. Bodies are stubbed; type
+ *   Requires `signPsbt` and base backend. Bodies are stubbed; type
  *   surface is final.
  *
  * @module actions/inscriptions
  */
 
 import type { WalletAccount } from '../../account/types'
+import type { ActionGroup, BaseCapability, InscriptionCapability } from '../../backend/capabilities'
 import type { Client, ClientConfig } from '../../client/types'
 import type { WalletClient, WalletClientConfig } from '../../client/wallet-types'
-import type {
-  ActionGroup,
-  BaseCapability,
-  InscriptionCapability,
-} from '../../data-source/capabilities'
 import type { SignedPsbt, SignPsbtOptions } from '../../signer/types'
 import type { Inscription, InscriptionInfo, PaginatedResult, PaginationParams } from '../../types'
 
@@ -37,7 +33,7 @@ export async function getInscriptionsByAddress<
   address: string,
   pagination?: PaginationParams
 ): Promise<PaginatedResult<Inscription>> {
-  return client.config.dataSource.inscriptionsGetByAddress(address, pagination)
+  return client.config.backend.inscriptionsGetByAddress(address, pagination)
 }
 
 export async function getInscriptionInfo<
@@ -45,7 +41,7 @@ export async function getInscriptionInfo<
   Actions extends ActionGroup,
   DS extends Pick<InscriptionCapability, 'inscriptionsGetInfo'>,
 >(client: Client<Config, DS, Actions>, inscriptionId: string): Promise<InscriptionInfo> {
-  return client.config.dataSource.inscriptionsGetInfo(inscriptionId)
+  return client.config.backend.inscriptionsGetInfo(inscriptionId)
 }
 
 export async function batchGetInscriptionInfo<
@@ -53,7 +49,7 @@ export async function batchGetInscriptionInfo<
   Actions extends ActionGroup,
   DS extends Pick<InscriptionCapability, 'inscriptionsBatchGetInfo'>,
 >(client: Client<Config, DS, Actions>, inscriptionIds: string[]): Promise<InscriptionInfo[]> {
-  return client.config.dataSource.inscriptionsBatchGetInfo(inscriptionIds)
+  return client.config.backend.inscriptionsBatchGetInfo(inscriptionIds)
 }
 
 // ============================================================================
@@ -165,7 +161,7 @@ export type WalletInscriptionActions = {
  * ```ts
  * import { inscriptionActions } from '@omnisat/lasereyes-client/inscriptions'
  *
- * const client = createClient({ network, dataSource }).extend(inscriptionActions())
+ * const client = createClient({ network, backend }).extend(inscriptionActions())
  * const { data } = await client.getInscriptionsByAddress('bc1p...')
  * ```
  */
