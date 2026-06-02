@@ -33,11 +33,60 @@
 import {
   type ChainNetwork,
   type Client,
+  type ClientConfig,
   createClient,
+  type MergedCapabilities,
   NetworkNotConfiguredError,
 } from '@omnisat/lasereyes-client'
 import type { LaserEyesConfig } from './config'
 import { readCachedClient, resolveChainBackend, writeCachedClient } from './internal'
+
+/**
+ * The index-signature-stripped capability set of the backend configured for
+ * chain `K`. Stripping (via {@link MergedCapabilities}) makes method *absence*
+ * real — `client.config.backend.notAMethod` errors instead of resolving to the
+ * `ActionGroup` index signature's `AnyFn`.
+ */
+type StrippedCapsFor<C extends LaserEyesConfig, K extends keyof C['backends']> = MergedCapabilities<
+  readonly [C['backends'][K]]
+>
+
+/**
+ * The precise `Client` `getClient(config, { chainId: K })` returns: a bare
+ * client (no installed actions — reads go through the free-function actions)
+ * carrying chain `K`'s stripped capability set.
+ */
+export type ClientFor<C extends LaserEyesConfig, K extends keyof C['backends']> = Client<
+  ClientConfig<StrippedCapsFor<C, K>>,
+  StrippedCapsFor<C, K>,
+  // biome-ignore lint/complexity/noBannedTypes: bare client installs no actions
+  {}
+>
+
+/**
+ * The sound union `getClient(config)` returns when `chainId` is omitted: the
+ * omitted case resolves to the *active* network at runtime (which
+ * `switchNetwork` can change to any configured chain), so the static type is
+ * "one of the configured chains' clients, unknown which". Callers can reach
+ * only methods present on every chain without narrowing.
+ */
+export type ClientUnionFor<C extends LaserEyesConfig> = keyof C['backends'] extends infer K
+  ? K extends keyof C['backends']
+    ? ClientFor<C, K>
+    : never
+  : never
+
+/**
+ * `getClient`'s return: precise for an explicit `chainId`, the sound union when
+ * omitted.
+ */
+type GetClientReturn<C extends LaserEyesConfig, K extends keyof C['backends'] | undefined> = [
+  K,
+] extends [undefined]
+  ? ClientUnionFor<C>
+  : K extends keyof C['backends']
+    ? ClientFor<C, K>
+    : never
 
 /**
  * Build a typed `Client` for one of the chains in the config.
@@ -50,15 +99,21 @@ import { readCachedClient, resolveChainBackend, writeCachedClient } from './inte
  * @throws {Error} If `chainId` is not in `config.chains`.
  * @throws {Error} If no backend is configured for `chainId`.
  */
-export function getClient<const config extends LaserEyesConfig>(
-  config: config,
-  options?: { chainId?: config['chains'][number]['id'] }
-) {
+export function getClient<
+  const config extends LaserEyesConfig,
+  const chainId extends keyof config['backends'] | undefined = undefined,
+>(config: config, options?: { chainId?: chainId }): GetClientReturn<config, chainId> {
+  // The runtime client can't be precisely typed here (the chain is a runtime
+  // value, the cache is heterogeneous, and `config.client` is opaque), so the
+  // body works in `Client<any,…>` terms and the public return type is asserted
+  // via a single cast. Soundness rests on: the default path builds exactly the
+  // chain's backend client; the union/precise discrimination is on `chainId`.
+  type Ret = GetClientReturn<config, chainId>
   const id = (options?.chainId ?? config.state.$connection.get().networkId) as string
 
   // 1. Cached.
   const cached = readCachedClient(config, id)
-  if (cached) return cached
+  if (cached) return cached as Ret
 
   const chains = config.chains as readonly ChainNetwork[]
   const network = chains.find(c => c.id === id)
@@ -70,11 +125,15 @@ export function getClient<const config extends LaserEyesConfig>(
   }
   const backend = resolveChainBackend(config, id)
 
-  // 2. User-supplied factory wins unconditionally.
+  // 2. User-supplied factory wins unconditionally. Its output is surfaced
+  // through the precise/union signature via this cast — the caller is
+  // responsible for the custom client being compatible (see FUTURE-IMPROVEMENTS:
+  // "getClient can't return a broad client specifically for the config.client
+  // path").
   if (config.client) {
     const built = config.client({ chain: network, backend })
     writeCachedClient(config, id, built)
-    return built
+    return built as Ret
   }
 
   // 3. (Connected-wallet client.) Built at `connect()` time and stored
@@ -87,5 +146,5 @@ export function getClient<const config extends LaserEyesConfig>(
   // 4. Default bare client.
   const built = createClient({ network, backend })
   writeCachedClient(config, id, built)
-  return built as Client<any, any, any>
+  return built as unknown as Ret
 }

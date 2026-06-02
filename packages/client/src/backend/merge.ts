@@ -1,6 +1,7 @@
 import { NetworkMismatchError } from '../errors'
 import type { ChainBackend, ChainBackendContext } from '../types/backend'
 import type { ActionGroup } from './capabilities'
+import { guardBackend } from './guard'
 
 /**
  * Merges two chain backends into a single backend that combines their capabilities.
@@ -67,10 +68,10 @@ export function mergeChainBackends<A extends ActionGroup = {}, B extends ActionG
     extend<TNew>(factory: (ctx: ChainBackendContext) => TNew): ChainBackend<A & B & TNew> {
       const group = factory(context)
       Object.assign(mergedMethods, group)
-      return ds as unknown as ChainBackend<A & B & TNew>
+      return guardBackend(ds) as unknown as ChainBackend<A & B & TNew>
     },
     ...mergedMethods,
   } as ChainBackend<A & B>
 
-  return ds
+  return guardBackend(ds)
 }

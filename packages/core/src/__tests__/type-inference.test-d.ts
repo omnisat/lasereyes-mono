@@ -104,6 +104,8 @@ import { loadSparrowWalletAdapter, type SparrowAdapter } from '../adapters/sparr
 import { loadTokeoWalletAdapter, type TokeoAdapter } from '../adapters/tokeo'
 import { loadUnisatWalletAdapter, type UnisatAdapter } from '../adapters/unisat'
 import type { XverseAdapter } from '../adapters/xverse'
+// — Phase 10 keystone —
+import type { ClientFor, ClientUnionFor } from '../client'
 // — Config + state —
 import { createLaserEyesConfig, type LaserEyesConfig, type NetworkBackendsParams } from '../config'
 // — Connectors —
@@ -139,7 +141,6 @@ import type {
   CreateConnectorFn,
 } from '../types/connector'
 import type { BitcoinProvider, ProviderCapabilities } from '../types/provider'
-// — Phase 10 keystone —
 import { getWalletClient } from '../wallet-client'
 
 // ============================================================================
@@ -699,6 +700,38 @@ describe('Phase 9 — getClient', () => {
 
     // @ts-expect-error — 'signet' is not in the config chain ID union.
     getClient(_typedConfig, { chainId: 'signet' })
+  })
+
+  it('explicit chainId → precise, stripped-caps client (existence is real)', () => {
+    const client = getClient(_typedConfig, { chainId: 'mainnet' })
+    expectTypeOf(client).toEqualTypeOf<ClientFor<typeof _typedConfig, 'mainnet'>>()
+    // Declared base method is reachable…
+    expectTypeOf(client.config.backend.btcGetBalance).toBeFunction()
+    // @ts-expect-error — stripped caps: a made-up method is a real error
+    //   (no `ActionGroup` index signature handing back `AnyFn`).
+    client.config.backend.madeUpMethod
+  })
+
+  it('omitted chainId → sound union over the configured chains', () => {
+    const client = getClient(_typedConfig)
+    expectTypeOf(client).toEqualTypeOf<ClientUnionFor<typeof _typedConfig>>()
+    // A method present on every configured chain is reachable on the union.
+    expectTypeOf(client.config.backend.btcGetBalance).toBeFunction()
+  })
+
+  it('union refuses chain-specific methods without narrowing', () => {
+    // Mixed caps: sandshrew (runes/…) on mainnet, mempool (base only) on testnet4.
+    const mixed = createLaserEyesConfig({
+      chains: [MAINNET, TESTNET4],
+      backends: { mainnet: sandshrewMainnet, testnet4: memT4 },
+    })
+    // Explicit mainnet → the rune method is reachable (sandshrew has it):
+    expectTypeOf(
+      getClient(mixed, { chainId: 'mainnet' }).config.backend.runesGetAddressBalances
+    ).toBeFunction()
+    // Omitted → union; testnet4 lacks rune methods, so the union refuses it:
+    // @ts-expect-error — rune methods aren't on every configured chain.
+    getClient(mixed).config.backend.runesGetAddressBalances
   })
 
   it('default-generic config accepts any NetworkId', () => {

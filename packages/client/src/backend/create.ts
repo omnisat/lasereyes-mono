@@ -3,6 +3,7 @@ import { resolveNetwork } from '../chains'
 import type { ChainBackend, ChainBackendContext } from '../types/backend'
 import type { Extension, Prettify } from '../types/utils'
 import type { ActionGroup } from './capabilities'
+import { guardBackend } from './guard'
 
 /**
  * Creates a new chain backend with the specified network configuration.
@@ -52,7 +53,7 @@ export function createChainBackend(config: {
       },
       ...methods,
     }
-    return ds as ChainBackend<T>
+    return guardBackend(ds) as ChainBackend<T>
   }
 
   return buildChainBackend({})

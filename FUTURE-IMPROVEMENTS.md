@@ -104,15 +104,170 @@ direction — out of Phase 9 scope.
 
 ---
 
+### `getClient` can't return a broad client specifically for the `config.client` path
+
+**Status:** open
+
+**What:** When the keystones gain precise return types, `getClient(config, …)`
+returns:
+
+- `getClient(config, { chainId: K })` → a precise, **stripped-caps** client for
+  chain `K` (`MergedCapabilities`-based, so a missing method is a real error).
+- `getClient(config)` (chainId omitted) → a **union** over all configured
+  chains (sound: the omitted case resolves to the active network at runtime,
+  which `switchNetwork` can change to any chain).
+
+What it does **not** do: return a deliberately *broad* client when the user
+supplied a custom `config.client` factory. The desired behavior was — default
+path strict/precise, `config.client` path broad/permissive (`AnyDataSourceClient`
+= `Client<ClientConfig<ActionGroup>, ActionGroup, {}>`, any data-source method
+callable). Instead, the `config.client` output is surfaced through the
+precise/union signature via a **localized internal cast** inside `getClient`,
+and the caller is responsible for the custom client being compatible.
+
+**Why it's blocked (two findings):**
+
+1. **`config.client` isn't type-discriminable.** The field is
+   `client?: ClientFactory`, so for *every* config `C['client']` is
+   `ClientFactory | undefined` — there's no type-level signal that a custom
+   client was configured, so a `C['client'] extends ClientFactory ? Broad :
+   Precise` switch can never fire.
+2. **Broad isn't assignable to precise.** `AnyDataSourceClient` (its backend is
+   the poisoned `ChainBackend<ActionGroup>` — the `& ActionGroup` index
+   signature conflicts with the non-function `network` field) is **not**
+   assignable to a stripped-caps `Client`, so the factory's broad output can't
+   be surfaced through a precise/union return even structurally.
+
+Together: there is no single return type that is both broad-for-`config.client`
+and precise-for-default, and we can't branch without capturing client-ness in
+the config type.
+
+**What would unlock it:** capture whether a client factory was supplied so the
+return can branch on it. Either:
+- a **4th type param** on `LaserEyesConfig` / `createLaserEyesConfig`
+  (`client extends ClientFactory | undefined = undefined`, inferred from
+  `opts.client`), then `C['client'] extends ClientFactory ? AnyDataSourceClient
+  : Precise`; or
+- an **intersection-refinement** on `createLaserEyesConfig`'s return type that
+  narrows the `client` field to the actual factory type (avoids a named param
+  on the interface, but still threads a generic on the factory).
+
+The 4th param was explicitly ruled out (keep `LaserEyesConfig` at three
+params). Revisit if the broad-`config.client` ergonomics become important.
+
+**Why it's acceptable for now:** the high-value wins (precise stripped caps +
+sound union) land for the default/connected path — that's the actual
+runtime-safety fix. `config.client` is an advanced escape hatch; surfacing it
+through the precise signature with a contained cast keeps the one `any`
+localized rather than leaking to callers.
+
+**Cost (when picked up):** medium — a config type param (or factory-return
+refinement) + threading through `getClient` (and `getWalletClient`). The
+design + findings are prototyped in the (untracked) keystone exploration file;
+see FINDING C / FINDING D there.
+
+**Risk:** low-to-medium — adding a defaulted param is additive, but it touches
+the config's generic surface, which the action bound (`<C extends
+LaserEyesConfig>`) and the type-inference contract both depend on.
+
+**Surfaced during:** keystone precise-return design, 2026-06-02. Deferred per
+user direction — no 4th type param on `LaserEyesConfig`.
+
+---
+
 ## Action API
 
-(Add entries here as they come up.)
+### Capability-constrain the read actions to remove the `getClient` dispatch casts
+
+**Status:** open
+
+**What:** The data-source read actions (`getAddressBalance`, `getAddressUtxos`,
+`getRecommendedFees`, `getTransaction`, `broadcastTransaction` in
+`core/src/actions/data.ts`) are generic over `LaserEyesConfig` (the loose
+bound). Now that `getClient` returns a *precise* client, inside those generic
+bodies `config['backends']` is the loose `Record<string, ChainBackend>`, so the
+derived client is capability-less (`{}`). Each read therefore force-casts the
+client at the `getAction` dispatch site:
+
+```ts
+return getAction(
+  client as unknown as Parameters<typeof clientGetAddressBalance>[0],
+  clientGetAddressBalance,
+  'getAddressBalance',
+)(address)
+```
+
+The cast asserts a precondition — "the active backend supports `btcGetBalance`"
+— that the loose `config` can't prove (`getAction` itself stays strict and
+still verifies the cast *target*).
+
+**Why:** The proper fix is to constrain each action's `config` to backends that
+*have* the capability it dispatches, e.g.
+
+```ts
+export async function getAddressBalance<
+  const config extends LaserEyesConfig<
+    any,
+    Readonly<Record<string, ChainBackend<Pick<BaseCapability, 'btcGetBalance'>>>>
+  >,
+>(config: config, address: string, options?: …): Promise<string>
+```
+
+Then `getClient(config, …)` yields a client that genuinely carries
+`btcGetBalance`, `getAction` accepts it with no cast, and a config whose
+backends *don't* support the read is rejected at the **call site** (which is
+correct — it's the same class of safety the precise `getClient` buys).
+
+**Cost:** ~5 action signatures + matching updates to the core type-inference
+contract (the `_typedConfig` / `_looseConfig` regression guards may need a
+cap-bearing fixture — `_looseConfig`'s empty caps won't satisfy a cap
+constraint, so that assertion would change shape).
+
+**Risk:** medium — tightening an action's accepted config is a (subtle)
+breaking change for any caller passing a config whose backend can't prove the
+capability; in practice all real vendor backends implement `BaseCapability`.
+
+**Surfaced during:** `getClient` precise-return implementation, 2026-06-02.
+Deferred — the force-casts are localized and `getAction` stays strict.
+
+---
 
 ---
 
 ## Vendor / data-source
 
-(Add entries here as they come up.)
+### Per-action capability guards (complement to the backend Proxy guard)
+
+**Status:** open
+
+**What:** The backend Proxy guard (`backend/guard.ts`) makes a *call* to an
+unregistered capability throw `CapabilityNotFoundError` instead of
+`undefined is not a function`. A complementary, earlier-and-clearer guard is to
+have each client free-function (or action factory) check the capability *before*
+dispatching — e.g.
+
+```ts
+export async function getAddressBalance(client, address) {
+  if (typeof client.config.backend.btcGetBalance !== 'function') {
+    throw new CapabilityNotFoundError('base', 'btcGetBalance')
+  }
+  return client.config.backend.btcGetBalance(address)
+}
+```
+
+**Why:** The Proxy guard is centralized and catches everything, but it fires
+from *inside* the backend call (stack points into the proxy). A per-action
+check fails at the action boundary with the action's own context, and lets the
+factory constraints (`DS extends Pick<BaseCapability, 'btcGetBalance'>`) and the
+runtime check agree. Mostly redundant with the Proxy guard, so low urgency —
+nice-to-have for clearer stacks / belt-and-suspenders.
+
+**Cost:** small per free-function; relates to the "capability-constrain the read
+actions" entry under **Action API** — if those land, the type constraint plus
+the Proxy guard may make per-action runtime checks unnecessary.
+
+**Surfaced during:** backend Proxy guard, 2026-06-02. Deferred per user
+direction — Proxy guard first.
 
 ---
 

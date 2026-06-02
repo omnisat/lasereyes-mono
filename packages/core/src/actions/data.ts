@@ -117,8 +117,20 @@ export async function getAddressBalance<const config extends LaserEyesConfig>(
   address: string,
   options?: { chainId?: config['chains'][number]['id'] }
 ): Promise<string> {
+  // `getClient` now returns a precise/union client, but in this generic body
+  // `config` is the loose `LaserEyesConfig` bound, so its backends are
+  // capability-less (`{}`). These reads *assume* the active backend supports
+  // the base method they dispatch — a precondition the loose config can't
+  // prove — so we assert it at the dispatch site. `getAction` itself stays
+  // strict (it still verifies the cast target supports the action). See
+  // FUTURE-IMPROVEMENTS: capability-constraining read actions would remove
+  // these casts. Same pattern in every read below.
   const client = getClient(config, options)
-  return getAction(client, clientGetAddressBalance, 'getAddressBalance')(address)
+  return getAction(
+    client as unknown as Parameters<typeof clientGetAddressBalance>[0],
+    clientGetAddressBalance,
+    'getAddressBalance'
+  )(address)
 }
 
 /**
@@ -134,7 +146,11 @@ export async function getAddressUtxos<const config extends LaserEyesConfig>(
   options?: { chainId?: config['chains'][number]['id'] }
 ): Promise<PaginatedResult<UTXO>> {
   const client = getClient(config, options)
-  return getAction(client, clientGetAddressUtxos, 'getAddressUtxos')(address)
+  return getAction(
+    client as unknown as Parameters<typeof clientGetAddressUtxos>[0],
+    clientGetAddressUtxos,
+    'getAddressUtxos'
+  )(address)
 }
 
 // ============================================================================
@@ -245,7 +261,11 @@ export async function getRecommendedFees<const config extends LaserEyesConfig>(
   options?: { chainId?: config['chains'][number]['id'] }
 ): Promise<FeeEstimate> {
   const client = getClient(config, options)
-  return getAction(client, clientGetRecommendedFees, 'getRecommendedFees')()
+  return getAction(
+    client as unknown as Parameters<typeof clientGetRecommendedFees>[0],
+    clientGetRecommendedFees,
+    'getRecommendedFees'
+  )()
 }
 
 /**
@@ -267,7 +287,11 @@ export async function getTransaction<const config extends LaserEyesConfig>(
   options?: { chainId?: config['chains'][number]['id'] }
 ): Promise<Transaction> {
   const client = getClient(config, options)
-  return getAction(client, clientGetTransaction, 'getTransaction')(txId)
+  return getAction(
+    client as unknown as Parameters<typeof clientGetTransaction>[0],
+    clientGetTransaction,
+    'getTransaction'
+  )(txId)
 }
 
 /**
@@ -285,5 +309,9 @@ export async function broadcastTransaction<const config extends LaserEyesConfig>
   options?: { chainId?: config['chains'][number]['id'] }
 ): Promise<string> {
   const client = getClient(config, options)
-  return getAction(client, clientBroadcastTransaction, 'broadcastTransaction')(rawTx)
+  return getAction(
+    client as unknown as Parameters<typeof clientBroadcastTransaction>[0],
+    clientBroadcastTransaction,
+    'broadcastTransaction'
+  )(rawTx)
 }
