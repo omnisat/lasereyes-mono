@@ -175,6 +175,48 @@ user direction — no 4th type param on `LaserEyesConfig`.
 
 ---
 
+### `getWalletClient` precise return — low priority (corrected assessment)
+
+**Status:** open — low priority, **intentionally left as-is**
+
+**What:** `getWalletClient(config, …)` returns
+`WalletClient<WalletClientConfig<Account, any>, Account, any, any>`. Unlike
+`getClient` (now precise), this is deliberately **not** made precise yet.
+
+**Corrected understanding** (an earlier note wrongly called this "where the
+`sendBtc`/`signPsbt` `any` bites"):
+
+- `createWalletClient` installs **`clientActions = {}`** — no action methods
+  live on the wallet client. Callers never call `walletClient.sendBtc(...)`;
+  they use the **typed free-function actions** (`sendBtc(config, …)` →
+  `Promise<string>`, `signPsbt(config, …)` → `Promise<SignedPsbt>`), dispatched
+  through the `getAction` cascade.
+- **Signing is guarded, not `any`:** the `signPsbt`/`signMessage` free
+  functions read `client.config.signer` via `requireSigner`, which throws a
+  clear error if no signer is configured. The signer object does the work.
+- **`sendBtc` is typed + covered:** the client free function is
+  capability-constrained (`DS extends Pick<BaseCapability,
+  'btcGetAddressUtxos' | 'btcBroadcastTransaction'>`) and routes either
+  build-sign-broadcast or a connector-native `bitcoin_sendBitcoin` override
+  (installed via `connector.getClient`, picked up by `getAction` before the
+  fallback).
+
+So the `any` on `getWalletClient` is the **same class** as `getClient`'s was —
+the backend `dsMethods` caps and `account: Account` (generic, not the
+connector's precise account type) — **not** an unchecked-action-method hole.
+
+**Why deferred:** making it precise would only mirror `getClient`'s backend
+typing (plus account precision *if* connectors typed their accounts), while
+adding the **same dispatch force-casts** to `core/actions/wallet.ts` that the
+read actions needed — more cost, less benefit. The higher-leverage follow-up is
+"capability-constrain the read actions" under **Action API**, which removes the
+casts *and* adds real call-site safety.
+
+**Surfaced during:** wallet-client architecture review, 2026-06-02. Left as-is
+per user direction.
+
+---
+
 ## Action API
 
 ### Capability-constrain the read actions to remove the `getClient` dispatch casts
