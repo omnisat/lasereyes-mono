@@ -137,7 +137,7 @@ export async function getAddressBalance<const config extends LaserEyesConfig>(
  * Get unspent transaction outputs for an address.
  *
  * @remarks
- * Data-source path. See {@link getAddressBalance} for the wallet-fast-path
+ * Backend path. See {@link getAddressBalance} for the wallet-fast-path
  * alternative.
  */
 export async function getAddressUtxos<const config extends LaserEyesConfig>(

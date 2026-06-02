@@ -1,5 +1,11 @@
 # LaserEyes Core: Modular Architecture Refactor
 
+> **Historical note:** This document predates the final design. Its "transport"
+> and "data source" terminology was superseded by the **chain backend** model
+> (`ChainBackend`, `createBackend`, the `backend` config field). The body below
+> is preserved as-is for context; read "transport"/"data source" as "chain
+> backend" throughout.
+
 ## Overview
 
 Refactor `@omnisat/lasereyes-core` to be modular and tree-shaking compatible following viem's architecture patterns. This is a **breaking change** with no backward compatibility layer.
