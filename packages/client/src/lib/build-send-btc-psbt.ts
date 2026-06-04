@@ -33,9 +33,17 @@ export interface BuildSendBtcPsbtParams {
   feeRate: number
   /** Network type */
   network: NetworkType
-  /** Public key for the change address (needed for P2SH-P2WPKH) */
+  /**
+   * Public key of the address being spent. Required for **P2TR** (the
+   * taproot internal x-only key that becomes each input's `tapInternalKey`,
+   * without which the input is unsignable) and for **P2SH-P2WPKH** (to build
+   * the redeem script).
+   */
   publicKey?: string
-  /** Sender's address (if different from changeAddress for taproot-only wallets) */
+  /**
+   * @deprecated No longer used — the input type is detected from
+   * `changeAddress` via `getAddressType`. Kept for backward compatibility.
+   */
   fromAddress?: string
 }
 
@@ -64,16 +72,7 @@ export interface BuildSendBtcPsbtParams {
  * ```
  */
 export function buildSendBtcPsbt(params: BuildSendBtcPsbtParams): PsbtResult {
-  const {
-    utxos,
-    toAddress,
-    amount,
-    changeAddress,
-    feeRate,
-    network,
-    publicKey,
-    fromAddress = changeAddress,
-  } = params
+  const { utxos, toAddress, amount, changeAddress, feeRate, network, publicKey } = params
 
   if (amount <= 0) {
     throw new PsbtBuildError('Amount must be greater than 0')
@@ -83,16 +82,35 @@ export function buildSendBtcPsbt(params: BuildSendBtcPsbtParams): PsbtResult {
     throw new PsbtBuildError('No UTXOs provided')
   }
 
-  const isTaprootOnly = fromAddress === changeAddress
   const btcNetwork = getBitcoinNetwork(network)
+  const addrType = getAddressType(changeAddress)
+
+  // Taproot inputs are only signable if they carry the *internal* x-only
+  // public key (`tapInternalKey`). It can't be recovered from the address —
+  // that's the BIP86-tweaked output key — so the caller must supply the
+  // internal key via `publicKey`. Compute it once: every input here spends
+  // `changeAddress`, so they share a type.
+  let tapInternalKey: Uint8Array | undefined
+  if (addrType === AddressType.P2TR) {
+    if (!publicKey) {
+      throw new PsbtBuildError(
+        'Taproot (P2TR) spend requires `publicKey` (the taproot internal pubkey) to build a signable input'
+      )
+    }
+    // tapInternalKey is the 32-byte x-coordinate. Accept compressed (33),
+    // uncompressed (65), or already-x-only (32) input.
+    const pk = hex.decode(publicKey)
+    tapInternalKey = pk.length === 32 ? pk : pk.slice(1, 33)
+  }
 
   // Sort UTXOs by value descending (spend largest first)
   const sortedUtxos = [...utxos].sort((a, b) => b.value - a.value)
 
   const tx = new PsbtTransaction()
 
-  // Estimate transaction size (1 input, 0 taproot inputs, 2 outputs)
-  const estTxSize = estimateTxSize(1, 0, 2)
+  // Rough single-input fee estimate, shaped to the input's type.
+  const isTaproot = addrType === AddressType.P2TR
+  const estTxSize = estimateTxSize(isTaproot ? 1 : 0, isTaproot ? 0 : 1, 2)
   const satsNeeded = Math.floor(estTxSize * feeRate) + amount
   let amountGathered = 0
 
@@ -110,14 +128,14 @@ export function buildSendBtcPsbt(params: BuildSendBtcPsbtParams): PsbtResult {
       },
     })
 
-    // For non-taproot addresses, add redeem script if needed
-    if (!isTaprootOnly && publicKey) {
-      const addrType = getAddressType(changeAddress)
-      if (addrType === AddressType.P2SH_P2WPKH) {
-        const redeemScript = getRedeemScript(publicKey, network)
-        if (redeemScript) {
-          tx.updateInput(tx.inputsLength - 1, { redeemScript })
-        }
+    // Attach the per-input metadata the spend type needs to be signable:
+    // taproot → tapInternalKey; P2SH-P2WPKH → redeemScript.
+    if (tapInternalKey) {
+      tx.updateInput(tx.inputsLength - 1, { tapInternalKey })
+    } else if (addrType === AddressType.P2SH_P2WPKH && publicKey) {
+      const redeemScript = getRedeemScript(publicKey, network)
+      if (redeemScript) {
+        tx.updateInput(tx.inputsLength - 1, { redeemScript })
       }
     }
 

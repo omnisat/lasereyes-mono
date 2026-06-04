@@ -33,6 +33,7 @@ import { beforeAll, describe, expect, it, vi } from 'vitest'
 import { broadcastPsbt, sendBtc, signMessage, signPsbt } from '../../actions/wallet'
 import { createLaserEyesConfig } from '../../config'
 import { createConnector } from '../../connectors/create'
+import { mutateConnection } from '../../state'
 
 beforeAll(() => {
   ;(globalThis as any).window = globalThis
@@ -132,7 +133,7 @@ function makeConfigWithWalletClient(opts: {
   })
 
   // Set the connection so `getClient(config)` resolves the active chain.
-  config.state.$connection.set({
+  mutateConnection(config.state, {
     status: 'connected',
     networkId: 'mainnet',
     account,

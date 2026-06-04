@@ -26,7 +26,11 @@
  *    the discovery section.
  * 6. **Changed `LaserEyesConfig` / `createLaserEyesConfig` signature** —
  *    update the `LaserEyesConfig` section: literal preservation, chain-ID
- *    union, backends record shape, and connectorFns tuple identity.
+ *    union, backends record shape, and connectorFns tuple identity. If the
+ *    config threads a type into the reactive state (e.g. the connection
+ *    store's `networkId`), update §6a — assert both the narrowed read AND
+ *    that the concrete state stays assignable to bare `LaserEyesState` (the
+ *    action bound).
  * 7. **New action or changed action signature** — update §7 (Phase 9
  *    actions). Each action assertion captures: `<const config>` threading,
  *    parameter types, return type. `switchNetwork` is the showcase for
@@ -66,6 +70,7 @@ import type {
   SignPsbtOptions,
   WalletAccount,
 } from '@omnisat/lasereyes-client/wallet'
+import type { StoreValue } from 'nanostores'
 import { describe, expectTypeOf, it } from 'vitest'
 // — Phase 9 actions —
 import {
@@ -130,7 +135,12 @@ import {
   type WalletAnnouncement,
 } from '../detection/announcements'
 import { connectorFromAnnouncement, discoverConnectors } from '../detection/discovery'
-import type { LaserEyesState } from '../state'
+import {
+  type ConnectionSnapshot,
+  type ConnectionState,
+  type LaserEyesState,
+  mutateConnection,
+} from '../state'
 import type { Storage } from '../storage'
 // — Connector + provider types —
 import type {
@@ -598,6 +608,98 @@ const _typedConfig = createLaserEyesConfig({
 // A loosely-typed config used to verify the default-generic `LaserEyesConfig`
 // shape is still accepted by every action (regression guard).
 declare const _looseConfig: ReturnType<typeof createLaserEyesConfig>
+
+// ============================================================================
+// 6a. Config-threaded reactive state
+//
+// `LaserEyesConfig` threads its configured chains' ID union into the
+// connection store's READ surface (`get` / `value` / `listen` / `subscribe`).
+// The store is exposed READ-ONLY (no `set` / `setKey`) — wagmi-style: public
+// `config.state` is read-only, the action layer mutates via the internal
+// `mutateConnection` seam.
+//
+// The narrowing is output-only by necessity: nanostores stores are invariant
+// in their value (every atom has `notify(oldValue)` — a contravariant input),
+// so narrowing the value outright would make a concrete config's state
+// un-assignable to bare `LaserEyesState`, breaking every action's `<const
+// config extends LaserEyesConfig>` bound. Narrowing only covariant output
+// positions keeps narrow ⊆ wide.
+// ============================================================================
+
+describe('config-threaded reactive state', () => {
+  it('reads networkId as the configured chain-id union via get()', () => {
+    expectTypeOf(_typedConfig.state.$connection.get().networkId).toEqualTypeOf<
+      'mainnet' | 'testnet4'
+    >()
+  })
+
+  it('narrows the low-level `value` snapshot too', () => {
+    expectTypeOf(_typedConfig.state.$connection.value).toEqualTypeOf<
+      ConnectionSnapshot<'mainnet' | 'testnet4'> | undefined
+    >()
+  })
+
+  it('narrows the listen / subscribe callback value', () => {
+    _typedConfig.state.$connection.listen(value => {
+      expectTypeOf(value.networkId).toEqualTypeOf<'mainnet' | 'testnet4'>()
+    })
+    _typedConfig.state.$connection.subscribe(value => {
+      expectTypeOf(value.networkId).toEqualTypeOf<'mainnet' | 'testnet4'>()
+    })
+  })
+
+  it("narrows `StoreValue` — what `@nanostores/react`'s useStore returns", () => {
+    expectTypeOf<StoreValue<typeof _typedConfig.state.$connection>>().toEqualTypeOf<
+      ConnectionSnapshot<'mainnet' | 'testnet4'>
+    >()
+  })
+
+  it('discriminates account/connector on `status === "connected"`', () => {
+    const conn = _typedConfig.state.$connection.get()
+    if (conn.status === 'connected') {
+      // Connected ⇒ populated WalletAccount + Connector, no cast/import needed.
+      expectTypeOf(conn.account).toEqualTypeOf<WalletAccount>()
+      expectTypeOf(conn.connector).toEqualTypeOf<Connector>()
+    } else {
+      // Every other status leaves them possibly-undefined.
+      expectTypeOf(conn.account).toEqualTypeOf<WalletAccount | undefined>()
+      expectTypeOf(conn.connector).toEqualTypeOf<Connector | undefined>()
+    }
+  })
+
+  it('exposes $connection READ-ONLY — no public set / setKey', () => {
+    // @ts-expect-error — `setKey` is not on the read-only public view.
+    _typedConfig.state.$connection.setKey('status', 'connected')
+    // @ts-expect-error — `set` is not on the read-only public view.
+    _typedConfig.state.$connection.set({
+      status: 'connected',
+      account: undefined,
+      networkId: 'mainnet',
+      connector: undefined,
+    })
+  })
+
+  it('mutates only through the internal `mutateConnection` seam', () => {
+    // The seam accepts a partial patch; `networkId` stays wide (the value a
+    // connector/adapter reports is the open `NetworkId`), so no caller casts.
+    expectTypeOf(mutateConnection).parameter(0).toEqualTypeOf<LaserEyesState>()
+    expectTypeOf(mutateConnection).parameter(1).toEqualTypeOf<Partial<ConnectionState>>()
+    mutateConnection(_typedConfig.state, { status: 'connecting' })
+    mutateConnection(_typedConfig.state, { networkId: 'signet' as NetworkId })
+  })
+
+  it('default-generic config keeps the open NetworkId read', () => {
+    expectTypeOf(_looseConfig.state.$connection.get().networkId).toEqualTypeOf<NetworkId>()
+  })
+
+  it('THE BOUND: a concrete config state is assignable to bare LaserEyesState', () => {
+    // This is the assertion that would fail if the store were narrowed
+    // outright (invariant store). The covariant-output design keeps it.
+    expectTypeOf(_typedConfig.state).toMatchTypeOf<LaserEyesState>()
+    // …and the whole concrete config still satisfies the action bound.
+    expectTypeOf(_typedConfig).toMatchTypeOf<LaserEyesConfig>()
+  })
+})
 
 describe('Phase 9 — Lifecycle actions', () => {
   it('initialize: (config) => Promise<void>', () => {

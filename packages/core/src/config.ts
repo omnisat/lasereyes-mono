@@ -125,8 +125,12 @@ export interface LaserEyesConfig<
   readonly connectors: readonly Connector[]
   /** Per-network resolved backend, keyed by chain ID. */
   readonly backends: backends
-  /** Reactive state atoms. */
-  readonly state: LaserEyesState
+  /**
+   * Reactive state atoms. The connection store's `networkId` read is
+   * threaded to the configured chains' ID union, so
+   * `state.$connection.get().networkId` (and `useStore`) read back precisely.
+   */
+  readonly state: LaserEyesState<chains[number]['id']>
   /** Persisted-state storage. */
   readonly storage: Storage
   /** App name surfaced to wallets at connect time. */
@@ -254,7 +258,9 @@ export function createLaserEyesConfig<
 ): LaserEyesConfig<chains, NetworkBackends<chains, backends>, connectorFns> {
   const chains = opts.chains
   const defaultChain = chains[0]
-  const state = createState(defaultChain.id)
+  // Thread the full configured-chains ID union as the state's networkId type
+  // (the seed is just the default chain; the connection can switch to any).
+  const state = createState<chains[number]['id']>(defaultChain.id)
   const storage = opts.storage ?? createStorage()
   // Resolve each backend factory against its chain. We pass the full chain
   // object (not just the id) so custom `defineChain()` networks that aren't

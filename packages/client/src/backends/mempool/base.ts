@@ -60,9 +60,11 @@ export function baseCapabilities(
 
     async function call(method: 'get' | 'post', endpoint: string, body?: unknown) {
       const url = `${apiUrl}${endpoint}`
-      const headers: Record<string, string> = {
-        'Content-Type': method === 'post' ? 'text/plain' : 'application/json',
-      }
+      // Only POSTs carry a body and need a Content-Type. Setting one on a
+      // body-less GET makes the request non-simple and triggers a CORS
+      // preflight that mempool.space doesn't answer — so omit it for GETs.
+      const headers: Record<string, string> =
+        method === 'post' ? { 'Content-Type': 'text/plain' } : {}
 
       try {
         const response = await fetch(url, {

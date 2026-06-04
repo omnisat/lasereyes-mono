@@ -18,6 +18,7 @@ import type { NetworkId } from '@omnisat/lasereyes-client'
 import { createWalletAccount, type WalletAccountConfig } from '@omnisat/lasereyes-client/wallet'
 import type { LaserEyesConfig } from '../config'
 import { invalidateClientCache } from '../internal'
+import { mutateConnection } from '../state'
 import type { Connector, ConnectResult } from '../types/connector'
 import type { BitcoinProvider } from '../types/provider'
 import { getWalletClient } from '../wallet-client'
@@ -68,9 +69,9 @@ export function _clearConnectCleanup(config: object): void {
  * propagate them into config state.
  *
  * @remarks
- * Each handler writes through `$connection.setKey(...)` — only the
- * affected field changes, but the MapStore's listeners still see a
- * consistent snapshot (all other fields stay at their committed values).
+ * Each handler writes through {@link mutateConnection} — only the
+ * affected fields change, but listeners still see a consistent snapshot
+ * (all other fields stay at their committed values).
  *
  * @internal
  */
@@ -91,7 +92,7 @@ function subscribeToConnectorEvents(
     // account. The next `getWalletClient` call rebuilds and re-caches.
     const currentChain = config.state.$connection.get().networkId
     invalidateClientCache(config, currentChain)
-    config.state.$connection.setKey('account', createWalletAccount(data))
+    mutateConnection(config.state, { account: createWalletAccount(data) })
   }
 
   const onNetworkChanged = async (payload?: NetworkId) => {
@@ -115,7 +116,7 @@ function subscribeToConnectorEvents(
     const previous = config.state.$connection.get().networkId
     if (previous && previous !== next) invalidateClientCache(config, previous)
     invalidateClientCache(config, next)
-    config.state.$connection.setKey('networkId', next)
+    mutateConnection(config.state, { networkId: next })
 
     // Eagerly rebuild + cache the wallet client for the new chain so
     // the next sync `getClient(config)` returns a wallet client
@@ -134,8 +135,7 @@ function subscribeToConnectorEvents(
 
   const onDisconnect = () => {
     // Atomic clear — one notification, consistent observation.
-    config.state.$connection.set({
-      ...config.state.$connection.get(),
+    mutateConnection(config.state, {
       status: 'disconnected',
       account: undefined,
       connector: undefined,
@@ -192,7 +192,7 @@ export async function connect<const config extends LaserEyesConfig>(
 
   const prior = config.state.$connection.get()
 
-  config.state.$connection.setKey('status', 'connecting')
+  mutateConnection(config.state, { status: 'connecting' })
 
   let result: ConnectResult
   try {
@@ -201,7 +201,7 @@ export async function connect<const config extends LaserEyesConfig>(
     // No-op for everything except `status` — restore it. Account /
     // networkId / connector / event subscriptions all stay exactly as
     // they were.
-    config.state.$connection.setKey('status', prior.status)
+    mutateConnection(config.state, { status: prior.status })
     throw error
   }
 
@@ -217,7 +217,7 @@ export async function connect<const config extends LaserEyesConfig>(
   invalidateClientCache(config)
 
   // Atomic update: one notification, all four fields consistent.
-  config.state.$connection.set({
+  mutateConnection(config.state, {
     status: 'connected',
     account: result.account,
     networkId: result.networkId,

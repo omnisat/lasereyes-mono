@@ -6,6 +6,7 @@
 
 import type { LaserEyesConfig } from '../config'
 import { invalidateClientCache, tryResolveConnector } from '../internal'
+import { mutateConnection } from '../state'
 import { _clearConnectCleanup, _getConnectCleanup } from './connect'
 
 /**
@@ -15,8 +16,8 @@ import { _clearConnectCleanup, _getConnectCleanup } from './connect'
  * - Tears down the provider-level event subscriptions installed by
  *   `connect` (accountsChanged, networkChanged, disconnect).
  * - If a connector is active, calls `connector.disconnect()`.
- * - Atomically clears the connection state — one `$connection.set({...})`,
- *   subscribers fire once.
+ * - Atomically clears the connection state — one {@link mutateConnection}
+ *   call, subscribers fire once.
  * - Removes the persisted connector ID from storage.
  * - Idempotent — calling on an already-disconnected config is a no-op.
  */
@@ -41,8 +42,7 @@ export async function disconnect<const config extends LaserEyesConfig>(
 
   // Atomic clear. Networks ID stays at the last-known value (the next
   // connect will overwrite it); status/account/connector flip together.
-  config.state.$connection.set({
-    ...config.state.$connection.get(),
+  mutateConnection(config.state, {
     status: 'disconnected',
     account: undefined,
     connector: undefined,

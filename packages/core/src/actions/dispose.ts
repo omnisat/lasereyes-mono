@@ -5,6 +5,7 @@
  */
 
 import type { LaserEyesConfig } from '../config'
+import { mutateConnection } from '../state'
 import { _clearInitializeCleanup, _getInitializeCleanup } from './initialize'
 
 /**
@@ -25,8 +26,7 @@ export function dispose<const config extends LaserEyesConfig>(config: config): v
     _clearInitializeCleanup(config)
   }
 
-  config.state.$connection.set({
-    ...config.state.$connection.get(),
+  mutateConnection(config.state, {
     status: 'disconnected',
     account: undefined,
     connector: undefined,

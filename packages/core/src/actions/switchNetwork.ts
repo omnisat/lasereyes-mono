@@ -8,6 +8,7 @@ import type { ChainNetwork } from '@omnisat/lasereyes-client'
 import { NetworkNotConfiguredError } from '@omnisat/lasereyes-client'
 import type { LaserEyesConfig } from '../config'
 import { invalidateClientCache, resolveConnector } from '../internal'
+import { mutateConnection } from '../state'
 
 /**
  * Switch the active wallet to a different network.
@@ -80,7 +81,7 @@ export async function switchNetwork<
   if (prev) invalidateClientCache(config, prev)
   invalidateClientCache(config, resolvedId)
 
-  config.state.$connection.setKey('networkId', resolvedId)
+  mutateConnection(config.state, { networkId: resolvedId })
   connector.onNetworkChanged?.(resolvedId)
 
   return resolved as Extract<config['chains'][number], { id: id }>

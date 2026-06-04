@@ -1,13 +1,33 @@
 # core-showcase
 
-Minimal vanilla-TS app that exercises `@omnisat/lasereyes-core` end-to-end.
+Minimal TS app that exercises `@omnisat/lasereyes-core` end-to-end. The view
+layer is [Alpine.js](https://alpinejs.dev) — declarative bindings in
+`index.html`, no virtual DOM, no build step — so the library usage stays
+separated from the DOM plumbing.
+
+## Structure
+
+| File              | Responsibility                                                          |
+| ----------------- | ----------------------------------------------------------------------- |
+| `index.html`      | Declarative markup + Alpine bindings only (`x-text`, `@click`, `x-for`) |
+| `src/styles.css`  | Styles                                                                  |
+| `src/config.ts`   | lasereyes-core setup: `createLaserEyesConfig`, adapters, `initialize`   |
+| `src/showcase.ts` | Alpine component: store→state bridge + one method per core action       |
+| `src/main.ts`     | Entry — register the component, start Alpine                            |
+
+The store→state bridge in `showcase.ts` (`$connection`/`$connectors`
+`.subscribe(...)` → reactive Alpine fields) is the same job a React/Vue
+binding does, in ~15 lines. The view only ever sees flat primitives, so the
+showcase imports **zero types** from lasereyes — inference and a couple of
+`typeof`-derived types carry everything.
 
 ## What it demonstrates
 
 - **`createLaserEyesConfig`** with a typed chains tuple, transports, and the
   `unisat()` + `xverse()` connector factories.
-- **EIP-6963-style discovery** via `loadAllWallets()` + the `$connectors`
-  reactive store.
+- **EIP-6963-style discovery** via the per-wallet adapter loaders
+  (`loadUnisatWalletAdapter()` / `loadXverseWalletAdapter()`) + the
+  `$connectors` reactive store.
 - **Phase 9 lifecycle actions** — `initialize`, `connect`, `disconnect`.
 - **Phase 9 data actions** — `getAddressBalance` (which provider-first-falls-back
   through `getClient`).
