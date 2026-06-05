@@ -1,8 +1,8 @@
 import { resolve } from 'node:path'
+import { visualizer } from 'rollup-plugin-visualizer'
 import { defineConfig } from 'vite'
 import dts from 'vite-plugin-dts'
 import { nodePolyfills } from 'vite-plugin-node-polyfills'
-import { visualizer } from 'rollup-plugin-visualizer'
 
 export default defineConfig({
   plugins: [
@@ -20,10 +20,7 @@ export default defineConfig({
       : null,
   ],
   build: {
-    sourcemap: process.env.ANALYZE ? true : false,
-    rollupOptions: {
-      external: ['nanostores', '@omnisat/lasereyes-client', '@omnisat/lasereyes-client/wallet'],
-    },
+    sourcemap: !!process.env.ANALYZE,
     lib: {
       // Multi-entry so consumers can subpath-import the parts they need.
       // Each entry produces its own ESM file in dist; sideEffects: false
@@ -33,6 +30,10 @@ export default defineConfig({
         index: resolve(__dirname, 'src/index.ts'),
         // Action surface
         actions: resolve(__dirname, 'src/actions/index.ts'),
+        // Query layer — @nanostores/query caching/dedup over the actions,
+        // exports isolated per action: read FetcherStores (balance, utxos,
+        // fees, transaction) + write MutatorStores (send, sign, broadcast).
+        query: resolve(__dirname, 'src/query/index.ts'),
         // Detection (announceWallet, listenForWalletAnnouncements, discoverConnectors, loadAllWallets)
         detection: resolve(__dirname, 'src/detection/index.ts'),
         // Aggregate connectors barrel — re-exports every wallet's
