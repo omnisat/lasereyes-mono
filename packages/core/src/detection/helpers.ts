@@ -4,18 +4,18 @@
  * @module detection/helpers
  */
 
-import { loadKeplrWalletAdapter } from '../adapters/keplr'
 import { loadLeatherWalletAdapter } from '../adapters/leather'
 import { loadMagicEdenWalletAdapter } from '../adapters/magic-eden'
 import { loadOkxWalletAdapter } from '../adapters/okx'
-import { loadOpNetWalletAdapter } from '../adapters/op-net'
 import { loadOrangeWalletAdapter } from '../adapters/orange'
 import { loadOylWalletAdapter } from '../adapters/oyl'
 import { loadPhantomWalletAdapter } from '../adapters/phantom'
 import { loadSparrowWalletAdapter } from '../adapters/sparrow'
-import { loadTokeoWalletAdapter } from '../adapters/tokeo'
 import {
   loadBinanceWalletAdapter,
+  loadKeplrWalletAdapter,
+  loadOpNetWalletAdapter,
+  loadTokeoWalletAdapter,
   loadUnisatWalletAdapter,
   loadWizzWalletAdapter,
 } from '../adapters/unisat'

@@ -113,21 +113,9 @@
       "import": "./dist/adapters/orange.js",
       "types": "./dist/adapters/orange.d.ts"
     },
-    "./adapters/op-net": {
-      "import": "./dist/adapters/op-net.js",
-      "types": "./dist/adapters/op-net.d.ts"
-    },
     "./adapters/sparrow": {
       "import": "./dist/adapters/sparrow.js",
       "types": "./dist/adapters/sparrow.d.ts"
-    },
-    "./adapters/tokeo": {
-      "import": "./dist/adapters/tokeo.js",
-      "types": "./dist/adapters/tokeo.d.ts"
-    },
-    "./adapters/keplr": {
-      "import": "./dist/adapters/keplr.js",
-      "types": "./dist/adapters/keplr.d.ts"
     }
   },
   "scripts": {

@@ -10,7 +10,7 @@
  * @module connectors/xverse
  */
 
-import { XVERSE_ICON, XverseAdapter } from '../adapters/xverse'
+import { createXverseAdapter, XVERSE_ICON } from '../adapters/xverse'
 import type { CreateConnectorFn } from '../types/connector'
 import { injected } from './injected'
 
@@ -32,7 +32,7 @@ export function xverse(): CreateConnectorFn {
     getProvider: w => {
       const raw = (w as { XverseProviders?: { BitcoinProvider?: unknown } }).XverseProviders
         ?.BitcoinProvider
-      return raw ? new XverseAdapter(raw) : null
+      return raw ? createXverseAdapter(raw) : null
     },
     // Xverse exposes `sendBTC` natively via sats-connect. Route `sendBtc`
     // through the one-shot RPC.

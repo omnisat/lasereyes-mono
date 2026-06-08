@@ -3,7 +3,7 @@
  * @module connectors/leather
  */
 
-import { LeatherAdapter } from '../adapters/leather'
+import { createLeatherAdapter } from '../adapters/leather'
 import type { CreateConnectorFn } from '../types/connector'
 import { injected } from './injected'
 
@@ -14,7 +14,7 @@ export function leather(): CreateConnectorFn {
     rdns: 'io.leather',
     getProvider: w => {
       const raw = (w as { LeatherProvider?: unknown }).LeatherProvider
-      return raw ? new LeatherAdapter(raw) : null
+      return raw ? createLeatherAdapter(raw) : null
     },
     nativeRpc: { sendBtc: true },
   })

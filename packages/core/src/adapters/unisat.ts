@@ -625,3 +625,72 @@ export function loadWizzWalletAdapter(): BitcoinProviderAdapter | null {
   })
   return adapter
 }
+
+/**
+ * Detect and announce Tokeo Wallet.
+ *
+ * @remarks
+ * Tokeo exposes a Unisat-compatible API under `window.tokeo.bitcoin`, so
+ * we reuse {@link UnisatAdapter} with a different window-key check and
+ * identity. Same pattern as {@link loadBinanceWalletAdapter}.
+ */
+export function loadTokeoWalletAdapter(): BitcoinProviderAdapter | null {
+  if (typeof window === 'undefined') return null
+  const raw = (window as any).tokeo?.bitcoin
+  if (!raw) return null
+
+  const adapter = new UnisatAdapter(raw)
+  announceWallet({
+    uuid: crypto.randomUUID(),
+    name: 'Tokeo Wallet',
+    rdns: 'app.tokeo',
+    provider: adapter,
+  })
+  return adapter
+}
+
+/**
+ * Detect and announce Keplr Wallet (Bitcoin).
+ *
+ * @remarks
+ * Keplr is primarily a Cosmos wallet but exposes a Unisat-compatible
+ * Bitcoin API under `window.keplr.bitcoin` (with a legacy
+ * `window.bitcoin_keplr` fallback), so we reuse {@link UnisatAdapter}.
+ */
+export function loadKeplrWalletAdapter(): BitcoinProviderAdapter | null {
+  if (typeof window === 'undefined') return null
+  const raw = (window as any).keplr?.bitcoin ?? (window as any).bitcoin_keplr
+  if (!raw) return null
+
+  const adapter = new UnisatAdapter(raw)
+  announceWallet({
+    uuid: crypto.randomUUID(),
+    name: 'Keplr Wallet',
+    rdns: 'app.keplr',
+    provider: adapter,
+  })
+  return adapter
+}
+
+/**
+ * Detect and announce OP_NET Wallet.
+ *
+ * @remarks
+ * OP_NET exposes a Unisat-compatible API under `window.opnet`, so we
+ * reuse {@link UnisatAdapter} with a different window-key check and
+ * identity. Same pattern as {@link loadBinanceWalletAdapter}.
+ */
+export function loadOpNetWalletAdapter(): BitcoinProviderAdapter | null {
+  if (typeof window === 'undefined') return null
+  const raw = (window as any).opnet
+  if (!raw) return null
+
+  const adapter = new UnisatAdapter(raw)
+  announceWallet({
+    uuid: crypto.randomUUID(),
+    name: 'OpNet Wallet',
+    rdns: 'net.op_net',
+    provider: adapter,
+  })
+  return adapter
+}

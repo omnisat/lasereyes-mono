@@ -27,18 +27,20 @@
 
 export * from './actions'
 // Adapter classes + loader functions. Xverse omitted.
-export { KeplrAdapter, loadKeplrWalletAdapter } from './adapters/keplr'
-export { LeatherAdapter, loadLeatherWalletAdapter } from './adapters/leather'
+export { createLeatherAdapter, loadLeatherWalletAdapter } from './adapters/leather'
 export { loadMagicEdenWalletAdapter, MagicEdenAdapter } from './adapters/magic-eden'
-export { loadOkxWalletAdapter, OkxAdapter } from './adapters/okx'
-export { loadOpNetWalletAdapter, OpNetAdapter } from './adapters/op-net'
+export { createOkxAdapter, loadOkxWalletAdapter } from './adapters/okx'
 export { loadOrangeWalletAdapter, OrangeAdapter } from './adapters/orange'
 export { loadOylWalletAdapter, OylAdapter } from './adapters/oyl'
-export { loadPhantomWalletAdapter, PhantomAdapter } from './adapters/phantom'
+export { createPhantomAdapter, loadPhantomWalletAdapter } from './adapters/phantom'
 export { loadSparrowWalletAdapter, SparrowAdapter } from './adapters/sparrow'
-export { loadTokeoWalletAdapter, TokeoAdapter } from './adapters/tokeo'
+// Tokeo, Keplr, and OP_NET are Unisat-API clones — their loaders reuse
+// UnisatAdapter and live in `./adapters/unisat`.
 export {
   loadBinanceWalletAdapter,
+  loadKeplrWalletAdapter,
+  loadOpNetWalletAdapter,
+  loadTokeoWalletAdapter,
   loadUnisatWalletAdapter,
   loadWizzWalletAdapter,
   UnisatAdapter,
@@ -73,18 +75,18 @@ export {
 } from './detection'
 export * from './index'
 
-import { loadKeplrWalletAdapter } from './adapters/keplr'
 import { loadLeatherWalletAdapter } from './adapters/leather'
 import { loadMagicEdenWalletAdapter } from './adapters/magic-eden'
 import { loadOkxWalletAdapter } from './adapters/okx'
-import { loadOpNetWalletAdapter } from './adapters/op-net'
 import { loadOrangeWalletAdapter } from './adapters/orange'
 import { loadOylWalletAdapter } from './adapters/oyl'
 import { loadPhantomWalletAdapter } from './adapters/phantom'
 import { loadSparrowWalletAdapter } from './adapters/sparrow'
-import { loadTokeoWalletAdapter } from './adapters/tokeo'
 import {
   loadBinanceWalletAdapter,
+  loadKeplrWalletAdapter,
+  loadOpNetWalletAdapter,
+  loadTokeoWalletAdapter,
   loadUnisatWalletAdapter,
   loadWizzWalletAdapter,
 } from './adapters/unisat'

@@ -3,7 +3,7 @@
  * @module connectors/okx
  */
 
-import { OkxAdapter } from '../adapters/okx'
+import { createOkxAdapter } from '../adapters/okx'
 import type { CreateConnectorFn } from '../types/connector'
 import { injected } from './injected'
 
@@ -12,9 +12,12 @@ export function okx(): CreateConnectorFn {
     id: 'okx',
     name: 'OKX Wallet',
     rdns: 'com.okx.wallet',
+    // OKX serves mainnet (`bitcoin`) and testnet (`bitcoinTestnet`) from
+    // distinct sub-providers; hand the adapter the `okxwallet` root so it
+    // can pick the right one per network.
     getProvider: w => {
-      const raw = (w as { okxwallet?: { bitcoin?: unknown } }).okxwallet?.bitcoin
-      return raw ? new OkxAdapter(raw) : null
+      const root = (w as { okxwallet?: { bitcoin?: unknown; bitcoinTestnet?: unknown } }).okxwallet
+      return root?.bitcoin ? createOkxAdapter(root) : null
     },
     nativeRpc: { sendBtc: true },
   })

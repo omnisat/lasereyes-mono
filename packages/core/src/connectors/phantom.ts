@@ -3,7 +3,7 @@
  * @module connectors/phantom
  */
 
-import { PhantomAdapter } from '../adapters/phantom'
+import { createPhantomAdapter } from '../adapters/phantom'
 import type { CreateConnectorFn } from '../types/connector'
 import { injected } from './injected'
 
@@ -14,8 +14,9 @@ export function phantom(): CreateConnectorFn {
     rdns: 'app.phantom',
     getProvider: w => {
       const raw = (w as { phantom?: { bitcoin?: unknown } }).phantom?.bitcoin
-      return raw ? new PhantomAdapter(raw) : null
+      return raw ? createPhantomAdapter(raw) : null
     },
-    nativeRpc: { sendBtc: true },
+    // Phantom has no native sendBitcoin; `sendBtc` composes a PSBT and
+    // routes through `signPsbt`.
   })
 }

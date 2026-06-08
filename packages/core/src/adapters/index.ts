@@ -11,15 +11,12 @@
  */
 
 export * from './base'
-export * from './keplr'
 export * from './leather'
 export * from './magic-eden'
 export * from './okx'
-export * from './op-net'
 export * from './orange'
 export * from './oyl'
 export * from './phantom'
 export * from './sparrow'
-export * from './tokeo'
 export * from './unisat'
 export * from './xverse'

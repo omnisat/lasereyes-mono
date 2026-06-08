@@ -97,18 +97,23 @@ import {
 } from '../actions'
 // — Adapters (built-in) —
 import type { BaseAdapter, BitcoinProviderAdapter } from '../adapters/base'
-import { type KeplrAdapter, loadKeplrWalletAdapter } from '../adapters/keplr'
-import { type LeatherAdapter, loadLeatherWalletAdapter } from '../adapters/leather'
+import { createLeatherAdapter, loadLeatherWalletAdapter } from '../adapters/leather'
 import { loadMagicEdenWalletAdapter, type MagicEdenAdapter } from '../adapters/magic-eden'
-import { loadOkxWalletAdapter, type OkxAdapter } from '../adapters/okx'
-import { loadOpNetWalletAdapter, type OpNetAdapter } from '../adapters/op-net'
+import { createOkxAdapter, loadOkxWalletAdapter } from '../adapters/okx'
 import { loadOrangeWalletAdapter, type OrangeAdapter } from '../adapters/orange'
 import { loadOylWalletAdapter, type OylAdapter } from '../adapters/oyl'
-import { loadPhantomWalletAdapter, type PhantomAdapter } from '../adapters/phantom'
+import { createPhantomAdapter, loadPhantomWalletAdapter } from '../adapters/phantom'
 import { loadSparrowWalletAdapter, type SparrowAdapter } from '../adapters/sparrow'
-import { loadTokeoWalletAdapter, type TokeoAdapter } from '../adapters/tokeo'
-import { loadUnisatWalletAdapter, type UnisatAdapter } from '../adapters/unisat'
-import type { XverseAdapter } from '../adapters/xverse'
+// Tokeo, Keplr, and OP_NET are Unisat-API clones — their loaders reuse
+// UnisatAdapter and live in `../adapters/unisat`.
+import {
+  loadKeplrWalletAdapter,
+  loadOpNetWalletAdapter,
+  loadTokeoWalletAdapter,
+  loadUnisatWalletAdapter,
+  type UnisatAdapter,
+} from '../adapters/unisat'
+import { createXverseAdapter } from '../adapters/xverse'
 // — Phase 10 keystone —
 import type { ClientFor, ClientUnionFor } from '../client'
 // — Config + state —
@@ -160,17 +165,10 @@ import { getWalletClient } from '../wallet-client'
 declare const provider: BitcoinProvider
 declare const adapter: BaseAdapter
 declare const u: UnisatAdapter
-declare const x: XverseAdapter
-declare const l: LeatherAdapter
-declare const ok: OkxAdapter
 declare const oy: OylAdapter
 declare const me: MagicEdenAdapter
-declare const ph: PhantomAdapter
 declare const or: OrangeAdapter
-declare const op: OpNetAdapter
 declare const sp: SparrowAdapter
-declare const to: TokeoAdapter
-declare const ke: KeplrAdapter
 declare const caps: ProviderCapabilities
 declare const target: InjectedConnectorOptions
 declare const config: ConnectorConfig
@@ -218,18 +216,22 @@ describe('ProviderRpcError', () => {
 describe('Adapters', () => {
   it('all built-in adapters extend BaseAdapter and implement BitcoinProviderAdapter', () => {
     expectTypeOf(u).toMatchTypeOf<BaseAdapter>()
-    expectTypeOf(x).toMatchTypeOf<BaseAdapter>()
-    expectTypeOf(l).toMatchTypeOf<BaseAdapter>()
-    expectTypeOf(ok).toMatchTypeOf<BaseAdapter>()
     expectTypeOf(oy).toMatchTypeOf<BaseAdapter>()
     expectTypeOf(me).toMatchTypeOf<BaseAdapter>()
-    expectTypeOf(ph).toMatchTypeOf<BaseAdapter>()
     expectTypeOf(or).toMatchTypeOf<BaseAdapter>()
-    expectTypeOf(op).toMatchTypeOf<BaseAdapter>()
     expectTypeOf(sp).toMatchTypeOf<BaseAdapter>()
-    expectTypeOf(to).toMatchTypeOf<BaseAdapter>()
-    expectTypeOf(ke).toMatchTypeOf<BaseAdapter>()
+    // Tokeo, Keplr, and OP_NET are UnisatAdapter clones (no distinct
+    // adapter class); their loaders are covered below.
     expectTypeOf(u).toMatchTypeOf<BitcoinProviderAdapter>()
+  })
+
+  it('defineAdapter factories return the public BitcoinProviderAdapter contract', () => {
+    // Leather and OKX use the declarative `defineAdapter` factory rather
+    // than a bespoke class; the public surface is the adapter interface.
+    expectTypeOf(createLeatherAdapter).returns.toEqualTypeOf<BitcoinProviderAdapter>()
+    expectTypeOf(createOkxAdapter).returns.toEqualTypeOf<BitcoinProviderAdapter>()
+    expectTypeOf(createPhantomAdapter).returns.toEqualTypeOf<BitcoinProviderAdapter>()
+    expectTypeOf(createXverseAdapter).returns.toEqualTypeOf<BitcoinProviderAdapter>()
   })
 
   it('every adapter has positional request(method, params?)', () => {
