@@ -8,7 +8,6 @@ import {
   ORANGE,
   OYL,
   PHANTOM,
-  type ProviderType,
   SPARROW,
   TOKEO,
   UNISAT,
@@ -39,7 +38,7 @@ const WalletIcon = ({
   size: number
   className?: string
   variant?: 'first' | 'second'
-  walletName: ProviderType
+  walletName: string
 }) => {
   if (walletName === XVERSE) {
     return <XverseLogo size={size} className={className} variant={variant} />

@@ -1,96 +1,71 @@
 'use client'
 
-import { createLaserEyesCore, type LaserEyesCoreConfig, type LaserEyesCore } from '@omnisat/lasereyes-core'
-import { type ReactNode, createContext, useContext, useEffect, useState } from 'react'
-
-// ============================================================================
-// Context
-// ============================================================================
-
-const CoreContext = createContext<LaserEyesCore | null>(null)
-
-// ============================================================================
-// Provider
-// ============================================================================
+import type { LaserEyesConfig } from '@omnisat/lasereyes-core'
+import { dispose, initialize } from '@omnisat/lasereyes-core/actions'
+import { createQueryContext } from '@omnisat/lasereyes-core/query'
+import { type ReactNode, useEffect, useMemo, useState } from 'react'
+import { LaserEyesContext } from './context'
 
 /**
- * Root context provider for LaserEyes Bitcoin wallet integration.
+ * Props for {@link LaserEyesProvider}.
+ */
+export interface LaserEyesProviderProps {
+  /**
+   * A config built with `createLaserEyesConfig` from `@omnisat/lasereyes-core`.
+   *
+   * @remarks
+   * Build it once, outside React (module scope), so its identity is stable
+   * across renders — the provider runs `initialize`/`dispose` keyed on it.
+   */
+  config: LaserEyesConfig
+  children: ReactNode | ReactNode[]
+}
+
+/**
+ * Root provider for LaserEyes Bitcoin wallet integration.
  *
  * @remarks
- * Instantiates a {@link LaserEyesCore} state manager, calls `initialize()` on
- * mount, and disposes it on unmount. All descendant components can access the
- * core via {@link useLaserEyesCore}.
+ * Wagmi-shaped: you build the config yourself and pass it in. The provider
+ * - exposes the config + a provider-scoped query cache to all descendant hooks,
+ * - calls `initialize(config)` on mount (wiring connector discovery + optional
+ *   auto-reconnect) and `dispose(config)` on unmount.
  *
- * Must be placed near the top of your component tree. Only one instance should
- * be rendered at a time.
- *
- * @param props.config - Optional configuration (network, data sources, connectors)
- * @param props.children - Child React nodes
+ * The query cache is created once per mount (`useState` initializer), so reads
+ * and writes share one cache and SSR / per-request isolation is preserved.
  *
  * @example
  * ```tsx
  * import { LaserEyesProvider } from '@omnisat/lasereyes-react'
- * import { createDataSource } from '@omnisat/lasereyes-client/backends/mempool'
- * import { MAINNET } from '@omnisat/lasereyes-client'
+ * import { createLaserEyesConfig, MAINNET } from '@omnisat/lasereyes-core'
+ * import { unisat, xverse } from '@omnisat/lasereyes-core/connectors'
+ * import { mempool } from '@omnisat/lasereyes-client/backends/mempool'
  *
- * const ds = createDataSource({ network: MAINNET })
+ * const config = createLaserEyesConfig({
+ *   chains: [MAINNET],
+ *   connectors: [unisat(), xverse()],
+ *   backends: { mainnet: mempool() },
+ * })
  *
- * function App() {
+ * export function App() {
  *   return (
- *     <LaserEyesProvider
- *       config={{
- *         network: 'mainnet',
- *         networks: { mainnet: { dataSources: [ds] } },
- *       }}
- *     >
- *       <MyWalletUI />
+ *     <LaserEyesProvider config={config}>
+ *       <WalletUI />
  *     </LaserEyesProvider>
  *   )
  * }
  * ```
  */
-export default function LaserEyesProvider({
-  config,
-  children,
-}: {
-  config?: LaserEyesCoreConfig
-  children: ReactNode | ReactNode[]
-}) {
-  const [core] = useState(() => createLaserEyesCore(config))
+export function LaserEyesProvider({ config, children }: LaserEyesProviderProps) {
+  const [queryCtx] = useState(() => createQueryContext())
 
   useEffect(() => {
-    core.initialize()
-    return () => core.dispose()
-  }, [core])
+    initialize(config)
+    return () => dispose(config)
+  }, [config])
 
-  return <CoreContext.Provider value={core}>{children}</CoreContext.Provider>
+  const value = useMemo(() => ({ config, queryCtx }), [config, queryCtx])
+
+  return <LaserEyesContext.Provider value={value}>{children}</LaserEyesContext.Provider>
 }
 
-// ============================================================================
-// Core hook
-// ============================================================================
-
-/**
- * Returns the {@link LaserEyesCore} instance from the nearest {@link LaserEyesProvider}.
- *
- * @remarks
- * Use this hook when you need direct access to the core — for example, to call
- * `core.connect()`, `core.disconnect()`, or `core.getClient()`.
- *
- * For most use cases, prefer the purpose-specific hooks (`useAccount`,
- * `useConnect`, `useBalance`, etc.) which subscribe to the relevant atom and
- * re-render only when that atom changes.
- *
- * @throws {Error} If called outside of a {@link LaserEyesProvider}.
- *
- * @example
- * ```tsx
- * const core = useLaserEyesCore()
- * await core.connect('io.unisat.wallet')
- * ```
- */
-export function useLaserEyesCore(): LaserEyesCore {
-  const core = useContext(CoreContext)
-  if (!core) throw new Error('useLaserEyesCore must be used within a LaserEyesProvider')
-  return core
-}
+export default LaserEyesProvider

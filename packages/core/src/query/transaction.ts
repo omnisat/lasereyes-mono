@@ -14,7 +14,13 @@ import type { Transaction } from '@omnisat/lasereyes-client'
 import { atom } from 'nanostores'
 import { getTransaction } from '../actions'
 import type { LaserEyesConfig } from '../config'
-import { defaultQueryContext, networkIdAtom, type QueryContext, SEP } from './context'
+import {
+  defaultQueryContext,
+  effectiveNetworkIdAtom,
+  type QueryBuilderOptions,
+  type QueryContext,
+  SEP,
+} from './context'
 import { withSharedData } from './structural-sharing'
 
 /**
@@ -42,16 +48,21 @@ export function getTransactionQueryKey(networkId: string, txId: string): string 
 export function getTransactionQuery(
   config: LaserEyesConfig,
   txId: string | null | undefined,
-  ctx: QueryContext = defaultQueryContext
+  ctx: QueryContext = defaultQueryContext,
+  options?: QueryBuilderOptions
 ): FetcherStore<Transaction> {
   const [createFetcherStore] = ctx
-  const $networkId = networkIdAtom(config)
+  const $networkId = effectiveNetworkIdAtom(config, options)
   const $txId = atom<string | null>(txId || null)
+  const chainOpts = options?.chainId !== undefined ? { chainId: options.chainId } : undefined
   let $store: FetcherStore<Transaction>
   $store = createFetcherStore<Transaction>(['transaction', SEP, $networkId, SEP, $txId], {
     fetcher: withSharedData(
       () => $store,
-      () => getTransaction(config, $txId.get() as string)
+      () =>
+        chainOpts
+          ? getTransaction(config, $txId.get() as string, chainOpts)
+          : getTransaction(config, $txId.get() as string)
     ),
   })
   return $store

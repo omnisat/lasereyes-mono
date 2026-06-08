@@ -12,7 +12,13 @@ import type { FetcherStore } from '@nanostores/query'
 import { atom } from 'nanostores'
 import { getAddressBalance } from '../actions'
 import type { LaserEyesConfig } from '../config'
-import { defaultQueryContext, networkIdAtom, type QueryContext, SEP } from './context'
+import {
+  defaultQueryContext,
+  effectiveNetworkIdAtom,
+  type QueryBuilderOptions,
+  type QueryContext,
+  SEP,
+} from './context'
 import { withSharedData } from './structural-sharing'
 
 /**
@@ -43,20 +49,28 @@ export function getAddressBalanceQueryKey(networkId: string, address: string): s
 export function getAddressBalanceQuery(
   config: LaserEyesConfig,
   address: string | null | undefined,
-  ctx: QueryContext = defaultQueryContext
+  ctx: QueryContext = defaultQueryContext,
+  options?: QueryBuilderOptions
 ): FetcherStore<string> {
   const [createFetcherStore] = ctx
-  const $networkId = networkIdAtom(config)
+  // Folds `chainId` (own cache slot) and `enabled: false` (NoKey) into the key.
+  const $networkId = effectiveNetworkIdAtom(config, options)
   // Only an atom may resolve to a NoKey (`null`) to disable the fetch; a bare
   // empty string would be a *valid* key and would fetch.
   const $addr = atom<string | null>(address || null)
+  // Forward `{ chainId }` to the action only when set, so the default call stays
+  // 2-arg (`getAddressBalance(config, addr)`) — the action's own contract.
+  const chainOpts = options?.chainId !== undefined ? { chainId: options.chainId } : undefined
   // Structural sharing is a no-op for a primitive string result, but keeping the
   // wrap uniform across every action file makes this a clean copy-paste template.
   let $store: FetcherStore<string>
   $store = createFetcherStore<string>(['balance', SEP, $networkId, SEP, $addr], {
     fetcher: withSharedData(
       () => $store,
-      () => getAddressBalance(config, $addr.get() as string)
+      () =>
+        chainOpts
+          ? getAddressBalance(config, $addr.get() as string, chainOpts)
+          : getAddressBalance(config, $addr.get() as string)
     ),
   })
   return $store

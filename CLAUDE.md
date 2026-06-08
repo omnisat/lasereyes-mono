@@ -329,3 +329,9 @@ This project uses **@changesets/cli** for version management:
 - Build tool: **Turbo** for monorepo orchestration
 - Test runner: **Vitest**
 - Linter/Formatter: **Biome** (primary), Prettier (legacy)
+- **Run `pnpm` commands through `script` (PTY) in non-interactive shells.** Plain
+  `pnpm install` aborts with `ERR_PNPM_ABORTED_REMOVE_MODULES_DIR_NO_TTY` when it
+  needs to remove `node_modules` and there's no TTY. Wrap it:
+  `script -q /dev/null pnpm install` (macOS). This gives pnpm a pseudo-TTY so it
+  proceeds instead of aborting. (Setting `CI=true` also bypasses the prompt but
+  changes other pnpm behavior — prefer `script`.)

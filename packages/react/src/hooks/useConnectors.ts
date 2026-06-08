@@ -1,33 +1,23 @@
+'use client'
+
 import { useStore } from '@nanostores/react'
-import { useLaserEyesCore } from '../providers/lasereyes-provider'
 import type { Connector } from '@omnisat/lasereyes-core'
+import { useMemo } from 'react'
+import { useConfig } from '../providers/context'
 
 /**
- * Returns the list of currently available wallet connectors.
- *
- * @remarks
- * Subscribes to `core.$connectors` via nanostores. The list updates whenever
- * a new wallet announces itself (EIP-6963-style detection) or when connectors
- * are added programmatically.
- *
- * Must be used within a {@link LaserEyesProvider}.
- *
- * @returns Array of available {@link Connector} instances.
+ * The available connectors — registered factories plus any wallets discovered
+ * via EIP-6963-style announcement after `initialize`. Re-renders when the
+ * registry changes.
  *
  * @example
  * ```tsx
  * const connectors = useConnectors()
- * return (
- *   <ul>
- *     {connectors.map(c => (
- *       <li key={c.id}>{c.name}</li>
- *     ))}
- *   </ul>
- * )
+ * connectors.map(c => <button key={c.id}>{c.name}</button>)
  * ```
  */
 export function useConnectors(): Connector[] {
-  const core = useLaserEyesCore()
-  const connectorMap = useStore(core.$connectors)
-  return Object.values(connectorMap)
+  const config = useConfig()
+  const registry = useStore(config.state.$connectors)
+  return useMemo(() => Object.values(registry), [registry])
 }

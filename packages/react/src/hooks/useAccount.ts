@@ -1,104 +1,158 @@
+'use client'
+
 import { useStore } from '@nanostores/react'
-import { type DependencyList, type EffectCallback, useEffect } from 'react'
-import { useLaserEyesCore } from '../providers/lasereyes-provider'
+import type {
+  AddressInfo,
+  AddressPurpose,
+  Connector,
+  LaserEyesConfig,
+  WalletAccount,
+} from '@omnisat/lasereyes-core'
+import { useConfig } from '../providers/context'
+import type { ConfigNetworkId, ConfigParameter, ResolvedRegister } from '../types'
+
+function addressFor(
+  account: WalletAccount | undefined,
+  purpose: AddressPurpose
+): string | undefined {
+  return account?.addresses.find(a => a.purpose === purpose)?.address
+}
+
+function publicKeyFor(
+  account: WalletAccount | undefined,
+  purpose: AddressPurpose
+): string | undefined {
+  return account?.publicKeys?.[purpose]
+}
+
+/** Conveniences present on every branch (their values vary by status). */
+interface AccountCommon<config extends LaserEyesConfig> {
+  /** Active network id — the configured chains' id union. */
+  networkId: ConfigNetworkId<config>
+  /** All addresses the account controls (empty when disconnected). */
+  addresses: AddressInfo[]
+  /** Ordinals/taproot address, if the wallet exposes one. */
+  ordinalsAddress: string | undefined
+  /** Ordinals public key, if the wallet exposes one. */
+  ordinalsPublicKey: string | undefined
+}
 
 /**
- * Return type for the {@link useAccount} hook.
- *
- * Returns `undefined` when no wallet is connected, otherwise provides the
- * connected wallet's address information.
- */
-type UseAccountReturnType =
-  | {
-      /** All account addresses exposed by the connected wallet */
-      addresses: string[]
-      /** The payment (P2WPKH/P2SH) address */
-      payment: string
-      /** The ordinals/taproot address */
-      ordinals: string
-      /** The wallet's public key (hex-encoded) for the payment address */
-      publicKey: string
-    }
-  | undefined
-
-/**
- * Returns the connected wallet's account addresses and public key.
+ * Discriminated account view returned by {@link useAccount}.
  *
  * @remarks
- * Returns `undefined` when no wallet is connected. Subscribes directly to
- * `core.$account` via nanostores, so the component re-renders only when
- * the account atom changes.
+ * Discriminated on `status`. The `connected` branch **guarantees** non-null
+ * `account` / `connector` **and** a non-null primary (payment) address +
+ * public key — so `account.paymentAddress` needs no `?? '—'` after a
+ * `status === 'connected'` check. Ordinals/taproot fields stay
+ * `string | undefined` (not every wallet exposes them).
+ */
+export type UseAccountResult<config extends LaserEyesConfig = ResolvedRegister['config']> =
+  AccountCommon<config> &
+    (
+      | {
+          status: 'connected'
+          isConnected: true
+          isConnecting: false
+          isReconnecting: false
+          isDisconnected: false
+          /** The connected wallet account. */
+          account: WalletAccount
+          /** The active connector. */
+          connector: Connector
+          /** Payment address (alias of `paymentAddress`). */
+          address: string
+          /** Payment address. */
+          paymentAddress: string
+          /** Payment public key (alias of `paymentPublicKey`). */
+          publicKey: string
+          /** Payment public key. */
+          paymentPublicKey: string
+        }
+      | {
+          status: 'disconnected' | 'connecting' | 'reconnecting'
+          isConnected: false
+          isConnecting: boolean
+          isReconnecting: boolean
+          isDisconnected: boolean
+          account: WalletAccount | undefined
+          connector: Connector | undefined
+          address: string | undefined
+          paymentAddress: string | undefined
+          publicKey: string | undefined
+          paymentPublicKey: string | undefined
+        }
+    )
+
+/**
+ * Subscribe to the connected account and connection status.
  *
- * Must be used within a {@link LaserEyesProvider}.
+ * @remarks
+ * Re-renders only when `config.state.$connection` changes. The result is a
+ * `status`-discriminated union: in the `connected` branch `account` and
+ * `connector` are non-null. Address/public-key fields are derived conveniences;
+ * the raw {@link WalletAccount} is on `account`.
  *
- * @returns Account info, or `undefined` if no wallet is connected.
+ * @param parameters - Optional `{ config }` override.
  *
  * @example
  * ```tsx
  * const account = useAccount()
- * if (account) {
- *   console.log(account.payment)  // payment address
- *   console.log(account.ordinals) // ordinals/taproot address
+ * if (account.status === 'connected') {
+ *   account.account.getPublicKey() // no null-check needed
  * }
  * ```
  */
-export function useAccount(): UseAccountReturnType {
-  const core = useLaserEyesCore()
-  const account = useStore(core.$account)
+export function useAccount<config extends LaserEyesConfig = ResolvedRegister['config']>(
+  parameters: ConfigParameter<config> = {}
+): UseAccountResult<config> {
+  const config = useConfig(parameters)
+  const conn = useStore(config.state.$connection)
+  const account = conn.account
 
-  if (!account || account.length === 0) return undefined
-
-  const paymentAddr = account.find((a) => a.purpose === 'payment')
-  const ordinalsAddr = account.find((a) => a.purpose === 'ordinals') ?? paymentAddr
-
-  return {
-    addresses: account.map((a) => a.address),
-    payment: paymentAddr?.address ?? '',
-    ordinals: ordinalsAddr?.address ?? '',
-    publicKey: paymentAddr?.publicKey ?? '',
+  const common: AccountCommon<config> = {
+    networkId: conn.networkId as ConfigNetworkId<config>,
+    addresses: account?.addresses ?? [],
+    ordinalsAddress: addressFor(account, 'ordinals') ?? addressFor(account, 'taproot'),
+    ordinalsPublicKey: publicKeyFor(account, 'ordinals') ?? publicKeyFor(account, 'taproot'),
   }
-}
 
-/**
- * Runs a side effect whenever the connected wallet's accounts change.
- *
- * @remarks
- * Subscribes to `core.$account` and invokes the callback whenever the atom
- * emits a new value. The callback follows the same semantics as `useEffect` —
- * it may return a cleanup function that is called before the next invocation
- * or on unmount.
- *
- * Must be used within a {@link LaserEyesProvider}.
- *
- * @param callback - Effect to run on account change; may return a cleanup function.
- * @param dependencies - Additional dependencies for the underlying `useEffect`.
- *
- * @example
- * ```tsx
- * useAccountEffect(() => {
- *   console.log('Accounts changed, refetching data...')
- *   refetchUserData()
- * }, [refetchUserData])
- * ```
- */
-export function useAccountEffect(callback: EffectCallback, dependencies: DependencyList) {
-  const core = useLaserEyesCore()
-
-  useEffect(() => {
-    let cleanup: ReturnType<EffectCallback>
-
-    const unsub = core.$account.subscribe((account, prevAccount) => {
-      // Only fire when the value actually changes (nanostores calls on subscribe too)
-      if (account !== prevAccount) {
-        cleanup?.()
-        cleanup = callback()
-      }
-    })
-
-    return () => {
-      unsub()
-      cleanup?.()
+  if (conn.status === 'connected') {
+    // `WalletAccount.getAddress()` / `getPublicKey()` return a guaranteed
+    // `string` for the primary (payment) role — so the connected branch can
+    // promise these non-null without a cast.
+    const paymentAddress = conn.account.getAddress('payment')
+    const paymentPublicKey = conn.account.getPublicKey('payment')
+    return {
+      ...common,
+      status: 'connected',
+      isConnected: true,
+      isConnecting: false,
+      isReconnecting: false,
+      isDisconnected: false,
+      account: conn.account,
+      connector: conn.connector,
+      address: paymentAddress,
+      paymentAddress,
+      publicKey: paymentPublicKey,
+      paymentPublicKey,
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [core, callback, ...dependencies])
+  }
+
+  const paymentAddress = addressFor(account, 'payment')
+  const paymentPublicKey = publicKeyFor(account, 'payment')
+  return {
+    ...common,
+    status: conn.status,
+    isConnected: false,
+    isConnecting: conn.status === 'connecting',
+    isReconnecting: conn.status === 'reconnecting',
+    isDisconnected: conn.status === 'disconnected',
+    account: conn.account,
+    connector: conn.connector,
+    address: paymentAddress,
+    paymentAddress,
+    publicKey: paymentPublicKey,
+    paymentPublicKey,
+  }
 }

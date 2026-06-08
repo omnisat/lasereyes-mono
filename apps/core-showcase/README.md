@@ -1,19 +1,78 @@
 # core-showcase
 
-Minimal TS app that exercises `@omnisat/lasereyes-core` end-to-end. The view
-layer is [Alpine.js](https://alpinejs.dev) — declarative bindings in
-`index.html`, no virtual DOM, no build step — so the library usage stays
-separated from the DOM plumbing.
+Two showcases in one Vite app, sharing `src/styles.css`:
+
+- **`/`** — `@omnisat/lasereyes-core` driven directly, view layer is
+  [Alpine.js](https://alpinejs.dev). The library usage stays separated from the
+  DOM plumbing.
+- **`/react.html`** — `@omnisat/lasereyes-react` driven the way an app would,
+  exercising **every** exported hook. This is the "standard environment" path —
+  plain React 19 + Vite, idiomatic `useState` forms, no extra cleverness.
 
 ## Structure
 
-| File              | Responsibility                                                          |
-| ----------------- | ----------------------------------------------------------------------- |
-| `index.html`      | Declarative markup + Alpine bindings only (`x-text`, `@click`, `x-for`) |
-| `src/styles.css`  | Styles                                                                  |
-| `src/config.ts`   | lasereyes-core setup: `createLaserEyesConfig`, adapters, `initialize`   |
-| `src/showcase.ts` | Alpine component: store→state bridge + one method per core action       |
-| `src/main.ts`     | Entry — register the component, start Alpine                            |
+| File                          | Responsibility                                                          |
+| ----------------------------- | ----------------------------------------------------------------------- |
+| `index.html`                  | Alpine markup + bindings (`x-text`, `@click`, `x-for`)                  |
+| `src/styles.css`              | Shared styles (both paths)                                              |
+| `src/config.ts`               | core setup: `createLaserEyesConfig`, adapters, `initialize`            |
+| `src/showcase.ts`             | Alpine component: store→state bridge + one method per core action       |
+| `src/main.ts`                 | Alpine entry                                                            |
+| `react.html`                  | React entry document (`#root`)                                          |
+| `src/react/config.ts`         | react setup: config + `Register` augmentation (no `initialize` — the provider owns it) |
+| `src/react/main.tsx`          | `createRoot` + `<StrictMode>`                                          |
+| `src/react/App.tsx`           | `<LaserEyesProvider>` + layout                                          |
+| `src/react/ConnectionPanel.tsx` | useStatus, useConnectors, useConnect, useConnector, useDisconnect, useAccount, useNetwork, useConfig |
+| `src/react/ReadsPanel.tsx`    | useBalance, useUtxos, useFeeRates, useTransaction (+ `chainId`/`enabled` overrides, + `useUtxos` cursor pagination via "Load more") |
+| `src/react/WritesPanel.tsx`   | useSendBitcoin, useSignMessage, useSignPsbt, useBroadcastPsbt, useBroadcastTransaction |
+
+## React path — frictions observed
+
+Building the React showcase against the actual package surfaced a few rough
+edges (kept here as honest feedback, not blockers):
+
+1. **`Register` placement.** To get `network` / `chainId` narrowed to the
+   configured chains without threading `{ config }` everywhere, you write a
+   `declare module '@omnisat/lasereyes-react'` augmentation. It works, but it's
+   global and easy to forget — and there's no runtime hint when you do.
+2. **The provider owns `initialize`/`dispose`.** Unlike the core path, the
+   React app must **not** call `initialize(config)` itself (the provider does,
+   in an effect). Not obvious from the types; double-init is silent.
+3. **`chainId` from a `<select>` needs a cast.** `onChange` hands you a
+   `string`; `chainId` is narrowed to the configured-id union, so you assert
+   `e.target.value as ConfigNetworkId`. Expected, but a paper cut.
+4. **No "build + sign PSBT" hook.** `useSignPsbt` wants a PSBT hex, so the app
+   assembles one itself from `useUtxos` + `useFeeRates` + `useAccount`
+   (address + `getPublicKey()`) + `buildSendBtcPsbt`. That's a lot of wiring for
+   what reads like a one-liner; the taproot `publicKey` requirement is also easy
+   to miss (wallets sign nothing without it).
+
+What worked cleanly: the discriminated results (`if (q.status === 'success')`
+gives you `data: T`), the `useAccount` connected-branch narrowing (no null
+checks on `account`/`connector`), and per-call `{ enabled }` / `{ config }`.
+
+Resolved since:
+
+- `useUtxos` was originally a single page with a dangling `nextCursor`. It now
+  accumulates pages — `items` / `fetchNextPage()` / `hasNextPage` /
+  `isFetchingNextPage` — on a reusable internal primitive (`useInfiniteFetcher`)
+  that the other paginated reads can adopt.
+- `useNetwork()` now returns the configured **`chains`** alongside `network` +
+  `switchNetwork`, so a network switcher needs no separate `useConfig().chains`.
+- `useBalance` / `useUtxos` now make the cross-chain footgun unrepresentable: an
+  overload requires an **explicit `address`** to pass `{ chainId }`, so the
+  active-account default address can't be silently read against a foreign chain
+  (which is what produced the "switch to testnet → balance error" bug). The
+  selector here passes `paymentAddress` explicitly.
+- `useAccount`'s **connected branch** now guarantees the primary `paymentAddress`
+  / `address` / `publicKey` are `string` (not `string | undefined`), so the
+  panel drops the `?? '—'` on those after `status === 'connected'`.
+- Result types (`UTXO`, `Transaction`, `FeeEstimate`, `PaginatedResult`, …) are
+  re-exported from `@omnisat/lasereyes-core` (and thus `@omnisat/lasereyes-react`),
+  so you can name a hook's result type without importing the client package.
+- Read results renamed the ambiguous `loading` → **`isFetching`** (any fetch,
+  incl. background revalidation) and kept **`isLoading`** (first load, no data) —
+  TanStack semantics. Mutations drop the redundant `loading`, keeping `isLoading`.
 
 The store→state bridge in `showcase.ts` (`$connection`/`$connectors`
 `.subscribe(...)` → reactive Alpine fields) is the same job a React/Vue

@@ -15,7 +15,13 @@ import type { FetcherStore } from '@nanostores/query'
 import type { FeeEstimate } from '@omnisat/lasereyes-client'
 import { getRecommendedFees } from '../actions'
 import type { LaserEyesConfig } from '../config'
-import { defaultQueryContext, networkIdAtom, type QueryContext, SEP } from './context'
+import {
+  defaultQueryContext,
+  effectiveNetworkIdAtom,
+  type QueryBuilderOptions,
+  type QueryContext,
+  SEP,
+} from './context'
 import { withSharedData } from './structural-sharing'
 
 /**
@@ -41,15 +47,19 @@ export function getRecommendedFeesQueryKey(networkId: string): string {
  */
 export function getRecommendedFeesQuery(
   config: LaserEyesConfig,
-  ctx: QueryContext = defaultQueryContext
+  ctx: QueryContext = defaultQueryContext,
+  options?: QueryBuilderOptions
 ): FetcherStore<FeeEstimate> {
   const [createFetcherStore] = ctx
-  const $networkId = networkIdAtom(config)
+  // No address gate here, so `enabled: false` rides on the networkId key-part
+  // (effectiveNetworkIdAtom → null → NoKey → idle).
+  const $networkId = effectiveNetworkIdAtom(config, options)
+  const chainOpts = options?.chainId !== undefined ? { chainId: options.chainId } : undefined
   let $store: FetcherStore<FeeEstimate>
   $store = createFetcherStore<FeeEstimate>(['fees', SEP, $networkId], {
     fetcher: withSharedData(
       () => $store,
-      () => getRecommendedFees(config)
+      () => (chainOpts ? getRecommendedFees(config, chainOpts) : getRecommendedFees(config))
     ),
   })
   return $store

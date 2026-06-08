@@ -87,7 +87,8 @@ h3 {
   flex-wrap: wrap;
 }
 
-.row > label {
+.row > label,
+.row > .cap {
   min-width: 90px;
   color: var(--muted);
 }
@@ -155,6 +156,21 @@ textarea {
 .kv code {
   color: var(--ink);
   word-break: break-all;
+}
+
+/* Inline error text (outside the dark log panel). */
+.err {
+  color: #ef4444;
+}
+
+select {
+  background: transparent;
+  color: inherit;
+  border: 1px solid var(--border);
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 12px;
 }
 
 .log {

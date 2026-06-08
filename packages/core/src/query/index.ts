@@ -19,6 +19,9 @@
  * @module query
  */
 
+// Store types these builders return — re-exported so consumers (e.g. the React
+// bindings) can type their adapters without a direct `@nanostores/query` dep.
+export type { FetcherStore, MutatorStore } from '@nanostores/query'
 // Per-action reads
 export { getAddressBalanceQuery, getAddressBalanceQueryKey } from './balance'
 // Per-action writes (mutations)
@@ -31,7 +34,10 @@ export {
 export {
   createQueryContext,
   defaultQueryContext,
+  effectiveNetworkIdAtom,
   networkIdAtom,
+  type PaginatedQueryBuilderOptions,
+  type QueryBuilderOptions,
   type QueryContext,
   type QueryContextOptions,
   SEP,

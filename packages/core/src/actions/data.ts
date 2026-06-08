@@ -143,14 +143,19 @@ export async function getAddressBalance<const config extends LaserEyesConfig>(
 export async function getAddressUtxos<const config extends LaserEyesConfig>(
   config: config,
   address: string,
-  options?: { chainId?: config['chains'][number]['id'] }
+  options?: { chainId?: config['chains'][number]['id']; cursor?: string | number; limit?: number }
 ): Promise<PaginatedResult<UTXO>> {
   const client = getClient(config, options)
+  // Forward cursor pagination to the client action when set.
+  const pagination =
+    options?.cursor !== undefined || options?.limit !== undefined
+      ? { cursor: options?.cursor, limit: options?.limit }
+      : undefined
   return getAction(
     client as unknown as Parameters<typeof clientGetAddressUtxos>[0],
     clientGetAddressUtxos,
     'getAddressUtxos'
-  )(address)
+  )(address, pagination)
 }
 
 // ============================================================================

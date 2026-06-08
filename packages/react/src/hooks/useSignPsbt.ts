@@ -1,35 +1,37 @@
-import { useCallback } from 'react'
-import { signPsbt } from '@omnisat/lasereyes-core'
-import type { SignPsbtOptions } from '@omnisat/lasereyes-core'
-import { useLaserEyesCore } from '../providers/lasereyes-provider'
+'use client'
+
+import type { LaserEyesConfig } from '@omnisat/lasereyes-core'
+import { type SignPsbtVariables, signPsbtMutation } from '@omnisat/lasereyes-core/query'
+import { useMutatorStore } from '../internal/use-mutator-store'
+import { useConfig, useQueryContext } from '../providers/context'
+import type { MutationHookOptions, ResolvedRegister } from '../types'
 
 /**
- * Returns a function to sign a PSBT via the connected wallet.
+ * Sign (and optionally finalize/broadcast) a PSBT.
  *
  * @remarks
- * The returned function is a stable reference — it will not change between
- * renders unless the core instance changes.
+ * `data` is the `SignedPsbt` result (`psbtHex`/`psbtBase64`, plus `txId`/`txHex`
+ * when broadcast). If the result was broadcast, the shared cache revalidates the
+ * connected account's reads. `status === 'success'` proves `data` is present.
  *
- * Must be used within a {@link LaserEyesProvider} with an active wallet connection.
- *
- * @returns A function `(psbt: string, options?: SignPsbtOptions) => Promise<SignedPsbt>`
- *
- * @throws {Error} If no wallet is connected when the function is called.
+ * @param options - Optional `{ config }` / `{ queryContext }` overrides.
  *
  * @example
  * ```tsx
- * const sign = useSignPsbt()
- *
- * const handleSign = async () => {
- *   const result = await sign(psbtHex, { finalize: true })
- *   console.log('Signed PSBT:', result.psbtHex)
- * }
+ * const { signPsbtAsync } = useSignPsbt()
+ * const signed = await signPsbtAsync({ psbt, options: { finalize: true, broadcast: true } })
  * ```
  */
-export function useSignPsbt() {
-  const core = useLaserEyesCore()
-  return useCallback(
-    (psbt: string, options?: SignPsbtOptions) => signPsbt(core, psbt, options),
-    [core]
-  )
+export function useSignPsbt<config extends LaserEyesConfig = ResolvedRegister['config']>(
+  options?: MutationHookOptions<config>
+) {
+  const config = useConfig(options)
+  const ctx = useQueryContext(options?.queryContext)
+  const m = useMutatorStore(() => signPsbtMutation(config, ctx), [config, ctx])
+  return Object.assign(m, {
+    /** Sign, fire-and-forget. Alias of `mutate`. */
+    signPsbt: (args: SignPsbtVariables) => m.mutate(args),
+    /** Sign and await the `SignedPsbt`. Alias of `mutateAsync`. */
+    signPsbtAsync: (args: SignPsbtVariables) => m.mutateAsync(args),
+  })
 }

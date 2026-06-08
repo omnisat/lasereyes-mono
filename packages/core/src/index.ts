@@ -95,8 +95,15 @@ export {
 export type {
   ChainBackendFactory,
   ChainNetwork,
+  // Read-action result types — re-exported so consumers (and the React
+  // bindings) can name a hook/action's result without importing the client.
+  FeeEstimate,
   NetworkId,
   NetworkType,
+  PaginatedResult,
+  PaginationParams,
+  Transaction,
+  UTXO,
 } from '@omnisat/lasereyes-client'
 export {
   combineBackends,

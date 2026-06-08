@@ -116,6 +116,38 @@ describe('getAddressBalanceQuery (read)', () => {
   })
 })
 
+describe('getAddressBalanceQuery — per-call options (chainId / enabled)', () => {
+  it('chainId override forwards { chainId } and caches under its own key', async () => {
+    const config = makeConnectedConfig() // active chain: mainnet
+    const ctx = createQueryContext({ dedupeTime: 0, cache: new Map() })
+
+    // Same address, two chains → two distinct cache slots, two fetches.
+    const $active = getAddressBalanceQuery(config, PAYMENT, ctx)
+    const $t4 = getAddressBalanceQuery(config, PAYMENT, ctx, { chainId: 'testnet4' })
+    const u1 = mount($active)
+    const u2 = mount($t4)
+
+    await vi.waitFor(() => expect(actions.getAddressBalance).toHaveBeenCalledTimes(2))
+    expect(actions.getAddressBalance).toHaveBeenCalledWith(config, PAYMENT) // active chain
+    expect(actions.getAddressBalance).toHaveBeenCalledWith(config, PAYMENT, {
+      chainId: 'testnet4',
+    })
+    u1()
+    u2()
+  })
+
+  it('enabled: false keeps the store idle (no fetch)', async () => {
+    const config = makeConnectedConfig()
+    const ctx = createQueryContext({ dedupeTime: 0, cache: new Map() })
+    const $balance = getAddressBalanceQuery(config, PAYMENT, ctx, { enabled: false })
+    const unsub = mount($balance)
+
+    await new Promise(r => setTimeout(r, 10))
+    expect(actions.getAddressBalance).not.toHaveBeenCalled()
+    unsub()
+  })
+})
+
 describe('sendBtcMutation (write)', () => {
   it('calls sendBtc and returns the txid', async () => {
     const config = makeConnectedConfig()

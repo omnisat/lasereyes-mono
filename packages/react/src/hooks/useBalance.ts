@@ -1,88 +1,60 @@
-import { useStore } from '@nanostores/react'
-import { useEffect, useState } from 'react'
-import { getAddressBalance } from '@omnisat/lasereyes-core'
-import { useLaserEyesCore } from '../providers/lasereyes-provider'
+'use client'
+
+import type { LaserEyesConfig } from '@omnisat/lasereyes-core'
+import { getAddressBalanceQuery } from '@omnisat/lasereyes-core/query'
+import { type QueryResult, useFetcherStore } from '../internal/use-fetcher-store'
+import { useConfig, useQueryContext } from '../providers/context'
+import type { ReadHookOptions, ResolvedRegister } from '../types'
+import { useAccount } from './useAccount'
 
 /**
- * Return type for the {@link useBalance} hook.
- */
-export interface UseBalanceResult {
-  /** Balance in satoshis as a decimal string, or `undefined` if not yet loaded. */
-  balance: string | undefined
-  /** `true` while the balance fetch is in flight. */
-  loading: boolean
-  /** Non-null if the last fetch attempt failed. */
-  error: Error | null
-}
-
-/**
- * Fetches the Bitcoin balance for an address.
+ * Reactive, cached BTC balance (in sats, as a string) for an address.
  *
  * @remarks
- * Uses smart routing: tries the connected wallet's provider first, then falls
- * back to the configured data-source client. The balance is refreshed whenever
- * `address` or the active network changes.
+ * Defaults to the connected account's payment address when `address` is omitted.
+ * Backed by the shared query cache, so multiple components reading the same
+ * address dedupe to one fetch; revalidates automatically after a send.
  *
- * If `address` is omitted, the payment address of the currently connected
- * wallet is used. Returns `{ balance: undefined, loading: false, error: null }`
- * when no address is available.
+ * @param address - Address to query; defaults to the connected payment address.
+ * @param options - Per-call overrides: `chainId` (read a non-active chain,
+ *   narrowed to configured chains), `enabled` (gate the fetch), `config`, and
+ *   `queryContext`.
  *
- * Does **not** use React Query internally — consumers can add their own caching
- * layer (e.g. TanStack Query) if needed.
- *
- * Must be used within a {@link LaserEyesProvider}.
- *
- * @param address - Bitcoin address to query. Defaults to the connected wallet's payment address.
- * @returns Balance, loading state, and error.
+ * `chainId` (cross-chain read) requires an **explicit `address`** — the default
+ * (active account's payment address) can't be paired with a foreign chain, since
+ * that address belongs to the active network and would error against another
+ * chain's backend. `enabled` / `config` / `queryContext` are fine without an
+ * address.
  *
  * @example
  * ```tsx
- * const { balance, loading, error } = useBalance()
- * // or for an explicit address:
- * const { balance } = useBalance('bc1q...')
+ * const balance = useBalance()
+ * if (balance.status === 'success') console.log(balance.data) // string
+ *
+ * useBalance(addr, { chainId: 'testnet4' }) // read another chain (explicit address)
+ * useBalance(undefined, { enabled: false }) // default address, paused
  * ```
  */
-export function useBalance(address?: string): UseBalanceResult {
-  const core = useLaserEyesCore()
-  const account = useStore(core.$account)
-  const networkId = useStore(core.$networkId)
-
-  const resolvedAddress =
-    address ?? account?.find((a) => a.purpose === 'payment')?.address
-
-  const [balance, setBalance] = useState<string | undefined>(undefined)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<Error | null>(null)
-
-  useEffect(() => {
-    if (!resolvedAddress) {
-      setBalance(undefined)
-      setError(null)
-      return
-    }
-
-    let cancelled = false
-    setLoading(true)
-    setError(null)
-
-    getAddressBalance(core, resolvedAddress)
-      .then((b) => {
-        if (!cancelled) {
-          setBalance(b)
-          setLoading(false)
-        }
-      })
-      .catch((e: unknown) => {
-        if (!cancelled) {
-          setError(e instanceof Error ? e : new Error(String(e)))
-          setLoading(false)
-        }
-      })
-
-    return () => {
-      cancelled = true
-    }
-  }, [core, resolvedAddress, networkId])
-
-  return { balance, loading, error }
+export function useBalance<config extends LaserEyesConfig = ResolvedRegister['config']>(
+  address?: undefined,
+  options?: Omit<ReadHookOptions<config>, 'chainId'>
+): QueryResult<string>
+export function useBalance<config extends LaserEyesConfig = ResolvedRegister['config']>(
+  address: string,
+  options?: ReadHookOptions<config>
+): QueryResult<string>
+export function useBalance<config extends LaserEyesConfig = ResolvedRegister['config']>(
+  address?: string,
+  options?: ReadHookOptions<config>
+): QueryResult<string> {
+  const config = useConfig(options)
+  const ctx = useQueryContext(options?.queryContext)
+  const { paymentAddress } = useAccount({ config })
+  const addr = address ?? paymentAddress
+  const chainId = options?.chainId
+  const enabled = options?.enabled
+  return useFetcherStore(
+    () => getAddressBalanceQuery(config, addr, ctx, { chainId, enabled }),
+    [config, ctx, addr, chainId, enabled]
+  )
 }

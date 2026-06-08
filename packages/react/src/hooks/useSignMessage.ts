@@ -1,35 +1,36 @@
-import { useCallback } from 'react'
-import { signMessage } from '@omnisat/lasereyes-core'
-import type { SignMessageOptions } from '@omnisat/lasereyes-core'
-import { useLaserEyesCore } from '../providers/lasereyes-provider'
+'use client'
+
+import type { LaserEyesConfig } from '@omnisat/lasereyes-core'
+import { type SignMessageVariables, signMessageMutation } from '@omnisat/lasereyes-core/query'
+import { useMutatorStore } from '../internal/use-mutator-store'
+import { useConfig, useQueryContext } from '../providers/context'
+import type { MutationHookOptions, ResolvedRegister } from '../types'
 
 /**
- * Returns a function to sign a message via the connected wallet.
+ * Sign an arbitrary message.
  *
  * @remarks
- * The returned function is a stable reference — it will not change between
- * renders unless the core instance changes.
+ * Side-effect-free on chain, so no cache revalidation. `data` is the signature
+ * string. `status === 'success'` proves `data` is present.
  *
- * Must be used within a {@link LaserEyesProvider} with an active wallet connection.
- *
- * @returns A function `(message: string, options?: SignMessageOptions) => Promise<string>`
- *
- * @throws {Error} If no wallet is connected when the function is called.
+ * @param options - Optional `{ config }` / `{ queryContext }` overrides.
  *
  * @example
  * ```tsx
- * const sign = useSignMessage()
- *
- * const handleSign = async () => {
- *   const signature = await sign('Hello, Bitcoin!', { protocol: 'bip322' })
- *   console.log('Signature:', signature)
- * }
+ * const { signMessageAsync } = useSignMessage()
+ * const sig = await signMessageAsync({ message: 'hello' })
  * ```
  */
-export function useSignMessage() {
-  const core = useLaserEyesCore()
-  return useCallback(
-    (message: string, options?: SignMessageOptions) => signMessage(core, message, options),
-    [core]
-  )
+export function useSignMessage<config extends LaserEyesConfig = ResolvedRegister['config']>(
+  options?: MutationHookOptions<config>
+) {
+  const config = useConfig(options)
+  const ctx = useQueryContext(options?.queryContext)
+  const m = useMutatorStore(() => signMessageMutation(config, ctx), [config, ctx])
+  return Object.assign(m, {
+    /** Sign, fire-and-forget. Alias of `mutate`. */
+    signMessage: (args: SignMessageVariables) => m.mutate(args),
+    /** Sign and await the signature string. Alias of `mutateAsync`. */
+    signMessageAsync: (args: SignMessageVariables) => m.mutateAsync(args),
+  })
 }

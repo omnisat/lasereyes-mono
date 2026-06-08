@@ -13,7 +13,7 @@
     "skipLibCheck": true,
     "useDefineForClassFields": true,
     "verbatimModuleSyntax": true,
-    "jsx": "preserve"
+    "jsx": "react-jsx"
   },
   "include": ["src", "vite.config.ts"]
 }

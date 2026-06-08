@@ -1,27 +1,24 @@
+'use client'
+
 import { useStore } from '@nanostores/react'
-import { useLaserEyesCore } from '../providers/lasereyes-provider'
 import type { Connector } from '@omnisat/lasereyes-core'
+import { useConfig } from '../providers/context'
 
 /**
- * Returns the currently active (connected) wallet connector, or `undefined`.
+ * A single connector. With an `id`, returns that registered connector; without
+ * one, returns the currently active connector (or `undefined` when disconnected).
  *
- * @remarks
- * Subscribes to `core.$connector` via nanostores. Re-renders only when
- * the active connector changes.
- *
- * Must be used within a {@link LaserEyesProvider}.
- *
- * @returns The active {@link Connector}, or `undefined` if no wallet is connected.
+ * @param id - Optional connector id to look up.
  *
  * @example
  * ```tsx
- * const connector = useConnector()
- * if (connector) {
- *   console.log('Connected to:', connector.name)
- * }
+ * const active = useConnector()
+ * const unisat = useConnector('unisat')
  * ```
  */
-export function useConnector(): Connector | undefined {
-  const core = useLaserEyesCore()
-  return useStore(core.$connector)
+export function useConnector(id?: string): Connector | undefined {
+  const config = useConfig()
+  const conn = useStore(config.state.$connection)
+  const registry = useStore(config.state.$connectors)
+  return id ? registry[id] : conn.connector
 }
