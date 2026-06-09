@@ -15,15 +15,19 @@ import { createLaserEyesConfig } from '@omnisat/lasereyes-core'
 import { initialize } from '@omnisat/lasereyes-core/actions'
 import { loadUnisatWalletAdapter } from '@omnisat/lasereyes-core/adapters/unisat'
 import { loadXverseWalletAdapter } from '@omnisat/lasereyes-core/adapters/xverse'
+import { leather } from '@omnisat/lasereyes-core/connectors/leather'
+import { okx } from '@omnisat/lasereyes-core/connectors/okx'
 import { unisat } from '@omnisat/lasereyes-core/connectors/unisat'
 
 export const config = createLaserEyesConfig({
   chains: [MAINNET, TESTNET],
-  // Only Unisat is registered explicitly. Xverse is intentionally left out
-  // so we can exercise the announcement/discovery flow: its adapter is loaded
-  // below, the adapter announces itself, and discovery synthesizes a connector
-  // for it into `state.$connectors` — no explicit registration needed.
-  connectors: [unisat()],
+  // The fully-ported wallets are registered explicitly so they always surface
+  // in `state.$connectors` — each button stays disabled until its extension is
+  // installed (`isReady() === false`). Xverse is intentionally left out so we
+  // can exercise the announcement/discovery flow: its adapter is loaded below,
+  // it announces itself, and discovery synthesizes a connector for it into
+  // `state.$connectors` — no explicit registration needed.
+  connectors: [unisat(), leather(), okx()],
   backends: {
     mainnet: mempool(),
     testnet: mempool(),

@@ -83,10 +83,11 @@ showcase imports **zero types** from lasereyes — inference and a couple of
 ## What it demonstrates
 
 - **`createLaserEyesConfig`** with a typed chains tuple, transports, and the
-  `unisat()` + `xverse()` connector factories.
+  `unisat()` + `leather()` + `okx()` connector factories
+  (registered explicitly so each appears even when its extension is absent).
 - **EIP-6963-style discovery** via the per-wallet adapter loaders
   (`loadUnisatWalletAdapter()` / `loadXverseWalletAdapter()`) + the
-  `$connectors` reactive store.
+  `$connectors` reactive store — Xverse surfaces purely through this path.
 - **Phase 9 lifecycle actions** — `initialize`, `connect`, `disconnect`.
 - **Phase 9 data actions** — `getAddressBalance` (which provider-first-falls-back
   through `getClient`).
@@ -94,8 +95,8 @@ showcase imports **zero types** from lasereyes — inference and a couple of
   `broadcastTransaction` — all routed through:
 - **Phase 10 keystone** — `getWalletClient(config)` builds the bare wallet
   client, defers to the active connector's `getClient?` override (set for
-  unisat/xverse via `injected({ nativeRpc: { sendBtc: true } })`), and
-  hands the result to `getAction` for the call.
+  unisat/xverse/leather/okx via `injected({ nativeRpc: { sendBtc: true } })`),
+  and hands the result to `getAction` for the call.
 
 The UI surfaces, in real time:
 
@@ -112,15 +113,15 @@ pnpm install
 pnpm --filter core-showcase dev
 ```
 
-Open `http://localhost:5173`. Install Unisat or Xverse browser extension to
-exercise the wallet paths.
+Open `http://localhost:5173`. Install a Unisat, Xverse, Leather, or OKX
+browser extension to exercise the wallet paths.
 
 ## What you'll see
 
 1. On load: announced wallets appear as buttons. Click one → `connect(config, …)`.
 2. Once connected: the "Account" panel shows your address, network, and
    whether the connector applied a `getClient` override (`yes (nativeRpc)`
-   for unisat/xverse).
+   for unisat/xverse/leather/okx).
 3. Click **Send** with a destination + sats. Because the connector declared
    `nativeRpc: { sendBtc: true }`, `getWalletClient(config)` returns a client
    with `sendBtc` overridden to call `bitcoin_sendBitcoin` directly — one

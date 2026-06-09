@@ -22,21 +22,29 @@ import { mempool } from '@omnisat/lasereyes-client/backends/mempool'
 import { createLaserEyesConfig } from '@omnisat/lasereyes-core'
 import { loadUnisatWalletAdapter } from '@omnisat/lasereyes-core/adapters/unisat'
 import { loadXverseWalletAdapter } from '@omnisat/lasereyes-core/adapters/xverse'
+import { leather } from '@omnisat/lasereyes-core/connectors/leather'
+import { okx } from '@omnisat/lasereyes-core/connectors/okx'
 import { unisat } from '@omnisat/lasereyes-core/connectors/unisat'
 
 export const config = createLaserEyesConfig({
   chains: [MAINNET, TESTNET],
-  // Only Unisat is registered explicitly; Xverse shows up purely via the
-  // announcement/discovery flow once its adapter loads below.
-  connectors: [unisat()],
+  // The fully-ported wallets are registered explicitly so they always appear
+  // in `useConnectors()` — their button stays disabled (`isReady() === false`)
+  // until the extension is installed. Unisat/Leather/OKX all carry `nativeRpc`
+  // overrides (the "nativeRpc override" pill in the UI). Xverse is deliberately
+  // *not* listed here so it can demonstrate the announcement/discovery path
+  // (its adapter loads below).
+  connectors: [unisat(), leather(), okx()],
   backends: {
     mainnet: mempool(),
     testnet: mempool(),
   },
 })
 
-// Load the adapters so they can announce themselves to discovery. (The
-// provider calls `initialize(config)`, which wires discovery + auto-reconnect.)
+// Load the adapters so they can announce themselves to discovery. Unisat backs
+// its explicit connector; Xverse has no explicit connector, so loading its
+// adapter is the *only* reason it surfaces — purely via the announcement flow.
+// (The provider calls `initialize(config)`, which wires discovery + auto-reconnect.)
 loadUnisatWalletAdapter()
 loadXverseWalletAdapter()
 
