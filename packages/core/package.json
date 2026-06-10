@@ -49,10 +49,6 @@
       "import": "./dist/connectors/okx.js",
       "types": "./dist/connectors/okx.d.ts"
     },
-    "./connectors/magic-eden": {
-      "import": "./dist/connectors/magic-eden.js",
-      "types": "./dist/connectors/magic-eden.d.ts"
-    },
     "./connectors/oyl": {
       "import": "./dist/connectors/oyl.js",
       "types": "./dist/connectors/oyl.d.ts"
@@ -68,10 +64,6 @@
     "./connectors/op-net": {
       "import": "./dist/connectors/op-net.js",
       "types": "./dist/connectors/op-net.d.ts"
-    },
-    "./connectors/sparrow": {
-      "import": "./dist/connectors/sparrow.js",
-      "types": "./dist/connectors/sparrow.d.ts"
     },
     "./connectors/tokeo": {
       "import": "./dist/connectors/tokeo.js",
@@ -97,10 +89,6 @@
       "import": "./dist/adapters/okx.js",
       "types": "./dist/adapters/okx.d.ts"
     },
-    "./adapters/magic-eden": {
-      "import": "./dist/adapters/magic-eden.js",
-      "types": "./dist/adapters/magic-eden.d.ts"
-    },
     "./adapters/oyl": {
       "import": "./dist/adapters/oyl.js",
       "types": "./dist/adapters/oyl.d.ts"
@@ -112,19 +100,17 @@
     "./adapters/orange": {
       "import": "./dist/adapters/orange.js",
       "types": "./dist/adapters/orange.d.ts"
-    },
-    "./adapters/sparrow": {
-      "import": "./dist/adapters/sparrow.js",
-      "types": "./dist/adapters/sparrow.d.ts"
     }
   },
   "scripts": {
     "dev": "vite",
     "build": "pnpm build:esm && pnpm build:umd",
     "build:esm": "tsc && vite build",
-    "build:umd": "vite build --config vite.umd.config.js",
+    "build:umd": "vite build --mode umd",
     "preview": "vite preview",
     "prepublishOnly": "npm run build",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit -p tsconfig.typecheck.json",
     "lint": "eslint ."
   },
   "devDependencies": {
@@ -137,31 +123,15 @@
     "sonda": "^0.7.1",
     "typescript": "5.8.3",
     "vite": "^5.4.1",
-    "vite-plugin-dts": "^4.2.1",
-    "vite-plugin-node-polyfills": "^0.22.0"
+    "vite-plugin-dts": "^4.2.1"
   },
   "dependencies": {
-    "@bitcoinerlab/secp256k1": "^1.1.1",
-    "@cmdcode/crypto-utils": "^2.4.6",
-    "@cmdcode/tapscript": "^1.4.6",
-    "@magiceden-oss/runestone-lib": "^1.0.2",
-    "@nanostores/persistent": "^0.10.2",
     "@nanostores/query": "^0.3.4",
     "@omnisat/lasereyes-client": "workspace:*",
-    "@orangecrypto/orange-connect": "^1.2.2",
     "@scure/base": "^1.2.0",
     "@scure/btc-signer": "^1.5.0",
-    "axios": "^1.7.7",
-    "bip32": "5.0.0-rc.0",
-    "bip39": "^3.1.0",
-    "buffer": "^6.0.3",
-    "crypto-browserify": "^3.12.1",
     "eventemitter3": "^5.0.1",
-    "nanostores": "^0.11.3",
-    "ordapi": "^0.0.7",
-    "sats-connect": "^3.3.0",
-    "tiny-async-pool": "^2.1.0",
-    "uint8array-tools": "^0.0.9"
+    "nanostores": "^0.11.3"
   },
   "publishConfig": {
     "access": "public"

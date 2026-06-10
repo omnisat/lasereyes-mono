@@ -5,12 +5,10 @@
  */
 
 import { loadLeatherWalletAdapter } from '../adapters/leather'
-import { loadMagicEdenWalletAdapter } from '../adapters/magic-eden'
 import { loadOkxWalletAdapter } from '../adapters/okx'
 import { loadOrangeWalletAdapter } from '../adapters/orange'
 import { loadOylWalletAdapter } from '../adapters/oyl'
 import { loadPhantomWalletAdapter } from '../adapters/phantom'
-import { loadSparrowWalletAdapter } from '../adapters/sparrow'
 import {
   loadBinanceWalletAdapter,
   loadKeplrWalletAdapter,
@@ -34,22 +32,30 @@ import { loadXverseWalletAdapter } from '../adapters/xverse'
  *
  * @example
  * ```ts
- * import { createLaserEyesCore, loadAllWallets } from '@omnisat/lasereyes-core'
+ * import { createLaserEyesConfig, initialize, loadAllWallets } from '@omnisat/lasereyes-core'
+ * import { MAINNET, mempool } from '@omnisat/lasereyes-client'
  *
- * const core = createLaserEyesCore()
+ * const config = createLaserEyesConfig({
+ *   chains: [MAINNET],
+ *   backends: { mainnet: mempool() },
+ * })
  * loadAllWallets()
- * await core.initialize()
+ * await initialize(config)
  * ```
  *
  * @example
  * ```ts
  * // Smaller bundle: load only specific wallets.
- * import { createLaserEyesCore } from '@omnisat/lasereyes-core'
+ * import { createLaserEyesConfig, initialize } from '@omnisat/lasereyes-core'
+ * import { MAINNET, mempool } from '@omnisat/lasereyes-client'
  * import { loadUnisatWalletAdapter } from '@omnisat/lasereyes-core/adapters/unisat'
  *
- * const core = createLaserEyesCore()
+ * const config = createLaserEyesConfig({
+ *   chains: [MAINNET],
+ *   backends: { mainnet: mempool() },
+ * })
  * loadUnisatWalletAdapter()
- * await core.initialize()
+ * await initialize(config)
  * ```
  */
 export function loadAllWallets(): void {
@@ -60,11 +66,9 @@ export function loadAllWallets(): void {
   loadLeatherWalletAdapter()
   loadOkxWalletAdapter()
   loadOylWalletAdapter()
-  loadMagicEdenWalletAdapter()
   loadPhantomWalletAdapter()
   loadOrangeWalletAdapter()
   loadOpNetWalletAdapter()
-  loadSparrowWalletAdapter()
   loadTokeoWalletAdapter()
   loadKeplrWalletAdapter()
 }

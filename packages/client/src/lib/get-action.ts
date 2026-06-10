@@ -2,8 +2,8 @@
  * `getAction` — override-aware action dispatch.
  *
  * @remarks
- * Ported from wagmi's `@wagmi/core/utils/getAction`. Resolves the best
- * implementation for a given action against a client:
+ * Resolves the best implementation for a given action against a client,
+ * honoring user overrides:
  *
  * 1. The client's overridden method, looked up by `actionFn.name`.
  * 2. The client's overridden method, looked up by the explicit `name` arg
@@ -15,7 +15,7 @@
  * through `getAction`, so user overrides via `.extend()` cascade through
  * all composition layers automatically.
  *
- * The composition pattern (paraphrasing the wagmi authors): default
+ * The composition pattern: default
  * behavior comes from tree-shakable functions; client extensions are
  * **overrides**, not requirements. The compile-time "you must extend X
  * before Y" rule isn't needed — `getAction` falls back to the free

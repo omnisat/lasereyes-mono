@@ -122,7 +122,7 @@ export abstract class BaseAdapter implements BitcoinProviderAdapter {
    * (suitable for wallets that already use the spec event names — most
    * window-injected Bitcoin wallets, including Unisat). Override in
    * subclasses that use different event names (e.g. Xverse via
-   * sats-connect; Magic Eden; Phantom) to do the mapping.
+   * sats-connect; Phantom) to do the mapping.
    *
    * Subclasses overriding this should:
    * 1. Call `this.rawProvider.on(walletEventName, payload => { ... })`.

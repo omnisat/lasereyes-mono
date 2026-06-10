@@ -10,7 +10,7 @@ export type {
 export type { MutationResult, MutationStatus } from '../internal/use-mutator-store'
 // Config access
 export { useConfig } from '../providers/context'
-// Config-threading type plumbing (wagmi-style Register + option bags)
+// Config-threading type plumbing (module-augmentation Register + option bags)
 export type {
   ConfigNetworkId,
   ConfigParameter,

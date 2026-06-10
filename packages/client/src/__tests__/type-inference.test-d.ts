@@ -843,7 +843,7 @@ describe('broadcastPsbt', () => {
 // ============================================================================
 // 14. Anti-clobber — `.extend()` rejects redeclaring reserved members
 //
-// This is the viem-style `Extension<Reserved>` constraint at work. The
+// This is the `Extension<Reserved>` constraint at work. The
 // factory's return type cannot redeclare keys that the receiver reserves
 // (e.g. `config`, `extend` on Client/WalletClient; `network`,
 // `getCapabilities`, `extend` on ChainBackend). Other keys are permitted.
@@ -905,7 +905,7 @@ describe('Extension anti-clobber', () => {
 
   // ============================================================================
   // ExtendableProtectedActions shape-validation — overrides of registered
-  // action names must match their canonical signature. Mirrors viem's
+  // action names must match their canonical signature. Uses the
   // `ExactPartial<ExtendableProtectedActions>` constraint on `.extend()`.
   // ============================================================================
 

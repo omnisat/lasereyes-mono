@@ -107,7 +107,7 @@ export async function waitForTransaction<
 // ============================================================================
 // Named action surface — the canonical method shapes that `publicActions()`
 // installs on a client. Declared as an interface so it can be `Pick`'d from
-// when constraining `.extend()` (viem-style `ExtendableProtectedActions`).
+// when constraining `.extend()` (the `ExtendableProtectedActions` pattern).
 // ============================================================================
 
 /**

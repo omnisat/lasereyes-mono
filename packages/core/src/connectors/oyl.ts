@@ -3,7 +3,7 @@
  * @module connectors/oyl
  */
 
-import { OylAdapter } from '../adapters/oyl'
+import { createOylAdapter } from '../adapters/oyl'
 import type { CreateConnectorFn } from '../types/connector'
 import { injected } from './injected'
 
@@ -14,10 +14,11 @@ export function oyl(): CreateConnectorFn {
     rdns: 'app.oyl',
     getProvider: w => {
       const raw = (w as { oyl?: unknown }).oyl
-      return raw ? new OylAdapter(raw) : null
+      return raw ? createOylAdapter(raw) : null
     },
-    // OYL is the only baseline wallet that natively exposes `pushPsbt`
-    // separately from `signPsbt`'s `broadcast` flag. Route both writes.
-    nativeRpc: { sendBtc: true, broadcastPsbt: true },
+    // OYL has no single-prompt `sendBitcoin`, so BTC sends use the composed
+    // PSBT path. It does expose `pushPsbt` separately from `signPsbt`'s
+    // `broadcast` flag, so route `broadcastPsbt` to it natively.
+    nativeRpc: { broadcastPsbt: true },
   })
 }

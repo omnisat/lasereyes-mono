@@ -8,15 +8,15 @@
 Major architectural refactor (pre-stable — breaking changes are expected on
 every minor until 1.0).
 
-The library is rebuilt around a composable, framework-agnostic core modeled on
-viem/wagmi: declare your chains, backends, and connectors once as data, then
-extend a client with the actions you need.
+The library is rebuilt around a composable, framework-agnostic core: declare
+your chains, backends, and connectors once as data, then extend a client with
+the actions you need.
 
 **New `@omnisat/lasereyes-client`** — a modern Bitcoin data client. Composable
 chain backends (`mempool()`, `sandshrew()`, `maestro()`) with one backend per
 network and `combineBackends()` for fallbacks; pure utility builders (PSBT,
-address) split from I/O actions; subpath exports for `/wallet`, `/utils`,
-`/runes`, `/brc20`, `/alkanes`, `/inscriptions`, and `/backends/*`.
+address) split from I/O actions; subpath exports for `/wallet`, `/utils`, and
+`/backends/*`.
 
 **`@omnisat/lasereyes-core`** — `createLaserEyesConfig({ chains, connectors,
 backends })`, declarative wallet adapters, nanostores-backed state with a
@@ -29,9 +29,9 @@ explicit, revalidate-on-write mutations).
 `useNetwork`, `useConnectors`/`useConnector`, `useBalance`, `useFeeRates`,
 `useUtxos` (cursor-paginated), `useSendBitcoin`, `useSignPsbt`,
 `useSignMessage`, plus broadcast mutations. Wallets are discovered at runtime
-(EIP-6963-style) instead of hardcoded `hasX` booleans. Adds a wagmi-style typed
-`Register` so `network`/`chainId` are inferred without threading `config`
-through every call.
+(EIP-6963-style) instead of hardcoded `hasX` booleans. Adds a typed `Register`
+seam so `network`/`chainId` are inferred without threading `config` through
+every call.
 
 **`@omnisat/lasereyes`** — now simply re-exports the new React surface (which
 itself re-exports core). The legacy `useLaserEyes`, `useBitcoinFees`,

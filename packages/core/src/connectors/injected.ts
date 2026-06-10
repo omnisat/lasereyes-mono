@@ -134,14 +134,11 @@ export interface InjectedConnectorOptions {
 /**
  * `true` when the error is the wallet adapter signalling "this method
  * isn't something I handle" (JSON-RPC `METHOD_NOT_FOUND`, code -32601).
- *
- * @remarks
- * The native-RPC overrides fall back to the composed/backend path
- * **only** on this error. User rejections (4001), network errors, and
- * adapter-internal errors re-throw — the caller asked the wallet to do
- * something, the wallet refused for a reason, and silently re-routing
- * into a different code path would hide that.
  */
+// The native-RPC overrides fall back to the composed/backend path only on this
+// error. User rejections (4001), network errors, and adapter-internal errors
+// re-throw — the caller asked the wallet to do something, the wallet refused for
+// a reason, and silently re-routing into a different code path would hide that.
 function isMethodNotFound(e: unknown): boolean {
   return (
     typeof e === 'object' && e !== null && 'code' in e && (e as { code: unknown }).code === -32601

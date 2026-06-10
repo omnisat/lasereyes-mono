@@ -62,18 +62,19 @@ export type MutationResult<Data, Result, E = Error> = {
 )
 
 /**
- * Bridge a `@nanostores/query` MutatorStore to React.
+ * Bridge a query MutatorStore to React.
  *
  * @remarks
  * One MutatorStore per hook instance (memoized by `deps`, usually `[config,
- * ctx]`). This matters: nanoquery's `throttleCalls` defaults true and drops a
- * `.mutate()` issued while the same store is still loading — so a fresh store
- * per hook instance gives natural double-submit protection without sharing
+ * ctx]`), so each caller gets natural double-submit protection without sharing
  * in-flight state across unrelated callers.
  *
  * @param makeStore - Builds the MutatorStore (e.g. `() => sendBtcMutation(...)`).
  * @param deps - Identity deps for the store (typically `[config, ctx]`).
  */
+// A fresh store per instance is what gives the double-submit protection: the
+// underlying mutator throttles calls by default and drops a `.mutate()` issued
+// while the same store is still loading.
 export function useMutatorStore<Data, Result, E = Error>(
   makeStore: () => MutatorStore<Data, Result, E>,
   deps: DependencyList

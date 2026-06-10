@@ -1,6 +1,5 @@
 /**
- * `LaserEyesConfig` — the wagmi-shaped registry that replaces the old
- * `LaserEyesCore` class.
+ * `LaserEyesConfig` — the typed config registry at the center of LaserEyes.
  *
  * @remarks
  * A LaserEyes config is a value, not a class. It bundles:
@@ -15,11 +14,10 @@
  *
  * Three threaded generics — `chains`, `backends`, `connectorFns` —
  * preserve literal-typed information (chain IDs, per-chain capability
- * sets, per-connector identity) so the keystone {@link getWalletClient}
- * (Phase 10) can hand callers a precisely-typed wallet client without
- * extra ceremony at the call site. All three default to permissive
- * variants so call sites that don't need precision can pass
- * `LaserEyesConfig` (no type args) directly.
+ * sets, per-connector identity) so {@link getWalletClient} can hand
+ * callers a precisely-typed wallet client without extra ceremony at the
+ * call site. All three default to permissive variants so call sites that
+ * don't need precision can pass `LaserEyesConfig` (no type args) directly.
  *
  * @module config
  */

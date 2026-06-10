@@ -3,6 +3,7 @@
   "private": false,
   "version": "0.0.79",
   "type": "module",
+  "sideEffects": false,
   "main": "./dist/index.umd.cjs",
   "module": "./dist/index.js",
   "files": [
@@ -12,6 +13,7 @@
   "typings": "./dist/index.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.umd.cjs"
     }
@@ -22,6 +24,7 @@
     "lint": "eslint .",
     "test": "vitest run",
     "test:types": "vitest run --typecheck.enabled=true --typecheck.only",
+    "typecheck": "vitest run --typecheck.enabled=true --typecheck.only",
     "test:watch": "vitest",
     "preview": "vite preview",
     "prepublishOnly": "npm run build"

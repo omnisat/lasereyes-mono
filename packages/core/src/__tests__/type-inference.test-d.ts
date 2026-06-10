@@ -98,12 +98,10 @@ import {
 // — Adapters (built-in) —
 import type { BaseAdapter, BitcoinProviderAdapter } from '../adapters/base'
 import { createLeatherAdapter, loadLeatherWalletAdapter } from '../adapters/leather'
-import { loadMagicEdenWalletAdapter, type MagicEdenAdapter } from '../adapters/magic-eden'
 import { createOkxAdapter, loadOkxWalletAdapter } from '../adapters/okx'
-import { loadOrangeWalletAdapter, type OrangeAdapter } from '../adapters/orange'
-import { loadOylWalletAdapter, type OylAdapter } from '../adapters/oyl'
+import { createOrangeAdapter, loadOrangeWalletAdapter } from '../adapters/orange'
+import { createOylAdapter, loadOylWalletAdapter } from '../adapters/oyl'
 import { createPhantomAdapter, loadPhantomWalletAdapter } from '../adapters/phantom'
-import { loadSparrowWalletAdapter, type SparrowAdapter } from '../adapters/sparrow'
 // Tokeo, Keplr, and OP_NET are Unisat-API clones — their loaders reuse
 // UnisatAdapter and live in `../adapters/unisat`.
 import {
@@ -123,13 +121,11 @@ import { createConnector } from '../connectors/create'
 import { type InjectedConnectorOptions, injected } from '../connectors/injected'
 import { keplr } from '../connectors/keplr'
 import { leather } from '../connectors/leather'
-import { magicEden } from '../connectors/magic-eden'
 import { okx } from '../connectors/okx'
 import { opNet } from '../connectors/op-net'
 import { orange } from '../connectors/orange'
 import { oyl } from '../connectors/oyl'
 import { phantom } from '../connectors/phantom'
-import { sparrow } from '../connectors/sparrow'
 import { tokeo } from '../connectors/tokeo'
 import { binance, unisat, unisatLike, wizz } from '../connectors/unisat'
 import { xverse } from '../connectors/xverse'
@@ -165,10 +161,6 @@ import { getWalletClient } from '../wallet-client'
 declare const provider: BitcoinProvider
 declare const adapter: BaseAdapter
 declare const u: UnisatAdapter
-declare const oy: OylAdapter
-declare const me: MagicEdenAdapter
-declare const or: OrangeAdapter
-declare const sp: SparrowAdapter
 declare const caps: ProviderCapabilities
 declare const target: InjectedConnectorOptions
 declare const config: ConnectorConfig
@@ -216,20 +208,19 @@ describe('ProviderRpcError', () => {
 describe('Adapters', () => {
   it('all built-in adapters extend BaseAdapter and implement BitcoinProviderAdapter', () => {
     expectTypeOf(u).toMatchTypeOf<BaseAdapter>()
-    expectTypeOf(oy).toMatchTypeOf<BaseAdapter>()
-    expectTypeOf(me).toMatchTypeOf<BaseAdapter>()
-    expectTypeOf(or).toMatchTypeOf<BaseAdapter>()
-    expectTypeOf(sp).toMatchTypeOf<BaseAdapter>()
     // Tokeo, Keplr, and OP_NET are UnisatAdapter clones (no distinct
     // adapter class); their loaders are covered below.
     expectTypeOf(u).toMatchTypeOf<BitcoinProviderAdapter>()
   })
 
   it('defineAdapter factories return the public BitcoinProviderAdapter contract', () => {
-    // Leather and OKX use the declarative `defineAdapter` factory rather
-    // than a bespoke class; the public surface is the adapter interface.
+    // Leather, OKX, OYL, Orange, Phantom, and Xverse use the declarative
+    // `defineAdapter` factory rather than a bespoke class; the public
+    // surface is the adapter interface.
     expectTypeOf(createLeatherAdapter).returns.toEqualTypeOf<BitcoinProviderAdapter>()
     expectTypeOf(createOkxAdapter).returns.toEqualTypeOf<BitcoinProviderAdapter>()
+    expectTypeOf(createOylAdapter).returns.toEqualTypeOf<BitcoinProviderAdapter>()
+    expectTypeOf(createOrangeAdapter).returns.toEqualTypeOf<BitcoinProviderAdapter>()
     expectTypeOf(createPhantomAdapter).returns.toEqualTypeOf<BitcoinProviderAdapter>()
     expectTypeOf(createXverseAdapter).returns.toEqualTypeOf<BitcoinProviderAdapter>()
   })
@@ -247,11 +238,9 @@ describe('Adapters', () => {
     expectTypeOf(loadLeatherWalletAdapter).returns.toEqualTypeOf<BitcoinProviderAdapter | null>()
     expectTypeOf(loadOkxWalletAdapter).returns.toEqualTypeOf<BitcoinProviderAdapter | null>()
     expectTypeOf(loadOylWalletAdapter).returns.toEqualTypeOf<BitcoinProviderAdapter | null>()
-    expectTypeOf(loadMagicEdenWalletAdapter).returns.toEqualTypeOf<BitcoinProviderAdapter | null>()
     expectTypeOf(loadPhantomWalletAdapter).returns.toEqualTypeOf<BitcoinProviderAdapter | null>()
     expectTypeOf(loadOrangeWalletAdapter).returns.toEqualTypeOf<BitcoinProviderAdapter | null>()
     expectTypeOf(loadOpNetWalletAdapter).returns.toEqualTypeOf<BitcoinProviderAdapter | null>()
-    expectTypeOf(loadSparrowWalletAdapter).returns.toEqualTypeOf<BitcoinProviderAdapter | null>()
     expectTypeOf(loadTokeoWalletAdapter).returns.toEqualTypeOf<BitcoinProviderAdapter | null>()
     expectTypeOf(loadKeplrWalletAdapter).returns.toEqualTypeOf<BitcoinProviderAdapter | null>()
   })
@@ -286,11 +275,9 @@ describe('Connector factories', () => {
     expectTypeOf(leather).returns.toEqualTypeOf<CreateConnectorFn>()
     expectTypeOf(okx).returns.toEqualTypeOf<CreateConnectorFn>()
     expectTypeOf(oyl).returns.toEqualTypeOf<CreateConnectorFn>()
-    expectTypeOf(magicEden).returns.toEqualTypeOf<CreateConnectorFn>()
     expectTypeOf(phantom).returns.toEqualTypeOf<CreateConnectorFn>()
     expectTypeOf(orange).returns.toEqualTypeOf<CreateConnectorFn>()
     expectTypeOf(opNet).returns.toEqualTypeOf<CreateConnectorFn>()
-    expectTypeOf(sparrow).returns.toEqualTypeOf<CreateConnectorFn>()
     expectTypeOf(tokeo).returns.toEqualTypeOf<CreateConnectorFn>()
     expectTypeOf(keplr).returns.toEqualTypeOf<CreateConnectorFn>()
   })
@@ -384,7 +371,7 @@ describe('Discovery', () => {
 })
 
 // ============================================================================
-// 6. createLaserEyesConfig — wagmi-shaped generic registry
+// 6. createLaserEyesConfig — generic typed config registry
 //
 // Three threaded generics — `chains`, `backends`, `connectorFns` — preserve
 // literal-typed information so Phase 10's keystone (`getWalletClient` /
@@ -616,7 +603,7 @@ declare const _looseConfig: ReturnType<typeof createLaserEyesConfig>
 //
 // `LaserEyesConfig` threads its configured chains' ID union into the
 // connection store's READ surface (`get` / `value` / `listen` / `subscribe`).
-// The store is exposed READ-ONLY (no `set` / `setKey`) — wagmi-style: public
+// The store is exposed READ-ONLY (no `set` / `setKey`): public
 // `config.state` is read-only, the action layer mutates via the internal
 // `mutateConnection` seam.
 //
@@ -858,7 +845,7 @@ describe('Phase 9 — getClient', () => {
 // ============================================================================
 // Phase 10 — `getWalletClient` keystone
 //
-// Wagmi-faithful: returns a bare WalletClient by default (no `.extend()`
+// Returns a bare WalletClient by default (no `.extend()`
 // calls), or delegates entirely to `connector.getClient` when present.
 // Threads `<const config>` so chainId is narrowed to the config's chain
 // tuple.

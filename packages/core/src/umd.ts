@@ -2,38 +2,27 @@
  * UMD entry — script-tag drop-in surface.
  *
  * @remarks
- * Re-exports the subset of `@omnisat/lasereyes-core` that we ship in
- * the single-file UMD build (see `vite.umd.config.js`). The UMD bundle
- * is the "no-toolchain" path: drop in via `<script>` and read
- * everything off `window.LaserEyes`.
+ * Re-exports the full `@omnisat/lasereyes-core` wallet surface into a
+ * single file (built via `vite build --mode umd`). The UMD bundle is the
+ * "no-toolchain" path: drop in via `<script>` and read everything off
+ * `window.LaserEyes`.
  *
- * **What's in the UMD:** core config + state + clients, actions,
- * detection primitives, every connector except Xverse, and every
- * adapter except Xverse — plus a Xverse-less `loadAllWallets`.
- *
- * **What's NOT in the UMD:** `xverse` connector + `XverseAdapter` +
- * `loadXverseWalletAdapter`. These pull in `sats-connect`, which drags
- * in `@sats-connect/core` + `jsontokens` + `elliptic` + `bn.js` + the
- * browserify polyfill chain (~600 kB raw). Loading that synchronously
- * into a UMD bundle would balloon the drop-in file past 1 MB and
- * defeat its purpose.
- *
- * Apps that need Xverse use the ESM build with a bundler instead, or
- * (TODO) a sibling `lasereyes-xverse.umd.js` that self-registers via
- * the EIP-6963 announcement channel.
+ * Every wallet is included — adapters, connectors, and loaders — plus the
+ * canonical {@link loadAllWallets}. (Xverse used to be omitted because it
+ * pulled in `sats-connect`; the adapter now talks to
+ * `window.XverseProviders.BitcoinProvider` directly, so there's nothing
+ * heavy left to exclude.)
  *
  * @module umd
  */
 
 export * from './actions'
-// Adapter classes + loader functions. Xverse omitted.
+// Per-wallet adapter factories + loaders.
 export { createLeatherAdapter, loadLeatherWalletAdapter } from './adapters/leather'
-export { loadMagicEdenWalletAdapter, MagicEdenAdapter } from './adapters/magic-eden'
 export { createOkxAdapter, loadOkxWalletAdapter } from './adapters/okx'
-export { loadOrangeWalletAdapter, OrangeAdapter } from './adapters/orange'
-export { loadOylWalletAdapter, OylAdapter } from './adapters/oyl'
+export { createOrangeAdapter, loadOrangeWalletAdapter } from './adapters/orange'
+export { createOylAdapter, loadOylWalletAdapter } from './adapters/oyl'
 export { createPhantomAdapter, loadPhantomWalletAdapter } from './adapters/phantom'
-export { loadSparrowWalletAdapter, SparrowAdapter } from './adapters/sparrow'
 // Tokeo, Keplr, and OP_NET are Unisat-API clones — their loaders reuse
 // UnisatAdapter and live in `./adapters/unisat`.
 export {
@@ -45,72 +34,32 @@ export {
   loadWizzWalletAdapter,
   UnisatAdapter,
 } from './adapters/unisat'
+export { createXverseAdapter, loadXverseWalletAdapter } from './adapters/xverse'
 export type { InjectedConnectorOptions } from './connectors'
-// All connector factories except `xverse`.
+// All connector factories.
 export {
   binance,
   createConnector,
   injected,
   keplr,
   leather,
-  magicEden,
   okx,
   opNet,
   orange,
   oyl,
   phantom,
-  sparrow,
   tokeo,
   unisat,
   unisatLike,
   wizz,
+  xverse,
 } from './connectors'
-// Detection primitives — but NOT `loadAllWallets`, which would pull in
-// the xverse adapter through `detection/helpers.ts`. We define a
-// UMD-safe replacement below.
+// Detection — including the canonical `loadAllWallets` (now safe to ship
+// in the UMD: it loads Xverse too, with no sats-connect baggage).
 export {
   announceWallet,
   discoverConnectors,
   listenForWalletAnnouncements,
+  loadAllWallets,
 } from './detection'
 export * from './index'
-
-import { loadLeatherWalletAdapter } from './adapters/leather'
-import { loadMagicEdenWalletAdapter } from './adapters/magic-eden'
-import { loadOkxWalletAdapter } from './adapters/okx'
-import { loadOrangeWalletAdapter } from './adapters/orange'
-import { loadOylWalletAdapter } from './adapters/oyl'
-import { loadPhantomWalletAdapter } from './adapters/phantom'
-import { loadSparrowWalletAdapter } from './adapters/sparrow'
-import {
-  loadBinanceWalletAdapter,
-  loadKeplrWalletAdapter,
-  loadOpNetWalletAdapter,
-  loadTokeoWalletAdapter,
-  loadUnisatWalletAdapter,
-  loadWizzWalletAdapter,
-} from './adapters/unisat'
-
-/**
- * UMD-flavored `loadAllWallets` — same as the ESM helper, minus Xverse.
- *
- * @remarks
- * Mirrors `loadAllWallets()` from `detection/helpers.ts` but skips the
- * Xverse loader so the UMD bundle doesn't drag in the sats-connect
- * stack. Apps that need Xverse should use the ESM build.
- */
-export function loadAllWallets(): void {
-  loadUnisatWalletAdapter()
-  loadBinanceWalletAdapter()
-  loadWizzWalletAdapter()
-  loadLeatherWalletAdapter()
-  loadOkxWalletAdapter()
-  loadOylWalletAdapter()
-  loadMagicEdenWalletAdapter()
-  loadPhantomWalletAdapter()
-  loadOrangeWalletAdapter()
-  loadOpNetWalletAdapter()
-  loadSparrowWalletAdapter()
-  loadTokeoWalletAdapter()
-  loadKeplrWalletAdapter()
-}

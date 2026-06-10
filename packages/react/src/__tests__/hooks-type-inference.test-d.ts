@@ -7,7 +7,7 @@
  * `type-inference.test-d.ts` discipline (see CLAUDE.md). If a change breaks one
  * of these contracts, `vitest typecheck` fails.
  *
- * Covers the four problems from `docs/hooks-typing-and-overrides.md`:
+ * Covers the four problems the hooks' config-threading design solves:
  * - **P1** generic threading (Register default + explicit `{ config }`),
  * - **P2** discriminated results (account + read/write),
  * - **P3** per-call `chainId` narrowed to the configured chains,

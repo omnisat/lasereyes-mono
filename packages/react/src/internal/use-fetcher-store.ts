@@ -69,14 +69,14 @@ export type QueryResult<T, E = Error> =
     }
 
 /**
- * Bridge a `@nanostores/query` FetcherStore to React.
+ * Bridge a query FetcherStore to React.
  *
  * @remarks
  * The store is created **once per `deps` change** via `useMemo` — a FetcherStore
  * must not be rebuilt every render (that would churn subscriptions and defeat
  * the cache). `deps` are the query arguments (config, ctx, address, …): change
  * the args → new store keyed to the new query; keep them → the same store, so
- * nanoquery dedupes against its cache.
+ * the cached result is reused.
  *
  * @param makeStore - Builds the FetcherStore (e.g. `() => getAddressBalanceQuery(...)`).
  * @param deps - The query args that identify the store; rebuild on change.

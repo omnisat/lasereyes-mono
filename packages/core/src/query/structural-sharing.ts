@@ -2,9 +2,9 @@
  * Structural sharing — `replaceEqualDeep`.
  *
  * @remarks
- * Vendored from TanStack Query (MIT). wagmi re-exports this same function as
- * `structuralSharing`; nanoquery has no equivalent, so we apply it inside our
- * fetchers. It walks the new result against the previous one and returns the
+ * Vendored from TanStack Query (MIT). nanoquery has no equivalent, so we apply
+ * it inside our fetchers (the same role a `structuralSharing` option plays
+ * elsewhere). It walks the new result against the previous one and returns the
  * **old reference** for any sub-tree that's deep-equal, so consumers selecting
  * `.data` (or sub-paths of it) keep a stable identity across refetches and
  * don't re-render / recompute when the data hasn't actually changed.

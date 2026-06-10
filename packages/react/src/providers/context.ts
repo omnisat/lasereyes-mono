@@ -12,7 +12,7 @@ import type { ConfigParameter, ResolvedRegister } from '../types'
 export interface LaserEyesContextValue {
   /** The config built by `createLaserEyesConfig` and passed to the provider. */
   config: LaserEyesConfig
-  /** Provider-scoped `@nanostores/query` cache (one per provider mount). */
+  /** Provider-scoped query cache (one per provider mount). */
   queryCtx: QueryContext
 }
 

@@ -3,8 +3,12 @@
  *
  * @remarks
  * For account-aware operations (wallet client, signing, send-btc) import
- * from the `/wallet` subpath. Protocol actions live at `/runes`, `/brc20`,
- * `/inscriptions`. Vendor backends live at `/backends/<name>`.
+ * from the `/wallet` subpath. Vendor backends live at `/backends/<name>`.
+ *
+ * Protocol actions (runes, brc20, inscriptions, alkanes) are **not yet
+ * exported** — their type surfaces are scaffolded under `src/actions/<proto>`
+ * but deferred from the public API pending implementation. See
+ * `FUTURE-IMPROVEMENTS.md` for the re-introduction plan (runes first).
  *
  * @module @omnisat/lasereyes-client
  */

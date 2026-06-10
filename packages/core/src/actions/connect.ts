@@ -172,8 +172,8 @@ function subscribeToConnectorEvents(
  * network or account in the wallet UI) propagate into state.
  *
  * **On failure.** Restores `status` to whatever it was before — the
- * attempt is a no-op for everything except `status`. wagmi behaves the
- * same way: clicking "Connect Y" while connected to X doesn't disconnect
+ * attempt is a no-op for everything except `status`: clicking
+ * "Connect Y" while connected to X doesn't disconnect
  * from X if Y rejects.
  *
  * @returns The connection result `{ account, networkId }`.

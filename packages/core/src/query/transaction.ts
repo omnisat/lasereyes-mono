@@ -4,7 +4,7 @@
  * @remarks
  * Mirrors the other per-action read modules. A keyed-by-txid read: a confirmed
  * transaction is immutable, so it caches indefinitely well — the nanoquery
- * analogue of wagmi's `getTransactionQueryOptions` / `useTransaction`.
+ * analogue of a transaction query-options builder / `useTransaction` hook.
  *
  * @module query/transaction
  */

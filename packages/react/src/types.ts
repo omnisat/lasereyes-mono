@@ -2,7 +2,7 @@
 
 /**
  * Type plumbing that threads a concrete {@link LaserEyesConfig}'s generics
- * through the hooks — the wagmi `Register` pattern.
+ * through the hooks — the module-augmentation `Register` pattern.
  *
  * @remarks
  * React context can't carry the caller's type parameters, so a hook that reads
@@ -23,7 +23,7 @@ import type { LaserEyesConfig } from '@omnisat/lasereyes-core'
 import type { QueryContext } from '@omnisat/lasereyes-core/query'
 
 /**
- * Module-augmentation seam for the app's config type (wagmi's `Register`).
+ * Module-augmentation seam for the app's config type (the `Register` pattern).
  *
  * @remarks
  * Declare it once, in app code, so every context-derived hook types precisely:

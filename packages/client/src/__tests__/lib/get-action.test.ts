@@ -35,7 +35,7 @@ describe('getAction', () => {
   })
 
   it('falls back to client[name] when actionFn.name is empty (minifier-safe)', () => {
-    // Anonymous arrow → `.name === ''` — viem's minifier-resilience case.
+    // Anonymous arrow → `.name === ''` — the minifier-resilience case.
     const anon: any = (_client: any, x: number) => `free:${x}`
     Object.defineProperty(anon, 'name', { value: '' })
     const override = vi.fn((x: number) => `byString:${x}`)

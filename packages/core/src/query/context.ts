@@ -2,15 +2,15 @@
  * Shared cache "context" for the per-action query stores.
  *
  * @remarks
- * The nanoquery analogue of wagmi's app-owned `QueryClient`: one `nanoquery()`
+ * The nanoquery analogue of an app-owned `QueryClient`: one `nanoquery()`
  * call = one cache + dedup/revalidation engine, shared by every per-action
  * query module that imports {@link defaultQueryContext}. Mirrors the nanoquery
  * README's "define the context once, create fetcher stores per resource"
- * layout and wagmi's `@wagmi/core/query` split (per-action files, shared cache).
+ * layout and a per-action query-module split (per-action files, shared cache).
  *
  * The default context is process-wide. Pass a custom one (with its own `cache`
  * Map) into any `getXxxQuery(config, …, ctx)` call for SSR / test isolation —
- * the cache stays injectable, like wagmi's QueryClient, rather than hidden.
+ * the cache stays injectable, like an app-owned QueryClient, rather than hidden.
  *
  * Verified against `@nanostores/query@0.3.4`: settings are `dedupeTime`,
  * `cacheLifetime` (must be ≥ `dedupeTime`; default `Infinity`),
@@ -66,7 +66,7 @@ export const defaultQueryContext: QueryContext = createQueryContext()
 /**
  * Reactive networkId key-part for a config. Recomputes on every connection
  * change, so switching networks re-keys (own cache slot) AND refetches —
- * the wagmi "identity change → new queryKey → fetch" channel, nanostores-native.
+ * the "identity change → new queryKey → fetch" channel, nanostores-native.
  */
 export function networkIdAtom(config: LaserEyesConfig): ReadableAtom<string> {
   return computed(config.state.$connection, c => c.networkId)

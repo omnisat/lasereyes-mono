@@ -1,6 +1,6 @@
 /**
- * `getWalletClient(config, options?)` — the keystone bridging core's
- * stateful config with the client package's typed wallet client.
+ * `getWalletClient(config, options?)` — bridges core's stateful config with
+ * the client package's typed wallet client.
  *
  * @remarks
  * Built as `getClient` + (when needed) wallet-client construction.

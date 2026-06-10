@@ -2,20 +2,18 @@
  * Internal: per-config, per-chain client cache.
  *
  * @remarks
- * `getClient` and `getWalletClient` go through this cache so we don't
- * rebuild a client on every call. Matches wagmi's
- * `clients = new Map<number, Client>()` closure-captured inside
- * `createConfig` — same shape, expressed as a module-private WeakMap
- * keyed by the config object (since our config is a plain value, not a
- * class with a captured closure).
- *
- * Cache entries are invalidated by:
- * - `connect()` populating a fresh wallet client for the active chain.
- * - `disconnect()` / `networkChanged` / `accountsChanged` clearing the
- *   relevant chain entry.
+ * `getClient` and `getWalletClient` go through this cache so a client isn't
+ * rebuilt on every call.
  *
  * @internal
  */
+
+// Mechanism: a module-private WeakMap keyed by the config object (the config is
+// a plain value, not a class with a captured closure), conceptually a per-config
+// `Map<chainId, Client>` cache. Entries are invalidated by:
+// - `connect()` populating a fresh wallet client for the active chain.
+// - `disconnect()` / `networkChanged` / `accountsChanged` clearing the relevant
+//   chain entry.
 
 import type { Client } from '@omnisat/lasereyes-client'
 

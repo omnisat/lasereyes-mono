@@ -58,12 +58,10 @@ export interface InfiniteResult<Item, E = Error> {
  * Accumulate a cursor-paginated `FetcherStore` into an infinite-query result.
  *
  * @remarks
- * nanoquery has no infinite-query primitive, so this bridges the gap: it tracks
- * the **list of page cursors** loaded so far, builds one store per cursor, and
- * combines them into a single derived store via `computed`. Because every page's
- * store stays subscribed (through the combined store), the accumulated `items`
- * **auto-revalidate** exactly like a single-store read — a write that revalidates
- * the address's keys refreshes the whole list with no manual `refetch()`.
+ * Tracks the list of page cursors loaded so far and combines one store per
+ * cursor into a single derived result. The accumulated `items` auto-revalidate
+ * exactly like a single-store read — a write that revalidates the address's keys
+ * refreshes the whole list with no manual `refetch()`.
  *
  * `fetchNextPage` appends the last page's `nextCursor` to the list (one more
  * subscribed store); `refetch` collapses back to the first page.

@@ -2,12 +2,13 @@
  * `@nanostores/query` caching/dedup layer, exports isolated per action.
  *
  * @remarks
- * Layout mirrors `@wagmi/core/query`: one file per action (each exporting its
- * own key/store builder), a shared cache {@link createQueryContext} they all
- * import, and this barrel re-exporting them. Tree-shakeable — importing
+ * Layout follows a per-action query-module convention: one file per action
+ * (each exporting its own key/store builder), a shared cache
+ * {@link createQueryContext} they all import, and this barrel re-exporting them.
+ * Tree-shakeable — importing
  * `getAddressBalanceQuery` does not pull in the utxos module.
  *
- * Two flavours, matching wagmi's read/write split:
+ * Two flavours, matching a read/write split:
  * - **Reads** return a `FetcherStore` (`getXxxQuery` + `getXxxQueryKey`).
  * - **Writes** return a `MutatorStore` (`xxxMutation`); on success they
  *   **revalidate** the cached reads of the addresses the write touched (see

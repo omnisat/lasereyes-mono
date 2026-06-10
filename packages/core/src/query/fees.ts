@@ -5,8 +5,8 @@
  * Demonstrates the pattern scaling to a **network-only** read (no address): the
  * key is just `fees:${networkId}`, the store is always enabled, and there's no
  * conditional `$addr` atom. Fees are polled often, so dedup + stale-while-
- * revalidate caching pays off heavily here — the nanoquery analogue of wagmi's
- * `getFeeHistoryQueryOptions` / `useFeeData`.
+ * revalidate caching pays off heavily here — the nanoquery analogue of a
+ * fee-history query-options builder / `useFeeData` hook.
  *
  * @module query/fees
  */

@@ -2,8 +2,8 @@
  * Cross-action invalidation / revalidation helpers.
  *
  * @remarks
- * The "same-key → refresh" reactivity channel (wagmi's
- * `queryClient.invalidateQueries`). Two flavours, mirroring nanoquery's two
+ * The "same-key → refresh" reactivity channel (the
+ * `queryClient.invalidateQueries` role). Two flavours, mirroring nanoquery's two
  * cache verbs:
  *
  * - **invalidate** drops the cached value, so a mounted store flips to

@@ -26,7 +26,7 @@ export type Prettify<T> = { [K in keyof T]: T[K] } & {}
  * shadowing reserved members of the receiving type.
  *
  * @remarks
- * Mirrors viem's `Extended` / anti-clobber pattern. The `Reserved` type
+ * Implements the `Extended` / anti-clobber pattern. The `Reserved` type
  * parameter is the union of property keys the receiver wants to protect.
  * Any key in `Reserved` must resolve to `undefined` (i.e. cannot be
  * redeclared with a real value); any other string key is permitted with
@@ -85,7 +85,7 @@ export type WithoutIndexSig<T> = {
  * type so the shape passes under `exactOptionalPropertyTypes`.
  *
  * @remarks
- * Mirrors viem's `ExactPartial`. Use to compose a "you may include any
+ * An `ExactPartial` helper. Use to compose a "you may include any
  * of these keys, but if you do, the value must match" constraint —
  * the construction behind {@link Client.extend}'s shape validation
  * against {@link ExtendableProtectedActions}.

@@ -250,7 +250,7 @@ export async function getAccountUtxos<
 // ============================================================================
 // Named action surface — the canonical method shapes that `walletBtcActions()`
 // installs on a wallet client. Declared as a type alias so it can be `Pick`'d
-// from when constraining `.extend()` (viem-style `ExtendableProtectedActions`).
+// from when constraining `.extend()` (the `ExtendableProtectedActions` pattern).
 // ============================================================================
 
 /**

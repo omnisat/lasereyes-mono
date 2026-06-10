@@ -23,18 +23,6 @@
       "import": "./dist/utils/index.js",
       "types": "./dist/utils.d.ts"
     },
-    "./runes": {
-      "import": "./dist/runes/index.js",
-      "types": "./dist/runes.d.ts"
-    },
-    "./brc20": {
-      "import": "./dist/brc20/index.js",
-      "types": "./dist/brc20.d.ts"
-    },
-    "./inscriptions": {
-      "import": "./dist/inscriptions/index.js",
-      "types": "./dist/inscriptions.d.ts"
-    },
     "./backends": {
       "import": "./dist/backends/index.js",
       "types": "./dist/backends/index.d.ts"
@@ -58,6 +46,7 @@
     "preview": "vite preview",
     "prepublishOnly": "npm run build",
     "test": "vitest run",
+    "typecheck": "tsc --noEmit -p tsconfig.typecheck.json",
     "size": "size-limit",
     "size:why": "size-limit --why"
   },

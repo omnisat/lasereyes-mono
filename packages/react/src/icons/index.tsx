@@ -1,6 +1,5 @@
 export * from './lasereyes-logo.tsx'
 export * from './leather.tsx'
-export * from './magiceden.tsx'
 export * from './okx.tsx'
 export * from './orange.tsx'
 export * from './oyl.tsx'

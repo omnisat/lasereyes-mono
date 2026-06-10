@@ -2,9 +2,8 @@
  * `createConnector` — identity helper for typed connector factories.
  *
  * @remarks
- * Mirrors wagmi's `createConnector`. The function is itself the factory;
- * `createConnector` just provides a nominal type anchor and keeps the
- * surface ergonomic.
+ * The function is itself the factory; `createConnector` just provides a
+ * nominal type anchor and keeps the surface ergonomic.
  *
  * @example
  * ```ts

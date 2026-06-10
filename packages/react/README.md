@@ -1,101 +1,188 @@
-# lasereyes-react
+# @omnisat/lasereyes-react
 
-`@omnisat/lasereyes-react` is a React-specific package built on top of `lasereyes-core`. It provides React hooks, context providers, and wallet icon components to make it easy to integrate Bitcoin wallet support into React applications.
+React bindings for [`@omnisat/lasereyes-core`](../core) — a provider, typed
+hooks, and wallet icon components for integrating Bitcoin wallets into React
+apps. The hooks are query-backed: reads cache and auto-revalidate, and writes
+refresh the relevant reads for you.
 
-This package simplifies the interaction between your React app and various Bitcoin wallets, allowing you to focus on building dApps with a seamless user experience.
+> **Status: pre-1.0.** APIs may change on any minor release until 1.0.
 
-## Key Concepts
+## Installation
 
-### Provider
+```bash
+npm install @omnisat/lasereyes-react @omnisat/lasereyes-core @omnisat/lasereyes-client
+# or: pnpm add / yarn add / bun add
+```
 
-The `@omnisat/lasereyes-react` package exports a `Provider` component that wraps your React application, providing access to wallet functionality throughout your app via React context.
+This package re-exports the full `@omnisat/lasereyes-core` surface, so you can
+import config helpers, constants, and types straight from
+`@omnisat/lasereyes-react`.
 
-Example of setting up the provider:
+## Setup
 
-```typescript
-import { LaserEyesProvider } from '@omnisat/lasereyes-react';
+Build a config once (outside React, so its identity is stable), then wrap your
+app with `LaserEyesProvider`. The provider owns the `initialize`/`dispose`
+lifecycle — don't call `initialize` yourself.
 
-function App() {
+```tsx
+import { MAINNET, TESTNET } from '@omnisat/lasereyes-client'
+import { mempool } from '@omnisat/lasereyes-client/backends/mempool'
+import { createLaserEyesConfig } from '@omnisat/lasereyes-core'
+import { unisat } from '@omnisat/lasereyes-core/connectors/unisat'
+import { leather } from '@omnisat/lasereyes-core/connectors/leather'
+import { loadUnisatWalletAdapter } from '@omnisat/lasereyes-core/adapters/unisat'
+import { LaserEyesProvider } from '@omnisat/lasereyes-react'
+
+const config = createLaserEyesConfig({
+  chains: [MAINNET, TESTNET],
+  connectors: [unisat(), leather()],
+  backends: { mainnet: mempool(), testnet: mempool() },
+})
+
+loadUnisatWalletAdapter() // load the adapters you support
+
+export function App() {
   return (
-    <LaserEyesProvider network="mainnet">
-      {/* Rest of your application */}
+    <LaserEyesProvider config={config}>
+      <WalletUI />
     </LaserEyesProvider>
-  );
+  )
 }
 ```
 
-### Hooks
+## Hooks
 
-`@omnisat/lasereyes-react` provides hooks to interact with wallets within your React components. The most commonly used hook is `useLaserEyes`, which allows you to access the connected wallet and its state.
+### Connection & account
 
-Example of using the `useLaserEyes` hook:
+```tsx
+import {
+  useConnect,
+  useConnectors,
+  useDisconnect,
+  useAccount,
+  useStatus,
+  useNetwork,
+} from '@omnisat/lasereyes-react'
 
-```typescript
-// must be a child of a component that is wrapped with LaserEyesProvider
+function WalletUI() {
+  const status = useStatus()
+  const account = useAccount()
+  const connectors = useConnectors()
+  const { connect, isPending, error } = useConnect()
+  const { disconnect } = useDisconnect()
+  const { network, chains, switchNetwork } = useNetwork()
 
-import { useLaserEyes } from '@omnisat/lasereyes-react';
-
-function WalletInfo() {
-  const { address, connect } = useLaserEyes();
+  if (account.status === 'connected') {
+    // Connected branch: addresses and connector are non-null without a check.
+    return (
+      <div>
+        <p>Payment: {account.paymentAddress}</p>
+        <p>Ordinals: {account.ordinalsAddress}</p>
+        <p>Network: {network}</p>
+        <button onClick={() => disconnect()}>Disconnect</button>
+      </div>
+    )
+  }
 
   return (
     <div>
-      {address ? (
-        <p>Connected: {address}</p>
-      ) : (
-        <button onClick={connect}>Connect Wallet</button>
-      )}
+      {connectors.map(c => (
+        <button key={c.id} disabled={!c.isReady() || isPending} onClick={() => connect(c.id)}>
+          Connect {c.name}
+        </button>
+      ))}
+      {error && <p>Connect failed: {error.message}</p>}
     </div>
-  );
+  )
 }
 ```
 
-### Icons
+`useAccount()` returns a discriminated union on `status`: when
+`status === 'connected'`, `paymentAddress`, `publicKey`, and `connector` are
+guaranteed present.
 
-`@omnisat/lasereyes-react` also exports SVG wallet icons as React components, making it easy to include visual wallet indicators in your app.
+### Reads (cached, auto-revalidating)
 
-Example of using a wallet icon:
+```tsx
+import { useBalance, useUtxos, useFeeRates, useTransaction } from '@omnisat/lasereyes-react'
 
-```typescript
-import { UnisatLogo } from '@omnisat/lasereyes-react';
+function Reads({ address }: { address: string }) {
+  const { data: balance, status } = useBalance(address)
+  const utxos = useUtxos(address)       // paginated: utxos.items, utxos.fetchNextPage()
+  const fees = useFeeRates()            // fees.data?.fastFee
 
-function WalletDisplay() {
-  return <UnisatLogo size={size} className={className} variant={variant} />;
+  if (status === 'loading') return <p>Loading…</p>
+  return <p>{balance} sats</p>
 }
 ```
 
-or you could use the `WalletIcon` component to display a wallet icon based on the wallet's name:
+Read hooks accept an options bag — e.g. `useBalance(address, { chainId, enabled })`
+— to scope to a network or pause fetching.
 
-```jsx
-import { WalletIcon, UNISAT, XVERSE } from '@omnisat/lasereyes-react';
+### Writes (revalidate affected reads)
 
-const WalletConnectPage = () => {
+```tsx
+import { useSendBitcoin, useSignMessage, useSignPsbt } from '@omnisat/lasereyes-react'
+
+function Send() {
+  const send = useSendBitcoin()
+
   return (
-    <div>
-      {[UNISAT, XVERSE].map((walletName) => (
-        <WalletIcon key={walletName} walletName={walletName} size={45} className={"mx-4"} />
-      ))
-    </div>
-  );
-};
+    <button
+      disabled={send.isLoading}
+      onClick={() => send.sendBitcoin({ to: 'bc1q…', amount: 10_000 })}
+    >
+      Send · {send.status} {send.txId}
+    </button>
+  )
+}
 ```
 
-## Features
+Other write hooks: `useSignMessage`, `useSignPsbt`, `useBroadcastPsbt`,
+`useBroadcastTransaction`. After a successful send, balance and UTXO reads
+revalidate automatically.
 
-- **React Hooks**: Easily manage wallet connections and state in your components.
-- **Provider Component**: Wrap your app with the `LaserEyesProvider` to enable wallet access across your React tree with `useLaserEyes`.
-- **Wallet Icons**: Use pre-built wallet icons as React components for visual integration.
+### Full hook list
 
-## Usage
+`useConnect` · `useDisconnect` · `useConnectors` · `useConnector` · `useAccount`
+· `useStatus` · `useNetwork` · `useConfig` · `useBalance` · `useUtxos` ·
+`useFeeRates` · `useTransaction` · `useSendBitcoin` · `useSignMessage` ·
+`useSignPsbt` · `useBroadcastPsbt` · `useBroadcastTransaction`
 
-Set up `@omnisat/lasereyes-react` by wrapping your app with the `LaserEyesProvider` and using the provided hooks (like `useWallet`) to interact with wallets.
+## Typed config (optional)
 
-## Contributing
+Register your config's type once and the context-driven hooks narrow `network` /
+`chainId` to your configured chains — no need to pass `{ config }` on every call.
 
-Contributions are welcome! Feel free to submit pull requests or open issues in the GitHub repository.
+```ts
+declare module '@omnisat/lasereyes-react' {
+  interface Register {
+    config: typeof config
+  }
+}
+```
+
+## Wallet icons
+
+SVG wallet icons are exported as React components:
+
+```tsx
+import { UnisatLogo, WalletIcon, UNISAT, XVERSE } from '@omnisat/lasereyes-react'
+
+// A specific logo
+<UnisatLogo size={42} />
+
+// Or resolve by wallet name
+{[UNISAT, XVERSE].map(name => (
+  <WalletIcon key={name} walletName={name} size={42} />
+))}
+```
+
+## Next.js
+
+Hooks and the provider carry the `'use client'` directive, so they work in the
+App Router. Keep the `createLaserEyesConfig(...)` call in a client module.
 
 ## License
 
-`@omnisat/lasereyes-react` is MIT licensed.
-
-
+MIT

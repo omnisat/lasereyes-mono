@@ -2,8 +2,8 @@
  * Internal helpers for the core package.
  *
  * @remarks
- * Not part of the public surface. Imported only by `actions/*` and (later)
- * Phase 10's keystone (`getClient`, `getWalletClient`).
+ * Not part of the public surface. Imported only by `actions/*` and the
+ * typed clients (`getClient`, `getWalletClient`).
  *
  * @internal
  * @module internal

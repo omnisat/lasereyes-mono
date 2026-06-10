@@ -1,15 +1,14 @@
 /**
  * Read-only client type definitions.
  *
- * @remarks
- * Type-parameter discipline:
- * - `Config` and `dsMethods` are fixed at construction time
- *   ({@link createClient}) and passed through `.extend()` unchanged.
- * - Only `clientActions` accumulates. Each `.extend()` widens
- *   `clientActions` to `Prettify<clientActions & TNew>`.
- *
  * @module client/types
  */
+
+// Type-parameter discipline:
+// - `Config` and `dsMethods` are fixed at construction time
+//   (`createClient`) and passed through `.extend()` unchanged.
+// - Only `clientActions` accumulates. Each `.extend()` widens
+//   `clientActions` to `Prettify<clientActions & TNew>`.
 
 import type { ActionGroup } from '../backends/capabilities'
 import type { ChainNetwork } from '../chains'
@@ -57,7 +56,7 @@ export type Client<
    *    canonical signature. Mis-shaped overrides fail at compile time.
    *    Novel keys (not in the registry) remain unconstrained.
    *
-   * Mirrors viem's `.extend()` (`createClient.ts`).
+   * The composable `.extend()` pattern.
    *
    * @typeParam TNew - The action group being added
    * @param factory - A function that receives the current client and returns new action methods

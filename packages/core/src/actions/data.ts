@@ -13,7 +13,7 @@
  *   answer) lives in the *connector's* `getClient` override — apps that
  *   want it call through `getWalletClient(config)` and the override
  *   wires "try wallet, fall back to base via `getAction`." Action-layer
- *   reads stay wagmi-shaped: backend-only, no wallet involvement.
+ *   reads stay backend-only: no wallet involvement.
  *
  * - **Provider-only protocol reads** (`getInscriptions`,
  *   `getRunesBalances`, `getBrc20Balances`, `getAlkanesBalances`): no
@@ -172,8 +172,8 @@ export async function getAddressUtxos<const config extends LaserEyesConfig>(
  * Provider-only. The active wallet must support `bitcoin_getInscriptions`.
  *
  * @throws {Error} If no wallet is connected or the provider doesn't support
- *   the method. (Once Phase 10's typed wallet keystone lands, the
- *   `inscriptionActions()` factory provides a backend path.)
+ *   the method. For a backend-backed path, use the `inscriptionActions()`
+ *   factory from `@omnisat/lasereyes-client`.
  */
 export async function getInscriptions<const config extends LaserEyesConfig>(
   config: config,
@@ -186,7 +186,7 @@ export async function getInscriptions<const config extends LaserEyesConfig>(
   const result = await callProvider<Inscription[]>(config, 'bitcoin_getInscriptions', params)
   if (result !== undefined) return result
   throw new Error(
-    'getInscriptions: provider unavailable. Connect a wallet that supports `bitcoin_getInscriptions`, or use the typed `inscriptionActions()` once Phase 10 keystone lands.'
+    'getInscriptions: provider unavailable. Connect a wallet that supports `bitcoin_getInscriptions`, or use the typed `inscriptionActions()` from `@omnisat/lasereyes-client`.'
   )
 }
 
@@ -203,7 +203,7 @@ export async function getRunesBalances<const config extends LaserEyesConfig>(
   const result = await callProvider<RuneBalance[]>(config, 'bitcoin_getRunesBalances', { address })
   if (result !== undefined) return result
   throw new Error(
-    'getRunesBalances: provider unavailable. Use the typed `runeActions()` once Phase 10 keystone lands.'
+    'getRunesBalances: provider unavailable. Use the typed `runeActions()` from `@omnisat/lasereyes-client`.'
   )
 }
 
@@ -222,7 +222,7 @@ export async function getBrc20Balances<const config extends LaserEyesConfig>(
   })
   if (result !== undefined) return result
   throw new Error(
-    'getBrc20Balances: provider unavailable. Use the typed `brc20Actions()` once Phase 10 keystone lands.'
+    'getBrc20Balances: provider unavailable. Use the typed `brc20Actions()` from `@omnisat/lasereyes-client`.'
   )
 }
 

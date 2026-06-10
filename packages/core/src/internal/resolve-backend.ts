@@ -7,9 +7,9 @@
  * into one backend (with fallback) happens up-front via `combineBackends`
  * at `createLaserEyesConfig` time, so there's nothing to fold here.
  *
- * Phase 10's keystone (`getClient(config, opts?)`) wraps this helper to
- * return a typed `Client`. For Phase 9 actions that just need backend
- * methods (read-fallback paths), this lower-level helper is enough.
+ * `getClient(config, opts?)` wraps this helper to return a typed `Client`.
+ * For actions that just need backend methods (read-fallback paths), this
+ * lower-level helper is enough.
  *
  * @internal
  */
@@ -30,8 +30,7 @@ import type { LaserEyesConfig } from '../config'
 // the dynamic runtime-routing boundary: the chain is chosen at call time, so
 // the precise capability set isn't known statically here, and `getClient`'s
 // default path feeds this straight into `createClient` (whose result it then
-// casts to `Client<any,…>`). Precisely typing this is the deferred keystone
-// work; it is NOT one of the config-bound `any`s removed in this pass.
+// casts to `Client<any,…>`).
 export function resolveChainBackend(config: LaserEyesConfig, chainId?: string): ChainBackend<any> {
   const id = chainId ?? config.state.$connection.get().networkId
   const backend = config.backends[id]

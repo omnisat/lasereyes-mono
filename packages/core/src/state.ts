@@ -11,7 +11,7 @@
  *   subscribers fire once, no listener ever observes a partial transition.
  *   Per-key reactivity via nanostores' `listenKeys` if you only care about,
  *   say, `status`. Exposed to consumers **read-only** — only the action
- *   layer mutates it, through {@link mutateConnection} (the wagmi-style
+ *   layer mutates it, through {@link mutateConnection} (the
  *   "public state is read-only, internal seam writes" split).
  *
  * - **`$connectors`** — registry of available connector instances keyed
@@ -19,16 +19,16 @@
  *   different reason (EIP-6963 announcements arrive over time;
  *   reconnects don't touch it).
  *
- * **Why one map instead of four atoms.** Earlier iterations had
- * `$status`, `$account`, `$networkId`, `$connector` as four separate
- * atoms. Connect/disconnect set them sequentially, and any subscriber
- * that read a *different* atom inside its handler saw stale values
- * mid-transition (e.g. a `$account` listener reading `$networkId` before
- * `$networkId.set()` had run). The atomic MapStore eliminates that whole
- * class of bug — there is no "in between" any more.
- *
  * @module state
  */
+
+// Maintainer note — why `$connection` is one map instead of four atoms:
+// Earlier iterations had `$status`, `$account`, `$networkId`, `$connector` as
+// four separate atoms. Connect/disconnect set them sequentially, and any
+// subscriber that read a *different* atom inside its handler saw stale values
+// mid-transition (e.g. a `$account` listener reading `$networkId` before
+// `$networkId.set()` had run). The atomic MapStore eliminates that whole class
+// of bug — there is no "in between" any more.
 
 import type { NetworkId } from '@omnisat/lasereyes-client'
 import type { WalletAccount } from '@omnisat/lasereyes-client/wallet'
@@ -109,33 +109,26 @@ export type ConnectionSnapshot<networkId extends NetworkId = NetworkId> =
  * its read surface narrowed to the configured chain-id union.
  *
  * @remarks
- * Two things are happening here, both deliberate:
- *
- * 1. **Read-only.** The type is built from nanostores' `ReadableAtom`, not
- *    `MapStore`/`WritableAtom`, so it carries no `set` / `setKey`. Consumers
- *    can `get` / `value` / `listen` / `subscribe` (and `useStore`) but cannot
- *    mutate — mutations go through the internal {@link mutateConnection} seam
- *    (mirrors wagmi: public `config.state` is a read-only surface; the store
- *    is written only internally).
- *
- * 2. **Precise reads, sound bound.** nanostores stores are **invariant** in
- *    their value (every atom has `notify(oldValue)` — a contravariant input —
- *    alongside `get` — a covariant output). If we narrowed the value outright,
- *    `…<ConnectionSnapshot<'mainnet'>>` would not be assignable to
- *    `…<ConnectionState<NetworkId>>`, so a concrete config would stop being
- *    assignable to bare `LaserEyesConfig` — breaking every action's
- *    `<const config extends LaserEyesConfig>` bound. So we narrow only the
- *    covariant **output** positions (`get` / `value` / `listen` / `subscribe`)
- *    to the discriminated {@link ConnectionSnapshot}, and leave `notify` / `lc`
- *    / `off` on the wide {@link ConnectionState}. Because `Snapshot ⊆ State`,
- *    that keeps narrow ⊆ wide, keeps the view a valid `Store` for `useStore`,
- *    and — since `StoreValue` is inferred off `get()` — gives `useStore(
- *    state.$connection)` the discriminated snapshot too.
- *
- * The net effect for consumers: reads are both network-id-precise *and*
- * status-discriminated (connected ⇒ `account: WalletAccount`), while the
- * writable seam stays wide so {@link mutateConnection} can patch single fields.
+ * - **Read-only.** Built from nanostores' `ReadableAtom`, so it carries no
+ *   `set` / `setKey`. Consumers can `get` / `value` / `listen` / `subscribe`
+ *   (and `useStore`) but cannot mutate — mutations go through the internal
+ *   {@link mutateConnection} seam.
+ * - **Precise reads.** Reads are both network-id-precise *and*
+ *   status-discriminated (connected ⇒ `account: WalletAccount`), so
+ *   `useStore(state.$connection)` and `state.$connection.get()` read back the
+ *   discriminated {@link ConnectionSnapshot}.
  */
+// Maintainer note — why only the read surface is narrowed:
+// nanostores stores are invariant in their value (every atom has
+// `notify(oldValue)` — a contravariant input — alongside `get` — a covariant
+// output). Narrowing the value outright would make `…<ConnectionSnapshot<'mainnet'>>`
+// non-assignable to `…<ConnectionState<NetworkId>>`, so a concrete config would
+// stop being assignable to bare `LaserEyesConfig` — breaking every action's
+// `<const config extends LaserEyesConfig>` bound. So we narrow only the covariant
+// output positions (`get` / `value` / `listen` / `subscribe`) to the discriminated
+// snapshot, and leave `notify` / `lc` / `off` on the wide `ConnectionState`. Because
+// `Snapshot ⊆ State`, narrow ⊆ wide holds, the view stays a valid `Store` for
+// `useStore`, and `StoreValue` (inferred off `get()`) carries the snapshot through.
 type ReadSurface = 'get' | 'value' | 'listen' | 'subscribe'
 export type ConnectionStore<networkId extends NetworkId = NetworkId> = Omit<
   ReadableAtom<ConnectionState>,

@@ -1,12 +1,12 @@
 /**
- * `@omnisat/lasereyes-core` — wagmi-shaped Bitcoin wallet integration.
+ * `@omnisat/lasereyes-core` — config-driven Bitcoin wallet integration.
  *
  * @remarks
  * The core package owns:
  * - {@link LaserEyesConfig} — the value bundle (chains, connectors, backends, state, storage)
  * - {@link createLaserEyesConfig} — the factory
  * - Reactive state atoms ({@link LaserEyesState})
- * - Phase 9 free-function actions over the config
+ * - Free-function actions over the config
  * - Wallet adapters and connectors (EIP-1193-shaped)
  * - EIP-6963-style discovery
  *
@@ -37,14 +37,14 @@ export {
 
 // ============================================================================
 // Typed clients — the bridge between core's state and the client package's
-// typed surface. Phase 10 keystones.
+// typed surface.
 // ============================================================================
 
 export { getClient } from './client'
 export { getWalletClient } from './wallet-client'
 
 // ============================================================================
-// Phase 9 actions live at `@omnisat/lasereyes-core/actions`.
+// Actions live at `@omnisat/lasereyes-core/actions`.
 // Adapters / connectors / detection live at their own subpaths:
 //   - `@omnisat/lasereyes-core/connectors/<wallet>` for connector factories.
 //   - `@omnisat/lasereyes-core/adapters/<wallet>` for adapter classes

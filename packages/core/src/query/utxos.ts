@@ -1,7 +1,7 @@
 /**
  * Cached `getAddressUtxos` read. One file, one action.
  *
- * Mirrors wagmi's per-action query module layout. See {@link getAddressUtxosQuery}.
+ * Follows the per-action query-module layout. See {@link getAddressUtxosQuery}.
  *
  * @module query/utxos
  */

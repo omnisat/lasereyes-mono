@@ -11,8 +11,8 @@
  * spending payment address (UTXOs spent, change returned) and the recipient
  * (if the app happens to track it) — rather than the whole account. Revalidate
  * (not invalidate) so subscribers keep showing the prior balance while the
- * fresh one fetches in the background, no loading flash (wagmi's
- * `useSendTransaction` → targeted refetch).
+ * fresh one fetches in the background, no loading flash (a
+ * send-transaction → targeted refetch).
  *
  * @module query/send-btc
  */

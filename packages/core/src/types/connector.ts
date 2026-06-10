@@ -140,7 +140,7 @@ export interface Connector {
   getProvider(): BitcoinProvider | null
 
   // ============================================================================
-  // Optional Client Override (wagmi-shaped — see getConnectorClient pattern)
+  // Optional Client Override (see the getConnectorClient pattern)
   // ============================================================================
 
   /**

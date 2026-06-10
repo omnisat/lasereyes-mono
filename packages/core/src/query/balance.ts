@@ -1,8 +1,8 @@
 /**
  * Cached `getAddressBalance` read. One file, one action.
  *
- * Mirrors wagmi's per-action `query/getBalance.ts` (`getBalanceQueryKey` +
- * `getBalanceQueryOptions`). Here the builder returns a nanostores fetcher
+ * Follows the per-action query-module layout (a `getBalanceQueryKey` +
+ * `getBalanceQueryOptions` pair). Here the builder returns a nanostores fetcher
  * store instead of a TanStack options descriptor.
  *
  * @module query/balance
@@ -24,7 +24,7 @@ import { withSharedData } from './structural-sharing'
 /**
  * Serialized cache key for an address-balance read. Use with
  * `ctx[2].invalidateKeys(getAddressBalanceQueryKey(networkId, address))` for
- * precise invalidation (wagmi's `getBalanceQueryKey` analogue). MUST stay in
+ * precise invalidation (the balance query-key builder). MUST stay in
  * sync with the key parts in {@link getAddressBalanceQuery}.
  */
 export function getAddressBalanceQueryKey(networkId: string, address: string): string {

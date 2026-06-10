@@ -2,7 +2,7 @@
  * Free-function actions over `LaserEyesConfig`.
  *
  * @remarks
- * Phase 9 surface. Three groups:
+ * Three groups:
  *
  * - **Lifecycle**: `initialize`, `connect`, `disconnect`, `switchNetwork`,
  *   `dispose`.

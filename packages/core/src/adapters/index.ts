@@ -12,11 +12,9 @@
 
 export * from './base'
 export * from './leather'
-export * from './magic-eden'
 export * from './okx'
 export * from './orange'
 export * from './oyl'
 export * from './phantom'
-export * from './sparrow'
 export * from './unisat'
 export * from './xverse'

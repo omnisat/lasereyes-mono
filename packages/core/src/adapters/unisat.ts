@@ -549,7 +549,7 @@ export class UnisatAdapter extends BaseAdapter {
  *
  * @remarks
  * This loader checks if Unisat wallet is available and automatically
- * announces it so it can be discovered by LaserEyesCore.
+ * announces it so it can be discovered through the wallet-discovery channel.
  * This can be removed once Unisat implements the Bitcoin Provider Standard.
  *
  * @returns Adapter instance if wallet is detected, null otherwise

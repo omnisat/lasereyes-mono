@@ -25,7 +25,7 @@ export interface LaserEyesProviderProps {
  * Root provider for LaserEyes Bitcoin wallet integration.
  *
  * @remarks
- * Wagmi-shaped: you build the config yourself and pass it in. The provider
+ * Config-first: you build the config yourself and pass it in. The provider
  * - exposes the config + a provider-scoped query cache to all descendant hooks,
  * - calls `initialize(config)` on mount (wiring connector discovery + optional
  *   auto-reconnect) and `dispose(config)` on unmount.

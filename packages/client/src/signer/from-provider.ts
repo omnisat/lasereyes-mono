@@ -13,9 +13,9 @@
  * - `signPsbt(psbt, options)` → `provider.request('bitcoin_signPsbt', { psbt, …options })`
  * - `signMessage(message, options)` → `provider.request('bitcoin_signMessage', { message, …options })`
  *
- * The return shapes follow the canonical {@link SignedPsbt} (Phase 0
- * decision) and `string`, respectively. Adapter authors are expected to
- * return those shapes from the underlying RPC.
+ * The return shapes follow the canonical {@link SignedPsbt} and `string`,
+ * respectively. Adapter authors are expected to return those shapes from
+ * the underlying RPC.
  *
  * @module signer/from-provider
  *

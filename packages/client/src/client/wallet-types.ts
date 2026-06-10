@@ -1,16 +1,14 @@
 /**
  * Wallet-client type definitions.
  *
- * @remarks
- * Type-parameter discipline:
- * - `Config`, `TAccount`, and `dsMethods` are fixed at construction
- *   time ({@link createWalletClient}) and passed through `.extend()`
- *   unchanged.
- * - Only `clientActions` accumulates. Each `.extend()` widens
- *   `clientActions` to `Prettify<clientActions & TNew>`.
- *
  * @module client/wallet-types
  */
+
+// Type-parameter discipline:
+// - `Config`, `TAccount`, and `dsMethods` are fixed at construction time
+//   (`createWalletClient`) and passed through `.extend()` unchanged.
+// - Only `clientActions` accumulates. Each `.extend()` widens
+//   `clientActions` to `Prettify<clientActions & TNew>`.
 
 import type { Account } from '../account/types'
 import type { ActionGroup } from '../backends/capabilities'
