@@ -1,8 +1,8 @@
-"use client"
+'use client'
 
-import { Heading } from "@/components/heading"
-import { CodeBlock } from "@/components/code-block"
-import Image from "next/image"
+import Image from 'next/image'
+import { CodeBlock } from '@/components/code-block'
+import { Heading } from '@/components/heading'
 
 export default function BitcoinDonationPageRecipe() {
   return (
@@ -12,7 +12,8 @@ export default function BitcoinDonationPageRecipe() {
       </Heading>
 
       <p className="text-lg mb-6">
-        Create a Bitcoin donation page that's so good, even nocoiners might consider throwing some sats your way!
+        Create a Bitcoin donation page that's so good, even nocoiners might consider throwing some
+        sats your way!
       </p>
 
       <div className="flex justify-center mb-8">
@@ -268,17 +269,19 @@ export function DonationTracker({ address }) {
 
       <ul className="list-disc pl-6 space-y-2 mb-6">
         <li>
-          <strong>Custom Donation Amounts:</strong> Modify the <code>donationOptions</code> array to set your preferred
-          donation tiers
+          <strong>Custom Donation Amounts:</strong> Modify the <code>donationOptions</code> array to
+          set your preferred donation tiers
         </li>
         <li>
           <strong>Suggested Uses:</strong> Add specific projects or goals that donations will fund
         </li>
         <li>
-          <strong>Thank You Page:</strong> Redirect donors to a thank you page after they scan the QR code
+          <strong>Thank You Page:</strong> Redirect donors to a thank you page after they scan the
+          QR code
         </li>
         <li>
-          <strong>Lightning Support:</strong> Add Lightning Network payment options for smaller donations
+          <strong>Lightning Support:</strong> Add Lightning Network payment options for smaller
+          donations
         </li>
       </ul>
 
@@ -296,19 +299,18 @@ export function DonationTracker({ address }) {
       <div className="p-4 bg-yellow-100 dark:bg-yellow-900 rounded-lg mt-8">
         <p className="font-semibold">⚠️ Important Note:</p>
         <p>
-          For security reasons, never store private keys on your frontend. LaserEyes only generates addresses for
-          receiving funds - the actual funds should be managed with a proper wallet.
+          For security reasons, never store private keys on your frontend. LaserEyes only generates
+          addresses for receiving funds - the actual funds should be managed with a proper wallet.
         </p>
       </div>
 
       <div className="p-4 bg-green-100 dark:bg-green-900 rounded-lg mt-4">
         <p className="font-semibold">🎉 Congratulations!</p>
         <p>
-          You've successfully created a Bitcoin donation page that's both user-friendly and secure. Now go forth and
-          collect those sats!
+          You've successfully created a Bitcoin donation page that's both user-friendly and secure.
+          Now go forth and collect those sats!
         </p>
       </div>
     </div>
   )
 }
-

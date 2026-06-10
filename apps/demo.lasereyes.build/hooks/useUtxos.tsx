@@ -1,14 +1,8 @@
-import type React from 'react'
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from 'react'
-import useSWR from 'swr'
 import type { MempoolUtxo } from '@omnisat/lasereyes'
 import { useLaserEyes } from '@omnisat/lasereyes'
+import type React from 'react'
+import { createContext, useCallback, useContext, useEffect, useState } from 'react'
+import useSWR from 'swr'
 
 type UtxoContextType = {
   utxos: MempoolUtxo[]
@@ -72,9 +66,7 @@ export const UtxoProvider: React.FC<{
   }, [fetcher])
 
   return (
-    <UtxoContext.Provider
-      value={{ utxos, loading: !utxos && !error, fetchUtxos }}
-    >
+    <UtxoContext.Provider value={{ utxos, loading: !utxos && !error, fetchUtxos }}>
       {children}
     </UtxoContext.Provider>
   )

@@ -1,15 +1,26 @@
-"use client"
+'use client'
 
-import * as React from "react"
-import { ClientPageWrapper } from "@/components/client-page-wrapper"
-import { CodeBlock } from "@/components/code-block"
-import { Heading } from "@/components/heading"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Code2, Puzzle, Workflow, Layers, Settings, ArrowRight, Wrench, Boxes, Cpu, GitFork } from "lucide-react"
-import { cn } from "@/lib/utils"
-import Link from "next/link"
+import {
+  ArrowRight,
+  Boxes,
+  Code2,
+  Cpu,
+  GitFork,
+  Layers,
+  Puzzle,
+  Settings,
+  Workflow,
+  Wrench,
+} from 'lucide-react'
+import Link from 'next/link'
+import type * as React from 'react'
+import { ClientPageWrapper } from '@/components/client-page-wrapper'
+import { CodeBlock } from '@/components/code-block'
+import { Heading } from '@/components/heading'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { cn } from '@/lib/utils'
 
 interface FeatureCardProps {
   icon: React.ElementType
@@ -26,11 +37,26 @@ export default function CustomDataSourcePage() {
         <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-violet-600/20 rounded-full blur-[120px] -z-10 translate-x-1/2 -translate-y-1/2 animate-pulse" />
         <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-indigo-500/10 rounded-full blur-[100px] -z-10 -translate-x-1/2 translate-y-1/2 animate-pulse" />
         <div className="absolute top-1/2 left-1/2 w-[200px] h-[200px] bg-violet-400/10 rounded-full blur-[80px] -z-10 -translate-x-1/2 -translate-y-1/2" />
-        
+
         <div className="flex items-center gap-3 mb-4">
-          <Badge variant="secondary" className="bg-violet-500/10 text-violet-500 hover:bg-violet-500/20">Advanced</Badge>
-          <Badge variant="secondary" className="bg-indigo-500/10 text-indigo-500 hover:bg-indigo-500/20">Extensible</Badge>
-          <Badge variant="secondary" className="bg-violet-500/10 text-violet-500 hover:bg-violet-500/20">Customizable</Badge>
+          <Badge
+            variant="secondary"
+            className="bg-violet-500/10 text-violet-500 hover:bg-violet-500/20"
+          >
+            Advanced
+          </Badge>
+          <Badge
+            variant="secondary"
+            className="bg-indigo-500/10 text-indigo-500 hover:bg-indigo-500/20"
+          >
+            Extensible
+          </Badge>
+          <Badge
+            variant="secondary"
+            className="bg-violet-500/10 text-violet-500 hover:bg-violet-500/20"
+          >
+            Customizable
+          </Badge>
         </div>
 
         <div className="flex items-center gap-6 mb-6">
@@ -38,7 +64,10 @@ export default function CustomDataSourcePage() {
             <Puzzle className="h-7 w-7 text-violet-500" />
           </div>
           <div>
-            <Heading level={1} className="bg-gradient-to-r from-violet-600 via-violet-500 to-indigo-500 bg-clip-text text-transparent">
+            <Heading
+              level={1}
+              className="bg-gradient-to-r from-violet-600 via-violet-500 to-indigo-500 bg-clip-text text-transparent"
+            >
               Custom DataSource
             </Heading>
             <p className="text-sm text-muted-foreground">Build Your Own Bitcoin Data Provider</p>
@@ -46,7 +75,8 @@ export default function CustomDataSourcePage() {
         </div>
 
         <p className="text-xl mb-8 max-w-2xl text-muted-foreground">
-          Create custom data sources to integrate any Bitcoin data provider with LaserEyes. Perfect for specialized use cases and custom infrastructure.
+          Create custom data sources to integrate any Bitcoin data provider with LaserEyes. Perfect
+          for specialized use cases and custom infrastructure.
         </p>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
@@ -106,7 +136,10 @@ export default function CustomDataSourcePage() {
 
         <div className="flex gap-4 items-center">
           <Link href="#implementation">
-            <Button size="lg" className="bg-gradient-to-r from-violet-600 to-indigo-500 hover:from-violet-500 hover:to-indigo-400 group">
+            <Button
+              size="lg"
+              className="bg-gradient-to-r from-violet-600 to-indigo-500 hover:from-violet-500 hover:to-indigo-400 group"
+            >
               Start Building
               <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Button>
@@ -129,10 +162,12 @@ export default function CustomDataSourcePage() {
 
 function FeatureCard({ icon: Icon, title, description, className }: FeatureCardProps) {
   return (
-    <Card className={cn(
-      "group relative overflow-hidden transition-all duration-300 hover:border-violet-500/30 hover:shadow-lg hover:shadow-violet-500/5",
-      className
-    )}>
+    <Card
+      className={cn(
+        'group relative overflow-hidden transition-all duration-300 hover:border-violet-500/30 hover:shadow-lg hover:shadow-violet-500/5',
+        className
+      )}
+    >
       <div className="absolute right-0 top-0 h-20 w-20 translate-x-6 -translate-y-6 rounded-full bg-violet-500/10 blur-2xl filter group-hover:bg-violet-500/20" />
       <CardContent className="p-6">
         <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-violet-500/20 to-indigo-500/20 text-violet-500 ring-1 ring-violet-500/20">
@@ -363,19 +398,22 @@ const client = new LaserEyesClient(config)`}
               <div>
                 <h3 className="font-semibold mb-2">Error Handling</h3>
                 <p className="text-sm text-muted-foreground">
-                  Implement proper error handling and normalize errors to match the LaserEyes error format.
+                  Implement proper error handling and normalize errors to match the LaserEyes error
+                  format.
                 </p>
               </div>
               <div>
                 <h3 className="font-semibold mb-2">Rate Limiting</h3>
                 <p className="text-sm text-muted-foreground">
-                  Add rate limiting and request queuing to prevent API abuse and handle throttling gracefully.
+                  Add rate limiting and request queuing to prevent API abuse and handle throttling
+                  gracefully.
                 </p>
               </div>
               <div>
                 <h3 className="font-semibold mb-2">Data Normalization</h3>
                 <p className="text-sm text-muted-foreground">
-                  Normalize response data to match the expected format of other data sources for consistency.
+                  Normalize response data to match the expected format of other data sources for
+                  consistency.
                 </p>
               </div>
               <div>
@@ -391,4 +429,3 @@ const client = new LaserEyesClient(config)`}
     </div>
   )
 }
-

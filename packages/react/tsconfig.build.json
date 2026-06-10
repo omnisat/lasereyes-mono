@@ -2,13 +2,13 @@
   "compilerOptions": {
     "target": "ES2020",
     "useDefineForClassFields": true,
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "skipLibCheck": true,
 
     "declaration": true,
     "declarationMap": true,
-    "composite": true,  // Add this line
+    "composite": true, // Add this line
 
     /* Bundler mode */
     "moduleResolution": "bundler",
@@ -27,5 +27,6 @@
       "@": ["./src"]
     }
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx", "src/test-utils.tsx"]
 }

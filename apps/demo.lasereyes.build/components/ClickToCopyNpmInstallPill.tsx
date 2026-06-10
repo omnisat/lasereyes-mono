@@ -1,15 +1,12 @@
+/** biome-ignore-all lint/a11y/noStaticElementInteractions: Need to swap the components with a shadcn one which provides accessibility by default */
 'use client'
-import { cn, truncateString } from '@/lib/utils'
-import { badgeVariants } from '@/components/ui/badge'
-import { FaCopy } from 'react-icons/fa6'
 import { useEffect, useState } from 'react'
+import { FaCopy } from 'react-icons/fa6'
 import { useLocalStorage } from 'usehooks-ts'
+import { badgeVariants } from '@/components/ui/badge'
+import { cn } from '@/lib/utils'
 
-export const ClickToCopyNpmInstallPill = ({
-  className,
-}: {
-  className?: string
-}) => {
+export const ClickToCopyNpmInstallPill = ({ className }: { className?: string }) => {
   const DEPENDENCY_MANAGERS = ['npm', 'yarn', 'pnpm', 'bun']
   const [dependencyManager, setDependencyManager] = useLocalStorage(
     'preferredDependencyManager',
@@ -50,15 +47,12 @@ export const ClickToCopyNpmInstallPill = ({
           copied ? 'animate-pulse' : ''
         )}
         onClick={() => copyToClipboard(signature)}
+        onKeyUp={e => (e.key === 'Enter' || e.key === ' ') && copyToClipboard(signature)}
       >
-        <span
-          className={'pl-4 gap-5 group-hover:text-orange-500 cursor-pointer'}
-        >
+        <span className={'pl-4 gap-5 group-hover:text-orange-500 cursor-pointer'}>
           {signature?.length > 0 && !copied ? (
             <span className={'flex flex-row gap-1.5'}>
-              <span className={'text-orange-500 tracking-wide'}>
-                {dependencyManager}
-              </span>{' '}
+              <span className={'text-orange-500 tracking-wide'}>{dependencyManager}</span>{' '}
               <span className={'tracking-wide'}>
                 {signature.replaceAll(dependencyManager, ' ')}
               </span>
@@ -66,22 +60,24 @@ export const ClickToCopyNpmInstallPill = ({
           ) : (
             ''
           )}{' '}
-          {copied && (
-            <span className={'text-orange-500'}>Copied to clipboard</span>
-          )}
+          {copied && <span className={'text-orange-500'}>Copied to clipboard</span>}
         </span>
-        <FaCopy
-          className={cn(
-            'group-hover:text-orange-500',
-            copied ? 'text-orange-500' : ''
-          )}
-        />
+        <FaCopy className={cn('group-hover:text-orange-500', copied ? 'text-orange-500' : '')} />
       </span>
       <div
         className={
           'p-1 px-4 border-l tracking-wide border-[#3c393f] rounded-md text-orange-500 hover:text-white  rounded-r-full'
         }
         onClick={() =>
+          setDepManagerAndSignature(
+            DEPENDENCY_MANAGERS[
+              (DEPENDENCY_MANAGERS.indexOf(String(dependencyManager)) + 1) %
+                DEPENDENCY_MANAGERS.length
+            ]
+          )
+        }
+        onKeyUp={e =>
+          (e.key === 'Enter' || e.key === ' ') &&
           setDepManagerAndSignature(
             DEPENDENCY_MANAGERS[
               (DEPENDENCY_MANAGERS.indexOf(String(dependencyManager)) + 1) %

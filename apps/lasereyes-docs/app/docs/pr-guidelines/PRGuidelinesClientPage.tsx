@@ -1,27 +1,26 @@
-"use client"
+'use client'
 
-import * as React from "react"
-import { CodeBlock } from "@/components/code-block"
-import { Heading } from "@/components/heading"
-import { ClientPageWrapper } from "@/components/client-page-wrapper"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { 
-  GitBranch,
-  CheckCircle2,
-  GitPullRequest,
-  MessageSquare,
-  FileCode2,
+import type { LucideIcon } from 'lucide-react'
+import {
   AlertTriangle,
-  GitMerge,
-  GitCommit,
-  TestTube,
-  Hammer,
   CheckCheck,
-  HelpCircle
-} from "lucide-react"
-import type { LucideIcon } from "lucide-react"
-import { cn } from "@/lib/utils"
+  CheckCircle2,
+  GitBranch,
+  GitCommit,
+  GitMerge,
+  GitPullRequest,
+  Hammer,
+  HelpCircle,
+  MessageSquare,
+  TestTube,
+} from 'lucide-react'
+import type * as React from 'react'
+import { ClientPageWrapper } from '@/components/client-page-wrapper'
+import { CodeBlock } from '@/components/code-block'
+import { Heading } from '@/components/heading'
+import { Badge } from '@/components/ui/badge'
+import { Card, CardContent } from '@/components/ui/card'
+import { cn } from '@/lib/utils'
 
 interface GuidelineCardProps {
   icon: LucideIcon
@@ -33,10 +32,12 @@ interface GuidelineCardProps {
 
 function GuidelineCard({ icon: Icon, title, description, content, className }: GuidelineCardProps) {
   return (
-    <Card className={cn(
-      "group relative overflow-hidden transition-all duration-300 hover:border-teal-500/30 hover:shadow-lg hover:shadow-teal-500/5",
-      className
-    )}>
+    <Card
+      className={cn(
+        'group relative overflow-hidden transition-all duration-300 hover:border-teal-500/30 hover:shadow-lg hover:shadow-teal-500/5',
+        className
+      )}
+    >
       <div className="absolute right-0 top-0 h-20 w-20 translate-x-6 -translate-y-6 rounded-full bg-teal-500/10 blur-2xl filter group-hover:bg-teal-500/20" />
       <CardContent className="p-6">
         <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-teal-500/10 text-teal-500">
@@ -248,7 +249,9 @@ git branch -d feature/your-feature`}
               </div>
               <div>
                 <h2 className="text-2xl font-bold">Need Help?</h2>
-                <p className="text-muted-foreground">We're here to support your contribution journey</p>
+                <p className="text-muted-foreground">
+                  We're here to support your contribution journey
+                </p>
               </div>
             </div>
             <div className="space-y-4">
@@ -277,12 +280,18 @@ export default function PRGuidelinesClientPage() {
     <div className="space-y-8">
       <div className="relative overflow-hidden rounded-lg border bg-gradient-to-br from-teal-500/10 via-background to-background p-8">
         <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-teal-500/20 rounded-full blur-3xl -z-10 translate-x-1/2 -translate-y-1/2" />
-        <Badge variant="secondary" className="mb-4">Contributing</Badge>
-        <Heading level={1} className="mb-4 bg-gradient-to-br from-teal-500 to-cyan-500 bg-clip-text text-transparent">
+        <Badge variant="secondary" className="mb-4">
+          Contributing
+        </Badge>
+        <Heading
+          level={1}
+          className="mb-4 bg-gradient-to-br from-teal-500 to-cyan-500 bg-clip-text text-transparent"
+        >
           Pull Request Guidelines
         </Heading>
         <p className="text-xl mb-6 max-w-2xl text-muted-foreground">
-          Learn how to contribute effectively to LaserEyes with our comprehensive pull request guidelines and best practices.
+          Learn how to contribute effectively to LaserEyes with our comprehensive pull request
+          guidelines and best practices.
         </p>
       </div>
 
@@ -291,4 +300,4 @@ export default function PRGuidelinesClientPage() {
       </ClientPageWrapper>
     </div>
   )
-} 
+}

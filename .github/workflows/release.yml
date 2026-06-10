@@ -26,7 +26,7 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-        
+
       - name: Check for changesets
         id: check
         run: |
@@ -61,7 +61,7 @@ jobs:
         run: pnpm install
 
       - name: Build packages
-        run: pnpm build --filter="@omnisat/*"
+        run: pnpm build --filter="@omnisat/*" --filter="!@omnisat/lasereyes-ui"
 
       # Dev branch - Publish to next tag
       - name: Version, Publish 'next' tag, Commit and Push (dev)
@@ -70,11 +70,11 @@ jobs:
         run: |
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
-          
+
           # First version update
           pnpm run version-prerelease
-          pnpm build --filter="@omnisat/*"
-          
+          pnpm build --filter="@omnisat/*" --filter="!@omnisat/lasereyes-ui"
+
           # Stage and commit all changes to get a clean state
           echo "Adding version changes to git..."
           git add package.json || true
@@ -84,11 +84,11 @@ jobs:
             find .changeset -name "*.md" -not -name "README.md" -exec git add {} \; || true
           fi
           git commit -m "chore: update versions [skip ci]" || echo "No changes to commit"
-          
+
           # Temporarily disable git checks for publish
           pnpm config set git-checks false
           pnpm config set publish-branch dev
-          
+
           # Now publish
           pnpm release
 
@@ -106,19 +106,19 @@ jobs:
         run: |
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
-          
+
           # Disable git checks before any operations
           pnpm config set git-checks false
-          
+
           # Exit prerelease mode first
           echo "Exiting prerelease mode..."
           pnpm changeset pre exit || true
-          
+
           # Force version and build
           echo "Running version update..."
           pnpm run version
-          pnpm build --filter="@omnisat/*"
-          
+          pnpm build --filter="@omnisat/*" --filter="!@omnisat/lasereyes-ui"
+
           # Stage and commit all changes
           echo "Adding version changes to git..."
           git add package.json || true
@@ -128,7 +128,7 @@ jobs:
             find .changeset -name "*.md" -not -name "README.md" -exec git add {} \; || true
           fi
           git commit -m "chore: update versions [skip ci]" || echo "No changes to commit"
-          
+
           # Publish with changeset
           pnpm release
 
@@ -136,11 +136,11 @@ jobs:
           pnpm config set git-checks true
           git push --follow-tags
 
-          # Sync changes back to dev
+          # Sync changes back to dev (main is canonical — prefer main on conflict)
           echo "Syncing changes back to dev branch..."
           git fetch origin dev
-          git checkout dev
-          git merge main
+          git checkout -B dev origin/dev
+          git merge -X theirs main
           git push origin dev
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

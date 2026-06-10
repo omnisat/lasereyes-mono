@@ -1,35 +1,27 @@
 'use client'
 
-import * as React from 'react'
-import { ConnectWallet } from '@/components/connect-wallet'
-import { ClientPageWrapper } from '@/components/client-page-wrapper'
-import { Button } from '@/components/ui/button'
-import { Heading } from '@/components/heading'
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import {
+  BINANCE,
   LEATHER,
   MAGIC_EDEN,
   OKX,
-  OYL,
   ORANGE,
+  OYL,
   PHANTOM,
+  type ProviderType,
   UNISAT,
   WalletIcon,
   WIZZ,
   XVERSE,
-  BINANCE,
-  type ProviderType,
 } from '@omnisat/lasereyes-react'
 import { ExternalLink } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { ClientPageWrapper } from '@/components/client-page-wrapper'
 import { CodeBlock } from '@/components/code-block'
+import { ConnectWallet } from '@/components/connect-wallet'
+import { Heading } from '@/components/heading'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 const wallets = [
   {
@@ -56,8 +48,7 @@ const wallets = [
   {
     id: MAGIC_EDEN as ProviderType,
     name: 'Magic Eden',
-    description:
-      "Leading NFT marketplace's Bitcoin wallet with Ordinals support.",
+    description: "Leading NFT marketplace's Bitcoin wallet with Ordinals support.",
     url: 'https://magiceden.io',
     icon: <WalletIcon walletName={MAGIC_EDEN} size={64} />,
   },
@@ -112,10 +103,9 @@ function WalletsContent() {
         <Card className="overflow-hidden">
           <CardContent className="p-6">
             <p className="text-lg leading-relaxed">
-              LaserEyes provides seamless integration with all major Bitcoin
-              wallets through a unified interface. Simply import the wallet
-              constants and use them with the <code>connect</code> method from{' '}
-              <code>useLaserEyes</code>.
+              LaserEyes provides seamless integration with all major Bitcoin wallets through a
+              unified interface. Simply import the wallet constants and use them with the{' '}
+              <code>connect</code> method from <code>useLaserEyes</code>.
             </p>
           </CardContent>
         </Card>
@@ -124,7 +114,7 @@ function WalletsContent() {
       <section className="space-y-6">
         <h2 className="text-3xl font-bold">Available Wallets</h2>
         <div className="grid gap-6 md:grid-cols-2">
-          {wallets.map((wallet) => (
+          {wallets.map(wallet => (
             <Card
               key={wallet.id}
               className="group relative overflow-hidden transition-all duration-300 hover:border-orange-500/30 hover:shadow-lg hover:shadow-orange-500/5"
@@ -173,9 +163,7 @@ function WalletsContent() {
         <h2 className="text-3xl font-bold">Usage Example</h2>
         <Card className="overflow-hidden border-2 border-dashed">
           <CardHeader className="border-b bg-muted/50 px-6">
-            <h2 className="font-mono text-sm font-medium">
-              Connecting to Wallets
-            </h2>
+            <h2 className="font-mono text-sm font-medium">Connecting to Wallets</h2>
           </CardHeader>
           <CardContent className="p-6">
             <CodeBlock
@@ -229,8 +217,8 @@ export default function WalletsPage() {
           Supported Wallets
         </Heading>
         <p className="text-xl mb-6 max-w-2xl text-muted-foreground">
-          LaserEyes supports a wide range of Bitcoin wallets, making it easy for
-          users to interact with your application using their preferred wallet.
+          LaserEyes supports a wide range of Bitcoin wallets, making it easy for users to interact
+          with your application using their preferred wallet.
         </p>
       </div>
 

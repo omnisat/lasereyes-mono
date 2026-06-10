@@ -3,43 +3,47 @@
   "ui": "tui",
   "tasks": {
     "build": {
-      "dependsOn": [
-        "^build"
-      ],
-      "inputs": [
-        "$TURBO_DEFAULT$",
-        ".env*"
-      ],
-      "outputs": [
-        ".next/**",
-        "build/**",
-        "docs/**",
-        "docs/dist/**",
-        "dist/**",
-        "!.next/cache/**"
-      ]
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "outputs": [".next/**", "build/**", "docs/**", "docs/dist/**", "dist/**", "!.next/cache/**"]
     },
-    "lint": {
-      "dependsOn": [
-        "^lint"
-      ]
+    "test": {
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$", "vitest.config.*", "vite.config.*"],
+      "outputs": ["coverage/**"]
+    },
+    "typecheck": {
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$", "tsconfig*.json"]
+    },
+    "lint": {},
+    "size": {
+      "dependsOn": ["build"]
     },
     "dev": {
-      "dependsOn": [
-        "^build"
-      ],
+      "dependsOn": ["^build"],
+      "cache": false,
+      "persistent": true
+    },
+    "docs:typedoc": {
+      "dependsOn": ["^build"],
+      "inputs": ["packages/*/src/**"],
+      "outputs": ["apps/docs/.typedoc-output/**"]
+    },
+    "docs:build": {
+      "dependsOn": ["docs:typedoc"],
+      "outputs": [".next/**"]
+    },
+    "docs:dev": {
+      "dependsOn": ["docs:typedoc"],
       "cache": false,
       "persistent": true
     },
     "apps/**": {
-      "dependsOn": [
-        "packages/**"
-      ]
+      "dependsOn": ["packages/**"]
     },
     "packages/**": {
-      "outputs": [
-        "dist/**"
-      ]
+      "outputs": ["dist/**"]
     }
   }
 }

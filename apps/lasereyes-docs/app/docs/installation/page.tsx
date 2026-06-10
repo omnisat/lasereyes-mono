@@ -1,16 +1,13 @@
-"use client"
+'use client'
 
-import * as React from "react"
-import { CodeBlock } from "@/components/code-block"
-import { PackageManagerSelector } from "@/components/package-manager-selector"
-import { InstallationCommand } from "@/components/installation-command"
-import Link from "next/link"
-import { Heading } from "@/components/heading"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Package, Box, Wrench, ArrowRight, Boxes, Workflow } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
+import { ArrowRight, Box, Boxes, Package, Workflow, Wrench } from 'lucide-react'
+import Link from 'next/link'
+import type * as React from 'react'
+import { Heading } from '@/components/heading'
+import { InstallationCommand } from '@/components/installation-command'
+import { PackageManagerSelector } from '@/components/package-manager-selector'
+import { Badge } from '@/components/ui/badge'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
 
 interface GuideCardProps {
   href: string
@@ -44,12 +41,18 @@ export default function InstallationPage() {
     <div className="space-y-8">
       <div className="relative overflow-hidden rounded-lg border bg-gradient-to-br from-orange-500/10 via-background to-background p-8">
         <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-orange-500/20 rounded-full blur-3xl -z-10 translate-x-1/2 -translate-y-1/2" />
-        <Badge variant="secondary" className="mb-4">Installation Guide</Badge>
-        <Heading level={1} className="mb-4 bg-gradient-to-br from-orange-500 to-yellow-500 bg-clip-text text-transparent">
+        <Badge variant="secondary" className="mb-4">
+          Installation Guide
+        </Badge>
+        <Heading
+          level={1}
+          className="mb-4 bg-gradient-to-br from-orange-500 to-yellow-500 bg-clip-text text-transparent"
+        >
           Installation
         </Heading>
         <p className="text-xl mb-6 max-w-2xl text-muted-foreground">
-          Getting started with LaserEyes is simple. Follow these steps to install and set up LaserEyes in your project.
+          Getting started with LaserEyes is simple. Follow these steps to install and set up
+          LaserEyes in your project.
         </p>
       </div>
 
@@ -65,7 +68,10 @@ export default function InstallationPage() {
                 </div>
               </CardHeader>
               <CardContent className="p-6">
-                <p className="text-muted-foreground">The core functionality, framework-agnostic implementation for Bitcoin wallet integration.</p>
+                <p className="text-muted-foreground">
+                  The core functionality, framework-agnostic implementation for Bitcoin wallet
+                  integration.
+                </p>
               </CardContent>
             </Card>
             <Card className="overflow-hidden">
@@ -76,7 +82,10 @@ export default function InstallationPage() {
                 </div>
               </CardHeader>
               <CardContent className="p-6">
-                <p className="text-muted-foreground">React-specific components and hooks for seamless integration with React applications.</p>
+                <p className="text-muted-foreground">
+                  React-specific components and hooks for seamless integration with React
+                  applications.
+                </p>
               </CardContent>
             </Card>
           </div>
@@ -90,11 +99,12 @@ export default function InstallationPage() {
                 <span className="text-sm text-muted-foreground">Select your package manager:</span>
                 <PackageManagerSelector />
               </div>
-              <InstallationCommand packages={["@omnisat/lasereyes-core", "@omnisat/lasereyes-react"]} />
+              <InstallationCommand
+                packages={['@omnisat/lasereyes-core', '@omnisat/lasereyes-react']}
+              />
             </CardContent>
           </Card>
         </section>
-
 
         <section className="space-y-6">
           <h2 className="text-3xl font-bold">Next Steps</h2>
@@ -123,4 +133,3 @@ export default function InstallationPage() {
     </div>
   )
 }
-

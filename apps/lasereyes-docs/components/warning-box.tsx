@@ -1,6 +1,6 @@
-import type React from "react"
-import { cn } from "@/lib/utils"
-import { AlertTriangle } from "lucide-react"
+import { AlertTriangle } from 'lucide-react'
+import type React from 'react'
+import { cn } from '@/lib/utils'
 
 interface WarningBoxProps {
   title?: string
@@ -10,7 +10,7 @@ interface WarningBoxProps {
 
 export function WarningBox({ title, children, className }: WarningBoxProps) {
   return (
-    <div className={cn("bg-amber-500/10 border border-amber-500/30 rounded-md p-4", className)}>
+    <div className={cn('bg-amber-500/10 border border-amber-500/30 rounded-md p-4', className)}>
       <div className="flex items-start gap-3">
         <AlertTriangle className="h-5 w-5 text-amber-500 mt-0.5" />
         <div>
@@ -21,4 +21,3 @@ export function WarningBox({ title, children, className }: WarningBoxProps) {
     </div>
   )
 }
-

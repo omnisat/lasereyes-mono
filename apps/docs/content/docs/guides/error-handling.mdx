@@ -1,0 +1,90 @@
+---
+title: Error Handling
+description: Handle errors gracefully in LaserEyes applications
+---
+
+## Error Types
+
+### Client Package Errors
+
+The `@omnisat/lasereyes-client` package exports typed error classes:
+
+```ts
+import {
+  LaserEyesClientError,
+  DataSourceError,
+  NetworkMismatchError,
+  PsbtBuildError,
+  InsufficientFundsError,
+  CapabilityNotFoundError,
+} from '@omnisat/lasereyes-client'
+```
+
+| Error | When |
+|-------|------|
+| `LaserEyesClientError` | Base class for all client errors |
+| `DataSourceError` | Chain data request failed |
+| `NetworkMismatchError` | Operation attempted on wrong network |
+| `PsbtBuildError` | PSBT construction failed |
+| `InsufficientFundsError` | Not enough BTC for transaction |
+| `CapabilityNotFoundError` | Data source lacks required capability |
+
+### Handling Connection Errors
+
+```tsx
+const { connect } = useLaserEyes()
+
+try {
+  await connect('unisat')
+} catch (err) {
+  if (err.message.includes("isn't installed")) {
+    // Wallet not found
+  } else if (err.message.includes('not supported')) {
+    // Network not supported by this wallet
+  } else {
+    // Other connection error
+  }
+}
+```
+
+### Handling Transaction Errors
+
+```tsx
+const { sendBTC } = useLaserEyes()
+
+try {
+  await sendBTC(recipient, amount)
+} catch (err) {
+  if (err instanceof InsufficientFundsError) {
+    alert('Not enough BTC')
+  } else if (err instanceof PsbtBuildError) {
+    alert('Failed to build transaction')
+  } else {
+    alert(`Transaction failed: ${err.message}`)
+  }
+}
+```
+
+### React Query Error Handling
+
+Data hooks use React Query, so errors appear in the query result:
+
+```tsx
+import { useBalance } from '@omnisat/lasereyes'
+
+function Balance() {
+  const { data, error, isPending } = useBalance('btc')
+
+  if (error) return <p>Error: {error.message}</p>
+  if (isPending) return <p>Loading...</p>
+
+  return <p>{data?.toString()} sats</p>
+}
+```
+
+## Best Practices
+
+1. Always wrap `connect`, `send*`, and `signPsbt` calls in try/catch
+2. Check `connected` state before attempting transactions
+3. Use the typed error classes for specific error handling
+4. Display user-friendly messages instead of raw error strings

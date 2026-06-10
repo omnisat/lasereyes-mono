@@ -1,35 +1,27 @@
 'use client'
 
-import * as React from 'react'
-import { CodeBlock } from '@/components/code-block'
-import Link from 'next/link'
-import { Heading } from '@/components/heading'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import {
-  ArrowRight,
-  Wallet,
-  Shield,
-  Code2,
-  Zap,
-  Globe,
-  Plug,
-} from 'lucide-react'
-import { cn } from '@/lib/utils'
-import { WalletIcon } from '@omnisat/lasereyes-react'
-import {
-  UNISAT,
-  XVERSE,
-  OYL,
   LEATHER,
   MAGIC_EDEN,
   OKX,
-  PHANTOM,
-  WIZZ,
   ORANGE,
+  OYL,
+  PHANTOM,
   type ProviderType,
+  UNISAT,
+  WIZZ,
+  XVERSE,
 } from '@omnisat/lasereyes-core'
+import { WalletIcon } from '@omnisat/lasereyes-react'
+import { ArrowRight, Globe } from 'lucide-react'
+import Link from 'next/link'
+import type * as React from 'react'
+import { CodeBlock } from '@/components/code-block'
+import { Heading } from '@/components/heading'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { cn } from '@/lib/utils'
 
 interface FeatureCardProps {
   icon: React.ElementType
@@ -46,12 +38,7 @@ interface WalletCardProps {
   className?: string
 }
 
-function FeatureCard({
-  icon: Icon,
-  title,
-  description,
-  className,
-}: FeatureCardProps) {
+function _FeatureCard({ icon: Icon, title, description, className }: FeatureCardProps) {
   return (
     <Card
       className={cn(
@@ -71,13 +58,7 @@ function FeatureCard({
   )
 }
 
-function WalletCard({
-  name,
-  constant,
-  description,
-  website,
-  className,
-}: WalletCardProps) {
+function WalletCard({ name, constant, description, website, className }: WalletCardProps) {
   // Map wallet names to their provider constants
   const walletProviders: Record<string, ProviderType> = {
     UniSat: UNISAT as ProviderType,
@@ -118,9 +99,7 @@ function WalletCard({
                 <Globe className="h-5 w-5" />
               </a>
             </div>
-            <code className="mt-1 block rounded bg-muted px-2 py-1 text-sm">
-              {constant}
-            </code>
+            <code className="mt-1 block rounded bg-muted px-2 py-1 text-sm">{constant}</code>
           </div>
         </div>
         <p className="text-muted-foreground">{description}</p>
@@ -265,9 +244,7 @@ const availableProviders = [
             <Card className="h-full transition-all hover:border-orange-500/30 hover:shadow-lg hover:shadow-orange-500/5">
               <CardContent className="flex h-full flex-col justify-between p-6">
                 <div>
-                  <h3 className="mb-2 text-lg font-semibold">
-                    LaserEyes Client
-                  </h3>
+                  <h3 className="mb-2 text-lg font-semibold">LaserEyes Client</h3>
                   <p className="text-sm text-muted-foreground">
                     Learn how to use the core client with wallet providers
                   </p>
@@ -280,9 +257,7 @@ const availableProviders = [
             <Card className="h-full transition-all hover:border-orange-500/30 hover:shadow-lg hover:shadow-orange-500/5">
               <CardContent className="flex h-full flex-col justify-between p-6">
                 <div>
-                  <h3 className="mb-2 text-lg font-semibold">
-                    Wallet Connection
-                  </h3>
+                  <h3 className="mb-2 text-lg font-semibold">Wallet Connection</h3>
                   <p className="text-sm text-muted-foreground">
                     Explore wallet connection examples and best practices
                   </p>
@@ -312,8 +287,8 @@ export default function WalletProvidersPage() {
           Wallet Providers
         </Heading>
         <p className="text-xl mb-6 max-w-2xl text-muted-foreground">
-          LaserEyes supports multiple Bitcoin wallet providers through a unified
-          interface, making it simple to integrate with any supported wallet.
+          LaserEyes supports multiple Bitcoin wallet providers through a unified interface, making
+          it simple to integrate with any supported wallet.
         </p>
         <div className="flex gap-4 items-center">
           <Link href="#supported-wallets">

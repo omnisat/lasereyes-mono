@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LaserEyes Core Showcase</title>
+    <link rel="stylesheet" href="/src/styles.css" />
+  </head>
+  <body x-data="showcase">
+    <div class="layout">
+      <div class="header">
+        <h1>LaserEyes Core — Showcase</h1>
+        <div class="kv">
+          End-to-end exercise of <code>createLaserEyesConfig</code> →
+          <code>connect(config)</code> → <code>getWalletClient(config)</code> →
+          <code>Connector.getClient</code> override → <code>getAction</code> dispatch →
+          wallet RPC. Open your devtools console for full flow tracing. ·
+          <a href="/react.html">React (@omnisat/lasereyes-react) showcase →</a>
+        </div>
+      </div>
+
+      <!-- Connection ------------------------------------------------------- -->
+      <div class="panel">
+        <h2>Connection</h2>
+
+        <div class="row">
+          <label>Status</label>
+          <span
+            class="pill"
+            :class="status === 'connected' ? 'live' : 'idle'"
+            x-text="status"
+          ></span>
+        </div>
+
+        <div class="row">
+          <label>Connectors</label>
+          <div class="cluster">
+            <span class="kv" x-show="connectors.length === 0">No wallets announced.</span>
+            <template x-for="c in connectors" :key="c.id">
+              <button :disabled="!c.ready" @click="connect(c.id)">
+                <span x-text="c.name"></span>
+                <span x-show="c.discovered" class="pill">announced</span>
+              </button>
+            </template>
+          </div>
+        </div>
+
+        <div class="row">
+          <button :disabled="status !== 'connected'" @click="disconnect">Disconnect</button>
+        </div>
+
+        <h3 class="mt">Account</h3>
+        <div class="kv">
+          <div>Address: <code x-text="address"></code></div>
+          <div>
+            Network: <code x-text="networkId || '—'"></code>
+            <span x-show="networkId && !networkSupported">(unsupported)</span>
+          </div>
+          <div>Connector: <code x-text="connectorId"></code></div>
+          <div>
+            Has <code>getClient</code> override:
+            <code x-text="hasOverride ? 'yes (nativeRpc)' : 'no (composed default)'"></code>
+          </div>
+        </div>
+
+        <h3 class="mt">Switch network</h3>
+        <div class="cluster" x-show="hasConnector">
+          <template x-for="id in chains" :key="id">
+            <button :disabled="id === networkId" @click="switchNetwork(id)" x-text="id"></button>
+          </template>
+        </div>
+      </div>
+
+      <!-- Actions ---------------------------------------------------------- -->
+      <div class="panel">
+        <h2>Actions</h2>
+
+        <h3>Read</h3>
+        <div class="row">
+          <button :disabled="status !== 'connected'" @click="getBalance">Get balance</button>
+          <span class="kv">Balance: <code x-text="balance"></code> sats</span>
+        </div>
+
+        <h3 class="mt">Write</h3>
+        <div class="row">
+          <label>Send BTC to</label>
+          <input x-model="sendTo" placeholder="bc1q…" />
+        </div>
+        <div class="row">
+          <label>Amount (sats)</label>
+          <input x-model.number="sendAmount" type="number" placeholder="1000" />
+          <button class="primary" :disabled="status !== 'connected'" @click="send">Send</button>
+        </div>
+
+        <div class="row mt">
+          <label>Sign message</label>
+          <input x-model="message" placeholder="Hello, Bitcoin!" />
+          <button class="primary" :disabled="status !== 'connected'" @click="signMessage">
+            Sign
+          </button>
+        </div>
+
+        <div class="row mt">
+          <label>Sign PSBT (hex)</label>
+        </div>
+        <div class="row">
+          <textarea x-model="psbt" placeholder="70736274ff… or click Generate"></textarea>
+        </div>
+        <div class="row">
+          <button :disabled="status !== 'connected'" @click="generatePsbt">
+            Generate PSBT (self-send 1000 sats)
+          </button>
+          <button class="primary" :disabled="status !== 'connected'" @click="signPsbt">
+            Sign PSBT
+          </button>
+          <button :disabled="status !== 'connected' || !signedTx" @click="broadcast">
+            Broadcast
+          </button>
+        </div>
+      </div>
+
+      <!-- Flow trace ------------------------------------------------------- -->
+      <div class="panel span-all">
+        <h2>Flow trace</h2>
+        <div class="log">
+          <template x-for="(entry, i) in log" :key="i">
+            <div>
+              <span class="ts" x-text="entry.ts"></span>
+              <span :class="entry.level" x-text="entry.text"></span>
+            </div>
+          </template>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

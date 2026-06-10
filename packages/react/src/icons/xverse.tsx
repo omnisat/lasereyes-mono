@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 
 interface XverseLogoProps extends React.SVGProps<SVGSVGElement> {
   size?: number

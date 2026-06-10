@@ -1,6 +1,6 @@
-import { Heading } from "@/components/heading"
-import { CodeBlock } from "@/components/code-block"
-import Link from "next/link"
+import Link from 'next/link'
+import { CodeBlock } from '@/components/code-block'
+import { Heading } from '@/components/heading'
 
 export default function ExamplesPage() {
   return (
@@ -10,8 +10,9 @@ export default function ExamplesPage() {
       </Heading>
 
       <p className="text-lg mb-6">
-        Welcome to the examples section! Here you'll find practical, real-world examples of LaserEyes in action. Think
-        of this as your cookbook for Bitcoin superpowers - no cape required.
+        Welcome to the examples section! Here you'll find practical, real-world examples of
+        LaserEyes in action. Think of this as your cookbook for Bitcoin superpowers - no cape
+        required.
       </p>
 
       <Heading level={2} className="text-2xl font-semibold mt-8 mb-4">
@@ -34,7 +35,9 @@ export default function ExamplesPage() {
           className="block p-4 border rounded-lg hover:bg-muted transition-colors"
         >
           <h3 className="font-bold">🔍 Transaction Tracking</h3>
-          <p className="text-sm text-muted-foreground">Track transactions like a blockchain bloodhound</p>
+          <p className="text-sm text-muted-foreground">
+            Track transactions like a blockchain bloodhound
+          </p>
         </Link>
 
         <Link
@@ -42,7 +45,9 @@ export default function ExamplesPage() {
           className="block p-4 border rounded-lg hover:bg-muted transition-colors"
         >
           <h3 className="font-bold">📊 Balance Dashboard</h3>
-          <p className="text-sm text-muted-foreground">Build a dashboard that would make Satoshi proud</p>
+          <p className="text-sm text-muted-foreground">
+            Build a dashboard that would make Satoshi proud
+          </p>
         </Link>
 
         <Link
@@ -58,7 +63,9 @@ export default function ExamplesPage() {
         Quick Example: Hello Bitcoin
       </Heading>
 
-      <p className="mb-4">Here's a simple example to get you started - the "Hello World" of LaserEyes:</p>
+      <p className="mb-4">
+        Here's a simple example to get you started - the "Hello World" of LaserEyes:
+      </p>
 
       <CodeBlock
         code={`import { useLaserEyes } from 'laser-eyes';
@@ -79,9 +86,11 @@ export function BitcoinGreeter() {
 
       <div className="p-4 bg-yellow-100 dark:bg-yellow-900 rounded-lg mt-8">
         <p className="font-semibold">⚡ Pro Tip:</p>
-        <p>All examples can be copied directly into your project. Just make sure you've installed LaserEyes first!</p>
+        <p>
+          All examples can be copied directly into your project. Just make sure you've installed
+          LaserEyes first!
+        </p>
       </div>
     </div>
   )
 }
-

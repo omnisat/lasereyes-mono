@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 
 interface PhantomLogoProps extends React.SVGProps<SVGSVGElement> {
   size?: number

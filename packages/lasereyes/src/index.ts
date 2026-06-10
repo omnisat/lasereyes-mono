@@ -1,20 +1,4 @@
-export * from '@omnisat/lasereyes-core'
-export {
-  useLaserEyes,
-  useBalance,
-  useBitcoinFees,
-  useAddressTokens,
-  useAlkanesList,
-  LaserEyesProvider,
-  WalletIcon,
-  LeatherLogo,
-  MagicEdenLogo,
-  OkxLogo,
-  PhantomLogo,
-  OylLogo,
-  UnisatLogo,
-  WizzLogo,
-  XverseLogo,
-  LaserEyesLogo,
-} from '@omnisat/lasereyes-react'
-export type { LaserEyesContextType } from '@omnisat/lasereyes-react'
+// The React package already re-exports the full core surface
+// (createLaserEyesConfig, constants, types, actions) alongside its hooks,
+// icons, and provider — so a single star re-export covers everything.
+export * from '@omnisat/lasereyes-react'

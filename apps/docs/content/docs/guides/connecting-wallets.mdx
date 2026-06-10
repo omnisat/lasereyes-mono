@@ -1,0 +1,103 @@
+---
+title: Connecting Wallets
+description: How to connect, disconnect, and manage wallet connections
+---
+
+## Basic Connection
+
+```tsx
+import { useLaserEyes } from '@omnisat/lasereyes'
+
+function WalletManager() {
+  const { connect, disconnect, connected, address, provider, isConnecting } = useLaserEyes()
+
+  if (isConnecting) return <p>Connecting...</p>
+
+  if (connected) {
+    return (
+      <div>
+        <p>Connected via {provider}</p>
+        <p>Address: {address}</p>
+        <button onClick={disconnect}>Disconnect</button>
+      </div>
+    )
+  }
+
+  return <button onClick={() => connect('unisat')}>Connect</button>
+}
+```
+
+## Dynamic Wallet List
+
+Show only wallets the user has installed:
+
+```tsx
+const WALLETS = [
+  { id: 'unisat', name: 'UniSat', flag: 'hasUnisat' },
+  { id: 'xverse', name: 'Xverse', flag: 'hasXverse' },
+  { id: 'leather', name: 'Leather', flag: 'hasLeather' },
+  { id: 'magic-eden', name: 'Magic Eden', flag: 'hasMagicEden' },
+  { id: 'okx', name: 'OKX', flag: 'hasOkx' },
+  { id: 'phantom', name: 'Phantom', flag: 'hasPhantom' },
+] as const
+
+function WalletPicker() {
+  const state = useLaserEyes()
+
+  const available = WALLETS.filter(w => state[w.flag])
+
+  return (
+    <div>
+      {available.map(w => (
+        <button key={w.id} onClick={() => state.connect(w.id)}>
+          {w.name}
+        </button>
+      ))}
+    </div>
+  )
+}
+```
+
+## Account Information
+
+After connecting, access all account details:
+
+```tsx
+import { useAccount } from '@omnisat/lasereyes'
+
+function AccountInfo() {
+  const account = useAccount()
+
+  if (!account) return <p>Not connected</p>
+
+  return (
+    <div>
+      <p>Ordinals address: {account.ordinals}</p>
+      <p>Payment address: {account.payment}</p>
+      <p>Public key: {account.publicKey}</p>
+      <p>All addresses: {account.addresses.join(', ')}</p>
+    </div>
+  )
+}
+```
+
+## Reacting to Account Changes
+
+Use `useAccountEffect` to run side effects when the connected account changes:
+
+```tsx
+import { useAccountEffect } from '@omnisat/lasereyes'
+
+function AccountWatcher() {
+  useAccountEffect(() => {
+    console.log('Account changed!')
+    // Refresh data, update UI, etc.
+  }, [])
+
+  return null
+}
+```
+
+## Persisted Connections
+
+LaserEyes automatically persists the last connected wallet in `localStorage`. When the user returns, the provider will attempt to reconnect automatically.

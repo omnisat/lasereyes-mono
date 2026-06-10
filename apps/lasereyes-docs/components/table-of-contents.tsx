@@ -1,38 +1,37 @@
-"use client"
+'use client'
 
-import { useEffect, useState } from "react"
-import { usePathname } from "next/navigation"
-import { Suspense } from "react"
+import { usePathname } from 'next/navigation'
+import { Suspense, useEffect, useState } from 'react'
 
 function TableOfContentsContent() {
   const [headings, setHeadings] = useState<{ id: string; text: string; level: number }[]>([])
-  const [activeId, setActiveId] = useState<string>("")
-  const pathname = usePathname()
+  const [activeId, setActiveId] = useState<string>('')
+  const _pathname = usePathname()
 
   useEffect(() => {
-    const headingElements = Array.from(document.querySelectorAll("h1, h2, h3, h4, h5, h6"))
-      .filter((element) => element.id)
-      .map((element) => ({
+    const headingElements = Array.from(document.querySelectorAll('h1, h2, h3, h4, h5, h6'))
+      .filter(element => element.id)
+      .map(element => ({
         id: element.id,
-        text: element.textContent || "",
-        level: Number.parseInt(element.tagName.substring(1)),
+        text: element.textContent || '',
+        level: Number.parseInt(element.tagName.substring(1), 10),
       }))
     setHeadings(headingElements)
-  }, [pathname])
+  }, [])
 
   useEffect(() => {
     const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
+      entries => {
+        entries.forEach(entry => {
           if (entry.isIntersecting) {
             setActiveId(entry.target.id)
           }
         })
       },
-      { rootMargin: "0px 0px -80% 0px" },
+      { rootMargin: '0px 0px -80% 0px' }
     )
 
-    headings.forEach((heading) => {
+    headings.forEach(heading => {
       const element = document.getElementById(heading.id)
       if (element) {
         observer.observe(element)
@@ -40,7 +39,7 @@ function TableOfContentsContent() {
     })
 
     return () => {
-      headings.forEach((heading) => {
+      headings.forEach(heading => {
         const element = document.getElementById(heading.id)
         if (element) {
           observer.unobserve(element)
@@ -58,7 +57,7 @@ function TableOfContentsContent() {
       <div className="text-sm font-medium mb-4">On This Page</div>
       <nav>
         <ul className="space-y-2 text-sm">
-          {headings.map((heading) => (
+          {headings.map(heading => (
             <li
               key={heading.id}
               style={{
@@ -68,7 +67,7 @@ function TableOfContentsContent() {
               <a
                 href={`#${heading.id}`}
                 className={`block py-1 hover:text-primary transition-colors ${
-                  activeId === heading.id ? "text-primary font-medium" : "text-muted-foreground"
+                  activeId === heading.id ? 'text-primary font-medium' : 'text-muted-foreground'
                 }`}
               >
                 {heading.text}
@@ -88,4 +87,3 @@ export function TableOfContents() {
     </Suspense>
   )
 }
-

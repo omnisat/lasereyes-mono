@@ -1,23 +1,23 @@
-"use client"
+'use client'
 
-import { usePathname } from "next/navigation"
-import Link from "next/link"
-import { ChevronLeft, ChevronRight } from "lucide-react"
-import { themeConfig } from "@/lib/theme-config"
-import { Suspense } from "react"
+import { ChevronLeft, ChevronRight } from 'lucide-react'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { Suspense } from 'react'
+import { themeConfig } from '@/lib/theme-config'
 
 function DocNavigationContent() {
   const pathname = usePathname()
 
   // Find current page index
   let currentPageIndex = -1
-  let currentSectionIndex = -1
+  let _currentSectionIndex = -1
 
   // Flatten all navigation items
   const allPages = themeConfig.sidebarNav.flatMap((section, sectionIndex) => {
-    return section.items.map((item) => {
+    return section.items.map(item => {
       if (item.href === pathname) {
-        currentSectionIndex = sectionIndex
+        _currentSectionIndex = sectionIndex
       }
       return {
         ...item,
@@ -27,7 +27,7 @@ function DocNavigationContent() {
   })
 
   // Find the current page in the flattened array
-  currentPageIndex = allPages.findIndex((item) => item.href === pathname)
+  currentPageIndex = allPages.findIndex(item => item.href === pathname)
 
   // Get previous and next pages
   const prevPage = currentPageIndex > 0 ? allPages[currentPageIndex - 1] : null
@@ -77,4 +77,3 @@ export function DocNavigation() {
     </Suspense>
   )
 }
-

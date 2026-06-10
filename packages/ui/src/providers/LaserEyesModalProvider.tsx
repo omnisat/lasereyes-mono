@@ -1,12 +1,7 @@
+import { MAINNET, SIGNET, TESTNET, useLaserEyes } from '@omnisat/lasereyes'
+import { type ReactNode, useCallback, useState } from 'react'
 import ConnectWalletModal from '../components/connection-modal/ConnectModal'
 import type { LaserEyesModalConfig } from '../types/config'
-import {
-  MAINNET,
-  SIGNET,
-  TESTNET,
-  useLaserEyes,
-} from '@omnisat/lasereyes'
-import { type ReactNode, useCallback, useState } from 'react'
 import { laserEyesModalContext } from './LaserEyesModalContext'
 import { ThemeProvider } from './ThemeProvider'
 
@@ -45,10 +40,7 @@ export function LaserEyesModalProvider({
         }}
       >
         {children}
-        <ConnectWalletModal
-          onClose={() => setIsOpen(false)}
-          open={isOpen && !connected}
-        />
+        <ConnectWalletModal onClose={() => setIsOpen(false)} open={isOpen && !connected} />
       </laserEyesModalContext.Provider>
     </ThemeProvider>
   )

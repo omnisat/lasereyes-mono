@@ -1,0 +1,55 @@
+---
+title: Installation
+description: Install LaserEyes in your React project
+---
+
+## Install the Package
+
+<Tabs items={['npm', 'pnpm', 'yarn', 'bun']}>
+<Tab value="npm">
+```bash
+npm install @omnisat/lasereyes
+```
+</Tab>
+<Tab value="pnpm">
+```bash
+pnpm add @omnisat/lasereyes
+```
+</Tab>
+<Tab value="yarn">
+```bash
+yarn add @omnisat/lasereyes
+```
+</Tab>
+<Tab value="bun">
+```bash
+bun add @omnisat/lasereyes
+```
+</Tab>
+</Tabs>
+
+The `@omnisat/lasereyes` package includes everything you need:
+- `@omnisat/lasereyes-react` - React hooks and provider
+- `@omnisat/lasereyes-core` - Wallet management logic
+- All TypeScript types
+
+## Requirements
+
+- React 17 or later
+- Node.js 18 or later
+
+## Individual Packages
+
+If you only need specific functionality, you can install packages individually:
+
+```bash
+# Core only (framework-agnostic)
+npm install @omnisat/lasereyes-core
+
+# Low-level chain data client
+npm install @omnisat/lasereyes-client
+```
+
+## Next Steps
+
+Once installed, wrap your app with the [LaserEyesProvider](/docs/getting-started/quick-start) to start connecting wallets.

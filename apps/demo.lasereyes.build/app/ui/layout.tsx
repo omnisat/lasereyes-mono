@@ -1,7 +1,7 @@
 'use client'
 
 import { LaserEyesModalProvider } from '@omnisat/lasereyes-ui'
-import { ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import '@omnisat/lasereyes-ui/style'
 import { KEPLR, LaserEyesProvider, OYL, UNISAT } from '@omnisat/lasereyes'
 
@@ -22,14 +22,18 @@ export default function UILayout({ children }: { children: ReactNode }) {
         },
       }}
     >
-      <LaserEyesModalProvider config={{
-        providers: [KEPLR, UNISAT, OYL],
-        theme: {
-          primaryColor: '#3b82f6', // Blue primary color
-          darkMode: 'auto', // Follow system preference
-          borderRadius: 1, // Default border radius
-        }
-      }}>{children}</LaserEyesModalProvider>
+      <LaserEyesModalProvider
+        config={{
+          providers: [KEPLR, UNISAT, OYL],
+          theme: {
+            primaryColor: '#3b82f6', // Blue primary color
+            darkMode: 'auto', // Follow system preference
+            borderRadius: 1, // Default border radius
+          },
+        }}
+      >
+        {children}
+      </LaserEyesModalProvider>
     </LaserEyesProvider>
   )
 }

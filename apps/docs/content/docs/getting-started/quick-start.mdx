@@ -1,0 +1,108 @@
+---
+title: Quick Start
+description: Get up and running with LaserEyes in minutes
+---
+
+## 1. Wrap Your App
+
+Add `LaserEyesProvider` at the root of your application:
+
+```tsx
+import { LaserEyesProvider } from '@omnisat/lasereyes'
+
+export default function App() {
+  return (
+    <LaserEyesProvider config={{ network: 'mainnet' }}>
+      <YourApp />
+    </LaserEyesProvider>
+  )
+}
+```
+
+The provider sets up wallet detection, reactive state management, and React Query for data fetching.
+
+## 2. Connect a Wallet
+
+Use the `useLaserEyes` hook to access wallet state and methods:
+
+```tsx
+import { useLaserEyes } from '@omnisat/lasereyes'
+
+function ConnectButton() {
+  const { connect, disconnect, connected, address, provider } = useLaserEyes()
+
+  if (connected) {
+    return (
+      <div>
+        <p>Connected via {provider}: {address}</p>
+        <button onClick={disconnect}>Disconnect</button>
+      </div>
+    )
+  }
+
+  return (
+    <div>
+      <button onClick={() => connect('unisat')}>Connect UniSat</button>
+      <button onClick={() => connect('xverse')}>Connect Xverse</button>
+      <button onClick={() => connect('leather')}>Connect Leather</button>
+    </div>
+  )
+}
+```
+
+## 3. Send Bitcoin
+
+```tsx
+import { useLaserEyes } from '@omnisat/lasereyes'
+
+function SendForm() {
+  const { sendBTC } = useLaserEyes()
+
+  const handleSend = async () => {
+    const txId = await sendBTC('bc1q...recipient', 10000) // amount in sats
+    console.log('Transaction:', txId)
+  }
+
+  return <button onClick={handleSend}>Send 10,000 sats</button>
+}
+```
+
+## 4. Check Wallet Availability
+
+The hook exposes boolean flags for each supported wallet:
+
+```tsx
+function WalletList() {
+  const { hasUnisat, hasXverse, hasLeather, hasPhantom } = useLaserEyes()
+
+  return (
+    <ul>
+      {hasUnisat && <li>UniSat available</li>}
+      {hasXverse && <li>Xverse available</li>}
+      {hasLeather && <li>Leather available</li>}
+      {hasPhantom && <li>Phantom available</li>}
+    </ul>
+  )
+}
+```
+
+## Optimized Re-renders
+
+Use a selector to only re-render when specific values change:
+
+```tsx
+// Only re-renders when address changes
+const address = useLaserEyes(s => s.address)
+
+// Only re-renders when connection state changes
+const { connected, isConnecting } = useLaserEyes(s => ({
+  connected: s.connected,
+  isConnecting: s.isConnecting,
+}))
+```
+
+## Next Steps
+
+- Learn about the [architecture](/docs/concepts/architecture) and package layering
+- Explore [wallet providers](/docs/concepts/wallet-providers) for the full list of supported wallets
+- Read the [sending BTC guide](/docs/guides/sending-btc) for transaction details

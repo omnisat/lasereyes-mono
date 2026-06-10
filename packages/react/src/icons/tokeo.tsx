@@ -1,16 +1,11 @@
-import * as React from 'react'
+import type * as React from 'react'
 
 interface TokeoProps extends React.SVGProps<SVGSVGElement> {
   size?: number
   variant?: 'first' | 'second'
 }
 
-const TokeoLogo: React.FC<TokeoProps> = ({
-  size = 42,
-  variant = 'first',
-  className,
-  ...props
-}) => {
+const TokeoLogo: React.FC<TokeoProps> = ({ size = 42, variant = 'first', className, ...props }) => {
   return (
     <svg
       height={size}

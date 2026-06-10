@@ -1,16 +1,17 @@
-"use client"
+'use client'
 
-import { CodeBlock } from "@/components/code-block"
-import { WarningBox } from "@/components/warning-box"
-import Link from "next/link"
-import { Heading } from "@/components/heading"
+import Link from 'next/link'
+import { CodeBlock } from '@/components/code-block'
+import { Heading } from '@/components/heading'
+import { WarningBox } from '@/components/warning-box'
 
 export default function MaestroContent() {
   return (
     <>
       <p className="text-lg mb-4">
-        Maestro is a powerful Bitcoin API that provides comprehensive support for Bitcoin, Ordinals, inscriptions, and
-        more. LaserEyes integrates seamlessly with Maestro to provide high-performance access to blockchain data.
+        Maestro is a powerful Bitcoin API that provides comprehensive support for Bitcoin, Ordinals,
+        inscriptions, and more. LaserEyes integrates seamlessly with Maestro to provide
+        high-performance access to blockchain data.
       </p>
 
       <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
@@ -30,7 +31,9 @@ export default function MaestroContent() {
       <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
         Configuration
       </Heading>
-      <p className="mb-6">To use Maestro with LaserEyes, you need to configure it in your LaserEyes setup:</p>
+      <p className="mb-6">
+        To use Maestro with LaserEyes, you need to configure it in your LaserEyes setup:
+      </p>
       <CodeBlock
         language="typescript"
         code={`import { LaserEyesProvider } from '@omnisat/lasereyes-react'
@@ -57,10 +60,16 @@ function App() {
       />
 
       <WarningBox title="API Key Requirements" className="mt-6 mb-6">
-        While LaserEyes includes development API keys for testing, you should register for your own API key at{" "}
-        <a href="https://www.gomaestro.org/" target="_blank" rel="noreferrer" className="text-primary underline">
+        While LaserEyes includes development API keys for testing, you should register for your own
+        API key at{' '}
+        <a
+          href="https://www.gomaestro.org/"
+          target="_blank"
+          rel="noreferrer"
+          className="text-primary underline"
+        >
           gomaestro.org
-        </a>{" "}
+        </a>{' '}
         for production use to avoid rate limiting issues.
       </WarningBox>
 
@@ -68,7 +77,8 @@ function App() {
         Supported Features
       </Heading>
       <p className="mb-6">
-        Maestro is the most comprehensive data provider integrated with LaserEyes, supporting all major features:
+        Maestro is the most comprehensive data provider integrated with LaserEyes, supporting all
+        major features:
       </p>
       <div className="overflow-x-auto mb-6">
         <table className="w-full border-collapse">
@@ -88,7 +98,9 @@ function App() {
             <tr>
               <td className="border p-2">Ordinals & Inscriptions</td>
               <td className="border p-2 text-center">✅</td>
-              <td className="border p-2">Comprehensive inscription indexing and content retrieval</td>
+              <td className="border p-2">
+                Comprehensive inscription indexing and content retrieval
+              </td>
             </tr>
             <tr>
               <td className="border p-2">BRC-20 Tokens</td>
@@ -152,7 +164,9 @@ function BitcoinData() {
       <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
         Advanced Configuration
       </Heading>
-      <p className="mb-6">Maestro offers additional configuration options for advanced use cases:</p>
+      <p className="mb-6">
+        Maestro offers additional configuration options for advanced use cases:
+      </p>
       <CodeBlock
         language="typescript"
         code={`const config = createConfig({
@@ -180,7 +194,9 @@ function BitcoinData() {
       <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
         Rate Limits and Quotas
       </Heading>
-      <p className="mb-6">Maestro has different rate limits and quotas depending on your subscription plan:</p>
+      <p className="mb-6">
+        Maestro has different rate limits and quotas depending on your subscription plan:
+      </p>
       <ul className="list-disc pl-6 mb-6 space-y-2">
         <li>
           <strong>Free Tier:</strong> Limited to 10 requests per second and 10,000 requests per day
@@ -193,8 +209,8 @@ function BitcoinData() {
         </li>
       </ul>
       <p className="mb-6">
-        LaserEyes includes built-in rate limiting and retry logic to help manage these limits, but you should be aware
-        of them when designing your application.
+        LaserEyes includes built-in rate limiting and retry logic to help manage these limits, but
+        you should be aware of them when designing your application.
       </p>
 
       <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
@@ -222,34 +238,35 @@ function BitcoinData() {
       <Heading level={2} className="text-2xl font-bold mt-8 mb-4">
         Next Steps
       </Heading>
-      <p className="mb-6">Now that you understand how to use Maestro with LaserEyes, you can explore related topics:</p>
+      <p className="mb-6">
+        Now that you understand how to use Maestro with LaserEyes, you can explore related topics:
+      </p>
       <ul className="list-disc pl-6 mb-6 space-y-2">
         <li>
           <Link href="/docs/sandshrew" className="text-primary hover:underline">
             Sandshrew Integration
-          </Link>{" "}
+          </Link>{' '}
           - Learn about another data provider option
         </li>
         <li>
           <Link href="/docs/mempool-space" className="text-primary hover:underline">
             Mempool.space Integration
-          </Link>{" "}
+          </Link>{' '}
           - Explore the Mempool.space data provider
         </li>
         <li>
           <Link href="/docs/custom-datasource" className="text-primary hover:underline">
             Custom DataSource Implementation
-          </Link>{" "}
+          </Link>{' '}
           - Create your own data source
         </li>
         <li>
           <Link href="/docs/performance" className="text-primary hover:underline">
             Performance Optimization
-          </Link>{" "}
+          </Link>{' '}
           - Learn how to optimize performance with data providers
         </li>
       </ul>
     </>
   )
 }
-

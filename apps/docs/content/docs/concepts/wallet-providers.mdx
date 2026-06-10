@@ -1,0 +1,81 @@
+---
+title: Wallet Providers
+description: Supported Bitcoin wallet integrations
+---
+
+LaserEyes supports 14 Bitcoin wallet providers. Each wallet is detected automatically when the provider is available and the user has the extension installed.
+
+## Supported Wallets
+
+| Wallet | Constant | Networks | Notes |
+|--------|----------|----------|-------|
+| UniSat | `unisat` | Mainnet, Testnet, Signet, Fractal | Full protocol support |
+| Xverse | `xverse` | Mainnet, Testnet, Signet | Uses sats-connect |
+| Leather | `leather` | Mainnet, Testnet, Signet | Formerly Hiro Wallet |
+| Magic Eden | `magic-eden` | Mainnet | Popular NFT marketplace wallet |
+| OKX | `okx` | Mainnet, Testnet | Exchange wallet |
+| Phantom | `phantom` | Mainnet | Multi-chain wallet |
+| OYL | `oyl` | Mainnet, Testnet | Bitcoin-native wallet |
+| Wizz | `wizz` | Mainnet, Testnet | |
+| Orange | `orange` | Mainnet | ICP-Bitcoin wallet |
+| OpNet | `op_net` | Mainnet | Smart contract wallet |
+| Sparrow | `sparrow` | Mainnet, Testnet | Desktop wallet with web bridge |
+| Tokeo | `tokeo` | Mainnet | |
+| Keplr | `keplr` | Mainnet | Cosmos ecosystem wallet |
+| Binance | `binance` | Mainnet | Exchange wallet |
+
+## Connecting
+
+```tsx
+import { useLaserEyes } from '@omnisat/lasereyes'
+
+function WalletButtons() {
+  const { connect, hasUnisat, hasXverse, hasLeather } = useLaserEyes()
+
+  return (
+    <div>
+      {hasUnisat && <button onClick={() => connect('unisat')}>UniSat</button>}
+      {hasXverse && <button onClick={() => connect('xverse')}>Xverse</button>}
+      {hasLeather && <button onClick={() => connect('leather')}>Leather</button>}
+    </div>
+  )
+}
+```
+
+## Wallet Detection
+
+Each `has*` boolean on the context indicates whether the wallet's browser extension is detected:
+
+```tsx
+const {
+  hasUnisat, hasXverse, hasLeather, hasMagicEden,
+  hasOkx, hasPhantom, hasOyl, hasWizz,
+  hasOrange, hasOpNet, hasSparrow, hasTokeo,
+  hasKeplr, hasBinance,
+} = useLaserEyes()
+```
+
+## Switching Networks
+
+Some wallets support programmatic network switching:
+
+```tsx
+const { switchNetwork } = useLaserEyes()
+
+await switchNetwork('testnet')
+```
+
+Not all wallets support this. If unsupported, the user must switch manually in their wallet settings.
+
+## Accessing the Raw Provider
+
+For advanced use cases, access the underlying wallet provider instance:
+
+```tsx
+import { useConnectedProvider } from '@omnisat/lasereyes'
+
+function AdvancedComponent() {
+  const provider = useConnectedProvider()
+  // Access wallet-specific methods via provider.library
+}
+```

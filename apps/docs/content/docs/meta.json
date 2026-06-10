@@ -1,0 +1,31 @@
+{
+  "title": "Documentation",
+  "pages": [
+    "---Getting Started---",
+    "getting-started/installation",
+    "getting-started/quick-start",
+    "getting-started/project-structure",
+    "---Concepts---",
+    "concepts/architecture",
+    "concepts/data-sources",
+    "concepts/capabilities",
+    "concepts/vendors",
+    "concepts/wallet-providers",
+    "---Guides---",
+    "guides/connecting-wallets",
+    "guides/sending-btc",
+    "guides/working-with-runes",
+    "guides/working-with-inscriptions",
+    "guides/working-with-brc20",
+    "guides/working-with-alkanes",
+    "guides/custom-data-sources",
+    "guides/error-handling",
+    "guides/network-configuration",
+    "---Packages---",
+    "packages/react",
+    "packages/core",
+    "packages/client",
+    "---API Reference---",
+    "api-reference"
+  ]
+}

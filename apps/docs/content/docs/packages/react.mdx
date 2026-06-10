@@ -1,0 +1,59 @@
+---
+title: "@omnisat/lasereyes-react"
+description: React hooks and provider for Bitcoin wallet integration
+---
+
+The React package provides the primary developer interface for LaserEyes. Most applications should use `@omnisat/lasereyes` (which re-exports this package).
+
+## Provider
+
+Wrap your app with `LaserEyesProvider`:
+
+```tsx
+import { LaserEyesProvider } from '@omnisat/lasereyes'
+
+<LaserEyesProvider config={{ network: 'mainnet' }}>
+  <App />
+</LaserEyesProvider>
+```
+
+The provider handles:
+- Wallet detection and auto-reconnection
+- Reactive state management via nanostores
+- React Query client for data hooks
+
+## Primary Hook
+
+`useLaserEyes` is the main hook for wallet interaction:
+
+```tsx
+// Full context
+const { address, connect, sendBTC, signPsbt } = useLaserEyes()
+
+// With selector (prevents unnecessary re-renders)
+const address = useLaserEyes(s => s.address)
+```
+
+## Data Hooks
+
+| Hook | Purpose |
+|------|---------|
+| `useBalance` | Query BTC or token balances |
+| `useBitcoinFees` | Get current fee estimates |
+| `useAccount` | Get connected account details |
+| `useConnect` | Get the `connect` function |
+| `useClient` | Access the underlying `LaserEyesClient` |
+| `useConnectedProvider` | Access the raw wallet provider |
+| `useAddressTokens` | Query tokens for an address |
+| `useAlkanesList` | Paginated alkane token list |
+| `useAlkanesToken` | Look up a specific alkane token |
+
+All data hooks are backed by `@tanstack/react-query` and support custom query options.
+
+## Re-exports
+
+This package re-exports everything from `@omnisat/lasereyes-core`, so you get access to all constants, types, and utilities without installing the core package separately.
+
+## API Reference
+
+See the [auto-generated API docs](/docs/api-reference/lasereyes-react/README) for complete type information.

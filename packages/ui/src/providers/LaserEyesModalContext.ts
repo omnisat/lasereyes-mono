@@ -1,14 +1,14 @@
-import { createContext, useContext } from "react";
-import { SIGNET, TESTNET, FRACTAL_TESTNET, MAINNET } from "@omnisat/lasereyes";
-import { LaserEyesModalConfig } from "../types/config";
+import { FRACTAL_TESTNET, MAINNET, SIGNET, TESTNET } from '@omnisat/lasereyes'
+import { createContext, useContext } from 'react'
+import type { LaserEyesModalConfig } from '../types/config'
 
 export interface LasereyesModalContext {
-  isOpen: boolean;
-  isLoading: boolean;
-  showModal: () => void;
-  hideModal: () => void;
-  config: LaserEyesModalConfig;
-  setConfig: (config: LaserEyesModalConfig) => void;
+  isOpen: boolean
+  isLoading: boolean
+  showModal: () => void
+  hideModal: () => void
+  config: LaserEyesModalConfig
+  setConfig: (config: LaserEyesModalConfig) => void
 }
 
 export const laserEyesModalContext = createContext<LasereyesModalContext>({
@@ -21,8 +21,8 @@ export const laserEyesModalContext = createContext<LasereyesModalContext>({
     defaultNetwork: MAINNET,
   },
   setConfig: () => {},
-});
+})
 
 export const useLaserEyesModal = (): LasereyesModalContext => {
-  return useContext(laserEyesModalContext);
-};
+  return useContext(laserEyesModalContext)
+}

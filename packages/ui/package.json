@@ -1,9 +1,7 @@
 {
   "name": "@omnisat/lasereyes-ui",
-  "repository": {
-    "url": "https://github.com/omnisat/lasereyes-mono"
-  },
   "version": "0.0.21",
+  "private": true,
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -44,8 +42,8 @@
   "devDependencies": {
     "@omnisat/lasereyes": "workspace:*",
     "@types/node": "^22.0.0",
-    "@types/react": "^18.3.3",
-    "@types/react-dom": "^18.3.0",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
     "@typescript-eslint/eslint-plugin": "^7.15.0",
     "@typescript-eslint/parser": "^7.15.0",
     "@vitejs/plugin-react": "^4.3.1",
@@ -56,8 +54,8 @@
     "eslint-plugin-react-hooks": "^4.6.2",
     "eslint-plugin-react-refresh": "^0.4.7",
     "postcss": "^8.4.40",
-    "react": ">=17",
-    "react-dom": ">=17",
+    "react": "catalog:",
+    "react-dom": "catalog:",
     "react-jsx": "^1.0.0",
     "tailwindcss": "^3.4.7",
     "tailwindcss-animate": "^1.0.7",
@@ -66,9 +64,5 @@
     "vite-plugin-dts": "^4.0.3",
     "vite-plugin-node-polyfills": "^0.22.0"
   },
-  "stableVersion": "0.0.1",
-  "publishConfig": {
-    "access": "public",
-    "provenance": true
-  }
+  "stableVersion": "0.0.1"
 }

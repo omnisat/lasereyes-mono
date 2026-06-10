@@ -1,15 +1,28 @@
-"use client"
+'use client'
 
-import * as React from "react"
-import { ClientPageWrapper } from "@/components/client-page-wrapper"
-import { CodeBlock } from "@/components/code-block"
-import { Heading } from "@/components/heading"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { ArrowRight, Zap, Gauge, BarChart2, Cpu, Network, Layers, Workflow, Timer, Scale, Maximize2, Minimize2 } from "lucide-react"
-import { cn } from "@/lib/utils"
-import Link from "next/link"
+import {
+  ArrowRight,
+  BarChart2,
+  Cpu,
+  Gauge,
+  Layers,
+  Maximize2,
+  Minimize2,
+  Network,
+  Scale,
+  Timer,
+  Workflow,
+  Zap,
+} from 'lucide-react'
+import Link from 'next/link'
+import type * as React from 'react'
+import { ClientPageWrapper } from '@/components/client-page-wrapper'
+import { CodeBlock } from '@/components/code-block'
+import { Heading } from '@/components/heading'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { cn } from '@/lib/utils'
 
 interface FeatureCardProps {
   icon: React.ElementType
@@ -31,11 +44,26 @@ export default function PerformancePage() {
         <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-orange-500/20 rounded-full blur-[120px] -z-10 translate-x-1/2 -translate-y-1/2 animate-pulse" />
         <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-yellow-500/10 rounded-full blur-[100px] -z-10 -translate-x-1/2 translate-y-1/2 animate-pulse" />
         <div className="absolute top-1/2 left-1/2 w-[200px] h-[200px] bg-orange-800/10 rounded-full blur-[80px] -z-10 -translate-x-1/2 -translate-y-1/2" />
-        
+
         <div className="flex items-center gap-3 mb-4">
-          <Badge variant="secondary" className="bg-orange-900/10 text-orange-400 hover:bg-orange-900/20">Performance</Badge>
-          <Badge variant="secondary" className="bg-yellow-900/10 text-yellow-400 hover:bg-yellow-900/20">Optimization</Badge>
-          <Badge variant="secondary" className="bg-orange-900/10 text-orange-400 hover:bg-orange-900/20">Best Practices</Badge>
+          <Badge
+            variant="secondary"
+            className="bg-orange-900/10 text-orange-400 hover:bg-orange-900/20"
+          >
+            Performance
+          </Badge>
+          <Badge
+            variant="secondary"
+            className="bg-yellow-900/10 text-yellow-400 hover:bg-yellow-900/20"
+          >
+            Optimization
+          </Badge>
+          <Badge
+            variant="secondary"
+            className="bg-orange-900/10 text-orange-400 hover:bg-orange-900/20"
+          >
+            Best Practices
+          </Badge>
         </div>
 
         <div className="flex items-center gap-6 mb-6">
@@ -43,7 +71,10 @@ export default function PerformancePage() {
             <Gauge className="h-7 w-7 text-orange-400" />
           </div>
           <div>
-            <Heading level={1} className="bg-gradient-to-r from-orange-400 via-orange-500 to-yellow-400 bg-clip-text text-transparent">
+            <Heading
+              level={1}
+              className="bg-gradient-to-r from-orange-400 via-orange-500 to-yellow-400 bg-clip-text text-transparent"
+            >
               Performance Guide
             </Heading>
             <p className="text-sm text-muted-foreground">Optimize Your Bitcoin Applications</p>
@@ -51,7 +82,8 @@ export default function PerformancePage() {
         </div>
 
         <p className="text-xl mb-8 max-w-2xl text-muted-foreground">
-          Learn how to build lightning-fast Bitcoin applications with LaserEyes' performance optimization techniques and best practices.
+          Learn how to build lightning-fast Bitcoin applications with LaserEyes' performance
+          optimization techniques and best practices.
         </p>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 mb-8">
@@ -98,7 +130,10 @@ export default function PerformancePage() {
 
         <div className="flex gap-4 items-center">
           <Link href="#implementation">
-            <Button size="lg" className="bg-gradient-to-r from-orange-600 to-yellow-600 hover:from-orange-500 hover:to-yellow-500 group">
+            <Button
+              size="lg"
+              className="bg-gradient-to-r from-orange-600 to-yellow-600 hover:from-orange-500 hover:to-yellow-500 group"
+            >
               View Optimizations
               <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Button>
@@ -119,12 +154,21 @@ export default function PerformancePage() {
   )
 }
 
-function FeatureCard({ icon: Icon, title, description, className, badges, stats }: FeatureCardProps) {
+function FeatureCard({
+  icon: Icon,
+  title,
+  description,
+  className,
+  badges,
+  stats,
+}: FeatureCardProps) {
   return (
-    <Card className={cn(
-      "group relative overflow-hidden transition-all duration-300 hover:border-orange-500/30 hover:shadow-lg hover:shadow-orange-500/5",
-      className
-    )}>
+    <Card
+      className={cn(
+        'group relative overflow-hidden transition-all duration-300 hover:border-orange-500/30 hover:shadow-lg hover:shadow-orange-500/5',
+        className
+      )}
+    >
       <div className="absolute right-0 top-0 h-20 w-20 translate-x-6 -translate-y-6 rounded-full bg-orange-500/10 blur-2xl filter group-hover:bg-orange-500/20" />
       <CardContent className="p-6">
         <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-orange-500/20 to-yellow-500/20 text-orange-400 ring-1 ring-orange-500/20">
@@ -134,7 +178,7 @@ function FeatureCard({ icon: Icon, title, description, className, badges, stats 
         <p className="text-muted-foreground mb-4">{description}</p>
         {badges && (
           <div className="flex gap-2 flex-wrap mb-4">
-            {badges.map((badge) => (
+            {badges.map(badge => (
               <Badge key={badge} variant="secondary" className="bg-orange-900/10 text-orange-400">
                 {badge}
               </Badge>
@@ -166,40 +210,40 @@ function PerformanceContent() {
             icon={Network}
             title="Network Optimization"
             description="Efficient data fetching and caching strategies for optimal network performance."
-            badges={["Caching", "Batching", "Prefetching"]}
+            badges={['Caching', 'Batching', 'Prefetching']}
             stats={[
-              { label: "Cache Hit Rate", value: "95%" },
-              { label: "Avg Response", value: "<100ms" }
+              { label: 'Cache Hit Rate', value: '95%' },
+              { label: 'Avg Response', value: '<100ms' },
             ]}
           />
           <FeatureCard
             icon={Layers}
             title="State Management"
             description="Optimized state updates and efficient re-rendering patterns."
-            badges={["Atomic Updates", "Memoization", "Lazy Loading"]}
+            badges={['Atomic Updates', 'Memoization', 'Lazy Loading']}
             stats={[
-              { label: "Memory Usage", value: "<5MB" },
-              { label: "Update Time", value: "<16ms" }
+              { label: 'Memory Usage', value: '<5MB' },
+              { label: 'Update Time', value: '<16ms' },
             ]}
           />
           <FeatureCard
             icon={Timer}
             title="Transaction Speed"
             description="Fast transaction processing and efficient signing operations."
-            badges={["Parallel Signing", "Quick Broadcast", "Fast Validation"]}
+            badges={['Parallel Signing', 'Quick Broadcast', 'Fast Validation']}
             stats={[
-              { label: "Sign Time", value: "<1s" },
-              { label: "Broadcast", value: "<2s" }
+              { label: 'Sign Time', value: '<1s' },
+              { label: 'Broadcast', value: '<2s' },
             ]}
           />
           <FeatureCard
             icon={Scale}
             title="Resource Usage"
             description="Minimal CPU and memory footprint for smooth operation."
-            badges={["Low CPU", "Memory Efficient", "Battery Friendly"]}
+            badges={['Low CPU', 'Memory Efficient', 'Battery Friendly']}
             stats={[
-              { label: "CPU Usage", value: "<5%" },
-              { label: "Memory", value: "Optimized" }
+              { label: 'CPU Usage', value: '<5%' },
+              { label: 'Memory', value: 'Optimized' },
             ]}
           />
         </div>
@@ -331,19 +375,22 @@ function OptimizedApp() {
               <div>
                 <h3 className="font-semibold mb-2">Real-time Monitoring</h3>
                 <p className="text-sm text-muted-foreground">
-                  Monitor performance metrics in real-time with built-in analytics and profiling tools.
+                  Monitor performance metrics in real-time with built-in analytics and profiling
+                  tools.
                 </p>
               </div>
               <div>
                 <h3 className="font-semibold mb-2">Automatic Optimization</h3>
                 <p className="text-sm text-muted-foreground">
-                  Automatic performance optimization based on usage patterns and resource availability.
+                  Automatic performance optimization based on usage patterns and resource
+                  availability.
                 </p>
               </div>
               <div>
                 <h3 className="font-semibold mb-2">Memory Management</h3>
                 <p className="text-sm text-muted-foreground">
-                  Intelligent memory management with automatic garbage collection and resource cleanup.
+                  Intelligent memory management with automatic garbage collection and resource
+                  cleanup.
                 </p>
               </div>
               <div>
@@ -369,28 +416,36 @@ function OptimizedApp() {
                 <Maximize2 className="h-5 w-5 text-orange-400 mt-1" />
                 <div>
                   <h3 className="font-semibold">Performance Budgets</h3>
-                  <p className="text-sm text-muted-foreground">Set and monitor performance budgets for key metrics.</p>
+                  <p className="text-sm text-muted-foreground">
+                    Set and monitor performance budgets for key metrics.
+                  </p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
                 <Minimize2 className="h-5 w-5 text-orange-400 mt-1" />
                 <div>
                   <h3 className="font-semibold">Bundle Size</h3>
-                  <p className="text-sm text-muted-foreground">Optimize bundle size with code splitting and lazy loading.</p>
+                  <p className="text-sm text-muted-foreground">
+                    Optimize bundle size with code splitting and lazy loading.
+                  </p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
                 <Network className="h-5 w-5 text-orange-400 mt-1" />
                 <div>
                   <h3 className="font-semibold">Network Optimization</h3>
-                  <p className="text-sm text-muted-foreground">Implement request batching and efficient caching strategies.</p>
+                  <p className="text-sm text-muted-foreground">
+                    Implement request batching and efficient caching strategies.
+                  </p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
                 <Cpu className="h-5 w-5 text-orange-400 mt-1" />
                 <div>
                   <h3 className="font-semibold">Resource Usage</h3>
-                  <p className="text-sm text-muted-foreground">Monitor and optimize CPU and memory usage patterns.</p>
+                  <p className="text-sm text-muted-foreground">
+                    Monitor and optimize CPU and memory usage patterns.
+                  </p>
                 </div>
               </div>
             </div>
@@ -400,4 +455,3 @@ function OptimizedApp() {
     </div>
   )
 }
-

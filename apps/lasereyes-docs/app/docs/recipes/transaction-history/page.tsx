@@ -1,8 +1,8 @@
-"use client"
+'use client'
 
-import { Heading } from "@/components/heading"
-import { CodeBlock } from "@/components/code-block"
-import Image from "next/image"
+import Image from 'next/image'
+import { CodeBlock } from '@/components/code-block'
+import { Heading } from '@/components/heading'
 
 export default function TransactionHistoryRecipe() {
   return (
@@ -12,8 +12,8 @@ export default function TransactionHistoryRecipe() {
       </Heading>
 
       <p className="text-lg mb-6">
-        Build a complete transaction history viewer that would make block explorers jealous. Perfect for wallets,
-        portfolio trackers, or just showing off your Bitcoin street cred.
+        Build a complete transaction history viewer that would make block explorers jealous. Perfect
+        for wallets, portfolio trackers, or just showing off your Bitcoin street cred.
       </p>
 
       <div className="flex justify-center mb-8">
@@ -292,7 +292,8 @@ export default function WalletPage() {
           <strong>Transaction Search:</strong> Add a search box to find specific transactions
         </li>
         <li>
-          <strong>Transaction Categories:</strong> Add the ability to categorize and tag transactions
+          <strong>Transaction Categories:</strong> Add the ability to categorize and tag
+          transactions
         </li>
         <li>
           <strong>Fiat Conversion:</strong> Show transaction values in USD or other fiat currencies
@@ -313,11 +314,10 @@ export default function WalletPage() {
       <div className="p-4 bg-blue-100 dark:bg-blue-900 rounded-lg mt-8">
         <p className="font-semibold">💡 Pro Tip:</p>
         <p>
-          For wallets with multiple addresses (like HD wallets), you can create a tabbed interface to switch between
-          addresses or aggregate all transactions into a single view.
+          For wallets with multiple addresses (like HD wallets), you can create a tabbed interface
+          to switch between addresses or aggregate all transactions into a single view.
         </p>
       </div>
     </div>
   )
 }
-

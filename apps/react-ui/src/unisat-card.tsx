@@ -1,17 +1,14 @@
-import { useLaserEyes, UNISAT } from '@omnisat/lasereyes'
+import { UNISAT, useLaserEyes } from '@omnisat/lasereyes'
 
 export default function UnisatCard() {
-  const { connected, connect, disconnect, address, balance, publicKey } =
-    useLaserEyes()
+  const { connected, connect, disconnect, address, balance, publicKey } = useLaserEyes()
   return (
     <div className="card">
       <div className="card-body">
         <h5 className="card-title">Unisat</h5>
       </div>
       <h6>Is Wallet Connected?</h6>
-      <p
-        className={`badge ${connected ? 'bg-success' : 'bg-danger'} text-light`}
-      >
+      <p className={`badge ${connected ? 'bg-success' : 'bg-danger'} text-light`}>
         {connected ? 'Yes' : 'No'}
       </p>
 

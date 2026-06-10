@@ -1,0 +1,59 @@
+---
+title: LaserEyes Documentation
+description: The Bitcoin wallet connector for React applications
+---
+
+LaserEyes is a comprehensive Bitcoin wallet integration library for React applications. It provides a unified interface for connecting to 14+ Bitcoin wallets, managing transactions, and interacting with Bitcoin protocols including Runes, BRC-20, Inscriptions, and Alkanes.
+
+## Quick Start
+
+```bash
+npm install @omnisat/lasereyes
+```
+
+```tsx
+import { LaserEyesProvider, useLaserEyes, MAINNET } from '@omnisat/lasereyes'
+
+function App() {
+  return (
+    <LaserEyesProvider config={{ network: MAINNET }}>
+      <WalletButton />
+    </LaserEyesProvider>
+  )
+}
+
+function WalletButton() {
+  const { connect, address, connected } = useLaserEyes()
+
+  if (connected) return <p>Connected: {address}</p>
+  return <button onClick={() => connect('unisat')}>Connect Wallet</button>
+}
+```
+
+## Packages
+
+<Cards>
+  <Card title="@omnisat/lasereyes" href="/docs/packages/react">
+    Main package with React hooks and provider. Start here.
+  </Card>
+  <Card title="@omnisat/lasereyes-core" href="/docs/packages/core">
+    Framework-agnostic wallet management and state.
+  </Card>
+  <Card title="@omnisat/lasereyes-client" href="/docs/packages/client">
+    Low-level chain data primitives and vendor integrations.
+  </Card>
+</Cards>
+
+## Explore
+
+<Cards>
+  <Card title="Getting Started" href="/docs/getting-started/installation">
+    Installation and setup guide.
+  </Card>
+  <Card title="Concepts" href="/docs/concepts/architecture">
+    Understand the architecture and design patterns.
+  </Card>
+  <Card title="API Reference" href="/docs/api-reference">
+    Auto-generated API documentation from source.
+  </Card>
+</Cards>

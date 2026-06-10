@@ -1,9 +1,9 @@
-import { IMempoolUtxo } from '@/types/btc'
+import * as ecc2 from '@bitcoinerlab/secp256k1'
 import {
   FRACTAL_MAINNET,
   FRACTAL_TESTNET,
   MAINNET,
-  NetworkType,
+  type NetworkType,
   OYLNET,
   P2PKH,
   P2SH,
@@ -14,11 +14,11 @@ import {
   TESTNET,
   TESTNET4,
 } from '@omnisat/lasereyes'
+import axios from 'axios'
 import * as bitcoin from 'bitcoinjs-lib'
 import { Psbt } from 'bitcoinjs-lib'
-import * as ecc2 from '@bitcoinerlab/secp256k1'
-import axios from 'axios'
 import { getMempoolSpaceUrl } from '@/lib/urls'
+import type { IMempoolUtxo } from '@/types/btc'
 
 bitcoin.initEccLib(ecc2)
 
@@ -30,19 +30,14 @@ export const satoshisToBTC = (satoshis: number): string => {
 }
 
 export const getBtcJsNetwork = (network: string): bitcoin.networks.Network => {
-  return network === MAINNET ||
-    network === FRACTAL_MAINNET ||
-    network === FRACTAL_TESTNET
+  return network === MAINNET || network === FRACTAL_MAINNET || network === FRACTAL_TESTNET
     ? bitcoin.networks.bitcoin
     : bitcoin.networks.testnet
 }
 
 export const P2SH_P2WPKH = 'p2sh-p2wpkh'
 
-export const getAddressType = (
-  address: string,
-  network: bitcoin.Network
-): string => {
+export const getAddressType = (address: string, network: bitcoin.Network): string => {
   try {
     const decoded = bitcoin.address.fromBase58Check(address)
 
@@ -56,13 +51,13 @@ export const getAddressType = (
       }
       return P2SH
     }
-  } catch (e) {
+  } catch (_e) {
     try {
       const decoded = bitcoin.address.fromBech32(address)
       if (decoded.version === 0 && decoded.data.length === 20) return P2WPKH
       if (decoded.version === 0 && decoded.data.length === 32) return P2WSH
       if (decoded.version === 1 && decoded.data.length === 32) return P2TR
-    } catch (e2) {
+    } catch (_e2) {
       return 'unknown'
     }
   }
@@ -87,10 +82,7 @@ export async function createPsbt(
   const psbt = new Psbt({
     network: btcNetwork,
   })
-  const script = bitcoin.address.toOutputScript(
-    outputAddress,
-    getBitcoinNetwork(network)
-  )
+  const script = bitcoin.address.toOutputScript(outputAddress, getBitcoinNetwork(network))
   if (!script) {
     throw new Error('Invalid output address')
   }
@@ -138,10 +130,7 @@ export async function createPsbt(
   return psbt
 }
 
-export function getRedeemScript(
-  paymentPublicKey: string,
-  network: NetworkType
-) {
+export function getRedeemScript(paymentPublicKey: string, network: NetworkType) {
   const p2wpkh = bitcoin.payments.p2wpkh({
     pubkey: Buffer.from(paymentPublicKey, 'hex'),
     network: getBitcoinNetwork(network),
@@ -164,8 +153,7 @@ export function estimateTxSize(
   const nonTaprootInputSize = 41
   const outputSize = 34
   const totalInputSize =
-    taprootInputCount * taprootInputSize +
-    nonTaprootInputCount * nonTaprootInputSize
+    taprootInputCount * taprootInputSize + nonTaprootInputCount * nonTaprootInputSize
   const totalOutputSize = outputCount * outputSize
   return baseTxSize + totalInputSize + totalOutputSize
 }

@@ -13,4 +13,3 @@ export default function Static404Page() {
     </div>
   )
 }
-

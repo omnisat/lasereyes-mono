@@ -1,0 +1,9 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "workspaces": {
+    "packages/client": {
+      "ignoreDependencies": ["size-limit"],
+      "ignoreBinaries": ["size-limit"]
+    }
+  }
+}

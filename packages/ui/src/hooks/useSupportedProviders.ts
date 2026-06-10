@@ -1,10 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {
-  MAGIC_EDEN,
-  ProviderType,
-  SUPPORTED_WALLETS,
-  useLaserEyes,
-} from '@omnisat/lasereyes'
+import { MAGIC_EDEN, type ProviderType, SUPPORTED_WALLETS, useLaserEyes } from '@omnisat/lasereyes'
 import { useMemo } from 'react'
 import useModalConfig from './useModalConfig'
 
@@ -33,8 +28,7 @@ export default function useSupportedProviders() {
     connect: connectLaserEyes,
   } = useLaserEyes()
   const config = useModalConfig()
-  const allowedProviders =
-    config.providers ?? (Object.keys(SUPPORTED_WALLETS) as ProviderType[])
+  const allowedProviders = config.providers ?? (Object.keys(SUPPORTED_WALLETS) as ProviderType[])
   const hasWallet: Record<keyof typeof SUPPORTED_WALLETS, boolean> = useMemo(
     () => ({
       unisat: hasUnisat,
@@ -66,6 +60,7 @@ export default function useSupportedProviders() {
       hasWizz,
       hasXverse,
       hasKeplr,
+      hasBinance,
     ]
   )
   const [installedWallets, otherWallets] = useMemo(() => {
@@ -76,8 +71,8 @@ export default function useSupportedProviders() {
     })[] = []
     const o: WalletInfo[] = []
     Object.keys(SUPPORTED_WALLETS)
-      .filter((e) => allowedProviders?.includes(e as ProviderType))
-      .forEach((e) => {
+      .filter(e => allowedProviders?.includes(e as ProviderType))
+      .forEach(e => {
         const isInstalled = hasWallet[e as keyof typeof hasWallet]
         const wallet = SUPPORTED_WALLETS[e as keyof typeof SUPPORTED_WALLETS]
         const w: WalletInfo = {
@@ -87,10 +82,7 @@ export default function useSupportedProviders() {
           label: wallet.name
             .replace(/[-_]/g, ' ')
             .split(' ')
-            .map(
-              (word) =>
-                word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-            )
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
             .join(' '),
         }
         if (isInstalled) {

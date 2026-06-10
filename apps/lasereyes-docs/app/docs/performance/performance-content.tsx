@@ -1,21 +1,22 @@
-"use client"
+'use client'
 
-import { CodeBlock } from "@/components/code-block"
-import Link from "next/link"
-import { Heading } from "@/components/heading"
+import Link from 'next/link'
+import { CodeBlock } from '@/components/code-block'
+import { Heading } from '@/components/heading'
 
 export default function PerformanceContent() {
   return (
     <>
       <Heading level="h1">Performance Optimization</Heading>
       <p className="text-lg mb-4">
-        Optimizing the performance of your LaserEyes integration is crucial for providing a smooth user experience. This
-        page covers strategies and best practices for improving performance.
+        Optimizing the performance of your LaserEyes integration is crucial for providing a smooth
+        user experience. This page covers strategies and best practices for improving performance.
       </p>
 
       <Heading level="h2">Performance Considerations</Heading>
       <p className="mb-6">
-        When working with Bitcoin wallets and blockchain data, several factors can affect performance:
+        When working with Bitcoin wallets and blockchain data, several factors can affect
+        performance:
       </p>
       <ul className="list-disc pl-6 mb-6 space-y-2">
         <li>
@@ -25,10 +26,12 @@ export default function PerformanceContent() {
           <strong>Wallet Interactions</strong>: Wallet operations like signing can be slow
         </li>
         <li>
-          <strong>Data Volume</strong>: Large amounts of data (e.g., many UTXOs or inscriptions) can be slow to process
+          <strong>Data Volume</strong>: Large amounts of data (e.g., many UTXOs or inscriptions) can
+          be slow to process
         </li>
         <li>
-          <strong>UI Rendering</strong>: Rendering large lists or complex data can impact performance
+          <strong>UI Rendering</strong>: Rendering large lists or complex data can impact
+          performance
         </li>
         <li>
           <strong>Rate Limits</strong>: Data provider rate limits can throttle your application
@@ -36,7 +39,9 @@ export default function PerformanceContent() {
       </ul>
 
       <Heading level="h2">Caching Strategies</Heading>
-      <p className="mb-6">Implementing effective caching is one of the most important performance optimizations:</p>
+      <p className="mb-6">
+        Implementing effective caching is one of the most important performance optimizations:
+      </p>
       <ul className="list-disc pl-6 mb-6 space-y-2">
         <li>
           <strong>In-Memory Caching</strong>: Cache frequently accessed data in memory
@@ -508,13 +513,16 @@ function OptimizedWalletInteraction() {
       <p className="mb-6">Choosing the right data provider can significantly impact performance:</p>
       <ul className="list-disc pl-6 mb-6 space-y-2">
         <li>
-          <strong>Use Multiple Providers</strong>: Configure multiple providers for redundancy and performance
+          <strong>Use Multiple Providers</strong>: Configure multiple providers for redundancy and
+          performance
         </li>
         <li>
-          <strong>Choose Providers by Feature</strong>: Use different providers for different features
+          <strong>Choose Providers by Feature</strong>: Use different providers for different
+          features
         </li>
         <li>
-          <strong>Consider Geographic Location</strong>: Choose providers with servers close to your users
+          <strong>Consider Geographic Location</strong>: Choose providers with servers close to your
+          users
         </li>
         <li>
           <strong>Monitor Performance</strong>: Track provider performance and adjust as needed
@@ -554,15 +562,15 @@ function OptimizedWalletInteraction() {
           <strong>Monitor Wallet Operation Times</strong>: Track wallet operation performance
         </li>
         <li>
-          <strong>Use Performance Metrics</strong>: Track metrics like First Contentful Paint (FCP) and Time to
-          Interactive (TTI)
+          <strong>Use Performance Metrics</strong>: Track metrics like First Contentful Paint (FCP)
+          and Time to Interactive (TTI)
         </li>
         <li>
           <strong>Implement Logging</strong>: Log performance data for analysis
         </li>
         <li>
-          <strong>Use Performance Monitoring Tools</strong>: Tools like Lighthouse, WebPageTest, or commercial
-          monitoring services
+          <strong>Use Performance Monitoring Tools</strong>: Tools like Lighthouse, WebPageTest, or
+          commercial monitoring services
         </li>
       </ul>
 
@@ -614,7 +622,9 @@ const balance = await getBalanceWithTracking('bc1q...')`}
       />
 
       <Heading level="h2">Performance Checklist</Heading>
-      <p className="mb-6">Use this checklist to ensure your LaserEyes integration is optimized for performance:</p>
+      <p className="mb-6">
+        Use this checklist to ensure your LaserEyes integration is optimized for performance:
+      </p>
       <div className="overflow-x-auto mb-6">
         <table className="w-full border-collapse">
           <thead>
@@ -719,35 +729,35 @@ const balance = await getBalanceWithTracking('bc1q...')`}
 
       <Heading level="h2">Next Steps</Heading>
       <p className="mb-6">
-        Now that you understand performance optimization for LaserEyes, you can explore related topics:
+        Now that you understand performance optimization for LaserEyes, you can explore related
+        topics:
       </p>
       <ul className="list-disc pl-6 mb-6 space-y-2">
         <li>
           <Link href="/docs/error-handling" className="text-primary hover:underline">
             Error Handling
-          </Link>{" "}
+          </Link>{' '}
           - Learn how to handle errors effectively
         </li>
         <li>
           <Link href="/docs/security" className="text-primary hover:underline">
             Security Considerations
-          </Link>{" "}
+          </Link>{' '}
           - Understand security best practices
         </li>
         <li>
           <Link href="/docs/testing" className="text-primary hover:underline">
             Testing
-          </Link>{" "}
+          </Link>{' '}
           - Learn how to test your LaserEyes integration
         </li>
         <li>
           <Link href="/docs/best-practices" className="text-primary hover:underline">
             Best Practices
-          </Link>{" "}
+          </Link>{' '}
           - General best practices for LaserEyes
         </li>
       </ul>
     </>
   )
 }
-

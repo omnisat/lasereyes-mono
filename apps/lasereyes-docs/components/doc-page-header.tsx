@@ -1,6 +1,6 @@
-"use client"
+'use client'
 
-import { Heading } from "./heading"
+import { Heading } from './heading'
 
 interface DocPageHeaderProps {
   id: string
@@ -17,4 +17,4 @@ export function DocPageHeader({ id, title, description }: DocPageHeaderProps) {
       {description && <p className="text-lg text-muted-foreground">{description}</p>}
     </div>
   )
-} 
+}

@@ -1,0 +1,110 @@
+{
+  "name": "@omnisat/lasereyes-client",
+  "description": "Composable Bitcoin data client — balances, UTXOs, fees, transactions, and PSBT utilities over pluggable backends (mempool, Sandshrew, Maestro).",
+  "keywords": [
+    "bitcoin",
+    "ordinals",
+    "utxo",
+    "psbt",
+    "mempool",
+    "sandshrew",
+    "maestro",
+    "blockchain",
+    "crypto"
+  ],
+  "homepage": "https://lasereyes.build",
+  "bugs": {
+    "url": "https://github.com/omnisat/lasereyes-mono/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/omnisat/lasereyes-mono.git",
+    "directory": "packages/client"
+  },
+  "license": "MIT",
+  "private": false,
+  "version": "0.0.1",
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./wallet": {
+      "import": "./dist/wallet/index.js",
+      "types": "./dist/wallet.d.ts"
+    },
+    "./utils": {
+      "import": "./dist/utils/index.js",
+      "types": "./dist/utils.d.ts"
+    },
+    "./backends": {
+      "import": "./dist/backends/index.js",
+      "types": "./dist/backends/index.d.ts"
+    },
+    "./backends/mempool": {
+      "import": "./dist/backends/mempool/index.js",
+      "types": "./dist/backends/mempool/index.d.ts"
+    },
+    "./backends/sandshrew": {
+      "import": "./dist/backends/sandshrew/index.js",
+      "types": "./dist/backends/sandshrew/index.d.ts"
+    },
+    "./backends/maestro": {
+      "import": "./dist/backends/maestro/index.js",
+      "types": "./dist/backends/maestro/index.d.ts"
+    }
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "prepublishOnly": "npm run build",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit -p tsconfig.typecheck.json",
+    "size": "size-limit",
+    "size:why": "size-limit --why"
+  },
+  "devDependencies": {
+    "@size-limit/esbuild-why": "^12.0.0",
+    "@size-limit/preset-small-lib": "^12.0.0",
+    "@types/node": "^22.7.7",
+    "size-limit": "^12.0.0",
+    "typescript": "5.8.3",
+    "vite": "^5.4.1",
+    "vite-plugin-dts": "^4.2.1",
+    "vitest": "^2.1.2"
+  },
+  "dependencies": {
+    "@scure/base": "^1.2.0",
+    "@scure/btc-signer": "^1.5.0"
+  },
+  "size-limit": [
+    {
+      "path": "dist/index.js",
+      "limit": "35 kB"
+    },
+    {
+      "path": "dist/backends/index.js",
+      "limit": "30 kB"
+    },
+    {
+      "path": "dist/backends/mempool/index.js",
+      "limit": "26 kB"
+    },
+    {
+      "path": "dist/backends/sandshrew/index.js",
+      "limit": "27 kB"
+    }
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}

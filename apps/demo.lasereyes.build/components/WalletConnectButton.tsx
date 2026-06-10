@@ -1,29 +1,29 @@
 'use client'
 
 import {
+  type BINANCE,
+  type LEATHER,
   MAGIC_EDEN,
   type OKX,
+  type OP_NET,
+  type ORANGE,
   type OYL,
   type PHANTOM,
-  type UNISAT,
-  type WIZZ,
-  type XVERSE,
-  type LEATHER,
-  type ORANGE,
-  useLaserEyes,
-  type OP_NET,
   type ProviderType,
+  type TOKEO,
+  type UNISAT,
+  useLaserEyes,
   // SPARROW,
   WalletIcon,
-  type TOKEO,
-  type BINANCE,
+  type WIZZ,
+  type XVERSE,
 } from '@omnisat/lasereyes'
-import { Button } from '@/components/ui/button'
-import { toast } from 'sonner'
-import { ImNewTab } from 'react-icons/im'
-import Link from 'next/link'
 import clsx from 'clsx'
+import Link from 'next/link'
 import { useState } from 'react'
+import { ImNewTab } from 'react-icons/im'
+import { toast } from 'sonner'
+import { Button } from '@/components/ui/button'
 
 const WalletConnectButton = ({
   wallet,
@@ -127,8 +127,7 @@ const WalletConnectButton = ({
           variant="outline"
           size="lg"
         >
-          <WalletIcon walletName={wallet.name} size={24} /> Download{' '}
-          {wallet.name}
+          <WalletIcon walletName={wallet.name} size={24} /> Download {wallet.name}
           <ImNewTab />
         </Button>
       </Link>
@@ -136,7 +135,7 @@ const WalletConnectButton = ({
   }
 
   const disconnectWallet = () => {
-    // @ts-ignore
+    // @ts-expect-error
     disconnect()
   }
 
@@ -151,8 +150,7 @@ const WalletConnectButton = ({
         variant="outline"
         size="lg"
       >
-        {provider && <WalletIcon walletName={wallet.name} size={24} />}{' '}
-        Disconnect {wallet.name}
+        {provider && <WalletIcon walletName={wallet.name} size={24} />} Disconnect {wallet.name}
       </Button>
     )
   }

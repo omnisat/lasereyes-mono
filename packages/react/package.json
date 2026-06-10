@@ -1,11 +1,31 @@
 {
   "name": "@omnisat/lasereyes-react",
-  "private": false,
-  "repository": {
-    "url": "https://github.com/omnisat/lasereyes-mono"
+  "description": "React hooks and provider for LaserEyes — connect Bitcoin wallets and read on-chain data in React and Next.js apps.",
+  "keywords": [
+    "bitcoin",
+    "ordinals",
+    "bitcoin wallets",
+    "react",
+    "hooks",
+    "web3",
+    "dapps",
+    "blockchain",
+    "crypto"
+  ],
+  "homepage": "https://lasereyes.build",
+  "bugs": {
+    "url": "https://github.com/omnisat/lasereyes-mono/issues"
   },
-  "version": "0.0.80",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/omnisat/lasereyes-mono.git",
+    "directory": "packages/react"
+  },
+  "license": "MIT",
+  "private": false,
+  "version": "0.0.79",
   "type": "module",
+  "sideEffects": false,
   "main": "./dist/index.umd.cjs",
   "module": "./dist/index.js",
   "files": [
@@ -15,6 +35,7 @@
   "typings": "./dist/index.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.umd.cjs"
     }
@@ -23,16 +44,17 @@
     "dev": "vite",
     "build": "tsc -b tsconfig.build.json && vite build",
     "lint": "eslint .",
+    "test": "vitest run",
+    "test:types": "vitest run --typecheck.enabled=true --typecheck.only",
+    "typecheck": "vitest run --typecheck.enabled=true --typecheck.only",
+    "test:watch": "vitest",
     "preview": "vite preview",
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
     "@nanostores/react": "^0.7.3",
     "@omnisat/lasereyes-core": "workspace:*",
-    "@tanstack/react-query": "^5.81.5",
-    "bootstrap": "^5.3.3",
-    "nanostores": "^0.11.3",
-    "vite-plugin-ssr": "^0.4.142"
+    "nanostores": "^0.11.3"
   },
   "peerDependencies": {
     "react": ">=17",
@@ -40,25 +62,28 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/react": "^16.1.0",
     "@types/node": "^22.5.4",
-    "@types/react": "^18.3.3",
-    "@types/react-dom": "^18.3.0",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
     "@vitejs/plugin-react-swc": "^3.7.0",
     "bip39": "^3.1.0",
     "eslint": "^9.9.0",
     "eslint-plugin-react-hooks": "^5.1.0-rc.0",
     "eslint-plugin-react-refresh": "^0.4.9",
     "globals": "^15.9.0",
-    "react": "19.0.0-rc.1",
-    "react-dom": "19.0.0-rc.1",
+    "jsdom": "^25.0.1",
+    "react": "catalog:",
+    "react-dom": "catalog:",
     "sonda": "^0.7.1",
     "typescript": "5.8.3",
     "typescript-eslint": "^8.0.1",
     "vite": "^5.4.1",
-    "vite-plugin-dts": "^4.2.1"
+    "vite-plugin-dts": "^4.2.1",
+    "vitest": "^2.1.9"
   },
   "publishConfig": {
-    "access": "public",
-    "provenance": true
+    "access": "public"
   }
 }

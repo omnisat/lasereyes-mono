@@ -1,15 +1,24 @@
-"use client"
+'use client'
 
-import * as React from "react"
-import { ClientPageWrapper } from "@/components/client-page-wrapper"
-import { CodeBlock } from "@/components/code-block"
-import { Heading } from "@/components/heading"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { ArrowRight, Coins, FileCode, Scroll, Blocks, Wallet, Banknote, CircleDollarSign, FileText } from "lucide-react"
-import { cn } from "@/lib/utils"
-import Link from "next/link"
+import {
+  ArrowRight,
+  Banknote,
+  Blocks,
+  CircleDollarSign,
+  Coins,
+  FileCode,
+  FileText,
+  Scroll,
+} from 'lucide-react'
+import Link from 'next/link'
+import type * as React from 'react'
+import { ClientPageWrapper } from '@/components/client-page-wrapper'
+import { CodeBlock } from '@/components/code-block'
+import { Heading } from '@/components/heading'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { cn } from '@/lib/utils'
 
 interface FeatureCardProps {
   icon: React.ElementType
@@ -27,11 +36,26 @@ export default function TransactionTypesPage() {
         <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-orange-500/20 rounded-full blur-[120px] -z-10 translate-x-1/2 -translate-y-1/2 animate-pulse" />
         <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-yellow-500/10 rounded-full blur-[100px] -z-10 -translate-x-1/2 translate-y-1/2 animate-pulse" />
         <div className="absolute top-1/2 left-1/2 w-[200px] h-[200px] bg-orange-800/10 rounded-full blur-[80px] -z-10 -translate-x-1/2 -translate-y-1/2" />
-        
+
         <div className="flex items-center gap-3 mb-4">
-          <Badge variant="secondary" className="bg-orange-900/10 text-orange-400 hover:bg-orange-900/20">BTC</Badge>
-          <Badge variant="secondary" className="bg-yellow-900/10 text-yellow-400 hover:bg-yellow-900/20">Ordinals</Badge>
-          <Badge variant="secondary" className="bg-orange-900/10 text-orange-400 hover:bg-orange-900/20">BRC-20</Badge>
+          <Badge
+            variant="secondary"
+            className="bg-orange-900/10 text-orange-400 hover:bg-orange-900/20"
+          >
+            BTC
+          </Badge>
+          <Badge
+            variant="secondary"
+            className="bg-yellow-900/10 text-yellow-400 hover:bg-yellow-900/20"
+          >
+            Ordinals
+          </Badge>
+          <Badge
+            variant="secondary"
+            className="bg-orange-900/10 text-orange-400 hover:bg-orange-900/20"
+          >
+            BRC-20
+          </Badge>
         </div>
 
         <div className="flex items-center gap-6 mb-6">
@@ -39,15 +63,21 @@ export default function TransactionTypesPage() {
             <Coins className="h-7 w-7 text-orange-400" />
           </div>
           <div>
-            <Heading level={1} className="bg-gradient-to-r from-orange-400 via-orange-500 to-yellow-400 bg-clip-text text-transparent">
+            <Heading
+              level={1}
+              className="bg-gradient-to-r from-orange-400 via-orange-500 to-yellow-400 bg-clip-text text-transparent"
+            >
               Transaction Types
             </Heading>
-            <p className="text-sm text-muted-foreground">Comprehensive Bitcoin Transaction Support</p>
+            <p className="text-sm text-muted-foreground">
+              Comprehensive Bitcoin Transaction Support
+            </p>
           </div>
         </div>
 
         <p className="text-xl mb-8 max-w-2xl text-muted-foreground">
-          LaserEyes supports all major Bitcoin transaction types, from standard BTC transfers to Ordinals inscriptions and BRC-20 tokens.
+          LaserEyes supports all major Bitcoin transaction types, from standard BTC transfers to
+          Ordinals inscriptions and BRC-20 tokens.
         </p>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 mb-8">
@@ -94,7 +124,10 @@ export default function TransactionTypesPage() {
 
         <div className="flex gap-4 items-center">
           <Link href="#implementation">
-            <Button size="lg" className="bg-gradient-to-r from-orange-600 to-yellow-600 hover:from-orange-500 hover:to-yellow-500 group">
+            <Button
+              size="lg"
+              className="bg-gradient-to-r from-orange-600 to-yellow-600 hover:from-orange-500 hover:to-yellow-500 group"
+            >
               View Examples
               <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Button>
@@ -117,10 +150,12 @@ export default function TransactionTypesPage() {
 
 function FeatureCard({ icon: Icon, title, description, className, badges }: FeatureCardProps) {
   return (
-    <Card className={cn(
-      "group relative overflow-hidden transition-all duration-300 hover:border-orange-500/30 hover:shadow-lg hover:shadow-orange-500/5",
-      className
-    )}>
+    <Card
+      className={cn(
+        'group relative overflow-hidden transition-all duration-300 hover:border-orange-500/30 hover:shadow-lg hover:shadow-orange-500/5',
+        className
+      )}
+    >
       <div className="absolute right-0 top-0 h-20 w-20 translate-x-6 -translate-y-6 rounded-full bg-orange-500/10 blur-2xl filter group-hover:bg-orange-500/20" />
       <CardContent className="p-6">
         <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-orange-500/20 to-yellow-500/20 text-orange-400 ring-1 ring-orange-500/20">
@@ -130,7 +165,7 @@ function FeatureCard({ icon: Icon, title, description, className, badges }: Feat
         <p className="text-muted-foreground mb-4">{description}</p>
         {badges && (
           <div className="flex gap-2 flex-wrap">
-            {badges.map((badge) => (
+            {badges.map(badge => (
               <Badge key={badge} variant="secondary" className="bg-orange-900/10 text-orange-400">
                 {badge}
               </Badge>
@@ -152,25 +187,25 @@ function TransactionTypesContent() {
             icon={Banknote}
             title="BTC Transactions"
             description="Standard Bitcoin transactions with support for multiple inputs, outputs, and fee estimation."
-            badges={["P2PKH", "P2SH", "P2WPKH", "P2WSH"]}
+            badges={['P2PKH', 'P2SH', 'P2WPKH', 'P2WSH']}
           />
           <FeatureCard
             icon={Scroll}
             title="Ordinal Inscriptions"
             description="Full support for inscribing and transferring Ordinals with various content types."
-            badges={["Text", "Image", "JSON", "HTML"]}
+            badges={['Text', 'Image', 'JSON', 'HTML']}
           />
           <FeatureCard
             icon={CircleDollarSign}
             title="BRC-20 Tokens"
             description="Complete BRC-20 token support including minting, transferring, and balance checking."
-            badges={["Deploy", "Mint", "Transfer"]}
+            badges={['Deploy', 'Mint', 'Transfer']}
           />
           <FeatureCard
             icon={FileCode}
             title="Custom Transactions"
             description="Build custom transaction types with our flexible transaction builder API."
-            badges={["Custom Scripts", "Multi-sig"]}
+            badges={['Custom Scripts', 'Multi-sig']}
           />
         </div>
       </section>
@@ -325,7 +360,8 @@ function BuildCustomTx() {
               <div>
                 <h3 className="font-semibold mb-2">Fee Estimation</h3>
                 <p className="text-sm text-muted-foreground">
-                  Always use proper fee estimation to ensure transactions are confirmed in a timely manner.
+                  Always use proper fee estimation to ensure transactions are confirmed in a timely
+                  manner.
                 </p>
               </div>
               <div>
@@ -353,4 +389,3 @@ function BuildCustomTx() {
     </div>
   )
 }
-

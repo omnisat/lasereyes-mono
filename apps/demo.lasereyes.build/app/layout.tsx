@@ -1,16 +1,16 @@
 import './globals.css'
 
-import { cn } from '@/lib/utils'
-import { ReactNode } from 'react'
-import { Toaster } from 'sonner'
 import localFont from 'next/font/local'
+import type { ReactNode } from 'react'
+import { Toaster } from 'sonner'
+import { cn } from '@/lib/utils'
 
 const windows = localFont({
   src: './Windows_Regular.ttf',
   variable: '--font-windows',
 })
 
-const pxplus = localFont({
+const _pxplus = localFont({
   src: './PxPlus_IBM_VGA8.ttf',
   variable: '--font-pxplus',
 })

@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/suspicious/noUnknownAtRules: false positive */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -31,7 +32,8 @@
     --lem-chart-5: 27 87% 67%;
   }
 
-  .dark, .lem-dark {
+  .dark,
+  .lem-dark {
     --lem-background: 0 0% 3.9%;
     --lem-foreground: 0 0% 98%;
     --lem-card: 0 0% 3.9%;

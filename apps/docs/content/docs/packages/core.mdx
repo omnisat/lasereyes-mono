@@ -1,0 +1,86 @@
+---
+title: "@omnisat/lasereyes-core"
+description: Framework-agnostic Bitcoin wallet management
+---
+
+The core package provides wallet management, state, and transaction operations without any framework dependency. Use this if you're building outside of React.
+
+## LaserEyesClient
+
+The main class for wallet management:
+
+```ts
+import { LaserEyesClient, createStores, createConfig } from '@omnisat/lasereyes-core'
+
+const stores = createStores()
+const config = createConfig({ network: 'mainnet' })
+const client = new LaserEyesClient(stores, config)
+
+client.initialize()
+
+// Connect a wallet
+await client.connect('unisat')
+
+// Send BTC
+const txId = await client.sendBTC('bc1q...', 10000)
+
+// Sign a message
+const sig = await client.signMessage('Hello Bitcoin')
+
+// Disconnect
+client.disconnect()
+
+// Cleanup
+client.dispose()
+```
+
+## Reactive State
+
+State is managed via [nanostores](https://github.com/nanostores/nanostores):
+
+```ts
+import { createStores } from '@omnisat/lasereyes-core'
+
+const { $store, $network } = createStores()
+
+// Subscribe to state changes
+$store.subscribe((value) => {
+  console.log('Address:', value.address)
+  console.log('Connected:', value.connected)
+  console.log('Balance:', value.balance)
+})
+
+// Subscribe to network changes
+$network.subscribe((network) => {
+  console.log('Network:', network)
+})
+```
+
+## DataSourceManager
+
+Singleton that manages chain data sources:
+
+```ts
+import { DataSourceManager } from '@omnisat/lasereyes-core'
+
+const manager = DataSourceManager.getInstance()
+
+// Query chain data
+const utxos = await manager.getAddressUtxos('bc1q...')
+const fees = await manager.getRecommendedFees()
+const inscriptions = await manager.getAddressInscriptions('bc1q...', 0, 20)
+```
+
+## Key Types
+
+| Type | Description |
+|------|-------------|
+| `Config` | Provider configuration (network, data sources) |
+| `NetworkType` | Union of supported network strings |
+| `ProviderType` | Union of wallet provider identifiers |
+| `Protocol` | `'btc' \| 'runes' \| 'brc20' \| 'alkanes'` |
+| `LaserEyesStoreType` | Shape of the reactive store |
+
+## API Reference
+
+See the [auto-generated API docs](/docs/api-reference/lasereyes-core/README) for complete type information.

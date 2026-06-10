@@ -1,0 +1,215 @@
+/**
+ * Base error class for all @omnisat/lasereyes-client errors.
+ *
+ * All errors thrown by the client library extend this class, allowing consumers
+ * to catch any client error with a single `catch (e instanceof LaserEyesClientError)`.
+ *
+ * @remarks
+ * The {@link LaserEyesClientError.code | code} property provides a machine-readable error identifier.
+ */
+export class LaserEyesClientError extends Error {
+  /** Machine-readable error code (e.g., `'NETWORK_MISMATCH'`, `'PSBT_BUILD_ERROR'`). */
+  code: string
+  constructor(message: string, code: string) {
+    super(message)
+    this.name = 'LaserEyesClientError'
+    this.code = code
+  }
+}
+
+/**
+ * Thrown when a requested method is not available on the backend because
+ * the required capability group has not been added via `.extend()`.
+ *
+ * @remarks
+ * Error code: `'CAPABILITY_NOT_FOUND'`
+ */
+export class CapabilityNotFoundError extends LaserEyesClientError {
+  /**
+   * @param group - The name of the missing capability group (e.g., `'rune'`, `'inscription'`)
+   * @param method - The method that was called but not available
+   */
+  constructor(group: string, method: string) {
+    super(
+      `Method "${method}" not available. Backend missing "${group}" capability.`,
+      'CAPABILITY_NOT_FOUND'
+    )
+    this.name = 'CapabilityNotFoundError'
+  }
+}
+
+/**
+ * Thrown when a vendor backend encounters an error during an API call.
+ *
+ * @remarks
+ * Error code: `'DATA_SOURCE_ERROR'`
+ *
+ * The {@link ChainBackendError.source | source} property identifies which vendor produced the error,
+ * and {@link ChainBackendError.originalCause | originalCause} preserves the underlying exception.
+ */
+export class ChainBackendError extends LaserEyesClientError {
+  /** The vendor name that produced this error (e.g., `'mempool'`, `'sandshrew'`, `'maestro'`). */
+  source: string
+  /** The original error that caused this backend error, if available. */
+  readonly originalCause?: Error
+  /**
+   * @param message - Human-readable error description
+   * @param source - The vendor or backend name that produced the error
+   * @param cause - The original underlying error, if any
+   */
+  constructor(message: string, source: string, cause?: Error) {
+    super(message, 'DATA_SOURCE_ERROR')
+    this.name = 'ChainBackendError'
+    this.source = source
+    this.originalCause = cause
+  }
+}
+
+/**
+ * Thrown when a client or merge operation detects that two components are configured
+ * for different Bitcoin networks.
+ *
+ * @remarks
+ * Error code: `'NETWORK_MISMATCH'`
+ */
+export class NetworkMismatchError extends LaserEyesClientError {
+  /**
+   * @param expected - The expected network identifier
+   * @param got - The actual network identifier that was found
+   */
+  constructor(expected: string, got: string) {
+    super(`Network mismatch: client is "${expected}" but backend is "${got}"`, 'NETWORK_MISMATCH')
+    this.name = 'NetworkMismatchError'
+  }
+}
+
+/**
+ * Thrown when the active wallet's network isn't in the LaserEyes config's
+ * chains tuple.
+ *
+ * @remarks
+ * Distinct from {@link NetworkMismatchError} (which guards
+ * client-vs-backend consistency). This one is raised by the core
+ * keystone when a wallet's runtime network falls outside the supported
+ * set — typically because the user switched chains in their wallet UI to
+ * a chain the app didn't register.
+ *
+ * Apps should catch this and either:
+ * - Surface a "wrong network" prompt and call `switchNetwork(config, …)`.
+ * - Refuse the operation with a clear message.
+ *
+ * Error code: `'UNSUPPORTED_NETWORK'`
+ */
+export class NetworkNotConfiguredError extends LaserEyesClientError {
+  /** The network ID the wallet is currently on. */
+  readonly networkId: string
+  /** The set of network IDs the config supports. */
+  readonly supported: readonly string[]
+
+  /**
+   * @param networkId - The wallet's current network.
+   * @param supported - The network IDs declared in `config.chains`.
+   */
+  constructor(networkId: string, supported: readonly string[]) {
+    super(
+      `Wallet is on '${networkId}' but config.chains only supports [${supported
+        .map(s => `'${s}'`)
+        .join(', ')}]. ` +
+        `Either add '${networkId}' to your chains config, or switch the wallet's network.`,
+      'UNSUPPORTED_NETWORK'
+    )
+    this.name = 'NetworkNotConfiguredError'
+    this.networkId = networkId
+    this.supported = supported
+  }
+}
+
+/**
+ * Thrown when PSBT construction fails due to invalid parameters, missing data,
+ * or transaction building errors.
+ *
+ * @remarks
+ * Error code: `'PSBT_BUILD_ERROR'`
+ */
+export class PsbtBuildError extends LaserEyesClientError {
+  /** The original error that caused this PSBT build failure, if available. */
+  readonly originalCause?: Error
+  /**
+   * @param message - Human-readable description of the PSBT build failure
+   * @param cause - The original underlying error, if any
+   */
+  constructor(message: string, cause?: Error) {
+    super(message, 'PSBT_BUILD_ERROR')
+    this.name = 'PsbtBuildError'
+    this.originalCause = cause
+  }
+}
+
+/**
+ * Thrown when the available UTXOs cannot cover the required amount plus transaction fees.
+ *
+ * @remarks
+ * Extends {@link PsbtBuildError} with error code `'PSBT_BUILD_ERROR'`.
+ */
+export class InsufficientFundsError extends PsbtBuildError {
+  /**
+   * @param required - The total satoshis needed (amount + estimated fees)
+   * @param available - The total satoshis available in the selected UTXOs
+   */
+  constructor(required: number, available: number) {
+    super(`Insufficient funds: need ${required} sats, have ${available}`)
+    this.name = 'InsufficientFundsError'
+  }
+}
+
+/**
+ * RPC-style error thrown by {@link BitcoinProvider} adapters and forwarded by
+ * connectors.
+ *
+ * @remarks
+ * Modeled on EIP-1193's `ProviderRpcError`. Defined here (in the client
+ * package) rather than in core because errors are values, not state — and
+ * actions throughout the library may need to throw or check them without
+ * pulling in the core layer.
+ *
+ * The `code` field is a numeric RPC error code; well-known values are listed
+ * in {@link ProviderErrorCode}.
+ */
+export class ProviderRpcError extends Error {
+  /** Numeric RPC error code. */
+  code: number
+  /** Optional supplementary data (provider-specific). */
+  data?: unknown
+  constructor(code: number, message: string, data?: unknown) {
+    super(message)
+    this.name = 'ProviderRpcError'
+    this.code = code
+    this.data = data
+  }
+}
+
+/**
+ * Common RPC error codes (following EIP-1193 conventions).
+ *
+ * @remarks
+ * These are suggested codes — providers may use different numbers, so callers
+ * should treat the message as authoritative rather than the code.
+ */
+export enum ProviderErrorCode {
+  /** User rejected the request. */
+  USER_REJECTED = 4001,
+  /** Method requires authorization that has not been granted. */
+  UNAUTHORIZED = 4100,
+  /** Method is not supported by this provider. */
+  UNSUPPORTED_METHOD = 4200,
+  /** Provider is disconnected. */
+  DISCONNECTED = 4900,
+  /** JSON-RPC: invalid request. */
+  INVALID_REQUEST = -32600,
+  /** JSON-RPC: method not found. */
+  METHOD_NOT_FOUND = -32601,
+  /** JSON-RPC: invalid params. */
+  INVALID_PARAMS = -32602,
+  /** JSON-RPC: internal error. */
+  INTERNAL_ERROR = -32603,
+}
