@@ -1,5 +1,27 @@
 {
   "name": "@omnisat/lasereyes-react",
+  "description": "React hooks and provider for LaserEyes — connect Bitcoin wallets and read on-chain data in React and Next.js apps.",
+  "keywords": [
+    "bitcoin",
+    "ordinals",
+    "bitcoin wallets",
+    "react",
+    "hooks",
+    "web3",
+    "dapps",
+    "blockchain",
+    "crypto"
+  ],
+  "homepage": "https://lasereyes.build",
+  "bugs": {
+    "url": "https://github.com/omnisat/lasereyes-mono/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/omnisat/lasereyes-mono.git",
+    "directory": "packages/react"
+  },
+  "license": "MIT",
   "private": false,
   "version": "0.0.79",
   "type": "module",

@@ -1,5 +1,27 @@
 {
   "name": "@omnisat/lasereyes-client",
+  "description": "Composable Bitcoin data client — balances, UTXOs, fees, transactions, and PSBT utilities over pluggable backends (mempool, Sandshrew, Maestro).",
+  "keywords": [
+    "bitcoin",
+    "ordinals",
+    "utxo",
+    "psbt",
+    "mempool",
+    "sandshrew",
+    "maestro",
+    "blockchain",
+    "crypto"
+  ],
+  "homepage": "https://lasereyes.build",
+  "bugs": {
+    "url": "https://github.com/omnisat/lasereyes-mono/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/omnisat/lasereyes-mono.git",
+    "directory": "packages/client"
+  },
+  "license": "MIT",
   "private": false,
   "version": "0.0.1",
   "type": "module",

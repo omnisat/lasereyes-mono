@@ -1,5 +1,26 @@
 {
   "name": "@omnisat/lasereyes-core",
+  "description": "Framework-agnostic Bitcoin wallet integration — declarative connectors, adapters, and reactive state for building Bitcoin and Ordinals dApps.",
+  "keywords": [
+    "bitcoin",
+    "ordinals",
+    "bitcoin wallets",
+    "wallet connect",
+    "web3",
+    "dapps",
+    "blockchain",
+    "crypto"
+  ],
+  "homepage": "https://lasereyes.build",
+  "bugs": {
+    "url": "https://github.com/omnisat/lasereyes-mono/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/omnisat/lasereyes-mono.git",
+    "directory": "packages/core"
+  },
+  "license": "MIT",
   "private": false,
   "version": "0.0.84",
   "type": "module",

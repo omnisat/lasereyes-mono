@@ -15,6 +15,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  id-token: write
 
 jobs:
   # Add a check job that determines if we should proceed
@@ -25,7 +26,7 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-        
+
       - name: Check for changesets
         id: check
         run: |
@@ -47,31 +48,20 @@ jobs:
           fetch-depth: 0
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 8.6.6
+        uses: pnpm/action-setup@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '24'
           registry-url: 'https://registry.npmjs.org'
           cache: 'pnpm'
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install
 
       - name: Build packages
-        run: pnpm build --filter="@omnisat/*"
-
-      - name: Setup npmrc
-        shell: bash
-        run: |
-          {
-            echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}"
-            echo "registry=https://registry.npmjs.org/"
-            echo "always-auth=true"
-          } > .npmrc
+        run: pnpm build --filter="@omnisat/*" --filter="!@omnisat/lasereyes-ui"
 
       # Dev branch - Publish to next tag
       - name: Version, Publish 'next' tag, Commit and Push (dev)
@@ -80,11 +70,11 @@ jobs:
         run: |
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
-          
+
           # First version update
           pnpm run version-prerelease
-          pnpm build --filter="@omnisat/*"
-          
+          pnpm build --filter="@omnisat/*" --filter="!@omnisat/lasereyes-ui"
+
           # Stage and commit all changes to get a clean state
           echo "Adding version changes to git..."
           git add package.json || true
@@ -94,21 +84,20 @@ jobs:
             find .changeset -name "*.md" -not -name "README.md" -exec git add {} \; || true
           fi
           git commit -m "chore: update versions [skip ci]" || echo "No changes to commit"
-          
+
           # Temporarily disable git checks for publish
           pnpm config set git-checks false
           pnpm config set publish-branch dev
-          
+
           # Now publish
-          pnpm publish -r --tag next --access public
-          
+          pnpm release
+
           # Re-enable git checks and push if publish was successful
           pnpm config set git-checks true
           git push --follow-tags
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: true
 
       # Main branch - Version and Publish Latest
       - name: Version and Publish Latest (main)
@@ -117,19 +106,19 @@ jobs:
         run: |
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
-          
+
           # Disable git checks before any operations
           pnpm config set git-checks false
-          
+
           # Exit prerelease mode first
           echo "Exiting prerelease mode..."
           pnpm changeset pre exit || true
-          
+
           # Force version and build
           echo "Running version update..."
           pnpm run version
-          pnpm build --filter="@omnisat/*"
-          
+          pnpm build --filter="@omnisat/*" --filter="!@omnisat/lasereyes-ui"
+
           # Stage and commit all changes
           echo "Adding version changes to git..."
           git add package.json || true
@@ -139,21 +128,20 @@ jobs:
             find .changeset -name "*.md" -not -name "README.md" -exec git add {} \; || true
           fi
           git commit -m "chore: update versions [skip ci]" || echo "No changes to commit"
-          
-          # Force publish with latest tag
-          pnpm publish -r --tag latest --access public --no-git-checks --force
-          
+
+          # Publish with changeset
+          pnpm release
+
           # Re-enable git checks and push
           pnpm config set git-checks true
           git push --follow-tags
-          
-          # Sync changes back to dev
+
+          # Sync changes back to dev (main is canonical — prefer main on conflict)
           echo "Syncing changes back to dev branch..."
           git fetch origin dev
-          git checkout dev
-          git merge main
+          git checkout -B dev origin/dev
+          git merge -X theirs main
           git push origin dev
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: true
