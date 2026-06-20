@@ -5,23 +5,20 @@
 '@omnisat/lasereyes': minor
 ---
 
-Major architectural refactor (pre-stable — breaking changes are expected on
-every minor until 1.0).
+Major architectural refactor
 
 The library is rebuilt around a composable, framework-agnostic core: declare
 your chains, backends, and connectors once as data, then extend a client with
 the actions you need.
 
 **New `@omnisat/lasereyes-client`** — a modern Bitcoin data client. Composable
-chain backends (`mempool()`, `sandshrew()`, `maestro()`) with one backend per
-network and `combineBackends()` for fallbacks; pure utility builders (PSBT,
+chain backends (`mempool()`, `sandshrew()`, `maestro()`); pure utility builders (PSBT,
 address) split from I/O actions; subpath exports for `/wallet`, `/utils`, and
 `/backends/*`.
 
 **`@omnisat/lasereyes-core`** — `createLaserEyesConfig({ chains, connectors,
 backends })`, declarative wallet adapters, nanostores-backed state with a
-**discriminated connection union** (the connected branch proves the address/key
-fields are present), and a `@nanostores/query` caching layer (cached reads +
+**discriminated connection union**, and a `@nanostores/query` caching layer (cached reads +
 explicit, revalidate-on-write mutations).
 
 **`@omnisat/lasereyes-react`** — the monolithic `useLaserEyes()` hook is
