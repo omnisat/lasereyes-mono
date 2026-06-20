@@ -23,10 +23,9 @@ import type { SignPsbtParams } from '../types/rpc-schema'
 import type { BitcoinProviderAdapter } from './base'
 import { type AdapterContext, defineAdapter } from './define-adapter'
 
-declare global {
-  interface Window {
-    okxwallet?: { bitcoin?: unknown; bitcoinTestnet?: unknown }
-  }
+/** OKX injects its provider at `window.okxwallet`. */
+type OkxWindow = Window & {
+  okxwallet?: { bitcoin?: unknown; bitcoinTestnet?: unknown }
 }
 
 /** Networks served by OKX's `bitcoinTestnet` sub-provider. */
@@ -136,7 +135,7 @@ async function signPsbt(params: SignPsbtParams, ctx: AdapterContext): Promise<Si
  */
 export function loadOkxWalletAdapter(): BitcoinProviderAdapter | null {
   if (typeof window === 'undefined') return null
-  const root = window.okxwallet
+  const root = (window as OkxWindow).okxwallet
   if (!root?.bitcoin) return null
 
   const adapter = createOkxAdapter(root)

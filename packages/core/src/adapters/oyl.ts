@@ -33,11 +33,8 @@ import type { SignMessageParams, SignPsbtParams } from '../types/rpc-schema'
 import type { BitcoinProviderAdapter } from './base'
 import { type AdapterContext, defineAdapter } from './define-adapter'
 
-declare global {
-  interface Window {
-    oyl?: unknown
-  }
-}
+/** OYL injects its provider at `window.oyl`. */
+type OylWindow = Window & { oyl?: unknown }
 
 interface OylAccount {
   address: string
@@ -154,9 +151,10 @@ async function signPsbt(params: SignPsbtParams, ctx: AdapterContext): Promise<Si
  */
 export function loadOylWalletAdapter(): BitcoinProviderAdapter | null {
   if (typeof window === 'undefined') return null
-  if (!window.oyl) return null
+  const { oyl } = window as OylWindow
+  if (!oyl) return null
 
-  const adapter = createOylAdapter(window.oyl)
+  const adapter = createOylAdapter(oyl)
   announceWallet({
     uuid: crypto.randomUUID(),
     name: 'OYL Wallet',

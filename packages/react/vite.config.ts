@@ -18,6 +18,9 @@ export default defineConfig({
     },
   },
   build: {
+    // Ship sourcemaps so consumers can step into `src` (included in the
+    // published package) for go-to-definition / debugging.
+    sourcemap: true,
     lib: {
       entry: resolve(__dirname, './src/index.ts'),
       name: 'lasereyes-react',

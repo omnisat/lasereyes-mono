@@ -30,7 +30,8 @@
   "unpkg": "./dist/lasereyes.umd.js",
   "jsdelivr": "./dist/lasereyes.umd.js",
   "files": [
-    "dist"
+    "dist",
+    "src"
   ],
   "types": "./dist/index.d.ts",
   "exports": {
@@ -126,7 +127,7 @@
   "scripts": {
     "dev": "vite",
     "build": "pnpm build:esm && pnpm build:umd",
-    "build:esm": "tsc && vite build",
+    "build:esm": "tsc && vite build && node scripts/inline-client-types.mjs",
     "build:umd": "vite build --mode umd",
     "preview": "vite preview",
     "prepublishOnly": "npm run build",
@@ -136,6 +137,7 @@
   },
   "devDependencies": {
     "@leather.io/rpc": "^2.20.3",
+    "@omnisat/lasereyes-client": "workspace:*",
     "@types/node": "^22.7.7",
     "@types/tiny-async-pool": "^2.0.3",
     "eslint": "^9.30.0",
@@ -148,7 +150,6 @@
   },
   "dependencies": {
     "@nanostores/query": "^0.3.4",
-    "@omnisat/lasereyes-client": "workspace:*",
     "@scure/base": "^1.2.0",
     "@scure/btc-signer": "^1.5.0",
     "eventemitter3": "^5.0.1",

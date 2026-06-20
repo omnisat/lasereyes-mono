@@ -7,5 +7,9 @@
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": ["@omnisat/lasereyes-ui", "demo.lasereyes.build"]
+  "ignore": [
+    "@omnisat/lasereyes-ui",
+    "demo.lasereyes.build",
+    "@omnisat/lasereyes-client"
+  ]
 }

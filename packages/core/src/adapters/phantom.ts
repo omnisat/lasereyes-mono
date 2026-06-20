@@ -32,11 +32,8 @@ import type { SignPsbtParams } from '../types/rpc-schema'
 import type { BitcoinProviderAdapter } from './base'
 import { type AdapterContext, defineAdapter } from './define-adapter'
 
-declare global {
-  interface Window {
-    phantom?: { bitcoin?: unknown }
-  }
-}
+/** Phantom injects its provider at `window.phantom`. */
+type PhantomWindow = Window & { phantom?: { bitcoin?: unknown } }
 
 interface PhantomAccount {
   address: string
@@ -165,7 +162,7 @@ async function signPsbt(params: SignPsbtParams, ctx: AdapterContext): Promise<Si
  */
 export function loadPhantomWalletAdapter(): BitcoinProviderAdapter | null {
   if (typeof window === 'undefined') return null
-  const raw = window.phantom?.bitcoin
+  const raw = (window as PhantomWindow).phantom?.bitcoin
   if (!raw) return null
 
   const adapter = createPhantomAdapter(raw)

@@ -30,11 +30,8 @@ import type { SignMessageParams, SignPsbtParams } from '../types/rpc-schema'
 import type { BitcoinProviderAdapter } from './base'
 import { type AdapterContext, defineAdapter } from './define-adapter'
 
-declare global {
-  interface Window {
-    LeatherProvider?: unknown
-  }
-}
+/** Leather injects its provider at `window.LeatherProvider`. */
+type LeatherWindow = Window & { LeatherProvider?: unknown }
 
 /** Leather's address `type` strings. */
 const LEATHER_P2TR = 'p2tr'
@@ -179,9 +176,10 @@ async function signPsbt(params: SignPsbtParams, ctx: AdapterContext): Promise<Si
  */
 export function loadLeatherWalletAdapter(): BitcoinProviderAdapter | null {
   if (typeof window === 'undefined') return null
-  if (!window.LeatherProvider) return null
+  const { LeatherProvider } = window as LeatherWindow
+  if (!LeatherProvider) return null
 
-  const adapter = createLeatherAdapter(window.LeatherProvider)
+  const adapter = createLeatherAdapter(LeatherProvider)
   announceWallet({
     uuid: crypto.randomUUID(),
     name: 'Leather Wallet',

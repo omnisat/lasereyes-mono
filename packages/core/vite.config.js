@@ -45,7 +45,9 @@ export default defineConfig(({ mode }) => {
         : null,
     ],
     build: {
-      sourcemap: !!process.env.ANALYZE,
+      // Always emit sourcemaps: `src` is shipped in the published package so
+      // consumers get go-to-definition / step-through debugging into core.
+      sourcemap: true,
       lib: {
         // Multi-entry so consumers can subpath-import the parts they need.
         // Each entry produces its own ESM file in dist; sideEffects: false

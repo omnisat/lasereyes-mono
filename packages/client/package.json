@@ -22,7 +22,7 @@
     "directory": "packages/client"
   },
   "license": "MIT",
-  "private": false,
+  "private": true,
   "version": "0.0.1",
   "type": "module",
   "sideEffects": false,

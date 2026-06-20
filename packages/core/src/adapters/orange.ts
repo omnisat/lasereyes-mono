@@ -31,10 +31,9 @@ import type { SignMessageParams, SignPsbtParams } from '../types/rpc-schema'
 import type { BitcoinProviderAdapter } from './base'
 import { type AdapterContext, defineAdapter } from './define-adapter'
 
-declare global {
-  interface Window {
-    OrangeWalletProviders?: { OrangeBitcoinProvider?: unknown }
-  }
+/** Orange injects its provider at `window.OrangeWalletProviders`. */
+type OrangeWindow = Window & {
+  OrangeWalletProviders?: { OrangeBitcoinProvider?: unknown }
 }
 
 /** Orange's sats-connect-style RPC user-rejection code. */
@@ -185,7 +184,7 @@ async function signPsbt(params: SignPsbtParams, ctx: AdapterContext): Promise<Si
 /** Resolve Orange's injected sats-connect provider, if present. */
 function getOrangeProvider(): unknown {
   if (typeof window === 'undefined') return null
-  return window.OrangeWalletProviders?.OrangeBitcoinProvider ?? null
+  return (window as OrangeWindow).OrangeWalletProviders?.OrangeBitcoinProvider ?? null
 }
 
 /**
