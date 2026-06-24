@@ -1,0 +1,34 @@
+---
+title: Reactive State
+description: Subscribe to connection and connector state via nanostores.
+---
+
+`config.state` exposes read-only [nanostores](https://github.com/nanostores/nanostores).
+The action layer is the only writer — you subscribe to react to changes. (In
+React, the hooks do this for you; reach for the stores in framework-agnostic
+code.)
+
+## Connection
+
+`$connection` is a discriminated union on `status`. A `status === 'connected'`
+check narrows `account` and `connector` to non-null with no cast.
+
+```ts
+config.state.$connection.subscribe(conn => {
+  if (conn.status === 'connected') {
+    console.log(conn.account.getAddress(), conn.networkId)
+  }
+})
+```
+
+## Connectors
+
+`$connectors` updates as wallets announce themselves:
+
+```ts
+const connectors = config.state.$connectors.get()
+
+config.state.$connectors.subscribe(list => {
+  console.log(list.map(c => c.id))
+})
+```

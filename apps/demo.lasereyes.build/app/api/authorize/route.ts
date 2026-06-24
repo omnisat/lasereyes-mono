@@ -9,7 +9,6 @@ export const POST = async (req: NextRequest) => {
     const { address, signature, message } = await req.json()
     //
     if (!address) {
-      // @ts-expect-error
       return NextResponse.json({ error: 'address and signature are required' }, { status: 400 })
     }
 
@@ -19,12 +18,11 @@ export const POST = async (req: NextRequest) => {
       const token = jwt.sign({ address }, SECRET_KEY, { expiresIn: '1h' })
       return NextResponse.json({ token })
     } else {
-      // @ts-expect-error
       return NextResponse.json({ error: 'not authenticated' }, { status: 401 })
     }
   } catch (e) {
     console.error(e)
-    // @ts-expect-error
-    return NextResponse.json({ error: e.message }, { status: 400 })
+    const message = e instanceof Error ? e.message : 'Bad request'
+    return NextResponse.json({ error: message }, { status: 400 })
   }
 }

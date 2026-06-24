@@ -1,0 +1,76 @@
+---
+title: Writing
+description: Send BTC, sign messages and PSBTs, and broadcast — with automatic read revalidation.
+---
+
+Write hooks are mutations. Each exposes an imperative trigger (e.g.
+`sendBitcoin`) and an async variant (`sendBitcoinAsync`) that returns a promise,
+plus `status`, `isLoading`, `error`, and `data`. After a successful write, the
+affected reads (balance, UTXOs) revalidate automatically.
+
+## Send BTC
+
+```tsx
+import { useSendBitcoin } from '@omnisat/lasereyes-react'
+
+function Send() {
+  const send = useSendBitcoin()
+  return (
+    <button
+      disabled={send.isLoading}
+      onClick={() => send.sendBitcoin({ to: 'bc1q…', amount: 10_000 })}
+    >
+      Send · {send.status} {send.txId}
+    </button>
+  )
+}
+```
+
+`amount` is in satoshis. Use `sendBitcoinAsync(...)` if you want to await the
+txid.
+
+## Sign a message
+
+```tsx
+import { useSignMessage } from '@omnisat/lasereyes-react'
+
+const { signMessageAsync } = useSignMessage()
+const signature = await signMessageAsync({ message: 'hello' })
+// Optional signing options: { message, options: { address, protocol } }
+```
+
+## Sign a PSBT
+
+```tsx
+import { useSignPsbt } from '@omnisat/lasereyes-react'
+
+const { signPsbtAsync } = useSignPsbt()
+const result = await signPsbtAsync({
+  psbt: psbtHex,
+  options: { finalize: true, broadcast: true },
+})
+```
+
+Signing alone changes no chain state, so the cache only revalidates when the
+signer broadcast (the result carries a `txId`).
+
+## Broadcast a PSBT
+
+`useBroadcastPsbt` signs + finalizes (via the wallet) and broadcasts in one step,
+returning the txid:
+
+```tsx
+import { useBroadcastPsbt } from '@omnisat/lasereyes-react'
+
+const { broadcastPsbtAsync } = useBroadcastPsbt()
+const txId = await broadcastPsbtAsync({ psbt: psbtHex })
+```
+
+## Broadcast a raw transaction
+
+```tsx
+import { useBroadcastTransaction } from '@omnisat/lasereyes-react'
+
+const { broadcastTransactionAsync } = useBroadcastTransaction()
+const txId = await broadcastTransactionAsync({ rawTx: rawTxHex })
+```

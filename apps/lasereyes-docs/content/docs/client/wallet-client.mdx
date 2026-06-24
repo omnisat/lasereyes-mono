@@ -1,0 +1,44 @@
+---
+title: Wallet Client
+description: Account-aware client that combines account, signer, and backend.
+---
+
+The wallet client is account-aware and ergonomic: combine an account, an
+optional signer, and a backend, then `.extend(walletBtcActions())`.
+
+```ts
+import { MAINNET } from '@omnisat/lasereyes-client'
+import {
+  createWalletClient,
+  createWalletAccount,
+  walletBtcActions,
+} from '@omnisat/lasereyes-client/wallet'
+
+const account = createWalletAccount({
+  addresses: [
+    { address: 'bc1q…', purpose: 'payment', type: AddressType.P2WPKH },
+    { address: 'bc1p…', purpose: 'ordinals', type: AddressType.P2TR },
+  ],
+  publicKeys: { payment: '02…', ordinals: '03…', taproot: '03…' },
+})
+
+const wallet = createWalletClient({ network: MAINNET, backend, account, signer })
+  .extend(walletBtcActions())
+
+await wallet.sendBtc({ to: 'bc1q…', amount: 10_000 })
+await wallet.signPsbt(psbtHex, { finalize: true })
+```
+
+## Accounts
+
+- `createWalletAccount(...)` — a full account with addresses and public keys.
+- `createReadOnlyAccount(...)` — addresses only, for read-only flows.
+
+An account is a **data container** — it holds addresses and keys but has no
+signing logic. Signing comes from the injected `signer`.
+
+## Signer
+
+The signer is an optional signing capability. When bridging a wallet provider,
+use `providerSigner(...)` from `@omnisat/lasereyes-client/wallet`. Without a
+signer the wallet client can still read; write methods require one.

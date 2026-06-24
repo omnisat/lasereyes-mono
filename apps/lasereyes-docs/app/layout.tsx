@@ -1,68 +1,26 @@
-import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
-import type React from 'react'
-import './globals.css'
-import type { Viewport } from 'next'
-import { Suspense } from 'react'
-import { Header } from '@/components/header'
-import { LaserEyesProvider } from '@/components/laser-eyes-provider'
-import { PackageManagerProvider } from '@/components/package-manager-provider'
-import { ThemeProvider } from '@/components/theme-provider'
-import { themeConfig } from '@/lib/theme-config'
-import { cn } from '@/lib/utils'
+import { RootProvider } from 'fumadocs-ui/provider/next';
+import './global.css';
+import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({
+  subsets: ['latin'],
+});
 
 export const metadata: Metadata = {
   title: {
-    default: themeConfig.name,
-    template: `%s | ${themeConfig.name}`,
+    default: 'LaserEyes',
+    template: '%s | LaserEyes',
   },
-  description: themeConfig.description,
-  icons: {
-    icon: '/favicon.ico',
-  },
-  generator: 'v0.dev',
-}
+  description: 'A Bitcoin wallet connect library for building Bitcoin Ordinal web apps.',
+};
 
-export const viewport: Viewport = {
-  width: 'device-width',
-  initialScale: 1,
-  maximumScale: 5,
-  userScalable: true,
-}
-
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode
-}>) {
+export default function Layout({ children }: LayoutProps<'/'>) {
   return (
-    <html lang="en" suppressHydrationWarning className="dark">
-      <body className={cn('min-h-screen bg-background font-sans antialiased', inter.className)}>
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
-          <PackageManagerProvider>
-            <LaserEyesProvider>
-              <div className="relative flex min-h-screen flex-col">
-                <Header />
-                <main className="flex-1">
-                  <Suspense
-                    fallback={
-                      <div className="flex items-center justify-center min-h-[50vh]">
-                        Loading...
-                      </div>
-                    }
-                  >
-                    {children}
-                  </Suspense>
-                </main>
-              </div>
-            </LaserEyesProvider>
-          </PackageManagerProvider>
-        </ThemeProvider>
+    <html lang="en" className={inter.className} suppressHydrationWarning>
+      <body className="flex flex-col min-h-screen">
+        <RootProvider>{children}</RootProvider>
       </body>
     </html>
-  )
+  );
 }
-
-import './globals.css'

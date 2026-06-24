@@ -1,0 +1,60 @@
+---
+title: Config
+description: Build the config value that drives LaserEyes.
+---
+
+`createLaserEyesConfig(...)` builds the config value that everything else plugs
+into — chains, connectors, backends, reactive state, and persisted storage. Build
+it **once**, at module scope, so its identity is stable.
+
+```ts
+import { createLaserEyesConfig } from '@omnisat/lasereyes-core'
+import { MAINNET, TESTNET } from '@omnisat/lasereyes-client'
+import { mempool } from '@omnisat/lasereyes-client/backends/mempool'
+import { unisat } from '@omnisat/lasereyes-core/connectors/unisat'
+import { leather } from '@omnisat/lasereyes-core/connectors/leather'
+
+export const config = createLaserEyesConfig({
+  chains: [MAINNET, TESTNET],
+  connectors: [unisat(), leather()],
+  backends: {
+    mainnet: mempool(),
+    testnet: mempool(),
+  },
+})
+```
+
+## Options
+
+| Option | Type | Description |
+| ------ | ---- | ----------- |
+| `chains` | chain values | The networks your app supports (`MAINNET`, `TESTNET`, …). |
+| `connectors` | connector factories | One per wallet you register (`unisat()`, `leather()`, …). |
+| `backends` | record keyed by network id | The read backend for each network. |
+
+## Loading adapters
+
+Building the config doesn't announce wallets. Load the adapters you support so
+installed wallets can be discovered and auto-reconnected:
+
+```ts
+import { loadAllWallets } from '@omnisat/lasereyes-core/detection'
+
+loadAllWallets()
+// — or, for a smaller bundle, load only what you need:
+// import { loadUnisatWalletAdapter } from '@omnisat/lasereyes-core/adapters/unisat'
+```
+
+## Framework-agnostic lifecycle
+
+Outside React, call `initialize(config)` once to wire discovery and
+auto-reconnect, and `dispose(config)` to tear it down. (In React,
+`LaserEyesProvider` does this for you.)
+
+```ts
+import { initialize, dispose } from '@omnisat/lasereyes-core/actions'
+
+initialize(config)
+// … later
+dispose(config)
+```

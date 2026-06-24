@@ -1,0 +1,48 @@
+---
+title: Backends
+description: Compose vendor backends or build your own data source.
+---
+
+A backend is a per-network capability bundle — the data source behind the
+client's reads. Use a vendor factory, combine several, or build a custom one.
+
+## Vendor backends
+
+```ts
+import { mempool } from '@omnisat/lasereyes-client/backends/mempool'
+import { sandshrew } from '@omnisat/lasereyes-client/backends/sandshrew'
+import { maestro } from '@omnisat/lasereyes-client/backends/maestro'
+
+const backend = sandshrew({ apiKey: '…' })(MAINNET)
+```
+
+Each factory takes its options (e.g. `apiKey`) and resolves against a network.
+
+## Combining backends
+
+`combineBackends` layers a primary over fallbacks — the first to satisfy a
+capability wins:
+
+```ts
+import { combineBackends } from '@omnisat/lasereyes-client'
+
+const backend = combineBackends(sandshrew({ apiKey: '…' }), mempool())(MAINNET)
+```
+
+## Custom backends
+
+Build your own from the primitives in `@omnisat/lasereyes-client/backends`:
+
+```ts
+import { createChainBackend } from '@omnisat/lasereyes-client/backends'
+
+const myBackend = createChainBackend({ network: MAINNET }).extend({
+  async getAddressBalance(address) {
+    // call your own indexer, normalize the response shape
+  },
+  // …implement the capability methods your actions need
+})
+```
+
+Compose multiple sources for one network with `combineBackends(primary, fallback)`,
+and normalize each API's responses to the standard return shapes.

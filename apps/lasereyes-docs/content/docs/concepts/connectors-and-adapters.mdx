@@ -1,0 +1,60 @@
+---
+title: Connectors & Adapters
+description: How wallets are connected and normalized.
+---
+
+Wallet support has two halves: **connectors** (how a user connects) and
+**adapters** (how a wallet's provider is normalized). You usually touch both.
+
+## Connectors
+
+A connector is what you list in your config's `connectors` array. Each built-in
+wallet has a connector factory under `@omnisat/lasereyes-core/connectors/<wallet>`:
+
+```ts
+import { unisat } from '@omnisat/lasereyes-core/connectors/unisat'
+import { xverse } from '@omnisat/lasereyes-core/connectors/xverse'
+import { leather } from '@omnisat/lasereyes-core/connectors/leather'
+
+const config = createLaserEyesConfig({
+  chains: [MAINNET],
+  connectors: [unisat(), xverse(), leather()],
+  backends: { mainnet: mempool() },
+})
+```
+
+Registered connectors always surface in `useConnectors()` / `config.state.$connectors`.
+Wallets you didn't register can still appear through EIP-6963-style discovery
+once their adapter is loaded.
+
+## Adapters
+
+An adapter normalizes a wallet's injected provider into LaserEyes' standard
+shape. Loading an adapter lets that wallet announce itself for discovery and
+auto-reconnect.
+
+```ts
+import { loadUnisatWalletAdapter } from '@omnisat/lasereyes-core/adapters/unisat'
+
+loadUnisatWalletAdapter()
+```
+
+Or load everything at once:
+
+```ts
+import { loadAllWallets } from '@omnisat/lasereyes-core'
+
+loadAllWallets() // announces every built-in wallet that's installed
+```
+
+For the smallest bundle, load only the adapters you actually support from
+`@omnisat/lasereyes-core/adapters/<wallet>`.
+
+## Supported wallets
+
+Leather, OKX, OP_NET, Orange, OYL, Phantom, UniSat, Wizz, Xverse, Binance,
+Keplr, Tokeo.
+
+Each has a connector at `@omnisat/lasereyes-core/connectors/<wallet>` and an
+adapter loader at `@omnisat/lasereyes-core/adapters/<wallet>`. See the
+[Supported wallets](/docs/reference/wallets) reference for the full list.

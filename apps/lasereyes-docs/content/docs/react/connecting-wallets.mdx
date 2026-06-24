@@ -1,0 +1,75 @@
+---
+title: Connecting Wallets
+description: Connect, disconnect, and read the active account with React hooks.
+---
+
+## Discovering connectors
+
+`useConnectors()` returns the available connectors — the ones you registered,
+plus any discovered through the wallet's announcement. Use `isReady()` to tell
+whether the wallet is actually installed.
+
+```tsx
+import { useConnect, useConnectors } from '@omnisat/lasereyes-react'
+
+function WalletList() {
+  const connectors = useConnectors()
+  const { connect, isPending, error } = useConnect()
+
+  return (
+    <div>
+      {connectors.map(c => (
+        <button key={c.id} disabled={!c.isReady() || isPending} onClick={() => connect(c.id)}>
+          Connect {c.name}
+        </button>
+      ))}
+      {error && <p>{error.message}</p>}
+    </div>
+  )
+}
+```
+
+## Reading the account
+
+`useAccount()` returns a discriminated union on `status`. In the `'connected'`
+branch, the addresses and connector are guaranteed non-null — no optional checks
+needed.
+
+```tsx
+import { useAccount } from '@omnisat/lasereyes-react'
+
+function Account() {
+  const account = useAccount()
+
+  if (account.status !== 'connected') return <p>Not connected</p>
+
+  return (
+    <ul>
+      <li>Payment: {account.paymentAddress}</li>
+      <li>Ordinals: {account.ordinalsAddress}</li>
+      <li>Public key: {account.publicKey}</li>
+      <li>Connector: {account.connector.name}</li>
+    </ul>
+  )
+}
+```
+
+`account.address` is an alias for `paymentAddress`. The raw account object is on
+`account.account` if you need lower-level access.
+
+## Status
+
+`useStatus()` returns just the connection status string
+(`'connected' | 'connecting' | 'reconnecting' | 'disconnected'`) when you only
+need to gate UI.
+
+## Disconnecting
+
+```tsx
+import { useDisconnect } from '@omnisat/lasereyes-react'
+
+function Disconnect() {
+  const { disconnect } = useDisconnect()
+  return <button onClick={() => disconnect()}>Disconnect</button>
+}
+```

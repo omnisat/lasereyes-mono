@@ -1,0 +1,58 @@
+---
+title: Networks
+description: The Bitcoin networks LaserEyes supports and how to switch between them.
+---
+
+## Supported networks
+
+LaserEyes supports:
+
+`mainnet` · `testnet` · `testnet4` · `signet` · `regtest` · `fractal-mainnet` ·
+`fractal-testnet` · `oylnet` · `localnet`
+
+Each is exported as a chain value (`MAINNET`, `TESTNET`, `SIGNET`, …) from
+`@omnisat/lasereyes-client` (and re-exported from core and react).
+
+## Choosing chains
+
+List the chains your app supports in the config, and provide a backend for each:
+
+```ts
+import { MAINNET, TESTNET, SIGNET } from '@omnisat/lasereyes-client'
+import { mempool } from '@omnisat/lasereyes-client/backends/mempool'
+
+const config = createLaserEyesConfig({
+  chains: [MAINNET, TESTNET, SIGNET],
+  connectors: [/* … */],
+  backends: {
+    mainnet: mempool(),
+    testnet: mempool(),
+    signet: mempool(),
+  },
+})
+```
+
+The `backends` keys are the network ids (`mainnet`, `testnet`, …).
+
+## Switching networks
+
+In React, use `useNetwork`:
+
+```tsx
+import { useNetwork } from '@omnisat/lasereyes-react'
+
+function NetworkSwitcher() {
+  const { network, chains, switchNetwork } = useNetwork()
+  return (
+    <select value={network} onChange={e => switchNetwork(e.target.value)}>
+      {chains.map(c => (
+        <option key={c.id} value={c.id}>{c.id}</option>
+      ))}
+    </select>
+  )
+}
+```
+
+Framework-agnostic code uses the `switchNetwork(config, networkId)` action. The
+wallet is asked to change chains, and LaserEyes verifies it landed on a supported
+one before committing.

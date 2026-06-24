@@ -1,0 +1,27 @@
+---
+title: Supported Networks
+description: The Bitcoin networks LaserEyes supports.
+---
+
+| Network id | Chain value |
+| ---------- | ----------- |
+| `mainnet` | `MAINNET` |
+| `testnet` | `TESTNET` |
+| `testnet4` | `TESTNET4` |
+| `signet` | `SIGNET` |
+| `regtest` | `REGTEST` |
+| `fractal-mainnet` | `FRACTAL_MAINNET` |
+| `fractal-testnet` | `FRACTAL_TESTNET` |
+| `oylnet` | `OYLNET` |
+| `localnet` | `LOCALNET` |
+
+Chain values are exported from `@omnisat/lasereyes-client` (and re-exported from
+`@omnisat/lasereyes-core` and `@omnisat/lasereyes-react`). The network id is the
+string used as a `backends` key and as the argument to `switchNetwork`.
+
+```ts
+import { MAINNET, TESTNET, SIGNET } from '@omnisat/lasereyes-client'
+```
+
+See [Concepts › Networks](/docs/concepts/networks) for choosing chains and
+switching at runtime.

@@ -1,0 +1,60 @@
+---
+title: Architecture
+description: The mental model behind LaserEyes — config, connectors, adapters, backends, actions, and state.
+---
+
+LaserEyes is **config-driven, not class-driven**. You build a config value once,
+then call free functions (actions) against it. Everything else is a piece that
+plugs into that config.
+
+## The pieces
+
+| Piece | What it is |
+| ----- | ---------- |
+| **Config** | The value bundle — chains, connectors, backends, reactive state, and persisted storage — built by `createLaserEyesConfig(...)`. |
+| **Connectors** | *How a user connects* — one per wallet (`unisat()`, `leather()`, …). Registered connectors always surface; others appear via discovery. |
+| **Adapters** | *Wallet normalizers* — translate a wallet's injected provider into a standard shape. Loading an adapter lets a wallet announce itself. |
+| **Backends** | *Data sources* — per-network read sources (mempool, sandshrew, maestro) from `@omnisat/lasereyes-client`. |
+| **Actions** | *Operations* — free functions like `connect(config, …)` and `sendBtc(config, …)`. Reads route through the backend; writes through the connected wallet. |
+| **State** | *Reactive stores* — `config.state.$connection` and `config.state.$connectors`, read-only nanostores you can subscribe to. |
+
+## How a read happens
+
+When you read on-chain data (a balance, UTXOs, fees), the request routes through
+the **backend** configured for the active network. If the connected wallet
+exposes a native RPC for that operation (e.g. `bitcoin_getBalance`), that path is
+tried first, with the backend as the fallback.
+
+## How a write happens
+
+Writes — sending BTC, signing a message or PSBT — always go through the
+**connected wallet** via its adapter. There is no private key in LaserEyes; the
+wallet signs.
+
+## Connectors vs. adapters
+
+These are two halves of wallet support:
+
+- A **connector** is the thing you list in `connectors: [...]`. It represents an
+  intent to support a wallet and drives the connect flow.
+- An **adapter** normalizes a specific wallet's injected provider. You load
+  adapters (`loadUnisatWalletAdapter()`, or `loadAllWallets()`) so installed
+  wallets can announce themselves for discovery.
+
+See [Connectors & Adapters](/docs/concepts/connectors-and-adapters) for details.
+
+## Reactive state
+
+`config.state` exposes read-only [nanostores](https://github.com/nanostores/nanostores).
+The action layer is the only writer; you subscribe to react to changes.
+
+```ts
+config.state.$connection.subscribe(conn => {
+  if (conn.status === 'connected') {
+    // account + connector are non-null in this branch
+    console.log(conn.account.getAddress(), conn.networkId)
+  }
+})
+```
+
+In React you don't touch the stores directly — the hooks subscribe for you.

@@ -1,0 +1,32 @@
+---
+title: Protocol Support
+description: Status of runes, BRC-20, alkanes, and inscriptions support.
+---
+
+LaserEyes is built to handle Bitcoin metaprotocols, but the **read and write
+action groups for runes, BRC-20, alkanes, and inscriptions are not yet exported**
+in the current pre-1.0 line.
+
+## What's available today
+
+- The protocol **domain types** and **capability interfaces** are exported from
+  `@omnisat/lasereyes-client` — they're needed to type backends.
+- Base Bitcoin operations (balance, UTXOs, fees, send, sign, broadcast) are fully
+  supported.
+
+## What's deferred
+
+The protocol action groups (`src/actions/<proto>` in the client package) are
+designed and scaffolded but deferred from the public API pending implementation
+of their write paths. The re-introduction order is **runes first**, then BRC-20,
+inscriptions, and alkanes.
+
+This means the following are **not currently available** through LaserEyes:
+
+- Fetching protocol balances (rune / BRC-20 / alkane holdings).
+- Sending runes, BRC-20 tokens, or alkanes.
+- Listing, creating, or transferring inscriptions.
+
+These features existed in the legacy `useLaserEyes` API and will return as typed
+action groups. Until then, build against the base Bitcoin actions and read
+protocol data directly from a backend that supports it (e.g. Sandshrew, Maestro).

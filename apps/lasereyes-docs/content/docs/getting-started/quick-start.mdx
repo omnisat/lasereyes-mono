@@ -1,0 +1,112 @@
+---
+title: Quick Start
+description: Connect a Bitcoin wallet and read on-chain data in a few lines.
+---
+
+This walkthrough uses the React bindings. For framework-agnostic usage, see
+[Core › Config](/docs/core/config).
+
+## 1. Build a config
+
+Create the config **once, at module scope**, so its identity is stable across
+renders. It bundles the chains you support, the wallet connectors, and a
+read backend per network.
+
+```ts title="lib/lasereyes.ts"
+import { MAINNET, TESTNET } from '@omnisat/lasereyes-client'
+import { mempool } from '@omnisat/lasereyes-client/backends/mempool'
+import { createLaserEyesConfig } from '@omnisat/lasereyes-core'
+import { unisat } from '@omnisat/lasereyes-core/connectors/unisat'
+import { xverse } from '@omnisat/lasereyes-core/connectors/xverse'
+import { loadAllWallets } from '@omnisat/lasereyes-core/detection'
+
+export const config = createLaserEyesConfig({
+  chains: [MAINNET, TESTNET],
+  connectors: [unisat(), xverse()],
+  backends: {
+    mainnet: mempool(),
+    testnet: mempool(),
+  },
+})
+
+// Announce every installed wallet so it can be discovered.
+// For the smallest bundle, load only the adapters you need instead —
+// e.g. loadUnisatWalletAdapter() from '@omnisat/lasereyes-core/adapters/unisat'.
+loadAllWallets()
+```
+
+## 2. Wrap your app
+
+`LaserEyesProvider` owns the `initialize`/`dispose` lifecycle — you don't call
+`initialize` yourself.
+
+```tsx title="app/layout.tsx"
+'use client'
+import { LaserEyesProvider } from '@omnisat/lasereyes-react'
+import { config } from '@/lib/lasereyes'
+
+export default function Providers({ children }: { children: React.ReactNode }) {
+  return <LaserEyesProvider config={config}>{children}</LaserEyesProvider>
+}
+```
+
+## 3. Connect a wallet
+
+```tsx title="components/connect.tsx"
+'use client'
+import { useConnect, useConnectors, useAccount, useDisconnect } from '@omnisat/lasereyes-react'
+
+export function Connect() {
+  const account = useAccount()
+  const connectors = useConnectors()
+  const { connect, isPending, error } = useConnect()
+  const { disconnect } = useDisconnect()
+
+  if (account.status === 'connected') {
+    return (
+      <div>
+        <p>Connected: {account.address}</p>
+        <button onClick={() => disconnect()}>Disconnect</button>
+      </div>
+    )
+  }
+
+  return (
+    <div>
+      {connectors.map(c => (
+        <button key={c.id} disabled={!c.isReady() || isPending} onClick={() => connect(c.id)}>
+          Connect {c.name}
+        </button>
+      ))}
+      {error && <p>{error.message}</p>}
+    </div>
+  )
+}
+```
+
+## 4. Read and write
+
+```tsx
+import { useBalance, useSendBitcoin } from '@omnisat/lasereyes-react'
+
+function Wallet({ address }: { address: string }) {
+  const { data: balance } = useBalance(address)
+  const send = useSendBitcoin()
+
+  return (
+    <div>
+      <p>{balance} sats</p>
+      <button onClick={() => send.sendBitcoin({ to: 'bc1q…', amount: 10_000 })}>
+        Send 10,000 sats
+      </button>
+    </div>
+  )
+}
+```
+
+## Next steps
+
+- [Connecting wallets](/docs/react/connecting-wallets) — the full connection flow
+- [Reading data](/docs/react/reading-data) — balances, UTXOs, fees, transactions
+- [Writing](/docs/react/writing) — send, sign, and broadcast
+- [Architecture](/docs/concepts/architecture) — how the pieces fit together

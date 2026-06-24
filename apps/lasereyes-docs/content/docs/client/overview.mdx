@@ -1,0 +1,51 @@
+---
+title: Overview
+description: A composable Bitcoin data client you can use on its own.
+---
+
+`@omnisat/lasereyes-client` is a modern, composable Bitcoin data client —
+balances, UTXOs, fees, transactions, and PSBT utilities — built around small,
+tree-shakeable action groups you compose onto a client. It's framework-agnostic
+and powers the reads in `@omnisat/lasereyes-core`, but you can use it directly.
+
+## Mental model
+
+| Piece | What it is |
+| ----- | ---------- |
+| **Actions** | Data operations — methods that talk to the blockchain. |
+| **Utils** | Pure functions — PSBT builders, address helpers, conversions. No I/O. |
+| **Account** | Data container — addresses and public keys, no signing. |
+| **Signer** | Signing capability — optional, injected into a wallet client. |
+| **Backend** | Data source — a per-network capability bundle. |
+| **Client** | Orchestrator — `createClient(...).extend(actions)`. |
+
+Each `.extend(...)` adds a typed action group, and the type system tracks which
+capabilities the backend must provide.
+
+## Installation
+
+```bash
+npm install @omnisat/lasereyes-client
+```
+
+`@scure/btc-signer` and `@scure/base` are used for PSBT and address operations.
+
+## Subpath exports
+
+| Subpath | Contents |
+| ------- | -------- |
+| `.` | Base client, `publicActions`, chains, errors, types |
+| `./wallet` | Wallet client, accounts, `walletBtcActions` |
+| `./utils` | Pure helpers (address utils, conversions) |
+| `./backends` | Backend primitives + vendor capability factories |
+| `./backends/mempool` | mempool.space backend |
+| `./backends/sandshrew` | Sandshrew backend |
+| `./backends/maestro` | Maestro backend |
+
+## Protocol support status
+
+Protocol action groups for **runes, BRC-20, alkanes, and inscriptions** are
+designed and scaffolded but **not yet exported** — they're deferred pending
+implementation of their write paths (runes first). The protocol domain types and
+capability interfaces *are* exported today, since they're needed to type
+backends. See [Protocol Support](/docs/reference/protocol-support).

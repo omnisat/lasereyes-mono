@@ -7,6 +7,9 @@
 /.next/
 /out/
 
+# fumadocs generated collections
+/.source/
+
 # production
 /build
 
