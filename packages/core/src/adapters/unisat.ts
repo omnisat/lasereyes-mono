@@ -68,17 +68,27 @@ export class UnisatAdapter extends BaseAdapter {
     const raw = this.rawProvider
     if (!raw?.on) return
 
-    raw.on('accountsChanged', async (_addresses: string[]) => {
-      // Unisat's event only carries the address list; the spec wants a
-      // full {@link Account} (addresses + purposes + types + public key).
-      // Re-derive via the existing handler — same normalization path as
-      // `bitcoin_getAccounts`.
+    raw.on('accountsChanged', async (addresses: string[]) => {
+      // An empty address list means the wallet revoked this site's access
+      // (the user removed it from connected sites, locked, or
+      // disconnected). Treat it as a disconnect and run the disconnect
+      // flow — and DON'T re-query, which would re-prompt the user on a
+      // now-deauthorized site.
+      if (!addresses || addresses.length === 0) {
+        this.emitter.emit('disconnect', {})
+        return
+      }
+      // The active account changed but the site is still authorized, so
+      // fetching the addresses + public key won't prompt. Re-derive the
+      // full account (addresses + purposes + types + public key) so
+      // subscribers get a complete payload — Unisat's event only carries
+      // the address list.
       try {
         const account = await this.handleGetAccounts()
         this.emitter.emit('accountsChanged', account)
       } catch {
-        // Wallet likely disconnected mid-event; the `disconnect` event
-        // listener will clean up.
+        // Wallet likely disconnected mid-event; the `disconnect` listener
+        // will clean up.
       }
     })
 
