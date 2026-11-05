@@ -10,7 +10,7 @@ refresh the relevant reads for you.
 ## Installation
 
 ```bash
-npm install @omnisat/lasereyes-react @omnisat/lasereyes-core @omnisat/lasereyes-client
+npm install @omnisat/lasereyes-react @omnisat/lasereyes-core @lasereyes/client
 # or: pnpm add / yarn add / bun add
 ```
 
@@ -25,8 +25,8 @@ app with `LaserEyesProvider`. The provider owns the `initialize`/`dispose`
 lifecycle — don't call `initialize` yourself.
 
 ```tsx
-import { MAINNET, TESTNET } from '@omnisat/lasereyes-client'
-import { mempool } from '@omnisat/lasereyes-client/backends/mempool'
+import { MAINNET, TESTNET } from '@lasereyes/client'
+import { mempool } from '@lasereyes/client/backends/mempool'
 import { createLaserEyesConfig } from '@omnisat/lasereyes-core'
 import { unisat } from '@omnisat/lasereyes-core/connectors/unisat'
 import { leather } from '@omnisat/lasereyes-core/connectors/leather'

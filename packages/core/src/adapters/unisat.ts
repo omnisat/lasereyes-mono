@@ -5,9 +5,9 @@
  * @module adapters/unisat
  */
 
-import type { Inscription, NetworkId } from '@omnisat/lasereyes-client'
-import { AddressType } from '@omnisat/lasereyes-client/utils'
-import type { SignedPsbt, WalletAccountConfig } from '@omnisat/lasereyes-client/wallet'
+import type { Inscription, NetworkId } from '@lasereyes/client'
+import { AddressType } from '@lasereyes/client/utils'
+import type { SignedPsbt, WalletAccountConfig } from '@lasereyes/client/wallet'
 import { base64, hex } from '@scure/base'
 import { Transaction } from '@scure/btc-signer'
 import { announceWallet } from '../detection/announcements'

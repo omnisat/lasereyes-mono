@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@bitcoinerlab/secp256k1": "^1.1.1",
-    "@omnisat/lasereyes-client": "workspace:*",
+    "@lasereyes/client": "workspace:*",
     "@omnisat/lasereyes-core": "workspace:*",
     "@omnisat/lasereyes-react": "workspace:*",
     "@radix-ui/react-avatar": "^1.1.0",

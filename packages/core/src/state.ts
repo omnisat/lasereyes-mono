@@ -30,8 +30,8 @@
 // `$networkId.set()` had run). The atomic MapStore eliminates that whole class
 // of bug — there is no "in between" any more.
 
-import type { NetworkId } from '@omnisat/lasereyes-client'
-import type { WalletAccount } from '@omnisat/lasereyes-client/wallet'
+import type { NetworkId } from '@lasereyes/client'
+import type { WalletAccount } from '@lasereyes/client/wallet'
 import { type MapStore, map, type ReadableAtom } from 'nanostores'
 import type { ConnectionStatus, Connector } from './types/connector'
 

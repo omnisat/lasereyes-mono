@@ -397,7 +397,7 @@ not land.
 
 ## Target package shapes
 
-### `@omnisat/lasereyes-client` — typed primitives, no state, no wallet I/O
+### `@lasereyes/client` — typed primitives, no state, no wallet I/O
 
 Concerns: chains, transports (data sources), accounts, signers, clients,
 actions. Knows nothing about wallets, connectors, or global state.
@@ -591,7 +591,7 @@ wallets in the wild actually implement.
 
 ### Error model
 
-`NetworkNotConfiguredError` (from `@omnisat/lasereyes-client`) is thrown
+`NetworkNotConfiguredError` (from `@lasereyes/client`) is thrown
 by `getClient` when the requested chain isn't in `config.chains`. It
 propagates naturally through `getWalletClient` and every Phase 9
 action. Apps catch it to prompt the user to switch chains or to surface
@@ -625,7 +625,7 @@ These are choices we're locking in to remove ambiguity:
 - **Not a kitchen sink.** The library is opinionated about composition; users
   who want to do something exotic compose lower-level primitives, not flags on
   a god-class.
-- **Not stateful by default.** `@omnisat/lasereyes-client` is fully tree-shakable
+- **Not stateful by default.** `@lasereyes/client` is fully tree-shakable
   and stateless. State only enters when you opt into the core layer.
 - **Not React-coupled.** React bindings are a thin nanostore subscription layer,
   not where logic lives. Vue/Solid/Svelte bindings should look almost identical.

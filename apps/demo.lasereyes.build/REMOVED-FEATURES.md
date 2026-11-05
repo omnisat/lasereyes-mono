@@ -20,7 +20,7 @@ to bring each back, so nothing is lost.
 - `send('runes' | 'brc20' | 'alkanes', { … })` — transfer a protocol asset.
 
 **Why:** The protocol action groups for runes, BRC-20, and alkanes are designed
-and scaffolded in `@omnisat/lasereyes-client` (`src/actions/<proto>`) but **not
+and scaffolded in `@lasereyes/client` (`src/actions/<proto>`) but **not
 yet exported** — they're deferred pending implementation of their write paths
 (runes first). See `packages/client/FUTURE-IMPROVEMENTS.md`.
 
@@ -71,7 +71,7 @@ constructed an unsigned PSBT (self-send) for the sign/finalize/broadcast demo.
 transaction via `useSendBitcoin`.
 
 **Re-add when:** wire `useUtxos()` + `buildSendBtcPsbt(...)` from
-`@omnisat/lasereyes-client/utils` to reconstruct the auto-build flow on the new
+`@lasereyes/client/utils` to reconstruct the auto-build flow on the new
 stack.
 
 ## 5. `has<Wallet>` flags

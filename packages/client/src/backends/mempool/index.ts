@@ -24,7 +24,7 @@ export type { MempoolConfig } from './config'
  *
  * @example
  * ```ts
- * import { createBackend } from '@omnisat/lasereyes-client/backends/mempool'
+ * import { createBackend } from '@lasereyes/client/backends/mempool'
  *
  * const ds = createBackend({ network: 'mainnet' })
  * const balance = await ds.btcGetBalance('bc1q...')
@@ -57,7 +57,7 @@ export function createBackend(
  *
  * @example
  * ```ts
- * import { mempool } from '@omnisat/lasereyes-client/backends/mempool'
+ * import { mempool } from '@lasereyes/client/backends/mempool'
  *
  * createLaserEyesConfig({
  *   chains: [MAINNET],

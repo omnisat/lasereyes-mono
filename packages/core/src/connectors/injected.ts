@@ -37,8 +37,8 @@
  * @module connectors/injected
  */
 
-import type { NetworkId } from '@omnisat/lasereyes-client'
-import { getAddressBalance as baseGetAddressBalance, getAction } from '@omnisat/lasereyes-client'
+import type { NetworkId } from '@lasereyes/client'
+import { getAddressBalance as baseGetAddressBalance, getAction } from '@lasereyes/client'
 import {
   broadcastPsbt as baseBroadcastPsbt,
   sendBtc as baseSendBtc,
@@ -46,7 +46,7 @@ import {
   type SendBtcParams,
   type WalletAccount,
   type WalletAccountConfig,
-} from '@omnisat/lasereyes-client/wallet'
+} from '@lasereyes/client/wallet'
 import type { Connector, CreateConnectorFn } from '../types/connector'
 import type { BitcoinProvider, ProviderCapabilities } from '../types/provider'
 import { createConnector } from './create'
@@ -191,7 +191,7 @@ export function injected(target: InjectedConnectorOptions): CreateConnectorFn {
         if (!a) return false
         try {
           const data = (await a.request('bitcoin_getAccounts')) as WalletAccountConfig | undefined
-          return !!(data && data.addresses && data.addresses.length > 0)
+          return !!(data?.addresses && data.addresses.length > 0)
         } catch {
           return false
         }

@@ -37,7 +37,7 @@ import {
   createClient,
   type MergedCapabilities,
   NetworkNotConfiguredError,
-} from '@omnisat/lasereyes-client'
+} from '@lasereyes/client'
 import type { LaserEyesConfig } from './config'
 import { readCachedClient, resolveChainBackend, writeCachedClient } from './internal'
 

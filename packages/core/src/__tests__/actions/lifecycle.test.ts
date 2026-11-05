@@ -22,9 +22,9 @@ import {
   type NetworkId,
   NetworkNotConfiguredError,
   TESTNET,
-} from '@omnisat/lasereyes-client'
-import { AddressType } from '@omnisat/lasereyes-client/utils'
-import { createWalletAccount, type WalletAccount } from '@omnisat/lasereyes-client/wallet'
+} from '@lasereyes/client'
+import { AddressType } from '@lasereyes/client/utils'
+import { createWalletAccount, type WalletAccount } from '@lasereyes/client/wallet'
 import { beforeAll, describe, expect, it, vi } from 'vitest'
 import { connect } from '../../actions/connect'
 import { disconnect } from '../../actions/disconnect'

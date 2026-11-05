@@ -17,18 +17,13 @@
  * pre-built wallet client. No real bitcoin libs touched.
  */
 
-import {
-  type ChainNetwork,
-  createChainBackend,
-  MAINNET,
-  type NetworkId,
-} from '@omnisat/lasereyes-client'
-import { AddressType } from '@omnisat/lasereyes-client/utils'
+import { type ChainNetwork, createChainBackend, MAINNET, type NetworkId } from '@lasereyes/client'
+import { AddressType } from '@lasereyes/client/utils'
 import {
   createWalletAccount,
   createWalletClient,
   type WalletAccount,
-} from '@omnisat/lasereyes-client/wallet'
+} from '@lasereyes/client/wallet'
 import { beforeAll, describe, expect, it, vi } from 'vitest'
 import { broadcastPsbt, sendBtc, signMessage, signPsbt } from '../../actions/wallet'
 import { createLaserEyesConfig } from '../../config'

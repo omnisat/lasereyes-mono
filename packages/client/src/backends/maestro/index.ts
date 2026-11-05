@@ -62,8 +62,8 @@ type MaestroCapabilities = Prettify<
  *
  * @example
  * ```ts
- * import { createBackend } from '@omnisat/lasereyes-client/backends/maestro'
- * import { MAINNET } from '@omnisat/lasereyes-client'
+ * import { createBackend } from '@lasereyes/client/backends/maestro'
+ * import { MAINNET } from '@lasereyes/client'
  *
  * const ds = createBackend({
  *   network: MAINNET,
@@ -106,7 +106,7 @@ export function createBackend(
  *
  * @example
  * ```ts
- * import { maestro } from '@omnisat/lasereyes-client/backends/maestro'
+ * import { maestro } from '@lasereyes/client/backends/maestro'
  *
  * createLaserEyesConfig({
  *   chains: [MAINNET],

@@ -21,7 +21,7 @@
  *
  * @example
  * ```ts
- * import { providerSigner } from '@omnisat/lasereyes-client/wallet'
+ * import { providerSigner } from '@lasereyes/client/wallet'
  *
  * const signer = providerSigner(connector.getProvider()!)
  * const walletClient = createWalletClient({ network, backend, account, signer })

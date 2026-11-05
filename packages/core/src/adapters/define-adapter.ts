@@ -20,7 +20,7 @@
  * @module adapters/define-adapter
  */
 
-import type { NetworkId, ProviderRpcError } from '@omnisat/lasereyes-client'
+import type { NetworkId, ProviderRpcError } from '@lasereyes/client'
 import type { NetworkCapabilities, ProviderCapabilities } from '../types/provider'
 import type { BitcoinRpcSchema } from '../types/rpc-schema'
 import { type AdapterEventMap, BaseAdapter, type BitcoinProviderAdapter } from './base'

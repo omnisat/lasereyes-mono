@@ -3,7 +3,7 @@
 Framework-agnostic Bitcoin wallet integration for dApps. Connect to Leather,
 OKX, Unisat, Xverse, OYL, Orange, Phantom and more behind one config-driven API,
 with reactive state powered by [nanostores](https://github.com/nanostores/nanostores).
-Pairs with `@omnisat/lasereyes-client` for blockchain data and
+Pairs with `@lasereyes/client` for blockchain data and
 `@omnisat/lasereyes-react` for React bindings.
 
 > **Status: pre-1.0.** APIs may change on any minor release until 1.0.
@@ -11,7 +11,7 @@ Pairs with `@omnisat/lasereyes-client` for blockchain data and
 ## Installation
 
 ```bash
-npm install @omnisat/lasereyes-core @omnisat/lasereyes-client
+npm install @omnisat/lasereyes-core @lasereyes/client
 # or: pnpm add / yarn add / bun add
 ```
 
@@ -27,7 +27,7 @@ then call free functions (actions) against it.
 - **Adapters = wallet normalizers** — translate a wallet's injected provider into
   a standard shape. Loading an adapter lets a wallet announce itself.
 - **Backends = data sources** — per-network read sources (mempool, sandshrew,
-  maestro) from `@omnisat/lasereyes-client`.
+  maestro) from `@lasereyes/client`.
 - **Actions = operations** — free functions like `connect(config, …)` and
   `sendBtc(config, …)`. Reads route through the backend; writes through the
   connected wallet.
@@ -37,8 +37,8 @@ then call free functions (actions) against it.
 ## Quick start
 
 ```ts
-import { MAINNET, TESTNET } from '@omnisat/lasereyes-client'
-import { mempool } from '@omnisat/lasereyes-client/backends/mempool'
+import { MAINNET, TESTNET } from '@lasereyes/client'
+import { mempool } from '@lasereyes/client/backends/mempool'
 import { createLaserEyesConfig } from '@omnisat/lasereyes-core'
 import { initialize, connect, getAddressBalance, sendBtc } from '@omnisat/lasereyes-core/actions'
 import { loadUnisatWalletAdapter } from '@omnisat/lasereyes-core/adapters/unisat'
@@ -133,7 +133,7 @@ adapter loader at `@omnisat/lasereyes-core/adapters/<wallet>`.
 
 mainnet, testnet, testnet4, signet, regtest, fractal-mainnet, fractal-testnet,
 oylnet, localnet — exported as chain values (`MAINNET`, `TESTNET`, …) from
-`@omnisat/lasereyes-client`.
+`@lasereyes/client`.
 
 ## React
 

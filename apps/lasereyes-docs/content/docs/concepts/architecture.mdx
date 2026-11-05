@@ -14,7 +14,7 @@ plugs into that config.
 | **Config** | The value bundle — chains, connectors, backends, reactive state, and persisted storage — built by `createLaserEyesConfig(...)`. |
 | **Connectors** | *How a user connects* — one per wallet (`unisat()`, `leather()`, …). Registered connectors always surface; others appear via discovery. |
 | **Adapters** | *Wallet normalizers* — translate a wallet's injected provider into a standard shape. Loading an adapter lets a wallet announce itself. |
-| **Backends** | *Data sources* — per-network read sources (mempool, sandshrew, maestro) from `@omnisat/lasereyes-client`. |
+| **Backends** | *Data sources* — per-network read sources (mempool, sandshrew, maestro) from `@lasereyes/client`. |
 | **Actions** | *Operations* — free functions like `connect(config, …)` and `sendBtc(config, …)`. Reads route through the backend; writes through the connected wallet. |
 | **State** | *Reactive stores* — `config.state.$connection` and `config.state.$connectors`, read-only nanostores you can subscribe to. |
 

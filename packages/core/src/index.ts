@@ -12,7 +12,7 @@
  *
  * Read/write data operations are typed through the client package's
  * action layer — `getClient(config)` builds a bare `Client` for
- * composing with bare actions imported from `@omnisat/lasereyes-client`.
+ * composing with bare actions imported from `@lasereyes/client`.
  *
  * @module @omnisat/lasereyes-core
  */
@@ -104,7 +104,7 @@ export type {
   PaginationParams,
   Transaction,
   UTXO,
-} from '@omnisat/lasereyes-client'
+} from '@lasereyes/client'
 export {
   combineBackends,
   defineChain,
@@ -126,13 +126,13 @@ export {
   TESTNET4,
   testnet,
   testnet4,
-} from '@omnisat/lasereyes-client'
+} from '@lasereyes/client'
 export type {
   Account,
   AddressInfo,
   AddressPurpose,
   WalletAccount,
-} from '@omnisat/lasereyes-client/wallet'
+} from '@lasereyes/client/wallet'
 
 // ============================================================================
 // Wallet constants (BINANCE, UNISAT, XVERSE, …) and other non-network constants

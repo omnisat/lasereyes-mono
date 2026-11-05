@@ -1,6 +1,6 @@
-import { combineBackends, MAINNET, TESTNET } from '@omnisat/lasereyes-client'
-import { mempool } from '@omnisat/lasereyes-client/backends/mempool'
-import { sandshrew } from '@omnisat/lasereyes-client/backends/sandshrew'
+import { combineBackends, MAINNET, TESTNET } from '@lasereyes/client'
+import { mempool } from '@lasereyes/client/backends/mempool'
+import { sandshrew } from '@lasereyes/client/backends/sandshrew'
 import { createLaserEyesConfig } from '@omnisat/lasereyes-core'
 import {
   leather,
@@ -21,22 +21,9 @@ import {
  */
 export const config = createLaserEyesConfig({
   chains: [MAINNET, TESTNET],
-  connectors: [
-    unisat(),
-    xverse(),
-    leather(),
-    okx(),
-    oyl(),
-    orange(),
-    phantom(),
-    opNet(),
-    wizz(),
-  ],
+  connectors: [unisat(), xverse(), leather(), okx(), oyl(), orange(), phantom(), opNet(), wizz()],
   backends: {
-    mainnet: combineBackends(
-      sandshrew({ apiKey: '348ae3256c48c15cc99dcb056d2f78df' }),
-      mempool()
-    ),
+    mainnet: combineBackends(sandshrew({ apiKey: '348ae3256c48c15cc99dcb056d2f78df' }), mempool()),
     testnet: mempool(),
   },
 })

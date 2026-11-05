@@ -12,7 +12,7 @@
  *
  * Each vendor's eager `createBackend` and per-capability factories are not
  * re-exported here; they live on the vendor's own subpath
- * (`@omnisat/lasereyes-client/backends/<name>`).
+ * (`@lasereyes/client/backends/<name>`).
  *
  * @module backends
  */

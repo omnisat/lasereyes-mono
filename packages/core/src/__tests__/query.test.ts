@@ -17,13 +17,8 @@
  * the background refetch runs — asserted via call-count, not a loading flash.
  */
 
-import {
-  type ChainNetwork,
-  createChainBackend,
-  MAINNET,
-  type NetworkId,
-} from '@omnisat/lasereyes-client'
-import type { WalletAccount } from '@omnisat/lasereyes-client/wallet'
+import { type ChainNetwork, createChainBackend, MAINNET, type NetworkId } from '@lasereyes/client'
+import type { WalletAccount } from '@lasereyes/client/wallet'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 vi.mock('../actions', () => ({

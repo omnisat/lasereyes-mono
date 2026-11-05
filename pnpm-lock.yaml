@@ -71,7 +71,7 @@ importers:
 
   apps/core-showcase:
     dependencies:
-      '@omnisat/lasereyes-client':
+      '@lasereyes/client':
         specifier: workspace:*
         version: link:../../packages/client
       '@omnisat/lasereyes-core':
@@ -117,7 +117,7 @@ importers:
       '@bitcoinerlab/secp256k1':
         specifier: ^1.1.1
         version: 1.2.0
-      '@omnisat/lasereyes-client':
+      '@lasereyes/client':
         specifier: workspace:*
         version: link:../../packages/client
       '@omnisat/lasereyes-core':
@@ -367,6 +367,9 @@ importers:
 
   packages/core:
     dependencies:
+      '@lasereyes/client':
+        specifier: workspace:*
+        version: link:../client
       '@nanostores/query':
         specifier: ^0.3.4
         version: 0.3.4(nanostores@0.11.4)
@@ -386,9 +389,6 @@ importers:
       '@leather.io/rpc':
         specifier: ^2.20.3
         version: 2.21.10
-      '@omnisat/lasereyes-client':
-        specifier: workspace:*
-        version: link:../client
       '@types/node':
         specifier: ^22.7.7
         version: 22.19.11

@@ -5,22 +5,22 @@ description: Per-network data sources that power on-chain reads.
 
 A **backend** is a per-network data source — the thing LaserEyes reads balances,
 UTXOs, fees, and transactions from. Backends come from
-`@omnisat/lasereyes-client` and are supplied per network in your config.
+`@lasereyes/client` and are supplied per network in your config.
 
 ## Built-in backends
 
 | Backend | Import | Notes |
 | ------- | ------ | ----- |
-| mempool.space | `@omnisat/lasereyes-client/backends/mempool` | Base BTC reads, no API key. |
-| Sandshrew | `@omnisat/lasereyes-client/backends/sandshrew` | Broad coverage; takes an `apiKey`. |
-| Maestro | `@omnisat/lasereyes-client/backends/maestro` | Broad coverage; takes an `apiKey`. |
+| mempool.space | `@lasereyes/client/backends/mempool` | Base BTC reads, no API key. |
+| Sandshrew | `@lasereyes/client/backends/sandshrew` | Broad coverage; takes an `apiKey`. |
+| Maestro | `@lasereyes/client/backends/maestro` | Broad coverage; takes an `apiKey`. |
 
 Each is a **factory** that resolves against a network:
 
 ```ts
 import { createLaserEyesConfig } from '@omnisat/lasereyes-core'
-import { MAINNET, TESTNET } from '@omnisat/lasereyes-client'
-import { mempool } from '@omnisat/lasereyes-client/backends/mempool'
+import { MAINNET, TESTNET } from '@lasereyes/client'
+import { mempool } from '@lasereyes/client/backends/mempool'
 
 const config = createLaserEyesConfig({
   chains: [MAINNET, TESTNET],
@@ -38,9 +38,9 @@ Compose a primary with a fallback for one network using `combineBackends` — th
 first to satisfy a capability wins:
 
 ```ts
-import { combineBackends } from '@omnisat/lasereyes-client'
-import { sandshrew } from '@omnisat/lasereyes-client/backends/sandshrew'
-import { mempool } from '@omnisat/lasereyes-client/backends/mempool'
+import { combineBackends } from '@lasereyes/client'
+import { sandshrew } from '@lasereyes/client/backends/sandshrew'
+import { mempool } from '@lasereyes/client/backends/mempool'
 
 const config = createLaserEyesConfig({
   chains: [MAINNET],
@@ -55,7 +55,7 @@ const config = createLaserEyesConfig({
 ## Custom backends
 
 You can implement your own backend with the primitives in
-`@omnisat/lasereyes-client/backends` (`createChainBackend`, `combineBackends`).
+`@lasereyes/client/backends` (`createChainBackend`, `combineBackends`).
 See [Client › Backends](/docs/client/backends) for building one.
 
 > The native wallet RPC shortcut: when the connected wallet exposes an operation

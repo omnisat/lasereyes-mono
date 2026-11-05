@@ -4,8 +4,8 @@
  * @module actions/switchNetwork
  */
 
-import type { ChainNetwork } from '@omnisat/lasereyes-client'
-import { NetworkNotConfiguredError } from '@omnisat/lasereyes-client'
+import type { ChainNetwork } from '@lasereyes/client'
+import { NetworkNotConfiguredError } from '@lasereyes/client'
 import type { LaserEyesConfig } from '../config'
 import { invalidateClientCache, resolveConnector } from '../internal'
 import { mutateConnection } from '../state'

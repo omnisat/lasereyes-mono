@@ -1,4 +1,4 @@
-# @omnisat/lasereyes-client
+# @lasereyes/client
 
 A modern, composable Bitcoin data client for runes, BRC-20, alkanes, and
 inscriptions — built around small, tree-shakeable action groups you compose onto
@@ -10,7 +10,7 @@ integration and `@omnisat/lasereyes-react` for React bindings.
 ## Installation
 
 ```bash
-npm install @omnisat/lasereyes-client
+npm install @lasereyes/client
 # or: pnpm add / yarn add / bun add
 ```
 
@@ -34,9 +34,9 @@ address operations.
 ## Base client (read-only)
 
 ```ts
-import { createClient, publicActions, combineBackends, MAINNET } from '@omnisat/lasereyes-client'
-import { mempool } from '@omnisat/lasereyes-client/backends/mempool'
-import { sandshrew } from '@omnisat/lasereyes-client/backends/sandshrew'
+import { createClient, publicActions, combineBackends, MAINNET } from '@lasereyes/client'
+import { mempool } from '@lasereyes/client/backends/mempool'
+import { sandshrew } from '@lasereyes/client/backends/sandshrew'
 
 // Backend factories resolve against a network. Here: sandshrew primary (full
 // protocol coverage), mempool fallback for base BTC reads.
@@ -53,12 +53,12 @@ const utxos = await client.getAddressUtxos('bc1q…')
 ## Wallet client (account-aware)
 
 ```ts
-import { MAINNET } from '@omnisat/lasereyes-client'
+import { MAINNET } from '@lasereyes/client'
 import {
   createWalletClient,
   createWalletAccount,
   walletBtcActions,
-} from '@omnisat/lasereyes-client/wallet'
+} from '@lasereyes/client/wallet'
 
 const account = createWalletAccount({
   addresses: [
@@ -78,7 +78,7 @@ await wallet.signPsbt(psbtHex, { finalize: true })
 ## Utilities (pure, no I/O)
 
 ```ts
-import { getAddressType } from '@omnisat/lasereyes-client/utils'
+import { getAddressType } from '@lasereyes/client/utils'
 
 const type = getAddressType('bc1q…')
 ```

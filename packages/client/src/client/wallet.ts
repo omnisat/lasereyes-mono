@@ -48,9 +48,9 @@ import type { WalletClient, WalletClientConfig } from './wallet-types'
  * ```ts
  * import {
  *   createWalletClient, createWalletAccount, walletBtcActions,
- * } from '@omnisat/lasereyes-client/wallet'
- * import { createBackend } from '@omnisat/lasereyes-client/backends/mempool'
- * import { MAINNET, AddressType } from '@omnisat/lasereyes-client'
+ * } from '@lasereyes/client/wallet'
+ * import { createBackend } from '@lasereyes/client/backends/mempool'
+ * import { MAINNET, AddressType } from '@lasereyes/client'
  *
  * const account = createWalletAccount({
  *   addresses: [

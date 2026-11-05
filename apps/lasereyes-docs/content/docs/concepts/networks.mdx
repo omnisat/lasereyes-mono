@@ -11,15 +11,15 @@ LaserEyes supports:
 `fractal-testnet` · `oylnet` · `localnet`
 
 Each is exported as a chain value (`MAINNET`, `TESTNET`, `SIGNET`, …) from
-`@omnisat/lasereyes-client` (and re-exported from core and react).
+`@lasereyes/client` (and re-exported from core and react).
 
 ## Choosing chains
 
 List the chains your app supports in the config, and provide a backend for each:
 
 ```ts
-import { MAINNET, TESTNET, SIGNET } from '@omnisat/lasereyes-client'
-import { mempool } from '@omnisat/lasereyes-client/backends/mempool'
+import { MAINNET, TESTNET, SIGNET } from '@lasereyes/client'
+import { mempool } from '@lasereyes/client/backends/mempool'
 
 const config = createLaserEyesConfig({
   chains: [MAINNET, TESTNET, SIGNET],

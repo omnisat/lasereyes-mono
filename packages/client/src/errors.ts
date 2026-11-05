@@ -1,5 +1,5 @@
 /**
- * Base error class for all @omnisat/lasereyes-client errors.
+ * Base error class for all @lasereyes/client errors.
  *
  * All errors thrown by the client library extend this class, allowing consumers
  * to catch any client error with a single `catch (e instanceof LaserEyesClientError)`.

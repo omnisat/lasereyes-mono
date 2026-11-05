@@ -27,7 +27,7 @@ const data = JSON.parse(html.slice(html.indexOf('{', start), end))
 
 function packageOf(p) {
   if (!p) return '(unknown)'
-  if (p.includes('packages/client')) return '@omnisat/lasereyes-client'
+  if (p.includes('packages/client')) return '@lasereyes/client'
   if (p.includes('packages/core/src')) return '@omnisat/lasereyes-core (own src)'
   if (p.includes('packages/core/dist')) return '@omnisat/lasereyes-core (dist)'
   const m = p.match(/\.pnpm\/[^/]+\/node_modules\/((?:@[^/]+\/)?[^/]+)/)
@@ -55,7 +55,13 @@ rows.sort((a, b) => b.size - a.size)
 const total = rows.reduce((a, r) => a + r.size, 0)
 const fmt = n => n.toLocaleString()
 
-console.log('package'.padEnd(45), 'size'.padStart(12), 'gz≈'.padStart(10), 'files'.padStart(7), '  %')
+console.log(
+  'package'.padEnd(45),
+  'size'.padStart(12),
+  'gz≈'.padStart(10),
+  'files'.padStart(7),
+  '  %'
+)
 console.log('-'.repeat(86))
 for (const r of rows) {
   const pct = `${((r.size / total) * 100).toFixed(1)}%`
@@ -69,8 +75,4 @@ for (const r of rows) {
   )
 }
 console.log('-'.repeat(86))
-console.log(
-  'TOTAL'.padEnd(45),
-  fmt(total).padStart(12),
-  fmt(Math.round(total * 0.32)).padStart(10)
-)
+console.log('TOTAL'.padEnd(45), fmt(total).padStart(12), fmt(Math.round(total * 0.32)).padStart(10))

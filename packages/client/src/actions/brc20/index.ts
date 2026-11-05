@@ -181,7 +181,7 @@ export type WalletBrc20Actions = {
  *
  * @example
  * ```ts
- * import { brc20Actions } from '@omnisat/lasereyes-client/brc20'
+ * import { brc20Actions } from '@lasereyes/client/brc20'
  *
  * const client = createClient({ network, backend }).extend(brc20Actions())
  * const balances = await client.getBrc20Balances('bc1q...')

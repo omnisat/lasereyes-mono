@@ -17,8 +17,8 @@
  * renders (the provider keys its effect on it).
  */
 
-import { MAINNET, TESTNET } from '@omnisat/lasereyes-client'
-import { mempool } from '@omnisat/lasereyes-client/backends/mempool'
+import { MAINNET, TESTNET } from '@lasereyes/client'
+import { mempool } from '@lasereyes/client/backends/mempool'
 import { createLaserEyesConfig } from '@omnisat/lasereyes-core'
 import { loadUnisatWalletAdapter } from '@omnisat/lasereyes-core/adapters/unisat'
 import { loadXverseWalletAdapter } from '@omnisat/lasereyes-core/adapters/xverse'

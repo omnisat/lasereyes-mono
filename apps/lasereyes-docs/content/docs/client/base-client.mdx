@@ -7,9 +7,9 @@ The base client is read-only and takes explicit addresses. Build it with a
 network and a backend, then `.extend(publicActions())` for the read methods.
 
 ```ts
-import { createClient, publicActions, combineBackends, MAINNET } from '@omnisat/lasereyes-client'
-import { mempool } from '@omnisat/lasereyes-client/backends/mempool'
-import { sandshrew } from '@omnisat/lasereyes-client/backends/sandshrew'
+import { createClient, publicActions, combineBackends, MAINNET } from '@lasereyes/client'
+import { mempool } from '@lasereyes/client/backends/mempool'
+import { sandshrew } from '@lasereyes/client/backends/sandshrew'
 
 // sandshrew primary (broad coverage), mempool fallback for base BTC reads
 const backend = combineBackends(sandshrew({ apiKey: '…' }), mempool())(MAINNET)

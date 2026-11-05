@@ -143,7 +143,7 @@ export type WalletAlkaneActions = {
  *
  * @example
  * ```ts
- * import { alkaneActions } from '@omnisat/lasereyes-client/alkanes'
+ * import { alkaneActions } from '@lasereyes/client/alkanes'
  *
  * const client = createClient({ network, backend }).extend(alkaneActions())
  * const balances = await client.getAlkaneBalances('bc1q...')

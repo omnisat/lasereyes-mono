@@ -6,8 +6,8 @@
  * @module query/utxos
  */
 
+import type { PaginatedResult, UTXO } from '@lasereyes/client'
 import type { FetcherStore } from '@nanostores/query'
-import type { PaginatedResult, UTXO } from '@omnisat/lasereyes-client'
 import { atom } from 'nanostores'
 import { getAddressUtxos } from '../actions'
 import type { LaserEyesConfig } from '../config'

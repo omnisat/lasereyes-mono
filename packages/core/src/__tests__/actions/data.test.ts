@@ -20,7 +20,7 @@ import {
   MAINNET,
   type NetworkId,
   TESTNET,
-} from '@omnisat/lasereyes-client'
+} from '@lasereyes/client'
 import { describe, expect, it, vi } from 'vitest'
 import {
   broadcastTransaction,

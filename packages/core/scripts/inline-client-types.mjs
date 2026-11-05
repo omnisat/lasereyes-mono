@@ -1,9 +1,9 @@
-// Inline @omnisat/lasereyes-client's type declarations into this package's dist.
+// Inline @lasereyes/client's type declarations into this package's dist.
 //
-// Why: `@omnisat/lasereyes-client` is bundled into core's runtime (Rollup
+// Why: `@lasereyes/client` is bundled into core's runtime (Rollup
 // inlines it — it is not listed in `dependencies`) and is intentionally NOT
 // published to npm. Its JS therefore ships inside core's `dist`, but the
-// emitted `.d.ts` files still contain bare `from '@omnisat/lasereyes-client'`
+// emitted `.d.ts` files still contain bare `from '@lasereyes/client'`
 // specifiers that a consumer can't resolve. This script vendors the client's
 // declaration tree into `dist/_client/` and rewrites every such specifier
 // (in both core's declarations and the vendored tree's own self-imports) to a
@@ -12,8 +12,9 @@
 // api-extractor's `bundledPackages` rollup would do this too, but it crashes
 // on core's `declare global` blocks ("Child declaration not found"), so we do
 // the inlining mechanically against the per-file `.d.ts` vite-plugin-dts emits.
-import { cp, mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises'
+
 import { existsSync } from 'node:fs'
+import { cp, mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { dirname, join, relative, resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -22,7 +23,7 @@ const coreDist = resolve(here, '../dist')
 const clientDist = resolve(here, '../../client/dist')
 const vendorDirName = '_client'
 const vendorDir = join(coreDist, vendorDirName)
-const PKG = '@omnisat/lasereyes-client'
+const PKG = '@lasereyes/client'
 
 // Matches a quoted module specifier for the client package, optionally with a
 // subpath — covers `from '...'`, `import('...')`, and `import type ... from`.
@@ -38,7 +39,7 @@ async function walkDts(dir) {
   return out
 }
 
-// Resolve `@omnisat/lasereyes-client[/sub]` to a vendored file path (no
+// Resolve `@lasereyes/client[/sub]` to a vendored file path (no
 // extension), relative to vendorDir. Probes the layouts the client uses:
 // flat (`wallet.d.ts`), index (`backends/index.d.ts`), and the scaffolded
 // protocol actions (`actions/alkanes/index.d.ts`).
@@ -59,7 +60,7 @@ function toRelativeImport(fromFile, target) {
 
 async function main() {
   if (!existsSync(clientDist)) {
-    throw new Error(`client dist not found at ${clientDist} — build @omnisat/lasereyes-client first`)
+    throw new Error(`client dist not found at ${clientDist} — build @lasereyes/client first`)
   }
 
   // Vendor the client's declaration tree (types only; its JS is already
@@ -68,7 +69,7 @@ async function main() {
   await mkdir(vendorDir, { recursive: true })
   await cp(clientDist, vendorDir, {
     recursive: true,
-    filter: (src) => !src.endsWith('.js') && !src.endsWith('.js.map') && !src.endsWith('.d.ts.map'),
+    filter: src => !src.endsWith('.js') && !src.endsWith('.js.map') && !src.endsWith('.d.ts.map'),
   })
 
   // Rewrite specifiers in every declaration file under dist, including the
@@ -94,7 +95,9 @@ async function main() {
   if (unresolved.size > 0) {
     throw new Error(`Unresolved client specifiers: ${[...unresolved].join(', ')}`)
   }
-  console.log(`inline-client-types: vendored client types, rewrote ${rewritten} declaration file(s)`)
+  console.log(
+    `inline-client-types: vendored client types, rewrote ${rewritten} declaration file(s)`
+  )
 }
 
 await main()

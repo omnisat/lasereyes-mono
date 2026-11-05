@@ -13,8 +13,8 @@ renders. It bundles the chains you support, the wallet connectors, and a
 read backend per network.
 
 ```ts title="lib/lasereyes.ts"
-import { MAINNET, TESTNET } from '@omnisat/lasereyes-client'
-import { mempool } from '@omnisat/lasereyes-client/backends/mempool'
+import { MAINNET, TESTNET } from '@lasereyes/client'
+import { mempool } from '@lasereyes/client/backends/mempool'
 import { createLaserEyesConfig } from '@omnisat/lasereyes-core'
 import { unisat } from '@omnisat/lasereyes-core/connectors/unisat'
 import { xverse } from '@omnisat/lasereyes-core/connectors/xverse'

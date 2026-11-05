@@ -23,7 +23,13 @@ export default defineConfig(({ mode }) => {
           fileName: () => 'lasereyes.umd.js',
         },
         rollupOptions: {
-          external: [],
+          external: [
+            /^@lasereyes\/client(\/.*)?$/,
+            /^@scure\/.*/,
+            /^@nanostores\/.*/,
+            'nanostores',
+            'eventemitter3',
+          ],
           // UMD can only be a single file; flatten any dynamic imports.
           output: { inlineDynamicImports: true },
         },

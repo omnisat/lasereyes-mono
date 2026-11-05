@@ -32,8 +32,8 @@ export interface WalletAccountConfig {
  *
  * @example
  * ```ts
- * import { createWalletAccount } from '@omnisat/lasereyes-client/wallet'
- * import { AddressType } from '@omnisat/lasereyes-client'
+ * import { createWalletAccount } from '@lasereyes/client/wallet'
+ * import { AddressType } from '@lasereyes/client'
  *
  * const account = createWalletAccount({
  *   addresses: [

@@ -1,5 +1,5 @@
-import { Boxes, Cable, Database, Plug, Zap } from 'lucide-react';
-import Link from 'next/link';
+import { Boxes, Cable, Database, Plug, Zap } from 'lucide-react'
+import Link from 'next/link'
 
 const features = [
   {
@@ -22,7 +22,7 @@ const features = [
     title: 'Composable data client',
     body: 'Pluggable backends (mempool, Sandshrew, Maestro) you can combine or replace.',
   },
-];
+]
 
 const packages = [
   {
@@ -36,11 +36,11 @@ const packages = [
     href: '/docs/react/connecting-wallets',
   },
   {
-    name: '@omnisat/lasereyes-client',
+    name: '@lasereyes/client',
     body: 'A composable Bitcoin data client — balances, UTXOs, fees, transactions, PSBT utils.',
     href: '/docs/client/overview',
   },
-];
+]
 
 export default function HomePage() {
   return (
@@ -111,7 +111,9 @@ export default function HomePage() {
                 href={href}
                 className="group rounded-xl border border-fd-border p-6 transition-colors hover:border-orange-500/40"
               >
-                <h3 className="font-mono text-sm font-medium group-hover:text-orange-500">{name}</h3>
+                <h3 className="font-mono text-sm font-medium group-hover:text-orange-500">
+                  {name}
+                </h3>
                 <p className="mt-2 text-sm text-fd-muted-foreground">{body}</p>
               </Link>
             ))}
@@ -119,5 +121,5 @@ export default function HomePage() {
         </div>
       </section>
     </main>
-  );
+  )
 }

@@ -14,7 +14,11 @@
  */
 
 import type { WalletAccount } from '../../account/types'
-import type { ActionGroup, BaseCapability, InscriptionCapability } from '../../backends/capabilities'
+import type {
+  ActionGroup,
+  BaseCapability,
+  InscriptionCapability,
+} from '../../backends/capabilities'
 import type { Client, ClientConfig } from '../../client/types'
 import type { WalletClient, WalletClientConfig } from '../../client/wallet-types'
 import type { SignedPsbt, SignPsbtOptions } from '../../signer/types'
@@ -159,7 +163,7 @@ export type WalletInscriptionActions = {
  *
  * @example
  * ```ts
- * import { inscriptionActions } from '@omnisat/lasereyes-client/inscriptions'
+ * import { inscriptionActions } from '@lasereyes/client/inscriptions'
  *
  * const client = createClient({ network, backend }).extend(inscriptionActions())
  * const { data } = await client.getInscriptionsByAddress('bc1p...')

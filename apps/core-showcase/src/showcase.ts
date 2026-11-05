@@ -12,8 +12,8 @@
  *     repetition is the library's actual call shape, left visible on purpose.
  */
 
-import { NetworkNotConfiguredError } from '@omnisat/lasereyes-client'
-import { buildSendBtcPsbt } from '@omnisat/lasereyes-client/utils'
+import { NetworkNotConfiguredError } from '@lasereyes/client'
+import { buildSendBtcPsbt } from '@lasereyes/client/utils'
 import {
   broadcastTransaction,
   connect,

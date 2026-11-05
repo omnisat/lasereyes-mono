@@ -11,8 +11,8 @@
  * @module types/rpc-schema
  */
 
-import type { Inscription, NetworkId } from '@omnisat/lasereyes-client'
-import type { SignedPsbt, WalletAccountConfig } from '@omnisat/lasereyes-client/wallet'
+import type { Inscription, NetworkId } from '@lasereyes/client'
+import type { SignedPsbt, WalletAccountConfig } from '@lasereyes/client/wallet'
 
 /** Params for `bitcoin_signPsbt`. */
 export interface SignPsbtParams {
@@ -62,9 +62,9 @@ export interface SwitchNetworkParams {
  * never a user-supplied handler.
  */
 export interface BitcoinRpcSchema {
-  bitcoin_requestAccounts: { params: void; result: WalletAccountConfig }
-  bitcoin_getAccounts: { params: void; result: WalletAccountConfig }
-  bitcoin_getNetwork: { params: void; result: NetworkId }
+  bitcoin_requestAccounts: { params: undefined; result: WalletAccountConfig }
+  bitcoin_getAccounts: { params: undefined; result: WalletAccountConfig }
+  bitcoin_getNetwork: { params: undefined; result: NetworkId }
   bitcoin_switchNetwork: { params: SwitchNetworkParams; result: NetworkId }
   bitcoin_signPsbt: { params: SignPsbtParams; result: SignedPsbt }
   bitcoin_signMessage: { params: SignMessageParams; result: string }

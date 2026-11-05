@@ -9,9 +9,9 @@
  * @module adapters/base
  */
 
-import type { NetworkId } from '@omnisat/lasereyes-client'
-import { ProviderErrorCode, ProviderRpcError } from '@omnisat/lasereyes-client'
-import type { WalletAccountConfig } from '@omnisat/lasereyes-client/wallet'
+import type { NetworkId } from '@lasereyes/client'
+import { ProviderErrorCode, ProviderRpcError } from '@lasereyes/client'
+import type { WalletAccountConfig } from '@lasereyes/client/wallet'
 import EventEmitter from 'eventemitter3'
 import type {
   BitcoinProvider,

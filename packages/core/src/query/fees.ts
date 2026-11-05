@@ -11,8 +11,8 @@
  * @module query/fees
  */
 
+import type { FeeEstimate } from '@lasereyes/client'
 import type { FetcherStore } from '@nanostores/query'
-import type { FeeEstimate } from '@omnisat/lasereyes-client'
 import { getRecommendedFees } from '../actions'
 import type { LaserEyesConfig } from '../config'
 import {

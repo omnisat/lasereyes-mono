@@ -18,9 +18,9 @@ import { guardBackend } from './guard'
  *
  * @example
  * ```ts
- * import { mergeChainBackends } from '@omnisat/lasereyes-client'
- * import { createBackend as createMempool } from '@omnisat/lasereyes-client/backends/mempool'
- * import { createBackend as createSandshrew } from '@omnisat/lasereyes-client/backends/sandshrew'
+ * import { mergeChainBackends } from '@lasereyes/client'
+ * import { createBackend as createMempool } from '@lasereyes/client/backends/mempool'
+ * import { createBackend as createSandshrew } from '@lasereyes/client/backends/sandshrew'
  *
  * const mempool = createMempool({ network: MAINNET })
  * const sandshrew = createSandshrew({ network: MAINNET, apiKey: '...' })

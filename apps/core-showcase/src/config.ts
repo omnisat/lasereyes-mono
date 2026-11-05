@@ -9,8 +9,8 @@
  * the actions throw `NetworkNotConfiguredError` — handled in `showcase.ts`.
  */
 
-import { MAINNET, TESTNET } from '@omnisat/lasereyes-client'
-import { mempool } from '@omnisat/lasereyes-client/backends/mempool'
+import { MAINNET, TESTNET } from '@lasereyes/client'
+import { mempool } from '@lasereyes/client/backends/mempool'
 import { createLaserEyesConfig } from '@omnisat/lasereyes-core'
 import { initialize } from '@omnisat/lasereyes-core/actions'
 import { loadUnisatWalletAdapter } from '@omnisat/lasereyes-core/adapters/unisat'

@@ -38,7 +38,7 @@ export interface LaserEyesProviderProps {
  * import { LaserEyesProvider } from '@omnisat/lasereyes-react'
  * import { createLaserEyesConfig, MAINNET } from '@omnisat/lasereyes-core'
  * import { unisat, xverse } from '@omnisat/lasereyes-core/connectors'
- * import { mempool } from '@omnisat/lasereyes-client/backends/mempool'
+ * import { mempool } from '@lasereyes/client/backends/mempool'
  *
  * const config = createLaserEyesConfig({
  *   chains: [MAINNET],
