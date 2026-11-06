@@ -3,8 +3,6 @@
 import type { Connector } from '@omnisat/lasereyes-core'
 import { useAccount, useConnect, useDisconnect } from '@omnisat/lasereyes-react'
 import clsx from 'clsx'
-import { useState } from 'react'
-import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 
 const buttonClass =
@@ -14,23 +12,16 @@ const WalletConnectButton = ({ connector }: { connector: Connector }) => {
   const account = useAccount()
   const { connect, isPending } = useConnect()
   const { disconnect } = useDisconnect()
-  const [, setError] = useState<string | null>(null)
 
   const isConnected = account.status === 'connected' && account.connector?.id === connector.id
   const isReady = connector.isReady()
 
-  const handleClick = async () => {
-    try {
-      if (isConnected) {
-        disconnect()
-        return
-      }
-      await connect(connector.id)
-    } catch (e) {
-      const message = e instanceof Error ? e.message : 'Unknown error'
-      setError(message)
-      toast.error(message)
+  const handleClick = () => {
+    if (isConnected) {
+      void disconnect()
+      return
     }
+    void connect(connector.id).catch(() => {})
   }
 
   return (
