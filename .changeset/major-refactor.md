@@ -1,5 +1,5 @@
 ---
-'@omnisat/lasereyes-client': minor
+'@lasereyes/client': minor
 '@omnisat/lasereyes-core': minor
 '@omnisat/lasereyes-react': minor
 '@omnisat/lasereyes': minor
@@ -11,7 +11,7 @@ The library is rebuilt around a composable, framework-agnostic core: declare
 your chains, backends, and connectors once as data, then extend a client with
 the actions you need.
 
-**New `@omnisat/lasereyes-client`** — a modern Bitcoin data client. Composable
+**New `@lasereyes/client`** — a modern Bitcoin data client. Composable
 chain backends (`mempool()`, `sandshrew()`, `maestro()`); pure utility builders (PSBT,
 address) split from I/O actions; subpath exports for `/wallet`, `/utils`, and
 `/backends/*`.

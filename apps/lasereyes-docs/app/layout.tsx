@@ -1,11 +1,11 @@
-import { RootProvider } from 'fumadocs-ui/provider/next';
-import './global.css';
-import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { RootProvider } from 'fumadocs-ui/provider/next'
+import './global.css'
+import type { Metadata } from 'next'
+import { Inter } from 'next/font/google'
 
 const inter = Inter({
   subsets: ['latin'],
-});
+})
 
 export const metadata: Metadata = {
   title: {
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     template: '%s | LaserEyes',
   },
   description: 'A Bitcoin wallet connect library for building Bitcoin Ordinal web apps.',
-};
+}
 
 export default function Layout({ children }: LayoutProps<'/'>) {
   return (
@@ -22,5 +22,5 @@ export default function Layout({ children }: LayoutProps<'/'>) {
         <RootProvider>{children}</RootProvider>
       </body>
     </html>
-  );
+  )
 }

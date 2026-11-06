@@ -16,8 +16,7 @@ const WalletConnectButton = ({ connector }: { connector: Connector }) => {
   const { disconnect } = useDisconnect()
   const [, setError] = useState<string | null>(null)
 
-  const isConnected =
-    account.status === 'connected' && account.connector?.id === connector.id
+  const isConnected = account.status === 'connected' && account.connector?.id === connector.id
   const isReady = connector.isReady()
 
   const handleClick = async () => {
@@ -47,10 +46,7 @@ const WalletConnectButton = ({ connector }: { connector: Connector }) => {
       variant="outline"
       size="lg"
     >
-      {connector.icon && (
-        // biome-ignore lint/a11y/useAltText: decorative wallet icon
-        <img src={connector.icon} alt="" className="h-6 w-6" />
-      )}
+      {connector.icon && <img src={connector.icon} alt="" className="h-6 w-6" />}
       {isConnected ? 'Disconnect' : connector.name}
     </Button>
   )

@@ -246,10 +246,7 @@ const App = () => {
                 providerName ? 'text-white' : 'text-gray-500'
               )}
             >
-              {providerIcon && (
-                // biome-ignore lint/a11y/useAltText: decorative wallet icon
-                <img src={providerIcon} alt="" className="h-6 w-6" />
-              )}
+              {providerIcon && <img src={providerIcon} alt="" className="h-6 w-6" />}
               {providerName ?? '--'}
             </span>
           </div>
@@ -276,10 +273,7 @@ const App = () => {
               )}
             >
               {totalBtc} BTC{' '}
-              <RxReload
-                className="cursor-pointer text-gray-600"
-                onClick={() => refetchBalance()}
-              />
+              <RxReload className="cursor-pointer text-gray-600" onClick={() => refetchBalance()} />
             </span>
           </div>
 

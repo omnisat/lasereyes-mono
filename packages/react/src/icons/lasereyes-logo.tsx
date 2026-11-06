@@ -780,9 +780,11 @@ const LaserEyesLogo = ({
       xmlns="http://www.w3.org/2000/svg"
       className={className}
     >
+      <title>LaserEyes Logo</title>
       {rectData.map((rect, index) => (
+        // biome-ignore lint/suspicious/noArrayIndexKey: static SVG pixel grid
         <rect
-          key={index}
+          key={rect.transform ?? index}
           width={7.89036}
           height={7.89036}
           transform={rect.transform}
