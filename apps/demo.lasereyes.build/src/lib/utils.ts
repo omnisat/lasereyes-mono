@@ -19,8 +19,8 @@ function getMultiplier(decimals: number): bigint {
   return BigInt(`1${'0'.repeat(decimals)}`)
 }
 
-function throwFault(message: string, fault: string, operation: string, value?: any): never {
-  const params: any = { fault: fault, operation: operation }
+function throwFault(message: string, fault: string, operation: string, value?: unknown): never {
+  const params: Record<string, unknown> = { fault: fault, operation: operation }
   if (value !== undefined) {
     params.value = value
   }

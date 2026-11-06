@@ -3,8 +3,30 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: "windows";
+  src: url("/fonts/Windows_Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "pxplus";
+  src:
+    url("/fonts/PxPlus_IBM_VGA8.woff2") format("woff2"),
+    url("/fonts/PxPlus_IBM_VGA8.woff") format("woff"),
+    url("/fonts/PxPlus_IBM_VGA8.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 @layer base {
   :root {
+    --font-windows: "windows", sans-serif;
+    --font-pxplus: "pxplus", monospace;
+
     --chart-1: 12 76% 61%;
     --chart-2: 173 58% 39%;
     --chart-3: 197 37% 24%;
@@ -90,6 +112,6 @@
 
 body,
 html {
-  font-family: "windows", sans-serif;
+  font-family: var(--font-windows), "windows", sans-serif;
   background-color: #1e1d1f;
 }
