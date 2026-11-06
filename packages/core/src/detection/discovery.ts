@@ -15,12 +15,12 @@
  * @module detection/discovery
  */
 
-import type { NetworkId } from '@omnisat/lasereyes-client'
+import type { NetworkId } from '@lasereyes/client'
 import {
   createWalletAccount,
   type WalletAccount,
   type WalletAccountConfig,
-} from '@omnisat/lasereyes-client/wallet'
+} from '@lasereyes/client/wallet'
 import type { Connector } from '../types/connector'
 import type { ProviderCapabilities } from '../types/provider'
 import { listenForWalletAnnouncements, type WalletAnnouncement } from './announcements'

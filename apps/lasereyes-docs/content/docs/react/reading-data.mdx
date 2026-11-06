@@ -1,0 +1,70 @@
+---
+title: Reading Data
+description: Cached, auto-revalidating hooks for balances, UTXOs, fees, and transactions.
+---
+
+Read hooks are query-backed: they cache and auto-revalidate, and writes refresh
+the relevant reads for you. Each returns a result object with `data` and
+`status`.
+
+## Balance
+
+```tsx
+import { useBalance } from '@omnisat/lasereyes-react'
+
+function Balance({ address }: { address: string }) {
+  const { data: balance, status } = useBalance(address)
+  if (status === 'loading') return <p>Loading…</p>
+  return <p>{balance} sats</p>
+}
+```
+
+Called without an address, `useBalance()` uses the connected payment address.
+
+## UTXOs
+
+`useUtxos()` is paginated:
+
+```tsx
+import { useUtxos } from '@omnisat/lasereyes-react'
+
+function Utxos({ address }: { address: string }) {
+  const utxos = useUtxos(address)
+  return (
+    <div>
+      {utxos.items.map(u => (
+        <p key={`${u.txid}:${u.vout}`}>{u.value} sats</p>
+      ))}
+      {utxos.hasNextPage && <button onClick={() => utxos.fetchNextPage()}>Load more</button>}
+    </div>
+  )
+}
+```
+
+## Fee rates
+
+```tsx
+import { useFeeRates } from '@omnisat/lasereyes-react'
+
+const fees = useFeeRates()
+// fees.data?.fastFee, etc.
+```
+
+## Transaction
+
+```tsx
+import { useTransaction } from '@omnisat/lasereyes-react'
+
+const { data: tx } = useTransaction(txId)
+```
+
+## Options
+
+Read hooks accept an options bag to scope to a network or pause fetching:
+
+```tsx
+useBalance(address, { chainId: 'testnet', enabled: Boolean(address) })
+```
+
+- `chainId` — read from a specific configured network.
+- `enabled` — set `false` to pause the query.

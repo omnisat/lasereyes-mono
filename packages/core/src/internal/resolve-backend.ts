@@ -14,7 +14,7 @@
  * @internal
  */
 
-import type { ChainBackend } from '@omnisat/lasereyes-client'
+import type { ChainBackend } from '@lasereyes/client'
 import type { LaserEyesConfig } from '../config'
 
 /**

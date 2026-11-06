@@ -1,5 +1,5 @@
 {
-  "name": "@omnisat/lasereyes-client",
+  "name": "@lasereyes/client",
   "description": "Composable Bitcoin data client — balances, UTXOs, fees, transactions, and PSBT utilities over pluggable backends (mempool, Sandshrew, Maestro).",
   "keywords": [
     "bitcoin",
@@ -22,7 +22,7 @@
     "directory": "packages/client"
   },
   "license": "MIT",
-  "private": true,
+  "private": false,
   "version": "0.1.0-next.1",
   "type": "module",
   "sideEffects": false,

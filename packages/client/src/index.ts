@@ -10,7 +10,7 @@
  * but deferred from the public API pending implementation. See
  * `FUTURE-IMPROVEMENTS.md` for the re-introduction plan (runes first).
  *
- * @module @omnisat/lasereyes-client
+ * @module @lasereyes/client
  */
 
 // Read-only public actions — both the bare action functions (compose

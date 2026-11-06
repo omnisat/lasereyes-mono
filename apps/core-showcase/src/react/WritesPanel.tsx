@@ -9,7 +9,7 @@
  * take it from a different angle.
  */
 
-import { buildSendBtcPsbt } from '@omnisat/lasereyes-client/utils'
+import { buildSendBtcPsbt } from '@lasereyes/client/utils'
 import {
   useAccount,
   useBroadcastPsbt,

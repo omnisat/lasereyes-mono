@@ -16,8 +16,8 @@
  * to end against this mock without any real wallet extension.
  */
 
-import { createChainBackend, createClient, MAINNET } from '@omnisat/lasereyes-client'
-import { AddressType } from '@omnisat/lasereyes-client/utils'
+import { createChainBackend, createClient, MAINNET } from '@lasereyes/client'
+import { AddressType } from '@lasereyes/client/utils'
 import { beforeAll, describe, expect, it, vi } from 'vitest'
 import { injected } from '../../connectors/injected'
 import type { BitcoinProvider, BitcoinRpcMethod } from '../../types/provider'
@@ -157,7 +157,7 @@ describe('injected().getClient — override installation', () => {
       network: MAINNET,
       backend: createChainBackend({ network: MAINNET }) as any,
     })
-    const extended = await connector.getClient!({ client: bare as any, chainId: 'mainnet' })
+    const extended = await connector.getClient?.({ client: bare as any, chainId: 'mainnet' })
 
     expect(typeof (extended as any).sendBtc).toBe('function')
     const result = await (extended as any).sendBtc({ to: ADDR, amount: 100 })
@@ -181,7 +181,7 @@ describe('injected().getClient — override installation', () => {
       network: MAINNET,
       backend: createChainBackend({ network: MAINNET }) as any,
     })
-    const extended = await connector.getClient!({ client: bare as any, chainId: 'mainnet' })
+    const extended = await connector.getClient?.({ client: bare as any, chainId: 'mainnet' })
 
     expect(typeof (extended as any).getAddressBalance).toBe('function')
     // No `getAccountBalance` slot — that would be the bug.
@@ -201,7 +201,7 @@ describe('injected().getClient — override installation', () => {
       network: MAINNET,
       backend: createChainBackend({ network: MAINNET }) as any,
     })
-    const extended = await connector.getClient!({ client: bare as any, chainId: 'mainnet' })
+    const extended = await connector.getClient?.({ client: bare as any, chainId: 'mainnet' })
 
     expect(typeof (extended as any).broadcastPsbt).toBe('function')
     const result = await (extended as any).broadcastPsbt('hex')
@@ -239,7 +239,7 @@ describe('injected().getClient — selective fallback semantics', () => {
       },
     } as any
 
-    const extended = await connector.getClient!({ client: bare, chainId: 'mainnet' })
+    const extended = await connector.getClient?.({ client: bare, chainId: 'mainnet' })
     const result = await (extended as any).sendBtc({ to: ADDR, amount: 100 })
     expect(result).toBe(fallbackResult)
     expect(bare.sendBtc).toHaveBeenCalledWith({ to: ADDR, amount: 100 })
@@ -262,7 +262,7 @@ describe('injected().getClient — selective fallback semantics', () => {
         return { ...this, ...fn(this) }
       },
     } as any
-    const extended = await connector.getClient!({ client: bare, chainId: 'mainnet' })
+    const extended = await connector.getClient?.({ client: bare, chainId: 'mainnet' })
 
     await expect((extended as any).sendBtc({ to: ADDR, amount: 100 })).rejects.toThrow(
       /User rejected/
@@ -285,7 +285,7 @@ describe('injected().getClient — selective fallback semantics', () => {
         return { ...this, ...fn(this) }
       },
     } as any
-    const extended = await connector.getClient!({ client: bare, chainId: 'mainnet' })
+    const extended = await connector.getClient?.({ client: bare, chainId: 'mainnet' })
 
     await expect((extended as any).broadcastPsbt('hex')).rejects.toThrow(/TypeError/)
     expect(fallback).not.toHaveBeenCalled()
@@ -311,7 +311,7 @@ describe('injected().getClient — selective fallback semantics', () => {
         return { ...this, ...fn(this) }
       },
     } as any
-    const extended = await connector.getClient!({ client: bare, chainId: 'mainnet' })
+    const extended = await connector.getClient?.({ client: bare, chainId: 'mainnet' })
 
     await expect((extended as any).getAddressBalance('bc1qOTHER')).resolves.toBe(dsResult)
     expect(bare.getAddressBalance).toHaveBeenCalledWith('bc1qOTHER')

@@ -4,13 +4,13 @@
  * @module types/connector
  */
 
-import type { ChainNetwork, NetworkId } from '@omnisat/lasereyes-client'
+import type { ChainNetwork, NetworkId } from '@lasereyes/client'
 import type {
   Account,
   WalletAccount,
   WalletClient,
   WalletClientConfig,
-} from '@omnisat/lasereyes-client/wallet'
+} from '@lasereyes/client/wallet'
 import type { BitcoinProvider, ProviderCapabilities } from './provider'
 
 /**

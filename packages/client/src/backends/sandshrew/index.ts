@@ -50,8 +50,8 @@ export { runeCapabilities } from './runes'
  *
  * @example
  * ```ts
- * import { createBackend } from '@omnisat/lasereyes-client/backends/sandshrew'
- * import { MAINNET } from '@omnisat/lasereyes-client'
+ * import { createBackend } from '@lasereyes/client/backends/sandshrew'
+ * import { MAINNET } from '@lasereyes/client'
  *
  * const ds = createBackend({
  *   network: MAINNET,
@@ -97,7 +97,7 @@ export function createBackend(
  *
  * @example
  * ```ts
- * import { sandshrew } from '@omnisat/lasereyes-client/backends/sandshrew'
+ * import { sandshrew } from '@lasereyes/client/backends/sandshrew'
  *
  * createLaserEyesConfig({
  *   chains: [MAINNET],

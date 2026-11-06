@@ -25,7 +25,7 @@
  * **Architectural pattern: bare action + bare client.**
  *
  * Each client read goes through the *bare action functions* exported
- * from `@omnisat/lasereyes-client` (e.g. `getAddressBalance(client, addr)`),
+ * from `@lasereyes/client` (e.g. `getAddressBalance(client, addr)`),
  * NOT through the extended-method form (`client.getAddressBalance(addr)`). The
  * client returned by `getClient(config)` is bare — no action groups
  * pre-extended. Tree-shake friendly, explicit imports per call.
@@ -45,7 +45,7 @@ import type {
   RuneBalance,
   Transaction,
   UTXO,
-} from '@omnisat/lasereyes-client'
+} from '@lasereyes/client'
 import {
   broadcastTransaction as clientBroadcastTransaction,
   getAddressBalance as clientGetAddressBalance,
@@ -53,7 +53,7 @@ import {
   getRecommendedFees as clientGetRecommendedFees,
   getTransaction as clientGetTransaction,
   getAction,
-} from '@omnisat/lasereyes-client'
+} from '@lasereyes/client'
 import { getClient } from '../client'
 import type { LaserEyesConfig } from '../config'
 import { tryResolveConnector } from '../internal'
@@ -173,7 +173,7 @@ export async function getAddressUtxos<const config extends LaserEyesConfig>(
  *
  * @throws {Error} If no wallet is connected or the provider doesn't support
  *   the method. For a backend-backed path, use the `inscriptionActions()`
- *   factory from `@omnisat/lasereyes-client`.
+ *   factory from `@lasereyes/client`.
  */
 export async function getInscriptions<const config extends LaserEyesConfig>(
   config: config,
@@ -186,7 +186,7 @@ export async function getInscriptions<const config extends LaserEyesConfig>(
   const result = await callProvider<Inscription[]>(config, 'bitcoin_getInscriptions', params)
   if (result !== undefined) return result
   throw new Error(
-    'getInscriptions: provider unavailable. Connect a wallet that supports `bitcoin_getInscriptions`, or use the typed `inscriptionActions()` from `@omnisat/lasereyes-client`.'
+    'getInscriptions: provider unavailable. Connect a wallet that supports `bitcoin_getInscriptions`, or use the typed `inscriptionActions()` from `@lasereyes/client`.'
   )
 }
 
@@ -203,7 +203,7 @@ export async function getRunesBalances<const config extends LaserEyesConfig>(
   const result = await callProvider<RuneBalance[]>(config, 'bitcoin_getRunesBalances', { address })
   if (result !== undefined) return result
   throw new Error(
-    'getRunesBalances: provider unavailable. Use the typed `runeActions()` from `@omnisat/lasereyes-client`.'
+    'getRunesBalances: provider unavailable. Use the typed `runeActions()` from `@lasereyes/client`.'
   )
 }
 
@@ -222,7 +222,7 @@ export async function getBrc20Balances<const config extends LaserEyesConfig>(
   })
   if (result !== undefined) return result
   throw new Error(
-    'getBrc20Balances: provider unavailable. Use the typed `brc20Actions()` from `@omnisat/lasereyes-client`.'
+    'getBrc20Balances: provider unavailable. Use the typed `brc20Actions()` from `@lasereyes/client`.'
   )
 }
 

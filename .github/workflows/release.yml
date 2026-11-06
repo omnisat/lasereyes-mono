@@ -61,7 +61,7 @@ jobs:
         run: pnpm install
 
       - name: Build packages
-        run: pnpm build --filter="@omnisat/*" --filter="!@omnisat/lasereyes-ui"
+        run: pnpm build --filter="@lasereyes/*" --filter="@omnisat/*" --filter="!@omnisat/lasereyes-ui"
 
       # Dev branch - Publish to next tag
       - name: Version, Publish 'next' tag, Commit and Push (dev)
@@ -73,7 +73,7 @@ jobs:
 
           # First version update
           pnpm run version-prerelease
-          pnpm build --filter="@omnisat/*" --filter="!@omnisat/lasereyes-ui"
+          pnpm build --filter="@lasereyes/*" --filter="@omnisat/*" --filter="!@omnisat/lasereyes-ui"
 
           # Stage and commit all changes to get a clean state
           echo "Adding version changes to git..."
@@ -117,7 +117,7 @@ jobs:
           # Force version and build
           echo "Running version update..."
           pnpm run version
-          pnpm build --filter="@omnisat/*" --filter="!@omnisat/lasereyes-ui"
+          pnpm build --filter="@lasereyes/*" --filter="@omnisat/*" --filter="!@omnisat/lasereyes-ui"
 
           # Stage and commit all changes
           echo "Adding version changes to git..."

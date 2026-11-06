@@ -31,7 +31,7 @@ import {
   type SignedPsbt,
   type SignMessageOptions,
   type SignPsbtOptions,
-} from '@omnisat/lasereyes-client/wallet'
+} from '@lasereyes/client/wallet'
 import type { LaserEyesConfig } from '../config'
 import { getWalletClient } from '../wallet-client'
 

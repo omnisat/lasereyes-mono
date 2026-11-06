@@ -9,8 +9,8 @@
  * @module query/transaction
  */
 
+import type { Transaction } from '@lasereyes/client'
 import type { FetcherStore } from '@nanostores/query'
-import type { Transaction } from '@omnisat/lasereyes-client'
 import { atom } from 'nanostores'
 import { getTransaction } from '../actions'
 import type { LaserEyesConfig } from '../config'

@@ -265,11 +265,11 @@ Restore actions in the structure described in MENTAL-MODEL.md.
 - This locks in the public API even though the bodies aren't done
 
 ### 3.5 Consolidate `client/src/index.ts` and `client/src/wallet.ts` subpath exports
-- `@omnisat/lasereyes-client` (main): chains, errors, `createClient`, `createChainDataSource`, `mergeDataSources`, public types, `publicActions`
-- `@omnisat/lasereyes-client/wallet`: account factories, `createWalletClient`, `walletBtcActions`, `signingActions`, plus signer/account types
-- `@omnisat/lasereyes-client/runes` (and brc20/alkanes/inscriptions): the protocol action factories
-- `@omnisat/lasereyes-client/backends/mempool` (and sandshrew/maestro): vendor entrypoints
-- `@omnisat/lasereyes-client/utils`: PSBT builders, address utilities
+- `@lasereyes/client` (main): chains, errors, `createClient`, `createChainDataSource`, `mergeDataSources`, public types, `publicActions`
+- `@lasereyes/client/wallet`: account factories, `createWalletClient`, `walletBtcActions`, `signingActions`, plus signer/account types
+- `@lasereyes/client/runes` (and brc20/alkanes/inscriptions): the protocol action factories
+- `@lasereyes/client/backends/mempool` (and sandshrew/maestro): vendor entrypoints
+- `@lasereyes/client/utils`: PSBT builders, address utilities
 
 **Commit:** `refactor(client): introduce public/wallet/signing/protocol action groups`
 
@@ -543,12 +543,12 @@ Now make it compile.
 
 ### 12.2 Run `pnpm build` for both packages
 - Confirm `tsup`/`vite` produces the expected dist shape
-- Confirm subpath exports work (`@omnisat/lasereyes-client/wallet`, etc.)
+- Confirm subpath exports work (`@lasereyes/client/wallet`, etc.)
 
 ### 12.3 Run `pnpm lint:biome:fix`
 - Auto-fix import ordering and formatting
 
-### 12.4 Run `pnpm test --filter @omnisat/lasereyes-client`
+### 12.4 Run `pnpm test --filter @lasereyes/client`
 - Update existing tests to the new APIs
 - Add a sanity test for `mergeDataSources` precedence and `createClient(...).extend(...)` type accumulation
 

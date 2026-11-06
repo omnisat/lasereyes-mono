@@ -22,12 +22,7 @@
  * @module config
  */
 
-import type {
-  ChainBackend,
-  ChainBackendFactory,
-  ChainNetwork,
-  Client,
-} from '@omnisat/lasereyes-client'
+import type { ChainBackend, ChainBackendFactory, ChainNetwork, Client } from '@lasereyes/client'
 import { createState, type LaserEyesState } from './state'
 import { createStorage, type Storage } from './storage'
 import type { Connector, CreateConnectorFn } from './types/connector'
@@ -63,7 +58,7 @@ export type ClientFactory = (params: {
  * Each chain ID maps to a single {@link ChainBackendFactory} — the external
  * service backing that chain's reads. To use several services for one chain
  * (with fallback), compose them into one backend via `combineBackends(…)`
- * from `@omnisat/lasereyes-client`. The network is injected from the map key
+ * from `@lasereyes/client`. The network is injected from the map key
  * when `createLaserEyesConfig` builds the config, so a backend declaration
  * (`mempool()`) carries no network of its own.
  */
@@ -160,7 +155,7 @@ export interface CreateLaserEyesConfigOptions<
    *
    * @remarks
    * The first chain in the list becomes the default network. Pass chains
-   * imported from `@omnisat/lasereyes-client` (e.g. `MAINNET`, `TESTNET4`).
+   * imported from `@lasereyes/client` (e.g. `MAINNET`, `TESTNET4`).
    */
   chains: chains
   /**
@@ -230,10 +225,10 @@ export interface CreateLaserEyesConfigOptions<
  * @example
  * ```ts
  * import { createLaserEyesConfig, unisat, xverse } from '@omnisat/lasereyes-core'
- * import { MAINNET, TESTNET4 } from '@omnisat/lasereyes-client'
- * import { mempool } from '@omnisat/lasereyes-client/backends/mempool'
- * import { sandshrew } from '@omnisat/lasereyes-client/backends/sandshrew'
- * import { combineBackends } from '@omnisat/lasereyes-client'
+ * import { MAINNET, TESTNET4 } from '@lasereyes/client'
+ * import { mempool } from '@lasereyes/client/backends/mempool'
+ * import { sandshrew } from '@lasereyes/client/backends/sandshrew'
+ * import { combineBackends } from '@lasereyes/client'
  *
  * const config = createLaserEyesConfig({
  *   chains: [MAINNET, TESTNET4],

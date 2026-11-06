@@ -21,8 +21,8 @@ import { guardBackend } from './guard'
  *
  * @example
  * ```ts
- * import { createChainBackend } from '@omnisat/lasereyes-client'
- * import { baseCapabilities } from '@omnisat/lasereyes-client/backends/mempool'
+ * import { createChainBackend } from '@lasereyes/client'
+ * import { baseCapabilities } from '@lasereyes/client/backends/mempool'
  *
  * // Both of these work:
  * const ds1 = createChainBackend({ network: 'mainnet' })

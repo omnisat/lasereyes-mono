@@ -18,7 +18,7 @@
 // `ProviderRpcError` and `ProviderErrorCode` live in the client package's
 // `errors.ts` (errors are values, not state). Re-export here for adapter
 // consumers that already import from `types/provider`.
-export { ProviderErrorCode, ProviderRpcError } from '@omnisat/lasereyes-client'
+export { ProviderErrorCode, ProviderRpcError } from '@lasereyes/client'
 
 // ============================================================================
 // Core Provider Interface

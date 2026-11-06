@@ -33,7 +33,7 @@ import { loadXverseWalletAdapter } from '../adapters/xverse'
  * @example
  * ```ts
  * import { createLaserEyesConfig, initialize, loadAllWallets } from '@omnisat/lasereyes-core'
- * import { MAINNET, mempool } from '@omnisat/lasereyes-client'
+ * import { MAINNET, mempool } from '@lasereyes/client'
  *
  * const config = createLaserEyesConfig({
  *   chains: [MAINNET],
@@ -47,7 +47,7 @@ import { loadXverseWalletAdapter } from '../adapters/xverse'
  * ```ts
  * // Smaller bundle: load only specific wallets.
  * import { createLaserEyesConfig, initialize } from '@omnisat/lasereyes-core'
- * import { MAINNET, mempool } from '@omnisat/lasereyes-client'
+ * import { MAINNET, mempool } from '@lasereyes/client'
  * import { loadUnisatWalletAdapter } from '@omnisat/lasereyes-core/adapters/unisat'
  *
  * const config = createLaserEyesConfig({

@@ -15,14 +15,14 @@
  * @module adapters/leather
  */
 
-import type { NetworkId } from '@omnisat/lasereyes-client'
-import { AddressType, getAddressType } from '@omnisat/lasereyes-client/utils'
+import type { NetworkId } from '@lasereyes/client'
+import { AddressType, getAddressType } from '@lasereyes/client/utils'
 import type {
   AddressInfo,
   AddressPurpose,
   SignedPsbt,
   WalletAccountConfig,
-} from '@omnisat/lasereyes-client/wallet'
+} from '@lasereyes/client/wallet'
 import { base64, hex } from '@scure/base'
 import { Transaction } from '@scure/btc-signer'
 import { announceWallet } from '../detection/announcements'

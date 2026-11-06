@@ -15,7 +15,7 @@
 // - `disconnect()` / `networkChanged` / `accountsChanged` clearing the relevant
 //   chain entry.
 
-import type { Client } from '@omnisat/lasereyes-client'
+import type { Client } from '@lasereyes/client'
 
 /** Module-private cache, lifetime tied to the config object. */
 const store = new WeakMap<object, Map<string, Client<any, any, any>>>()

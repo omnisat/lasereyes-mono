@@ -35,7 +35,7 @@ pnpm build:lasereyes
 pnpm build:ui
 
 # Build with Turbo filter
-turbo build --filter @omnisat/lasereyes-client
+turbo build --filter @lasereyes/client
 ```
 
 ### Development
@@ -82,7 +82,7 @@ pnpm test:watch
 pnpm test:coverage
 
 # Run tests for specific package
-pnpm --filter @omnisat/lasereyes-client test
+pnpm --filter @lasereyes/client test
 ```
 
 Tests use **Vitest** with configuration in [vitest.config.ts](vitest.config.ts). Test files are located in `packages/**/*.test.ts` and `packages/**/__tests__/`.
@@ -126,7 +126,7 @@ pnpm release
 - **Connectors**: One per wallet (`unisat()`, `leather()`, …) — how a user connects. Registered connectors always surface; others appear via EIP-6963-style discovery.
 - **Adapters**: Normalize a wallet's injected provider into a standard shape — either a class (`BaseAdapter`) or the declarative `defineAdapter()` factory.
 - **State**: **nanostores** atoms on `config.state` (`$connection`, `$connectors`), exposed read-only; the action layer is the only writer.
-- **Data**: Reads route through a per-network **backend** from `@omnisat/lasereyes-client` (with a native-wallet-RPC shortcut when the connected wallet supports it).
+- **Data**: Reads route through a per-network **backend** from `@lasereyes/client` (with a native-wallet-RPC shortcut when the connected wallet supports it).
 - **Structure**:
   - `src/config.ts`, `src/state.ts`: config + reactive state
   - `src/client.ts`, `src/wallet-client.ts`: typed client builders bridging to the client package
@@ -136,7 +136,7 @@ pnpm release
   - `src/detection/`: EIP-6963-style wallet discovery
   - `src/constants/`, `src/types/`, `src/internal/`: constants, types, internal helpers
 
-### Client Package (`@omnisat/lasereyes-client`)
+### Client Package (`@lasereyes/client`)
 
 **Primary data package**: Modern, composable Bitcoin data client with wallet integration support. The core package builds on it.
 
@@ -149,7 +149,7 @@ pnpm release
 - **Wallet Client = Orchestrator**: Combines Account + Signer + Backend
 
 #### Subpath Exports
-- **Main export** (`@omnisat/lasereyes-client`): Base client, `publicActions`, chains, errors, domain types
+- **Main export** (`@lasereyes/client`): Base client, `publicActions`, chains, errors, domain types
 - **`/wallet`**: Wallet client + accounts — `createWalletClient()`, `createWalletAccount()`, `createReadOnlyAccount()`, `walletBtcActions()`, `providerSigner()`
 - **`/utils`**: Pure utility functions (PSBT builders, address utilities, conversions)
 - **`/backends`**: Backend primitives — `createChainBackend()`, `combineBackends()`
@@ -163,9 +163,9 @@ Protocol action groups (runes, BRC-20, alkanes, inscriptions) are scaffolded und
 
 **Base Client** (Read-only, explicit addresses):
 ```typescript
-import { createClient, publicActions, combineBackends, MAINNET } from '@omnisat/lasereyes-client'
-import { mempool } from '@omnisat/lasereyes-client/backends/mempool'
-import { sandshrew } from '@omnisat/lasereyes-client/backends/sandshrew'
+import { createClient, publicActions, combineBackends, MAINNET } from '@lasereyes/client'
+import { mempool } from '@lasereyes/client/backends/mempool'
+import { sandshrew } from '@lasereyes/client/backends/sandshrew'
 
 // Backend factories resolve against a network.
 const backend = combineBackends(sandshrew({ apiKey: '…' }), mempool())(MAINNET)
@@ -178,7 +178,7 @@ const balance = await client.getAddressBalance('bc1q...')
 ```typescript
 import {
   createWalletClient, createWalletAccount, walletBtcActions,
-} from '@omnisat/lasereyes-client/wallet'
+} from '@lasereyes/client/wallet'
 
 const account = createWalletAccount({
   addresses: [
@@ -197,7 +197,7 @@ await walletClient.signPsbt(psbtHex, { finalize: true })
 
 **Utilities** (Pure functions, no I/O):
 ```typescript
-import { buildSendBtcPsbt, getAddressType } from '@omnisat/lasereyes-client/utils'
+import { buildSendBtcPsbt, getAddressType } from '@lasereyes/client/utils'
 
 const psbt = buildSendBtcPsbt({ utxos, toAddress, amount, changeAddress, feeRate, network })
 const addrType = getAddressType('bc1q...')
@@ -243,7 +243,7 @@ Size limits enforced via **size-limit** tool.
 
 `packages/client/src/__tests__/type-inference.test-d.ts` is the
 **binding type-level contract** for the client package. Any change to a
-public type or signature in `@omnisat/lasereyes-client` must come with a
+public type or signature in `@lasereyes/client` must come with a
 corresponding update to that file. Concretely:
 
 - New action factory or new client method → add `expectTypeOf` coverage

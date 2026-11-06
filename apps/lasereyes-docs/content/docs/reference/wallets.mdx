@@ -1,0 +1,37 @@
+---
+title: Supported Wallets
+description: Wallets LaserEyes can connect to, with their connector and adapter imports.
+---
+
+Each wallet has a connector factory at
+`@omnisat/lasereyes-core/connectors/<wallet>` and an adapter loader at
+`@omnisat/lasereyes-core/adapters/<wallet>`.
+
+| Wallet | Connector | Adapter loader |
+| ------ | --------- | -------------- |
+| UniSat | `unisat()` | `loadUnisatWalletAdapter()` |
+| Xverse | `xverse()` | `loadXverseWalletAdapter()` |
+| Leather | `leather()` | `loadLeatherWalletAdapter()` |
+| OKX | `okx()` | `loadOkxWalletAdapter()` |
+| OYL | `oyl()` | `loadOylWalletAdapter()` |
+| Orange | `orange()` | `loadOrangeWalletAdapter()` |
+| Phantom | `phantom()` | `loadPhantomWalletAdapter()` |
+| OP_NET | `opNet()` | `loadOpNetWalletAdapter()` |
+| Wizz | `wizz()` | `loadWizzWalletAdapter()` |
+| Binance | `binance()` | `loadBinanceWalletAdapter()` |
+| Keplr | `keplr()` | `loadKeplrWalletAdapter()` |
+| Tokeo | `tokeo()` | `loadTokeoWalletAdapter()` |
+
+> Connectors are exported from `@omnisat/lasereyes-core/connectors` (e.g.
+> `import { unisat, xverse } from '@omnisat/lasereyes-core/connectors'`). The
+> per-wallet subpaths (`/connectors/unisat`) keep your bundle minimal.
+
+## Loading all wallets
+
+```ts
+import { loadAllWallets } from '@omnisat/lasereyes-core/detection'
+
+loadAllWallets() // announces every built-in wallet that's installed
+```
+
+For the smallest bundle, load only the adapters you support.

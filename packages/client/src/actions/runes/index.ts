@@ -178,7 +178,7 @@ export type WalletRuneActions = {
  *
  * @example
  * ```ts
- * import { runeActions } from '@omnisat/lasereyes-client/runes'
+ * import { runeActions } from '@lasereyes/client/runes'
  *
  * const client = createClient({ network, backend }).extend(runeActions())
  * const balances = await client.getRuneBalances('bc1q...')

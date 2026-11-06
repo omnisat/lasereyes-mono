@@ -53,23 +53,23 @@ import type {
   RuneBalance,
   Transaction,
   UTXO,
-} from '@omnisat/lasereyes-client'
+} from '@lasereyes/client'
 import {
   combineBackends,
   MAINNET,
   ProviderErrorCode,
   ProviderRpcError,
   TESTNET4,
-} from '@omnisat/lasereyes-client'
-import type { mempool } from '@omnisat/lasereyes-client/backends/mempool'
-import type { sandshrew } from '@omnisat/lasereyes-client/backends/sandshrew'
+} from '@lasereyes/client'
+import type { mempool } from '@lasereyes/client/backends/mempool'
+import type { sandshrew } from '@lasereyes/client/backends/sandshrew'
 import type {
   Account,
   SignedPsbt,
   SignMessageOptions,
   SignPsbtOptions,
   WalletAccount,
-} from '@omnisat/lasereyes-client/wallet'
+} from '@lasereyes/client/wallet'
 import type { StoreValue } from 'nanostores'
 import { describe, expectTypeOf, it } from 'vitest'
 // — Phase 9 actions —
@@ -455,7 +455,7 @@ describe('createLaserEyesConfig', () => {
   })
 
   it('accepts an optional `client` factory of shape ({chain, backend}) => Client', async () => {
-    const { createClient } = await import('@omnisat/lasereyes-client')
+    const { createClient } = await import('@lasereyes/client')
     const config = createLaserEyesConfig({
       chains: [MAINNET],
       backends: { mainnet: memMainnet },
@@ -772,7 +772,7 @@ describe('Phase 9 — Lifecycle actions', () => {
 //
 // Pulled in from Phase 10.2 to support the bare-action pattern in Phase 9
 // reads. Returns a bare `Client` (no action groups extended) so callers
-// compose it with the bare action functions from `@omnisat/lasereyes-client`:
+// compose it with the bare action functions from `@lasereyes/client`:
 //   `clientGetBalance(getClient(config), address)`.
 // ============================================================================
 
@@ -837,7 +837,7 @@ describe('Phase 9 — getClient', () => {
     const client = getClient(_typedConfig)
 
     // Imports here exercise the same paths Phase 9 actions use.
-    const { getAddressBalance: clientGetAddressBalance } = await import('@omnisat/lasereyes-client')
+    const { getAddressBalance: clientGetAddressBalance } = await import('@lasereyes/client')
     expectTypeOf(clientGetAddressBalance(client, 'bc1q…')).resolves.toEqualTypeOf<string>()
   })
 })
@@ -880,7 +880,7 @@ describe('Phase 10 — getWalletClient', () => {
     // extended on top. Confirms the wallet client exposes the `.extend()`
     // chain required by the client package's factory signatures.
     const wc = await getWalletClient(_typedConfig)
-    const { walletBtcActions } = await import('@omnisat/lasereyes-client/wallet')
+    const { walletBtcActions } = await import('@lasereyes/client/wallet')
     const extended = wc.extend(walletBtcActions())
     expectTypeOf(extended.sendBtc).toMatchTypeOf<Function>()
   })
@@ -899,11 +899,11 @@ describe('Phase 10 — getWalletClient', () => {
     }
     expectTypeOf(_check).toMatchTypeOf<
       | ((args: {
-          client: import('@omnisat/lasereyes-client/wallet').WalletClient<any, any, any, any>
+          client: import('@lasereyes/client/wallet').WalletClient<any, any, any, any>
           chainId?: NetworkId
         }) =>
-          | import('@omnisat/lasereyes-client/wallet').WalletClient<any, any, any, any>
-          | Promise<import('@omnisat/lasereyes-client/wallet').WalletClient<any, any, any, any>>)
+          | import('@lasereyes/client/wallet').WalletClient<any, any, any, any>
+          | Promise<import('@lasereyes/client/wallet').WalletClient<any, any, any, any>>)
       | undefined
     >()
     // Reference the typedef to keep the import alive for tooling.

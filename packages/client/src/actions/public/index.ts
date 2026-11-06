@@ -144,8 +144,8 @@ export type PublicBtcActions = {
  *
  * @example
  * ```ts
- * import { createClient, publicActions, MAINNET } from '@omnisat/lasereyes-client'
- * import { createBackend } from '@omnisat/lasereyes-client/backends/mempool'
+ * import { createClient, publicActions, MAINNET } from '@lasereyes/client'
+ * import { createBackend } from '@lasereyes/client/backends/mempool'
  *
  * const ds = createBackend({ network: MAINNET })
  * const client = createClient({ network: MAINNET, backend: ds })

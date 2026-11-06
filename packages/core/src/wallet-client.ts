@@ -12,14 +12,14 @@
  * @module wallet-client
  */
 
-import type { ChainNetwork, Client, NetworkId } from '@omnisat/lasereyes-client'
+import type { ChainNetwork, Client, NetworkId } from '@lasereyes/client'
 import {
   type Account,
   createWalletClient,
   providerSigner,
   type WalletClient,
   type WalletClientConfig,
-} from '@omnisat/lasereyes-client/wallet'
+} from '@lasereyes/client/wallet'
 import { getClient } from './client'
 import type { LaserEyesConfig } from './config'
 import { resolveConnector, writeCachedClient } from './internal'

@@ -36,8 +36,8 @@ export interface ReadOnlyAccountConfig {
  *
  * @example
  * ```ts
- * import { createReadOnlyAccount } from '@omnisat/lasereyes-client/wallet'
- * import { AddressType } from '@omnisat/lasereyes-client'
+ * import { createReadOnlyAccount } from '@lasereyes/client/wallet'
+ * import { AddressType } from '@lasereyes/client'
  *
  * const account = createReadOnlyAccount({
  *   addresses: [

@@ -18,13 +18,13 @@
  * @module adapters/phantom
  */
 
-import { getAddressType, getBitcoinNetwork } from '@omnisat/lasereyes-client/utils'
+import { getAddressType, getBitcoinNetwork } from '@lasereyes/client/utils'
 import type {
   AddressInfo,
   AddressPurpose,
   SignedPsbt,
   WalletAccountConfig,
-} from '@omnisat/lasereyes-client/wallet'
+} from '@lasereyes/client/wallet'
 import { base64, hex } from '@scure/base'
 import { Address, OutScript, Transaction } from '@scure/btc-signer'
 import { announceWallet } from '../detection/announcements'

@@ -1,6 +1,6 @@
-import { combineBackends } from '@omnisat/lasereyes-client'
-import { mempool } from '@omnisat/lasereyes-client/backends/mempool'
-import { sandshrew } from '@omnisat/lasereyes-client/backends/sandshrew'
+import { combineBackends } from '@lasereyes/client'
+import { mempool } from '@lasereyes/client/backends/mempool'
+import { sandshrew } from '@lasereyes/client/backends/sandshrew'
 import { createLaserEyesConfig, mainnet, testnet } from '@omnisat/lasereyes-core'
 
 const config = createLaserEyesConfig({

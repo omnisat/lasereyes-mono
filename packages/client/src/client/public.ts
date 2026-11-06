@@ -32,8 +32,8 @@ import type { Client, ClientConfig } from './types'
  *
  * @example
  * ```ts
- * import { createClient, publicActions, MAINNET } from '@omnisat/lasereyes-client'
- * import { createBackend } from '@omnisat/lasereyes-client/backends/mempool'
+ * import { createClient, publicActions, MAINNET } from '@lasereyes/client'
+ * import { createBackend } from '@lasereyes/client/backends/mempool'
  *
  * const ds = createBackend({ network: 'mainnet' })
  * const client = createClient({ network: 'mainnet', backend: ds })

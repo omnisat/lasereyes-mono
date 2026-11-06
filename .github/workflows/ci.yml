@@ -29,7 +29,7 @@ jobs:
         run: pnpm install
 
       - name: Build
-        run: pnpm run build --filter="@omnisat*" --filter="!@omnisat/lasereyes-ui"
+        run: pnpm run build --filter="@lasereyes/*" --filter="@omnisat*"
 
   test:
     runs-on: ubuntu-latest
@@ -73,7 +73,7 @@ jobs:
         run: pnpm install
 
       - name: Build packages
-        run: pnpm run build --filter="@omnisat*" --filter="!@omnisat/lasereyes-ui"
+        run: pnpm run build --filter="@lasereyes/*" --filter="@omnisat*"
 
       - name: Check doc coverage
         run: pnpm docs:check-coverage

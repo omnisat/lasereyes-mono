@@ -1,4 +1,4 @@
-# Future improvements — `@omnisat/lasereyes-client`
+# Future improvements — `@lasereyes/client`
 
 Tracking deferred work whose **type surface is already designed** but is held
 back from the public API until the implementation lands. Nothing here is
