@@ -1,4 +1,3 @@
-'use client'
 import {
   LaserEyesLogo,
   useAccount,
@@ -12,8 +11,6 @@ import {
 } from '@omnisat/lasereyes-react'
 import { clsx } from 'clsx'
 import { Pencil, Recycle, SendIcon, Upload } from 'lucide-react'
-import Image from 'next/image'
-import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { FaBroadcastTower, FaExternalLinkAlt } from 'react-icons/fa'
 import { FaSignature } from 'react-icons/fa6'
@@ -178,35 +175,36 @@ const App = () => {
     <div className="flex flex-col gap-4 w-full mt-12 mb-24 max-w-[1200px] px-4 md:px-12 font-windows">
       {/* Header */}
       <div className="w-full flex gap-2 flex-col md:flex-row justify-center items-center">
-        <Image
+        <img
           src={address ? '/lasereyes_connected.svg' : '/lasereyes_disconnected.svg'}
           className="w-auto h-auto"
-          priority
           alt={address ? 'Laser Eyes Connected' : 'Laser Eyes Disconnected'}
           width={300}
           height={47}
         />
-        <Link
+        <a
           className={cn(
             badgeVariants({ variant: 'outline' }),
             'self-end mb-1.5 text-orange-400 border-orange-500 hover:border-white hover:bg-white hover:text-black transition-all text-md'
           )}
           href="https://github.com/omnisat/lasereyes-mono"
           target="_blank"
+          rel="noreferrer"
         >
           {pkgVersion ? `v ${pkgVersion}` : '--'}
-        </Link>
+        </a>
 
         <div className="grow" />
         <ClickToCopyNpmInstallPill className="mr-6" />
-        <Link
+        <a
           href="https://www.lasereyes.build/docs"
           target="_blank"
+          rel="noreferrer"
           className="self-end font-windows text-white flex flex-row gap-2 items-center hover:text-orange-400 transition-all"
         >
           docs
           <ImNewTab />
-        </Link>
+        </a>
       </div>
 
       {/* Supported wallets */}
@@ -424,13 +422,14 @@ function Field({ label, value }: { label: string; value?: string }) {
         )}
       >
         {value && (
-          <Link
+          <a
             href={`https://mempool.space/address/${value}`}
             target="_blank"
+            rel="noreferrer"
             className="flex flex-row items-center gap-1"
           >
             <FaExternalLinkAlt className="h-3 w-3 text-gray-500" />
-          </Link>
+          </a>
         )}
         {value ? truncateString(value, 24) : '--'}
         {value && <ClickToCopy value={value} />}
