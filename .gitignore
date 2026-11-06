@@ -4,6 +4,7 @@
 node_modules
 .pnp
 .pnp.js
+.pnpm-store/
 
 # Local env files
 .env
@@ -26,6 +27,7 @@ coverage
 out/
 build
 dist
+.typedoc-output
 
 
 # Debug
@@ -38,7 +40,11 @@ yarn-error.log*
 *.pem
 .idea
 .vscode
+.zed/
 package-lock.json
 **/*.tsbuildinfo
 wallet-info.txt
 .npmrc
+# local research clones, not part of the repo
+.research/
+

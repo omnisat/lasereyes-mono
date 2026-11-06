@@ -11,26 +11,21 @@ export function truncateString(str: string, maxLength: number): string {
   } else {
     const leftHalf = str?.slice(0, Math.ceil((maxLength - 3) / 2))
     const rightHalf = str?.slice(-Math.floor((maxLength - 3) / 2))
-    return leftHalf + '...' + rightHalf
+    return `${leftHalf}...${rightHalf}`
   }
 }
 
 function getMultiplier(decimals: number): bigint {
-  return BigInt("1" + "0".repeat(decimals))
+  return BigInt(`1${'0'.repeat(decimals)}`)
 }
 
-function throwFault(
-  message: string,
-  fault: string,
-  operation: string,
-  value?: any
-): never {
+function throwFault(message: string, fault: string, operation: string, value?: any): never {
   const params: any = { fault: fault, operation: operation }
   if (value !== undefined) {
     params.value = value
   }
   throw new Error(message, {
-    cause: params
+    cause: params,
   })
 }
 
@@ -76,11 +71,7 @@ export function parseFixed(value: string, decimals?: number): bigint {
 
   // Check the fraction doesn't exceed our decimals size
   if (fraction.length > decimals) {
-    throwFault(
-      'fractional component exceeds decimals',
-      'underflow',
-      'parseFixed'
-    )
+    throwFault('fractional component exceeds decimals', 'underflow', 'parseFixed')
   }
 
   // If decimals is 0, we have an empty string for fraction

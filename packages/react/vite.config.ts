@@ -1,6 +1,6 @@
-import { resolve } from 'path'
-import { defineConfig, UserConfig } from 'vite'
+import { resolve } from 'node:path'
 import react from '@vitejs/plugin-react-swc'
+import { defineConfig, type UserConfig } from 'vite'
 import dts from 'vite-plugin-dts'
 
 // https://vitejs.dev/config/
@@ -18,6 +18,9 @@ export default defineConfig({
     },
   },
   build: {
+    // Ship sourcemaps so consumers can step into `src` (included in the
+    // published package) for go-to-definition / debugging.
+    sourcemap: true,
     lib: {
       entry: resolve(__dirname, './src/index.ts'),
       name: 'lasereyes-react',

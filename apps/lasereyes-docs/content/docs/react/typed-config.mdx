@@ -1,0 +1,38 @@
+---
+title: Typed Config
+description: Narrow network and chainId to your configured chains via module augmentation.
+---
+
+By default the context-driven hooks accept any configured network. Register your
+config's type once and they'll narrow `network` / `chainId` to **your** chains —
+so you get autocomplete and compile errors for unconfigured ids, without passing
+`{ config }` on every call.
+
+```ts title="lasereyes.d.ts"
+import type { config } from '@/lib/lasereyes'
+
+declare module '@omnisat/lasereyes-react' {
+  interface Register {
+    config: typeof config
+  }
+}
+```
+
+With that in place:
+
+```tsx
+const { network, switchNetwork } = useNetwork()
+//      ^? the union of your configured chain ids
+
+switchNetwork('testnet')  // ok if configured
+switchNetwork('mars')     // compile error
+```
+
+## Per-call override
+
+You can always override the config for a single call instead of (or alongside)
+the global `Register`:
+
+```tsx
+useBalance(address, { config })
+```

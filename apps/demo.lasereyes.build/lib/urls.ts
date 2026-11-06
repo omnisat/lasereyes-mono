@@ -1,31 +1,27 @@
-import {
-  MAINNET,
-  SIGNET,
-  TESTNET,
-  FRACTAL_TESTNET,
-  FRACTAL_MAINNET,
-  TESTNET4,
-  NetworkType,
-} from '@omnisat/lasereyes'
-
 export const MEMPOOL_SPACE_URL = 'https://mempool.space'
 export const MEMPOOL_SPACE_TESTNET_URL = 'https://mempool.space/testnet'
 export const MEMPOOL_SPACE_TESTNET4_URL = 'https://mempool.space/testnet4'
 export const MEMPOOL_SPACE_SIGNET_URL = 'https://mempool.space/signet'
-export const MEMPOOL_SPACE_FRACTAL_MAINNET_URL =
-  'https://mempool.fractalbitcoin.io'
-export const MEMPOOL_SPACE_FRACTAL_TESTNET_URL =
-  'https://mempool-testnet.fractalbitcoin.io'
+export const MEMPOOL_SPACE_FRACTAL_MAINNET_URL = 'https://mempool.fractalbitcoin.io'
+export const MEMPOOL_SPACE_FRACTAL_TESTNET_URL = 'https://mempool-testnet.fractalbitcoin.io'
 
-export const getMempoolSpaceUrl = (network: NetworkType) =>
-  network === TESTNET
-    ? MEMPOOL_SPACE_TESTNET_URL
-    : network === TESTNET4
-      ? MEMPOOL_SPACE_TESTNET4_URL
-      : network === SIGNET
-        ? MEMPOOL_SPACE_SIGNET_URL
-        : network === FRACTAL_MAINNET
-          ? MEMPOOL_SPACE_FRACTAL_MAINNET_URL
-          : network === FRACTAL_TESTNET
-            ? MEMPOOL_SPACE_FRACTAL_TESTNET_URL
-            : MEMPOOL_SPACE_URL
+/**
+ * Resolve a mempool.space base URL from a LaserEyes network id
+ * (`'mainnet'`, `'testnet'`, …).
+ */
+export const getMempoolSpaceUrl = (network: string) => {
+  switch (network) {
+    case 'testnet':
+      return MEMPOOL_SPACE_TESTNET_URL
+    case 'testnet4':
+      return MEMPOOL_SPACE_TESTNET4_URL
+    case 'signet':
+      return MEMPOOL_SPACE_SIGNET_URL
+    case 'fractal-mainnet':
+      return MEMPOOL_SPACE_FRACTAL_MAINNET_URL
+    case 'fractal-testnet':
+      return MEMPOOL_SPACE_FRACTAL_TESTNET_URL
+    default:
+      return MEMPOOL_SPACE_URL
+  }
+}

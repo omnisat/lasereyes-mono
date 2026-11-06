@@ -1,0 +1,43 @@
+---
+title: Wallet Icons
+description: The LaserEyes logo component and per-wallet icons.
+---
+
+## Brand logo
+
+The LaserEyes logo is exported as a React component from
+`@omnisat/lasereyes-react`:
+
+```tsx
+import { LaserEyesLogo } from '@omnisat/lasereyes-react'
+
+<LaserEyesLogo width={96} color="orange" />
+```
+
+## Wallet icons
+
+Each connector carries its own icon as a URL or data URI on `connector.icon`.
+Render it directly — this pairs naturally with `useConnectors()`:
+
+```tsx
+import { useConnectors } from '@omnisat/lasereyes-react'
+
+function WalletList() {
+  const connectors = useConnectors()
+
+  return (
+    <div>
+      {connectors.map(c => (
+        <button key={c.id}>
+          {c.icon && <img src={c.icon} alt="" width={24} height={24} />}
+          {c.name}
+        </button>
+      ))}
+    </div>
+  )
+}
+```
+
+Reading the icon from the connector means you always get the correct, current
+artwork for whichever wallets are installed — no per-wallet icon imports to keep
+in sync.

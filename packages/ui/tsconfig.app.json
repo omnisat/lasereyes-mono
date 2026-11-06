@@ -23,7 +23,7 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
 
-    "baseUrl": ".",
+    "baseUrl": "."
   },
   "include": ["src", "src/i18n/locales/**/*.json", "src", "../react/src/hooks/useBalance.ts"]
 }

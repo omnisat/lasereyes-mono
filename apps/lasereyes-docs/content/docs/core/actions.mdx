@@ -1,0 +1,45 @@
+---
+title: Actions
+description: Free-function operations that take the config as their first argument.
+---
+
+Actions are free functions imported from `@omnisat/lasereyes-core/actions`. Each
+takes the `config` as its first argument. Reads fall back to the configured
+backend; writes go through the connected wallet.
+
+```ts
+import {
+  initialize,
+  connect,
+  getAddressBalance,
+  sendBtc,
+} from '@omnisat/lasereyes-core/actions'
+
+initialize(config)
+await connect(config, { connectorId: 'unisat' })
+
+const sats = await getAddressBalance(config, 'bc1q…')
+const txId = await sendBtc(config, 'bc1q…', 10_000) // 10,000 satoshis
+```
+
+## Reference
+
+| Action | Signature | Notes |
+| ------ | --------- | ----- |
+| `initialize` | `(config)` | Wire discovery + auto-reconnect. Call once. |
+| `dispose` | `(config)` | Tear down discovery. |
+| `connect` | `(config, { connectorId })` | Connect a wallet. |
+| `disconnect` | `(config)` | Disconnect the active wallet. |
+| `switchNetwork` | `(config, networkId)` | Switch the active network. |
+| `getAddressBalance` | `(config, address)` | Confirmed balance, in sats. |
+| `getAddressUtxos` | `(config, address)` | UTXOs for an address. |
+| `getRecommendedFees` | `(config)` | Fee-rate estimates. |
+| `getTransaction` | `(config, txId)` | Look up a transaction. |
+| `broadcastTransaction` | `(config, txHex)` | Broadcast a raw transaction. |
+| `sendBtc` | `(config, to, amount, options?)` | Send BTC; returns txId. |
+| `signPsbt` | `(config, psbt, options?)` | Sign a PSBT (`finalize`, `broadcast`, `inputsToSign`). |
+| `signMessage` | `(config, message, options?)` | Sign a message (`address`, `protocol`). |
+| `broadcastPsbt` | `(config, psbt)` | Finalize + broadcast a PSBT; returns txId. |
+
+> If the connected wallet exposes a native RPC for a read (e.g.
+> `bitcoin_getBalance`), that path is tried before the backend.

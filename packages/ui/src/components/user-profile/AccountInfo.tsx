@@ -1,40 +1,38 @@
 'use client'
 
+import {
+  BTC,
+  FRACTAL_MAINNET,
+  FRACTAL_TESTNET,
+  MAINNET,
+  SIGNET,
+  TESTNET,
+  TESTNET4,
+  useBalance,
+  useLaserEyes,
+} from '@omnisat/lasereyes'
+import { Bitcoin, Copy, Globe, LogOut, Wallet } from 'lucide-react'
 import { useState } from 'react'
-import { Button } from "../ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
-import { useLaserEyes, useBalance, MAINNET, TESTNET, TESTNET4, SIGNET, FRACTAL_MAINNET, FRACTAL_TESTNET, BTC } from '@omnisat/lasereyes'
-import { 
-  Wallet, 
-  Bitcoin, 
-  Globe, 
-  Copy,
-  LogOut
-} from 'lucide-react'
+import { Button } from '../ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 
 export default function AccountInfo() {
-  const { 
-    connected, 
-    address, 
-    disconnect, 
-    network,
-    switchNetwork,
-  } = useLaserEyes(({ 
-    connected, 
-    address, 
-    disconnect, 
-    network,
-    switchNetwork,
-  }) => ({ 
-    connected, 
-    address, 
-    disconnect, 
-    network,
-    switchNetwork,
-  }))
+  const { connected, address, disconnect, network, switchNetwork } = useLaserEyes(
+    ({ connected, address, disconnect, network, switchNetwork }) => ({
+      connected,
+      address,
+      disconnect,
+      network,
+      switchNetwork,
+    })
+  )
 
-  const { data: btcBalance, isPending: isBtcBalancePending, error: btcBalanceError } = useBalance(BTC);
+  const {
+    data: btcBalance,
+    isPending: isBtcBalancePending,
+    error: btcBalanceError,
+  } = useBalance(BTC)
 
   const [copied, setCopied] = useState(false)
   const [isSwitchingNetwork, setIsSwitchingNetwork] = useState(false)
@@ -64,7 +62,7 @@ export default function AccountInfo() {
 
   const handleNetworkChange = async (networkValue: string) => {
     if (networkValue === network) return
-    
+
     setIsSwitchingNetwork(true)
     try {
       await switchNetwork(networkValue)
@@ -101,24 +99,30 @@ export default function AccountInfo() {
                 <Bitcoin className="lem-h-4 lem-w-4 lem-text-foreground" />
                 <span className="lem-text-foreground lem-leading-none">Balance</span>
               </div>
-              <p className={`lem-text-sm ${btcBalanceError ? 'lem-text-red-600 dark:lem-text-red-400' : 'lem-text-foreground'}`}>
-                { btcBalanceError ? 'Error' : isBtcBalancePending ? '...' : `${btcBalance} BTC`}
+              <p
+                className={`lem-text-sm ${btcBalanceError ? 'lem-text-red-600 dark:lem-text-red-400' : 'lem-text-foreground'}`}
+              >
+                {btcBalanceError ? 'Error' : isBtcBalancePending ? '...' : `${btcBalance} BTC`}
               </p>
             </div>
-            
+
             <div className="lem-p-4 lem-bg-primary/10 dark:lem-bg-primary/20 lem-border lem-border-primary/20 dark:lem-border-primary/40 lem-rounded-lg">
               <div className="lem-flex lem-items-center lem-gap-2 lem-mb-2">
                 <Globe className="lem-h-4 lem-w-4 lem-text-foreground" />
                 <span className="lem-text-foreground lem-leading-none">Network</span>
               </div>
-              <Select value={network || MAINNET} onValueChange={handleNetworkChange} disabled={isSwitchingNetwork}>
+              <Select
+                value={network || MAINNET}
+                onValueChange={handleNetworkChange}
+                disabled={isSwitchingNetwork}
+              >
                 <SelectTrigger className="lem-w-full lem-h-6 lem-text-sm lem-bg-transparent lem-border-primary/30 lem-text-foreground">
                   <SelectValue>
                     {isSwitchingNetwork ? 'Switching...' : getCurrentNetworkLabel()}
                   </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
-                  {allowedNetworks.map((networkOption) => (
+                  {allowedNetworks.map(networkOption => (
                     <SelectItem key={networkOption.value} value={networkOption.value}>
                       {networkOption.label}
                     </SelectItem>
@@ -127,29 +131,21 @@ export default function AccountInfo() {
               </Select>
             </div>
           </div>
-          
+
           <div className="lem-p-4 lem-bg-slate-50/50 dark:lem-bg-slate-800/30 lem-border lem-border-slate-200/60 dark:lem-border-slate-700/40 lem-rounded-lg">
             <div className="lem-hidden sm:lem-flex lem-items-center lem-justify-between">
               <div>
-                <p className="lem-text-sm lem-font-medium lem-text-muted-foreground lem-mb-1">Wallet Address</p>
+                <p className="lem-text-sm lem-font-medium lem-text-muted-foreground lem-mb-1">
+                  Wallet Address
+                </p>
                 <p className="lem-font-mono lem-text-sm">{formatAddress(address!)}</p>
               </div>
               <div className="lem-flex lem-gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={copyAddress}
-                  className="lem-h-8"
-                >
+                <Button variant="outline" size="sm" onClick={copyAddress} className="lem-h-8">
                   <Copy className="lem-h-3 lem-w-3 lem-mr-1" />
                   {copied ? 'Copied!' : 'Copy'}
                 </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={disconnect}
-                  className="lem-h-8"
-                >
+                <Button variant="outline" size="sm" onClick={disconnect} className="lem-h-8">
                   Disconnect
                 </Button>
               </div>
